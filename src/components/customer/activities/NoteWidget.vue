@@ -3,13 +3,15 @@
   <Dialog v-if="modal" :open="show" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="w-full sm:max-w-lg max-h-[calc(100vh-4rem)] flex flex-col">
-        <DialogHeader class="flex-shrink-0">
+      <DialogContent
+        class="w-full sm:max-w-lg max-h-[calc(100vh-4rem)] flex flex-col"
+        :show-close-button="true"
+      >
+        <DialogHeader class="shrink-0">
           <DialogTitle>{{ item ? 'Edit Note' : 'Add Note' }}</DialogTitle>
         </DialogHeader>
 
-        <div class="flex-1 overflow-y-auto px-6 py-4 w-full space-y-6">
-          <!-- Note Content -->
+        <div class="flex-1 overflow-y-auto py-4 w-full space-y-6">
           <div class="space-y-2">
             <Label class="block text-sm font-semibold text-foreground">
               Note <span class="text-brand-red">*</span>
@@ -24,22 +26,22 @@
           </div>
         </div>
 
-        <DialogFooter class="flex-shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
+        <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
           <Button
-            label="Cancel"
             variant="outline"
-            size="small"
             class="rounded-sm w-full sm:w-auto"
             @click="handleCancel"
-          />
+          >
+            Cancel
+          </Button>
           <Button
-            :label="saving ? 'Saving...' : (item ? 'Update Note' : 'Save Note')"
-            variant="primary"
-            size="small"
-            class="rounded-sm w-full sm:w-auto !bg-brand-red !hover:bg-brand-red-dark !text-white !border-brand-red"
+            variant="default"
+            class="rounded-sm w-full sm:w-auto"
             :disabled="!noteText.trim() || saving"
             @click="handleSave"
-          />
+          >
+            {{ saving ? 'Saving...' : (item ? 'Update Note' : 'Add note') }}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </DialogPortal>

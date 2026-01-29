@@ -26,31 +26,33 @@
         class="w-full min-h-[150px] resize-none"
       />
     </div>
-    
-    <!-- Action Buttons -->
-    <div class="flex justify-end gap-3">
+
+    <div v-if="showActions" class="flex justify-end gap-3">
       <Button
-        label="Cancel"
         variant="outline"
         size="small"
         class="rounded-sm"
         @click="$emit('cancel')"
-      />
+      >
+        Cancel
+      </Button>
       <Button
-        label="Send WhatsApp"
-        variant="primary"
+        variant="default"
         size="small"
-        class="rounded-sm !bg-green-600 !hover:bg-green-700 !text-white !border-green-600"
+        class="rounded-sm"
+        :disabled="!canSubmit()"
         @click="handleSend"
-      />
+      >
+        Send
+      </Button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { 
-  Button, 
+import { ref, watch } from 'vue'
+import {
+  Button,
   Textarea,
   Label,
   Select,
@@ -68,15 +70,18 @@ const props = defineProps({
   initialMessage: {
     type: String,
     default: ''
+  },
+  showActions: {
+    type: Boolean,
+    default: true
   }
 })
 
-const emit = defineEmits(['send', 'cancel'])
+const emit = defineEmits(['send', 'cancel', 'update:valid'])
 
 const selectedTemplate = ref(props.initialTemplate)
 const message = ref(props.initialMessage)
 
-// Template content mapping
 const templateContent = {
   'Follow-up': 'Hi! I wanted to follow up on our previous conversation. Are you still interested in moving forward? Let me know if you have any questions.',
   'Meeting Confirmation': 'This is a confirmation for our meeting scheduled on [DATE] at [TIME]. Looking forward to speaking with you!',
@@ -84,20 +89,31 @@ const templateContent = {
   'Unable to Reach': 'I tried reaching you but wasn\'t able to connect. Please let me know a good time to call you back, or feel free to reach out at your convenience.'
 }
 
-// Populate message when template is selected
 const onTemplateChange = () => {
   if (selectedTemplate.value && templateContent[selectedTemplate.value]) {
     message.value = templateContent[selectedTemplate.value]
   }
 }
 
+function canSubmit() {
+  return !!message.value.trim()
+}
+
 const handleSend = () => {
   if (!message.value.trim()) return
-  
   emit('send', {
     type: 'whatsapp',
     template: selectedTemplate.value,
     message: message.value
   })
 }
+
+watch(message, () => {
+  emit('update:valid', canSubmit())
+}, { immediate: true })
+
+defineExpose({
+  submit: handleSend,
+  canSubmit
+})
 </script>

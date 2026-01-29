@@ -33,7 +33,8 @@
     "title": "Activité",
     "plural": "Activités",
     "new": "Nouvelle Activité",
-    "details": "Détails de l'Activité"
+    "details": "Détails de l'Activité",
+    "reply": "Répondre"
   },
   "appointment": {
     "title": "Rendez-vous",

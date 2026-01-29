@@ -648,6 +648,7 @@ import { getTabForItemTypeDefault as getTabForItemType } from '@/composables/use
 import { useTaskInlineWidgets } from '@/composables/useTaskInlineWidgets'
 import { useCustomersStore } from '@/stores/customers'
 import { useUsersStore } from '@/stores/users'
+import { useUserStore } from '@/stores/user'
 import CreateEventForm from '@/components/shared/forms/CreateEventForm.vue'
 import { createCalendarEvent, fetchCalendarFilterOptions } from '@/api/calendar'
 
@@ -672,6 +673,11 @@ const route = useRoute()
 const router = useRouter()
 const customersStore = useCustomersStore()
 const usersStore = useUsersStore()
+const userStore = useUserStore()
+
+const activityAuthor = computed(() =>
+  props.task?.assignee || userStore.currentUser?.name || 'You'
+)
 
 const taskId = computed(() => props.task.id)
 
@@ -760,6 +766,7 @@ const handleEnrichWidgetSave = async (data) => {
     // Add activity to the store
     await props.storeAdapter.addActivity(props.task.id, {
       type: data.type,
+      user: activityAuthor.value,
       action: data.action,
       content: data.content,
       data: data.data,
@@ -910,8 +917,12 @@ const formatGridNumber = (value) => {
 
 const handleCommunicationWidgetSave = async (data) => {
   // Handle communication save from CommunicationWidget
+  const commType = data.communicationType || data.type
+  const actionByType = commType === 'email' ? 'sent an email' : commType === 'whatsapp' ? 'sent a WhatsApp message' : commType === 'sms' ? 'sent an SMS' : 'logged communication'
   await props.storeAdapter.addActivity(props.task.id, {
-    type: data.communicationType || data.type,
+    type: commType,
+    user: activityAuthor.value,
+    action: actionByType,
     content: data.content || data.message || 'Communication logged',
     subject: data.subject,
     template: data.template,
@@ -1383,6 +1394,8 @@ const handleNoteSave = async (noteData) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'note',
+      user: activityAuthor.value,
+      action: 'added a note',
       content: noteData.content || noteData.message,
       message: noteData.content || noteData.message,
       timestamp: new Date().toISOString()
@@ -1397,6 +1410,8 @@ const handleAttachmentSave = async (attachmentData) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'attachment',
+      user: activityAuthor.value,
+      action: 'uploaded an attachment',
       fileName: attachmentData.fileName,
       file: attachmentData.file,
       content: `Attachment: ${attachmentData.fileName}`,
@@ -1412,6 +1427,8 @@ const handleWhatsAppSave = async (data) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'whatsapp',
+      user: activityAuthor.value,
+      action: 'sent a WhatsApp message',
       message: data.message,
       content: data.message,
       template: data.template,
@@ -1427,6 +1444,8 @@ const handleSMSSave = async (data) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'sms',
+      user: activityAuthor.value,
+      action: 'sent an SMS',
       message: data.message,
       content: data.message,
       template: data.template,
@@ -1442,6 +1461,8 @@ const handleEmailSave = async (data) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'email',
+      user: activityAuthor.value,
+      action: 'sent an email',
       subject: data.subject,
       message: data.message,
       content: data.message,

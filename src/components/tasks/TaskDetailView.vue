@@ -237,6 +237,7 @@ import { ref, computed, nextTick } from 'vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-library/future/primitives'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
+import { useUserStore } from '@/stores/user'
 import TaskDetailHeader from './TaskDetailHeader.vue'
 import TaskManagementCard from './TaskManagementCard.vue'
 import TaskContactCard from './TaskContactCard.vue'
@@ -287,6 +288,11 @@ const emit = defineEmits(['task-navigate', 'close', 'postpone-expected-close'])
 
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
+const userStore = useUserStore()
+
+const activityAuthor = computed(() =>
+  props.task?.assignee || userStore.currentUser?.name || 'You'
+)
 
 // Sidebar tab state
 const sidebarTab = ref('request')
@@ -438,6 +444,8 @@ const handleNoteSave = async (noteData) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'note',
+      user: activityAuthor.value,
+      action: 'added a note',
       content: noteData.content || noteData.message,
       message: noteData.content || noteData.message,
       timestamp: new Date().toISOString()
@@ -485,6 +493,8 @@ const handleAttachmentSave = async (attachmentData) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'attachment',
+      user: activityAuthor.value,
+      action: 'uploaded an attachment',
       fileName: attachmentData.fileName,
       file: attachmentData.file,
       content: `Attachment: ${attachmentData.fileName}`,
@@ -501,6 +511,8 @@ const handleWhatsAppSave = async (data) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'whatsapp',
+      user: activityAuthor.value,
+      action: 'sent a WhatsApp message',
       message: data.message,
       content: data.message,
       template: data.template,
@@ -517,6 +529,8 @@ const handleSMSSave = async (data) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'sms',
+      user: activityAuthor.value,
+      action: 'sent an SMS',
       message: data.message,
       content: data.message,
       template: data.template,
@@ -533,6 +547,8 @@ const handleEmailSave = async (data) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'email',
+      user: activityAuthor.value,
+      action: 'sent an email',
       subject: data.subject,
       message: data.message,
       content: data.message,
@@ -553,6 +569,7 @@ const handleFinancingSave = async (data) => {
     const content = duration ? `${typeLabel} ${duration} months` : typeLabel
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'financing',
+      user: activityAuthor.value,
       action: editingFinancingOption.value ? 'updated a financing proposal' : 'added a financing proposal',
       content: data.successMessage || content,
       data: { type: data.type, ...(data.fields || {}) },
@@ -614,6 +631,7 @@ const handleTradeInSave = async (data) => {
     const valuation = data.valuation?.tradeInPrice ?? 0
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'tradein',
+      user: activityAuthor.value,
       action: data.isEdit ? 'updated a trade-in' : 'added a trade-in',
       content: label,
       data: { vehicle: data.vehicle, valuation: data.valuation },
@@ -667,6 +685,7 @@ const handleOfferSave = async (data) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'offer',
+      user: activityAuthor.value,
       action: data.action || 'created an offer',
       content: data.content || `Offer: €${data.data?.price || 0}`,
       data: data.data,
@@ -683,6 +702,7 @@ const handleAppointmentSave = async (data) => {
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'appointment',
+      user: activityAuthor.value,
       action: 'scheduled an appointment',
       content: `Appointment: ${data.type || 'Meeting'} on ${data.date || ''}`,
       data: data,

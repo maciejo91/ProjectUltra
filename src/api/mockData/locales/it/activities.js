@@ -7,7 +7,7 @@ export const mockActivities = [
     action: 'ha fatto una chiamata',
     content: 'Discusse preferenze di colore. Il cliente è interessato a Taycan nero o bianco.',
     timestamp: '2025-03-25T11:30:00',
-    opportunityId: 2
+    opportunityId: 1
   },
   {
     id: 9,
@@ -16,7 +16,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Il cliente sta aspettando la disponibilità di un colore specifico. Follow-up tra 2 settimane.',
     timestamp: '2025-03-23T16:20:00',
-    opportunityId: 2
+    opportunityId: 1
   },
   {
     id: 23,
@@ -25,7 +25,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Il cliente preferisce esterno nero con interno beige. Verificando disponibilità.',
     timestamp: '2025-03-24T09:00:00',
-    opportunityId: 2
+    opportunityId: 1
   },
   {
     id: 10,
@@ -34,7 +34,16 @@ export const mockActivities = [
     action: 'ha inviato un\'email',
     content: 'Inviate opzioni di colore disponibili e informazioni sui prezzi.',
     timestamp: '2025-03-15T10:00:00',
-    opportunityId: 2
+    opportunityId: 1
+  },
+  {
+    id: 1850,
+    type: 'customer-email',
+    user: 'Emma Watson',
+    action: 'sent an email',
+    content: 'Hi Sarah, thank you for the color options. I would like to schedule a test drive for the black Taycan next week if possible. Best, Emma',
+    timestamp: '2025-03-16T14:20:00',
+    opportunityId: 1
   },
   {
     id: 11,
@@ -42,7 +51,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunità creata da richiesta sito web',
     timestamp: '2025-03-01T09:00:00',
-    opportunityId: 2
+    opportunityId: 1
   },
   // Opportunity 3 activities (DFB - Delivery completed, 3+ days ago)
   {
@@ -82,6 +91,15 @@ export const mockActivities = [
     opportunityId: 3
   },
   {
+    id: 1852,
+    type: 'customer-whatsapp',
+    user: 'Liam Johnson',
+    action: 'sent a WhatsApp message',
+    content: 'Thanks for the EQS brochure. When can I come in for a test drive? I am free this weekend.',
+    timestamp: '2024-12-22T16:00:00',
+    opportunityId: 3
+  },
+  {
     id: 15,
     type: 'opportunity-won',
     user: 'David Miller',
@@ -105,7 +123,7 @@ export const mockActivities = [
     action: 'ha fatto una chiamata',
     content: 'Discusse opzioni di finanziamento e valore permuta. Il cliente sta negoziando il prezzo finale.',
     timestamp: '2025-03-26T14:20:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 18,
@@ -114,7 +132,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Cliente ha richiesto uno sconto aggiuntivo. Preparazione controfferta.',
     timestamp: '2025-03-25T11:00:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 25,
@@ -123,7 +141,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Cliente interessato a garanzia estesa e pacchetto manutenzione. Discussione opzioni.',
     timestamp: '2025-03-24T15:30:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 19,
@@ -132,7 +150,7 @@ export const mockActivities = [
     action: 'ha inviato un\'email',
     content: 'Inviate opzioni di finanziamento dettagliate e specifiche del veicolo.',
     timestamp: '2025-03-22T09:30:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 20,
@@ -141,7 +159,7 @@ export const mockActivities = [
     action: 'ha programmato un incontro',
     content: 'Test drive programmato per la prossima settimana. Il cliente visiterà il concessionario.',
     timestamp: '2025-03-20T15:00:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 21,
@@ -149,7 +167,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunità creata da richiesta sito web',
     timestamp: '2025-03-15T11:00:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   // Opportunity 5 activities (OOFB - Open for 7+ days without offers)
   {
@@ -159,7 +177,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Primo contatto effettuato. Cliente interessato alle caratteristiche EQS.',
     timestamp: '2024-12-20T10:30:00',
-    opportunityId: 5
+    opportunityId: 204
   },
   {
     id: 27,
@@ -167,7 +185,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunità creata da richiesta sito web',
     timestamp: '2024-12-20T10:00:00',
-    opportunityId: 5
+    opportunityId: 204
   },
   // Opportunity 6 activities (UFB - Open for 14+ days without offers)
   {
@@ -177,7 +195,7 @@ export const mockActivities = [
     action: 'ha fatto una chiamata',
     content: 'Prima chiamata. Cliente ha chiesto sulla disponibilità ID.4.',
     timestamp: '2024-12-10T09:30:00',
-    opportunityId: 6
+    opportunityId: 37
   },
   {
     id: 29,
@@ -185,7 +203,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunità creata da campagna marketing',
     timestamp: '2024-12-10T09:00:00',
-    opportunityId: 6
+    opportunityId: 37
   },
   // Opportunity 7 activities (OFB - In Negotiation for 5+ days without contract)
   {
@@ -195,7 +213,7 @@ export const mockActivities = [
     action: 'ha creato un\'offerta',
     content: 'Offerta iniziale inviata per BMW i4',
     timestamp: '2024-12-20T14:00:00',
-    opportunityId: 7
+    opportunityId: 36
   },
   {
     id: 31,
@@ -204,7 +222,7 @@ export const mockActivities = [
     action: 'ha fatto una chiamata',
     content: 'Discussi dettagli offerta. Cliente sta rivedendo opzioni di finanziamento.',
     timestamp: '2024-12-19T11:00:00',
-    opportunityId: 7
+    opportunityId: 36
   },
   {
     id: 32,
@@ -212,7 +230,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunità creata da richiesta sito web',
     timestamp: '2024-12-15T11:00:00',
-    opportunityId: 7
+    opportunityId: 36
   },
   // Opportunity 8 activities (NFU - In Negotiation with no contract date)
   {
@@ -222,7 +240,7 @@ export const mockActivities = [
     action: 'ha creato un\'offerta',
     content: 'Offerta inviata per Audi Q4 e-tron',
     timestamp: '2024-12-25T15:00:00',
-    opportunityId: 8
+    opportunityId: 223
   },
   {
     id: 34,
@@ -231,7 +249,7 @@ export const mockActivities = [
     action: 'ha inviato un\'email',
     content: 'Inviati dettagli offerta e specifiche.',
     timestamp: '2024-12-24T10:00:00',
-    opportunityId: 8
+    opportunityId: 223
   },
   {
     id: 35,
@@ -239,7 +257,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunità creata da campagna marketing',
     timestamp: '2024-12-18T10:00:00',
-    opportunityId: 8
+    opportunityId: 223
   },
   // Opportunity 9 activities (CFB - Contract signed but not delivered)
   {
@@ -249,7 +267,7 @@ export const mockActivities = [
     action: 'ha contrassegnato l\'opportunità come vinta',
     content: 'Contratto firmato. Preparazione veicolo in corso.',
     timestamp: '2024-12-22T16:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   {
     id: 37,
@@ -258,7 +276,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Contratto finalizzato. Pagamento ricevuto. Preparazione veicolo per consegna.',
     timestamp: '2024-12-22T14:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   {
     id: 38,
@@ -267,7 +285,7 @@ export const mockActivities = [
     action: 'ha creato un\'offerta',
     content: 'Offerta finale accettata per Macan Electric',
     timestamp: '2024-12-20T11:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   {
     id: 39,
@@ -275,7 +293,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunità creata da richiesta sito web',
     timestamp: '2024-12-01T09:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   // Opportunity 16 activities (UFB - In Negotiation for 10+ days without contract)
   {
@@ -312,7 +330,7 @@ export const mockActivities = [
     action: 'ha contrassegnato l\'opportunità come vinta',
     content: 'Contratto firmato. Preparazione veicolo in corso.',
     timestamp: '2024-12-20T14:00:00',
-    opportunityId: 11
+    opportunityId: 223
   },
   {
     id: 44,
@@ -321,7 +339,7 @@ export const mockActivities = [
     action: 'ha creato un\'offerta',
     content: 'Offerta finale accettata per BMW iX3',
     timestamp: '2024-12-18T11:00:00',
-    opportunityId: 11
+    opportunityId: 223
   },
   {
     id: 45,
@@ -330,7 +348,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Cliente soddisfatto dell\'offerta. Termini contratto concordati.',
     timestamp: '2024-12-19T15:00:00',
-    opportunityId: 11
+    opportunityId: 223
   },
   {
     id: 46,
@@ -338,7 +356,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunità creata da campagna marketing',
     timestamp: '2024-12-10T09:00:00',
-    opportunityId: 11
+    opportunityId: 223
   },
   // Opportunity 12 activities (In Negotiation with future appointment - no NFU)
   {
@@ -348,7 +366,7 @@ export const mockActivities = [
     action: 'ha creato un\'offerta',
     content: 'Offerta iniziale inviata per Audi A6 e-tron',
     timestamp: '2024-12-18T10:00:00',
-    opportunityId: 12
+    opportunityId: 39
   },
   {
     id: 48,
@@ -357,7 +375,7 @@ export const mockActivities = [
     action: 'ha fatto una chiamata',
     content: 'Discussa offerta e programmato test drive per il prossimo mese.',
     timestamp: '2024-12-17T14:00:00',
-    opportunityId: 12
+    opportunityId: 39
   },
   {
     id: 49,
@@ -366,7 +384,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Cliente interessato a test drive. Appuntamento programmato.',
     timestamp: '2024-12-16T11:00:00',
-    opportunityId: 12
+    opportunityId: 39
   },
   {
     id: 50,
@@ -374,7 +392,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunità creata da richiesta sito web',
     timestamp: '2024-12-12T11:00:00',
-    opportunityId: 12
+    opportunityId: 39
   },
   // Opportunity 13 activities (Open for 14+ days - stale but no task widget)
   {
@@ -384,7 +402,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Primo contatto effettuato. Cliente interessato alle caratteristiche ID.3.',
     timestamp: '2024-12-01T08:30:00',
-    opportunityId: 13
+    opportunityId: 51
   },
   {
     id: 52,
@@ -392,7 +410,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunità creata da campagna marketing',
     timestamp: '2024-12-01T08:00:00',
-    opportunityId: 13
+    opportunityId: 51
   },
   // Opportunity 18 activities (Awaiting Appointment - has future appointment)
   {
@@ -432,7 +450,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 1) // 1 day ago (less than 3 days)
       return date.toISOString()
     })(),
-    opportunityId: 20
+    opportunityId: 10
   },
   {
     id: 58,
@@ -444,7 +462,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 10)
       return date.toISOString()
     })(),
-    opportunityId: 20
+    opportunityId: 10
   },
   // Opportunity 21 activities (Awaiting Response - offer 3+ days old)
   {
@@ -458,7 +476,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 4) // 4 days ago (3+ days)
       return date.toISOString()
     })(),
-    opportunityId: 21
+    opportunityId: 223
   },
   {
     id: 60,
@@ -471,7 +489,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 3)
       return date.toISOString()
     })(),
-    opportunityId: 21
+    opportunityId: 223
   },
   {
     id: 61,
@@ -483,7 +501,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 15)
       return date.toISOString()
     })(),
-    opportunityId: 21
+    opportunityId: 223
   },
   // Opportunity 22 activities (Contract Pending - has contractDate)
   {
@@ -497,7 +515,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 2)
       return date.toISOString()
     })(),
-    opportunityId: 22
+    opportunityId: 39
   },
   {
     id: 63,
@@ -510,7 +528,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 5)
       return date.toISOString()
     })(),
-    opportunityId: 22
+    opportunityId: 39
   },
   {
     id: 64,
@@ -522,7 +540,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 20)
       return date.toISOString()
     })(),
-    opportunityId: 22
+    opportunityId: 39
   },
   // Opportunity 23 activities (Closed Won - Awaiting Delivery - has deliveryDate but no delivery activity)
   {
@@ -535,7 +553,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 10)
       return date.toISOString()
     })(),
-    opportunityId: 23
+    opportunityId: 51
   },
   {
     id: 66,
@@ -548,7 +566,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 10)
       return date.toISOString()
     })(),
-    opportunityId: 23
+    opportunityId: 51
   },
   {
     id: 67,
@@ -561,7 +579,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 3)
       return date.toISOString()
     })(),
-    opportunityId: 23
+    opportunityId: 51
   },
   {
     id: 68,
@@ -573,7 +591,7 @@ export const mockActivities = [
       date.setDate(date.getDate() - 30)
       return date.toISOString()
     })(),
-    opportunityId: 23
+    opportunityId: 51
   },
   
   // ========== LEAD ACTIVITIES (Leads 2-22) ==========
@@ -586,7 +604,7 @@ export const mockActivities = [
     action: 'ha tentato una chiamata',
     content: 'Nessuna risposta. Riproverò più tardi.',
     timestamp: '2025-03-26T10:15:00',
-    leadId: 2
+    leadId: 8
   },
   {
     id: 70,
@@ -595,7 +613,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Cliente preferisce contatto dopo le 14:00. Interessato a test drive EQS.',
     timestamp: '2025-03-25T16:30:00',
-    leadId: 2
+    leadId: 8
   },
   {
     id: 71,
@@ -604,7 +622,7 @@ export const mockActivities = [
     action: 'ha inviato un\'email',
     content: 'Inviate specifiche dettagliate EQS e informazioni sui prezzi.',
     timestamp: '2025-03-24T14:00:00',
-    leadId: 2
+    leadId: 8
   },
   
   // Lead 3 (Liam Johnson) - Mercedes EQS
@@ -615,7 +633,7 @@ export const mockActivities = [
     action: 'ha inviato un SMS',
     content: 'Ciao Liam! Il nostro concessionario Milano è in Via Roma 45. Aperto Lun-Sab 9-19. Fammi sapere quando puoi visitarci!',
     timestamp: '2025-03-26T09:00:00',
-    leadId: 3
+    leadId: 7
   },
   {
     id: 73,
@@ -625,7 +643,7 @@ export const mockActivities = [
     content: 'Brochure Mercedes-Benz EQS e specifiche tecniche',
     fileName: 'Mercedes_EQS_Brochure_2024.pdf',
     timestamp: '2025-03-25T11:30:00',
-    leadId: 3
+    leadId: 7
   },
   {
     id: 74,
@@ -634,14 +652,14 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Cliente vuole veicolo elettrico con autonomia elevata. EQS perfetto.',
     timestamp: '2025-03-24T10:00:00',
-    leadId: 3
+    leadId: 7
   },
   
   // Lead 4 (Sophie Mueller) - BMW X5
   {
     id: 75,
     type: 'whatsapp',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'ha inviato un messaggio WhatsApp',
     content: 'Ciao Sophie! Grazie per il tuo interesse nella BMW X5. Vorresti programmare un test drive questa settimana?',
     timestamp: '2025-03-26T15:00:00',
@@ -650,7 +668,7 @@ export const mockActivities = [
   {
     id: 76,
     type: 'attachment',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'ha caricato un allegato',
     content: 'Foto esterno e interno BMW X5',
     fileName: 'BMW_X5_Photos.jpg',
@@ -660,10 +678,19 @@ export const mockActivities = [
   {
     id: 77,
     type: 'call',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'ha fatto una chiamata',
     content: 'Parlato con cliente. Molto interessata a pacchetto X5 M Sport. Discusse opzioni di finanziamento.',
     timestamp: '2025-03-24T11:00:00',
+    leadId: 4
+  },
+  {
+    id: 1851,
+    type: 'customer-whatsapp',
+    user: 'Sophie Mueller',
+    action: 'sent a WhatsApp message',
+    content: 'Hi! I received the BMW X5 photos, thank you. Can we schedule a test drive for Saturday morning?',
+    timestamp: '2025-03-25T09:15:00',
     leadId: 4
   },
   
@@ -755,11 +782,11 @@ export const mockActivities = [
     leadId: 7
   },
   
-  // Lead 8 (Thomas Weber) - Audi e-tron GT
+  // Lead 8 (Thomas Weber) - Audi e-tron GT - assignee Sarah Jenkins
   {
     id: 87,
     type: 'call',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'ha fatto una chiamata',
     content: 'Discussione dettagliata su prestazioni e caratteristiche di lusso e-tron GT.',
     timestamp: '2025-03-26T14:00:00',
@@ -768,7 +795,7 @@ export const mockActivities = [
   {
     id: 88,
     type: 'attachment',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'ha caricato un allegato',
     content: 'Documento di confronto Audi e-tron GT RS',
     fileName: 'Audi_etron_GT_Comparison.pdf',
@@ -778,7 +805,7 @@ export const mockActivities = [
   {
     id: 89,
     type: 'whatsapp',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'ha inviato un messaggio WhatsApp',
     content: 'Thomas, ho trovato una bellissima e-tron GT in Daytona Gray. Vorresti vederla?',
     timestamp: '2025-03-24T16:00:00',
@@ -793,7 +820,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Cliente ha bisogno di SUV a 7 posti. GLE perfetto con opzione terza fila.',
     timestamp: '2025-03-26T09:30:00',
-    leadId: 9
+    leadId: 10
   },
   {
     id: 75,
@@ -802,7 +829,7 @@ export const mockActivities = [
     action: 'ha inviato un\'email',
     content: 'Inviata configurazione GLE a 7 posti con opzioni pacchetto famiglia.',
     timestamp: '2025-03-25T14:00:00',
-    leadId: 9
+    leadId: 10
   },
   {
     id: 76,
@@ -811,7 +838,7 @@ export const mockActivities = [
     action: 'ha inviato un SMS',
     content: 'Ciao Julia! La GLE 450 con 7 posti è disponibile per la visione. Quando puoi visitarci?',
     timestamp: '2025-03-24T10:30:00',
-    leadId: 9
+    leadId: 10
   },
   
   // Lead 10 (Michael Hoffmann) - BMW iX
@@ -961,11 +988,11 @@ export const mockActivities = [
     leadId: 14
   },
   
-  // Lead 15 (Petra Schulz) - Volkswagen ID.4
+  // Lead 15 (Petra Schulz) - Volkswagen ID.4 - assignee Sarah Jenkins
   {
     id: 92,
     type: 'sms',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'ha inviato un SMS',
     content: 'Petra, il tuo test drive ID.4 è programmato per domani alle 11:00. Non vedo l\'ora di vederti!',
     timestamp: '2025-03-26T17:00:00',
@@ -974,7 +1001,7 @@ export const mockActivities = [
   {
     id: 93,
     type: 'attachment',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'ha caricato un allegato',
     content: 'ID.4 charging network map for Berlin area',
     fileName: 'ID4_Charging_Network_Berlin.pdf',
@@ -984,7 +1011,7 @@ export const mockActivities = [
   {
     id: 94,
     type: 'whatsapp',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'ha inviato un messaggio WhatsApp',
     content: 'Ciao Petra! Ho trovato una bellissima ID.4 nel tuo colore preferito - Moonstone Gray. Vuoi vedere le foto?',
     timestamp: '2025-03-24T16:30:00',
@@ -1080,11 +1107,11 @@ export const mockActivities = [
     leadId: 18
   },
   
-  // Lead 19 (Christina Bauer) - BMW X3
+  // Lead 19 (Christina Bauer) - BMW X3 - assignee Salsabeel Khaleel
   {
     id: 104,
     type: 'sms',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'ha inviato un SMS',
     content: 'Christina, abbiamo un\'offerta speciale su X3 xDrive30i questa settimana. Risparmia fino a €5.000!',
     timestamp: '2025-03-26T11:00:00',
@@ -1093,16 +1120,16 @@ export const mockActivities = [
   {
     id: 105,
     type: 'call',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'ha fatto una chiamata',
-    content: 'Discusse caratteristiche familiari X3 e spazio bagagliaio. Cliente ha due figli.',
+    content: 'Discusse caratteristiche familiari X3 e spazio bagagliaio. Christina Bauer ha due figli.',
     timestamp: '2025-03-25T16:00:00',
     leadId: 19
   },
   {
     id: 106,
     type: 'whatsapp',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'ha inviato un messaggio WhatsApp',
     content: 'Ciao Christina! Posso organizzare un test drive familiare con seggiolini installati. Fammi sapere!',
     timestamp: '2025-03-24T12:00:00',
@@ -1117,7 +1144,7 @@ export const mockActivities = [
     action: 'ha fatto una chiamata',
     content: 'Cliente molto entusiasta. Vuole M4 Competition in Isle of Man Green.',
     timestamp: '2025-03-26T15:00:00',
-    leadId: 20
+    leadId: 80
   },
   {
     id: 108,
@@ -1127,7 +1154,7 @@ export const mockActivities = [
     content: 'M4 Competition in Isle of Man Green - foto esclusive',
     fileName: 'M4_Isle_of_Man_Green.jpg',
     timestamp: '2025-03-26T14:30:00',
-    leadId: 20
+    leadId: 80
   },
   {
     id: 109,
@@ -1136,7 +1163,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Appassionato di prestazioni con esperienza su pista. Pronto a procedere rapidamente.',
     timestamp: '2025-03-26T14:00:00',
-    leadId: 20
+    leadId: 80
   },
   
   // ========== OPPORTUNITY ACTIVITIES - MISSING TYPES ==========
@@ -1159,7 +1186,7 @@ export const mockActivities = [
       status: 'approved'
     },
     timestamp: '2025-03-24T14:00:00',
-    opportunityId: 2
+    opportunityId: 1
   },
   {
     id: 114,
@@ -1168,7 +1195,7 @@ export const mockActivities = [
     action: 'ha inviato un SMS',
     content: 'Oliver, il tuo finanziamento è approvato! Pronto a finalizzare l\'acquisto Taycan.',
     timestamp: '2025-03-24T15:00:00',
-    opportunityId: 2
+    opportunityId: 1
   },
   {
     id: 115,
@@ -1178,7 +1205,7 @@ export const mockActivities = [
     content: 'Lettera di approvazione finanziamento e piano di pagamento',
     fileName: 'Financing_Approval_Oliver_Brown.pdf',
     timestamp: '2025-03-24T14:30:00',
-    opportunityId: 2
+    opportunityId: 1
   },
   
   // Opportunity 3 (Sophia Martinez) - Add WhatsApp and attachment
@@ -1227,7 +1254,7 @@ export const mockActivities = [
       value: 45000
     },
     timestamp: '2025-03-25T10:00:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 120,
@@ -1244,7 +1271,7 @@ export const mockActivities = [
       status: 'pending'
     },
     timestamp: '2025-03-25T11:00:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 121,
@@ -1254,7 +1281,7 @@ export const mockActivities = [
     content: 'Rapporto di valutazione permuta e foto ispezione',
     fileName: 'TradeIn_Valuation_Tesla_ModelS.pdf',
     timestamp: '2025-03-25T09:30:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   
   // Opportunity 5 (Emma Wilson) - Add attachment and SMS
@@ -1266,7 +1293,7 @@ export const mockActivities = [
     content: 'Documenti assicurazione e carte di circolazione',
     fileName: 'Insurance_Registration_Emma_Wilson.pdf',
     timestamp: '2025-03-24T13:00:00',
-    opportunityId: 5
+    opportunityId: 204
   },
   {
     id: 123,
@@ -1275,7 +1302,7 @@ export const mockActivities = [
     action: 'ha inviato un SMS',
     content: 'Emma, promemoria: la consegna della tua Mercedes EQE è programmata per venerdì alle 10:00!',
     timestamp: '2025-03-23T15:00:00',
-    opportunityId: 5
+    opportunityId: 204
   },
   {
     id: 124,
@@ -1284,7 +1311,7 @@ export const mockActivities = [
     action: 'ha inviato un messaggio WhatsApp',
     content: 'Tutti i documenti sono pronti! Non vedo l\'ora di consegnarti la tua nuova EQE.',
     timestamp: '2025-03-22T11:00:00',
-    opportunityId: 5
+    opportunityId: 204
   },
   
   // Opportunity 6 (Robert Taylor) - Full activity history
@@ -1295,7 +1322,7 @@ export const mockActivities = [
     action: 'ha fatto una chiamata',
     content: 'Discusse caratteristiche BMW X7 e opzioni di lusso.',
     timestamp: '2025-03-26T10:00:00',
-    opportunityId: 6
+    opportunityId: 37
   },
   {
     id: 126,
@@ -1304,7 +1331,7 @@ export const mockActivities = [
     action: 'ha aggiunto una nota',
     content: 'Cliente vuole X7 M60i con pacchetto Executive Drive Pro.',
     timestamp: '2025-03-25T14:00:00',
-    opportunityId: 6
+    opportunityId: 37
   },
   {
     id: 127,
@@ -1313,7 +1340,7 @@ export const mockActivities = [
     action: 'ha inviato un\'email',
     content: 'Inviata configurazione X7 M60i con tutte le opzioni richieste.',
     timestamp: '2025-03-24T11:00:00',
-    opportunityId: 6
+    opportunityId: 37
   },
   {
     id: 128,
@@ -1323,7 +1350,7 @@ export const mockActivities = [
     content: 'Scheda specifiche dettagliate BMW X7 M60i',
     fileName: 'BMW_X7_M60i_Specs.pdf',
     timestamp: '2025-03-23T15:00:00',
-    opportunityId: 6
+    opportunityId: 37
   },
   {
     id: 129,
@@ -1340,7 +1367,7 @@ export const mockActivities = [
       value: 55000
     },
     timestamp: '2025-03-22T10:00:00',
-    opportunityId: 6
+    opportunityId: 37
   },
   {
     id: 130,
@@ -1357,7 +1384,7 @@ export const mockActivities = [
       status: 'approved'
     },
     timestamp: '2025-03-21T14:00:00',
-    opportunityId: 6
+    opportunityId: 37
   },
   {
     id: 131,
@@ -1366,7 +1393,7 @@ export const mockActivities = [
     action: 'ha inviato un SMS',
     content: 'Robert, ottime notizie! Il tuo finanziamento è approvato. Pronto a ordinare la tua X7!',
     timestamp: '2025-03-21T15:00:00',
-    opportunityId: 6
+    opportunityId: 37
   },
   {
     id: 132,
@@ -1375,7 +1402,7 @@ export const mockActivities = [
     action: 'ha inviato un messaggio WhatsApp',
     content: 'Ho trovato la X7 perfetta in Tanzanite Blue. Vuoi vedere le foto?',
     timestamp: '2025-03-20T12:00:00',
-    opportunityId: 6
+    opportunityId: 37
   },
   
   // Opportunity 7 (Lisa Anderson) - Add missing types
@@ -1387,7 +1414,7 @@ export const mockActivities = [
     content: 'Brochure e prezzi Audi Q8 e-tron',
     fileName: 'Audi_Q8_etron_Brochure.pdf',
     timestamp: '2025-03-24T10:00:00',
-    opportunityId: 7
+    opportunityId: 36
   },
   {
     id: 134,
@@ -1396,7 +1423,7 @@ export const mockActivities = [
     action: 'ha inviato un SMS',
     content: 'Lisa, il tuo test drive Q8 e-tron è confermato per sabato alle 11:00!',
     timestamp: '2025-03-23T16:00:00',
-    opportunityId: 7
+    opportunityId: 36
   },
   {
     id: 135,
@@ -1405,7 +1432,7 @@ export const mockActivities = [
     action: 'ha inviato un messaggio WhatsApp',
     content: 'La Q8 e-tron che ti è piaciuta è ancora disponibile. Fammi sapere se vuoi procedere!',
     timestamp: '2025-03-22T14:00:00',
-    opportunityId: 7
+    opportunityId: 36
   },
   
   // Opportunity 8 (James White) - Add missing types
@@ -1424,7 +1451,7 @@ export const mockActivities = [
       status: 'pending'
     },
     timestamp: '2024-12-24T11:00:00',
-    opportunityId: 8
+    opportunityId: 223
   },
   {
     id: 137,
@@ -1434,7 +1461,7 @@ export const mockActivities = [
     content: 'Confronto opzioni finanziamento Audi Q4 e-tron',
     fileName: 'Q4_Financing_Options.pdf',
     timestamp: '2024-12-23T15:00:00',
-    opportunityId: 8
+    opportunityId: 223
   },
   {
     id: 138,
@@ -1443,7 +1470,7 @@ export const mockActivities = [
     action: 'ha inviato un SMS',
     content: 'James, ho inviato la tua domanda di finanziamento. Dovresti ricevere risposta entro 24-48 ore.',
     timestamp: '2024-12-24T12:00:00',
-    opportunityId: 8
+    opportunityId: 223
   },
   
   // Opportunity 9 (Maria Garcia) - Add missing types
@@ -1462,7 +1489,7 @@ export const mockActivities = [
       value: 48000
     },
     timestamp: '2024-12-21T10:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   {
     id: 140,
@@ -1472,7 +1499,7 @@ export const mockActivities = [
     content: 'Contratto finale e programma di consegna',
     fileName: 'Contract_Maria_Garcia.pdf',
     timestamp: '2024-12-22T15:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   {
     id: 141,
@@ -1481,7 +1508,7 @@ export const mockActivities = [
     action: 'ha inviato un messaggio WhatsApp',
     content: 'Maria, la tua Macan Electric è in preparazione per la consegna. Che emozione!',
     timestamp: '2024-12-21T14:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   
   // Opportunity 11 (Jennifer Lee) - Add missing types
@@ -1493,7 +1520,7 @@ export const mockActivities = [
     content: 'Dettagli garanzia e pacchetto assistenza BMW iX3',
     fileName: 'BMW_iX3_Warranty.pdf',
     timestamp: '2024-12-19T11:00:00',
-    opportunityId: 11
+    opportunityId: 223
   },
   {
     id: 143,
@@ -1502,7 +1529,7 @@ export const mockActivities = [
     action: 'ha inviato un SMS',
     content: 'Jennifer, il tuo contratto iX3 è pronto per la firma. Puoi passare questa settimana?',
     timestamp: '2024-12-18T15:00:00',
-    opportunityId: 11
+    opportunityId: 223
   },
   {
     id: 144,
@@ -1511,7 +1538,7 @@ export const mockActivities = [
     action: 'ha inviato un messaggio WhatsApp',
     content: 'Ottime notizie! Abbiamo assicurato la iX3 nel tuo colore preferito Sophisto Gray!',
     timestamp: '2024-12-17T10:00:00',
-    opportunityId: 11
+    opportunityId: 223
   },
   
   // Opportunity 12 (Daniel Kim) - Add missing types
@@ -1530,7 +1557,7 @@ export const mockActivities = [
       value: 28000
     },
     timestamp: '2024-12-17T14:00:00',
-    opportunityId: 12
+    opportunityId: 39
   },
   {
     id: 146,
@@ -1547,7 +1574,7 @@ export const mockActivities = [
       status: 'approved'
     },
     timestamp: '2024-12-17T15:00:00',
-    opportunityId: 12
+    opportunityId: 39
   },
   {
     id: 147,
@@ -1557,7 +1584,7 @@ export const mockActivities = [
     content: 'Configurazione A6 e-tron e riepilogo finanziamento',
     fileName: 'A6_etron_Config_Daniel_Kim.pdf',
     timestamp: '2024-12-16T13:00:00',
-    opportunityId: 12
+    opportunityId: 39
   },
   
   // Opportunity 13 (Rachel Green) - Add missing types
@@ -1569,7 +1596,7 @@ export const mockActivities = [
     content: 'Guida ricarica VW ID.3 e informazioni installazione caricatore domestico',
     fileName: 'ID3_Charging_Guide.pdf',
     timestamp: '2024-12-01T09:00:00',
-    opportunityId: 13
+    opportunityId: 51
   },
   {
     id: 149,
@@ -1578,7 +1605,7 @@ export const mockActivities = [
     action: 'ha inviato un SMS',
     content: 'Rachel, la ID.3 è disponibile per test drive. Quando vorresti visitarci?',
     timestamp: '2024-12-01T10:00:00',
-    opportunityId: 13
+    opportunityId: 51
   },
   
   // Opportunity 14 (Monica Geller) - Communication-focused
@@ -1747,7 +1774,7 @@ export const mockActivities = [
       notes: 'Cliente molto soddisfatto delle negoziazioni finali. Permuta processata con successo.'
     },
     timestamp: '2025-12-20T14:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   {
     id: 165,
@@ -1763,7 +1790,7 @@ export const mockActivities = [
       notes: 'Contratto finalizzato. Cliente ha selezionato vernice metallizzata blu notte.'
     },
     timestamp: '2025-12-22T11:15:00',
-    opportunityId: 11
+    opportunityId: 223
   },
   // Offer activities for new opportunities (with vehicle data for carousel)
   {

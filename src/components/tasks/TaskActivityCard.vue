@@ -1,12 +1,7 @@
 <template>
   <div 
-    class="overflow-hidden p-4 flex flex-col flex-1"
-    style="
-      border-radius: var(--border-radius-rounded-lg, 10px);
-      background: var(--base-card, #FFF);
-      box-shadow: var(--nsc-card-shadow);
-      min-height: 100vh;
-    "
+    class="overflow-hidden p-4 flex flex-col flex-1 min-h-0 rounded-lg bg-white shadow-nsc-card"
+    style="border-radius: var(--border-radius-rounded-lg, 10px);"
   >
     <div class="mb-4">
       <div class="flex items-center justify-between mb-2">
@@ -86,8 +81,8 @@
         </div> <!-- Close flex items-center justify-between mb-2 -->
       </div> <!-- Close mb-4 -->
     
-    <div class="space-y-6 flex-1 flex flex-col min-h-0">
-      <div v-if="sortedActivities.length > 0" class="flex-1 overflow-y-auto min-h-0">
+    <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
+      <div v-if="sortedActivities.length > 0" class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
         <div class="flex flex-col items-start gap-1 mb-4">
           <h3
             class="text-sm font-normal text-muted-foreground leading-normal"
@@ -95,69 +90,71 @@
             {{ getActivityDateHeader(sortedActivities) }}
           </h3>
         </div>
-        <div class="space-y-4">
+        <div class="space-y-4 pb-2">
           <div
             v-for="activity in sortedActivities"
             :key="activity.id"
             class="space-y-2"
           >
             <div
-              class="flex items-start gap-2"
+              class="flex flex-col"
               :class="{
-                'cursor-pointer hover:opacity-80 transition-opacity':
+                'cursor-pointer hover:opacity-95 transition-opacity':
                   activity.type === 'note' ||
                   activity.type === 'email' ||
-                  activity.type === 'whatsapp',
+                  activity.type === 'whatsapp' ||
+                  activity.type === 'customer-email' ||
+                  activity.type === 'customer-whatsapp',
               }"
               @click="handleActivityClick(activity)"
             >
-              <div
-                :class="[
-                  'size-8 rounded-md flex items-center justify-center shrink-0 p-2',
-                  activity.type === 'note'
-                    ? 'bg-orange-100'
-                    : activity.type === 'call'
-                      ? 'bg-green-100'
-                      : activity.type === 'ai-summary'
-                        ? 'bg-purple-100'
-                        : activity.type === 'email'
-                          ? 'bg-blue-100'
-                          : activity.type === 'whatsapp'
-                            ? 'bg-green-100'
-                            : 'bg-muted',
-                ]"
-              >
-                <StickyNote
-                  v-if="activity.type === 'note'"
-                  :size="16"
-                  class="text-orange-600"
-                />
-                <Phone
-                  v-else-if="activity.type === 'call'"
-                  :size="16"
-                  class="text-green-600"
-                />
-                <Sparkles
-                  v-else-if="activity.type === 'ai-summary'"
-                  :size="16"
-                  class="text-purple-600"
-                />
-                <Mail
-                  v-else-if="activity.type === 'email'"
-                  :size="16"
-                  class="text-blue-600"
-                />
-                <MessageCircle
-                  v-else-if="activity.type === 'whatsapp'"
-                  :size="16"
-                  class="text-green-600"
-                />
-                <FileText v-else :size="16" class="text-foreground" />
-              </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2 flex-nowrap">
+                <div
+                  :class="[
+                    'size-8 rounded-md flex items-center justify-center shrink-0',
+                    activity.type === 'note'
+                      ? 'bg-orange-100'
+                      : activity.type === 'call'
+                        ? 'bg-green-100'
+                        : activity.type === 'ai-summary'
+                          ? 'bg-purple-100'
+                          : activity.type === 'email' || activity.type === 'customer-email'
+                            ? 'bg-blue-100'
+                            : activity.type === 'whatsapp' || activity.type === 'customer-whatsapp'
+                              ? 'bg-green-100'
+                              : 'bg-muted',
+                  ]"
+                >
+                  <StickyNote
+                    v-if="activity.type === 'note'"
+                    :size="16"
+                    class="text-orange-600"
+                  />
+                  <Phone
+                    v-else-if="activity.type === 'call'"
+                    :size="16"
+                    class="text-green-600"
+                  />
+                  <Sparkles
+                    v-else-if="activity.type === 'ai-summary'"
+                    :size="16"
+                    class="text-purple-600"
+                  />
+                  <Mail
+                    v-else-if="activity.type === 'email' || activity.type === 'customer-email'"
+                    :size="16"
+                    class="text-blue-600"
+                  />
+                  <MessageCircle
+                    v-else-if="activity.type === 'whatsapp' || activity.type === 'customer-whatsapp'"
+                    :size="16"
+                    class="text-green-600"
+                  />
+                  <FileText v-else :size="16" class="text-foreground" />
+                </div>
+                <div class="flex items-center justify-between gap-2 min-w-0 flex-1 flex-nowrap">
                   <p
-                    class="text-sm text-foreground flex-1 wrap-break-word min-w-0 leading-normal"
+                    class="text-sm text-foreground min-w-0 truncate leading-normal"
                   >
                     <span
                       :class="[
@@ -185,11 +182,11 @@
                     >
                       summary</span
                     >
-                    <span v-else-if="activity.type === 'email'" class="text-muted-foreground">
+                    <span v-else-if="activity.type === 'email' || activity.type === 'customer-email'" class="text-muted-foreground">
                       {{ ' sent an email' }}</span
                     >
                     <span
-                      v-else-if="activity.type === 'whatsapp'"
+                      v-else-if="activity.type === 'whatsapp' || activity.type === 'customer-whatsapp'"
                       class="text-muted-foreground"
                     >
                       {{ ' sent a WhatsApp message' }}</span
@@ -198,12 +195,14 @@
                       {{ ' ' + (activity.message || activity.action) }}</span
                     >
                   </p>
-                  <p
-                    class="text-sm text-muted-foreground text-right shrink-0 w-14 leading-normal"
+                  <span
+                    class="text-sm text-muted-foreground shrink-0 whitespace-nowrap leading-normal"
                   >
-                    {{ activity.time }}
-                  </p>
+                    {{ formatActivityTime(activity) }}
+                  </span>
                 </div>
+              </div>
+              <div class="flex-1 min-w-0 pl-10">
                 <div
                   v-if="activity.type === 'note' && (activity.message || activity.content)"
                   class="mt-2 bg-amber-50 rounded-lg p-4 backdrop-blur-sm"
@@ -215,24 +214,48 @@
                   </p>
                 </div>
                 <div
-                  v-if="activity.type === 'email' && activity.content"
-                  class="mt-2 bg-blue-50 rounded-lg p-4"
+                  v-if="(activity.type === 'email' || activity.type === 'customer-email') && activity.content"
+                  class="mt-2 relative group rounded-lg"
                 >
-                  <p
-                    class="text-sm text-foreground wrap-break-word leading-normal"
+                  <div class="bg-blue-50 rounded-lg p-4 pr-24">
+                    <p
+                      class="text-sm text-foreground wrap-break-word leading-normal"
+                    >
+                      {{ activity.content }}
+                    </p>
+                  </div>
+                  <Button
+                    v-if="activity.type === 'customer-email'"
+                    variant="outline"
+                    size="sm"
+                    class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-sm"
+                    @click.stop="handleAddActivity('email')"
                   >
-                    {{ activity.content }}
-                  </p>
+                    <Reply class="w-3.5 h-3.5 shrink-0" />
+                    {{ t('entities.activity.reply') }}
+                  </Button>
                 </div>
                 <div
-                  v-if="activity.type === 'whatsapp' && activity.content"
-                  class="mt-2 bg-green-50 rounded-lg p-4"
+                  v-if="(activity.type === 'whatsapp' || activity.type === 'customer-whatsapp') && activity.content"
+                  class="mt-2 relative group rounded-lg"
                 >
-                  <p
-                    class="text-sm text-foreground wrap-break-word leading-normal"
+                  <div class="bg-green-50 rounded-lg p-4 pr-24">
+                    <p
+                      class="text-sm text-foreground wrap-break-word leading-normal"
+                    >
+                      {{ activity.content }}
+                    </p>
+                  </div>
+                  <Button
+                    v-if="activity.type === 'customer-whatsapp'"
+                    variant="outline"
+                    size="sm"
+                    class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-sm"
+                    @click.stop="handleAddActivity('whatsapp')"
                   >
-                    {{ activity.content }}
-                  </p>
+                    <Reply class="w-3.5 h-3.5 shrink-0" />
+                    {{ t('entities.activity.reply') }}
+                  </Button>
                 </div>
                 <div
                   v-if="activity.type === 'ai-summary' && (activity.message || activity.content)"
@@ -295,9 +318,20 @@ import {
   Paperclip,
   Filter,
   Plus,
-  X
+  X,
+  Reply
 } from 'lucide-vue-next'
 import { DropdownMenu } from '@motork/component-library/future/primitives'
+import { useI18n } from 'vue-i18n'
+import { formatTime } from '@/utils/formatters'
+
+const { t } = useI18n()
+
+function formatActivityTime(activity) {
+  if (activity?.time) return activity.time
+  const ts = activity?.timestamp || activity?.createdAt
+  return ts ? formatTime(ts) : ''
+}
 
 const props = defineProps({
   activities: {
@@ -366,7 +400,7 @@ const filterMenuItems = computed(() => {
 // Map activity types to filter categories
 const getActivityFilterCategory = (activity) => {
   if (activity.important || activity.isImportant) return 'important'
-  if (['email', 'sms', 'whatsapp', 'call'].includes(activity.type)) return 'communications'
+  if (['email', 'sms', 'whatsapp', 'call', 'customer-email', 'customer-whatsapp'].includes(activity.type)) return 'communications'
   if (activity.type === 'note') return 'notes'
   if (activity.type === 'transcription' || activity.transcription) return 'transcriptions'
   if (activity.type === 'system' || activity.type === 'created' || activity.type === 'status') return 'system-updates'
@@ -422,7 +456,7 @@ const getActivityDateHeader = (activities) => {
 }
 
 const handleActivityClick = (activity) => {
-  if (['note', 'email', 'whatsapp'].includes(activity.type)) {
+  if (['note', 'email', 'whatsapp', 'customer-email', 'customer-whatsapp'].includes(activity.type)) {
     emit('activity-click', activity)
   }
 }

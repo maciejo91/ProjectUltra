@@ -2,24 +2,52 @@
   <Dialog :open="show" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="w-full sm:max-w-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent
+        class="w-full sm:max-w-lg max-h-[calc(100vh-4rem)] flex flex-col"
+        :show-close-button="true"
+      >
+        <DialogHeader class="shrink-0">
           <DialogTitle>Send SMS</DialogTitle>
         </DialogHeader>
 
-        <SMSForm 
-          @send="handleSend" 
-          @cancel="$emit('close')"
-        />
+        <div class="flex-1 overflow-y-auto py-4 w-full space-y-6">
+          <SMSForm
+            ref="formRef"
+            :show-actions="false"
+            @send="handleSend"
+            @update:valid="(v) => (formValid = v)"
+          />
+        </div>
+
+        <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
+          <Button
+            variant="outline"
+            class="rounded-sm w-full sm:w-auto"
+            @click="$emit('close')"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="default"
+            class="rounded-sm w-full sm:w-auto"
+            :disabled="!formValid"
+            @click="formRef?.submit?.()"
+          >
+            Send
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </DialogPortal>
   </Dialog>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import { Button } from '@motork/component-library/future/primitives'
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogOverlay,
   DialogPortal,
@@ -27,7 +55,7 @@ import {
 } from '@motork/component-library/future/primitives'
 import SMSForm from '@/components/shared/communication/SMSForm.vue'
 
-const props = defineProps({
+defineProps({
   show: {
     type: Boolean,
     required: true
@@ -35,6 +63,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'save'])
+
+const formRef = ref(null)
+const formValid = ref(false)
 
 const handleSend = (data) => {
   emit('save', data)

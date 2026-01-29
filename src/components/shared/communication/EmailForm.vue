@@ -37,32 +37,34 @@
         class="w-full min-h-[150px] resize-none"
       />
     </div>
-    
-    <!-- Action Buttons -->
-    <div class="flex justify-end gap-3">
+
+    <div v-if="showActions" class="flex justify-end gap-3">
       <Button
-        label="Cancel"
         variant="outline"
         size="small"
         class="rounded-sm"
         @click="$emit('cancel')"
-      />
+      >
+        Cancel
+      </Button>
       <Button
-        label="Send Email"
-        variant="primary"
+        variant="default"
         size="small"
-        class="rounded-sm !bg-brand-red !hover:bg-brand-red-dark !text-white !border-brand-red"
+        class="rounded-sm"
+        :disabled="!canSubmit()"
         @click="handleSend"
-      />
+      >
+        Send
+      </Button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { 
-  Button, 
-  Input, 
+import { ref, watch } from 'vue'
+import {
+  Button,
+  Input,
   Textarea,
   Label,
   Select,
@@ -80,16 +82,19 @@ const props = defineProps({
   initialMessage: {
     type: String,
     default: ''
+  },
+  showActions: {
+    type: Boolean,
+    default: true
   }
 })
 
-const emit = defineEmits(['send', 'cancel'])
+const emit = defineEmits(['send', 'cancel', 'update:valid'])
 
 const selectedTemplate = ref(props.initialTemplate)
 const subject = ref('')
 const message = ref(props.initialMessage)
 
-// Template content mapping
 const templateContent = {
   'Follow-up': {
     subject: 'Following up on your inquiry',
@@ -109,7 +114,6 @@ const templateContent = {
   }
 }
 
-// Populate message when template is selected
 const onTemplateChange = () => {
   if (selectedTemplate.value && templateContent[selectedTemplate.value]) {
     subject.value = templateContent[selectedTemplate.value].subject
@@ -117,9 +121,12 @@ const onTemplateChange = () => {
   }
 }
 
+function canSubmit() {
+  return !!message.value.trim()
+}
+
 const handleSend = () => {
   if (!message.value.trim()) return
-  
   emit('send', {
     type: 'email',
     template: selectedTemplate.value,
@@ -127,4 +134,13 @@ const handleSend = () => {
     message: message.value
   })
 }
+
+watch(message, () => {
+  emit('update:valid', canSubmit())
+}, { immediate: true })
+
+defineExpose({
+  submit: handleSend,
+  canSubmit
+})
 </script>

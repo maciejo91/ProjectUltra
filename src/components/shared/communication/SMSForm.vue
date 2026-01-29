@@ -28,31 +28,33 @@
       />
       <p class="text-xs text-muted-foreground mt-1">{{ message.length }}/160 characters</p>
     </div>
-    
-    <!-- Action Buttons -->
-    <div class="flex justify-end gap-3">
+
+    <div v-if="showActions" class="flex justify-end gap-3">
       <Button
-        label="Cancel"
         variant="outline"
         size="small"
         class="rounded-sm"
         @click="$emit('cancel')"
-      />
+      >
+        Cancel
+      </Button>
       <Button
-        label="Send SMS"
-        variant="primary"
+        variant="default"
         size="small"
-        class="rounded-sm !bg-brand-red !hover:bg-brand-red-dark !text-white !border-brand-red"
+        class="rounded-sm"
+        :disabled="!canSubmit()"
         @click="handleSend"
-      />
+      >
+        Send
+      </Button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { 
-  Button, 
+import { ref, watch } from 'vue'
+import {
+  Button,
   Textarea,
   Label,
   Select,
@@ -70,15 +72,18 @@ const props = defineProps({
   initialMessage: {
     type: String,
     default: ''
+  },
+  showActions: {
+    type: Boolean,
+    default: true
   }
 })
 
-const emit = defineEmits(['send', 'cancel'])
+const emit = defineEmits(['send', 'cancel', 'update:valid'])
 
 const selectedTemplate = ref(props.initialTemplate)
 const message = ref(props.initialMessage)
 
-// Template content mapping (shorter for SMS)
 const templateContent = {
   'Follow-up': 'Hi! Following up on our conversation. Still interested? Let me know if you have questions.',
   'Meeting Confirmation': 'Confirming our meeting on [DATE] at [TIME]. Looking forward to it!',
@@ -86,20 +91,31 @@ const templateContent = {
   'Unable to Reach': 'Tried to reach you. When\'s a good time to call back?'
 }
 
-// Populate message when template is selected
 const onTemplateChange = () => {
   if (selectedTemplate.value && templateContent[selectedTemplate.value]) {
     message.value = templateContent[selectedTemplate.value]
   }
 }
 
+function canSubmit() {
+  return !!message.value.trim()
+}
+
 const handleSend = () => {
   if (!message.value.trim()) return
-  
   emit('send', {
     type: 'sms',
     template: selectedTemplate.value,
     message: message.value
   })
 }
+
+watch(message, () => {
+  emit('update:valid', canSubmit())
+}, { immediate: true })
+
+defineExpose({
+  submit: handleSend,
+  canSubmit
+})
 </script>

@@ -13,5 +13,6 @@ export const mockUsers = [
   { id: 12, name: 'Elena Marchetti', initials: 'EM', role: 'salesman', email: 'elena.marchetti@example.com', team: 'Sales (Used)', teamId: 7, dealership: 'Firenze' },
   { id: 13, name: 'Matteo Rizzo', initials: 'MR', role: 'operator', email: 'matteo.rizzo@example.com', team: 'Service', teamId: 9, dealership: 'Bari' },
   { id: 14, name: 'Chiara De Luca', initials: 'CD', role: 'salesman', email: 'chiara.deluca@example.com', team: 'Sales (New)', teamId: 5, dealership: 'Milano' },
-  { id: 15, name: 'Riccardo Esposito', initials: 'RE', role: 'operator', email: 'riccardo.esposito@example.com', team: 'Service', teamId: 15, dealership: 'Trento' }
+  { id: 15, name: 'Riccardo Esposito', initials: 'RE', role: 'operator', email: 'riccardo.esposito@example.com', team: 'Service', teamId: 15, dealership: 'Trento' },
+  { id: 16, name: 'Michael Thomas', initials: 'MT', role: 'salesman', email: 'michael.thomas@example.com', team: 'Sales (New)', teamId: 5, dealership: 'Milano' }
 ]

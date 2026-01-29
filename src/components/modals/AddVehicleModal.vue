@@ -47,23 +47,75 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="space-y-2">
                 <Label class="block text-sm font-medium text-foreground">Brand <span class="text-muted-foreground">*</span></Label>
-                <Input 
-                  v-model="vehicleData.brand"
-                  type="text" 
-                  placeholder="e.g., Volkswagen" 
-                  class="w-full"
-                  required
-                />
+                <Popover :open="showBrandDropdown" @update:open="(v) => (showBrandDropdown = v)">
+                  <PopoverAnchor class="block w-full">
+                    <Input
+                      v-model="vehicleData.brand"
+                      type="text"
+                      class="w-full"
+                      required
+                      @focus="showBrandDropdown = true"
+                    />
+                  </PopoverAnchor>
+                  <PopoverContent
+                    class="w-(--radix-popover-trigger-width) min-w-(--radix-popover-trigger-width) p-0"
+                    align="start"
+                    @open-auto-focus.prevent
+                  >
+                    <Command class="rounded-md border border-border bg-background" :filter-disabled="true">
+                      <CommandList class="max-h-64 overflow-y-auto">
+                        <CommandEmpty class="py-4 text-center text-sm text-muted-foreground">No brand found.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            v-for="b in filteredBrands"
+                            :key="b"
+                            :value="b"
+                            class="cursor-pointer"
+                            @select="selectBrand(b)"
+                          >
+                            {{ b }}
+                          </CommandItem>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
               <div class="space-y-2">
                 <Label class="block text-sm font-medium text-foreground">Model <span class="text-muted-foreground">*</span></Label>
-                <Input 
-                  v-model="vehicleData.model"
-                  type="text" 
-                  placeholder="e.g., ID.4" 
-                  class="w-full"
-                  required
-                />
+                <Popover :open="showModelDropdown" @update:open="(v) => (showModelDropdown = v)">
+                  <PopoverAnchor class="block w-full">
+                    <Input
+                      v-model="vehicleData.model"
+                      type="text"
+                      class="w-full"
+                      required
+                      @focus="showModelDropdown = true"
+                    />
+                  </PopoverAnchor>
+                  <PopoverContent
+                    class="w-(--radix-popover-trigger-width) min-w-(--radix-popover-trigger-width) p-0"
+                    align="start"
+                    @open-auto-focus.prevent
+                  >
+                    <Command class="rounded-md border border-border bg-background" :filter-disabled="true">
+                      <CommandList class="max-h-64 overflow-y-auto">
+                        <CommandEmpty class="py-4 text-center text-sm text-muted-foreground">No model found.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            v-for="m in filteredModels"
+                            :key="m"
+                            :value="m"
+                            class="cursor-pointer"
+                            @select="selectModel(m)"
+                          >
+                            {{ m }}
+                          </CommandItem>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
@@ -93,62 +145,67 @@
               </div>
             </div>
 
-            <!-- Valuation (€) -->
-            <div class="space-y-2">
-              <Label class="block text-sm font-medium text-foreground">Valuation (€)</Label>
-              <Input 
-                v-model.number="vehicleData.valuation"
-                type="number"
-                placeholder="0"
-                class="w-full"
-                min="0"
-                step="1"
-              />
-            </div>
+            <CollapsibleSection
+              title="More details"
+              :is-expanded="moreDetailsExpanded"
+              @toggle="moreDetailsExpanded = !moreDetailsExpanded"
+            >
+              <div class="space-y-4">
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Valuation (€)</Label>
+                  <Input 
+                    v-model.number="vehicleData.valuation"
+                    type="number"
+                    placeholder="0"
+                    class="w-full"
+                    min="0"
+                    step="1"
+                  />
+                </div>
 
-            <!-- Fuel Type and Gear Type in same row -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label class="block text-sm font-medium text-foreground">Fuel Type</Label>
-                <Select v-model="vehicleData.fuelType">
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select fuel type..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Petrol">Petrol</SelectItem>
-                    <SelectItem value="Diesel">Diesel</SelectItem>
-                    <SelectItem value="Electric">Electric</SelectItem>
-                    <SelectItem value="Hybrid">Hybrid</SelectItem>
-                    <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div class="space-y-2">
-                <Label class="block text-sm font-medium text-foreground">Gear Type</Label>
-                <Select v-model="vehicleData.gearType">
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select gear type..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Manual">Manual</SelectItem>
-                    <SelectItem value="Automatic">Automatic</SelectItem>
-                    <SelectItem value="CVT">CVT</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Fuel Type</Label>
+                    <Select v-model="vehicleData.fuelType">
+                      <SelectTrigger class="w-full">
+                        <SelectValue placeholder="Select fuel type..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Petrol">Petrol</SelectItem>
+                        <SelectItem value="Diesel">Diesel</SelectItem>
+                        <SelectItem value="Electric">Electric</SelectItem>
+                        <SelectItem value="Hybrid">Hybrid</SelectItem>
+                        <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Gear Type</Label>
+                    <Select v-model="vehicleData.gearType">
+                      <SelectTrigger class="w-full">
+                        <SelectValue placeholder="Select gear type..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Manual">Manual</SelectItem>
+                        <SelectItem value="Automatic">Automatic</SelectItem>
+                        <SelectItem value="CVT">CVT</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
 
-            <!-- Plates -->
-            <div class="space-y-2">
-              <Label class="block text-sm font-medium text-foreground">Plates</Label>
-              <Input 
-                v-model="vehicleData.plates"
-                type="text" 
-                placeholder="License plate number" 
-                class="w-full"
-              />
-              <p class="text-xs text-muted-foreground mt-1">These can be relevant for automatically retrieving other information.</p>
-            </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Plates</Label>
+                  <Input 
+                    v-model="vehicleData.plates"
+                    type="text" 
+                    placeholder="License plate number" 
+                    class="w-full"
+                  />
+                  <p class="text-xs text-muted-foreground mt-1">These can be relevant for automatically retrieving other information.</p>
+                </div>
+              </div>
+            </CollapsibleSection>
 
             <!-- Note field -->
             <div class="space-y-2">
@@ -392,8 +449,18 @@ import {
   DialogHeader,
   DialogOverlay,
   DialogPortal,
-  DialogTitle
+  DialogTitle,
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  Command,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem
 } from '@motork/component-library/future/primitives'
+import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
+import { VEHICLE_BRANDS, getModelsForBrand, getAllModels } from '@/constants/vehicleSuggestions'
 
 const props = defineProps({
   show: {
@@ -423,6 +490,7 @@ const emit = defineEmits(['close', 'save', 'delete'])
 
 // Auto-set to 'tradein' when mode is 'tradein', otherwise null
 const selectedVehicleType = ref(props.mode === 'tradein' ? 'tradein' : null) // 'drove', 'requested', 'tradein', or null
+const moreDetailsExpanded = ref(false)
 
 // Watch for mode changes to auto-set vehicle type
 watch(() => props.mode, (newMode) => {
@@ -437,6 +505,33 @@ watch(() => props.mode, (newMode) => {
 const isTradeIn = computed(() => {
   return props.mode === 'tradein' || selectedVehicleType.value === 'tradein'
 })
+
+const showBrandDropdown = ref(false)
+const showModelDropdown = ref(false)
+
+const filteredBrands = computed(() => {
+  const q = (vehicleData.value.brand || '').trim().toLowerCase()
+  if (!q) return VEHICLE_BRANDS.slice(0, 15)
+  return VEHICLE_BRANDS.filter(b => b.toLowerCase().includes(q)).slice(0, 15)
+})
+
+const filteredModels = computed(() => {
+  const q = (vehicleData.value.model || '').trim().toLowerCase()
+  const forBrand = getModelsForBrand(vehicleData.value.brand)
+  const pool = forBrand.length ? forBrand : getAllModels()
+  if (!q) return pool.slice(0, 15)
+  return pool.filter(m => m.toLowerCase().includes(q)).slice(0, 15)
+})
+
+function selectBrand(brand) {
+  vehicleData.value.brand = brand
+  showBrandDropdown.value = false
+}
+
+function selectModel(model) {
+  vehicleData.value.model = model
+  showModelDropdown.value = false
+}
 
 // Get modal title based on context
 const getTitle = () => {
@@ -604,6 +699,8 @@ watch(() => [props.show, props.item], ([isOpen, item]) => {
   }
   if (!isOpen) {
     selectedVehicleType.value = null
+    showBrandDropdown.value = false
+    showModelDropdown.value = false
     resetForm()
   }
 }, { immediate: true })

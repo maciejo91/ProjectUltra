@@ -1,31 +1,31 @@
 export const mockActivities = [
-  // Opportunity 2 activities
+  // Opportunity 1 activities (assignee Sarah Jenkins)
   {
     id: 8,
     type: 'call',
     user: 'Sarah Jenkins',
     action: 'made a call',
-    content: 'Discussed color preferences. Customer is interested in black or white Taycan.',
+    content: 'Discussed color preferences. Emma Watson is interested in black or white Taycan.',
     timestamp: '2025-03-25T11:30:00',
-    opportunityId: 2
+    opportunityId: 1
   },
   {
     id: 9,
     type: 'note',
     user: 'Sarah Jenkins',
     action: 'added a note',
-    content: 'Customer is waiting for specific color availability. Follow up in 2 weeks.',
+    content: 'Emma Watson is waiting for specific color availability. Follow up in 2 weeks.',
     timestamp: '2025-03-23T16:20:00',
-    opportunityId: 2
+    opportunityId: 1
   },
   {
     id: 23,
     type: 'note',
     user: 'Sarah Jenkins',
     action: 'added a note',
-    content: 'Customer prefers black exterior with beige interior. Checking availability.',
+    content: 'Emma Watson prefers black exterior with beige interior. Checking availability.',
     timestamp: '2025-03-24T09:00:00',
-    opportunityId: 2
+    opportunityId: 1
   },
   {
     id: 10,
@@ -34,7 +34,25 @@ export const mockActivities = [
     action: 'sent an email',
     content: 'Sent available color options and pricing information.',
     timestamp: '2025-03-15T10:00:00',
-    opportunityId: 2
+    opportunityId: 1
+  },
+  {
+    id: 1850,
+    type: 'customer-email',
+    user: 'Emma Watson',
+    action: 'sent an email',
+    content: 'Hi Sarah, thank you for the color options. I would like to schedule a test drive for the black Taycan next week if possible. Best, Emma',
+    timestamp: '2025-03-16T14:20:00',
+    opportunityId: 1
+  },
+  {
+    id: 1857,
+    type: 'customer-email',
+    user: 'Emma Watson',
+    action: 'sent an email',
+    content: 'Hi, I have a few questions about the Audi A4 - is the one we discussed still in stock? When can I come in for a test drive? I am really interested. Emma',
+    timestamp: '2025-03-14T10:15:00',
+    opportunityId: 1
   },
   {
     id: 11,
@@ -42,7 +60,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunity was created from website inquiry',
     timestamp: '2025-03-01T09:00:00',
-    opportunityId: 2
+    opportunityId: 1
   },
   // Opportunity 3 activities (DFB - Delivery completed, 3+ days ago)
   {
@@ -50,7 +68,7 @@ export const mockActivities = [
     type: 'delivery',
     user: 'David Miller',
     action: 'completed delivery',
-    content: 'Vehicle delivered successfully. Customer satisfied with the purchase.',
+    content: 'Vehicle delivered successfully. Liam Johnson satisfied with the purchase.',
     timestamp: '2024-12-25T16:45:00', // 3+ days ago - perfect for DFB
     opportunityId: 3
   },
@@ -77,8 +95,26 @@ export const mockActivities = [
     type: 'call',
     user: 'David Miller',
     action: 'made a call',
-    content: 'Confirmed delivery date and time. Customer will pick up at dealership.',
+    content: 'Confirmed delivery date and time. Liam Johnson will pick up at dealership.',
     timestamp: '2024-12-23T10:30:00',
+    opportunityId: 3
+  },
+  {
+    id: 1852,
+    type: 'customer-whatsapp',
+    user: 'Liam Johnson',
+    action: 'sent a WhatsApp message',
+    content: 'Thanks for the EQS brochure. When can I come in for a test drive? I am free this weekend.',
+    timestamp: '2024-12-22T16:00:00',
+    opportunityId: 3
+  },
+  {
+    id: 1858,
+    type: 'customer-whatsapp',
+    user: 'Liam Johnson',
+    action: 'sent a WhatsApp message',
+    content: 'Hi, is the Mercedes C-Class we talked about still available? I would like to see it and do a test drive. When are you free? Liam',
+    timestamp: '2024-12-21T09:30:00',
     opportunityId: 3
   },
   {
@@ -97,7 +133,7 @@ export const mockActivities = [
     timestamp: '2024-11-15T10:00:00',
     opportunityId: 3
   },
-  // Opportunity 4 activities
+  // Opportunity 100 activities (assignee Salsabeel Khaleel)
   {
     id: 17,
     type: 'call',
@@ -105,7 +141,7 @@ export const mockActivities = [
     action: 'made a call',
     content: 'Discussed financing options and trade-in value. Customer is negotiating final price.',
     timestamp: '2025-03-26T14:20:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 18,
@@ -114,7 +150,7 @@ export const mockActivities = [
     action: 'added a note',
     content: 'Customer requested additional discount. Preparing counter-offer.',
     timestamp: '2025-03-25T11:00:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 25,
@@ -123,7 +159,7 @@ export const mockActivities = [
     action: 'added a note',
     content: 'Customer interested in extended warranty and maintenance package. Discussing options.',
     timestamp: '2025-03-24T15:30:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 19,
@@ -132,7 +168,7 @@ export const mockActivities = [
     action: 'sent an email',
     content: 'Sent detailed financing options and vehicle specifications.',
     timestamp: '2025-03-22T09:30:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 20,
@@ -141,7 +177,7 @@ export const mockActivities = [
     action: 'scheduled a meeting',
     content: 'Test drive scheduled for next week. Customer will visit dealership.',
     timestamp: '2025-03-20T15:00:00',
-    opportunityId: 4
+    opportunityId: 100
   },
   {
     id: 21,
@@ -149,9 +185,9 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunity was created from website inquiry',
     timestamp: '2025-03-15T11:00:00',
-    opportunityId: 4
+    opportunityId: 100
   },
-  // Opportunity 5 activities (OOFB - Open for 7+ days without offers)
+  // Opportunity 204 activities (assignee Michael Thomas - OOFB)
   {
     id: 26,
     type: 'note',
@@ -159,7 +195,7 @@ export const mockActivities = [
     action: 'added a note',
     content: 'Initial contact made. Customer interested in EQS features.',
     timestamp: '2024-12-20T10:30:00',
-    opportunityId: 5
+    opportunityId: 204
   },
   {
     id: 27,
@@ -167,9 +203,9 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunity was created from website inquiry',
     timestamp: '2024-12-20T10:00:00',
-    opportunityId: 5
+    opportunityId: 204
   },
-  // Opportunity 6 activities (UFB - Open for 14+ days without offers)
+  // Opportunity 37 activities (assignee Sarah Jenkins - UFB)
   {
     id: 28,
     type: 'call',
@@ -177,7 +213,7 @@ export const mockActivities = [
     action: 'made a call',
     content: 'Initial call. Customer asked about ID.4 availability.',
     timestamp: '2024-12-10T09:30:00',
-    opportunityId: 6
+    opportunityId: 37
   },
   {
     id: 29,
@@ -185,9 +221,9 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunity was created from marketing campaign',
     timestamp: '2024-12-10T09:00:00',
-    opportunityId: 6
+    opportunityId: 37
   },
-  // Opportunity 7 activities (OFB - In Negotiation for 5+ days without contract)
+  // Opportunity 36 activities (assignee David Miller - OFB)
   {
     id: 30,
     type: 'offer',
@@ -195,7 +231,7 @@ export const mockActivities = [
     action: 'created an offer',
     content: 'Initial offer sent for BMW i4',
     timestamp: '2024-12-20T14:00:00',
-    opportunityId: 7
+    opportunityId: 36
   },
   {
     id: 31,
@@ -204,7 +240,7 @@ export const mockActivities = [
     action: 'made a call',
     content: 'Discussed offer details. Customer reviewing financing options.',
     timestamp: '2024-12-19T11:00:00',
-    opportunityId: 7
+    opportunityId: 36
   },
   {
     id: 32,
@@ -212,9 +248,9 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunity was created from website inquiry',
     timestamp: '2024-12-15T11:00:00',
-    opportunityId: 7
+    opportunityId: 36
   },
-  // Opportunity 8 activities (NFU - In Negotiation with no contract date)
+  // Opportunity 223 activities (assignee Michael Thomas - NFU)
   {
     id: 33,
     type: 'offer',
@@ -222,7 +258,7 @@ export const mockActivities = [
     action: 'created an offer',
     content: 'Offer sent for Audi Q4 e-tron',
     timestamp: '2024-12-25T15:00:00',
-    opportunityId: 8
+    opportunityId: 223
   },
   {
     id: 34,
@@ -231,7 +267,7 @@ export const mockActivities = [
     action: 'sent an email',
     content: 'Sent offer details and specifications.',
     timestamp: '2024-12-24T10:00:00',
-    opportunityId: 8
+    opportunityId: 223
   },
   {
     id: 35,
@@ -239,9 +275,9 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunity was created from marketing campaign',
     timestamp: '2024-12-18T10:00:00',
-    opportunityId: 8
+    opportunityId: 223
   },
-  // Opportunity 9 activities (CFB - Contract signed but not delivered)
+  // Opportunity 38 activities (assignee Sarah Jenkins - CFB)
   {
     id: 36,
     type: 'opportunity-won',
@@ -249,7 +285,7 @@ export const mockActivities = [
     action: 'marked opportunity as won',
     content: 'Contract signed. Vehicle preparation in progress.',
     timestamp: '2024-12-22T16:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   {
     id: 37,
@@ -258,7 +294,7 @@ export const mockActivities = [
     action: 'added a note',
     content: 'Contract finalized. Payment received. Preparing vehicle for delivery.',
     timestamp: '2024-12-22T14:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   {
     id: 38,
@@ -267,7 +303,7 @@ export const mockActivities = [
     action: 'created an offer',
     content: 'Final offer accepted for Macan Electric',
     timestamp: '2024-12-20T11:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   {
     id: 39,
@@ -275,7 +311,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunity was created from website inquiry',
     timestamp: '2024-12-01T09:00:00',
-    opportunityId: 9
+    opportunityId: 38
   },
   // Opportunity 16 activities (UFB - In Negotiation for 10+ days without contract)
   {
@@ -304,7 +340,7 @@ export const mockActivities = [
     timestamp: '2024-12-05T10:00:00',
     opportunityId: 16
   },
-  // Opportunity 11 activities (In Negotiation with contract date - no task widgets)
+  // Opportunity 223 activities (assignee Michael Thomas)
   {
     id: 43,
     type: 'opportunity-won',
@@ -312,7 +348,7 @@ export const mockActivities = [
     action: 'marked opportunity as won',
     content: 'Contract signed. Vehicle preparation in progress.',
     timestamp: '2024-12-20T14:00:00',
-    opportunityId: 11
+    opportunityId: 223
   },
   {
     id: 44,
@@ -321,7 +357,7 @@ export const mockActivities = [
     action: 'created an offer',
     content: 'Final offer accepted for BMW iX3',
     timestamp: '2024-12-18T11:00:00',
-    opportunityId: 11
+    opportunityId: 223
   },
   {
     id: 45,
@@ -330,7 +366,7 @@ export const mockActivities = [
     action: 'added a note',
     content: 'Customer satisfied with offer. Contract terms agreed upon.',
     timestamp: '2024-12-19T15:00:00',
-    opportunityId: 11
+    opportunityId: 223
   },
   {
     id: 46,
@@ -338,9 +374,9 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunity was created from marketing campaign',
     timestamp: '2024-12-10T09:00:00',
-    opportunityId: 11
+    opportunityId: 223
   },
-  // Opportunity 12 activities (In Negotiation with future appointment - no NFU)
+  // Opportunity 39 activities (assignee Sarah Jenkins)
   {
     id: 47,
     type: 'offer',
@@ -348,7 +384,7 @@ export const mockActivities = [
     action: 'created an offer',
     content: 'Initial offer sent for Audi A6 e-tron',
     timestamp: '2024-12-18T10:00:00',
-    opportunityId: 12
+    opportunityId: 39
   },
   {
     id: 48,
@@ -357,7 +393,7 @@ export const mockActivities = [
     action: 'made a call',
     content: 'Discussed offer and scheduled test drive for next month.',
     timestamp: '2024-12-17T14:00:00',
-    opportunityId: 12
+    opportunityId: 39
   },
   {
     id: 49,
@@ -366,7 +402,7 @@ export const mockActivities = [
     action: 'added a note',
     content: 'Customer interested in test drive. Appointment scheduled.',
     timestamp: '2024-12-16T11:00:00',
-    opportunityId: 12
+    opportunityId: 39
   },
   {
     id: 50,
@@ -374,9 +410,9 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunity was created from website inquiry',
     timestamp: '2024-12-12T11:00:00',
-    opportunityId: 12
+    opportunityId: 39
   },
-  // Opportunity 13 activities (Open for 14+ days - stale but no task widget)
+  // Opportunity 51 activities (assignee David Miller)
   {
     id: 51,
     type: 'note',
@@ -384,7 +420,7 @@ export const mockActivities = [
     action: 'added a note',
     content: 'Initial contact made. Customer interested in ID.3 features.',
     timestamp: '2024-12-01T08:30:00',
-    opportunityId: 13
+    opportunityId: 51
   },
   {
     id: 52,
@@ -392,7 +428,7 @@ export const mockActivities = [
     user: 'System',
     action: 'Opportunity was created from marketing campaign',
     timestamp: '2024-12-01T08:00:00',
-    opportunityId: 13
+    opportunityId: 51
   },
   // Opportunity 18 activities (Awaiting Appointment - has future appointment)
   {
@@ -578,7 +614,7 @@ export const mockActivities = [
   
   // ========== LEAD ACTIVITIES (Leads 2-22) ==========
   
-  // Lead 2 (Emma Watson) - Mercedes EQS
+  // Lead 8 (assignee Sarah Jenkins)
   {
     id: 69,
     type: 'call',
@@ -586,16 +622,16 @@ export const mockActivities = [
     action: 'made a call attempt',
     content: 'No answer. Will try again later.',
     timestamp: '2025-03-26T10:15:00',
-    leadId: 2
+    leadId: 8
   },
   {
     id: 70,
     type: 'note',
     user: 'Sarah Jenkins',
     action: 'added a note',
-    content: 'Customer prefers contact after 2 PM. Interested in EQS test drive.',
+    content: 'Josh Adams prefers contact after 2 PM. Interested in EQS test drive.',
     timestamp: '2025-03-25T16:30:00',
-    leadId: 2
+    leadId: 8
   },
   {
     id: 71,
@@ -604,10 +640,10 @@ export const mockActivities = [
     action: 'sent an email',
     content: 'Sent detailed EQS specifications and pricing information.',
     timestamp: '2025-03-24T14:00:00',
-    leadId: 2
+    leadId: 8
   },
-  
-  // Lead 3 (Liam Johnson) - Mercedes EQS
+
+  // Lead 7 (assignee David Miller)
   {
     id: 72,
     type: 'sms',
@@ -615,7 +651,7 @@ export const mockActivities = [
     action: 'sent an SMS',
     content: 'Hi Liam! Our Milano dealership is at Via Roma 45. Open Mon-Sat 9-7. Let me know when you can visit!',
     timestamp: '2025-03-26T09:00:00',
-    leadId: 3
+    leadId: 7
   },
   {
     id: 73,
@@ -625,23 +661,23 @@ export const mockActivities = [
     content: 'Mercedes-Benz EQS brochure and technical specifications',
     fileName: 'Mercedes_EQS_Brochure_2024.pdf',
     timestamp: '2025-03-25T11:30:00',
-    leadId: 3
+    leadId: 7
   },
   {
     id: 74,
     type: 'note',
     user: 'David Miller',
     action: 'added a note',
-    content: 'Customer wants electric vehicle with long range. EQS perfect fit.',
+    content: 'Anna Becker wants electric vehicle with long range. EQS perfect fit.',
     timestamp: '2025-03-24T10:00:00',
-    leadId: 3
+    leadId: 7
   },
-  
-  // Lead 4 (Sophie Mueller) - BMW X5
+
+  // Lead 4 (assignee Salsabeel Khaleel)
   {
     id: 75,
     type: 'whatsapp',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'sent a WhatsApp message',
     content: 'Hello Sophie! Thank you for your interest in the BMW X5. Would you like to schedule a test drive this week?',
     timestamp: '2025-03-26T15:00:00',
@@ -650,7 +686,7 @@ export const mockActivities = [
   {
     id: 76,
     type: 'attachment',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'uploaded an attachment',
     content: 'BMW X5 exterior and interior photos',
     fileName: 'BMW_X5_Photos.jpg',
@@ -660,13 +696,58 @@ export const mockActivities = [
   {
     id: 77,
     type: 'call',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'made a call',
-    content: 'Spoke with customer. Very interested in X5 M Sport package. Discussed financing options.',
+    content: 'Spoke with Sophie Mueller. Very interested in X5 M Sport package. Discussed financing options.',
     timestamp: '2025-03-24T11:00:00',
     leadId: 4
   },
-  
+  {
+    id: 1851,
+    type: 'customer-whatsapp',
+    user: 'Sophie Mueller',
+    action: 'sent a WhatsApp message',
+    content: 'Hi! I received the BMW X5 photos, thank you. Can we schedule a test drive for Saturday morning?',
+    timestamp: '2025-03-25T09:15:00',
+    leadId: 4
+  },
+  {
+    id: 1853,
+    type: 'customer-email',
+    user: 'Emma Watson',
+    action: 'sent an email',
+    content: 'Hi, I am interested in the Volkswagen Golf you have in stock. Is it still available? When could I come for a test drive? I am free most afternoons this week. Thanks, Emma',
+    timestamp: '2025-03-23T09:00:00',
+    leadId: 14
+  },
+  {
+    id: 1854,
+    type: 'customer-whatsapp',
+    user: 'Liam Johnson',
+    action: 'sent a WhatsApp message',
+    content: 'Hello, I saw the M4 Coupe on your website. Can you send me more details about the car - mileage, options, and when I can get a test drive? Thanks, Liam',
+    timestamp: '2025-03-24T14:30:00',
+    leadId: 15
+  },
+  {
+    id: 1855,
+    type: 'customer-email',
+    user: 'Marco Rossi',
+    action: 'sent an email',
+    content: 'Hi, I would like to know more about the Fiat 500X - fuel consumption, warranty and if you have any in the color I want. Also when can I book a test drive? Marco',
+    timestamp: '2025-03-22T11:20:00',
+    leadId: 17
+  },
+  {
+    id: 1856,
+    type: 'customer-whatsapp',
+    user: 'Laura Zimmermann',
+    action: 'sent a WhatsApp message',
+    content: 'Hi, is the Tiguan still available? I need a car soon. When could I do a test drive - maybe this weekend? Laura',
+    timestamp: '2025-03-25T08:45:00',
+    leadId: 18
+  },
+
   // Lead 5 (Marco Rossi) - Volkswagen ID.4
   {
     id: 78,
@@ -691,7 +772,7 @@ export const mockActivities = [
     type: 'note',
     user: 'Salsabeel Khaleel',
     action: 'added a note',
-    content: 'Customer concerned about charging times. Explained fast charging capabilities.',
+    content: 'Marco Rossi concerned about charging times. Explained fast charging capabilities.',
     timestamp: '2025-03-24T09:00:00',
     leadId: 5
   },
@@ -741,7 +822,7 @@ export const mockActivities = [
     type: 'note',
     user: 'David Miller',
     action: 'added a note',
-    content: 'Customer very enthusiastic about Tesla. Prefers Performance variant.',
+    content: 'Anna Becker very enthusiastic about Tesla. Prefers Performance variant.',
     timestamp: '2025-03-25T10:00:00',
     leadId: 7
   },
@@ -755,11 +836,11 @@ export const mockActivities = [
     leadId: 7
   },
   
-  // Lead 8 (Thomas Weber) - Audi e-tron GT
+  // Lead 8 (Thomas Weber) - Audi e-tron GT - assignee Sarah Jenkins
   {
     id: 87,
     type: 'call',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'made a call',
     content: 'Detailed discussion about e-tron GT performance and luxury features.',
     timestamp: '2025-03-26T14:00:00',
@@ -768,7 +849,7 @@ export const mockActivities = [
   {
     id: 88,
     type: 'attachment',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'uploaded an attachment',
     content: 'Audi e-tron GT RS comparison document',
     fileName: 'Audi_etron_GT_Comparison.pdf',
@@ -778,47 +859,47 @@ export const mockActivities = [
   {
     id: 89,
     type: 'whatsapp',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'sent a WhatsApp message',
     content: 'Thomas, I found a beautiful e-tron GT in Daytona Gray. Would you like to see it?',
     timestamp: '2025-03-24T16:00:00',
     leadId: 8
   },
   
-  // Lead 9 (Julia Fischer) - Mercedes-Benz GLE
+  // Lead 10 (assignee Salsabeel Khaleel) - Mercedes-Benz GLE
   {
-    id: 74,
+    id: 790,
     type: 'note',
     user: 'Salsabeel Khaleel',
     action: 'added a note',
     content: 'Customer needs 7-seater SUV. GLE perfect match with third row option.',
     timestamp: '2025-03-26T09:30:00',
-    leadId: 9
+    leadId: 10
   },
   {
-    id: 75,
+    id: 791,
     type: 'email',
     user: 'Salsabeel Khaleel',
     action: 'sent an email',
     content: 'Sent GLE 7-seater configuration with family package options.',
     timestamp: '2025-03-25T14:00:00',
-    leadId: 9
+    leadId: 10
   },
   {
-    id: 76,
+    id: 792,
     type: 'sms',
     user: 'Salsabeel Khaleel',
     action: 'sent an SMS',
     content: 'Hi Julia! The GLE 450 with 7 seats is available for viewing. When can you visit?',
     timestamp: '2025-03-24T10:30:00',
-    leadId: 9
+    leadId: 10
   },
-  
-  // Lead 10 (Michael Hoffmann) - BMW iX
+
+  // Lead 10 (Michael Hoffmann) - BMW iX - assignee Salsabeel Khaleel
   {
     id: 77,
     type: 'call',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'made a call attempt',
     content: 'Left voicemail about BMW iX availability and test drive options.',
     timestamp: '2025-03-26T11:30:00',
@@ -827,7 +908,7 @@ export const mockActivities = [
   {
     id: 78,
     type: 'attachment',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'uploaded an attachment',
     content: 'BMW iX sustainability and technology features',
     fileName: 'BMW_iX_Technology_Guide.pdf',
@@ -837,18 +918,18 @@ export const mockActivities = [
   {
     id: 79,
     type: 'note',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'added a note',
     content: 'Customer interested in sustainable mobility. iX perfect for eco-conscious buyers.',
     timestamp: '2025-03-24T15:00:00',
     leadId: 10
   },
   
-  // Lead 11 (Laura Zimmermann) - Porsche Cayenne
+  // Lead 11 (Laura Zimmermann) - Porsche Cayenne - assignee Salsabeel Khaleel
   {
     id: 80,
     type: 'whatsapp',
-    user: 'David Miller',
+    user: 'Salsabeel Khaleel',
     action: 'sent a WhatsApp message',
     content: 'Laura, we have a stunning Cayenne S in white arriving next week. Interested in first look?',
     timestamp: '2025-03-26T13:00:00',
@@ -857,7 +938,7 @@ export const mockActivities = [
   {
     id: 81,
     type: 'call',
-    user: 'David Miller',
+    user: 'Salsabeel Khaleel',
     action: 'made a call',
     content: 'Discussed Cayenne variants and performance differences between S and Turbo.',
     timestamp: '2025-03-25T16:30:00',
@@ -866,27 +947,27 @@ export const mockActivities = [
   {
     id: 82,
     type: 'email',
-    user: 'David Miller',
+    user: 'Salsabeel Khaleel',
     action: 'sent an email',
     content: 'Sent Cayenne S vs Turbo comparison with pricing breakdown.',
     timestamp: '2025-03-24T12:00:00',
     leadId: 11
   },
   
-  // Lead 12 (Stefan Braun) - Porsche Macan
+  // Lead 12 (Stefan Braun) - Porsche Macan - assignee Salsabeel Khaleel
   {
     id: 83,
     type: 'note',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'added a note',
-    content: 'Multiple contact attempts. Customer seems busy. Will try different times.',
+    content: 'Multiple contact attempts. Stefan seems busy. Will try different times.',
     timestamp: '2025-03-26T10:00:00',
     leadId: 12
   },
   {
     id: 84,
     type: 'sms',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'sent an SMS',
     content: 'Hi Stefan! Still interested in the Porsche Macan? We have great financing offers this month!',
     timestamp: '2025-03-25T14:30:00',
@@ -895,27 +976,27 @@ export const mockActivities = [
   {
     id: 85,
     type: 'call',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'made a call attempt',
     content: 'No answer. Fifth attempt.',
     timestamp: '2025-03-24T11:00:00',
     leadId: 12
   },
   
-  // Lead 13 (Nina Keller) - Audi e-tron GT (Hot/Urgent)
+  // Lead 13 (Nina Keller) - Audi e-tron GT (Hot/Urgent) - assignee Salsabeel Khaleel
   {
     id: 86,
     type: 'call',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'made a call',
-    content: 'Urgent inquiry. Customer needs e-tron GT for business event next week.',
+    content: 'Urgent inquiry. Nina needs e-tron GT for business event next week.',
     timestamp: '2025-03-26T16:00:00',
     leadId: 13
   },
   {
     id: 87,
     type: 'whatsapp',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'sent a WhatsApp message',
     content: 'Nina, I can arrange immediate viewing today at 5 PM. The e-tron GT is ready!',
     timestamp: '2025-03-26T15:30:00',
@@ -924,7 +1005,7 @@ export const mockActivities = [
   {
     id: 88,
     type: 'attachment',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'uploaded an attachment',
     content: 'Express delivery options and expedited paperwork process',
     fileName: 'Express_Delivery_Process.pdf',
@@ -961,11 +1042,11 @@ export const mockActivities = [
     leadId: 14
   },
   
-  // Lead 15 (Petra Schulz) - Volkswagen ID.4
+  // Lead 15 (Petra Schulz) - Volkswagen ID.4 - assignee Sarah Jenkins
   {
     id: 92,
     type: 'sms',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'sent an SMS',
     content: 'Petra, your ID.4 test drive is scheduled for tomorrow at 11 AM. Looking forward to seeing you!',
     timestamp: '2025-03-26T17:00:00',
@@ -974,7 +1055,7 @@ export const mockActivities = [
   {
     id: 93,
     type: 'attachment',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'uploaded an attachment',
     content: 'ID.4 charging network map for Berlin area',
     fileName: 'ID4_Charging_Network_Berlin.pdf',
@@ -984,7 +1065,7 @@ export const mockActivities = [
   {
     id: 94,
     type: 'whatsapp',
-    user: 'Natalia Sung',
+    user: 'Sarah Jenkins',
     action: 'sent a WhatsApp message',
     content: 'Hi Petra! I found a great ID.4 in your preferred color - Moonstone Gray. Want to see photos?',
     timestamp: '2025-03-24T16:30:00',
@@ -1045,46 +1126,46 @@ export const mockActivities = [
     type: 'call',
     user: 'Sarah Jenkins',
     action: 'made a call',
-    content: 'Spoke about Q5 comfort features and advanced driver assistance systems.',
+    content: 'Spoke with Sabine Vogel about Q5 comfort features and advanced driver assistance systems.',
     timestamp: '2025-03-24T13:30:00',
     leadId: 17
   },
   
-  // Lead 18 (Dr. Andreas Werner) - Porsche Taycan
+  // Lead 18 (Laura Zimmermann) - assignee Sarah Jenkins
   {
     id: 101,
     type: 'email',
-    user: 'David Miller',
+    user: 'Sarah Jenkins',
     action: 'sent an email',
-    content: 'Sent Taycan Turbo S specifications and performance comparison with Tesla.',
+    content: 'Sent Tiguan specifications and pricing for Laura Zimmermann.',
     timestamp: '2025-03-26T09:00:00',
     leadId: 18
   },
   {
     id: 102,
     type: 'note',
-    user: 'David Miller',
+    user: 'Sarah Jenkins',
     action: 'added a note',
-    content: 'High-value customer. Interested in Taycan Turbo S for luxury electric performance.',
+    content: 'Laura Zimmermann interested in Tiguan. Urgent need - compact SUV with safety features.',
     timestamp: '2025-03-25T14:00:00',
     leadId: 18
   },
   {
     id: 103,
     type: 'attachment',
-    user: 'David Miller',
+    user: 'Sarah Jenkins',
     action: 'uploaded an attachment',
-    content: 'Porsche Taycan exclusive color options catalog',
-    fileName: 'Taycan_Exclusive_Colors.pdf',
+    content: 'VW Tiguan brochure and safety features',
+    fileName: 'Tiguan_Safety_Features.pdf',
     timestamp: '2025-03-24T10:00:00',
     leadId: 18
   },
   
-  // Lead 19 (Christina Bauer) - BMW X3
+  // Lead 19 (Christina Bauer) - BMW X3 - assignee Salsabeel Khaleel
   {
     id: 104,
     type: 'sms',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'sent an SMS',
     content: 'Christina, we have a special offer on X3 xDrive30i this week. Save up to €5,000!',
     timestamp: '2025-03-26T11:00:00',
@@ -1093,48 +1174,48 @@ export const mockActivities = [
   {
     id: 105,
     type: 'call',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'made a call',
-    content: 'Discussed X3 family features and cargo space. Customer has two children.',
+    content: 'Discussed X3 family features and cargo space. Christina Bauer has two children.',
     timestamp: '2025-03-25T16:00:00',
     leadId: 19
   },
   {
     id: 106,
     type: 'whatsapp',
-    user: 'Natalia Sung',
+    user: 'Salsabeel Khaleel',
     action: 'sent a WhatsApp message',
     content: 'Hi Christina! I can arrange a family test drive with car seats installed. Let me know!',
     timestamp: '2025-03-24T12:00:00',
     leadId: 19
   },
   
-  // Lead 20 (Martin Richter) - BMW M4 Competition (Hot)
+  // Lead 20 (Dr. Andreas Werner) - Mercedes S-Class - assignee Salsabeel Khaleel
   {
     id: 107,
     type: 'call',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'made a call',
-    content: 'Customer very enthusiastic. Wants M4 Competition in Isle of Man Green.',
+    content: 'Dr. Andreas Werner very enthusiastic. Wants S-Class for company car program.',
     timestamp: '2025-03-26T15:00:00',
     leadId: 20
   },
   {
     id: 108,
     type: 'attachment',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'uploaded an attachment',
-    content: 'M4 Competition in Isle of Man Green - exclusive photos',
-    fileName: 'M4_Isle_of_Man_Green.jpg',
+    content: 'S-Class executive specification and fleet options',
+    fileName: 'S-Class_Executive_Spec.pdf',
     timestamp: '2025-03-26T14:30:00',
     leadId: 20
   },
   {
     id: 109,
     type: 'note',
-    user: 'Sarah Jenkins',
+    user: 'Salsabeel Khaleel',
     action: 'added a note',
-    content: 'Performance enthusiast with track experience. Ready to proceed quickly.',
+    content: 'High-value customer. Dr. Andreas Werner ready to proceed with executive vehicle.',
     timestamp: '2025-03-26T14:00:00',
     leadId: 20
   },
