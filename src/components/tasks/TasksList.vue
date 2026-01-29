@@ -72,17 +72,6 @@
           @sort-change="selectSort"
         />
       </div>
-      
-      <!-- Filter Chips -->
-      <div v-if="activeFilters.length > 0" class="mt-2">
-        <TaskFilters
-          :active-filters="activeFilters"
-          :sort-option="currentSort"
-          :chips-only="true"
-          @filter-change="$emit('filter-change', $event)"
-          @sort-change="selectSort"
-        />
-      </div>
     </div>
     
     <div ref="scrollContainer" class="task-list-cards flex-1 overflow-y-auto px-5 space-y-3 pt-4 pb-6 scrollbar-hide">

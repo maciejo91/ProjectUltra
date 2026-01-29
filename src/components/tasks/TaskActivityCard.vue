@@ -1,83 +1,82 @@
 <template>
   <div 
-    class="overflow-hidden p-4 flex flex-col flex-1 min-h-0 rounded-lg bg-white shadow-nsc-card"
+    class="overflow-visible p-4 flex flex-col flex-1 min-h-0 rounded-lg bg-white shadow-nsc-card"
     style="border-radius: var(--border-radius-rounded-lg, 10px);"
   >
     <div class="mb-4">
       <div class="flex items-center justify-between mb-2">
-        <h3 class="text-base font-medium text-foreground leading-6">Activity</h3>
+        <h3 class="text-base font-medium text-foreground leading-6">{{ t('entities.activity.title') }}</h3>
         
         <!-- Filter Dropdown, Add Activity Button, and Chips (Right side of title) -->
         <div class="flex items-center gap-2 flex-wrap">
-          <!-- Filter Dropdown Button -->
-          <div class="relative" ref="filterContainer">
-            <Button
-              variant="outline"
-              size="icon"
-              @click.stop="toggleFilterMenu"
-              class="relative w-8 h-8"
-            >
-              <Filter class="w-4 h-4 shrink-0" />
-              <span 
-                v-if="selectedFilters.length > 0"
-                class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-black"
-              ></span>
-            </Button>
-            
-            <transition name="dropdown">
-              <div 
-                v-if="showFilterMenu"
-                class="absolute right-0 mt-2 z-50 filter-dropdown-wrapper"
-                v-click-outside="() => showFilterMenu = false"
+          <!-- Filter Dropdown -->
+          <DropdownMenu :modal="false">
+            <DropdownMenuTrigger as-child>
+              <Button
+                variant="outline"
+                size="icon"
+                class="relative w-8 h-8"
+                aria-label="Filter activity"
               >
-                <DropdownMenu :items="filterMenuItems" className="w-56" />
-              </div>
-            </transition>
-          </div>
+                <Filter class="w-4 h-4 shrink-0" />
+<span 
+                v-if="hasActiveFilters"
+                class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-primary"
+              ></span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent class="w-56" align="end">
+              <DropdownMenuItem
+                v-for="filter in activityFilters"
+                :key="filter.value"
+                @select="(e) => { e.preventDefault(); toggleFilter(filter.value); }"
+                class="flex items-center gap-2 cursor-pointer"
+              >
+                <Check
+                  v-if="selectedFilters.includes(filter.value)"
+                  class="w-4 h-4 shrink-0"
+                />
+                <span v-else class="w-4 h-4 shrink-0" aria-hidden="true"></span>
+                <span>{{ filter.label }}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
-          <!-- Add Activity Button -->
-          <div class="relative">
-            <Button
-              variant="default"
-              size="icon"
-              @click.stop="showAddDropdown = !showAddDropdown"
-              class="relative w-8 h-8 bg-primary text-white border border-primary hover:bg-primary/90"
-              aria-label="Add activity"
-            >
-              <Plus class="w-4 h-4 shrink-0" />
-            </Button>
-            <div
-              v-if="showAddDropdown"
-              class="absolute right-0 top-full mt-2 w-48 bg-white border border-black/10 rounded-lg shadow-nsc-card py-1 z-50"
-              v-click-outside="() => showAddDropdown = false"
-              @click.stop
-            >
-            <!-- Communication Group -->
-            <button @click="handleAddActivity('email')" class="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2">
-              <Mail class="w-4 h-4 shrink-0 text-primary" /> Email
-            </button>
-            <button @click="handleAddActivity('sms')" class="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2">
-              <MessageCircle class="w-4 h-4 shrink-0 text-purple-600" /> SMS
-            </button>
-            <button @click="handleAddActivity('whatsapp')" class="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2">
-              <MessageCircle class="w-4 h-4 shrink-0 text-green-600" /> WhatsApp
-            </button>
-            <button @click="handleAddActivity('call')" class="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2">
-              <Phone class="w-4 h-4 shrink-0 text-green-600" /> Call
-            </button>
-
-            <div class="border-t border-black/10 my-1"></div>
-
-            <!-- Activities Group -->
-            <button @click="handleAddActivity('note')" class="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2">
-              <StickyNote class="w-4 h-4 shrink-0 text-orange-600" /> Note
-            </button>
-            <button @click="handleAddActivity('attachment')" class="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2">
-              <Paperclip class="w-4 h-4 shrink-0 text-muted-foreground" /> Attachment
-            </button>
+          <!-- Add Activity Button: same DropdownMenu as Filter for consistent popover -->
+          <DropdownMenu :modal="false">
+            <DropdownMenuTrigger as-child>
+              <Button
+                variant="default"
+                size="icon"
+                class="relative w-8 h-8"
+                aria-label="Add activity"
+              >
+                <Plus class="w-4 h-4 shrink-0" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent class="w-48" align="end">
+              <DropdownMenuItem
+                v-for="item in addActivityCommunicationItems"
+                :key="item.type"
+                @select="(e) => { e.preventDefault(); handleAddActivity(item.type); }"
+                class="flex items-center gap-2 cursor-pointer"
+              >
+                <component :is="item.icon" class="w-4 h-4 shrink-0" :class="item.iconClass" />
+                <span>{{ item.label }}</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                v-for="item in addActivityOtherItems"
+                :key="item.type"
+                @select="(e) => { e.preventDefault(); handleAddActivity(item.type); }"
+                class="flex items-center gap-2 cursor-pointer"
+              >
+                <component :is="item.icon" class="w-4 h-4 shrink-0" :class="item.iconClass" />
+                <span>{{ item.label }}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </div>
-          </div> <!-- Close flex items-center gap-2 flex-wrap -->
         </div> <!-- Close flex items-center justify-between mb-2 -->
       </div> <!-- Close mb-4 -->
     
@@ -270,26 +269,6 @@
               </div>
             </div>
           </div>
-          
-          <!-- Selected Filter Chips -->
-          <div v-if="selectedFilters.length > 0" class="flex items-center gap-2 flex-wrap">
-            <div
-              v-for="filterValue in selectedFilters"
-              :key="filterValue"
-              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted text-sm font-medium text-foreground border border-border"
-            >
-              <span>{{ getFilterLabel(filterValue) }}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                @click="removeFilter(filterValue)"
-                class="w-4 h-4 rounded-full"
-                aria-label="Remove filter"
-              >
-                <X class="w-4 h-4 shrink-0" />
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
       
@@ -319,9 +298,16 @@ import {
   Filter,
   Plus,
   X,
-  Reply
+  Reply,
+  Check
 } from 'lucide-vue-next'
-import { DropdownMenu } from '@motork/component-library/future/primitives'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator
+} from '@motork/component-library/future/primitives'
 import { useI18n } from 'vue-i18n'
 import { formatTime } from '@/utils/formatters'
 
@@ -346,80 +332,65 @@ const props = defineProps({
 
 const emit = defineEmits(['activity-click', 'toggle-summary-expanded', 'add-activity'])
 
-const showAddDropdown = ref(false)
-const showFilterMenu = ref(false)
-const filterContainer = ref(null)
-
-// Activity filters
-const activityFilters = [
-  { label: 'Important', value: 'important' },
-  { label: 'Communications', value: 'communications' },
-  { label: 'Notes', value: 'notes' },
-  { label: 'Transcriptions', value: 'transcriptions' },
-  { label: 'System Updates', value: 'system-updates' }
+const addActivityCommunicationItems = [
+  { type: 'email', label: 'Email', icon: Mail, iconClass: 'text-primary' },
+  { type: 'sms', label: 'SMS', icon: MessageCircle, iconClass: 'text-purple-600' },
+  { type: 'whatsapp', label: 'WhatsApp', icon: MessageCircle, iconClass: 'text-green-600' },
+  { type: 'call', label: 'Call', icon: Phone, iconClass: 'text-green-600' }
+]
+const addActivityOtherItems = [
+  { type: 'note', label: 'Note', icon: StickyNote, iconClass: 'text-orange-600' },
+  { type: 'attachment', label: 'Attachment', icon: Paperclip, iconClass: 'text-muted-foreground' }
 ]
 
-const selectedFilters = ref([])
+const activityFilters = computed(() => [
+  { label: t('entities.activity.filterAll'), value: 'all' },
+  { label: t('entities.activity.filterCommunication'), value: 'communication' },
+  { label: t('entities.activity.filterNotes'), value: 'notes' },
+  { label: t('entities.activity.filterSystemUpdates'), value: 'system-updates' }
+])
 
-const toggleFilterMenu = () => {
-  showFilterMenu.value = !showFilterMenu.value
-}
+const selectedFilters = ref(['all'])
 
 const toggleFilter = (filterValue) => {
-  showFilterMenu.value = false
-  const index = selectedFilters.value.indexOf(filterValue)
-  if (index > -1) {
-    selectedFilters.value.splice(index, 1)
+  if (filterValue === 'all') {
+    selectedFilters.value = ['all']
   } else {
-    selectedFilters.value.push(filterValue)
+    const current = selectedFilters.value.filter(v => v !== 'all')
+    const index = current.indexOf(filterValue)
+    if (index > -1) {
+      current.splice(index, 1)
+    } else {
+      current.push(filterValue)
+    }
+    selectedFilters.value = current.length > 0 ? current : ['all']
   }
 }
 
-const removeFilter = (filterValue) => {
-  const index = selectedFilters.value.indexOf(filterValue)
-  if (index > -1) {
-    selectedFilters.value.splice(index, 1)
-  }
-}
+const hasActiveFilters = computed(() =>
+  selectedFilters.value.length > 0 &&
+  !(selectedFilters.value.length === 1 && selectedFilters.value[0] === 'all')
+)
 
-const getFilterLabel = (filterValue) => {
-  const filter = activityFilters.find(f => f.value === filterValue)
-  return filter ? filter.label : filterValue
-}
-
-// Build filter menu items
-const filterMenuItems = computed(() => {
-  return activityFilters.map(filter => ({
-    key: filter.value,
-    label: filter.label,
-    onClick: () => toggleFilter(filter.value),
-    className: selectedFilters.value.includes(filter.value) ? 'filter-item-selected' : ''
-  }))
-})
-
-// Map activity types to filter categories
-const getActivityFilterCategory = (activity) => {
-  if (activity.important || activity.isImportant) return 'important'
-  if (['email', 'sms', 'whatsapp', 'call', 'customer-email', 'customer-whatsapp'].includes(activity.type)) return 'communications'
+function getActivityFilterCategory(activity) {
+  if (['email', 'sms', 'whatsapp', 'call', 'customer-email', 'customer-whatsapp'].includes(activity.type)) return 'communication'
   if (activity.type === 'note') return 'notes'
-  if (activity.type === 'transcription' || activity.transcription) return 'transcriptions'
+  if (activity.type === 'transcription' || activity.transcription) return 'system-updates'
   if (activity.type === 'system' || activity.type === 'created' || activity.type === 'status') return 'system-updates'
+  if (activity.type === 'ai-summary') return 'notes'
   return null
 }
 
-// Sort and filter activities by timestamp (most recent first) and selected filters
 const sortedActivities = computed(() => {
   let filtered = [...props.activities]
-  
-  // Filter by selected filter categories
-  if (selectedFilters.value.length > 0) {
+  const selected = selectedFilters.value
+  const showAll = selected.length === 0 || selected.includes('all')
+  if (!showAll) {
     filtered = filtered.filter(activity => {
       const category = getActivityFilterCategory(activity)
-      return category && selectedFilters.value.includes(category)
+      return category && selected.includes(category)
     })
   }
-  
-  // Sort by timestamp
   return filtered.sort((a, b) => {
     const timeA = new Date(a.timestamp || a.createdAt || 0).getTime()
     const timeB = new Date(b.timestamp || b.createdAt || 0).getTime()
@@ -462,7 +433,6 @@ const handleActivityClick = (activity) => {
 }
 
 const handleAddActivity = (action) => {
-  showAddDropdown.value = false
   emit('add-activity', action)
 }
 </script>
@@ -479,51 +449,4 @@ const handleAddActivity = (action) => {
   word-break: break-word;
 }
 
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: all 0.2s ease;
-}
-
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-}
-
-/* Extended styling for Motork DropdownMenu */
-:deep(.filter-dropdown-wrapper *) {
-  font-size: 0.875rem !important; /* text-sm - smaller text for all items */
-}
-
-/* Target all dropdown menu items */
-:deep(.filter-dropdown-wrapper button),
-:deep(.filter-dropdown-wrapper [role="menuitem"]),
-:deep(.filter-dropdown-wrapper a),
-:deep(.filter-dropdown-wrapper [class*="item"]) {
-  font-size: 0.875rem !important; /* text-sm */
-  position: relative;
-  padding-left: 2.5rem !important; /* Space for dot */
-}
-
-/* Selected item styling using className */
-:deep(.filter-dropdown-wrapper .filter-item-selected),
-:deep(.filter-dropdown-wrapper button.filter-item-selected),
-:deep(.filter-dropdown-wrapper [class*="item"].filter-item-selected) {
-  background-color: var(--color-bg-surface-secondary) !important; /* Light grey background */
-}
-
-/* Highlight dot for selected item */
-:deep(.filter-dropdown-wrapper .filter-item-selected::before),
-:deep(.filter-dropdown-wrapper button.filter-item-selected::before),
-:deep(.filter-dropdown-wrapper [class*="item"].filter-item-selected::before) {
-  content: '';
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0.375rem;
-  height: 0.375rem;
-  border-radius: 50%;
-  background-color: var(--brand-dark); /* Black dot instead of red */
-}
 </style>

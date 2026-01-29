@@ -2,172 +2,107 @@
   <div v-if="!buttonOnly && !chipsOnly" class="flex flex-col gap-2">
     <!-- Filter Dropdown and Chips Row -->
     <div class="flex items-center gap-1.5 flex-wrap">
-      <!-- Filter Dropdown (Icon only) -->
-      <div class="relative" ref="filterContainer" v-click-outside="closeFilterMenu">
-        <button
-          @click="toggleFilterMenu"
-          class="filter-dropdown-button"
-        >
-          <ArrowDownWideNarrow class="w-4 h-4 shrink-0" />
-          <span 
-            v-if="activeFilters.length > 0 || sortOption"
-            class="filter-indicator"
-          ></span>
-        </button>
-        
-        <transition name="dropdown-fade">
-          <div 
-            v-if="showFilterMenu"
-            class="absolute left-0 mt-2 z-50 w-56 bg-white border border-black/10 rounded-lg shadow-nsc-card py-1"
-            @click.stop
+      <!-- Filter Dropdown: same button as Activity tab (Filter icon + blue dot) -->
+      <DropdownMenu :modal="false">
+        <DropdownMenuTrigger as-child>
+          <Button
+            variant="outline"
+            size="icon"
+            class="relative w-8 h-8"
+            aria-label="Filter tasks"
           >
-            <!-- Filter Options -->
-            <button
-              v-for="option in filterOptions"
-              :key="option.key"
-              @click="toggleFilter(option.key)"
-              class="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2 relative"
-              :class="{ 'bg-muted filter-item-selected': activeFilters.includes(option.key) }"
-            >
-              <span>{{ option.label }}</span>
-            </button>
-            
-            <div class="border-t border-black/10 my-1"></div>
-            
-            <!-- Sort Options -->
-            <button
-              v-for="sortItem in sortMenuItems"
-              :key="sortItem.key"
-              @click="selectSort(sortItem.key)"
-              class="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2 relative"
-              :class="{ 'bg-muted sort-item-selected': sortItem.key === sortOption }"
-            >
-              <span>{{ sortItem.label }}</span>
-            </button>
-          </div>
-        </transition>
-      </div>
-      
-      <!-- Filter and Sort Chips -->
-      <div v-if="activeFilters.length > 0 || showSortChip" class="flex items-center gap-1.5 flex-wrap">
-        <!-- Filter Chips -->
-        <div
-          v-for="filterKey in activeFilters"
-          :key="filterKey"
-          class="task-filter-badge"
-        >
-          <span>{{ getFilterLabel(filterKey) }}</span>
-          <button
-            @click="removeFilter(filterKey)"
-            class="task-filter-badge-remove"
-            aria-label="Remove filter"
+            <Filter class="w-4 h-4 shrink-0" />
+            <span
+              v-if="hasActiveFilters"
+              class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-primary"
+            ></span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent class="w-56" align="start">
+          <DropdownMenuItem
+            v-for="option in filterOptions"
+            :key="option.key"
+            @select="(e) => { e.preventDefault(); toggleFilter(option.key); }"
+            class="flex items-center gap-2 cursor-pointer"
           >
-            <X class="w-4 h-4 shrink-0" />
-          </button>
-        </div>
-        
-        <!-- Sort Chip -->
-        <div
-          v-if="showSortChip"
-          class="task-filter-badge"
-        >
-          <span>{{ sortLabel }}</span>
-          <button
-            @click="removeSort"
-            class="task-filter-badge-remove"
-            aria-label="Remove sort"
+            <Check v-if="activeFilters.includes(option.key)" class="w-4 h-4 shrink-0" />
+            <span v-else class="w-4 h-4 shrink-0" aria-hidden="true"></span>
+            <span>{{ option.label }}</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            v-for="sortItem in sortMenuItems"
+            :key="sortItem.key"
+            @select="() => selectSort(sortItem.key)"
+            class="flex items-center gap-2 cursor-pointer"
           >
-            <X class="w-4 h-4 shrink-0" />
-          </button>
-        </div>
-      </div>
+            <Check v-if="sortItem.key === sortOption" class="w-4 h-4 shrink-0" />
+            <span v-else class="w-4 h-4 shrink-0" aria-hidden="true"></span>
+            <span>{{ sortItem.label }}</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   </div>
   
-  <!-- Button Only Mode -->
-  <div v-else-if="buttonOnly" class="relative" ref="filterContainer" v-click-outside="closeFilterMenu">
-    <button
-      @click="toggleFilterMenu"
-      class="filter-dropdown-button"
-    >
-      <ArrowDownWideNarrow class="w-4 h-4 shrink-0" />
-      <span 
-        v-if="activeFilters.length > 0 || sortOption"
-        class="filter-indicator"
-      ></span>
-    </button>
-    
-    <transition name="dropdown-fade">
-      <div 
-        v-if="showFilterMenu"
-        class="absolute right-0 mt-2 z-50 w-56 bg-white border border-black/10 rounded-lg shadow-nsc-card py-1"
-        @click.stop
-      >
-        <!-- Filter Options -->
-        <button
+  <!-- Button Only Mode (e.g. next to search) -->
+  <div v-else-if="buttonOnly">
+    <DropdownMenu :modal="false">
+      <DropdownMenuTrigger as-child>
+        <Button
+          variant="outline"
+          size="icon"
+          class="relative w-8 h-8"
+          aria-label="Filter tasks"
+        >
+          <Filter class="w-4 h-4 shrink-0" />
+          <span
+            v-if="hasActiveFilters"
+            class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-primary"
+          ></span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent class="w-56" align="end">
+        <DropdownMenuItem
           v-for="option in filterOptions"
           :key="option.key"
-          @click="toggleFilter(option.key)"
-          class="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2 relative"
-          :class="{ 'bg-muted filter-item-selected': activeFilters.includes(option.key) }"
+          @select="(e) => { e.preventDefault(); toggleFilter(option.key); }"
+          class="flex items-center gap-2 cursor-pointer"
         >
+          <Check v-if="activeFilters.includes(option.key)" class="w-4 h-4 shrink-0" />
+          <span v-else class="w-4 h-4 shrink-0" aria-hidden="true"></span>
           <span>{{ option.label }}</span>
-        </button>
-        
-        <div class="border-t border-black/10 my-1"></div>
-        
-        <!-- Sort Options -->
-        <button
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
           v-for="sortItem in sortMenuItems"
           :key="sortItem.key"
-          @click="selectSort(sortItem.key)"
-          class="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2 relative"
-          :class="{ 'bg-muted sort-item-selected': sortItem.key === sortOption }"
+          @select="() => selectSort(sortItem.key)"
+          class="flex items-center gap-2 cursor-pointer"
         >
+          <Check v-if="sortItem.key === sortOption" class="w-4 h-4 shrink-0" />
+          <span v-else class="w-4 h-4 shrink-0" aria-hidden="true"></span>
           <span>{{ sortItem.label }}</span>
-        </button>
-      </div>
-    </transition>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   </div>
   
-  <!-- Chips Only Mode -->
-  <div v-else-if="chipsOnly && (activeFilters.length > 0 || showSortChip)" class="flex items-center gap-1.5 flex-wrap">
-    <!-- Filter Chips -->
-    <div
-      v-for="filterKey in activeFilters"
-      :key="filterKey"
-      class="task-filter-badge"
-    >
-      <span>{{ getFilterLabel(filterKey) }}</span>
-      <button
-        @click="removeFilter(filterKey)"
-        class="task-filter-badge-remove"
-        aria-label="Remove filter"
-      >
-        <X class="w-4 h-4 shrink-0" />
-      </button>
-    </div>
-    
-    <!-- Sort Chip -->
-    <div
-      v-if="showSortChip"
-      class="task-filter-badge"
-    >
-      <span>{{ sortLabel }}</span>
-      <button
-        @click="removeSort"
-        class="task-filter-badge-remove"
-        aria-label="Remove sort"
-      >
-        <X class="w-4 h-4 shrink-0" />
-      </button>
-    </div>
-  </div>
+  <!-- Chips hidden: only the blue dot on the filter button indicates active filters -->
+  <template v-else-if="chipsOnly"></template>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { ArrowDownWideNarrow, X } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { Filter, Check } from 'lucide-vue-next'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator
+} from '@motork/component-library/future/primitives'
 
 const props = defineProps({
   activeFilters: { type: Array, default: () => [] },
@@ -179,15 +114,11 @@ const props = defineProps({
 
 const emit = defineEmits(['filter-change', 'sort-change', 'toggle-closed'])
 
-const showFilterMenu = ref(false)
-
-const toggleFilterMenu = () => {
-  showFilterMenu.value = !showFilterMenu.value
-}
-
-const closeFilterMenu = () => {
-  showFilterMenu.value = false
-}
+const hasActiveFilters = computed(() => {
+  const hasFilters = props.activeFilters.length > 0
+  const hasSort = props.sortOption && props.sortOption !== '' && props.sortOption !== 'none'
+  return hasFilters || hasSort
+})
 
 // Filter options configuration
 const filterOptions = [
@@ -199,15 +130,8 @@ const filterOptions = [
   { key: 'assigned-to-me', label: 'Assigned to me', type: 'assignee' }
 ]
 
-// Get filter label by key
-const getFilterLabel = (filterKey) => {
-  const option = filterOptions.find(opt => opt.key === filterKey)
-  return option ? option.label : filterKey
-}
-
 // Toggle filter on/off
 const toggleFilter = (filterKey) => {
-  showFilterMenu.value = false
   const currentFilters = [...props.activeFilters]
   const index = currentFilters.indexOf(filterKey)
   
@@ -222,24 +146,8 @@ const toggleFilter = (filterKey) => {
   emit('filter-change', currentFilters)
 }
 
-// Remove filter from chips
-const removeFilter = (filterKey) => {
-  const currentFilters = [...props.activeFilters]
-  const index = currentFilters.indexOf(filterKey)
-  if (index > -1) {
-    currentFilters.splice(index, 1)
-    emit('filter-change', currentFilters)
-  }
-}
-
 const selectSort = (option) => {
-  showFilterMenu.value = false
   emit('sort-change', option)
-}
-
-// Remove sort chip (reset to default)
-const removeSort = () => {
-  emit('sort-change', '')
 }
 
 // Build sort menu items
@@ -253,14 +161,4 @@ const sortMenuItems = computed(() => {
   ]
 })
 
-// Show sort chip for currently selected sort
-const showSortChip = computed(() => {
-  return props.sortOption && props.sortOption !== '' && props.sortOption !== 'none'
-})
-
-// Get current sort label
-const sortLabel = computed(() => {
-  const sortItem = sortMenuItems.value.find(item => item.key === props.sortOption)
-  return sortItem ? sortItem.label : props.sortOption
-})
 </script>

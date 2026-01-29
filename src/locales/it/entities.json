@@ -34,7 +34,11 @@
     "plural": "Attività",
     "new": "Nuova Attività",
     "details": "Dettagli Attività",
-    "reply": "Rispondi"
+    "reply": "Rispondi",
+    "filterAll": "Tutte le attività",
+    "filterCommunication": "Communication",
+    "filterNotes": "Notes",
+    "filterSystemUpdates": "System updates"
   },
   "appointment": {
     "title": "Appuntamento",

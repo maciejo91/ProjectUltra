@@ -34,7 +34,11 @@
     "plural": "Activiteiten",
     "new": "Nieuwe Activiteit",
     "details": "Activiteit Details",
-    "reply": "Beantwoorden"
+    "reply": "Beantwoorden",
+    "filterAll": "Alle activiteiten",
+    "filterCommunication": "Communication",
+    "filterNotes": "Notes",
+    "filterSystemUpdates": "System updates"
   },
   "appointment": {
     "title": "Afspraak",

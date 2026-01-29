@@ -121,7 +121,7 @@
               </TabsContent>
               
               <!-- Activity Tab -->
-              <TabsContent value="activity" class="p-2 flex-1 overflow-hidden h-full flex flex-col mt-0">
+              <TabsContent value="activity" class="p-2 flex-1 overflow-visible h-full flex flex-col mt-0">
                 <TaskActivityCard
                   :activities="allActivities"
                   :expanded-summaries="expandedSummaries"
