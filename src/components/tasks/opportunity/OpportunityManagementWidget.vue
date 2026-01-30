@@ -219,8 +219,13 @@
                 :mock-transcription="mockTranscription"
                 :contact-attempts="0"
                 :max-contact-attempts="3"
+                :lead-summary="leadSummary"
+                :caller-name="callerName"
+                :is-muted="isMuted"
                 @start-call="startCall"
                 @end-call="endCall"
+                @close="callState.resetCall()"
+                @toggle-mute="toggleMute"
                 @log-manual-call="logManualCall"
                 @extract-information="showComingSoonModal = true"
                 @update:call-notes="updateCallNotes"
@@ -945,7 +950,7 @@ import { useUsersStore } from '@/stores/users'
 import { useUserStore } from '@/stores/user'
 import { fetchVehicles } from '@/api/vehicles'
 import { getDisplayStage, OPPORTUNITY_STAGES } from '@/utils/stageMapper'
-import { formatDateTime } from '@/utils/formatters'
+import { formatDateTime, formatDate, formatTime } from '@/utils/formatters'
 import { initDateField, getTodayDateString } from '@/utils/formHelpers'
 import { useOpportunityActions } from '@/composables/useOpportunityActions'
 import { useLQWidgetCall } from '@/composables/useLQWidgetCall'
@@ -1169,12 +1174,30 @@ const {
   callEnded, 
   callDuration, 
   callNotes, 
+  isMuted,
   mockTranscription, 
   formattedCallDuration, 
   startCall: startCallFromComposable, 
   endCall: endCallFromComposable, 
+  toggleMute,
   copyNumber: copyNumberFromComposable
 } = callState
+
+const callerName = computed(() => {
+  const c = props.opportunity.customer
+  return typeof c === 'string' ? c : (c?.name || 'Caller')
+})
+
+const leadSummary = computed(() => {
+  const name = callerName.value
+  const car = props.opportunity.requestedCar
+  const vehicle = car ? `${car.brand || ''} ${car.model || ''} (${car.year || ''})`.trim() : 'a vehicle'
+  const source = props.opportunity.source || 'Generic sales'
+  const created = props.opportunity.createdAt
+    ? `${formatDate(props.opportunity.createdAt)}, ${formatTime(props.opportunity.createdAt)}`
+    : ''
+  return `${name} is interested in ${vehicle}. Lead comes from ${source}${created ? `, created ${created}` : ''}.`
+})
 
 // Wrapper functions for call
 const startCall = () => {

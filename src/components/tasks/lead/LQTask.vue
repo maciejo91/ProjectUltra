@@ -123,8 +123,13 @@
           :mock-transcription="mockTranscription"
           :contact-attempts="contactAttempts"
           :max-contact-attempts="maxContactAttempts"
+          :lead-summary="leadSummary"
+          :caller-name="callerName"
+          :is-muted="isMuted"
           @start-call="startCall"
           @end-call="endCallFromComposable"
+          @close="callState.resetCall()"
+          @toggle-mute="toggleMute"
           @log-manual-call="logManualCall"
           @extract-information="showComingSoonModal = true"
           @update:call-notes="updateCallNotes"
@@ -949,12 +954,14 @@ const {
   callEnded, 
   callDuration, 
   callNotes, 
+  isMuted,
   callData, 
   extractedData, 
   mockTranscription, 
   formattedCallDuration, 
   startCall: startCallFromComposable, 
   endCall: endCallFromComposable, 
+  toggleMute,
   copyNumber: copyNumberFromComposable, 
   extractInformation: extractInformationFromComposable 
 } = callState
@@ -1166,6 +1173,19 @@ const copyNumber = () => {
 const updateCallNotes = (value) => {
   callNotes.value = value
 }
+
+const callerName = computed(() => props.lead.customer?.name || 'Caller')
+
+const leadSummary = computed(() => {
+  const name = props.lead.customer?.name || 'Lead'
+  const car = props.lead.requestedCar
+  const vehicle = car ? `${car.brand || ''} ${car.model || ''} (${car.year || ''})`.trim() : 'a vehicle'
+  const source = props.lead.source || 'Generic sales'
+  const created = props.lead.createdAt
+    ? `${formatDate(props.lead.createdAt)}, ${formatTime(props.lead.createdAt)}`
+    : ''
+  return `${name} is interested in ${vehicle}. Lead comes from ${source}${created ? `, created ${created}` : ''}.`
+})
 
 const dynamicTitle = computed(() => {
   return leadState.primaryAction.value?.title || 'Call to Verify Contact Details'

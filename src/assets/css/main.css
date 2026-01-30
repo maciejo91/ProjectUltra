@@ -75,7 +75,10 @@
   --text-body: #3f3f46;
   --text-sub: #737373; /* Updated from #71717a to match Figma */
   --greys-900: #0a0a0a;
+  --greys-800: #1f2937;
+  --greys-700: #374151;
   --greys-500: #737373; /* Updated to match --text-sub */
+  --greys-400: #9ca3af;
   --greys-50: #f9fafb;
   
   /* Brand colors */

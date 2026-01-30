@@ -11,9 +11,14 @@ export function useLQWidgetCall() {
   const callEnded = ref(false)
   const callDuration = ref(0)
   const callNotes = ref('')
+  const isMuted = ref(false)
   const callInterval = ref(null)
   const callData = ref({})
   const extractedData = ref(null)
+
+  const toggleMute = () => {
+    isMuted.value = !isMuted.value
+  }
 
   const mockTranscription = {
     leadLines: [
@@ -99,6 +104,7 @@ export function useLQWidgetCall() {
     callEnded.value = false
     callDuration.value = 0
     callNotes.value = ''
+    isMuted.value = false
     callData.value = {}
     if (callInterval.value) {
       clearInterval(callInterval.value)
@@ -118,6 +124,7 @@ export function useLQWidgetCall() {
     callEnded,
     callDuration,
     callNotes,
+    isMuted,
     callData,
     extractedData,
     mockTranscription,
@@ -126,6 +133,7 @@ export function useLQWidgetCall() {
     // Methods
     startCall,
     endCall,
+    toggleMute,
     copyNumber,
     extractInformation,
     resetCall
