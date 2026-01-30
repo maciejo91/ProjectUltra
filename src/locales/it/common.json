@@ -101,6 +101,35 @@
     "optional": "Opzionale",
     "required": "Obbligatorio"
   },
+  "tasks": {
+    "filterAria": "Filtra attività",
+    "sortAria": "Ordina attività",
+    "filters": {
+      "lead": "Lead",
+      "opportunity": "Opportunità",
+      "dueIn24h": "Scadenza entro 24 ore",
+      "toBeCalled": "Da richiamare",
+      "leads1h": "Lead creati 1 ora fa",
+      "assignedToMe": "Assegnati a me",
+      "assignedToMyTeam": "Assegnati al mio team"
+    },
+    "sort": {
+      "mostRecentFirst": "Più recenti prima",
+      "mostUrgentFirst": "Più urgenti prima",
+      "oldestFirst": "Più vecchi prima"
+    }
+  },
+  "call": {
+    "inProgress": "Chiamata in corso",
+    "ended": "Chiamata terminata",
+    "endCall": "Termina chiamata",
+    "madeACall": "{name} ha effettuato una chiamata",
+    "user": "Utente",
+    "transcript": "Trascrizione",
+    "showTranscript": "Mostra trascrizione",
+    "expandTranscript": "Espandi",
+    "collapseTranscript": "Comprimi"
+  },
   "assignee": {
     "taskUnassigned": "Questa attività non è assegnata",
     "assignToMe": "Assegna a me",

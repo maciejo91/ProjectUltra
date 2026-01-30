@@ -101,6 +101,35 @@
     "optional": "Optional",
     "required": "Erforderlich"
   },
+  "tasks": {
+    "filterAria": "Aufgaben filtern",
+    "sortAria": "Aufgaben sortieren",
+    "filters": {
+      "lead": "Leads",
+      "opportunity": "Opportunities",
+      "dueIn24h": "Fällig in 24 Stunden",
+      "toBeCalled": "Erneut anzurufen",
+      "leads1h": "Leads vor 1 Stunde erstellt",
+      "assignedToMe": "Mir zugewiesen",
+      "assignedToMyTeam": "Meinem Team zugewiesen"
+    },
+    "sort": {
+      "mostRecentFirst": "Neueste zuerst",
+      "mostUrgentFirst": "Dringendste zuerst",
+      "oldestFirst": "Älteste zuerst"
+    }
+  },
+  "call": {
+    "inProgress": "Anruf läuft",
+    "ended": "Anruf beendet",
+    "endCall": "Anruf beenden",
+    "madeACall": "{name} hat angerufen",
+    "user": "Benutzer",
+    "transcript": "Transkript",
+    "showTranscript": "Transkript anzeigen",
+    "expandTranscript": "Erweitern",
+    "collapseTranscript": "Einklappen"
+  },
   "assignee": {
     "taskUnassigned": "Diese Aufgabe ist nicht zugewiesen",
     "assignToMe": "Mir zuweisen",

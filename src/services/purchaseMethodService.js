@@ -75,9 +75,11 @@ class PurchaseMethodService {
       errors.push('Down Payment must be greater than or equal to 0')
     }
     
-    const duration = parseInt(fields.duration)
-    if (!duration || duration < 12 || duration > 60) {
-      errors.push('Duration must be between 12 and 60 months')
+    if (type === 'LTR') {
+      const duration = parseInt(fields.duration)
+      if (!duration || duration < 12 || duration > 60) {
+        errors.push('Duration must be between 12 and 60 months')
+      }
     }
     
     // Type-specific validations

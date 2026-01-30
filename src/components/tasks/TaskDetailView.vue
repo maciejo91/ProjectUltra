@@ -109,11 +109,13 @@
                   :task="task"
                 />
                 <TradeInsCard
+                  v-if="task.type !== 'lead' || (task.tradeIns || []).length > 0"
                   :items="task.tradeIns || []"
                   @open-add="editingTradeIn = null; showTradeInModal = true"
                   @open-edit="openTradeInEdit"
                 />
                 <FinancingOptionsCard
+                  v-if="task.type !== 'lead' || (task.financingOptions || []).length > 0"
                   :items="task.financingOptions || []"
                   @open-add="editingFinancingOption = null; showFinancingModal = true"
                   @open-edit="openFinancingEdit"

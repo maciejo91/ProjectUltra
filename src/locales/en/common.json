@@ -101,6 +101,35 @@
     "optional": "Optional",
     "required": "Required"
   },
+  "tasks": {
+    "filterAria": "Filter tasks",
+    "sortAria": "Sort tasks",
+    "filters": {
+      "lead": "Leads",
+      "opportunity": "Opportunities",
+      "dueIn24h": "Due in 24 hours",
+      "toBeCalled": "To be called again",
+      "leads1h": "Leads created 1 hour ago",
+      "assignedToMe": "Assigned to me",
+      "assignedToMyTeam": "Assigned to my team"
+    },
+    "sort": {
+      "mostRecentFirst": "Most recent first",
+      "mostUrgentFirst": "Most urgent first",
+      "oldestFirst": "Oldest first"
+    }
+  },
+  "call": {
+    "inProgress": "Call in progress",
+    "ended": "Call ended",
+    "endCall": "End call",
+    "madeACall": "{name} made a call",
+    "user": "User",
+    "transcript": "Transcript",
+    "showTranscript": "Show transcript",
+    "expandTranscript": "Expand",
+    "collapseTranscript": "Collapse"
+  },
   "assignee": {
     "taskUnassigned": "This task is unassigned",
     "assignToMe": "Assign to me",

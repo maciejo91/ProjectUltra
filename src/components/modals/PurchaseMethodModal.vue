@@ -450,22 +450,26 @@ const validateForm = () => {
   })
   
   if (!validation.isValid) {
-    validationErrors.value = validation.errors
-    // Map errors to field-specific errors for display
+    const type = formData.value.type
+    const durationOnlyForLTR = type !== 'LTR'
+    validationErrors.value = durationOnlyForLTR
+      ? validation.errors.filter(e => !e.includes('Duration must be between'))
+      : validation.errors
     validation.errors.forEach(error => {
       if (error.includes('Monthly Instalment')) {
         errors.value.monthlyInstalment = error
       } else if (error.includes('Down Payment')) {
         errors.value.downPayment = error
-      } else if (error.includes('Duration')) {
+      } else if (error.includes('Duration') && type === 'LTR') {
         errors.value.duration = error
       } else if (error.includes('Customer Type')) {
         errors.value.customerType = error
       }
     })
   }
-  
-  return validation.isValid
+
+  const onlyDurationWasInvalid = formData.value.type !== 'LTR' && validationErrors.value.length === 0 && !validation.isValid
+  return validation.isValid || onlyDurationWasInvalid
 }
 
 const isFormValid = computed(() => {
@@ -503,8 +507,25 @@ const handleTypeChange = () => {
   validationErrors.value = []
 }
 
+function isStandaloneSaveAllowed() {
+  if (!formData.value.type) return false
+  const monthly = formData.value.fields.monthlyInstalment
+  const down = formData.value.fields.downPayment
+  if (monthly == null || monthly <= 0) return false
+  if (down == null || down < 0) return false
+  if (formData.value.type === 'LTR') {
+    const dur = formData.value.fields.duration
+    if (!dur || dur < 12 || dur > 60) return false
+    if (!formData.value.fields.customerType) return false
+  }
+  return true
+}
+
 const handleSubmit = async () => {
-  if (!validateForm()) {
+  const standaloneAndFinancingOrLeasing = props.standalone && (formData.value.type === 'FIN' || formData.value.type === 'LEA')
+  const formValid = validateForm()
+  const minimalValid = isStandaloneSaveAllowed()
+  if (!formValid && !(standaloneAndFinancingOrLeasing && minimalValid)) {
     return
   }
 
@@ -572,7 +593,16 @@ const handleSubmit = async () => {
     })
     emit('close')
   } catch (error) {
-    validationErrors.value = [error.message || 'Failed to save purchase method']
+    const msg = error.message || 'Failed to save purchase method'
+    const durationOnlyForLTR = formData.value.type !== 'LTR'
+    let toShow = [msg]
+    if (durationOnlyForLTR && msg.startsWith('Validation failed: ')) {
+      const rest = msg.replace('Validation failed: ', '').split(', ').filter(e => !e.includes('Duration must be between'))
+      toShow = rest.length ? rest : []
+    } else if (durationOnlyForLTR && msg.includes('Duration must be between 12 and 60 months')) {
+      toShow = []
+    }
+    validationErrors.value = toShow
   } finally {
     saving.value = false
   }

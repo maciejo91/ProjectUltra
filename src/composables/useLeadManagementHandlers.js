@@ -224,6 +224,10 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
     if (!lead) return
 
     try {
+      if (noteData.type === 'tradein' || noteData.type === 'purchase-method') {
+        await leadsStore.fetchLeadById(lead.id)
+        return
+      }
       await leadsStore.addActivity(lead.id, {
         type: 'note',
         user: 'You',
@@ -231,7 +235,6 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
         content: noteData.content || noteData.text || '',
         data: noteData
       })
-      
       await leadsStore.fetchLeadById(lead.id)
     } catch (err) {
       console.error('Failed to save note:', err)

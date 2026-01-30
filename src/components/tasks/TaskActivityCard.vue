@@ -216,7 +216,7 @@
                   v-if="(activity.type === 'email' || activity.type === 'customer-email') && activity.content"
                   class="mt-2 relative group rounded-lg"
                 >
-                  <div class="bg-blue-50 rounded-lg p-4 pr-24">
+                  <div class="bg-blue-50 rounded-lg p-4">
                     <p
                       class="text-sm text-foreground wrap-break-word leading-normal"
                     >
@@ -227,7 +227,7 @@
                     v-if="activity.type === 'customer-email'"
                     variant="outline"
                     size="sm"
-                    class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-sm"
+                    class="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 hover:!opacity-100 hover:!bg-background hover:!text-foreground hover:!border-border transition-opacity rounded-sm"
                     @click.stop="handleAddActivity('email')"
                   >
                     <Reply class="w-3.5 h-3.5 shrink-0" />
@@ -238,7 +238,7 @@
                   v-if="(activity.type === 'whatsapp' || activity.type === 'customer-whatsapp') && activity.content"
                   class="mt-2 relative group rounded-lg"
                 >
-                  <div class="bg-green-50 rounded-lg p-4 pr-24">
+                  <div class="bg-green-50 rounded-lg p-4">
                     <p
                       class="text-sm text-foreground wrap-break-word leading-normal"
                     >
@@ -249,7 +249,7 @@
                     v-if="activity.type === 'customer-whatsapp'"
                     variant="outline"
                     size="sm"
-                    class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-sm"
+                    class="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 hover:!opacity-100 hover:!bg-background hover:!text-foreground hover:!border-border transition-opacity rounded-sm"
                     @click.stop="handleAddActivity('whatsapp')"
                   >
                     <Reply class="w-3.5 h-3.5 shrink-0" />
@@ -266,6 +266,25 @@
                     {{ activity.message || activity.content }}
                   </p>
                 </div>
+                <div
+                  v-if="activity.type === 'call'"
+                  class="mt-2 bg-muted rounded-lg p-4"
+                >
+                  <p
+                    class="text-sm text-foreground wrap-break-word leading-normal"
+                  >
+                    {{ getCallSummary(activity) }}
+                  </p>
+                  <Button
+                    v-if="getCallTranscriptLines(activity).length > 0"
+                    variant="outline"
+                    size="sm"
+                    class="mt-3 rounded-sm"
+                    @click.stop="openTranscriptDialog(activity)"
+                  >
+                    {{ t('common.call.showTranscript') }}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -281,6 +300,31 @@
       </div>
     </div>
   </div>
+
+  <!-- Transcript dialog -->
+  <Dialog :open="!!transcriptDialogActivity" @update:open="(open) => !open && (transcriptDialogActivity = null)">
+    <DialogPortal>
+      <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
+      <DialogContent
+        class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
+        :show-close-button="true"
+      >
+        <DialogHeader class="shrink-0">
+          <DialogTitle>{{ t('common.call.transcript') }}</DialogTitle>
+        </DialogHeader>
+        <div class="flex-1 overflow-y-auto py-4 w-full space-y-3">
+          <div
+            v-for="(line, idx) in transcriptDialogLines"
+            :key="idx"
+            class="flex gap-2 text-sm font-mono"
+          >
+            <span :class="line.speaker === 'Lead' ? 'text-blue-600 font-semibold shrink-0' : 'text-green-600 font-semibold shrink-0'">{{ line.speaker }}:</span>
+            <span class="text-foreground wrap-break-word">{{ line.text }}</span>
+          </div>
+        </div>
+      </DialogContent>
+    </DialogPortal>
+  </Dialog>
 </template>
 
 <script setup>
@@ -306,7 +350,13 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator
+  DropdownMenuSeparator,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle
 } from '@motork/component-library/future/primitives'
 import { useI18n } from 'vue-i18n'
 import { formatTime } from '@/utils/formatters'
@@ -351,6 +401,33 @@ const activityFilters = computed(() => [
 ])
 
 const selectedFilters = ref(['all'])
+const transcriptDialogActivity = ref(null)
+
+function getCallTranscriptLines(activity) {
+  const transcription = activity?.data?.transcription || activity?.transcription
+  if (!transcription?.leadLines?.length && !transcription?.salesLines?.length) return []
+  const lead = transcription.leadLines ?? []
+  const sales = transcription.salesLines ?? []
+  const lines = []
+  const maxLen = Math.max(lead.length, sales.length)
+  for (let i = 0; i < maxLen; i++) {
+    if (lead[i]) lines.push({ speaker: 'Lead', text: lead[i] })
+    if (sales[i]) lines.push({ speaker: 'Sales', text: sales[i] })
+  }
+  return lines
+}
+
+const transcriptDialogLines = computed(() =>
+  transcriptDialogActivity.value ? getCallTranscriptLines(transcriptDialogActivity.value) : []
+)
+
+function getCallSummary(activity) {
+  return activity?.data?.summary || activity?.content || 'Call completed.'
+}
+
+function openTranscriptDialog(activity) {
+  transcriptDialogActivity.value = activity
+}
 
 const toggleFilter = (filterValue) => {
   if (filterValue === 'all') {

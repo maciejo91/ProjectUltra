@@ -302,14 +302,16 @@
             />
           </div>
 
-          <!-- Trade-ins and Financing options (leads + opportunities) -->
+          <!-- Trade-ins and Financing options (leads: only if added in Interested flow; opportunities: always) -->
           <div v-if="type !== 'contact'" class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:col-span-2">
             <TradeInsCard
+              v-if="type !== 'lead' || (task.tradeIns || []).length > 0"
               :items="task.tradeIns || []"
               @open-add="openTradeInModalFromCard"
               @open-edit="openTradeInEdit"
             />
             <FinancingOptionsCard
+              v-if="type !== 'lead' || (task.financingOptions || []).length > 0"
               :items="task.financingOptions || []"
               @open-add="openFinancingModalFromCard"
               @open-edit="openFinancingEdit"

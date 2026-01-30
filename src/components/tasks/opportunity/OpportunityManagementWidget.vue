@@ -221,6 +221,7 @@
                 :max-contact-attempts="3"
                 :lead-summary="leadSummary"
                 :caller-name="callerName"
+                :assigned-person-name="userStore.currentUser?.name ?? ''"
                 :is-muted="isMuted"
                 @start-call="startCall"
                 @end-call="endCall"

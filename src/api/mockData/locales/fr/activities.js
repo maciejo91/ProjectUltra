@@ -594,576 +594,177 @@ export const mockActivities = [
     opportunityId: 51
   },
   
-  // ========== LEAD ACTIVITIES (Leads 2-22) ==========
-  
-  // Lead 2 (Emma Watson) - Mercedes EQS
+  // ========== LEAD ACTIVITIES (1 customer message per lead when in progress) ==========
   {
     id: 69,
-    type: 'call',
-    user: 'Sarah Jenkins',
-    action: 'made a call attempt',
-    content: 'No answer. Will try again later.',
+    type: 'customer-whatsapp',
+    user: 'Emma Watson',
+    action: 'sent a WhatsApp message',
+    content: 'Hi, I am still interested in the EQS. Can we schedule a test drive after 2 PM?',
     timestamp: '2025-03-26T10:15:00',
-    leadId: 8
+    leadId: 2
   },
   {
     id: 70,
-    type: 'note',
-    user: 'Sarah Jenkins',
-    action: 'added a note',
-    content: 'Customer prefers contact after 2 PM. Interested in EQS test drive.',
-    timestamp: '2025-03-25T16:30:00',
-    leadId: 8
+    type: 'customer-email',
+    user: 'Liam Johnson',
+    action: 'sent an email',
+    content: 'When can I visit the Milano dealership to see the EQS?',
+    timestamp: '2025-03-25T11:00:00',
+    leadId: 3
   },
   {
     id: 71,
-    type: 'email',
-    user: 'Sarah Jenkins',
-    action: 'sent an email',
-    content: 'Sent detailed EQS specifications and pricing information.',
-    timestamp: '2025-03-24T14:00:00',
-    leadId: 8
-  },
-  
-  // Lead 3 (Liam Johnson) - Mercedes EQS
-  {
-    id: 72,
-    type: 'sms',
-    user: 'David Miller',
-    action: 'sent an SMS',
-    content: 'Hi Liam! Our Milano dealership is at Via Roma 45. Open Mon-Sat 9-7. Let me know when you can visit!',
-    timestamp: '2025-03-26T09:00:00',
-    leadId: 7
-  },
-  {
-    id: 73,
-    type: 'attachment',
-    user: 'David Miller',
-    action: 'uploaded an attachment',
-    content: 'Mercedes-Benz EQS brochure and technical specifications',
-    fileName: 'Mercedes_EQS_Brochure_2024.pdf',
-    timestamp: '2025-03-25T11:30:00',
-    leadId: 7
-  },
-  {
-    id: 74,
-    type: 'note',
-    user: 'David Miller',
-    action: 'added a note',
-    content: 'Customer wants electric vehicle with long range. EQS perfect fit.',
-    timestamp: '2025-03-24T10:00:00',
-    leadId: 7
-  },
-  
-  // Lead 4 (Sophie Mueller) - BMW X5
-  {
-    id: 75,
-    type: 'whatsapp',
-    user: 'Salsabeel Khaleel',
-    action: 'sent a WhatsApp message',
-    content: 'Hello Sophie! Thank you for your interest in the BMW X5. Would you like to schedule a test drive this week?',
-    timestamp: '2025-03-26T15:00:00',
-    leadId: 4
-  },
-  {
-    id: 76,
-    type: 'attachment',
-    user: 'Salsabeel Khaleel',
-    action: 'uploaded an attachment',
-    content: 'BMW X5 exterior and interior photos',
-    fileName: 'BMW_X5_Photos.jpg',
-    timestamp: '2025-03-25T14:00:00',
-    leadId: 4
-  },
-  {
-    id: 77,
-    type: 'call',
-    user: 'Salsabeel Khaleel',
-    action: 'made a call',
-    content: 'Spoke with customer. Very interested in X5 M Sport package. Discussed financing options.',
-    timestamp: '2025-03-24T11:00:00',
-    leadId: 4
-  },
-  {
-    id: 1851,
     type: 'customer-whatsapp',
     user: 'Sophie Mueller',
     action: 'sent a WhatsApp message',
-    content: 'Hi! I received the BMW X5 photos, thank you. Can we schedule a test drive for Saturday morning?',
-    timestamp: '2025-03-25T09:15:00',
+    content: 'Thanks for the X5 info. I would like to see the M Sport package this week.',
+    timestamp: '2025-03-26T14:00:00',
     leadId: 4
   },
-
-  // Lead 5 (Marco Rossi) - Volkswagen ID.4
   {
-    id: 78,
-    type: 'email',
-    user: 'Salsabeel Khaleel',
+    id: 72,
+    type: 'customer-email',
+    user: 'Marco Rossi',
     action: 'sent an email',
-    content: 'Sent comparison between ID.4 and ID.5 models with pricing.',
-    timestamp: '2025-03-26T10:00:00',
+    content: 'Do you have charging times for the ID.4? Interested in test drive.',
+    timestamp: '2025-03-25T09:30:00',
     leadId: 5
   },
   {
-    id: 79,
-    type: 'call',
-    user: 'Salsabeel Khaleel',
-    action: 'made a call',
-    content: 'Discussed electric vehicle benefits and charging infrastructure in Florence area.',
-    timestamp: '2025-03-25T15:30:00',
-    leadId: 5
-  },
-  {
-    id: 80,
-    type: 'note',
-    user: 'Salsabeel Khaleel',
-    action: 'added a note',
-    content: 'Customer concerned about charging times. Explained fast charging capabilities.',
-    timestamp: '2025-03-24T09:00:00',
-    leadId: 5
-  },
-  
-  // Lead 6 (Klaus Schmidt) - Porsche 911
-  {
-    id: 81,
-    type: 'attachment',
-    user: 'Sarah Jenkins',
-    action: 'uploaded an attachment',
-    content: 'Porsche 911 Carrera configuration options',
-    fileName: 'Porsche_911_Configurator.pdf',
-    timestamp: '2025-03-26T11:00:00',
-    leadId: 6
-  },
-  {
-    id: 82,
-    type: 'whatsapp',
-    user: 'Sarah Jenkins',
+    id: 73,
+    type: 'customer-whatsapp',
+    user: 'Klaus Schmidt',
     action: 'sent a WhatsApp message',
-    content: 'Hi Klaus! I have prepared a custom 911 configuration based on your preferences. Check the attachment!',
-    timestamp: '2025-03-25T16:00:00',
+    content: 'I would like the Sport Chrono package. Can you send the config?',
+    timestamp: '2025-03-25T15:00:00',
     leadId: 6
   },
-  {
-    id: 83,
-    type: 'call',
-    user: 'Sarah Jenkins',
-    action: 'made a call',
-    content: 'Discussed 911 customization options. Customer wants Sport Chrono package.',
-    timestamp: '2025-03-24T14:30:00',
-    leadId: 6
-  },
-  
-  // Lead 7 (Anna Becker) - Tesla Model 3
-  {
-    id: 84,
-    type: 'sms',
-    user: 'David Miller',
-    action: 'sent an SMS',
-    content: 'Hi Anna! Your Tesla Model 3 test drive is confirmed for Friday at 3 PM. See you then!',
-    timestamp: '2025-03-26T12:00:00',
-    leadId: 7
-  },
-  {
-    id: 85,
-    type: 'note',
-    user: 'David Miller',
-    action: 'added a note',
-    content: 'Customer very enthusiastic about Tesla. Prefers Performance variant.',
-    timestamp: '2025-03-25T10:00:00',
-    leadId: 7
-  },
-  {
-    id: 86,
-    type: 'email',
-    user: 'David Miller',
-    action: 'sent an email',
-    content: 'Sent Tesla Model 3 Performance specs and Autopilot features overview.',
-    timestamp: '2025-03-24T13:00:00',
-    leadId: 7
-  },
-  
-  // Lead 8 (Thomas Weber) - Audi e-tron GT - assignee Sarah Jenkins
-  {
-    id: 87,
-    type: 'call',
-    user: 'Sarah Jenkins',
-    action: 'made a call',
-    content: 'Detailed discussion about e-tron GT performance and luxury features.',
-    timestamp: '2025-03-26T14:00:00',
-    leadId: 8
-  },
-  {
-    id: 88,
-    type: 'attachment',
-    user: 'Sarah Jenkins',
-    action: 'uploaded an attachment',
-    content: 'Audi e-tron GT RS comparison document',
-    fileName: 'Audi_etron_GT_Comparison.pdf',
-    timestamp: '2025-03-25T11:00:00',
-    leadId: 8
-  },
-  {
-    id: 89,
-    type: 'whatsapp',
-    user: 'Sarah Jenkins',
-    action: 'sent a WhatsApp message',
-    content: 'Thomas, I found a beautiful e-tron GT in Daytona Gray. Would you like to see it?',
-    timestamp: '2025-03-24T16:00:00',
-    leadId: 8
-  },
-  
-  // Lead 9 (Julia Fischer) - Mercedes-Benz GLE
   {
     id: 74,
-    type: 'note',
-    user: 'Salsabeel Khaleel',
-    action: 'added a note',
-    content: 'Customer needs 7-seater SUV. GLE perfect match with third row option.',
-    timestamp: '2025-03-26T09:30:00',
-    leadId: 10
+    type: 'customer-email',
+    user: 'Anna Becker',
+    action: 'sent an email',
+    content: 'Confirming Friday 3 PM for the Model 3 test drive. Thanks!',
+    timestamp: '2025-03-26T11:00:00',
+    leadId: 7
   },
   {
     id: 75,
-    type: 'email',
-    user: 'Salsabeel Khaleel',
-    action: 'sent an email',
-    content: 'Sent GLE 7-seater configuration with family package options.',
-    timestamp: '2025-03-25T14:00:00',
-    leadId: 10
+    type: 'customer-whatsapp',
+    user: 'Thomas Weber',
+    action: 'sent a WhatsApp message',
+    content: 'Is the Daytona Gray e-tron GT still available? I can visit tomorrow.',
+    timestamp: '2025-03-25T16:00:00',
+    leadId: 8
   },
   {
     id: 76,
-    type: 'sms',
-    user: 'Salsabeel Khaleel',
-    action: 'sent an SMS',
-    content: 'Hi Julia! The GLE 450 with 7 seats is available for viewing. When can you visit?',
-    timestamp: '2025-03-24T10:30:00',
-    leadId: 10
+    type: 'customer-email',
+    user: 'Julia Fischer',
+    action: 'sent an email',
+    content: 'We need the 7-seater GLE. When can we see it?',
+    timestamp: '2025-03-26T09:00:00',
+    leadId: 9
   },
-  
-  // Lead 10 (Michael Hoffmann) - BMW iX
   {
     id: 77,
-    type: 'call',
-    user: 'Sarah Jenkins',
-    action: 'made a call attempt',
-    content: 'Left voicemail about BMW iX availability and test drive options.',
-    timestamp: '2025-03-26T11:30:00',
+    type: 'customer-whatsapp',
+    user: 'Michael Hoffmann',
+    action: 'sent a WhatsApp message',
+    content: 'Interested in the iX. Please call me back to arrange a test drive.',
+    timestamp: '2025-03-25T10:00:00',
     leadId: 10
   },
   {
     id: 78,
-    type: 'attachment',
-    user: 'Sarah Jenkins',
-    action: 'uploaded an attachment',
-    content: 'BMW iX sustainability and technology features',
-    fileName: 'BMW_iX_Technology_Guide.pdf',
-    timestamp: '2025-03-25T09:00:00',
-    leadId: 10
+    type: 'customer-email',
+    user: 'Laura Zimmermann',
+    action: 'sent an email',
+    content: 'I would like to see the Cayenne S when it arrives. Keep me posted.',
+    timestamp: '2025-03-26T12:00:00',
+    leadId: 11
   },
   {
     id: 79,
-    type: 'note',
-    user: 'Sarah Jenkins',
-    action: 'added a note',
-    content: 'Customer interested in sustainable mobility. iX perfect for eco-conscious buyers.',
-    timestamp: '2025-03-24T15:00:00',
-    leadId: 10
+    type: 'customer-whatsapp',
+    user: 'Stefan Braun',
+    action: 'sent a WhatsApp message',
+    content: 'Still interested in the Macan. Can you send financing options?',
+    timestamp: '2025-03-25T14:00:00',
+    leadId: 12
   },
-  
-  // Lead 11 (Laura Zimmermann) - Porsche Cayenne
   {
     id: 80,
-    type: 'whatsapp',
-    user: 'David Miller',
-    action: 'sent a WhatsApp message',
-    content: 'Laura, we have a stunning Cayenne S in white arriving next week. Interested in first look?',
-    timestamp: '2025-03-26T13:00:00',
-    leadId: 11
+    type: 'customer-email',
+    user: 'Nina Keller',
+    action: 'sent an email',
+    content: 'I need the e-tron GT for an event next week. Is 5 PM today possible?',
+    timestamp: '2025-03-26T15:00:00',
+    leadId: 13
   },
   {
     id: 81,
-    type: 'call',
-    user: 'David Miller',
-    action: 'made a call',
-    content: 'Discussed Cayenne variants and performance differences between S and Turbo.',
-    timestamp: '2025-03-25T16:30:00',
-    leadId: 11
+    type: 'customer-whatsapp',
+    user: 'Oliver Lang',
+    action: 'sent a WhatsApp message',
+    content: 'Can you send the C-Class hybrid comparison? Interested in fuel economy.',
+    timestamp: '2025-03-26T10:00:00',
+    leadId: 14
   },
   {
     id: 82,
-    type: 'email',
-    user: 'David Miller',
+    type: 'customer-email',
+    user: 'Petra Schulz',
     action: 'sent an email',
-    content: 'Sent Cayenne S vs Turbo comparison with pricing breakdown.',
-    timestamp: '2025-03-24T12:00:00',
-    leadId: 11
+    content: 'Confirming ID.4 test drive tomorrow 11 AM. See you then!',
+    timestamp: '2025-03-26T16:00:00',
+    leadId: 15
   },
-  
-  // Lead 12 (Stefan Braun) - Porsche Macan
   {
     id: 83,
-    type: 'note',
-    user: 'Sarah Jenkins',
-    action: 'added a note',
-    content: 'Multiple contact attempts. Customer seems busy. Will try different times.',
-    timestamp: '2025-03-26T10:00:00',
-    leadId: 12
+    type: 'customer-whatsapp',
+    user: 'Robert Klein',
+    action: 'sent a WhatsApp message',
+    content: 'I want the M4 with M xDrive. When can I see the performance data?',
+    timestamp: '2025-03-25T12:00:00',
+    leadId: 16
   },
   {
     id: 84,
-    type: 'sms',
-    user: 'Sarah Jenkins',
-    action: 'sent an SMS',
-    content: 'Hi Stefan! Still interested in the Porsche Macan? We have great financing offers this month!',
-    timestamp: '2025-03-25T14:30:00',
-    leadId: 12
+    type: 'customer-email',
+    user: 'Sabine Vogel',
+    action: 'sent an email',
+    content: 'Is the Q5 45 TFSI still available? I can visit this week.',
+    timestamp: '2025-03-26T11:30:00',
+    leadId: 17
   },
   {
     id: 85,
-    type: 'call',
-    user: 'Sarah Jenkins',
-    action: 'made a call attempt',
-    content: 'No answer. Fifth attempt.',
-    timestamp: '2025-03-24T11:00:00',
-    leadId: 12
+    type: 'customer-whatsapp',
+    user: 'Dr. Andreas Werner',
+    action: 'sent a WhatsApp message',
+    content: 'Please send Taycan Turbo S specs and color options. Ready to proceed.',
+    timestamp: '2025-03-26T08:30:00',
+    leadId: 18
   },
-  
-  // Lead 13 (Nina Keller) - Audi e-tron GT (Hot/Urgent)
   {
     id: 86,
-    type: 'call',
-    user: 'Sarah Jenkins',
-    action: 'made a call',
-    content: 'Urgent inquiry. Customer needs e-tron GT for business event next week.',
-    timestamp: '2025-03-26T16:00:00',
-    leadId: 13
+    type: 'customer-email',
+    user: 'Christina Bauer',
+    action: 'sent an email',
+    content: 'We have two kids. Can you arrange a test drive with car seats?',
+    timestamp: '2025-03-25T14:00:00',
+    leadId: 19
   },
   {
     id: 87,
-    type: 'whatsapp',
-    user: 'Sarah Jenkins',
+    type: 'customer-whatsapp',
+    user: 'Martin Richter',
     action: 'sent a WhatsApp message',
-    content: 'Nina, I can arrange immediate viewing today at 5 PM. The e-tron GT is ready!',
-    timestamp: '2025-03-26T15:30:00',
-    leadId: 13
-  },
-  {
-    id: 88,
-    type: 'attachment',
-    user: 'Sarah Jenkins',
-    action: 'uploaded an attachment',
-    content: 'Express delivery options and expedited paperwork process',
-    fileName: 'Express_Delivery_Process.pdf',
-    timestamp: '2025-03-26T15:00:00',
-    leadId: 13
-  },
-  
-  // Lead 14 (Oliver Lang) - Mercedes C-Class
-  {
-    id: 89,
-    type: 'email',
-    user: 'David Miller',
-    action: 'sent an email',
-    content: 'Sent C-Class hybrid benefits and fuel economy comparison.',
-    timestamp: '2025-03-26T10:30:00',
-    leadId: 14
-  },
-  {
-    id: 90,
-    type: 'note',
-    user: 'David Miller',
-    action: 'added a note',
-    content: 'Customer interested in hybrid technology for daily commute.',
-    timestamp: '2025-03-25T13:00:00',
-    leadId: 14
-  },
-  {
-    id: 91,
-    type: 'call',
-    user: 'David Miller',
-    action: 'made a call',
-    content: 'Discussed hybrid system and maintenance costs. Customer satisfied with information.',
-    timestamp: '2025-03-24T14:00:00',
-    leadId: 14
-  },
-  
-  // Lead 15 (Petra Schulz) - Volkswagen ID.4 - assignee Sarah Jenkins
-  {
-    id: 92,
-    type: 'sms',
-    user: 'Sarah Jenkins',
-    action: 'sent an SMS',
-    content: 'Petra, your ID.4 test drive is scheduled for tomorrow at 11 AM. Looking forward to seeing you!',
-    timestamp: '2025-03-26T17:00:00',
-    leadId: 15
-  },
-  {
-    id: 93,
-    type: 'attachment',
-    user: 'Sarah Jenkins',
-    action: 'uploaded an attachment',
-    content: 'ID.4 charging network map for Berlin area',
-    fileName: 'ID4_Charging_Network_Berlin.pdf',
-    timestamp: '2025-03-25T10:00:00',
-    leadId: 15
-  },
-  {
-    id: 94,
-    type: 'whatsapp',
-    user: 'Sarah Jenkins',
-    action: 'sent a WhatsApp message',
-    content: 'Hi Petra! I found a great ID.4 in your preferred color - Moonstone Gray. Want to see photos?',
-    timestamp: '2025-03-24T16:30:00',
-    leadId: 15
-  },
-  
-  // Lead 16 (Robert Klein) - BMW M4
-  {
-    id: 95,
-    type: 'call',
-    user: 'Salsabeel Khaleel',
-    action: 'made a call',
-    content: 'Discussed M4 Competition performance specs and track capabilities.',
-    timestamp: '2025-03-26T14:30:00',
-    leadId: 16
-  },
-  {
-    id: 96,
-    type: 'note',
-    user: 'Salsabeel Khaleel',
-    action: 'added a note',
-    content: 'Performance enthusiast. Interested in M4 Competition with M xDrive.',
-    timestamp: '2025-03-25T11:30:00',
-    leadId: 16
-  },
-  {
-    id: 97,
-    type: 'email',
-    user: 'Salsabeel Khaleel',
-    action: 'sent an email',
-    content: 'Sent M4 Competition performance data and track mode features.',
-    timestamp: '2025-03-24T09:30:00',
-    leadId: 16
-  },
-  
-  // Lead 17 (Sabine Vogel) - Audi Q5
-  {
-    id: 98,
-    type: 'whatsapp',
-    user: 'Sarah Jenkins',
-    action: 'sent a WhatsApp message',
-    content: 'Sabine, the Q5 45 TFSI you asked about is available. Can you visit this week?',
-    timestamp: '2025-03-26T12:30:00',
-    leadId: 17
-  },
-  {
-    id: 99,
-    type: 'attachment',
-    user: 'Sarah Jenkins',
-    action: 'uploaded an attachment',
-    content: 'Audi Q5 interior photos and equipment list',
-    fileName: 'Audi_Q5_Interior_Photos.jpg',
-    timestamp: '2025-03-25T15:00:00',
-    leadId: 17
-  },
-  {
-    id: 100,
-    type: 'call',
-    user: 'Sarah Jenkins',
-    action: 'made a call',
-    content: 'Spoke about Q5 comfort features and advanced driver assistance systems.',
-    timestamp: '2025-03-24T13:30:00',
-    leadId: 17
-  },
-  
-  // Lead 18 (Dr. Andreas Werner) - Porsche Taycan
-  {
-    id: 101,
-    type: 'email',
-    user: 'David Miller',
-    action: 'sent an email',
-    content: 'Sent Taycan Turbo S specifications and performance comparison with Tesla.',
-    timestamp: '2025-03-26T09:00:00',
-    leadId: 18
-  },
-  {
-    id: 102,
-    type: 'note',
-    user: 'David Miller',
-    action: 'added a note',
-    content: 'High-value customer. Interested in Taycan Turbo S for luxury electric performance.',
-    timestamp: '2025-03-25T14:00:00',
-    leadId: 18
-  },
-  {
-    id: 103,
-    type: 'attachment',
-    user: 'David Miller',
-    action: 'uploaded an attachment',
-    content: 'Porsche Taycan exclusive color options catalog',
-    fileName: 'Taycan_Exclusive_Colors.pdf',
-    timestamp: '2025-03-24T10:00:00',
-    leadId: 18
-  },
-  
-  // Lead 19 (Christina Bauer) - BMW X3 - assignee Salsabeel Khaleel
-  {
-    id: 104,
-    type: 'sms',
-    user: 'Salsabeel Khaleel',
-    action: 'sent an SMS',
-    content: 'Christina, we have a special offer on X3 xDrive30i this week. Save up to €5,000!',
-    timestamp: '2025-03-26T11:00:00',
-    leadId: 19
-  },
-  {
-    id: 105,
-    type: 'call',
-    user: 'Salsabeel Khaleel',
-    action: 'made a call',
-    content: 'Discussed X3 family features and cargo space. Christina Bauer has two children.',
-    timestamp: '2025-03-25T16:00:00',
-    leadId: 19
-  },
-  {
-    id: 106,
-    type: 'whatsapp',
-    user: 'Salsabeel Khaleel',
-    action: 'sent a WhatsApp message',
-    content: 'Hi Christina! I can arrange a family test drive with car seats installed. Let me know!',
-    timestamp: '2025-03-24T12:00:00',
-    leadId: 19
-  },
-  
-  // Lead 20 (Martin Richter) - BMW M4 Competition (Hot)
-  {
-    id: 107,
-    type: 'call',
-    user: 'Sarah Jenkins',
-    action: 'made a call',
-    content: 'Customer very enthusiastic. Wants M4 Competition in Isle of Man Green.',
-    timestamp: '2025-03-26T15:00:00',
-    leadId: 80
-  },
-  {
-    id: 108,
-    type: 'attachment',
-    user: 'Sarah Jenkins',
-    action: 'uploaded an attachment',
-    content: 'M4 Competition in Isle of Man Green - exclusive photos',
-    fileName: 'M4_Isle_of_Man_Green.jpg',
-    timestamp: '2025-03-26T14:30:00',
-    leadId: 80
-  },
-  {
-    id: 109,
-    type: 'note',
-    user: 'Sarah Jenkins',
-    action: 'added a note',
-    content: 'Performance enthusiast with track experience. Ready to proceed quickly.',
+    content: 'I want the M4 Competition in Isle of Man Green. When can I see it?',
     timestamp: '2025-03-26T14:00:00',
-    leadId: 80
+    leadId: 20
   },
   
   // ========== OPPORTUNITY ACTIVITIES - MISSING TYPES ==========

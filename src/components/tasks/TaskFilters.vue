@@ -1,15 +1,13 @@
 <template>
   <div v-if="!buttonOnly && !chipsOnly" class="flex flex-col gap-2">
-    <!-- Filter Dropdown and Chips Row -->
     <div class="flex items-center gap-1.5 flex-wrap">
-      <!-- Filter Dropdown: same button as Activity tab (Filter icon + blue dot) -->
       <DropdownMenu :modal="false">
         <DropdownMenuTrigger as-child>
           <Button
             variant="outline"
             size="icon"
             class="relative w-8 h-8"
-            aria-label="Filter tasks"
+            :aria-label="t('common.tasks.filterAria')"
           >
             <Filter class="w-4 h-4 shrink-0" />
             <span
@@ -29,7 +27,24 @@
             <span v-else class="w-4 h-4 shrink-0" aria-hidden="true"></span>
             <span>{{ option.label }}</span>
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DropdownMenu :modal="false">
+        <DropdownMenuTrigger as-child>
+          <Button
+            variant="outline"
+            size="icon"
+            class="relative w-8 h-8"
+            :aria-label="t('common.tasks.sortAria')"
+          >
+            <ArrowUpDown class="w-4 h-4 shrink-0" />
+            <span
+              v-if="hasActiveSort"
+              class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-primary"
+            ></span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent class="w-56" align="start">
           <DropdownMenuItem
             v-for="sortItem in sortMenuItems"
             :key="sortItem.key"
@@ -44,16 +59,15 @@
       </DropdownMenu>
     </div>
   </div>
-  
-  <!-- Button Only Mode (e.g. next to search) -->
-  <div v-else-if="buttonOnly">
+
+  <div v-else-if="buttonOnly" class="flex items-center gap-2 shrink-0">
     <DropdownMenu :modal="false">
       <DropdownMenuTrigger as-child>
         <Button
           variant="outline"
           size="icon"
           class="relative w-8 h-8"
-          aria-label="Filter tasks"
+          :aria-label="t('common.tasks.filterAria')"
         >
           <Filter class="w-4 h-4 shrink-0" />
           <span
@@ -73,7 +87,24 @@
           <span v-else class="w-4 h-4 shrink-0" aria-hidden="true"></span>
           <span>{{ option.label }}</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
+      </DropdownMenuContent>
+    </DropdownMenu>
+    <DropdownMenu :modal="false">
+      <DropdownMenuTrigger as-child>
+        <Button
+          variant="outline"
+          size="icon"
+          class="relative w-8 h-8"
+          :aria-label="t('common.tasks.sortAria')"
+        >
+          <ArrowUpDown class="w-4 h-4 shrink-0" />
+          <span
+            v-if="hasActiveSort"
+            class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-primary"
+          ></span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent class="w-56" align="end">
         <DropdownMenuItem
           v-for="sortItem in sortMenuItems"
           :key="sortItem.key"
@@ -87,22 +118,23 @@
       </DropdownMenuContent>
     </DropdownMenu>
   </div>
-  
-  <!-- Chips hidden: only the blue dot on the filter button indicates active filters -->
+
   <template v-else-if="chipsOnly"></template>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { Filter, Check } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
+import { Filter, ArrowUpDown, Check } from 'lucide-vue-next'
 import {
   Button,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator
+  DropdownMenuItem
 } from '@motork/component-library/future/primitives'
+
+const { t } = useI18n()
 
 const props = defineProps({
   activeFilters: { type: Array, default: () => [] },
@@ -114,35 +146,30 @@ const props = defineProps({
 
 const emit = defineEmits(['filter-change', 'sort-change', 'toggle-closed'])
 
-const hasActiveFilters = computed(() => {
-  const hasFilters = props.activeFilters.length > 0
-  const hasSort = props.sortOption && props.sortOption !== '' && props.sortOption !== 'none'
-  return hasFilters || hasSort
-})
+const hasActiveFilters = computed(() => props.activeFilters.length > 0)
 
-// Filter options configuration
-const filterOptions = [
-  { key: 'lead', label: 'Leads', type: 'type' },
-  { key: 'opportunity', label: 'Opportunities', type: 'type' },
-  { key: 'due-in-24h', label: 'Due in 24 hours', type: 'date' },
-  { key: 'to-be-called', label: 'To be called again', type: 'status' },
-  { key: 'leads-1h', label: 'Leads created 1 hour ago', type: 'date' },
-  { key: 'assigned-to-me', label: 'Assigned to me', type: 'assignee' }
-]
+const hasActiveSort = computed(() =>
+  Boolean(props.sortOption && props.sortOption !== '' && props.sortOption !== 'none')
+)
 
-// Toggle filter on/off
+const filterOptions = computed(() => [
+  { key: 'lead', label: t('common.tasks.filters.lead'), type: 'type' },
+  { key: 'opportunity', label: t('common.tasks.filters.opportunity'), type: 'type' },
+  { key: 'due-in-24h', label: t('common.tasks.filters.dueIn24h'), type: 'date' },
+  { key: 'to-be-called', label: t('common.tasks.filters.toBeCalled'), type: 'status' },
+  { key: 'leads-1h', label: t('common.tasks.filters.leads1h'), type: 'date' },
+  { key: 'assigned-to-me', label: t('common.tasks.filters.assignedToMe'), type: 'assignee' },
+  { key: 'assigned-to-my-team', label: t('common.tasks.filters.assignedToMyTeam'), type: 'assignee' }
+])
+
 const toggleFilter = (filterKey) => {
   const currentFilters = [...props.activeFilters]
   const index = currentFilters.indexOf(filterKey)
-  
   if (index > -1) {
-    // Remove filter
     currentFilters.splice(index, 1)
   } else {
-    // Add filter
     currentFilters.push(filterKey)
   }
-  
   emit('filter-change', currentFilters)
 }
 
@@ -150,15 +177,9 @@ const selectSort = (option) => {
   emit('sort-change', option)
 }
 
-// Build sort menu items
-const sortMenuItems = computed(() => {
-  const hasLeads = props.activeFilters.includes('lead')
-  return [
-    { key: 'recent-first', label: 'Most Recent First' },
-    ...(hasLeads ? [{ key: 'urgent-first', label: 'Urgent first' }] : []),
-    { key: 'assigned-to-me', label: 'Assigned to me' },
-    { key: 'assigned-to-my-team', label: 'Assigned to my team' }
-  ]
-})
-
+const sortMenuItems = computed(() => [
+  { key: 'recent-first', label: t('common.tasks.sort.mostRecentFirst') },
+  { key: 'urgent-first', label: t('common.tasks.sort.mostUrgentFirst') },
+  { key: 'oldest-first', label: t('common.tasks.sort.oldestFirst') }
+])
 </script>

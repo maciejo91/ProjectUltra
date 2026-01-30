@@ -47,16 +47,7 @@ export const mockLeads = [
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: [], // Zero contact attempts - needs initial call
-    tradeIns: [
-      { id: 't1', label: '2015 Mercedes', valuation: 8000 },
-      { id: 't2', label: '2018 VW', valuation: 6000 }
-    ],
-    financingOptions: [
-      { id: 'f1', label: 'Cash' },
-      { id: 'f2', label: 'Loan 48 months', termMonths: 48 },
-      { id: 'f3', label: 'Leasing 36 months', termMonths: 36 }
-    ]
+    contactAttempts: [] // Zero contact attempts - needs initial call
   },
   // GROUP A: Validated Stage Leads
   {
@@ -116,15 +107,6 @@ export const mockLeads = [
         notes: 'Customer confirmed interest, validated contact details, scheduled test drive',
         transcription: null
       }
-    ],
-    tradeIns: [
-      { id: 't1', label: '2015 Mercedes', valuation: 8000 },
-      { id: 't2', label: '2018 VW', valuation: 6000 }
-    ],
-    financingOptions: [
-      { id: 'f1', label: 'Cash' },
-      { id: 'f2', label: 'Loan 48 months', termMonths: 48 },
-      { id: 'f3', label: 'Leasing 36 months', termMonths: 36 }
     ]
   },
   {
@@ -199,15 +181,6 @@ export const mockLeads = [
         notes: 'Validated lead, customer interested. Needs to check calendar for appointment',
         transcription: null
       }
-    ],
-    tradeIns: [
-      { id: 't1', label: '2016 Audi A3', valuation: 9500 },
-      { id: 't2', label: '2019 VW Golf', valuation: 7200 }
-    ],
-    financingOptions: [
-      { id: 'f1', label: 'Cash' },
-      { id: 'f2', label: 'Loan 48 months', termMonths: 48 },
-      { id: 'f3', label: 'Leasing 36 months', termMonths: 36 }
     ]
   },
   // GROUP B: Disqualified States
@@ -256,14 +229,7 @@ export const mockLeads = [
     disqualifyReason: 'Data cleanup',
     disqualifyCategory: 'Not Valid',
     scheduledAppointment: null,
-    contactAttempts: [],
-    tradeIns: [
-      { id: 't1', label: '2020 VW Golf', valuation: 14000 }
-    ],
-    financingOptions: [
-      { id: 'f1', label: 'Cash' },
-      { id: 'f2', label: 'Loan 48 months', termMonths: 48 }
-    ]
+    contactAttempts: []
   },
   {
     id: 7,
@@ -1021,7 +987,16 @@ export const mockLeads = [
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: []
+    contactAttempts: [],
+    tradeIns: [
+      { id: 't1', label: '2019 Mercedes E-Class', valuation: 32000 },
+      { id: 't2', label: '2021 BMW 5 Series', valuation: 28000 }
+    ],
+    financingOptions: [
+      { id: 'f1', label: 'Cash' },
+      { id: 'f2', label: 'Loan 48 months', termMonths: 48 },
+      { id: 'f3', label: 'Leasing 36 months', termMonths: 36 }
+    ]
   },
   // Lead 21 - To be called back with OVERDUE callback
   {
@@ -1170,6 +1145,15 @@ export const mockLeads = [
         notes: 'Customer very interested. Requested urgent callback tomorrow morning at 10 AM.',
         transcription: null
       }
+    ],
+    tradeIns: [
+      { id: 't1', label: '2017 BMW 3 Series', valuation: 15000 },
+      { id: 't2', label: '2019 VW Passat', valuation: 12000 }
+    ],
+    financingOptions: [
+      { id: 'f1', label: 'Cash' },
+      { id: 'f2', label: 'Loan 48 months', termMonths: 48 },
+      { id: 'f3', label: 'Leasing 36 months', termMonths: 36 }
     ]
   },
   // Lead 23 - Validated with multiple contact attempts before validation

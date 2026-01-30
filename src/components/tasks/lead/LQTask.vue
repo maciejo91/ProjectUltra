@@ -125,10 +125,11 @@
           :max-contact-attempts="maxContactAttempts"
           :lead-summary="leadSummary"
           :caller-name="callerName"
+          :assigned-person-name="currentUser?.name ?? ''"
           :is-muted="isMuted"
           @start-call="startCall"
-          @end-call="endCallFromComposable"
-          @close="callState.resetCall()"
+          @end-call="onEndCall"
+          @close="onCallClose"
           @toggle-mute="toggleMute"
           @log-manual-call="logManualCall"
           @extract-information="showComingSoonModal = true"
@@ -433,38 +434,54 @@
                   </Select>
                 </div>
 
-                <!-- Trade in -->
+                <!-- Trade-in -->
                 <div class="space-y-2">
-                  <label class="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      v-model="enrichLeadData.hasTradeIn"
-                      class="w-4 h-4 focus:ring-brand-blue border-gray-300 rounded"
-                      style="accent-color: var(--brand-blue);"
-                    />
-                    <span class="text-sm font-medium text-muted-foreground">Trade in?</span>
-                  </label>
-                  <Input
-                    v-model="enrichLeadData.tradeInModel"
-                    :disabled="!enrichLeadData.hasTradeIn"
-                    placeholder="Car brand and model"
-                    class="w-full h-10 min-h-10"
-                  />
+                  <Label class="form-label">Trade-in</Label>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    class="gap-1.5"
+                    @click="editingTradeIn = null; showVehicleModal = true"
+                  >
+                    <Plus class="size-3.5" />
+                    Add trade-in
+                  </Button>
+                  <ul v-if="(lead.tradeIns || []).length" class="space-y-1.5">
+                    <li
+                      v-for="t in (lead.tradeIns || [])"
+                      :key="t.id"
+                      class="flex items-center justify-between gap-2 py-1.5 px-2.5 rounded-lg border border-border bg-muted/50 text-sm cursor-pointer hover:bg-muted transition-colors"
+                      @click="openTradeInEdit(t)"
+                    >
+                      <span class="font-medium text-foreground">{{ t.label }}</span>
+                      <span v-if="t.valuation != null" class="text-muted-foreground shrink-0 text-xs">€ {{ formatTradeInCurrency(t.valuation) }}</span>
+                    </li>
+                  </ul>
                 </div>
 
                 <!-- Financing -->
-                <div>
-                  <Label class="form-label">Financing?</Label>
-                  <Select v-model="enrichLeadData.financingOption">
-                    <SelectTrigger class="w-full h-10 min-h-10">
-                      <SelectValue placeholder="Select financing option" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="FIN">Captive Financing</SelectItem>
-                      <SelectItem value="LEA">Leasing</SelectItem>
-                      <SelectItem value="LTR">Long-Term Rental</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div class="space-y-2">
+                  <Label class="form-label">Financing</Label>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    class="gap-1.5"
+                    @click="editingFinancingOption = null; showFinancingModal = true"
+                  >
+                    <Plus class="size-3.5" />
+                    Add financing
+                  </Button>
+                  <ul v-if="(lead.financingOptions || []).length" class="space-y-1.5">
+                    <li
+                      v-for="f in (lead.financingOptions || [])"
+                      :key="f.id"
+                      class="flex items-center justify-between gap-2 py-1.5 px-2.5 rounded-lg border border-border bg-muted/50 text-sm cursor-pointer hover:bg-muted transition-colors"
+                      @click="openFinancingEdit(f)"
+                    >
+                      <span class="font-medium text-foreground">{{ f.label }}</span>
+                      <span v-if="f.termMonths" class="text-muted-foreground shrink-0 text-xs">{{ f.termMonths }} months</span>
+                    </li>
+                  </ul>
                 </div>
 
                 <!-- Additional notes -->
@@ -660,8 +677,8 @@
                 </div>
               </div>
 
-              <!-- Step 3: Schedule (Calendar and Time Slots) - show by default when assign-and-schedule is selected -->
-              <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+              <!-- Step 3: Schedule (Calendar and Time Slots) - only after event type is selected -->
+              <div v-if="qualificationEventType" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
                 <h5 class="font-semibold text-foreground text-sm mb-4">{{ t('forms.schedule.title') }} <span class="text-red-600">*</span></h5>
                 
                 <!-- Calendar and Time Slots - Two Column Layout -->
@@ -844,8 +861,10 @@
       :show="showFinancingModal"
       :task-type="'lead'"
       :task-id="lead.id"
+      :purchase-method="editingFinancingOption"
       @save="handlePurchaseMethodSave"
-      @close="showFinancingModal = false"
+      @delete="handleFinancingDelete"
+      @close="showFinancingModal = false; editingFinancingOption = null"
     />
 
     <!-- Add Trade-In Modal -->
@@ -855,8 +874,10 @@
       :task-type="'lead'"
       :task-id="lead.id"
       :customer-id="lead.customerId"
-      @close="showVehicleModal = false"
+      :item="editingTradeIn"
+      @close="showVehicleModal = false; editingTradeIn = null"
       @save="handleVehicleSave"
+      @delete="handleTradeInDelete"
     />
 
     <!-- Coming Soon Modal -->
@@ -865,6 +886,18 @@
       title="AI Information Extraction"
       @close="showComingSoonModal = false"
     />
+
+    <!-- Loading overlay when trade-in or financing action is in progress -->
+    <Teleport to="body">
+      <div
+        v-if="(tradeInActionLoading && showVehicleModal) || (financingActionLoading && showFinancingModal)"
+        class="fixed inset-0 z-60 flex items-center justify-center bg-black/30"
+        aria-busy="true"
+        aria-label="Loading"
+      >
+        <Spinner class="size-8 text-foreground" />
+      </div>
+    </Teleport>
 
   </div>
 </template>
@@ -882,7 +915,8 @@ import {
   Label,
   Input,
   Textarea,
-  Toggle
+  Toggle,
+  Spinner
 } from '@motork/component-library/future/primitives'
 import { SelectMenu } from '@motork/component-library/future/components'
 
@@ -896,7 +930,7 @@ import {
   DialogPortal,
   DialogTitle
 } from '@motork/component-library/future/primitives'
-import { Check, PhoneOff, ThumbsDown, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { Check, PhoneOff, ThumbsDown, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, ChevronLeft, ChevronRight, Plus } from 'lucide-vue-next'
 import NoteWidget from '@/components/customer/activities/NoteWidget.vue'
 import ScheduleAppointmentModal from '@/components/modals/ScheduleAppointmentModal.vue'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
@@ -972,6 +1006,10 @@ const showAssignmentModal = ref(false)
 const showFinancingModal = ref(false)
 const showVehicleModal = ref(false)
 const showComingSoonModal = ref(false)
+const editingTradeIn = ref(null)
+const editingFinancingOption = ref(null)
+const tradeInActionLoading = ref(false)
+const financingActionLoading = ref(false)
 
 // Static data that stays in component
 const assignableUsers = computed(() => usersStore.assignableUsers)
@@ -980,14 +1018,17 @@ const currentUser = computed(() => userStore.currentUser)
 
 // Enrich lead data
 const enrichLeadData = ref({
-  interestLevel: '', // 'High', 'Medium', 'Low'
+  interestLevel: '',
   purchaseTimeline: '',
   budgetRange: '',
-  hasTradeIn: false,
-  tradeInModel: '',
-  financingOption: '', // 'FIN', 'LEA', 'LTR'
   additionalNotes: ''
 })
+
+function formatTradeInCurrency(val) {
+  if (val == null) return '0'
+  const n = typeof val === 'string' ? parseFloat(val) : val
+  return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+}
 
 // Assignment state
 const selectedDealership = ref('')
@@ -1091,17 +1132,6 @@ const handleEnrichLeadSave = async () => {
     if (data.budgetRange) {
       noteParts.push(`Budget range: ${data.budgetRange}`)
     }
-    if (data.hasTradeIn && data.tradeInModel) {
-      noteParts.push(`Trade-in: ${data.tradeInModel}`)
-    }
-    if (data.financingOption) {
-      const financingLabels = {
-        'FIN': 'Captive Financing',
-        'LEA': 'Leasing',
-        'LTR': 'Long-Term Rental'
-      }
-      noteParts.push(`Financing: ${financingLabels[data.financingOption] || data.financingOption}`)
-    }
     if (data.additionalNotes) {
       noteParts.push(data.additionalNotes)
     }
@@ -1144,14 +1174,10 @@ const handleEnrichLeadSave = async () => {
       emit('survey-completed', { lead: props.lead, responses: surveyResponses })
     }
     
-    // Clear form after successful save
     enrichLeadData.value = {
       interestLevel: '',
       purchaseTimeline: '',
       budgetRange: '',
-      hasTradeIn: false,
-      tradeInModel: '',
-      financingOption: '',
       additionalNotes: ''
     }
   } catch (error) {
@@ -1172,6 +1198,33 @@ const copyNumber = () => {
 
 const updateCallNotes = (value) => {
   callNotes.value = value
+}
+
+async function addCallActivity() {
+  const userName = currentUser.value?.name || 'You'
+  const transcription = callData.value?.transcription
+  const summary = 'Lead confirmed their details and the call covered the main inquiry discussed in the transcript.'
+  await leadsStore.addActivity(props.lead.id, {
+    type: 'call',
+    user: userName,
+    action: 'made a call',
+    content: `${userName} made a call`,
+    data: transcription
+      ? { transcription, duration: callData.value?.duration, summary }
+      : { summary, duration: callData.value?.duration },
+    timestamp: new Date().toISOString()
+  })
+}
+
+const onEndCall = () => {
+  endCallFromComposable()
+}
+
+const onCallClose = async () => {
+  if (callEnded) {
+    await addCallActivity()
+  }
+  callState.resetCall()
 }
 
 const callerName = computed(() => props.lead.customer?.name || 'Caller')
@@ -1587,16 +1640,12 @@ const canSendAndPostpone = computed(() => {
   return true
 })
 
-// Reset enrich lead data when outcome changes
 watch(selectedOutcome, (newOutcome) => {
   if (newOutcome !== 'interested') {
     enrichLeadData.value = {
       interestLevel: '',
       purchaseTimeline: '',
       budgetRange: '',
-      hasTradeIn: false,
-      tradeInModel: '',
-      financingOption: '',
       additionalNotes: ''
     }
     selectedDealership.value = ''
@@ -1901,60 +1950,142 @@ const successPerformedAtLabel = computed(() => {
 const { saveTradeInVehicle } = useTradeInVehicle()
 
 const handlePurchaseMethodSave = async (purchaseMethodData) => {
+  financingActionLoading.value = true
   try {
     showFinancingModal.value = false
     preferences.value.financing = true
-    
-    // Create activity for the purchase method (for activity feed display)
-    const typeLabel = purchaseMethodData.type === 'FIN' ? 'Captive Financing' 
-      : purchaseMethodData.type === 'LEA' ? 'Leasing' 
+    const isEdit = !!editingFinancingOption.value
+    const typeLabel = purchaseMethodData.type === 'FIN' ? 'Captive Financing'
+      : purchaseMethodData.type === 'LEA' ? 'Leasing'
       : 'Long-Term Rental'
     const monthly = purchaseMethodData.fields?.monthlyInstalment || 0
-    
-    await leadsStore.addActivity(props.lead.id, {
-      type: 'purchase-method',
-      user: currentUser.value?.name || 'You',
-      action: `added a ${typeLabel} purchase method`,
-      content: `${typeLabel}: €${monthly.toLocaleString()}/month for ${purchaseMethodData.fields?.duration || 0} months`,
-      data: {
-        purchaseMethodId: purchaseMethodData.id,
-        type: purchaseMethodData.type,
-        ...purchaseMethodData.fields
-      },
-      timestamp: new Date().toISOString()
-    })
-    
+    if (!isEdit) {
+      await leadsStore.addActivity(props.lead.id, {
+        type: 'purchase-method',
+        user: currentUser.value?.name || 'You',
+        action: `added a ${typeLabel} purchase method`,
+        content: `${typeLabel}: €${monthly.toLocaleString()}/month for ${purchaseMethodData.fields?.duration || 0} months`,
+        data: {
+          purchaseMethodId: purchaseMethodData.id,
+          type: purchaseMethodData.type,
+          ...purchaseMethodData.fields
+        },
+        timestamp: new Date().toISOString()
+      })
+    }
+    const duration = purchaseMethodData.fields?.duration ?? purchaseMethodData.termMonths ?? null
+    const foLabel = purchaseMethodData.label ?? (duration ? `${typeLabel} - ${duration} months` : typeLabel)
+    const fullItem = {
+      id: purchaseMethodData.id || editingFinancingOption.value?.id || `fo-${Date.now()}`,
+      label: foLabel,
+      termMonths: duration ?? null,
+      type: purchaseMethodData.type,
+      fields: purchaseMethodData.fields ? { ...purchaseMethodData.fields } : {},
+      currency: purchaseMethodData.currency || 'EUR',
+      offerValidFrom: purchaseMethodData.offerValidFrom ?? null,
+      offerValidTo: purchaseMethodData.offerValidTo ?? null
+    }
+    const list = props.lead.financingOptions || []
+    const updatedList = isEdit
+      ? list.map((f) => (String(f.id) === String(fullItem.id) ? fullItem : f))
+      : [...list, fullItem]
+    await leadsStore.updateLead(props.lead.id, { financingOptions: updatedList })
+    editingFinancingOption.value = null
     emit('note-saved', { type: 'purchase-method', ...purchaseMethodData })
   } catch (error) {
     console.error('Error saving purchase method:', error)
+  } finally {
+    financingActionLoading.value = false
   }
 }
 
 // Handle vehicle save (handles drove, requested, and trade-in)
+function openTradeInEdit(t) {
+  editingTradeIn.value = t
+  showVehicleModal.value = true
+}
+
+function openFinancingEdit(f) {
+  editingFinancingOption.value = f
+  showFinancingModal.value = true
+}
+
+async function handleTradeInDelete() {
+  if (!editingTradeIn.value) return
+  tradeInActionLoading.value = true
+  try {
+    const list = (props.lead.tradeIns || []).filter((t) => String(t.id) !== String(editingTradeIn.value.id))
+    await leadsStore.updateLead(props.lead.id, { tradeIns: list })
+    showVehicleModal.value = false
+    editingTradeIn.value = null
+  } catch (error) {
+    console.error('Error deleting trade-in:', error)
+  } finally {
+    tradeInActionLoading.value = false
+  }
+}
+
+async function handleFinancingDelete() {
+  if (!editingFinancingOption.value) return
+  financingActionLoading.value = true
+  try {
+    const list = (props.lead.financingOptions || []).filter((f) => String(f.id) !== String(editingFinancingOption.value.id))
+    await leadsStore.updateLead(props.lead.id, { financingOptions: list })
+    showFinancingModal.value = false
+    editingFinancingOption.value = null
+  } catch (error) {
+    console.error('Error deleting financing option:', error)
+  } finally {
+    financingActionLoading.value = false
+  }
+}
+
 const handleVehicleSave = async (data) => {
+  const isTradeIn = data.vehicleType === 'tradein' || props.mode === 'tradein'
+  if (isTradeIn) tradeInActionLoading.value = true
   try {
     showVehicleModal.value = false
-    
-    // If it's a trade-in, use the trade-in handler
-    if (data.vehicleType === 'tradein' || props.mode === 'tradein') {
-      const result = await saveTradeInVehicle('lead', props.lead.id, data.vehicle, data.valuation || {})
-      preferences.value.tradeIn = true
-      emit('note-saved', { 
-        type: 'tradein',
-        id: result.activity.id,
-        action: 'added a trade-in',
-        vehicleId: result.vehicle.id,
-        data: result.activity.data,
-        timestamp: result.activity.timestamp
-      })
+    const isEdit = !!editingTradeIn.value
+
+    if (isTradeIn) {
+      if (!isEdit) {
+        const result = await saveTradeInVehicle('lead', props.lead.id, data.vehicle, data.valuation || {})
+        preferences.value.tradeIn = true
+        emit('note-saved', {
+          type: 'tradein',
+          id: result.activity.id,
+          action: 'added a trade-in',
+          vehicleId: result.vehicle.id,
+          data: result.activity.data,
+          timestamp: result.activity.timestamp
+        })
+      }
+      const v = data.vehicle || {}
+      const parts = [v.brand, v.model].filter(Boolean)
+      const label = (parts.length ? parts.join(' ') + (v.year ? ` (${v.year})` : '') : 'Trade-in') || 'Trade-in'
+      const valuation = data.valuation?.tradeInPrice ?? 0
+      const fullItem = {
+        id: isEdit ? editingTradeIn.value.id : `ti-${Date.now()}`,
+        label: label || 'Trade-in',
+        valuation: typeof valuation === 'number' ? valuation : parseFloat(valuation) || 0,
+        vehicle: v,
+        valuationDetail: data.valuation || {}
+      }
+      const list = props.lead.tradeIns || []
+      const updatedList = isEdit
+        ? list.map((t) => (String(t.id) === String(fullItem.id) ? fullItem : t))
+        : [...list, fullItem]
+      await leadsStore.updateLead(props.lead.id, { tradeIns: updatedList })
+      editingTradeIn.value = null
     } else {
-      // For drove or requested vehicles, add to customer
       const { addVehicleToCustomer } = await import('@/api/contacts')
       await addVehicleToCustomer(props.lead.customerId, data.vehicle)
       emit('note-saved', { type: 'vehicle', vehicleType: data.vehicleType, ...data.vehicle })
     }
   } catch (err) {
     console.error('Error saving vehicle:', err)
+  } finally {
+    if (isTradeIn) tradeInActionLoading.value = false
   }
 }
 

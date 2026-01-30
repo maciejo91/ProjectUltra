@@ -2,6 +2,7 @@ import { computed } from 'vue'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
+import { useUsersStore } from '@/stores/users'
 import { useSettingsStore } from '@/stores/settings'
 import { getDisplayStage } from '@/utils/stageMapper'
 import { calculateLeadUrgency } from '@/composables/useLeadUrgency'
@@ -15,6 +16,7 @@ export function useTaskFilters(showClosed) {
   const leadsStore = useLeadsStore()
   const opportunitiesStore = useOpportunitiesStore()
   const userStore = useUserStore()
+  const usersStore = useUsersStore()
 
   // Combine leads and opportunities with type property and composite key
   // Filter based on user role
@@ -116,15 +118,26 @@ export function useTaskFilters(showClosed) {
     })
   }
 
-  // Filter tasks assigned to current user
   const filterByAssignedToMe = (tasks) => {
     const currentUserName = userStore.currentUser?.name
     if (!currentUserName) return []
-    
     return tasks.filter(task => task.assignee === currentUserName)
   }
 
-  // Apply all active filters to tasks
+  const filterByAssignedToMyTeam = (tasks) => {
+    const currentUser = userStore.currentUser
+    if (!currentUser) return []
+    let teamMemberNames = []
+    if (currentUser.role === 'manager') {
+      teamMemberNames = usersStore.users.map(u => u.name)
+    } else if (currentUser.role === 'salesman') {
+      teamMemberNames = usersStore.users.filter(u => u.role === 'salesman').map(u => u.name)
+    } else if (currentUser.role === 'operator') {
+      teamMemberNames = usersStore.users.filter(u => u.role === 'operator').map(u => u.name)
+    }
+    return tasks.filter(task => teamMemberNames.includes(task.assignee))
+  }
+
   const applyFilters = (tasks, activeFilters) => {
     if (!activeFilters || activeFilters.length === 0) {
       return tasks
@@ -153,6 +166,9 @@ export function useTaskFilters(showClosed) {
         case 'assigned-to-me':
           filtered = filterByAssignedToMe(filtered)
           break
+        case 'assigned-to-my-team':
+          filtered = filterByAssignedToMyTeam(filtered)
+          break
       }
     })
 
@@ -173,6 +189,7 @@ export function useTaskFilters(showClosed) {
     filterByToBeCalled,
     filterByLeadsCreated1Hour,
     filterByAssignedToMe,
+    filterByAssignedToMyTeam,
     applyFilters,
     shouldShowTypeFilter
   }

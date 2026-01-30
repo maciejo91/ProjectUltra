@@ -117,6 +117,18 @@
   background: var(--ai-gradient);
 }
 
+.text-ai-gradient {
+  background: var(--ai-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.text-ai-gradient-start {
+  color: var(--figma-cyan);
+}
+
 .shadow-mk-dashboard-card,
 .shadow-nsc-card {
   box-shadow: var(--nsc-card-shadow) !important;

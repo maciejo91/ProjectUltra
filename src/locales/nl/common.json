@@ -101,6 +101,35 @@
     "optional": "Optioneel",
     "required": "Verplicht"
   },
+  "tasks": {
+    "filterAria": "Taken filteren",
+    "sortAria": "Taken sorteren",
+    "filters": {
+      "lead": "Leads",
+      "opportunity": "Opportunities",
+      "dueIn24h": "Vervalt binnen 24 uur",
+      "toBeCalled": "Opnieuw bellen",
+      "leads1h": "Leads 1 uur geleden aangemaakt",
+      "assignedToMe": "Aan mij toegewezen",
+      "assignedToMyTeam": "Aan mijn team toegewezen"
+    },
+    "sort": {
+      "mostRecentFirst": "Meest recent eerst",
+      "mostUrgentFirst": "Meest urgent eerst",
+      "oldestFirst": "Oudste eerst"
+    }
+  },
+  "call": {
+    "inProgress": "Gesprek bezig",
+    "ended": "Gesprek beëindigd",
+    "endCall": "Ophangen",
+    "madeACall": "{name} heeft gebeld",
+    "user": "Gebruiker",
+    "transcript": "Transcriptie",
+    "showTranscript": "Transcriptie tonen",
+    "expandTranscript": "Uitklappen",
+    "collapseTranscript": "Inklappen"
+  },
   "assignee": {
     "taskUnassigned": "Deze taak is niet toegewezen",
     "assignToMe": "Aan mij toewijzen",

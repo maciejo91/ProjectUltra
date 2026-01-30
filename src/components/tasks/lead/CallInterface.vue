@@ -18,79 +18,81 @@
       <div
         v-if="isCallActive || callEnded"
         ref="floatingPanelRef"
-        class="fixed z-50 px-4 pb-4 select-none"
+        class="fixed z-50 px-4 pb-3 select-none"
         :style="floatingPanelStyle"
         @mousedown="onDragStart"
       >
-        <div class="bg-greys-900 text-white rounded-2xl shadow-2xl w-full overflow-hidden" style="max-width: 42rem; width: 100%;">
+        <div
+          class="bg-greys-900 text-white rounded-2xl shadow-2xl w-full overflow-hidden"
+          style="max-width: 33.6rem; width: 100%;"
+        >
           <!-- Top section (details, collapsible) -->
           <div
-            class="px-6 pt-4 pb-3 transition-colors cursor-grab active:cursor-grabbing"
+            class="px-6 pt-2 pb-2 transition-colors cursor-grab active:cursor-grabbing"
+            :class="detailsVisible ? 'pt-3' : ''"
             style="background-color: rgb(31, 41, 55);"
           >
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center justify-between gap-2">
               <button
                 type="button"
-                class="text-greys-400 text-sm hover:text-white transition-colors cursor-pointer"
+                class="flex items-center gap-2 min-w-0 text-left cursor-pointer"
                 @click.stop="detailsVisible = !detailsVisible"
               >
-                {{ detailsVisible ? 'Hide details' : 'Show details' }}
+                <template v-if="detailsVisible">
+                  <span class="text-greys-400 text-sm hover:text-white transition-colors shrink-0">
+                    {{ 'Hide details' }}
+                  </span>
+                </template>
+                <template v-else>
+                  <span
+                    v-if="isCallActive"
+                    class="inline-flex items-center gap-2 text-sm animate-pulse truncate shrink-0"
+                  >
+                    <Sparkles
+                      :size="16"
+                      class="shrink-0 text-ai-gradient-start"
+                      aria-hidden="true"
+                    />
+                    <span class="text-ai-gradient">Transcribing in progress...</span>
+                  </span>
+                  <span
+                    v-else
+                    class="text-sm text-greys-400 truncate"
+                  >
+                    Call summary
+                  </span>
+                </template>
               </button>
               <button
                 type="button"
-                class="text-greys-400 hover:text-white transition-colors cursor-pointer p-1"
-                aria-label="Close"
-                @click.stop="onCloseClick"
-              >
-                <X :size="headerIconSize" class="shrink-0" aria-hidden="true" />
-              </button>
-            </div>
-            <p v-if="leadSummary" class="text-sm text-white leading-relaxed mb-3">
-              {{ leadSummary }}
-            </p>
-            <div class="flex items-center justify-between gap-2 mt-3">
-              <div class="flex items-center gap-2">
-                <Sparkles
-                  v-if="isCallActive"
-                  :size="16"
-                  class="text-orange-500 shrink-0"
-                  aria-hidden="true"
-                />
-                <span
-                  v-if="isCallActive"
-                  class="text-sm text-orange-500 animate-pulse"
-                >
-                  Transcribing in progress...
-                </span>
-                <span
-                  v-else
-                  class="text-sm text-greys-400"
-                >
-                  Call summary
-                </span>
-              </div>
-              <button
-                type="button"
-                class="text-greys-400 hover:text-white transition-colors cursor-pointer p-1"
+                class="text-greys-400 hover:text-white transition-colors cursor-pointer p-1 shrink-0"
                 :aria-label="detailsVisible ? 'Collapse details' : 'Expand details'"
                 @click.stop="detailsVisible = !detailsVisible"
               >
                 <ChevronDown
                   :size="headerIconSize"
                   class="transition-transform shrink-0"
-                  :class="{ 'rotate-180': detailsVisible }"
+                  :class="{ 'rotate-180': !detailsVisible }"
                   aria-hidden="true"
                 />
               </button>
             </div>
+            <p v-if="detailsVisible && leadSummary" class="text-sm text-white leading-relaxed mt-2 mb-2">
+              {{ leadSummary }}
+            </p>
 
-            <!-- Merged content: transcript, quick note, summary, Extract information (single scrollable block when details expanded) -->
+            <!-- Merged content: log, transcript card, quick note, summary, Extract information (single scrollable block when details expanded) -->
             <div
               v-if="detailsVisible"
-              class="mt-4 pt-4 border-t overflow-y-auto space-y-4 max-h-64"
+              class="mt-3 pt-3 border-t overflow-y-auto space-y-4 max-h-64"
               style="border-color: rgba(55, 65, 81, 0.5);"
               @mousedown.stop
             >
+              <!-- Log when call has ended -->
+              <div v-if="callEnded && !isCallActive" class="text-sm text-muted-foreground">
+                {{ t('common.call.madeACall', { name: assignedPersonName || t('common.call.user') }) }}
+              </div>
+
               <!-- Summary when call has ended -->
               <div v-if="callEnded && !isCallActive" class="space-y-1">
                 <h4 class="text-xs font-bold uppercase tracking-wider text-greys-400">Summary</h4>
@@ -99,45 +101,33 @@
                 </p>
               </div>
 
-              <!-- Mock Transcription -->
-              <div class="space-y-3 text-sm font-mono">
-                <div>
-                  <span class="text-blue-400 font-semibold">Lead:</span>
-                  <span class="ml-2 text-white">{{ mockTranscription.leadLines[0] }}</span>
+              <!-- Transcript (grey card, 3 lines with expand/collapse) -->
+              <div class="bg-greys-800 rounded-lg p-3 space-y-2 border border-greys-700">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ t('common.call.transcript') }}</span>
+                  <button
+                    v-if="transcriptLines.length > transcriptPreviewCount"
+                    type="button"
+                    class="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    @click="transcriptExpanded = !transcriptExpanded"
+                  >
+                    {{ transcriptExpanded ? t('common.call.collapseTranscript') : t('common.call.expandTranscript') }}
+                  </button>
                 </div>
-                <div>
-                  <span class="text-green-400 font-semibold">Sales:</span>
-                  <span class="ml-2 text-white">{{ mockTranscription.salesLines[0] }}</span>
+                <div class="space-y-1.5 text-sm font-mono">
+                  <div
+                    v-for="(line, idx) in visibleTranscriptLines"
+                    :key="idx"
+                    class="flex gap-2"
+                  >
+                    <span :class="line.speaker === 'Lead' ? 'text-blue-400 font-semibold shrink-0' : 'text-green-400 font-semibold shrink-0'">{{ line.speaker }}:</span>
+                    <span class="text-white wrap-break-word">{{ line.text }}</span>
+                  </div>
                 </div>
-                <div v-if="callDuration >= 5">
-                  <span class="text-blue-400 font-semibold">Lead:</span>
-                  <span class="ml-2 text-white">{{ mockTranscription.leadLines[1] }}</span>
-                </div>
-                <div v-if="callDuration >= 8">
-                  <span class="text-green-400 font-semibold">Sales:</span>
-                  <span class="ml-2 text-white">{{ mockTranscription.salesLines[1] }}</span>
-                </div>
-                <div v-if="callDuration >= 12">
-                  <span class="text-blue-400 font-semibold">Lead:</span>
-                  <span class="ml-2 text-white">{{ mockTranscription.leadLines[2] }}</span>
-                </div>
-              </div>
-
-              <!-- Quick Note (only while call is active) -->
-              <div v-if="isCallActive" class="pt-4 border-t" style="border-color: rgba(55, 65, 81, 0.5);">
-                <textarea
-                  :model-value="callNotes"
-                  placeholder="Add a quick note about this call..."
-                  class="w-full p-3 bg-greys-800 border rounded-sm text-white text-sm placeholder-greys-500 focus:outline-none focus:border-primary resize-none"
-                  style="border-color: rgba(55, 65, 81, 0.5);"
-                  rows="3"
-                  @update:model-value="$emit('update:call-notes', $event)"
-                  @mousedown.stop
-                />
               </div>
 
               <!-- Extract information (when call ended) -->
-              <div v-if="callEnded && !isCallActive" class="pt-4">
+              <div v-if="callEnded && !isCallActive" class="pt-3">
                 <AIButton
                   label="Extract information"
                   size="small"
@@ -149,16 +139,16 @@
 
           <!-- Bottom section (caller bar) -->
           <div
-            class="px-6 py-4 flex items-center justify-between min-h-[80px]"
+            class="px-6 py-3 flex items-center justify-between"
             style="background-color: rgb(17, 24, 39); border-top: 1px solid rgba(55, 65, 81, 0.5);"
             @mousedown.stop
           >
-            <div class="flex flex-col">
-              <h3 class="text-lg font-medium text-white">
+            <div class="flex flex-col justify-center gap-0.5">
+              <h3 class="text-lg font-medium text-white m-0 leading-tight">
                 {{ callerName || 'Caller' }}
               </h3>
-              <p class="text-sm text-greys-400">
-                {{ isCallActive ? 'Call in progress' : 'Call ended' }} - {{ formattedCallDuration }}
+              <p class="text-sm m-0 leading-tight" style="color: #9ca3af">
+                {{ isCallActive ? t('common.call.inProgress') : t('common.call.ended') }} - {{ formattedCallDuration }}
               </p>
             </div>
             <div class="flex items-center gap-3">
@@ -174,14 +164,24 @@
                 <Mic :size="20" aria-hidden="true" />
               </Button>
               <Button
+                v-if="isCallActive"
                 type="button"
                 variant="outline"
                 size="icon"
                 class="w-10 h-10 rounded-full shrink-0 bg-red-600 hover:bg-red-700 border-0 text-white"
-                aria-label="End call"
-                @click="$emit('end-call')"
+                :aria-label="t('common.call.endCall')"
+                @click="onCloseClick"
               >
                 <PhoneOff :size="20" aria-hidden="true" />
+              </Button>
+              <Button
+                v-if="callEnded && !isCallActive"
+                type="button"
+                variant="outline"
+                class="shrink-0 rounded-sm bg-greys-800 border border-greys-700 text-white hover:bg-greys-700 hover:text-white"
+                @click="emit('close')"
+              >
+                {{ t('common.buttons.close') }}
               </Button>
             </div>
           </div>
@@ -223,8 +223,9 @@
 </template>
 
 <script setup>
-import { Phone, ChevronDown, Sparkles, Mic, PhoneOff, X } from 'lucide-vue-next'
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
+import { Phone, ChevronDown, Sparkles, Mic, PhoneOff } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   Button,
   Dialog,
@@ -286,40 +287,64 @@ const props = defineProps({
   isMuted: {
     type: Boolean,
     default: false
+  },
+  assignedPersonName: {
+    type: String,
+    default: ''
   }
 })
 
 const emit = defineEmits(['start-call', 'end-call', 'close', 'toggle-mute', 'log-manual-call', 'extract-information', 'update:call-notes', 'copy-number'])
 
+const { t } = useI18n()
 const headerIconSize = 20
 const detailsVisible = ref(false)
+const transcriptExpanded = ref(false)
+const transcriptPreviewCount = 3
+
+const transcriptLines = computed(() => {
+  const lead = props.mockTranscription?.leadLines ?? []
+  const sales = props.mockTranscription?.salesLines ?? []
+  const lines = []
+  const maxLen = Math.max(lead.length, sales.length)
+  for (let i = 0; i < maxLen; i++) {
+    if (lead[i]) lines.push({ speaker: 'Lead', text: lead[i] })
+    if (sales[i]) lines.push({ speaker: 'Sales', text: sales[i] })
+  }
+  return lines
+})
+
+const visibleTranscriptLines = computed(() => {
+  if (transcriptExpanded.value) return transcriptLines.value
+  return transcriptLines.value.slice(0, transcriptPreviewCount)
+})
 const showCloseConfirm = ref(false)
 const floatingPanelRef = ref(null)
 
 // Draggable state
-const position = ref({ x: null, y: null })
+const position = ref({ x: null, bottom: null })
 const isDragging = ref(false)
 const dragStart = ref({ x: 0, y: 0 })
 
 const floatingPanelStyle = computed(() => {
   const base = {
-    width: '42rem',
+    width: '33.6rem',
     maxWidth: 'calc(100% - 2rem)'
   }
-  if (position.value.x !== null && position.value.y !== null) {
+  if (position.value.x !== null && position.value.bottom !== null) {
     return {
       ...base,
       left: `${position.value.x}px`,
-      top: `${position.value.y}px`,
+      bottom: `${position.value.bottom}px`,
       transform: 'none',
-      bottom: 'auto',
+      top: 'auto',
       right: 'auto'
     }
   }
   return {
     ...base,
     left: '50%',
-    bottom: '1rem',
+    bottom: '24px',
     transform: 'translateX(-50%)',
     top: 'auto',
     right: 'auto'
@@ -344,8 +369,11 @@ function onDragStart(e) {
   if (!e.target.closest('button') && !e.target.closest('textarea') && !e.target.closest('a')) {
     const rect = floatingPanelRef.value?.getBoundingClientRect()
     if (rect) {
-      if (position.value.x === null || position.value.y === null) {
-        position.value = { x: rect.left, y: rect.top }
+      if (position.value.x === null || position.value.bottom === null) {
+        position.value = {
+          x: rect.left,
+          bottom: window.innerHeight - rect.bottom
+        }
       }
       isDragging.value = true
       dragStart.value = { x: e.clientX - rect.left, y: e.clientY - rect.top }
@@ -355,13 +383,16 @@ function onDragStart(e) {
 
 function onMouseMove(e) {
   if (!isDragging.value) return
+  const rect = floatingPanelRef.value?.getBoundingClientRect()
+  if (!rect) return
   let x = e.clientX - dragStart.value.x
-  let y = e.clientY - dragStart.value.y
+  const panelBottom = window.innerHeight - (e.clientY - dragStart.value.y + rect.height)
   const maxX = window.innerWidth - 100
-  const maxY = window.innerHeight - 100
   x = Math.max(0, Math.min(x, maxX))
-  y = Math.max(0, Math.min(y, maxY))
-  position.value = { x, y }
+  const minBottom = 0
+  const maxBottom = window.innerHeight - 100
+  const bottom = Math.max(minBottom, Math.min(maxBottom, panelBottom))
+  position.value = { x, bottom }
 }
 
 function onMouseUp() {
@@ -378,12 +409,4 @@ onUnmounted(() => {
   window.removeEventListener('mouseup', onMouseUp)
 })
 
-watch(
-  () => props.isCallActive,
-  (isActive, wasActive) => {
-    if (isActive && !wasActive) {
-      detailsVisible.value = true
-    }
-  }
-)
 </script>
