@@ -105,6 +105,7 @@
     "taskUnassigned": "Diese Aufgabe ist nicht zugewiesen",
     "assignToMe": "Mir zuweisen",
     "assignToSomeone": "Jemand anderem zuweisen",
+    "removeAssignee": "Zuweisung aufheben",
     "searchPlaceholder": "Benutzer oder Teams suchen…",
     "noAssigneesFound": "Keine Zuweisbaren gefunden",
     "teamsLabel": "Teams"

@@ -105,6 +105,7 @@
     "taskUnassigned": "Questa attività non è assegnata",
     "assignToMe": "Assegna a me",
     "assignToSomeone": "Assegna a qualcuno",
+    "removeAssignee": "Rimuovi assegnatario",
     "searchPlaceholder": "Cerca utenti o team…",
     "noAssigneesFound": "Nessun assegnatario trovato",
     "teamsLabel": "Team"

@@ -65,7 +65,7 @@
                 side="bottom"
                 align="end"
               >
-                <AssigneeDropdownContent @select="handleAssigneeFromDropdown" />
+                <AssigneeDropdownContent show-remove-assignee @select="handleAssigneeFromDropdown" />
               </PopoverContent>
             </Popover>
           </div>
@@ -240,6 +240,25 @@ const getRoleAvatarClass = (role) => {
   return classes[role] || 'bg-muted text-muted-foreground'
 }
 
+const clearAssignmentPayload = {
+  assignee: null,
+  assigneeType: null,
+  assigneeTeam: null,
+  assigneeDealership: null,
+  assigneeRole: null,
+  teamId: null
+}
+
+async function clearAssignment() {
+  if (!props.task) return
+  if (props.task.type === 'lead') {
+    await leadsStore.updateLead(props.task.id, clearAssignmentPayload)
+  } else if (props.task.type === 'opportunity') {
+    await opportunitiesStore.updateOpportunity(props.task.id, clearAssignmentPayload)
+  }
+  emit('reassigned', null)
+}
+
 async function applyAssignment(assignee) {
   if (!props.task) return
   
@@ -262,7 +281,11 @@ async function applyAssignment(assignee) {
 }
 
 function handleAssigneeFromDropdown(assignee) {
-  applyAssignment(assignee).catch((err) => console.error('Error assigning:', err))
+  if (assignee === null) {
+    clearAssignment().catch((err) => console.error('Error removing assignee:', err))
+  } else {
+    applyAssignment(assignee).catch((err) => console.error('Error assigning:', err))
+  }
   assigneeDropdownOpen.value = false
 }
 

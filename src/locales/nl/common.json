@@ -105,6 +105,7 @@
     "taskUnassigned": "Deze taak is niet toegewezen",
     "assignToMe": "Aan mij toewijzen",
     "assignToSomeone": "Aan iemand toewijzen",
+    "removeAssignee": "Toewijzing verwijderen",
     "searchPlaceholder": "Zoek gebruikers of teams…",
     "noAssigneesFound": "Geen toegewezen personen gevonden",
     "teamsLabel": "Teams"

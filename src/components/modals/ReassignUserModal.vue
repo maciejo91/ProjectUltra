@@ -65,6 +65,14 @@
             {{ t('common.buttons.cancel') }}
           </Button>
           <Button
+            variant="outline"
+            size="small"
+            class="rounded-sm w-full sm:w-auto"
+            @click="handleRemoveAssignee"
+          >
+            {{ t('common.assignee.removeAssignee') }}
+          </Button>
+          <Button
             variant="default"
             size="small"
             class="rounded-sm w-full sm:w-auto"
@@ -198,6 +206,13 @@ const handleConfirm = () => {
     selectedAssignee.value = null
     searchQuery.value = ''
   }
+}
+
+const handleRemoveAssignee = () => {
+  emit('confirm', null)
+  selectedAssignee.value = null
+  searchQuery.value = ''
+  emit('close')
 }
 </script>
 

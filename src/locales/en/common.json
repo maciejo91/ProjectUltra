@@ -105,6 +105,7 @@
     "taskUnassigned": "This task is unassigned",
     "assignToMe": "Assign to me",
     "assignToSomeone": "Assign to someone",
+    "removeAssignee": "Remove assignee",
     "searchPlaceholder": "Search users or teams…",
     "noAssigneesFound": "No assignees found",
     "teamsLabel": "Teams"

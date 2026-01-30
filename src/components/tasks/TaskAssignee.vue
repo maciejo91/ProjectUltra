@@ -199,6 +199,24 @@ const assignToSelf = async () => {
   }
 }
 
+const clearAssignmentPayload = {
+  assignee: null,
+  assigneeType: null,
+  assigneeTeam: null,
+  assigneeDealership: null,
+  assigneeRole: null,
+  teamId: null
+}
+
+async function clearAssignment() {
+  if (props.taskType === 'lead') {
+    await leadsStore.updateLead(props.task.id, clearAssignmentPayload)
+  } else if (props.taskType === 'opportunity') {
+    await opportunitiesStore.updateOpportunity(props.task.id, clearAssignmentPayload)
+  }
+  emit('reassigned', null)
+}
+
 async function applyAssignment(assignee) {
   const updateData = {
     assignee: assignee.name,
@@ -219,13 +237,21 @@ async function applyAssignment(assignee) {
 }
 
 function handleAssigneeFromDropdown(assignee) {
-  applyAssignment(assignee).catch((err) => console.error('Error assigning:', err))
+  if (assignee === null) {
+    clearAssignment().catch((err) => console.error('Error removing assignee:', err))
+  } else {
+    applyAssignment(assignee).catch((err) => console.error('Error assigning:', err))
+  }
   assigneeDropdownOpen.value = false
 }
 
 async function handleReassign(assignee) {
   try {
-    await applyAssignment(assignee)
+    if (assignee === null) {
+      await clearAssignment()
+    } else {
+      await applyAssignment(assignee)
+    }
     showReassignModal.value = false
   } catch (error) {
     console.error('Error reassigning:', error)

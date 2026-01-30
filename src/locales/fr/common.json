@@ -105,6 +105,7 @@
     "taskUnassigned": "Cette tâche n'est pas assignée",
     "assignToMe": "M'assigner",
     "assignToSomeone": "Assigner à quelqu'un",
+    "removeAssignee": "Retirer l'assigné",
     "searchPlaceholder": "Rechercher utilisateurs ou équipes…",
     "noAssigneesFound": "Aucun assigné trouvé",
     "teamsLabel": "Équipes"

@@ -1,5 +1,15 @@
 <template>
   <div class="flex flex-col min-w-64 max-w-sm w-full bg-background rounded-lg shadow-nsc-card overflow-hidden">
+    <div v-if="showRemoveAssignee" class="p-2 shrink-0 border-b border-border">
+      <button
+        type="button"
+        @click="handleRemoveAssignee"
+        class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-muted/80 transition-colors text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-muted-foreground/40 focus-visible:ring-offset-2 text-muted-foreground hover:text-foreground"
+      >
+        <UserMinus class="w-5 h-5 shrink-0" aria-hidden="true" />
+        <span class="text-sm font-medium">{{ t('common.assignee.removeAssignee') }}</span>
+      </button>
+    </div>
     <div class="p-2 shrink-0">
       <Input
         v-model="searchQuery"
@@ -53,12 +63,18 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Users, Search } from 'lucide-vue-next'
+import { Users, Search, UserMinus } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { Input } from '@motork/component-library/future/primitives'
 import { useUsersStore } from '@/stores/users'
 import { getTeamAvatarClass } from '@/composables/useTeamAvatarColor'
 
+const props = defineProps({
+  showRemoveAssignee: {
+    type: Boolean,
+    default: false
+  }
+})
 const { t } = useI18n()
 const emit = defineEmits(['select'])
 
@@ -142,6 +158,10 @@ function getRoleAvatarClass(role) {
     operator: 'bg-muted text-muted-foreground'
   }
   return classes[role] || 'bg-muted text-muted-foreground'
+}
+
+function handleRemoveAssignee() {
+  emit('select', null)
 }
 
 function handleSelect(assignee) {
