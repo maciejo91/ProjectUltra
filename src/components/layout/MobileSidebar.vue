@@ -56,10 +56,10 @@
           <!-- Home -->
           <router-link
             v-if="navigationVisibility.home !== false"
-            to="/home"
+            to="/tasks"
             @click="$emit('close')"
             class="mobile-sidebar-link"
-            :class="{ 'mobile-sidebar-link-active': isActive('/home') }"
+            :class="{ 'mobile-sidebar-link-active': isActive('/tasks') }"
           >
             <Home :size="18" class="shrink-0 sm:hidden" />
             <Home :size="20" class="shrink-0 hidden sm:block" />
@@ -347,15 +347,15 @@ const firstVisibleRoute = computed(() => {
   const nav = navigationVisibility.value
   
   // Check routes in order of appearance
-  if (nav.home !== false) return '/home'
+  if (nav.home !== false) return '/tasks'
   if (nav.tasks !== false) return '/tasks'
   if (nav.customers !== false) return '/customers'
   if (nav.calendar !== false) return '/calendar'
   if (userStore.canAccessReports() && nav.reports !== false) return '/reports'
   if (nav.lists !== false) return '/vehicles'
   
-  // Fallback to home if all are hidden
-  return '/home'
+  // Fallback to tasks (home) if all are hidden
+  return '/tasks'
 })
 
 const showListsMenu = ref(false)
@@ -412,7 +412,7 @@ const switchRole = (role) => {
   userStore.switchRole(role)
   showUserMenu.value = false
   emit('close')
-  router.push('/home')
+  router.push('/tasks')
 }
 
 const handleLogout = () => {

@@ -42,10 +42,10 @@
       <!-- Home -->
       <router-link
         v-if="navigationVisibility.home !== false"
-        to="/home"
+        to="/tasks"
         :class="[
           'relative group w-full h-8 rounded-md flex items-center justify-center transition-colors cursor-pointer',
-          isActive('/home') ? 'bg-white/20' : 'hover:bg-white/10',
+          isActive('/tasks') ? 'bg-white/20' : 'hover:bg-white/10',
         ]"
         aria-label="Home"
         title="Home"
@@ -409,15 +409,15 @@ const firstVisibleRoute = computed(() => {
   const nav = navigationVisibility.value
   
   // Check routes in order of appearance
-  if (nav.home !== false) return '/home'
+  if (nav.home !== false) return '/tasks'
   if (nav.tasks !== false) return '/tasks'
   if (nav.customers !== false) return '/customers'
   if (nav.calendar !== false) return '/calendar'
   if (userStore.canAccessReports() && nav.reports !== false) return '/reports'
   if (nav.lists !== false) return '/vehicles'
   
-  // Fallback to home if all are hidden
-  return '/home'
+  // Fallback to tasks (home) if all are hidden
+  return '/tasks'
 })
 
 const showListsMenu = ref(false)
@@ -473,7 +473,7 @@ const toggleUserMenu = () => {
 const switchRole = (role) => {
   userStore.switchRole(role)
   showUserMenu.value = false
-  router.push('/home')
+  router.push('/tasks')
 }
 
 const handleLogout = () => {

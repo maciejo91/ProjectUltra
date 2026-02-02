@@ -81,53 +81,56 @@
               {{ leadSummary }}
             </p>
 
-            <!-- Merged content: log, transcript card, quick note, summary, Extract information (single scrollable block when details expanded) -->
+            <!-- Details: scrollable transcript block + fixed Extract button row -->
             <div
               v-if="detailsVisible"
-              class="mt-3 pt-3 border-t overflow-y-auto space-y-4 max-h-64"
+              class="mt-3 pt-3 border-t flex flex-col"
               style="border-color: rgba(55, 65, 81, 0.5);"
               @mousedown.stop
             >
-              <!-- Log when call has ended -->
-              <div v-if="callEnded && !isCallActive" class="text-sm text-muted-foreground">
-                {{ t('common.call.madeACall', { name: assignedPersonName || t('common.call.user') }) }}
-              </div>
-
-              <!-- Summary when call has ended -->
-              <div v-if="callEnded && !isCallActive" class="space-y-1">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-greys-400">Summary</h4>
-                <p class="text-sm text-white">
-                  Lead confirmed their details and the call covered the main inquiry discussed in the transcript below.
-                </p>
-              </div>
-
-              <!-- Transcript (grey card, 3 lines with expand/collapse) -->
-              <div class="bg-greys-800 rounded-lg p-3 space-y-2 border border-greys-700">
-                <div class="flex items-center justify-between gap-2">
-                  <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ t('common.call.transcript') }}</span>
-                  <button
-                    v-if="transcriptLines.length > transcriptPreviewCount"
-                    type="button"
-                    class="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                    @click="transcriptExpanded = !transcriptExpanded"
-                  >
-                    {{ transcriptExpanded ? t('common.call.collapseTranscript') : t('common.call.expandTranscript') }}
-                  </button>
+              <!-- Scrollable: log, summary, transcript only (keeps Extract button visible below) -->
+              <div class="overflow-y-auto space-y-4 max-h-64 shrink-0">
+                <!-- Log when call has ended -->
+                <div v-if="callEnded && !isCallActive" class="text-sm text-muted-foreground">
+                  {{ t('common.call.madeACall', { name: assignedPersonName || t('common.call.user') }) }}
                 </div>
-                <div class="space-y-1.5 text-sm font-mono">
-                  <div
-                    v-for="(line, idx) in visibleTranscriptLines"
-                    :key="idx"
-                    class="flex gap-2"
-                  >
-                    <span :class="line.speaker === 'Lead' ? 'text-blue-400 font-semibold shrink-0' : 'text-green-400 font-semibold shrink-0'">{{ line.speaker }}:</span>
-                    <span class="text-white wrap-break-word">{{ line.text }}</span>
+
+                <!-- Summary when call has ended -->
+                <div v-if="callEnded && !isCallActive" class="space-y-1">
+                  <h4 class="text-xs font-bold uppercase tracking-wider text-greys-400">Summary</h4>
+                  <p class="text-sm text-white">
+                    Lead confirmed their details and the call covered the main inquiry discussed in the transcript below.
+                  </p>
+                </div>
+
+                <!-- Transcript (grey card, 3 lines with expand/collapse) -->
+                <div class="bg-greys-800 rounded-lg p-3 space-y-2 border border-greys-700">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ t('common.call.transcript') }}</span>
+                    <button
+                      v-if="transcriptLines.length > transcriptPreviewCount"
+                      type="button"
+                      class="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      @click="transcriptExpanded = !transcriptExpanded"
+                    >
+                      {{ transcriptExpanded ? t('common.call.collapseTranscript') : t('common.call.expandTranscript') }}
+                    </button>
+                  </div>
+                  <div class="space-y-1.5 text-sm font-mono">
+                    <div
+                      v-for="(line, idx) in visibleTranscriptLines"
+                      :key="idx"
+                      class="flex gap-2"
+                    >
+                      <span :class="line.speaker === 'Lead' ? 'text-blue-400 font-semibold shrink-0' : 'text-green-400 font-semibold shrink-0'">{{ line.speaker }}:</span>
+                      <span class="text-white wrap-break-word">{{ line.text }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Extract information (when call ended) -->
-              <div v-if="callEnded && !isCallActive" class="pt-3">
+              <!-- Extract information: always visible under transcript, right-aligned -->
+              <div v-if="callEnded && !isCallActive" class="flex justify-end pt-3 shrink-0">
                 <AIButton
                   label="Extract information"
                   size="small"
@@ -170,7 +173,7 @@
                 size="icon"
                 class="w-10 h-10 rounded-full shrink-0 bg-red-600 hover:bg-red-700 border-0 text-white"
                 :aria-label="t('common.call.endCall')"
-                @click="onCloseClick"
+                @click="$emit('end-call')"
               >
                 <PhoneOff :size="20" aria-hidden="true" />
               </Button>
@@ -179,7 +182,7 @@
                 type="button"
                 variant="outline"
                 class="shrink-0 rounded-sm bg-greys-800 border border-greys-700 text-white hover:bg-greys-700 hover:text-white"
-                @click="emit('close')"
+                @click="$emit('close')"
               >
                 {{ t('common.buttons.close') }}
               </Button>

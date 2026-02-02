@@ -132,7 +132,7 @@
           @close="onCallClose"
           @toggle-mute="toggleMute"
           @log-manual-call="logManualCall"
-          @extract-information="showComingSoonModal = true"
+          @extract-information="handleExtractInformation"
           @update:call-notes="updateCallNotes"
           @copy-number="copyNumber"
         />
@@ -880,13 +880,6 @@
       @delete="handleTradeInDelete"
     />
 
-    <!-- Coming Soon Modal -->
-    <ComingSoonModal
-      :show="showComingSoonModal"
-      title="AI Information Extraction"
-      @close="showComingSoonModal = false"
-    />
-
     <!-- Loading overlay when trade-in or financing action is in progress -->
     <Teleport to="body">
       <div
@@ -936,7 +929,6 @@ import ScheduleAppointmentModal from '@/components/modals/ScheduleAppointmentMod
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
-import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
 import { useTradeInVehicle } from '@/composables/useTradeInVehicle'
 import CommunicationSelector from '@/components/shared/communication/CommunicationSelector.vue'
 import { useUsersStore } from '@/stores/users'
@@ -954,6 +946,7 @@ import DeadlineBanner from '@/components/tasks/shared/DeadlineBanner.vue'
 import AppointmentCommunications from '@/components/shared/communication/AppointmentCommunications.vue'
 import CloseAsLostForm from '@/components/shared/CloseAsLostForm.vue'
 import { getAvailabilityForAssignee } from '@/services/availabilityService'
+import { simulateCallExtraction } from '@/simulation/callExtractionSimulation'
 
 const props = defineProps({
   lead: {
@@ -1005,7 +998,6 @@ const noteWidgetRef = ref(null)
 const showAssignmentModal = ref(false)
 const showFinancingModal = ref(false)
 const showVehicleModal = ref(false)
-const showComingSoonModal = ref(false)
 const editingTradeIn = ref(null)
 const editingFinancingOption = ref(null)
 const tradeInActionLoading = ref(false)
@@ -1198,6 +1190,20 @@ const copyNumber = () => {
 
 const updateCallNotes = (value) => {
   callNotes.value = value
+}
+
+function handleExtractInformation() {
+  const result = simulateCallExtraction(callData.value)
+  extractedData.value = { tradeIn: result.tradeIn, financing: result.financing }
+  enrichLeadData.value = {
+    interestLevel: result.interestLevel,
+    purchaseTimeline: result.purchaseTimeline,
+    budgetRange: result.budgetRange,
+    additionalNotes: result.additionalNotes
+  }
+  if (result.tradeIn) preferences.value.tradeIn = true
+  if (result.financing) preferences.value.financing = true
+  selectOutcome('interested')
 }
 
 async function addCallActivity() {
