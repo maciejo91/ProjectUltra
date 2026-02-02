@@ -52,7 +52,7 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
         await leadsStore.updateLead(lead.id, {
           scheduledAppointment: {
             id: Date.now(),
-            title: `Follow-up Call - ${lead.customer.name}`,
+            title: 'Follow-up Call',
             start: isoTimestamp,
             end: endTime.toISOString(),
             type: 'Call',

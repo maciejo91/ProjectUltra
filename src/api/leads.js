@@ -124,7 +124,7 @@ export const scheduleLeadFollowUp = async (leadId, appointmentData) => {
   
   const calendarEvent = {
     id: eventId,
-    title: `Follow-up Call - ${customer.name}`,
+    title: 'Follow-up Call',
     start: appointmentStart.toISOString(),
     end: appointmentEnd.toISOString(),
     type: 'call',
