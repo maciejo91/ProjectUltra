@@ -1,3 +1,5 @@
+import { LEAD_STAGES } from '@/utils/stageMapper'
+
 /**
  * Composable for LQWidget handler functions
  * Coordinates between call and outcome composables
@@ -32,7 +34,10 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
     qualificationSelectedSlot,
     qualificationSelectedTeam,
     qualificationSelectedSalesman,
-    communicationPreferences
+    communicationPreferences,
+    restorePostponedInterestedState,
+    clearSuccessState,
+    resetOutcomeState
   } = outcomeState
 
   const actorName = () => (currentUserRef?.value?.name) || 'Unknown'
@@ -386,6 +391,56 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
     cancelOutcome()
   }
 
+  const handlePostponeFromInterested = async () => {
+    const attempt = {
+      timestamp: callLogDateTime.value ? new Date(callLogDateTime.value).toISOString() : new Date().toISOString(),
+      outcome: 'postponed-interested',
+      channel: callData.value?.channel || 'phone',
+      notes: callData.value?.notes || '',
+      transcription: callData.value?.transcription || null
+    }
+    emit('call-attempt-logged', attempt)
+
+    const nextCallDate = calculateNextCallDate()
+    const appointmentDate = nextCallDate.split('T')[0]
+    const appointmentTime = new Date(nextCallDate).toTimeString().slice(0, 5)
+
+    const draft = {
+      enrichLeadData: enrichLeadDataRef?.value ? { ...enrichLeadDataRef.value } : {},
+      qualificationMethod: qualificationMethod.value,
+      qualificationEventType: qualificationEventType.value,
+      qualificationSelectedDate: qualificationSelectedDate.value ? qualificationSelectedDate.value.toISOString() : null,
+      qualificationSelectedSlot: qualificationSelectedSlot.value ?? '',
+      qualificationSelectedTeam: qualificationSelectedTeam.value ?? null,
+      qualificationSelectedSalesman: qualificationSelectedSalesman.value ?? null,
+      assignment: assignment.value ? { ...assignment.value } : {},
+      callLogDateTime: callLogDateTime.value ?? ''
+    }
+
+    if (leadsStore && lead.value?.id) {
+      try {
+        await leadsStore.updateLead(lead.value.id, {
+          nextActionDue: nextCallDate,
+          stage: LEAD_STAGES.VALID_TO_BE_CALLED_BACK,
+          status: 'Pending',
+          postponedInterestedState: draft
+        })
+      } catch (error) {
+        console.error('Failed to update lead (postpone from interested):', error)
+      }
+    }
+
+    emit('postponed', {
+      date: appointmentDate,
+      time: appointmentTime,
+      createAppointment: true,
+      fromInterested: true
+    })
+
+    // Keep form visible with filled data (status is Valid - to be called back, not closed)
+    // Do not set successState or cancelOutcome so the user still sees the form
+  }
+
   const handleNotValidConfirm = () => {
     const attempt = {
       timestamp: new Date().toISOString(),
@@ -417,8 +472,19 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
   }
 
   const handleReopen = () => {
-    outcomeState.clearSuccessState()
-    outcomeState.resetOutcomeState()
+    clearSuccessState()
+    const draft = lead.value?.postponedInterestedState
+    if (draft) {
+      restorePostponedInterestedState(draft)
+      if (enrichLeadDataRef?.value && draft.enrichLeadData && typeof draft.enrichLeadData === 'object') {
+        enrichLeadDataRef.value.interestLevel = draft.enrichLeadData.interestLevel ?? ''
+        enrichLeadDataRef.value.purchaseTimeline = draft.enrichLeadData.purchaseTimeline ?? ''
+        enrichLeadDataRef.value.budgetRange = draft.enrichLeadData.budgetRange ?? ''
+        enrichLeadDataRef.value.additionalNotes = draft.enrichLeadData.additionalNotes ?? ''
+      }
+    } else {
+      resetOutcomeState()
+    }
   }
 
   return {
@@ -427,6 +493,7 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
     handleQualify,
     handleDisqualifyFromInterested,
     handleNoAnswerConfirm,
+    handlePostponeFromInterested,
     handleNotValidConfirm,
     handleNoteSave,
     handleSurveyCompleted,

@@ -133,6 +133,7 @@ export function getStageColor(displayStage, entityType = 'opportunity') {
   const leadColors = {
     [LEAD_STAGES.NEW]: 'bg-gray-100 text-gray-700',
     [LEAD_STAGES.TO_BE_CALLED_BACK]: 'bg-purple-100 text-purple-700',
+    [LEAD_STAGES.VALID_TO_BE_CALLED_BACK]: 'bg-emerald-100 text-emerald-700',
     [LEAD_STAGES.VALID]: 'bg-emerald-100 text-emerald-700',
     [LEAD_STAGES.CLOSED_INVALID]: 'bg-gray-100 text-gray-600',
     [LEAD_STAGES.CLOSED_NOT_INTERESTED]: 'bg-red-100 text-red-700',

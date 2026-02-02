@@ -31,8 +31,9 @@ export function calculateLeadDisplayStage(lead) {
     }
     
     // If stage is already an active display stage, return it directly
-    if (stageValue === LEAD_STAGES.NEW || 
-        stageValue === LEAD_STAGES.TO_BE_CALLED_BACK || 
+    if (stageValue === LEAD_STAGES.NEW ||
+        stageValue === LEAD_STAGES.TO_BE_CALLED_BACK ||
+        stageValue === LEAD_STAGES.VALID_TO_BE_CALLED_BACK ||
         stageValue === LEAD_STAGES.VALID) {
       return stageValue
     }
@@ -110,6 +111,7 @@ export function mapLeadStageToApiStatus(displayStage) {
   const mapping = {
     [LEAD_STAGES.NEW]: API_STATUSES.OPEN_LEAD,
     [LEAD_STAGES.TO_BE_CALLED_BACK]: API_STATUSES.OPEN_LEAD,
+    [LEAD_STAGES.VALID_TO_BE_CALLED_BACK]: API_STATUSES.VALIDATED,
     [LEAD_STAGES.VALID]: API_STATUSES.VALIDATED,
     [LEAD_STAGES.CLOSED_INVALID]: API_STATUSES.NOT_VALID,
     [LEAD_STAGES.CLOSED_NOT_INTERESTED]: API_STATUSES.NOT_INTERESTED,
@@ -137,13 +139,21 @@ export function getLeadTransitions() {
   return {
     [LEAD_STAGES.NEW]: [
       LEAD_STAGES.TO_BE_CALLED_BACK,
+      LEAD_STAGES.VALID_TO_BE_CALLED_BACK,
       LEAD_STAGES.VALID,
       LEAD_STAGES.CLOSED_INVALID,
       LEAD_STAGES.CLOSED_NOT_INTERESTED,
       LEAD_STAGES.CLOSED_DUPLICATE
     ],
     [LEAD_STAGES.TO_BE_CALLED_BACK]: [
+      LEAD_STAGES.VALID_TO_BE_CALLED_BACK,
       LEAD_STAGES.VALID,
+      LEAD_STAGES.CLOSED_INVALID,
+      LEAD_STAGES.CLOSED_NOT_INTERESTED
+    ],
+    [LEAD_STAGES.VALID_TO_BE_CALLED_BACK]: [
+      LEAD_STAGES.VALID,
+      LEAD_STAGES.TO_BE_CALLED_BACK,
       LEAD_STAGES.CLOSED_INVALID,
       LEAD_STAGES.CLOSED_NOT_INTERESTED
     ],

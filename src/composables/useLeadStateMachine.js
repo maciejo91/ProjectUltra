@@ -69,6 +69,38 @@ export const LEAD_STATE_CONFIG = {
     canReassign: true
   },
 
+  [LEAD_STAGES.VALID_TO_BE_CALLED_BACK]: {
+    primaryAction: {
+      key: 'call-prospect',
+      title: 'Valid - to be called back',
+      description: 'Call was interrupted after interest. Complete qualification or call back at scheduled time',
+      label: 'Call back',
+      icon: 'fa-solid fa-phone',
+      buttonClass: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+      colorScheme: { background: 'bg-emerald-50/50', border: 'border-emerald-100' }
+    },
+    secondaryActions: [
+      {
+        key: 'postpone',
+        label: 'Postpone Task',
+        icon: 'fa-solid fa-clock',
+        description: 'Reschedule the callback'
+      },
+      {
+        key: 'disqualify',
+        label: 'Disqualify Lead',
+        icon: 'fa-solid fa-xmark'
+      }
+    ],
+    taskWidgets: [
+      { type: 'LQ', condition: 'always' }
+    ],
+    showLQWidget: true,
+    showDeadlineBanner: true,
+    canPostpone: true,
+    canReassign: true
+  },
+
   [LEAD_STAGES.VALID]: {
     primaryAction: {
       key: 'complete-conversion',

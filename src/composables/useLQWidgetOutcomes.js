@@ -355,6 +355,36 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     successState.value = null
     successPerformedAt.value = null
   }
+
+  /**
+   * Restore outcome and qualification form state from a postponed-interested draft (e.g. lead.postponedInterestedState).
+   * Call when opening a task that was postponed from the interested flow.
+   * @param {Object} draft - Saved draft: enrichLeadData, qualificationMethod, qualificationEventType, qualificationSelectedDate (ISO string), qualificationSelectedSlot, qualificationSelectedTeam, qualificationSelectedSalesman, assignment, callLogDateTime
+   */
+  const restorePostponedInterestedState = (draft) => {
+    if (!draft) return
+    successState.value = null
+    successPerformedAt.value = null
+    selectedOutcome.value = 'interested'
+    showOutcomeSelection.value = true
+    qualificationMethod.value = draft.qualificationMethod ?? 'assign-only'
+    qualificationEventType.value = draft.qualificationEventType ?? ''
+    qualificationSelectedDate.value = draft.qualificationSelectedDate ? new Date(draft.qualificationSelectedDate) : null
+    qualificationSelectedSlot.value = draft.qualificationSelectedSlot ?? ''
+    qualificationSelectedTeam.value = draft.qualificationSelectedTeam ?? null
+    qualificationSelectedSalesman.value = draft.qualificationSelectedSalesman ?? null
+    if (draft.assignment?.assignee) {
+      assignment.value = { ...assignment.value, ...draft.assignment }
+    }
+    callLogDateTime.value = draft.callLogDateTime ?? ''
+    if (currentUserRef?.value && !callLogAssignee.value) {
+      callLogAssignee.value = currentUserRef.value
+    }
+    rescheduleTime.value = null
+    customDate.value = ''
+    customTime.value = '09:00'
+    aiSuggestionData.value = null
+  }
   
   // Initialize call log form with current datetime and auto-assign to current user
   const initCallLogForm = (showOutcomeImmediately = false) => {
@@ -434,6 +464,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     confirmCallLogForm,
     cancelCallLogForm,
     clearSuccessState,
+    restorePostponedInterestedState,
     successState,
     successPerformedAt,
     qualificationMethod,

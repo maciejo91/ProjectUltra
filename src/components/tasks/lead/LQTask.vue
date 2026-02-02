@@ -43,7 +43,7 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-end mt-4">
+        <div v-if="successState.kind !== 'valid-to-be-called-back'" class="flex justify-end mt-4">
           <Button
             variant="outline"
             size="small"
@@ -806,12 +806,19 @@
         </div>
         
         <!-- Unified Action Buttons at Bottom Right of Gray Wrapper -->
-        <div v-if="selectedOutcome && !successState" class="flex justify-end gap-2 px-4 pb-4 pt-3">
+        <div v-if="selectedOutcome && !successState" class="flex justify-end gap-2 px-4 pb-4 pt-3 flex-wrap">
           <Button
             variant="secondary"
             @click="cancelOutcome"
           >
             Cancel
+          </Button>
+          <Button
+            v-if="selectedOutcome === 'interested'"
+            variant="outline"
+            @click="onPostponeClick"
+          >
+            Postpone
           </Button>
           <Button
             variant="primary"
@@ -821,6 +828,79 @@
           >
             {{ actionButtonLabel }}
           </Button>
+        </div>
+
+        <!-- Next call attempt (below buttons, shown when Postpone is clicked) -->
+        <div v-if="selectedOutcome === 'interested' && showPostponeRescheduleBlock" class="px-4 pb-4">
+          <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+            <h5 class="font-semibold text-foreground text-sm mb-4">Next call attempt</h5>
+            <div class="reschedule-toggle-group flex flex-wrap gap-2">
+              <Toggle
+                variant="outline"
+                :model-value="rescheduleTime === 'tomorrow-9am'"
+                @update:model-value="(p) => p && setRescheduleTime('tomorrow-9am')"
+                class="followup-toggle-item"
+              >
+                Tomorrow 9:00 AM
+              </Toggle>
+              <Toggle
+                variant="outline"
+                :model-value="rescheduleTime === 'monday'"
+                @update:model-value="(p) => p && setRescheduleTime('monday')"
+                class="followup-toggle-item mk-ai-mode-active-toggle"
+              >
+                <Sparkles
+                  :size="14"
+                  class="mk-sparkles-icon shrink-0"
+                  :fill="rescheduleTime === 'monday' ? 'url(#sparkles-gradient)' : 'currentColor'"
+                  :stroke="rescheduleTime === 'monday' ? 'none' : 'currentColor'"
+                  :stroke-width="rescheduleTime === 'monday' ? 0 : 1.5"
+                />
+                Suggest AI time
+              </Toggle>
+              <Toggle
+                variant="outline"
+                :model-value="rescheduleTime === 'custom'"
+                @update:model-value="(p) => p && setRescheduleTime('custom')"
+                class="followup-toggle-item"
+              >
+                Select time
+              </Toggle>
+            </div>
+            <div v-if="rescheduleTime === 'monday' && aiSuggestionData" class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div class="flex items-start gap-2">
+                <Lightbulb class="w-4 h-4 shrink-0 text-blue-600 mt-0.5" />
+                <div class="flex-1">
+                  <p class="text-sm font-semibold text-foreground mb-1">
+                    {{ aiSuggestionData.formattedDate }} at {{ aiSuggestionData.time }}
+                  </p>
+                  <p class="text-xs text-muted-foreground">
+                    {{ aiSuggestionData.reason }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div v-if="rescheduleTime === 'custom'" class="mt-3 grid grid-cols-2 gap-3">
+              <div>
+                <Label class="form-label">Date</Label>
+                <Input type="date" v-model="customDate" class="w-full" />
+              </div>
+              <div>
+                <Label class="form-label">Time</Label>
+                <Input type="time" v-model="customTime" class="w-full" />
+              </div>
+            </div>
+            <div class="flex justify-end mt-4">
+              <Button
+                variant="primary"
+                size="small"
+                :disabled="!canPostponeFromInterested"
+                @click="onConfirmPostpone"
+              >
+                Confirm postpone
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </template>
@@ -998,6 +1078,7 @@ const noteWidgetRef = ref(null)
 const showAssignmentModal = ref(false)
 const showFinancingModal = ref(false)
 const showVehicleModal = ref(false)
+const showPostponeRescheduleBlock = ref(false)
 const editingTradeIn = ref(null)
 const editingFinancingOption = ref(null)
 const tradeInActionLoading = ref(false)
@@ -1333,8 +1414,27 @@ const {
   qualificationSelectedTeam,
   qualificationSelectedSalesman,
   suggestedTeam,
-  communicationPreferences
+  communicationPreferences,
+  restorePostponedInterestedState
 } = outcomeState
+
+// Restore postponed interested form when opening a lead that was postponed from interested flow
+watch(
+  () => props.lead?.postponedInterestedState,
+  (draft) => {
+    if (!draft) return
+    restorePostponedInterestedState(draft)
+    if (draft.enrichLeadData && typeof draft.enrichLeadData === 'object') {
+      enrichLeadData.value = {
+        interestLevel: draft.enrichLeadData.interestLevel ?? '',
+        purchaseTimeline: draft.enrichLeadData.purchaseTimeline ?? '',
+        budgetRange: draft.enrichLeadData.budgetRange ?? '',
+        additionalNotes: draft.enrichLeadData.additionalNotes ?? ''
+      }
+    }
+  },
+  { immediate: true }
+)
 
 function setFollowupChannel(v) {
   followupChannel.value = v
@@ -1646,8 +1746,26 @@ const canSendAndPostpone = computed(() => {
   return true
 })
 
+const canPostponeFromInterested = computed(() => {
+  if (selectedOutcome.value !== 'interested') return false
+  if (!rescheduleTime.value) return false
+  if (rescheduleTime.value === 'custom' && (!customDate.value || !customTime.value)) return false
+  return true
+})
+
+function onPostponeClick() {
+  showPostponeRescheduleBlock.value = !showPostponeRescheduleBlock.value
+}
+
+async function onConfirmPostpone() {
+  if (!canPostponeFromInterested.value) return
+  await handlePostponeFromInterested()
+  showPostponeRescheduleBlock.value = false
+}
+
 watch(selectedOutcome, (newOutcome) => {
   if (newOutcome !== 'interested') {
+    showPostponeRescheduleBlock.value = false
     enrichLeadData.value = {
       interestLevel: '',
       purchaseTimeline: '',
@@ -1932,6 +2050,7 @@ const {
   handleQualify,
   handleDisqualifyFromInterested,
   handleNoAnswerConfirm,
+  handlePostponeFromInterested,
   handleNotValidConfirm,
   handleNoteSave,
   handleSurveyCompleted,

@@ -25,6 +25,7 @@ export const DELIVERY_SUBSTATUS = {
 export const LEAD_STAGES = {
   NEW: 'New',
   TO_BE_CALLED_BACK: 'To be called back',
+  VALID_TO_BE_CALLED_BACK: 'Valid - to be called back',
   VALID: 'Valid',
   CLOSED_INVALID: 'Closed - Invalid',
   CLOSED_NOT_INTERESTED: 'Closed - Not Interested',
