@@ -5,9 +5,8 @@
     :class="[cardClass, selectedBorderClass]"
     @click="$emit('select', itemId)"
   >
-    <!-- Top Right: Due Date and Dropdown -->
+    <!-- Top Right: Due Date -->
     <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
-      <!-- Due Date / Expected Close Date -->
       <span 
         v-if="displayDate"
         class="text-xs font-bold uppercase leading-none shrink-0"
@@ -15,32 +14,6 @@
       >
         {{ displayDate.text }}
       </span>
-
-      <!-- Menu Button -->
-      <button 
-        v-if="showMenu"
-        @click.stop="$emit('menu-click', item.id)"
-        class="text-gray-300 hover:text-gray-600"
-      >
-        <MoreVertical class="w-4 h-4 shrink-0" />
-      </button>
-    </div>
-
-    <!-- Card Menu Dropdown -->
-    <div 
-      v-if="openMenuId === item.id && showMenu"
-      class="absolute right-4 top-10 z-50 w-40 bg-white border border-black/10 rounded-lg shadow-nsc-card py-1"
-      v-click-outside="() => $emit('menu-close')"
-      @click.stop
-    >
-      <button
-        v-for="menuItem in menuItems"
-        :key="menuItem.key"
-        @click="menuItem.onClick"
-        class="w-full px-3 py-2 text-left text-xs text-foreground hover:bg-muted flex items-center gap-2"
-      >
-        {{ menuItem.label }}
-      </button>
     </div>
 
     <div class="flex flex-col min-w-0 flex-1 pr-4">
@@ -60,8 +33,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { MoreVertical } from 'lucide-vue-next'
+import { computed } from 'vue'
 import { formatDueDate, getDeadlineStatus } from '@/utils/formatters'
 import { getTaskActionTitle } from '@/utils/taskActionTitle'
 import TaskBadges from './shared/TaskBadges.vue'
@@ -83,29 +55,13 @@ const props = defineProps({
     type: [String, Function],
     default: 'bg-white border border-gray-200 hover:border-gray-300'
   },
-  showMenu: {
-    type: Boolean,
-    default: true
-  },
-  openMenuId: {
-    type: [Number, String],
-    default: null
-  },
   getName: {
     type: Function,
     required: true
-  },
-  getVehicleInfo: {
-    type: Function,
-    default: null
-  },
-  menuItems: {
-    type: Array,
-    default: null
   }
 })
 
-const emit = defineEmits(['select', 'menu-click', 'menu-close'])
+defineEmits(['select'])
 
 const itemId = computed(() => {
   return props.item.compositeId || `${props.item.type || 'task'}-${props.item.id}` || props.item.id
@@ -164,20 +120,6 @@ const displayDate = computed(() => {
   }
   return deadline.value
 })
-
-const deadlineDotClass = computed(() => {
-  if (!deadline.value) return ''
-  // Convert text color class to background color class (e.g., text-red-700 -> bg-red-700)
-  return deadline.value.status.textClass.replace('text-', 'bg-')
-})
-
-const displayDateDotClass = computed(() => {
-  if (!displayDate.value) return ''
-  // Convert text color class to background color class (e.g., text-red-700 -> bg-red-700)
-  return displayDate.value.status.textClass.replace('text-', 'bg-')
-})
-
-const cardRef = ref(null)
 </script>
 
 <style scoped>

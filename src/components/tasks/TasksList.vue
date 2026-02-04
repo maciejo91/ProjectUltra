@@ -82,14 +82,8 @@
         :selected="isSelected(item)"
         :selected-class="selectedClass"
         :unselected-class="unselectedClass"
-        :show-menu="showMenu"
-        :open-menu-id="openMenuId"
         :getName="getName"
-        :getVehicleInfo="getVehicleInfo"
-        :menu-items="getMenuItems ? getMenuItems(item) : null"
         @select="$emit('select', $event)"
-        @menu-click="$emit('menu-click', $event)"
-        @menu-close="$emit('menu-close')"
       >
         <template #location="{ item }">
           <slot name="location" :item="item"></slot>
@@ -123,16 +117,13 @@ const props = defineProps({
   initialSearchQuery: { type: String, default: '' },
   selectedClass: { type: [String, Function], default: '' },
   unselectedClass: { type: [String, Function], default: '' },
-  openMenuId: { type: [String, Number], default: null },
   getName: { type: Function, default: (item) => item.name || 'Unknown' },
   getVehicleInfo: { type: Function, default: () => 'No vehicle specified' },
-  getMenuItems: { type: Function, default: null },
-  showMenu: { type: Boolean, default: true },
   searchPlaceholder: { type: String, default: 'Search' },
   viewMode: { type: String, default: 'card' }
 })
 
-const emit = defineEmits(['select', 'menu-click', 'menu-close', 'filter-change', 'sort-change', 'close', 'view-change'])
+const emit = defineEmits(['select', 'filter-change', 'sort-change', 'close', 'view-change'])
 
 const searchQuery = ref(props.initialSearchQuery)
 const scrollContainer = ref(null)

@@ -158,7 +158,6 @@ const props = defineProps({
   highlightId: { type: String, default: null },
   showClosed: { type: Boolean, default: false },
   showMobileClose: { type: Boolean, default: false },
-  openMenuId: { type: [Number, String], default: null },
   searchPlaceholder: { type: String, default: 'Search tasks...' },
   viewMode: { type: String, default: 'table' },
   getVehicleType: { type: Function, required: true },
@@ -167,7 +166,7 @@ const props = defineProps({
   getStageBadgeClass: { type: Function, required: true }
 })
 
-const emit = defineEmits(['select', 'menu-click', 'menu-close', 'toggle-closed', 'reassign', 'close', 'view-change'])
+const emit = defineEmits(['select', 'toggle-closed', 'reassign', 'close', 'view-change'])
 
 const settingsStore = useSettingsStore()
 const leadsStore = useLeadsStore()

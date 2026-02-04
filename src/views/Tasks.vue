@@ -23,7 +23,6 @@
           @view-change="handleViewChange"
           :selected-class="(task) => task.type === 'lead' ? 'bg-surface border-2 border-blue-500' : 'bg-surface border-2 border-purple-500'"
           :unselected-class="getUnselectedClass"
-          :open-menu-id="openCardMenu"
           :getName="(task) => {
             // Ensure customer exists and has name
             const customer = task.customer
@@ -75,11 +74,8 @@
             return parts.join(' • ')
           }"
           :avatarClass="(task) => task.type === 'lead' ? 'bg-orange-100 text-orange-600' : 'bg-purple-100 text-purple-600'"
-          :get-menu-items="getTaskMenuItems"
           :show-mobile-close="false"
           @select="selectTask"
-          @menu-click="toggleCardMenu"
-          @menu-close="openCardMenu = null"
           @close="handleBackToTaskList"
           :active-filters="activeFilters"
           @filter-change="activeFilters = $event"
@@ -185,15 +181,12 @@
         :highlight-id="highlightId"
         :show-closed="showClosed"
         :show-mobile-close="false"
-        :open-menu-id="openCardMenu"
         :get-vehicle-type="getVehicleType"
         :get-vehicle-type-badge-class="getVehicleTypeBadgeClass"
         :get-owner-info="getOwnerInfo"
         :get-stage-badge-class="getStageBadgeClass"
         :view-mode="viewMode"
         @select="selectTask"
-        @menu-click="toggleCardMenu"
-        @menu-close="openCardMenu = null"
         @toggle-closed="showClosed = $event"
         @reassign="reassignTask"
         @close="handleBackToTaskList"
@@ -253,8 +246,6 @@ import { useTaskSorting } from '@/composables/useTaskSorting'
 import { formatCurrency } from '@/utils/formatters'
 import { getStageBadgeClass } from '@/utils/formatters'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
-import { getTransitionHandler } from '@/composables/useLeadStateMachine'
-import { LEAD_STAGES } from '@/utils/stageMapper'
 import { getUrgencyIcon, getUrgencyColorClass } from '@/composables/useLeadUrgency'
 import { useSettingsStore } from '@/stores/settings'
 
@@ -342,7 +333,6 @@ const handleViewChange = (newViewMode, searchQuery = '') => {
 const activeFilters = ref([]) // Array of active filter keys: ['lead', 'due-in-24h', etc.] - no filters by default
 const sortOption = ref('') // '', 'urgent-first', 'assigned-to-me', 'assigned-to-my-team', 'recent-first'
 const showClosed = ref(false) // Toggle to show/hide closed (disqualified) leads
-const openCardMenu = ref(null)
 const showTaskListMobile = ref(false)
 const showReassignModal = ref(false)
 const taskToReassign = ref(null)
@@ -577,14 +567,9 @@ const handleDrawerTaskNavigate = (direction) => {
   }
 }
 
-const toggleCardMenu = (taskId) => {
-  openCardMenu.value = openCardMenu.value === taskId ? null : taskId
-}
-
 const reassignTask = (task) => {
   taskToReassign.value = task
   showReassignModal.value = true
-  openCardMenu.value = null
 }
 
 const handleSortChange = (sort) => {
@@ -613,121 +598,6 @@ const handleReassignConfirm = async (assignee) => {
   
   showReassignModal.value = false
   taskToReassign.value = null
-}
-
-const markAsHot = async (task) => {
-  openCardMenu.value = null
-  if (task.type === 'lead') {
-    await leadsStore.updateLead(task.id, { priority: 'Hot' })
-  } else if (task.type === 'opportunity') {
-    await opportunitiesStore.updateOpportunity(task.id, { priority: 'Hot' })
-  }
-}
-
-const unmarkAsHot = async (task) => {
-  openCardMenu.value = null
-  if (task.type === 'lead') {
-    await leadsStore.updateLead(task.id, { priority: 'Normal' })
-  } else if (task.type === 'opportunity') {
-    await opportunitiesStore.updateOpportunity(task.id, { priority: 'Normal' })
-  }
-}
-
-const assignToMe = async (task) => {
-  openCardMenu.value = null
-  const currentUser = userStore.user
-  if (!currentUser) return
-  
-  if (task.type === 'lead') {
-    await leadsStore.updateLead(task.id, { 
-      assignee: currentUser.name,
-      assigneeType: 'user'
-    })
-  } else if (task.type === 'opportunity') {
-    await opportunitiesStore.updateOpportunity(task.id, { 
-      assignee: currentUser.name,
-      assigneeType: 'user'
-    })
-  }
-}
-
-const reopenLead = async (task) => {
-  openCardMenu.value = null
-  if (task.type !== 'lead') return
-  
-  try {
-    const currentStage = task.displayStage || task.stage || LEAD_STAGES.NEW
-    const targetStage = LEAD_STAGES.NEW // Reopen to New stage
-    
-    const transitionHandler = getTransitionHandler(currentStage, targetStage)
-    
-    if (transitionHandler) {
-      const { updates, activities } = transitionHandler(task)
-      
-      // Apply updates
-      await leadsStore.updateLead(task.id, updates)
-      
-      // Log all activities
-      for (const activity of activities) {
-        await leadsStore.addActivity(task.id, activity)
-      }
-    } else {
-      // Fallback to direct update if no handler found
-      await leadsStore.updateLead(task.id, {
-        isDisqualified: false,
-        disqualifyReason: null,
-        disqualifyCategory: null,
-        isDuplicate: false,
-        stage: 'Open',
-        status: 'Open',
-        nextActionDue: null,
-        scheduledAppointment: null
-      })
-      
-      await leadsStore.addActivity(task.id, {
-        type: 'note',
-        user: 'You',
-        action: 'reopened lead',
-        content: 'Lead has been reopened for qualification'
-      })
-    }
-    
-    // Reload the lead to refresh the UI
-    await leadsStore.fetchLeadById(task.id)
-  } catch (err) {
-    console.error('Failed to reopen lead:', err)
-  }
-}
-
-// Generate menu items for task cards
-const getTaskMenuItems = (task) => {
-  const items = []
-  
-  // Reopen Lead (only for closed leads)
-  if (task.type === 'lead' && task.isDisqualified === true) {
-    items.push({
-      key: 'reopen',
-      label: 'Reopen Lead',
-      onClick: () => reopenLead(task)
-    })
-  }
-  
-  // Mark as hot / Unmark as hot
-  if (task.priority !== 'Hot') {
-    items.push({
-      key: 'mark-hot',
-      label: 'Mark as hot',
-      onClick: () => markAsHot(task)
-    })
-  } else {
-    items.push({
-      key: 'unmark-hot',
-      label: 'Unmark as hot',
-      onClick: () => unmarkAsHot(task)
-    })
-  }
-  
-  return items
 }
 
 </script>
