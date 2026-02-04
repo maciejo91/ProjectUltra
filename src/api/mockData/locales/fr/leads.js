@@ -47,7 +47,8 @@ export const mockLeads = [
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: [] // Zero contact attempts - needs initial call
+    contactAttempts: [], // Zero contact attempts - needs initial call
+    taskStatusBadge: 'Active now on website'
   },
   // GROUP A: Validated Stage Leads
   {
@@ -107,7 +108,8 @@ export const mockLeads = [
         notes: 'Customer confirmed interest, validated contact details, scheduled test drive',
         transcription: null
       }
-    ]
+    ],
+    taskStatusBadge: 'Active Campaign - Summer Deals'
   },
   {
     id: 5,
@@ -181,7 +183,8 @@ export const mockLeads = [
         notes: 'Validated lead, customer interested. Needs to check calendar for appointment',
         transcription: null
       }
-    ]
+    ],
+    taskStatusBadge: 'Vehicle ageing'
   },
   // GROUP B: Disqualified States
   {

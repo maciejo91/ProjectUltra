@@ -237,6 +237,29 @@ export function getStageBadgeClass(stage) {
 }
 
 /**
+ * Format a past date as relative time (e.g. "Just now", "3m ago", "1h ago", "Yesterday")
+ * @param {string|Date} dateInput - ISO date string or Date object
+ * @returns {string} Relative time string
+ */
+export function formatRelativeTime(dateInput) {
+  if (!dateInput) return ''
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput
+  const now = new Date()
+  const diffMs = now - date
+  const diffSec = Math.floor(diffMs / 1000)
+  const diffMin = Math.floor(diffSec / 60)
+  const diffHour = Math.floor(diffMin / 60)
+  const diffDay = Math.floor(diffHour / 24)
+
+  if (diffSec < 60) return 'Just now'
+  if (diffMin < 60) return `${diffMin}m ago`
+  if (diffHour < 24) return `${diffHour}h ago`
+  if (diffDay === 1) return 'Yesterday'
+  if (diffDay < 7) return `${diffDay} days ago`
+  return formatDate(date)
+}
+
+/**
  * Format date and time for display
  * @param {string} dateString - ISO date string
  * @returns {string} Formatted string like "Jan 5, 2:30 PM"

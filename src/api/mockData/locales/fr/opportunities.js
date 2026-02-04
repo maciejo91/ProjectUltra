@@ -537,7 +537,8 @@ export const mockOpportunities = [
       team: 'Sales (New)',
       status: 'confirmed',
       noShowCount: 0
-    }
+    },
+    taskStatusBadge: 'Active now on website'
   },
   // REMOVED ID 2 - Duplicate of Qualified stage (ID 1)
   {

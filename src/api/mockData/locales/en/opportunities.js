@@ -16,7 +16,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 5
+      stockDays: 5,
+      requestMessage: 'What are the financing options for the 3 Series?'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -38,7 +39,8 @@ export const mockOpportunities = [
       { id: 'f1', label: 'Cash' },
       { id: 'f2', label: 'Loan 48 months', termMonths: 48 },
       { id: 'f3', label: 'Leasing 36 months', termMonths: 36 }
-    ]
+    ],
+    taskStatusBadge: 'Active now on website'
   },
 
   // 2. Opportunity - In Negotiation, appointment TODAY (not "Appointment Scheduled" status); Manage Appointment card shows last
@@ -56,7 +58,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 8
+      stockDays: 8,
+      requestMessage: 'What is the warranty coverage on this vehicle?'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -108,7 +111,8 @@ export const mockOpportunities = [
       { id: 'f1', label: 'Cash' },
       { id: 'f2', label: 'Loan 48 months', termMonths: 48 },
       { id: 'f3', label: 'Leasing 36 months', termMonths: 36 }
-    ]
+    ],
+    taskStatusBadge: 'Active Campaign - Summer Deals'
   },
 
   // 3. Opportunity - 1st No Show

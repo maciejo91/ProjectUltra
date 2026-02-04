@@ -139,18 +139,21 @@
 
 <script setup>
 import { ref, computed, h } from 'vue'
-import { Table, LayoutGrid, Flame, Sun, CheckCircle, Circle, EyeOff, ListTodo, Trash2, X } from 'lucide-vue-next'
+import { Table, LayoutGrid, EyeOff, ListTodo, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
-import { formatCurrency, formatDeadlineFull, formatDate, getDeadlineStatus } from '@/utils/formatters'
-import { calculateLeadUrgency, getUrgencyIcon, getUrgencyColorClass } from '@/composables/useLeadUrgency'
+import { formatCurrency, formatDeadlineFull, formatDate, formatRelativeTime, getDeadlineStatus } from '@/utils/formatters'
+import { calculateLeadUrgency } from '@/composables/useLeadUrgency'
 import { useSettingsStore } from '@/stores/settings'
+import { useUsersStore } from '@/stores/users'
 import { useTasksTableFilters } from '@/composables/useTasksTableFilters'
 import { useTableRowSelection } from '@/composables/useTableRowSelection'
 import { useDataTableData, getNestedProperty } from '@/composables/useDataTableData'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
+import { useTaskHelpers } from '@/composables/useTaskHelpers'
+import { getTaskActionTitle } from '@/utils/taskActionTitle'
 
 const props = defineProps({
   tasks: { type: Array, required: true },
@@ -169,9 +172,38 @@ const props = defineProps({
 const emit = defineEmits(['select', 'toggle-closed', 'reassign', 'close', 'view-change'])
 
 const settingsStore = useSettingsStore()
+const usersStore = useUsersStore()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
+const { getCustomerCity } = useTaskHelpers()
 const searchQuery = ref('')
+
+const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
+
+function getVehicleConditionDisplay(task) {
+  const vehicle = task.type === 'lead' ? task.requestedCar : (task.vehicle || task.requestedCar)
+  if (!vehicle) return null
+  const status = vehicle.status || ''
+  const km = vehicle.kilometers
+  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'New') {
+    return (status && status.toLowerCase() === 'new') || km === 0 ? 'Km0' : 'New'
+  }
+  return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Used'
+}
+
+function getAssigneeDepartmentLocation(task) {
+  if (!task?.assignee) return { name: 'Unassigned', line2: '' }
+  const user = usersStore.users.find(u => u.name === task.assignee)
+  if (!user) return { name: task.assignee, line2: '' }
+  const line2 = [user.team, user.dealership].filter(Boolean).join(' - ') || ''
+  return { name: task.assignee, line2 }
+}
+
+function getRequestMessageSnippet(task) {
+  const msg = task.requestedCar?.requestMessage ?? task.requestMessage
+  if (!msg || typeof msg !== 'string') return '—'
+  return msg.length > 32 ? `${msg.slice(0, 29)}...` : msg
+}
 
 // Row selection
 const { rowSelection, selectedCount, hasSelection, getSelectedRows, clearSelection } = useTableRowSelection((row) => row.compositeId)
@@ -246,107 +278,57 @@ const getDateDisplay = (date) => {
   return formatDeadlineFull(date)
 }
 
-// Helper function to get car status
-const getCarStatus = (task) => {
-  const vehicle = task.type === 'lead' ? task.requestedCar : task.vehicle
-  if (!vehicle) return { status: 'N/A', class: 'bg-muted text-muted-foreground' }
-  const isInStock = vehicle.stockDays !== undefined && vehicle.stockDays !== null
-  return {
-    status: isInStock ? 'In Stock' : 'Out of Stock',
-    class: isInStock ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'
-  }
-}
-
-// Helper function to get request type
-const getRequestType = (task) => {
-  if (task.type === 'lead') {
-    return task.requestedCar?.requestType || task.requestType || 'N/A'
-  }
-  return task.requestType || 'Opportunity'
-}
-
 // Helper to get car price (requestedCar or vehicle)
 const getCarPrice = (task) => {
   const vehicle = task.type === 'lead' ? task.requestedCar : (task.vehicle || task.requestedCar)
   return vehicle?.price
 }
 
-// DataTable columns configuration (order: type, customer, carInfo, dueDate, price, leadSource, contactAttempts, assignee, createdAt, status, urgency)
+// DataTable columns: Task details (with badge), Created, Due date, Attempts, Customer, Vehicle, Request message, Source, Assigned
 const columns = computed(() => [
   {
-    id: 'type',
-    accessorKey: 'type',
-    header: 'Task type',
+    id: 'taskDetails',
+    accessorKey: 'compositeId',
+    header: 'Task details',
     meta: {
-      title: 'Task type',
+      title: 'Task details',
       onOpen: (row) => handleRowClick(row.original)
     },
     cell: ({ row }) => {
       const task = row.original
-      const typeClass = task.type === 'lead' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'
-      return h('span', {
-        class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${typeClass}`
-      }, task.type === 'lead' ? 'Lead' : 'Opportunity')
-    }
-  },
-  {
-    id: 'customer',
-    accessorKey: 'customer',
-    header: 'Customer',
-    meta: { title: 'Customer' },
-    cell: ({ row }) => {
-      const task = row.original
-      return h('div', { class: 'flex items-center gap-2 md:gap-3' }, [
-        h('div', {
-          class: `w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${task.type === 'lead' ? 'bg-orange-100 text-orange-600' : 'bg-purple-100 text-purple-600'}`
-        }, task.customer.initials),
-        h('div', { class: 'min-w-0' }, [
-          h('div', { class: 'text-content font-semibold text-foreground truncate max-w-32 md:max-w-none' }, task.customer.name),
-          h('div', { class: 'text-meta truncate hidden sm:block' }, task.customer.phone || 'N/A')
+      const actionTitle = getTaskActionTitle(task)
+      const stageStatus = task.type === 'lead' ? task.status : (task.displayStage || task.stage)
+      const stageClass = props.getStageBadgeClass(stageStatus)
+      const typeClass = task.type === 'lead' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-purple-50 text-purple-700 border-purple-200'
+      return h('div', { class: 'flex flex-col gap-1 min-w-0' }, [
+        h('div', { class: 'text-content font-semibold text-foreground truncate' }, actionTitle || '—'),
+        h('div', { class: 'flex flex-wrap items-center gap-1.5' }, [
+          h('span', {
+            class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${typeClass} w-fit`
+          }, task.type === 'lead' ? 'Lead' : 'Opportunity'),
+          stageStatus && h('span', {
+            class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${stageClass} w-fit`
+          }, stageStatus)
         ])
       ])
     }
   },
   {
-    id: 'carInfo',
-    accessorKey: 'carInfo',
-    header: 'Car Info',
-    meta: { title: 'Car Info' },
+    id: 'createdAt',
+    accessorKey: 'createdAt',
+    header: 'Created',
+    meta: { title: 'Created' },
     cell: ({ row }) => {
       const task = row.original
-      const vehicleInfo = getVehicleInfo(task)
-      const carStatus = getCarStatus(task)
-      const requestType = getRequestType(task)
-      const vehicle = task.type === 'lead' ? task.requestedCar : (task.vehicle || task.requestedCar)
-
-      if (vehicleInfo === 'No vehicle specified') {
-        return h('span', { class: 'text-meta' }, 'N/A')
-      }
-
-      const condition = vehicle?.condition ? vehicle.condition.charAt(0).toUpperCase() + vehicle.condition.slice(1).toLowerCase() : null
-      const mileage = vehicle?.kilometers ? `${vehicle.kilometers.toLocaleString()} km` : null
-      const quotationNumber = task.quotationNumber || task.quotation || null
-      const shouldShowRequestType = requestType && requestType !== 'N/A' && (requestType !== 'Quotation' || quotationNumber)
-
-      return h('div', { class: 'flex flex-col gap-1' }, [
-        h('div', { class: 'flex items-center gap-2' }, [
-          h('i', { class: 'fa-brands fa-volkswagen text-muted-foreground text-sm' }),
-          h('span', { class: 'text-content font-medium text-foreground truncate max-w-32' }, vehicleInfo)
-        ]),
-        h('div', { class: 'flex items-center gap-2 flex-wrap' }, [
-          h('span', { class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${carStatus.class}` }, carStatus.status),
-          condition && h('span', { class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-50 text-blue-700' }, condition),
-          mileage && h('span', { class: 'text-meta text-xs' }, mileage),
-          shouldShowRequestType && h('span', { class: 'text-meta text-xs' }, requestType)
-        ])
-      ])
+      if (!task.createdAt) return h('span', { class: 'text-meta' }, '—')
+      return h('span', { class: 'text-meta' }, formatRelativeTime(task.createdAt))
     }
   },
   {
     id: 'dueDate',
     accessorKey: 'nextActionDue',
-    header: 'Due Date',
-    meta: { title: 'Due Date' },
+    header: 'Due date',
+    meta: { title: 'Due date' },
     cell: ({ row }) => {
       const task = row.original
       const date = task.nextActionDue ?? task.dueDate
@@ -360,108 +342,94 @@ const columns = computed(() => [
     }
   },
   {
-    id: 'price',
-    accessorKey: 'price',
-    accessorFn: (row) => getCarPrice(row) ?? 0,
-    header: 'Price',
-    meta: { title: 'Price' },
+    id: 'contactAttempts',
+    accessorKey: 'contactAttempts',
+    header: 'Attempts',
+    meta: { title: 'Attempts' },
     cell: ({ row }) => {
       const task = row.original
-      const price = getCarPrice(task)
-      if (price == null || price === '') {
+      const attempts = task.contactAttempts?.length || 0
+      const max = maxContactAttempts.value
+      return h('span', { class: 'text-content font-medium text-foreground' }, `${attempts}/${max}`)
+    }
+  },
+  {
+    id: 'customer',
+    accessorKey: 'customer',
+    header: 'Customer',
+    meta: { title: 'Customer' },
+    cell: ({ row }) => {
+      const task = row.original
+      const city = getCustomerCity(task)
+      return h('div', { class: 'flex flex-col min-w-0' }, [
+        h('div', { class: 'text-content font-semibold text-foreground truncate' }, task.customer?.name || '—'),
+        h('div', { class: 'text-meta truncate' }, city || '—')
+      ])
+    }
+  },
+  {
+    id: 'vehicle',
+    accessorKey: 'carInfo',
+    header: 'Vehicle',
+    meta: { title: 'Vehicle' },
+    cell: ({ row }) => {
+      const task = row.original
+      const vehicleInfo = getVehicleInfo(task)
+      if (vehicleInfo === 'No vehicle specified') {
         return h('span', { class: 'text-meta' }, '—')
       }
-      return h('span', { class: 'text-content font-medium text-foreground' }, `€ ${formatCurrency(price)}`)
+      const price = getCarPrice(task)
+      const condition = getVehicleConditionDisplay(task)
+      const priceStr = price != null && price !== '' ? `€${formatCurrency(price)}` : ''
+      const conditionStr = condition ? ` (${condition})` : ''
+      return h('div', { class: 'flex flex-col min-w-0' }, [
+        h('div', { class: 'text-content font-medium text-foreground truncate' }, vehicleInfo),
+        h('div', { class: 'text-meta' }, `${priceStr}${conditionStr}`.trim() || '—')
+      ])
+    }
+  },
+  {
+    id: 'requestMessage',
+    accessorKey: 'requestMessage',
+    header: 'Request message',
+    meta: { title: 'Request message' },
+    cell: ({ row }) => {
+      const snippet = getRequestMessageSnippet(row.original)
+      return h('span', { class: 'text-meta truncate max-w-32 inline-block' }, snippet)
     }
   },
   {
     id: 'source',
     accessorKey: 'source',
-    header: 'Lead Source',
-    meta: { title: 'Lead Source' },
+    header: 'Source',
+    meta: { title: 'Source' },
     cell: ({ row }) => {
       const task = row.original
-      return h('span', {
-        class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-muted text-muted-foreground'
-      }, task.source || 'N/A')
-    }
-  },
-  {
-    id: 'contactAttempts',
-    accessorKey: 'contactAttempts',
-    header: 'Contact Attempts',
-    meta: { title: 'Contact Attempts' },
-    cell: ({ row }) => {
-      const task = row.original
-      const attempts = task.contactAttempts?.length || 0
-      return h('span', { class: 'text-content font-medium text-foreground' }, attempts)
+      const main = task.source || '—'
+      const details = task.sourceDetails ? ` ${task.sourceDetails}` : ''
+      const badge = task.taskStatusBadge
+      return h('div', { class: 'flex flex-col gap-1 min-w-0' }, [
+        h('span', { class: 'text-meta' }, `${main}${details}`.trim()),
+        ...(badge ? [h('span', {
+          class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-50 text-green-700 border border-green-200 w-fit'
+        }, badge)] : [])
+      ])
     }
   },
   {
     id: 'assignee',
     accessorKey: 'assignee',
-    header: 'Assignee',
-    meta: { title: 'Assignee' },
+    header: 'Assigned',
+    meta: { title: 'Assigned' },
     cell: ({ row }) => {
       const task = row.original
-      const owner = props.getOwnerInfo(task)
-      return h('div', { class: 'flex items-center gap-2' }, [
-        h('div', {
-          class: 'w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0'
-        }, owner.initials),
-        h('span', { class: 'text-meta truncate max-w-20' }, owner.name)
+      const { name, line2 } = getAssigneeDepartmentLocation(task)
+      return h('div', { class: 'flex flex-col min-w-0' }, [
+        h('div', { class: 'text-content font-medium text-foreground truncate' }, name),
+        ...(line2 ? [h('div', { class: 'text-meta truncate' }, line2)] : [])
       ])
     }
-  },
-  {
-    id: 'createdAt',
-    accessorKey: 'createdAt',
-    header: 'Creation Date',
-    meta: { title: 'Creation Date' },
-    cell: ({ row }) => {
-      const task = row.original
-      if (!task.createdAt) return h('span', { class: 'text-meta' }, 'N/A')
-      return h('span', { class: 'text-meta' }, formatDate(task.createdAt))
-    }
-  },
-  {
-    id: 'status',
-    accessorKey: 'status',
-    header: 'Status',
-    meta: { title: 'Status' },
-    cell: ({ row }) => {
-      const task = row.original
-      const stageStatus = task.type === 'lead' ? task.status : (task.displayStage || task.stage)
-      const stageClass = props.getStageBadgeClass(stageStatus)
-      return h('span', {
-        class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${stageClass}`
-      }, stageStatus)
-    }
-  },
-  ...(settingsStore.getSetting('urgencyEnabled') !== false ? [{
-    id: 'urgencyLevel',
-    accessorKey: 'urgencyLevel',
-    header: 'Urgency',
-    meta: { title: 'Urgency' },
-    cell: ({ row }) => {
-      const task = row.original
-      if (task.type !== 'lead') {
-        return h('span', { class: 'text-meta' }, '—')
-      }
-      let urgencyLevel = task.urgencyLevel
-      if (!urgencyLevel) {
-        const urgencyResult = calculateLeadUrgency(task)
-        urgencyLevel = urgencyResult.level
-      }
-      const colorClass = getUrgencyColorClass(urgencyLevel)
-      const iconName = getUrgencyIcon(urgencyLevel)
-      const urgencyIconComponents = { Flame, Sun, CheckCircle, Circle }
-      const IconComp = urgencyIconComponents[iconName] || Circle
-      return h('span', {
-        class: `inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold border ${colorClass}`
-      }, [h(IconComp, { class: 'size-3 shrink-0' }), h('span', {}, urgencyLevel)])
-    }
-  }] : [])
+  }
 ])
 
 // Filter → sort → paginate for DataTable (guide pattern) - must be after columns
@@ -496,10 +464,12 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
     row.customer?.name,
     row.customer?.email,
     row.customer?.phone,
+    getCustomerCity(row),
     getVehicleInfo(row),
     row.type === 'lead' ? row.status : (row.displayStage ?? row.stage),
     row.type,
     row.source,
+    row.sourceDetails,
     row.assignee,
     getDueDateSearchLabel(row),
     getCarPrice(row) != null ? String(getCarPrice(row)) : null,
@@ -507,7 +477,11 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
     row.createdAt,
     row.type === 'lead' ? (calculateLeadUrgency(row).level ?? null) : null,
     row.compositeId,
-    row.id
+    row.id,
+    getTaskActionTitle(row),
+    row.requestedCar?.requestMessage,
+    row.requestMessage,
+    row.taskStatusBadge
   ],
   getFilterValue: getTaskFilterValue
 })
