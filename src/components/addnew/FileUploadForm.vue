@@ -19,8 +19,8 @@
           class="border-2 border-dashed cursor-pointer transition-all hover:border-brand-primary/50 w-full"
           :class="{ 'opacity-50 cursor-not-allowed': loading, 'border-border': !loading }"
         >
-          <CardContent class="text-center py-8">
-            <Upload class="w-10 h-10 shrink-0 text-muted-foreground mb-3" />
+          <CardContent class="flex flex-col items-center text-center py-8">
+            <Upload class="w-5 h-5 shrink-0 text-muted-foreground mb-3" />
             <p class="text-foreground text-sm font-bold mb-1">
               {{ selectedFile ? selectedFile.name : 'Click to upload or drag and drop' }}
             </p>

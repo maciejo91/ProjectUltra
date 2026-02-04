@@ -152,7 +152,7 @@ const importSuccess = ref(false)
 const sources = [
   {
     value: 'contacts',
-    label: 'Contacts',
+    label: 'Customers',
     description: 'Import customer contacts',
     icon: 'fa-solid fa-users'
   },
@@ -284,7 +284,7 @@ const handleImport = async () => {
 
     // Redirect after short delay
     setTimeout(() => {
-      const tab = selectedSource.value === 'contacts' ? 'contacts' :
+      const tab = selectedSource.value === 'contacts' ? 'customers' :
                    selectedSource.value === 'leads' ? 'open-leads' :
                    'open-opportunities'
       router.push({

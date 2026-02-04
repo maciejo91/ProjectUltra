@@ -1,9 +1,9 @@
 <template>
   <form v-click-outside="() => (showResults = false)" @submit.prevent="handleSubmit" class="w-full">
-    <!-- Contact Section -->
+    <!-- Customer Section -->
     <Card class="mb-4">
       <CardHeader>
-        <CardTitle>Contact Information</CardTitle>
+        <CardTitle>Customer Information</CardTitle>
       </CardHeader>
       <CardContent class="space-y-6">
         
@@ -11,7 +11,7 @@
         <div v-if="!hideContactSelection" class="space-y-6">
           <!-- Radio: Existing vs New -->
           <div class="space-y-2">
-            <Label class="block text-sm font-semibold text-foreground">Contact Type</Label>
+            <Label class="block text-sm font-semibold text-foreground">Customer Type</Label>
             <div class="flex gap-6">
               <Label class="flex items-center gap-2 cursor-pointer">
                 <input
@@ -20,7 +20,7 @@
                   value="new"
                   class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-gray-300"
                 />
-                <span class="text-sm text-muted-foreground">New Contact</span>
+                <span class="text-sm text-muted-foreground">New Customer</span>
               </Label>
               <Label class="flex items-center gap-2 cursor-pointer">
                 <input
@@ -29,7 +29,7 @@
                   value="existing"
                   class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-gray-300"
                 />
-                <span class="text-sm text-muted-foreground">Existing Contact</span>
+                <span class="text-sm text-muted-foreground">Existing Customer</span>
               </Label>
             </div>
           </div>
@@ -37,7 +37,7 @@
           <!-- Contact Search (if existing) -->
           <div v-if="contactMode === 'existing'" class="space-y-6">
             <div class="relative space-y-2">
-              <Label class="block text-sm font-semibold text-foreground">Search Contact</Label>
+              <Label class="block text-sm font-semibold text-foreground">Search Customer</Label>
               <div class="relative w-full">
                 <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 shrink-0 text-muted-foreground z-10" />
                 <Input 
@@ -75,7 +75,7 @@
               </Card>
             </div>
             
-            <!-- Selected Contact Display -->
+            <!-- Selected Customer Display -->
             <Card v-if="selectedContact" class="bg-muted border-border">
               <CardContent class="p-4">
                 <div class="flex items-center justify-between">
@@ -101,16 +101,16 @@
             </Card>
           </div>
         
-          <!-- Contact Form Fields (if new) -->
+          <!-- Customer Form Fields (if new) -->
           <div v-else class="space-y-6">
             <div class="space-y-2">
               <Label class="block text-sm font-semibold text-foreground">
-                Contact Name <span class="text-brand-red">*</span>
+                Customer Name <span class="text-brand-red">*</span>
               </Label>
               <Input 
                 v-model="contactFormData.name"
                 type="text" 
-                placeholder="Enter contact name..."
+                placeholder="Enter customer name..."
                 class="w-full h-10"
                 :required="contactMode === 'new'"
                 :error="errors.name"
@@ -126,7 +126,7 @@
                 <Input 
                   v-model="contactFormData.email"
                   type="email" 
-                  placeholder="contact@example.com"
+                  placeholder="customer@example.com"
                   class="w-full h-10"
                   :required="contactMode === 'new'"
                   :error="errors.email"
@@ -157,7 +157,7 @@
           </div>
         </div>
 
-        <!-- Read-only Selected Contact Display (shown if selection is hidden) -->
+        <!-- Read-only Selected Customer Display (shown if selection is hidden) -->
         <Card v-else-if="selectedContact" class="bg-muted border-border">
           <CardContent class="p-4">
             <div class="flex items-center gap-3">
@@ -324,7 +324,7 @@
       </CardHeader>
       <CardContent class="space-y-3">
         <p class="text-muted-foreground text-xs">
-          Convert this contact to a lead or opportunity. 
+          Convert this customer to a lead or opportunity. 
           <span class="font-semibold text-muted-foreground">Requires vehicle details.</span>
         </p>
         

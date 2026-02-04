@@ -6,46 +6,43 @@
     <div class="px-4 md:px-8 py-8">
       <div class="max-w-6xl mx-auto">
         <!-- Tabs using Motork Tabs components -->
-        <Tabs v-model="activeTab" class="w-full">
-          <TabsList class="w-full justify-start border-b border-border bg-transparent mb-8">
-            <TabsTrigger
-              v-for="tab in tabs"
-              :key="tab.key"
-              :value="tab.key"
-              class="flex items-center gap-2 text-sm font-medium transition-all relative bg-transparent outline-none"
-              :class="activeTab === tab.key 
-                ? 'text-foreground' 
-                : 'text-muted-foreground hover:text-muted-foreground'"
-            >
-              <component :is="getLucideIcon(getTabIcon(tab.key))" class="w-4 h-4 shrink-0 text-sm" />
-              <span class="hidden md:inline whitespace-nowrap">{{ tab.label }}</span>
-              <span 
-                v-if="activeTab === tab.key"
-                class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
-              ></span>
-            </TabsTrigger>
-          </TabsList>
+        <div class="mb-2 -mt-2">
+          <Tabs v-model="activeTab" class="w-full">
+            <TabsList class="flex shrink-0 border-b border-border bg-white rounded-none w-full relative h-full">
+              <TabsTrigger
+                v-for="tab in tabs"
+                :key="tab.key"
+                :value="tab.key"
+                class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full shrink-0"
+                :class="activeTab === tab.key 
+                  ? 'text-foreground' 
+                  : 'text-muted-foreground hover:text-muted-foreground'"
+              >
+                <span class="whitespace-nowrap">{{ tab.label }}</span>
+                <span 
+                  v-if="activeTab === tab.key"
+                  class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+                ></span>
+              </TabsTrigger>
+            </TabsList>
 
-          <!-- Tab Content -->
-          <TabsContent value="manual">
-            <ManualTab ref="manualTabRef" @submit="handleSubmit" />
-          </TabsContent>
+            <!-- Tab Content -->
+            <TabsContent value="manual">
+              <ManualTab ref="manualTabRef" @submit="handleSubmit" />
+            </TabsContent>
 
-          <TabsContent value="upload">
-            <UploadTab />
-          </TabsContent>
-
-          <TabsContent value="integrations">
-            <IntegrationsTab />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="upload">
+              <UploadTab />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCustomersStore } from '@/stores/customers'
 import { useLeadsStore } from '@/stores/leads'
@@ -54,9 +51,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-libr
 import PageHeader from '@/components/layout/PageHeader.vue'
 import ManualTab from '@/components/addnew/ManualTab.vue'
 import UploadTab from '@/components/addnew/UploadTab.vue'
-import IntegrationsTab from '@/components/addnew/IntegrationsTab.vue'
 import { useTabPersistence } from '@/composables/useTabPersistence'
-import { getLucideIcon } from '@/utils/lucideIcons'
 
 const router = useRouter()
 const customersStore = useCustomersStore()
@@ -68,42 +63,15 @@ const { activeTab } = useTabPersistence('add-new-active-tab', 'manual')
 
 // Ensure manual is automatically selected on mount
 onMounted(() => {
-  if (!activeTab.value || !['manual', 'upload', 'integrations'].includes(activeTab.value)) {
+  if (!activeTab.value || !['manual', 'upload'].includes(activeTab.value)) {
     activeTab.value = 'manual'
   }
 })
 
-// Watch for tab changes to update persistence
-watch(activeTab, (newTab) => {
-  if (newTab && ['manual', 'upload', 'integrations'].includes(newTab)) {
-    // Tab persistence is handled by useTabPersistence composable
-  }
-})
-
 const tabs = [
-  {
-    key: 'manual',
-    label: 'Manual'
-  },
-  {
-    key: 'upload',
-    label: 'Upload'
-  },
-  {
-    key: 'integrations',
-    label: 'Integrations'
-  }
+  { key: 'manual', label: 'Manual' },
+  { key: 'upload', label: 'Upload' }
 ]
-
-// Icon mapping for tabs
-const getTabIcon = (tabKey) => {
-  const iconMap = {
-    manual: 'fa-solid fa-pen',
-    upload: 'fa-solid fa-upload',
-    integrations: 'fa-solid fa-plug'
-  }
-  return iconMap[tabKey] || 'fa-solid fa-circle'
-}
 
 const handleSubmit = async (formData) => {
   try {
@@ -192,10 +160,10 @@ const handleSubmit = async (formData) => {
         await customersStore.addRequestedCar(contact.id, vehicleData)
       }
       
-      // Just redirect to contacts (contact already created/selected)
+      // Just redirect to customers (contact already created/selected)
       router.push({ 
         path: '/customers', 
-        query: { tab: 'contacts', highlight: `contact-${contact.id}` }
+        query: { tab: 'customers', highlight: `contact-${contact.id}` }
       })
     }
   } catch (error) {
@@ -209,3 +177,55 @@ const handleSubmit = async (formData) => {
   }
 }
 </script>
+
+<style scoped>
+/* Tab styling to match Customers.vue */
+:deep([role="tablist"]) {
+  border: none !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  gap: 0 !important;
+  height: auto !important;
+  min-height: 48px !important;
+}
+
+:deep([role="tab"]) {
+  background: transparent !important;
+  border: none !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+  margin: 0 !important;
+  padding: 6px 16px 12px 16px !important;
+  position: relative !important;
+  box-shadow: none !important;
+  height: 100% !important;
+  min-height: 48px !important;
+}
+
+:deep([role="tab"]:not(:last-child)) {
+  border-right: none !important;
+}
+
+:deep([role="tab"]::before),
+:deep([role="tab"]::after) {
+  display: none !important;
+  box-shadow: none !important;
+}
+
+:deep([role="tab"] *) {
+  box-shadow: none !important;
+}
+
+:deep([role="tab"][data-state="active"]) {
+  color: var(--color-text-foreground) !important;
+  box-shadow: none !important;
+}
+
+:deep([role="tab"][data-state="inactive"]) {
+  color: var(--color-text-muted-foreground) !important;
+  box-shadow: none !important;
+}
+</style>
