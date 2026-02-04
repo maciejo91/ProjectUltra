@@ -178,7 +178,7 @@
           </div>
 
           <!-- No Answer Follow-up (Inline) -->
-          <div v-if="selectedOutcome === 'no-answer'" class="space-y-4">
+          <div v-if="selectedOutcome === 'no-answer'" ref="expandedOutcomeRef" class="space-y-4">
             <!-- When did you call field -->
             <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
               <Label class="form-label">When did you call?</Label>
@@ -327,7 +327,7 @@
           </div>
 
           <!-- Not Valid (Inline) -->
-          <div v-if="selectedOutcome === 'not-valid'" class="space-y-4">
+          <div v-if="selectedOutcome === 'not-valid'" ref="expandedOutcomeRef" class="space-y-4">
             <!-- When did you call field -->
             <div class="bg-white rounded-lg p-4 shadow-nsc-card">
               <Label class="form-label">When did you call?</Label>
@@ -347,7 +347,7 @@
           </div>
 
       <!-- Interested (Inline) -->
-          <div v-if="selectedOutcome === 'interested'" class="space-y-4">
+          <div v-if="selectedOutcome === 'interested'" ref="expandedOutcomeRef" class="space-y-4">
             <!-- Info note -->
             <div class="text-xs text-muted-foreground px-2">
               <span class="text-red-600">*</span> Required fields
@@ -626,7 +626,7 @@
               </div>
 
               <!-- Step 2: Assign appointment to (show when event type selected) -->
-              <div v-if="qualificationEventType" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+              <div v-if="qualificationEventType" ref="eventTypeExpandedRef" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
                 <h5 class="font-semibold text-foreground text-sm mb-4">Assign appointment to</h5>
                 
                 <div class="grid grid-cols-2 gap-4">
@@ -831,7 +831,7 @@
         </div>
 
         <!-- Next call attempt (below buttons, shown when Postpone is clicked) -->
-        <div v-if="selectedOutcome === 'interested' && showPostponeRescheduleBlock" class="px-4 pb-4">
+        <div v-if="selectedOutcome === 'interested' && showPostponeRescheduleBlock" ref="postponeBlockRef" class="px-4 pb-4">
           <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
             <h5 class="font-semibold text-foreground text-sm mb-4">Next call attempt</h5>
             <div class="reschedule-toggle-group flex flex-wrap gap-2">
@@ -1075,6 +1075,9 @@ const {
 
 // State that stays in component
 const noteWidgetRef = ref(null)
+const expandedOutcomeRef = ref(null)
+const postponeBlockRef = ref(null)
+const eventTypeExpandedRef = ref(null)
 const showAssignmentModal = ref(false)
 const showFinancingModal = ref(false)
 const showVehicleModal = ref(false)
@@ -1762,6 +1765,31 @@ async function onConfirmPostpone() {
   await handlePostponeFromInterested()
   showPostponeRescheduleBlock.value = false
 }
+
+function scrollToExpandedContent(getEl) {
+  nextTick(() => {
+    const el = typeof getEl === 'function' ? getEl() : getEl
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
+}
+
+watch(selectedOutcome, (newOutcome) => {
+  if (newOutcome) {
+    scrollToExpandedContent(() => expandedOutcomeRef.value)
+  }
+})
+
+watch(showPostponeRescheduleBlock, (show) => {
+  if (show) {
+    scrollToExpandedContent(() => postponeBlockRef.value)
+  }
+})
+
+watch(qualificationEventType, (eventType) => {
+  if (eventType) {
+    scrollToExpandedContent(() => eventTypeExpandedRef.value)
+  }
+})
 
 watch(selectedOutcome, (newOutcome) => {
   if (newOutcome !== 'interested') {
