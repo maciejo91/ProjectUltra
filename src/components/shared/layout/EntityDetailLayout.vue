@@ -359,7 +359,21 @@
                       <div class="text-sm text-muted-foreground leading-snug">
                         <span class="font-bold">{{ activity.user }}</span> {{ activity.action }}
                       </div>
-                      <div v-if="activity.content" class="mt-2 bg-orange-50/50 border border-orange-100 p-3 rounded-lg text-sm text-muted-foreground">
+                      <div v-if="activity.type === 'call' && (activity.data?.transcription || activity.content || activity.data?.summary)" class="mt-2 bg-muted rounded-lg p-3">
+                        <p class="text-sm text-foreground wrap-break-word leading-normal">
+                          {{ activity.data?.summary || activity.content || 'Call completed.' }}
+                        </p>
+                        <Button
+                          v-if="getCallTranscriptLines(activity).length > 0"
+                          variant="outline"
+                          size="sm"
+                          class="mt-3 rounded-sm"
+                          @click.stop="openTranscriptDialog(activity)"
+                        >
+                          {{ t('common.call.showTranscript') }}
+                        </Button>
+                      </div>
+                      <div v-else-if="activity.content && activity.type !== 'call'" class="mt-2 bg-orange-50/50 border border-orange-100 p-3 rounded-lg text-sm text-muted-foreground">
                         {{ activity.content }}
                       </div>
                       <div class="text-xs text-muted-foreground mt-1">{{ formatActivityTime(activity.timestamp) }}</div>
@@ -610,13 +624,48 @@
       @close="showAddTagModal = false"
       @add="handleAddTag"
     />
+
+    <!-- Call Transcript Dialog -->
+    <Dialog :open="!!transcriptDialogActivity" @update:open="(open) => !open && (transcriptDialogActivity = null)">
+      <DialogPortal>
+        <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
+        <DialogContent
+          class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
+          :show-close-button="true"
+        >
+          <DialogHeader class="shrink-0">
+            <DialogTitle>{{ t('common.call.transcript') }}</DialogTitle>
+          </DialogHeader>
+          <div class="flex-1 overflow-y-auto py-4 w-full space-y-3">
+            <div
+              v-for="(line, idx) in transcriptDialogLines"
+              :key="idx"
+              class="flex gap-2 text-sm font-mono"
+            >
+              <span :class="line.speaker === 'Lead' ? 'text-blue-600 font-semibold shrink-0' : 'text-green-600 font-semibold shrink-0'">{{ line.speaker }}:</span>
+              <span class="text-foreground wrap-break-word">{{ line.text }}</span>
+            </div>
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ExternalLink, Plus, X, Clock, FolderOpen, MessageCircle } from 'lucide-vue-next'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle
+} from '@motork/component-library/future/primitives'
 import { getLucideIcon } from '@/utils/lucideIcons'
 import CustomerContactHeader from '@/components/customer/widgets/CustomerContactHeader.vue'
 import Tabs from '@/components/customer/widgets/Tabs.vue'
@@ -673,6 +722,7 @@ const emit = defineEmits(['car-added', 'convert-to-lead', 'convert-to-opportunit
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const customersStore = useCustomersStore()
 const usersStore = useUsersStore()
 const userStore = useUserStore()
@@ -1632,5 +1682,29 @@ const formatActivityTime = (timestamp) => {
   const date = new Date(timestamp)
   return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 }
+
+const transcriptDialogActivity = ref(null)
+
+function getCallTranscriptLines(activity) {
+  const transcription = activity?.data?.transcription || activity?.transcription
+  if (!transcription?.leadLines?.length && !transcription?.salesLines?.length) return []
+  const lead = transcription.leadLines ?? []
+  const sales = transcription.salesLines ?? []
+  const lines = []
+  const maxLen = Math.max(lead.length, sales.length)
+  for (let i = 0; i < maxLen; i++) {
+    if (lead[i]) lines.push({ speaker: 'Lead', text: lead[i] })
+    if (sales[i]) lines.push({ speaker: 'Sales', text: sales[i] })
+  }
+  return lines
+}
+
+function openTranscriptDialog(activity) {
+  transcriptDialogActivity.value = activity
+}
+
+const transcriptDialogLines = computed(() =>
+  transcriptDialogActivity.value ? getCallTranscriptLines(transcriptDialogActivity.value) : []
+)
 </script>
 

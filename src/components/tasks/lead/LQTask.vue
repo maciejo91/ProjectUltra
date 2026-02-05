@@ -1311,7 +1311,7 @@ const onEndCall = () => {
 }
 
 const onCallClose = async () => {
-  if (callEnded) {
+  if (callEnded.value) {
     await addCallActivity()
   }
   callState.resetCall()
