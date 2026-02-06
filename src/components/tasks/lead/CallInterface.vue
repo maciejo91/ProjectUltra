@@ -1,16 +1,30 @@
 <template>
   <div>
     <!-- Call Action Buttons Row (hidden when hideButton is true or call is already active) -->
-    <div v-if="!hideButton && !isCallActive && !callEnded" class="flex gap-2 items-center mb-4">
+    <div v-if="!hideButton && !isCallActive && !callEnded" class="flex items-center justify-between gap-3 mb-1 w-full">
       <Button
         variant="default"
         :disabled="isCallActive"
-        class="inline-flex items-center gap-2"
+        class="inline-flex items-center gap-2 shrink-0"
         @click="$emit('start-call')"
       >
         <Phone :size="16" class="shrink-0" aria-hidden="true" />
         {{ contactAttempts > 0 ? 'Call Again' : 'Initiate Call' }}
       </Button>
+      <div
+        v-if="contactAttempts > 0"
+        class="flex items-center gap-1.5 shrink-0 px-2.5 py-1.5 rounded-lg bg-muted border border-border text-sm text-muted-foreground"
+        :title="contactAttempts >= maxContactAttempts - 1 ? 'One more attempt before auto-disqualification' : undefined"
+      >
+        <AlertTriangle
+          v-if="contactAttempts >= maxContactAttempts - 1"
+          :size="14"
+          class="shrink-0 text-orange-600"
+          aria-hidden="true"
+        />
+        <Phone v-else :size="14" class="shrink-0" aria-hidden="true" />
+        <span class="font-medium tabular-nums">{{ contactAttempts }} / {{ maxContactAttempts }}</span>
+      </div>
     </div>
 
     <!-- Floating Call Panel (when call is active or ended) -->
@@ -226,7 +240,7 @@
 </template>
 
 <script setup>
-import { Phone, ChevronDown, Sparkles, Mic, PhoneOff } from 'lucide-vue-next'
+import { Phone, ChevronDown, Sparkles, Mic, PhoneOff, AlertTriangle } from 'lucide-vue-next'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
