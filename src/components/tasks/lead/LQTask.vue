@@ -66,7 +66,7 @@
       <!-- Contact block: white card -->
       <div class="pt-1 px-1">
         <div
-          class="bg-white rounded-lg shadow-nsc-card overflow-hidden"
+          class="bg-white rounded-lg shadow-nsc-card overflow-hidden border border-primary"
         >
         <DeadlineBanner
           :next-action-due="lead.nextActionDue"
@@ -83,32 +83,15 @@
           </div>
         </div>
 
-        <!-- Combined Follow-up and Contact Attempts Banner -->
-        <div v-if="hasScheduledFollowUp || contactAttempts > 0" class="mb-3 bg-muted border border-border rounded-lg p-3">
-          <div class="flex items-center justify-between gap-4 flex-wrap">
-            <!-- Scheduled Follow-up Call -->
-            <div v-if="hasScheduledFollowUp" class="flex items-center gap-2">
-              <CalendarCheck class="w-4 h-4 shrink-0 text-blue-600" />
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-semibold text-foreground">Scheduled Follow-up Call:</span>
-                <span class="text-sm text-muted-foreground">
-                  {{ formatDate(lead.scheduledAppointment.start) }} at {{ formatTime(lead.scheduledAppointment.start) }}
-                </span>
-              </div>
-            </div>
-            
-            <!-- Contact Attempts -->
-            <div v-if="contactAttempts > 0" class="flex items-center gap-2">
-              <Phone class="w-4 h-4 shrink-0 text-muted-foreground" />
-              <span class="text-sm font-semibold text-muted-foreground">Contact Attempts:</span>
-              <span class="text-sm font-semibold text-foreground">{{ contactAttempts }} / {{ maxContactAttempts }}</span>
-              <div
-                v-if="contactAttempts >= maxContactAttempts - 1"
-                class="text-sm text-orange-600 font-medium flex items-center gap-1 ml-2"
-              >
-                <AlertTriangle class="w-4 h-4 shrink-0" />
-                <span>One more attempt before auto-disqualification</span>
-              </div>
+        <!-- Scheduled Follow-up Call Banner (contact attempts moved to same line as Call Again button) -->
+        <div v-if="hasScheduledFollowUp" class="mb-3 bg-muted border border-border rounded-lg p-3">
+          <div class="flex items-center gap-2">
+            <CalendarCheck class="w-4 h-4 shrink-0 text-blue-600" />
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-foreground">Scheduled Follow-up Call:</span>
+              <span class="text-sm text-muted-foreground">
+                {{ formatDate(lead.scheduledAppointment.start) }} at {{ formatTime(lead.scheduledAppointment.start) }}
+              </span>
             </div>
           </div>
         </div>
@@ -146,32 +129,38 @@
         <div v-if="!successState" class="space-y-4">
             <div>
             <p class="text-sm font-medium text-foreground leading-normal mb-3">Log what is happening?</p>
-            <div class="outcome-toggle-group flex flex-wrap gap-3">
+            <div class="outcome-toggle-group grid grid-cols-3 gap-3">
               <Toggle
                 variant="outline"
                 :model-value="selectedOutcome === 'no-answer'"
                 @update:model-value="(p) => selectOutcome(p ? 'no-answer' : null)"
-                class="outcome-toggle-item"
+                class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
               >
-                <PhoneOff :size="18" class="shrink-0" />
+                <span class="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-slate-500">
+                  <PhoneOff :size="16" class="text-white" />
+                </span>
                 <span>No answer</span>
               </Toggle>
               <Toggle
                 variant="outline"
                 :model-value="selectedOutcome === 'not-valid'"
                 @update:model-value="(p) => selectOutcome(p ? 'not-valid' : null)"
-                class="outcome-toggle-item"
+                class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
               >
-                <ThumbsDown :size="18" class="shrink-0" />
-                <span>Not valid</span>
+                <span class="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-rose-500">
+                  <ThumbsDown :size="16" class="text-white" />
+                </span>
+                <span>No interest/invalid</span>
               </Toggle>
               <Toggle
                 variant="outline"
                 :model-value="selectedOutcome === 'interested'"
                 @update:model-value="(p) => selectOutcome(p ? 'interested' : null)"
-                class="outcome-toggle-item"
+                class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
               >
-                <Check :size="18" class="shrink-0" />
+                <span class="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-emerald-500">
+                  <Check :size="16" class="text-white" />
+                </span>
                 <span>Interested</span>
               </Toggle>
             </div>
