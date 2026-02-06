@@ -205,11 +205,12 @@ export const useLeadsStore = defineStore('leads', () => {
       } : {}
       const opportunity = await createOpportunityFromLead(lead, activities, options)
       
-      // Mark lead as converted (or remove it)
+      // Mark lead as converted (API update only). Caller removes from list after navigation
+      // so the drawer can find the new opportunity before the lead disappears.
       await leadsApi.updateLead(leadId, { isDisqualified: true, disqualifyReason: 'Converted to opportunity' })
       
-      // Remove from leads list
-      leads.value = leads.value.filter(l => l.id !== leadId)
+      // Do NOT remove from leads list here – handleQualified removes after router.push
+      // to avoid drawer closing (drawerTask = null) before opportunity is shown
       
       return opportunity
     } catch (err) {

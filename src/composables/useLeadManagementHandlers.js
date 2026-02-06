@@ -192,11 +192,16 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
         await nextTick()
         await new Promise(resolve => setTimeout(resolve, 80))
         
-        // Refresh leads so the converted lead disappears from the list
-        await leadsStore.fetchLeads()
-        
-        // Navigate – task is already in store, drawer will open with the opportunity
+        // Navigate BEFORE removing the lead – otherwise drawerTask becomes null when the lead disappears,
+        // the drawer closes, and we never transition to the opportunity. By navigating first, the drawer
+        // can find the opportunity in allTasks and stay open.
         router.push({ path: `/tasks/${opportunity.id}`, query: { type: 'opportunity' } })
+        
+        // Remove converted lead from list (convertLeadToOpportunity no longer does this)
+        leadsStore.leads = leadsStore.leads.filter(l => l.id !== lead.id)
+        
+        // Refresh leads so list stays in sync
+        await leadsStore.fetchLeads()
         
         // Refresh opportunities in background after a short delay so we don't overwrite before drawer opens
         setTimeout(() => {

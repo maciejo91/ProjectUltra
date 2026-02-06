@@ -74,7 +74,11 @@
     </div>
 
     <!-- Table: scrollable area (hide built-in search row inside this wrapper only) -->
-    <div ref="tableScrollContainer" class="flex-1 overflow-y-auto px-4 md:px-8 pb-4 md:pb-8 bg-white min-h-0 data-table-inner table-search-wrapper">
+    <div
+      ref="tableScrollContainer"
+      class="flex-1 overflow-y-auto px-4 md:px-8 pb-4 md:pb-8 bg-white min-h-0 data-table-inner table-search-wrapper"
+      :class="{ 'hide-table-filter': !hasActiveFilters }"
+    >
       <DataTable 
             :data="paginatedData" 
             :columns="columns"
@@ -231,6 +235,12 @@ const { filterDefinitions } = useTasksTableFilters({
   typeFilter: computed(() => 'all'),
   showTypeFilter: computed(() => true),
   tasks: computed(() => props.tasks)
+})
+
+const hasActiveFilters = computed(() => {
+  const hasColumnFilters = Array.isArray(columnFilters.value) && columnFilters.value.length > 0
+  const hasSearch = Boolean(globalFilter.value && String(globalFilter.value).trim())
+  return hasColumnFilters || hasSearch
 })
 
 const assigneeOptions = computed(() => {
@@ -601,6 +611,11 @@ const tableMeta = computed(() => ({
 :deep(footer button[role="combobox"]) {
   background-color: transparent !important;
   border: none !important;
+}
+
+/* Hide filter row when no filter is applied */
+.hide-table-filter :deep([data-slot="table-filter"]) {
+  display: none !important;
 }
 
 /* Filter button - white background like reference */

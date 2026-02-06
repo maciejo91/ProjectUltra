@@ -494,21 +494,20 @@ watch(drawerTask, (task) => {
 }, { immediate: true })
 
 // Sync drawer with route when in table view (e.g. after qualify → opportunity, or selection)
-// Keeps drawer state in sync with URL so refresh and qualify flow work like list view
+// Keeps drawer state in sync with URL; also open drawer when a row is highlighted (e.g. ?highlight= or after row click)
 watch(
   () => [viewMode.value, route.params.id, route.query.type, route.query.highlight],
   () => {
     if (viewMode.value !== 'table') return
     
-    // Only open drawer if we have both id and type query params
-    // highlight query param is for scrolling/highlighting only, not for opening drawer
     if (route.params.id && route.query.type) {
       const compositeId = `${route.query.type}-${route.params.id}`
       drawerTaskCompositeId.value = compositeId
-      // Don't show drawer until task is actually in the list (prevents infinite loading)
-      // The drawer will show once the task is loaded via the drawerTask watch below
+      // Drawer will show once the task is loaded via the drawerTask watch below
+    } else if (route.query.highlight) {
+      // When a table row is highlighted (e.g. switch from card view or deep link), open drawer for that record
+      drawerTaskCompositeId.value = route.query.highlight
     } else {
-      // Close drawer if no id/type or if only highlight is present
       showTaskDrawer.value = false
       drawerTaskCompositeId.value = null
     }
@@ -527,8 +526,8 @@ watch(drawerTask, (task) => {
     drawerLoadTimeout = null
   }
   
-  // Open drawer only if we have a route id/type AND the task exists
-  if (task && route.params.id && route.query.type) {
+  // Open drawer when we have a selected/highlighted task (from route id/type or highlight query)
+  if (task && drawerTaskCompositeId.value) {
     showTaskDrawer.value = true
   } else if (!task && drawerTaskCompositeId.value) {
     // Task not found yet - keep drawer closed until task loads

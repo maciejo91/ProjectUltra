@@ -13,7 +13,10 @@
         @update:pagination="pagination = $event"
       />
       </div>
-      <div class="data-table-inner table-search-wrapper">
+      <div
+        class="data-table-inner table-search-wrapper"
+        :class="{ 'hide-table-filter': !hasActiveFilters }"
+      >
       <DataTable 
         :data="paginatedData" 
         :columns="columns"
@@ -196,6 +199,12 @@ const accountTypeOptions = computed(() => {
   return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
 })
 
+const hasActiveFilters = computed(() => {
+  const hasColumnFilters = Array.isArray(columnFilters.value) && columnFilters.value.length > 0
+  const hasSearch = Boolean(globalFilter.value && String(globalFilter.value).trim())
+  return hasColumnFilters || hasSearch
+})
+
 // Bulk delete handler
 const handleBulkDelete = () => {
   const selectedRows = getSelectedRows(sortedData.value)
@@ -247,6 +256,11 @@ onMounted(async () => {
 .data-table-inner.table-search-wrapper :deep([data-slot="table-search"]),
 .data-table-inner.table-search-wrapper :deep(div:has(> input[placeholder*="Search"])),
 .data-table-inner.table-search-wrapper :deep(div:has(> input[type="search"])) {
+  display: none !important;
+}
+
+/* Hide filter row when no filter is applied */
+.hide-table-filter :deep([data-slot="table-filter"]) {
   display: none !important;
 }
 
