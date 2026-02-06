@@ -74,7 +74,7 @@
     </div>
 
     <!-- Table: scrollable area (hide built-in search row inside this wrapper only) -->
-    <div class="flex-1 overflow-y-auto px-4 md:px-8 pb-4 md:pb-8 bg-white min-h-0 data-table-inner table-search-wrapper">
+    <div ref="tableScrollContainer" class="flex-1 overflow-y-auto px-4 md:px-8 pb-4 md:pb-8 bg-white min-h-0 data-table-inner table-search-wrapper">
       <DataTable 
             :data="paginatedData" 
             :columns="columns"
@@ -138,7 +138,7 @@
 </template>
 
 <script setup>
-import { ref, computed, h } from 'vue'
+import { ref, computed, h, watch, nextTick } from 'vue'
 import { Table, LayoutGrid, EyeOff, ListTodo, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
@@ -161,6 +161,7 @@ const props = defineProps({
   highlightId: { type: String, default: null },
   showClosed: { type: Boolean, default: false },
   showMobileClose: { type: Boolean, default: false },
+  initialGlobalFilter: { type: String, default: '' },
   searchPlaceholder: { type: String, default: 'Search tasks...' },
   viewMode: { type: String, default: 'table' },
   getVehicleType: { type: Function, required: true },
@@ -169,7 +170,7 @@ const props = defineProps({
   getStageBadgeClass: { type: Function, required: true }
 })
 
-const emit = defineEmits(['select', 'toggle-closed', 'reassign', 'close', 'view-change'])
+const emit = defineEmits(['select', 'toggle-closed', 'reassign', 'close', 'view-change', 'update:globalFilter'])
 
 const settingsStore = useSettingsStore()
 const usersStore = useUsersStore()
@@ -177,6 +178,7 @@ const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const { getCustomerCity } = useTaskHelpers()
 const searchQuery = ref('')
+const tableScrollContainer = ref(null)
 
 const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
 
@@ -214,10 +216,15 @@ const pagination = ref({
   pageSize: 10
 })
 
-const globalFilter = ref('')
+const globalFilter = ref(props.initialGlobalFilter || '')
 const sorting = ref([])
 const columnFilters = ref([])
 const columnVisibility = ref({})
+
+// Watch globalFilter changes and emit to parent
+watch(globalFilter, (newValue) => {
+  emit('update:globalFilter', newValue)
+})
 
 // Table has its own filters (column filters); TaskFilters button/chips apply to card view only.
 const { filterDefinitions } = useTasksTableFilters({
@@ -487,9 +494,6 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
 })
 
 const handleRowClick = (record) => {
-  // Set search filter to task ID to highlight the clicked record
-  globalFilter.value = String(record.id)
-  
   emit('select', record.compositeId)
 }
 
@@ -513,6 +517,30 @@ const handleBulkDelete = () => {
   
   clearSelection()
 }
+
+// Scroll selected task row into view when selection changes
+watch(
+  () => [props.currentTaskId, props.highlightId],
+  async ([currentTaskId, highlightId]) => {
+    const targetId = currentTaskId || highlightId
+    if (!targetId || !tableScrollContainer.value) return
+    const idx = sortedData.value.findIndex((t) => t.compositeId === targetId)
+    if (idx === -1) return
+    const pageSize = pagination.value.pageSize || 10
+    const pageIndex = Math.floor(idx / pageSize)
+    if (pagination.value.pageIndex !== pageIndex) {
+      pagination.value = { ...pagination.value, pageIndex }
+    }
+    await nextTick()
+    const rows = tableScrollContainer.value.querySelectorAll('tbody tr')
+    const rowIndexOnPage = idx % pageSize
+    const row = rows[rowIndexOnPage]
+    if (row) {
+      row.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  },
+  { immediate: true }
+)
 
 // Table meta with row click handler and highlighting
 const tableMeta = computed(() => ({

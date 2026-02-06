@@ -190,14 +190,20 @@ export const useLeadsStore = defineStore('leads', () => {
     }
   }
 
-  const convertLeadToOpportunity = async (leadId) => {
+  const convertLeadToOpportunity = async (leadId, qualifiedData = null) => {
     loading.value = true
     error.value = null
     try {
       const lead = await leadsApi.fetchLeadById(leadId)
       // Use API wrapper to fetch activities instead of direct mockActivities import
       const activities = await leadsApi.fetchLeadActivities(leadId)
-      const opportunity = await createOpportunityFromLead(lead, activities)
+      const options = qualifiedData ? {
+        appointmentData: qualifiedData.appointmentData,
+        assigneeId: qualifiedData.assignment?.assignee?.id,
+        preferences: qualifiedData.preferences,
+        surveyData: qualifiedData.surveyData
+      } : {}
+      const opportunity = await createOpportunityFromLead(lead, activities, options)
       
       // Mark lead as converted (or remove it)
       await leadsApi.updateLead(leadId, { isDisqualified: true, disqualifyReason: 'Converted to opportunity' })
@@ -205,7 +211,7 @@ export const useLeadsStore = defineStore('leads', () => {
       // Remove from leads list
       leads.value = leads.value.filter(l => l.id !== leadId)
       
-      return opportunity.id
+      return opportunity
     } catch (err) {
       error.value = err.message
       throw err

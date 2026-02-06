@@ -258,15 +258,7 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
       appointmentData,
       surveyData: enrichData
     })
-
-    let statusText = `Qualified - Assigned to ${assigneeName}`
-    if (meeting) {
-      statusText = `Qualified - Assigned to ${assigneeName}, meeting on ${meeting.date} ${meeting.time}`
-    }
-
-    successState.value = { kind: 'qualified', statusText, meeting, actorName: actorName() }
-    successPerformedAt.value = new Date()
-    cancelOutcome()
+    // Do NOT set successState for qualified – lead converts to opportunity and navigates away
   }
 
   const handleSurveyCompleted = async (responses) => {

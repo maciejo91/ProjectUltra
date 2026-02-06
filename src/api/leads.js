@@ -7,8 +7,8 @@ import { LeadRepository } from '@/repositories/LeadRepository'
 const activityRepository = new ActivityRepository()
 const leadRepository = new LeadRepository()
 
-// Simulate API delay (acceptable for mocking - will be removed when real API is integrated)
-const delay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms))
+// Simulate API delay (reduced for snappier UX; increase when testing loading states)
+const delay = (ms = 50) => new Promise(resolve => setTimeout(resolve, ms))
 
 // ID generation helpers
 // NOTE: This will not be needed when using real API (server generates IDs)

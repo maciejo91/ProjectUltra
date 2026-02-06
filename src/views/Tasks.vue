@@ -181,6 +181,7 @@
         :highlight-id="highlightId"
         :show-closed="showClosed"
         :show-mobile-close="false"
+        :initial-global-filter="tableSearchQuery"
         :get-vehicle-type="getVehicleType"
         :get-vehicle-type-badge-class="getVehicleTypeBadgeClass"
         :get-owner-info="getOwnerInfo"
@@ -191,6 +192,7 @@
         @reassign="reassignTask"
         @close="handleBackToTaskList"
         @view-change="handleViewChange"
+        @update:global-filter="tableSearchQuery = $event"
         class="flex-1 w-full"
       />
     </div>
@@ -199,8 +201,16 @@
     <DrawerContainer 
       v-if="viewMode === 'table'"
       :show="showTaskDrawer" 
-      @close="closeTaskDrawer"
+      @close="handleBackToTaskList"
     >
+      <!-- Loading State (when drawer is open but task not loaded yet) -->
+      <div v-if="!drawerTask && drawerTaskCompositeId" class="flex items-center justify-center h-full p-8">
+        <div class="flex flex-col items-center gap-4">
+          <Loader2 class="w-8 h-8 animate-spin text-primary" />
+          <p class="text-sm text-muted-foreground">Loading task...</p>
+        </div>
+      </div>
+      
       <!-- TaskDetailView in Drawer (uses allTasks for prev/next; table is independent of TaskFilters) -->
       <TaskDetailView
         v-if="drawerTask && drawerManagementWidget && drawerStoreAdapter && drawerAddNewConfig"
@@ -212,7 +222,7 @@
         :filtered-tasks="allTasks"
         :is-drawer-view="true"
         @task-navigate="handleDrawerTaskNavigate"
-        @close="closeTaskDrawer"
+        @close="handleBackToTaskList"
       />
     </DrawerContainer>
     
@@ -226,9 +236,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Flame, Sun, CheckCircle, Circle, ListTodo } from 'lucide-vue-next'
+import { Flame, Sun, CheckCircle, Circle, ListTodo, Loader2 } from 'lucide-vue-next'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
@@ -282,6 +292,9 @@ const viewMode = ref(localStorage.getItem('tasksViewMode') || 'table')
 // Card view search query (for when switching from table view)
 const cardSearchQuery = ref('')
 
+// Table view search query (for preserving search state when switching views)
+const tableSearchQuery = ref('')
+
 // Get highlight ID from query string
 const highlightId = computed(() => {
   return route.query.highlight || null
@@ -305,15 +318,26 @@ const handleViewChange = (newViewMode, searchQuery = '') => {
   if (newViewMode === 'card' && searchQuery) {
     cardSearchQuery.value = searchQuery
   }
+  // If switching to card view from table, preserve the table search query as card search
+  else if (newViewMode === 'card' && previousMode === 'table' && tableSearchQuery.value) {
+    cardSearchQuery.value = tableSearchQuery.value
+  }
   
-  // If switching to table view while a task is selected, navigate to /tasks with highlight query
+  // If switching to table view from card, preserve the card search query as table search
+  if (newViewMode === 'table' && previousMode === 'card' && cardSearchQuery.value) {
+    tableSearchQuery.value = cardSearchQuery.value
+  }
+  
+  // If switching to table view while a task is selected, navigate to /tasks with highlight query only
   if (newViewMode === 'table' && taskToHighlight) {
-    // Clear card search query when switching to table view
-    cardSearchQuery.value = ''
     router.push({ 
       path: '/tasks', 
       query: { highlight: taskToHighlight.compositeId } 
     })
+  }
+  // If switching to table view without a task selected, clear all query params
+  else if (newViewMode === 'table' && !taskToHighlight) {
+    router.push({ path: '/tasks', query: {} })
   }
   // If switching to card view and we have a highlight query, navigate to that task
   else if (newViewMode === 'card' && highlightId.value) {
@@ -325,7 +349,7 @@ const handleViewChange = (newViewMode, searchQuery = '') => {
   }
   // If switching to card view without highlight and no current task, just go to /tasks (no selection)
   else if (newViewMode === 'card' && !highlightId.value && !currentTask.value) {
-    router.push({ path: '/tasks' })
+    router.push({ path: '/tasks', query: {} })
   }
 }
 
@@ -440,9 +464,9 @@ onMounted(() => {
   }
 })
 
-// Watch for route changes
-watch(() => route.params.id, (newId) => {
-  if (newId) {
+// Watch for route changes (including type to ensure we load the correct task)
+watch(() => [route.params.id, route.query.type], ([newId, newType], [oldId, oldType]) => {
+  if (newId && (newId !== oldId || newType !== oldType)) {
     loadTaskById(newId)
   }
 })
@@ -469,17 +493,87 @@ watch(drawerTask, (task) => {
   }
 }, { immediate: true })
 
+// Sync drawer with route when in table view (e.g. after qualify → opportunity, or selection)
+// Keeps drawer state in sync with URL so refresh and qualify flow work like list view
+watch(
+  () => [viewMode.value, route.params.id, route.query.type, route.query.highlight],
+  () => {
+    if (viewMode.value !== 'table') return
+    
+    // Only open drawer if we have both id and type query params
+    // highlight query param is for scrolling/highlighting only, not for opening drawer
+    if (route.params.id && route.query.type) {
+      const compositeId = `${route.query.type}-${route.params.id}`
+      drawerTaskCompositeId.value = compositeId
+      // Don't show drawer until task is actually in the list (prevents infinite loading)
+      // The drawer will show once the task is loaded via the drawerTask watch below
+    } else {
+      // Close drawer if no id/type or if only highlight is present
+      showTaskDrawer.value = false
+      drawerTaskCompositeId.value = null
+    }
+  },
+  { immediate: true }
+)
+
+// Watch drawerTask to open drawer only when task is actually loaded
+let drawerLoadTimeout = null
+watch(drawerTask, (task) => {
+  if (viewMode.value !== 'table') return
+  
+  // Clear any existing timeout
+  if (drawerLoadTimeout) {
+    clearTimeout(drawerLoadTimeout)
+    drawerLoadTimeout = null
+  }
+  
+  // Open drawer only if we have a route id/type AND the task exists
+  if (task && route.params.id && route.query.type) {
+    showTaskDrawer.value = true
+  } else if (!task && drawerTaskCompositeId.value) {
+    // Task not found yet - keep drawer closed until task loads
+    showTaskDrawer.value = false
+    
+    // Set timeout to close drawer if task doesn't load within 5 seconds
+    drawerLoadTimeout = setTimeout(() => {
+      if (!drawerTask.value && drawerTaskCompositeId.value) {
+        handleBackToTaskList()
+      }
+    }, 5000)
+  }
+}, { immediate: true })
+
 
 const loadTaskById = (id) => {
   const taskId = parseInt(id)
-  const task = allTasks.value.find(t => t.id === taskId)
+  const routeType = route.query.type
   
+  // Use compositeId for matching to avoid loading wrong task type
+  let task = null
+  if (routeType) {
+    const compositeId = `${routeType}-${taskId}`
+    task = allTasks.value.find(t => t.compositeId === compositeId)
+  } else {
+    // Fallback: try to find by ID (but prefer with compositeId)
+    task = allTasks.value.find(t => t.id === taskId)
+  }
+
   if (task) {
     if (task.type === 'lead') {
       leadsStore.fetchLeadById(taskId)
     } else {
       opportunitiesStore.fetchOpportunityById(taskId)
     }
+  } else if (routeType === 'opportunity') {
+    // Fallback: task not in list (e.g. newly created) – fetch by ID and refresh list
+    opportunitiesStore.fetchOpportunityById(taskId).then(() => {
+      opportunitiesStore.fetchOpportunities()
+    })
+  } else if (routeType === 'lead') {
+    // Fallback for leads
+    leadsStore.fetchLeadById(taskId).then(() => {
+      leadsStore.fetchLeads()
+    })
   }
 }
 
@@ -487,18 +581,9 @@ const selectTask = (compositeId) => {
   // compositeId is in format "lead-1" or "opportunity-1"
   const [type, id] = compositeId.split('-')
   
-  // If in table view, open drawer instead of switching views
+  // If in table view, update route (sync watch will open drawer) so URL reflects selection and survives refresh
   if (viewMode.value === 'table') {
-    const task = allTasks.value.find(t => t.compositeId === compositeId)
-    if (task) {
-      drawerTaskCompositeId.value = compositeId
-      showTaskDrawer.value = true
-      if (task.type === 'lead') {
-        leadsStore.fetchLeadById(task.id)
-      } else {
-        opportunitiesStore.fetchOpportunityById(task.id)
-      }
-    }
+    router.push({ path: `/tasks/${id}`, query: { type } })
     return
   }
   
@@ -510,21 +595,14 @@ const selectTask = (compositeId) => {
 }
 
 const handleBackToTaskList = () => {
-  // If drawer is open, close it
+  // If drawer is open (table view), navigate to /tasks and clear all query params
   if (showTaskDrawer.value) {
-    closeTaskDrawer()
+    router.push({ path: '/tasks', query: {} })
     return
   }
   
-  // Navigate back to task list (no task selected)
-  router.push({ path: '/tasks' })
-}
-
-const closeTaskDrawer = () => {
-  nextTick(() => {
-    showTaskDrawer.value = false
-    drawerTaskCompositeId.value = null
-  })
+  // Card view: navigate back to task list (no task selected), clear query params
+  router.push({ path: '/tasks', query: {} })
 }
 
 const handleTaskNavigate = (direction) => {
@@ -550,7 +628,9 @@ const handleTaskNavigate = (direction) => {
 const handleDrawerTaskNavigate = (direction) => {
   if (!drawerTask.value) return
   
-  const index = filteredTasks.value.findIndex(t => {
+  // Drawer uses allTasks for prev/next (same as :filtered-tasks passed to drawer)
+  const tasks = allTasks.value
+  const index = tasks.findIndex(t => {
     const currentCompositeId = drawerTask.value.compositeId || `${drawerTask.value.type}-${drawerTask.value.id}`
     const taskCompositeId = t.compositeId || `${t.type}-${t.id}`
     return taskCompositeId === currentCompositeId
@@ -559,11 +639,9 @@ const handleDrawerTaskNavigate = (direction) => {
   if (index === -1) return
   
   if (direction === 'previous' && index > 0) {
-    const prevTask = filteredTasks.value[index - 1]
-    selectTask(prevTask.compositeId)
-  } else if (direction === 'next' && index < filteredTasks.value.length - 1) {
-    const nextTask = filteredTasks.value[index + 1]
-    selectTask(nextTask.compositeId)
+    selectTask(tasks[index - 1].compositeId)
+  } else if (direction === 'next' && index < tasks.length - 1) {
+    selectTask(tasks[index + 1].compositeId)
   }
 }
 

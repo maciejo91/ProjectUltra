@@ -1,4 +1,6 @@
 import { computed, h } from 'vue'
+import { Badge } from '@motork/component-library/future/primitives'
+import { Gem } from 'lucide-vue-next'
 import { getLucideIcon } from '@/utils/lucideIcons'
 
 /**
@@ -30,12 +32,16 @@ export function useCustomersTable(activeTab, handleRowClick) {
           ]
         },
         {
-          key: 'company',
-          label: 'Has Company',
-          type: 'boolean',
+          key: 'accountType',
+          label: 'Account type',
+          type: 'select',
           operators: [
-            { value: 'exists', label: 'exists' },
-            { value: 'notExists', label: 'does not exist' }
+            { value: 'eq', label: 'is' },
+            { value: 'ne', label: 'is not' }
+          ],
+          options: [
+            { value: 'Contact', label: 'Contact' },
+            { value: 'Account', label: 'Account' }
           ]
         }
       ]
@@ -103,28 +109,26 @@ export function useCustomersTable(activeTab, handleRowClick) {
         {
           accessorKey: 'customer',
           header: 'Customer',
-          meta: { 
+          meta: {
             title: 'Customer',
             onOpen: (row) => handleRowClick(row.original)
           },
           cell: ({ row }) => {
             const rowData = row.original
+            const accountType = rowData.accountType || 'Contact'
             return h('div', { class: 'flex items-center gap-2 md:gap-3' }, [
               h('div', {
                 class: 'w-9 h-9 rounded-full flex items-center justify-center text-fluid-xs font-bold shrink-0 bg-blue-100 text-blue-600'
               }, rowData.initials),
-              h('div', { class: 'min-w-0' }, [
-                h('div', { class: 'text-fluid-sm font-semibold text-gray-900 truncate max-w-[120px] md:max-w-none' }, rowData.customer)
+              h('div', { class: 'min-w-0 flex flex-wrap items-center gap-2' }, [
+                h('div', { class: 'text-fluid-sm font-semibold text-foreground truncate max-w-[120px] md:max-w-none' }, rowData.customer),
+                h(Badge, {
+                  text: accountType,
+                  size: 'small',
+                  theme: accountType === 'Account' ? 'blue' : 'gray'
+                })
               ])
             ])
-          }
-        },
-        {
-          accessorKey: 'accountType',
-          header: 'Account type',
-          meta: { title: 'Account type' },
-          cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.accountType || 'N/A')
           }
         },
         {
@@ -132,7 +136,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           header: 'Telephone',
           meta: { title: 'Telephone' },
           cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.telephone || 'N/A')
+            return h('span', { class: 'text-fluid-sm text-muted-foreground' }, row.original.telephone || 'N/A')
           }
         },
         {
@@ -140,7 +144,21 @@ export function useCustomersTable(activeTab, handleRowClick) {
           header: 'Location',
           meta: { title: 'Location' },
           cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600 truncate max-w-[150px]' }, row.original.location || 'N/A')
+            return h('span', { class: 'text-fluid-sm text-muted-foreground truncate max-w-[150px]' }, row.original.location || 'N/A')
+          }
+        },
+        {
+          accessorKey: 'interestScore',
+          header: 'Interest score',
+          meta: { title: 'Interest score' },
+          cell: ({ row }) => {
+            const score = row.original.interestScore
+            const display = score != null ? `${score}%` : 'N/A'
+            const showGem = score != null && score > 80
+            return h('div', { class: 'flex items-center gap-1.5 text-fluid-sm text-muted-foreground' }, [
+              showGem ? h(Gem, { size: 14, class: 'shrink-0 text-primary' }) : null,
+              h('span', display)
+            ])
           }
         },
         {
@@ -148,48 +166,25 @@ export function useCustomersTable(activeTab, handleRowClick) {
           header: 'Created at',
           meta: { title: 'Created at' },
           cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.createdAt || 'N/A')
-          }
-        },
-        // Account-specific columns (show N/A for contacts)
-        {
-          accessorKey: 'accountOwner',
-          header: 'Account owner',
-          meta: { title: 'Account owner' },
-          cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.type === 'account' ? (row.original.accountOwner || 'N/A') : 'N/A')
+            return h('span', { class: 'text-fluid-sm text-muted-foreground' }, row.original.createdAt || 'N/A')
           }
         },
         {
-          accessorKey: 'updatedAt',
-          header: 'Updated at',
-          meta: { title: 'Updated at' },
+          accessorKey: 'leads',
+          header: 'Leads',
+          meta: { title: 'Leads' },
           cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.type === 'account' ? (row.original.updatedAt || 'N/A') : 'N/A')
+            const val = row.original.leads
+            return h('span', { class: 'text-fluid-sm text-muted-foreground' }, val != null ? String(val) : '0')
           }
         },
         {
-          accessorKey: 'lastActivity',
-          header: 'Last activity',
-          meta: { title: 'Last activity' },
+          accessorKey: 'opportunities',
+          header: 'Opportunities',
+          meta: { title: 'Opportunities' },
           cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.type === 'account' ? (row.original.lastActivity || 'N/A') : 'N/A')
-          }
-        },
-        {
-          accessorKey: 'openOpportunities',
-          header: 'Open opportunities',
-          meta: { title: 'Open opportunities' },
-          cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.type === 'account' ? String(row.original.openOpportunities || 0) : 'N/A')
-          }
-        },
-        {
-          accessorKey: 'wonOpportunities',
-          header: 'Won opportunities',
-          meta: { title: 'Won opportunities' },
-          cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.type === 'account' ? String(row.original.wonOpportunities || 0) : 'N/A')
+            const val = row.original.opportunities
+            return h('span', { class: 'text-fluid-sm text-muted-foreground' }, val != null ? String(val) : '0')
           }
         },
         {
@@ -198,7 +193,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           meta: { title: 'Actions' },
           cell: () => {
             return h('button', {
-              class: 'text-gray-400 hover:text-gray-600'
+              class: 'text-muted-foreground hover:text-foreground'
             }, [
               h('i', { class: 'fa-solid fa-ellipsis-vertical' })
             ])

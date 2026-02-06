@@ -115,6 +115,13 @@ export const useOpportunitiesStore = defineStore('opportunities', () => {
     }
   }
 
+  /** Add an opportunity to the list immediately (e.g. after lead conversion) for instant UI flip */
+  const addOpportunityToList = (opportunity) => {
+    if (!opportunities.value.some(o => o.id === opportunity.id)) {
+      opportunities.value = [...opportunities.value, opportunity]
+    }
+  }
+
   const updateOpportunity = async (id, updates) => {
     loading.value = true
     error.value = null
@@ -602,6 +609,7 @@ export const useOpportunitiesStore = defineStore('opportunities', () => {
     fetchOpportunities,
     fetchOpportunityById,
     createOpportunity,
+    addOpportunityToList,
     updateOpportunity,
     deleteOpportunity,
     addActivity,

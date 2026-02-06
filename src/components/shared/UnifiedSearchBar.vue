@@ -71,6 +71,7 @@ const props = defineProps({
   priorityOptions: { type: Array, default: () => [] },
   typeOptions: { type: Array, default: () => [] },
   requestedCarBrandOptions: { type: Array, default: () => [] },
+  accountTypeOptions: { type: Array, default: () => [] },
   pagination: { type: Object, default: () => ({ pageIndex: 0, pageSize: 10 }) },
 })
 
@@ -95,6 +96,7 @@ function getProcessQuery () {
     priorityOptions: props.priorityOptions,
     typeOptions: props.typeOptions,
     requestedCarBrandOptions: props.requestedCarBrandOptions,
+    accountTypeOptions: props.accountTypeOptions,
   }).processQuery
 }
 

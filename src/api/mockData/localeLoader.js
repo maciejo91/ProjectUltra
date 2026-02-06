@@ -50,25 +50,16 @@ import { mockOpportunities as nlOpportunities } from './locales/nl/opportunities
 import { mockActivities as nlActivities } from './locales/nl/activities.js'
 
 /**
- * Get current locale from localStorage or browser
+ * Get current locale for mock data.
+ * Defaults to English so updates to locales/en/* are always reflected.
+ * Only uses other locales when user has explicitly set app-locale in localStorage.
  */
 function getCurrentLocale() {
   const saved = localStorage.getItem('app-locale')
   if (saved && ['en', 'it', 'de', 'fr', 'nl'].includes(saved)) {
     return saved
   }
-  
-  const browserLang = navigator.language || navigator.userLanguage
-  const langCode = browserLang.split('-')[0].toLowerCase()
-  const langMap = {
-    'en': 'en',
-    'it': 'it',
-    'de': 'de',
-    'fr': 'fr',
-    'nl': 'nl'
-  }
-  
-  return langMap[langCode] || 'en'
+  return 'en'
 }
 
 /**
@@ -113,10 +104,19 @@ const localeData = {
 export function getMockData() {
   const locale = getCurrentLocale()
   const data = localeData[locale] || localeData.en
-  
+  // English is the default source; other locales get interestScore from EN by id so we don't duplicate
+  const localeCustomers = data.customers || []
+  const mockCustomers =
+    locale === 'en'
+      ? localeCustomers
+      : localeCustomers.map((c) => {
+          const enCustomer = localeData.en.customers.find((e) => e.id === c.id)
+          return { ...c, interestScore: enCustomer?.interestScore ?? c.interestScore }
+        })
+
   return {
     mockUsers, // Users don't need localization
-    mockCustomers: data.customers,
+    mockCustomers,
     mockLeads: data.leads,
     mockOpportunities: data.opportunities,
     mockTasks, // Tasks use stage names that are translated in components

@@ -1,5 +1,16 @@
 <template>
-  <TaskManagementWidget :task="lead" hide-title hide-border>
+  <div class="relative">
+  <!-- Loader only while converting to opportunity; forms hidden until opportunity shows -->
+  <div
+    v-if="isConvertingToOpportunity"
+    class="flex items-center justify-center min-h-[200px] rounded-lg bg-muted/80"
+    aria-busy="true"
+    aria-label="Converting to opportunity"
+  >
+    <Spinner class="size-8 text-foreground" />
+  </div>
+
+  <TaskManagementWidget v-else :task="lead" hide-title hide-border>
     <template #primary-action>
       <!-- Blue banner with Assign to me only when unassigned; assigned state is in header -->
       <TaskAssignee
@@ -67,12 +78,13 @@
       </div>
     </template>
   </TaskManagementWidget>
+  </div>
 </template>
 
 <script setup>
 import { RotateCcw } from 'lucide-vue-next'
 import { toRef } from 'vue'
-import { Button } from '@motork/component-library/future/primitives'
+import { Button, Spinner } from '@motork/component-library/future/primitives'
 import { useLeadsStore } from '@/stores/leads'
 import { useLeadActions } from '@/composables/useLeadActions'
 import { useLeadManagementHandlers } from '@/composables/useLeadManagementHandlers'
@@ -113,6 +125,7 @@ const leadState = useLeadActions(toRef(props, 'lead'), actionHandlers)
 
 // Use handlers composable
 const {
+  isConvertingToOpportunity,
   handlePostponed,
   handleValidated,
   handleQualified,

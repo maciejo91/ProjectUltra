@@ -1,13 +1,16 @@
 import { BaseRepository } from './BaseRepository.js'
 import { getMockData } from '@/api/mockData/localeLoader.js'
 
+const STORAGE_KEY = 'projectUltra.createdOpportunities'
+
 /**
  * Opportunity Repository
- * 
+ *
  * Abstracts data access for opportunities.
  * Maps to REST API endpoint: /opportunities
- * 
+ *
  * Current implementation uses mock data arrays.
+ * Opportunities created from leads are persisted to localStorage so they survive page refresh.
  * When real API is integrated, this will call REST endpoints:
  * - findAll() → GET /opportunities
  * - findById(id) → GET /opportunities/{id}
@@ -18,6 +21,23 @@ import { getMockData } from '@/api/mockData/localeLoader.js'
 export class OpportunityRepository extends BaseRepository {
   constructor() {
     super([]) // Initialize with empty array, data loaded dynamically
+  }
+
+  getCreatedOpportunities() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY)
+      return stored ? JSON.parse(stored) : []
+    } catch {
+      return []
+    }
+  }
+
+  saveCreatedOpportunities(opportunities) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(opportunities))
+    } catch (e) {
+      console.warn('Failed to persist opportunities to localStorage:', e)
+    }
   }
   
   /**
@@ -36,7 +56,9 @@ export class OpportunityRepository extends BaseRepository {
     // Simulate API delay (will be removed when real API is integrated)
     await new Promise(resolve => setTimeout(resolve, 300))
     
-    let results = [...this.dataSource]
+    const mockIds = new Set(this.dataSource.map(o => o.id))
+    const created = this.getCreatedOpportunities().filter(o => !mockIds.has(o.id))
+    let results = [...this.dataSource, ...created]
     
     // Apply filters
     if (filters.stage) {
@@ -65,7 +87,11 @@ export class OpportunityRepository extends BaseRepository {
    */
   async findById(id) {
     await new Promise(resolve => setTimeout(resolve, 300))
-    const opportunity = this.dataSource.find(o => o.id === parseInt(id))
+    const numId = parseInt(id)
+    let opportunity = this.dataSource.find(o => o.id === numId)
+    if (!opportunity) {
+      opportunity = this.getCreatedOpportunities().find(o => o.id === numId)
+    }
     if (!opportunity) return null
     
     // Ensure opportunity id: 1 always has today's appointment (for demo purposes)
@@ -80,10 +106,11 @@ export class OpportunityRepository extends BaseRepository {
   async create(data) {
     await new Promise(resolve => setTimeout(resolve, 300))
     
-    // Generate ID (in real API, server generates this)
-    const newId = this.dataSource.length > 0 
-      ? Math.max(...this.dataSource.map(o => o.id)) + 1 
-      : 1
+    const allIds = [
+      ...this.dataSource.map(o => o.id),
+      ...this.getCreatedOpportunities().map(o => o.id)
+    ]
+    const newId = allIds.length > 0 ? Math.max(...allIds) + 1 : 1
     
     const newOpportunity = {
       id: newId,
@@ -109,6 +136,9 @@ export class OpportunityRepository extends BaseRepository {
     }
     
     this.dataSource.push(newOpportunity)
+    const created = this.getCreatedOpportunities()
+    created.push(newOpportunity)
+    this.saveCreatedOpportunities(created)
     return newOpportunity
   }
 
@@ -121,20 +151,24 @@ export class OpportunityRepository extends BaseRepository {
   async update(id, updates) {
     await new Promise(resolve => setTimeout(resolve, 300))
     
-    const index = this.dataSource.findIndex(o => o.id === parseInt(id))
-    if (index === -1) {
-      throw new Error('Opportunity not found')
-    }
-    
-    // Remove computed fields that shouldn't be stored
+    const numId = parseInt(id)
     const { displayStage, ...updatesToStore } = updates
     
-    this.dataSource[index] = { 
-      ...this.dataSource[index], 
-      ...updatesToStore 
+    const index = this.dataSource.findIndex(o => o.id === numId)
+    if (index !== -1) {
+      this.dataSource[index] = { ...this.dataSource[index], ...updatesToStore }
+      return this.dataSource[index]
     }
     
-    return this.dataSource[index]
+    const created = this.getCreatedOpportunities()
+    const createdIndex = created.findIndex(o => o.id === numId)
+    if (createdIndex !== -1) {
+      created[createdIndex] = { ...created[createdIndex], ...updatesToStore }
+      this.saveCreatedOpportunities(created)
+      return created[createdIndex]
+    }
+    
+    throw new Error('Opportunity not found')
   }
 
   /**
@@ -145,13 +179,22 @@ export class OpportunityRepository extends BaseRepository {
   async delete(id) {
     await new Promise(resolve => setTimeout(resolve, 300))
     
-    const index = this.dataSource.findIndex(o => o.id === parseInt(id))
-    if (index === -1) {
-      throw new Error('Opportunity not found')
+    const numId = parseInt(id)
+    const index = this.dataSource.findIndex(o => o.id === numId)
+    if (index !== -1) {
+      this.dataSource.splice(index, 1)
+      return { success: true }
     }
     
-    this.dataSource.splice(index, 1)
-    return { success: true }
+    const created = this.getCreatedOpportunities()
+    const createdIndex = created.findIndex(o => o.id === numId)
+    if (createdIndex !== -1) {
+      created.splice(createdIndex, 1)
+      this.saveCreatedOpportunities(created)
+      return { success: true }
+    }
+    
+    throw new Error('Opportunity not found')
   }
 
   /**

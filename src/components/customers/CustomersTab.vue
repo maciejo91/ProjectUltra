@@ -7,6 +7,7 @@
         placeholder="Search customers..."
         :pagination="pagination"
         :source-options="customersSourceOptions"
+        :account-type-options="accountTypeOptions"
         @update:globalFilter="globalFilter = $event"
         @update:columnFilters="columnFilters = $event"
         @update:pagination="pagination = $event"
@@ -81,12 +82,14 @@ import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
 import { useCustomersStore } from '@/stores/customers'
+import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useCustomersTable } from '@/composables/useCustomersTable'
 import { useTableRowSelection } from '@/composables/useTableRowSelection'
 import { useDataTableData, getNestedProperty } from '@/composables/useDataTableData'
 
 const customersStore = useCustomersStore()
+const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 
 const contactFilterType = ref('all') // 'all', 'contacts', 'accounts'
@@ -135,21 +138,13 @@ const rows = computed(() => {
     accountType: customer.company && customer.company !== '' ? 'Account' : 'Contact',
     telephone: customer.phone,
     location: getLocation(customer.address),
+    interestScore: customer.interestScore ?? null,
     createdAt: formatDate(customer.createdAt),
     name: customer.name,
-    accountOwner: customer.source || 'N/A',
-    updatedAt: formatDate(customer.lastContact || customer.createdAt),
-    lastActivity: formatDate(customer.lastContact),
-    openOpportunities: opportunitiesStore.opportunities.filter(opp => 
-      opp.customerId === customer.id && 
-      opp.stage !== 'Closed Won' && 
-      opp.stage !== 'Closed Lost'
-    ).length,
-    wonOpportunities: opportunitiesStore.opportunities.filter(opp => 
-      opp.customerId === customer.id && 
-      opp.stage === 'Closed Won'
-    ).length,
-    initials: customer.initials || customer.name.slice(0,2).toUpperCase(),
+    source: customer.source || 'N/A',
+    leads: leadsStore.leads.filter((l) => l.customerId === customer.id).length,
+    opportunities: opportunitiesStore.opportunities.filter((opp) => opp.customerId === customer.id).length,
+    initials: customer.initials || customer.name.slice(0, 2).toUpperCase(),
     type: customer.company && customer.company !== '' ? 'account' : 'contact',
     customerId: customer.id
   }))
@@ -165,8 +160,8 @@ const activeTab = ref('customers')
 const { columns, filterDefinitions, tableMeta } = useCustomersTable(activeTab, handleRowClick)
 
 const getCustomerFilterValue = (row, key) => {
-  if (key === 'company') return row.type === 'account'
-  if (key === 'source') return row.accountOwner
+  if (key === 'accountType') return row.accountType
+  if (key === 'source') return row.source
   return getNestedProperty(row, key)
 }
 const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
@@ -180,21 +175,24 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
   searchableFields: (row) => [
     row.customer,
     row.name,
-    row.accountOwner,
     row.telephone,
     row.location,
+    row.interestScore != null ? String(row.interestScore) : null,
     row.accountType,
     row.createdAt,
-    row.updatedAt,
-    row.lastActivity,
-    row.openOpportunities != null ? String(row.openOpportunities) : null,
-    row.wonOpportunities != null ? String(row.wonOpportunities) : null
+    row.leads != null ? String(row.leads) : null,
+    row.opportunities != null ? String(row.opportunities) : null
   ],
   getFilterValue: getCustomerFilterValue
 })
 
 const customersSourceOptions = computed(() => {
   const def = filterDefinitions.value?.find(d => d.key === 'source')
+  return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
+})
+
+const accountTypeOptions = computed(() => {
+  const def = filterDefinitions.value?.find(d => d.key === 'accountType')
   return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
 })
 
@@ -210,7 +208,9 @@ const handleBulkDelete = () => {
   
   selectedRows.forEach(row => {
     const customerId = row.id.replace('customer-', '')
-    customersStore.deleteCustomer(customerId)
+    const customer = customersStore.customers.find(c => c.id === parseInt(customerId))
+    const customerType = customer?.type || (customer?.company ? 'account' : 'contact')
+    customersStore.removeCustomer(customerId, customerType)
   })
   
   clearSelection()
@@ -219,6 +219,7 @@ const handleBulkDelete = () => {
 // Load data on mount
 onMounted(async () => {
   await customersStore.fetchCustomers()
+  await leadsStore.fetchLeads()
   await opportunitiesStore.fetchOpportunities()
 })
 </script>

@@ -223,12 +223,26 @@ No changes needed in components or stores - they already use the API layer.
 ## Build & Deploy
 
 - **Local**: `npm run build` (creates `dist/`)
-- **Netlify**: Configured in `netlify.toml` with AWS CLI installation and CodeArtifact authentication
-  - Required environment variables in Netlify:
-    - `AWS_ACCESS_KEY_ID_MK` - Your AWS access key
-    - `AWS_SECRET_ACCESS_KEY_MK` - Your AWS secret key
-  - The build automatically installs AWS CLI and authenticates with CodeArtifact before building
 - **.gitignore**: Excludes `node_modules`, `dist/`, log files
+
+### Deploying on Netlify
+
+Build is configured in `netlify.toml` (publish `dist/`, custom build command with CodeArtifact auth). No need to set build command or publish directory in the Netlify UI—they are in the repo.
+
+**Checklist before first deploy:**
+
+1. **Environment variables** (Site settings → Environment variables):
+   - `AWS_ACCESS_KEY_ID_MK` – AWS access key with CodeArtifact access
+   - `AWS_SECRET_ACCESS_KEY_MK` – AWS secret key  
+   Optional: `AWS_DEFAULT_REGION` (defaults to `eu-west-1` in `netlify.toml`).
+
+2. **Node version**: Netlify uses Node 22 (set in `netlify.toml`; matches `.nvmrc`).
+
+3. **Build**: The build command in `netlify.toml` restores `_package.json` / `_package-lock.json` → `package.json` / `package-lock.json`, installs AWS CLI if needed, gets a CodeArtifact token, runs `npm install` and `npm run build`. No extra Netlify build command needed.
+
+4. **Branch**: Deploy from `main` (or set your production branch in Netlify).
+
+5. **SPA routing**: `netlify.toml` includes a catch-all redirect so client-side routes work.
 
 ## Troubleshooting
 

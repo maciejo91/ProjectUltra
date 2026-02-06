@@ -7,7 +7,8 @@ import { ActivityRepository } from '@/repositories/ActivityRepository'
 const opportunityRepository = new OpportunityRepository()
 const activityRepository = new ActivityRepository()
 
-const delay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms))
+// Simulate API delay (reduced for snappier UX; increase when testing loading states)
+const delay = (ms = 50) => new Promise(resolve => setTimeout(resolve, ms))
 
 // Helper function for enrichment (used by business logic functions)
 function enrichOpportunityWithCustomer(opportunity) {
@@ -374,8 +375,8 @@ export const generateOpportunityId = () => {
 
 export const createOpportunityFromLead = async (leadData, activities, options = {}) => {
   await delay()
-  
-  // Get assignee name from options if provided
+
+  // Get assignee name from options or lead
   let assigneeName = leadData.assignee || 'Michael Thomas'
   if (options.assigneeId) {
     const assigneeUser = mockUsers.find(u => u.id === options.assigneeId)
@@ -383,19 +384,50 @@ export const createOpportunityFromLead = async (leadData, activities, options = 
       assigneeName = assigneeUser.name
     }
   }
-  
+
+  // Build scheduledAppointment from qualification appointmentData when provided
+  let scheduledAppointment = null
+  const appointmentData = options.appointmentData
+  if (appointmentData) {
+    const appointmentDateTime = appointmentData.datetime
+      ? new Date(appointmentData.datetime).toISOString().split('T')[0] + 'T' + appointmentData.time + ':00'
+      : `${appointmentData.date}T${appointmentData.time}:00`
+    const endTime = new Date(appointmentDateTime)
+    const duration = appointmentData.duration || 60
+    endTime.setMinutes(endTime.getMinutes() + duration)
+    const customerName = leadData.customer?.name || 'Customer'
+    scheduledAppointment = {
+      id: Date.now(),
+      title: `${appointmentData.type} - ${customerName}`,
+      start: appointmentDateTime,
+      end: endTime.toISOString(),
+      type: appointmentData.type,
+      assignee: appointmentData.assignee,
+      assigneeId: appointmentData.assigneeId || appointmentData.salespersonId || appointmentData.teamId,
+      assigneeType: appointmentData.assigneeType || (appointmentData.salespersonId ? 'user' : 'team'),
+      teamId: appointmentData.teamId || null,
+      team: appointmentData.team || null,
+      salesperson: appointmentData.salesperson || null,
+      salespersonId: appointmentData.salespersonId || null,
+      status: 'scheduled',
+      location: appointmentData.location || '',
+      notes: appointmentData.notes || ''
+    }
+  }
+
   // Use service layer to create opportunity
   // Get expected close date from settings
   const { useSettingsStore } = await import('@/stores/settings')
   const settingsStore = useSettingsStore()
   const defaultDays = settingsStore.getSetting('expectedCloseDateDays') || 90
   const expectedCloseDate = new Date(Date.now() + defaultDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-  
+
   const newOpportunity = await opportunityService.create({
     customerId: leadData.customerId,
     requestedCar: leadData.requestedCar,
     vehicle: { ...leadData.requestedCar }, // Copy requestedCar to vehicle
     stage: 'Qualified',
+    scheduledAppointment,
     tags: leadData.tags || [],
     value: leadData.requestedCar?.price || 0,
     expectedCloseDate: expectedCloseDate,

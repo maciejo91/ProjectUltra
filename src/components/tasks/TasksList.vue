@@ -75,9 +75,13 @@
     </div>
     
     <div ref="scrollContainer" class="task-list-cards flex-1 overflow-y-auto px-5 space-y-3 pt-4 pb-6 scrollbar-hide">
-      <TaskCard
-        v-for="item in filteredItems" 
+      <div
+        v-for="item in filteredItems"
         :key="item.compositeId || `${item.type || 'task'}-${item.id}`"
+        :data-composite-id="item.compositeId || `${item.type || 'task'}-${item.id}`"
+        class="scroll-mt-2 scroll-mb-2"
+      >
+      <TaskCard
         :item="item"
         :selected="isSelected(item)"
         :selected-class="selectedClass"
@@ -98,12 +102,13 @@
           <slot name="dates" :item="item"></slot>
         </template>
       </TaskCard>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { Table, LayoutGrid, Search } from 'lucide-vue-next'
 import { Button, InputGroup, InputGroupInput, InputGroupAddon } from '@motork/component-library/future/primitives'
 import TaskCard from '@/components/tasks/TaskCard.vue'
@@ -147,6 +152,16 @@ watch(() => props.initialSearchQuery, (newVal) => {
   searchQuery.value = newVal
 })
 
+// Scroll selected task into view when selection changes
+watch(() => props.selectedId, async (selectedId) => {
+  if (!selectedId || !scrollContainer.value) return
+  await nextTick()
+  const el = scrollContainer.value.querySelector(`[data-composite-id="${CSS.escape(String(selectedId))}"]`)
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+}, { immediate: true })
+
 // Filter items based on search query and active filters
 const filteredItems = computed(() => {
   let items = props.items
@@ -170,9 +185,31 @@ const filteredItems = computed(() => {
   
   const query = searchQuery.value.toLowerCase().trim()
   return items.filter(item => {
-    const name = props.getName(item).toLowerCase()
-    const vehicleInfo = props.getVehicleInfo(item).toLowerCase()
-    return name.includes(query) || vehicleInfo.includes(query)
+    // Collect all searchable fields
+    const searchableValues = [
+      props.getName(item),
+      props.getVehicleInfo(item),
+      item.customer?.email,
+      item.customer?.phone,
+      item.customer?.city,
+      item.customer?.location,
+      item.status,
+      item.stage,
+      item.displayStage,
+      item.type,
+      item.source,
+      item.sourceDetails,
+      item.assignee,
+      item.compositeId,
+      item.urgencyLevel,
+      item.requestMessage,
+      item.requestedCar?.brand,
+      item.requestedCar?.model,
+      item.vehicle?.brand,
+      item.vehicle?.model,
+    ].filter(Boolean).map(v => String(v).toLowerCase())
+    
+    return searchableValues.some(value => value.includes(query))
   })
 })
 

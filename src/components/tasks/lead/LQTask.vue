@@ -136,8 +136,8 @@
                 @update:model-value="(p) => selectOutcome(p ? 'no-answer' : null)"
                 class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
               >
-                <span class="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-slate-500">
-                  <PhoneOff :size="16" class="text-white" />
+                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-slate-500">
+                  <PhoneOff :size="4" class="text-white" />
                 </span>
                 <span>No answer</span>
               </Toggle>
@@ -147,8 +147,8 @@
                 @update:model-value="(p) => selectOutcome(p ? 'not-valid' : null)"
                 class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
               >
-                <span class="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-rose-500">
-                  <ThumbsDown :size="16" class="text-white" />
+                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-rose-500">
+                  <ThumbsDown :size="4" class="text-white" />
                 </span>
                 <span>No interest/invalid</span>
               </Toggle>
@@ -158,8 +158,8 @@
                 @update:model-value="(p) => selectOutcome(p ? 'interested' : null)"
                 class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
               >
-                <span class="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-emerald-500">
-                  <Check :size="16" class="text-white" />
+                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-emerald-500">
+                  <Check :size="4" class="text-white" />
                 </span>
                 <span>Interested</span>
               </Toggle>
@@ -311,6 +311,31 @@
                   <Label class="form-label">Time</Label>
                   <Input type="time" v-model="customTime" class="w-full" />
                 </div>
+              </div>
+              <!-- Reassign next attempt -->
+              <div class="mt-4">
+                <Label class="form-label">Reassign</Label>
+                <SelectMenu
+                  v-model="selectedNextAttemptKey"
+                  :items="nextAttemptAssigneeOptions"
+                  value-key="_key"
+                  placeholder="Assign next attempt to..."
+                  class="w-full"
+                >
+                  <template #item="{ item }">
+                    <div class="flex items-center gap-2">
+                      <div
+                        v-if="item.type === 'user'"
+                        class="w-6 h-6 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
+                        :class="getRoleAvatarClass(item.role)"
+                      >
+                        {{ getInitials(item.name) }}
+                      </div>
+                      <Users v-else-if="item.type === 'team'" class="w-4 h-4 shrink-0 text-muted-foreground" />
+                      <span class="font-medium text-foreground">{{ item.label }}</span>
+                    </div>
+                  </template>
+                </SelectMenu>
               </div>
             </div>
           </div>
@@ -879,6 +904,31 @@
                 <Input type="time" v-model="customTime" class="w-full" />
               </div>
             </div>
+            <!-- Reassign next attempt -->
+            <div class="mt-4">
+              <Label class="form-label">Reassign</Label>
+              <SelectMenu
+                v-model="selectedNextAttemptKey"
+                :items="nextAttemptAssigneeOptions"
+                value-key="_key"
+                placeholder="Assign next attempt to..."
+                class="w-full"
+              >
+                <template #item="{ item }">
+                  <div class="flex items-center gap-2">
+                    <div
+                      v-if="item.type === 'user'"
+                      class="w-6 h-6 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
+                      :class="getRoleAvatarClass(item.role)"
+                    >
+                      {{ getInitials(item.name) }}
+                    </div>
+                    <Users v-else-if="item.type === 'team'" class="w-4 h-4 shrink-0 text-muted-foreground" />
+                    <span class="font-medium text-foreground">{{ item.label }}</span>
+                  </div>
+                </template>
+              </SelectMenu>
+            </div>
             <div class="flex justify-end mt-4">
               <Button
                 variant="primary"
@@ -992,7 +1042,7 @@ import {
   DialogPortal,
   DialogTitle
 } from '@motork/component-library/future/primitives'
-import { Check, PhoneOff, ThumbsDown, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, ChevronLeft, ChevronRight, Plus } from 'lucide-vue-next'
+import { Check, PhoneOff, ThumbsDown, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, ChevronLeft, ChevronRight, Plus, Users } from 'lucide-vue-next'
 import NoteWidget from '@/components/customer/activities/NoteWidget.vue'
 import ScheduleAppointmentModal from '@/components/modals/ScheduleAppointmentModal.vue'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
@@ -1384,6 +1434,7 @@ const {
   handleAISuggestionClick,
   callLogDateTime,
   callLogAssignee,
+  nextAttemptAssignee,
   confirmCallLogForm,
   cancelCallLogForm,
   initCallLogForm,
@@ -1572,6 +1623,39 @@ const selectedSalesmanId = computed({
     }
     const user = salespersonSelectOptions.value.find(u => u.id === id)
     qualificationSelectedSalesman.value = user || null
+  }
+})
+
+// Next attempt reassign: combined users + teams for SelectMenu (unique _key for value-key)
+const nextAttemptAssigneeOptions = computed(() => {
+  const users = (assignableUsers.value || []).map(u => ({
+    ...u,
+    type: 'user',
+    _key: `user-${u.id}`,
+    label: u.name
+  }))
+  const teams = (assignableTeams.value || []).map(t => ({
+    ...t,
+    type: 'team',
+    _key: `team-${t.id}`,
+    label: t.name
+  }))
+  return [...users, ...teams]
+})
+
+const selectedNextAttemptKey = computed({
+  get: () => {
+    const a = nextAttemptAssignee.value
+    if (!a) return null
+    return a.type === 'user' ? `user-${a.id}` : `team-${a.id}`
+  },
+  set: (key) => {
+    if (!key) {
+      nextAttemptAssignee.value = null
+      return
+    }
+    const opt = nextAttemptAssigneeOptions.value.find(o => o._key === key)
+    nextAttemptAssignee.value = opt ? { ...opt } : null
   }
 })
 
@@ -1771,6 +1855,10 @@ watch(selectedOutcome, (newOutcome) => {
 watch(showPostponeRescheduleBlock, (show) => {
   if (show) {
     scrollToExpandedContent(() => postponeBlockRef.value)
+    // Autofill reassign with current assignee when opening postpone "Next call attempt" card
+    if (!nextAttemptAssignee.value && currentUser?.value) {
+      nextAttemptAssignee.value = { ...currentUser.value, type: 'user' }
+    }
   }
 })
 
@@ -1986,7 +2074,7 @@ watch(qualificationEventType, (newEventType) => {
 const canQualify = computed(() => {
   const hasAssignee = Boolean(qualificationSelectedTeam.value || qualificationSelectedSalesman.value)
   if (qualificationMethod.value === 'assign-only') {
-    return hasAssignee
+    return true
   }
 
   return Boolean(
@@ -2021,7 +2109,7 @@ const actionButtonLabel = computed(() => {
     return disqualifyCategory.value ? `Close as ${disqualifyCategory.value}` : 'Close'
   }
   if (selectedOutcome.value === 'interested') {
-    return 'Schedule and qualify'
+    return qualificationMethod.value === 'assign-only' ? 'Qualify' : 'Schedule and qualify'
   }
   return ''
 })

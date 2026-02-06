@@ -11,6 +11,7 @@
  * @param {Array} options.priorityOptions
  * @param {Array} options.typeOptions
  * @param {Array} options.requestedCarBrandOptions
+ * @param {Array} options.accountTypeOptions
  * @returns {{ processQuery: (query: string) => { filters: Array, error: string | null, globalFilterFallback?: string } }}
  */
 const VOLVO_MODELS = ['XC90', 'XC60', 'XC40', 'V90', 'V60', 'V40', 'S90', 'S60']
@@ -363,6 +364,38 @@ function matchType (q, typeOptions) {
   return null
 }
 
+function matchAccountType (q, accountTypeOptions) {
+  const lower = toLower(q)
+  const options = accountTypeOptions || [
+    { value: 'Contact', label: 'Contact' },
+    { value: 'Account', label: 'Account' }
+  ]
+  
+  // Match exact option values first
+  if (options.length) {
+    for (const opt of options) {
+      const v = (opt.value || opt.label || '').toString()
+      if (toLower(q.trim()) === toLower(v)) {
+        return { id: 'accountType', value: v, operator: 'eq' }
+      }
+    }
+  }
+  
+  // Match common patterns for contacts
+  if (/\bcontacts?\b/i.test(lower) || /\bindividuals?\b/i.test(lower) || /\bpeople\b/i.test(lower)) {
+    const v = options.find(o => toLower(String(o.value || o.label)) === 'contact')?.value || 'Contact'
+    return { id: 'accountType', value: v, operator: 'eq' }
+  }
+  
+  // Match common patterns for accounts
+  if (/\baccounts?\b/i.test(lower) || /\bcompan(?:y|ies)\b/i.test(lower) || /\bbusiness(?:es)?\b/i.test(lower) || /\borganizations?\b/i.test(lower)) {
+    const v = options.find(o => toLower(String(o.value || o.label)) === 'account')?.value || 'Account'
+    return { id: 'accountType', value: v, operator: 'eq' }
+  }
+  
+  return null
+}
+
 function matchRequestedCarBrand (q, requestedCarBrandOptions) {
   if (!requestedCarBrandOptions?.length) return null
   const lower = toLower(q)
@@ -392,6 +425,7 @@ export function useNaturalLanguageQuery (options = {}) {
   const priorityOptions = options.priorityOptions ?? []
   const typeOptions = options.typeOptions ?? []
   const requestedCarBrandOptions = options.requestedCarBrandOptions ?? []
+  const accountTypeOptions = options.accountTypeOptions ?? []
 
   function processQuery (query) {
     if (!query || typeof query !== 'string') {
@@ -435,6 +469,9 @@ export function useNaturalLanguageQuery (options = {}) {
 
     const type = matchType(q, typeOptions)
     if (type) filters.push(type)
+
+    const accountType = matchAccountType(q, accountTypeOptions)
+    if (accountType) filters.push(accountType)
 
     const requestedCarBrand = matchRequestedCarBrand(q, requestedCarBrandOptions)
     if (requestedCarBrand) filters.push(requestedCarBrand)

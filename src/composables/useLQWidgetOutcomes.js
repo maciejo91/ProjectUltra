@@ -15,6 +15,9 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
   const callLogDateTime = ref('')
   const callLogAssignee = ref(null)
 
+  // Next attempt assignee (reassign) – who will handle the next call attempt; defaults to current assignee
+  const nextAttemptAssignee = ref(null)
+
   // No Answer state
   const followupChannels = [
     { value: 'whatsapp', label: 'WhatsApp' },
@@ -22,7 +25,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     { value: 'email', label: 'Email' },
     { value: 'dont-send', label: "Don't send" }
   ]
-  const followupChannel = ref('whatsapp')
+  const followupChannel = ref('dont-send')
   const selectedTemplate = ref('followup-1')
   const rescheduleTime = ref(null)
   const customDate = ref('')
@@ -91,7 +94,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
   const successPerformedAt = ref(null) // Date
 
   // Qualification method (Assign only | Assign and schedule) and schedule state
-  const qualificationMethod = ref('assign-and-schedule')
+  const qualificationMethod = ref('assign-only')
   const qualificationEventType = ref('')
   const qualificationDurationMinutes = ref(null) // 30 | 60 | null
   const qualificationCustomDuration = ref('')
@@ -293,7 +296,12 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     if (!callLogAssignee.value && currentUserRef?.value) {
       callLogAssignee.value = currentUserRef.value
     }
-    
+
+    // Autofill next attempt assignee (reassign) with current assignee when no-answer is selected
+    if (outcome === 'no-answer' && callLogAssignee.value) {
+      nextAttemptAssignee.value = { ...callLogAssignee.value, type: 'user' }
+    }
+
     if (outcome === 'interested') {
       // Reset survey state when selecting interested outcome
       surveyCompleted.value = false
@@ -322,7 +330,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
   const resetOutcomeState = () => {
     selectedOutcome.value = null
     showOutcomeSelection.value = true
-    followupChannel.value = 'whatsapp'
+    followupChannel.value = 'dont-send'
     selectedTemplate.value = 'followup-1'
     rescheduleTime.value = null
     customDate.value = ''
@@ -336,6 +344,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     showCallLogForm.value = false
     callLogDateTime.value = ''
     callLogAssignee.value = null
+    nextAttemptAssignee.value = null
     successState.value = null
     successPerformedAt.value = null
     qualificationMethod.value = 'assign-only'
@@ -443,6 +452,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     showCallLogForm,
     callLogDateTime,
     callLogAssignee,
+    nextAttemptAssignee,
     // Team selection state
     qualificationSelectedTeam,
     qualificationSelectedSalesman,
