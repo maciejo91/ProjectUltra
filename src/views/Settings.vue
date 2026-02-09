@@ -10,15 +10,39 @@
     <div class="p-4 md:p-6 lg:p-8">
       <!-- Tabs -->
       <Tabs v-model="activeTab" class="mb-6">
-        <TabsList>
-          <TabsTrigger value="general">
-            General
+        <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
+          <TabsTrigger
+            value="general"
+            class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+            :class="activeTab === 'general' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+          >
+            <span>General</span>
+            <span
+              v-if="activeTab === 'general'"
+              class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+            />
           </TabsTrigger>
-          <TabsTrigger value="urgency">
-            Urgency Settings
+          <TabsTrigger
+            value="urgency"
+            class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+            :class="activeTab === 'urgency' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+          >
+            <span>Urgency Settings</span>
+            <span
+              v-if="activeTab === 'urgency'"
+              class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+            />
           </TabsTrigger>
-          <TabsTrigger value="navigation">
-            Navigation
+          <TabsTrigger
+            value="navigation"
+            class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+            :class="activeTab === 'navigation' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+          >
+            <span>Navigation</span>
+            <span
+              v-if="activeTab === 'navigation'"
+              class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+            />
           </TabsTrigger>
         </TabsList>
 
@@ -593,4 +617,56 @@ function handleCancel() {
   loadSettings()
 }
 </script>
+
+<style scoped>
+/* Tab styling to match TaskDetailView */
+:deep([role="tablist"]) {
+  border: none !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  gap: 0 !important;
+  height: auto !important;
+  min-height: 48px !important;
+}
+
+:deep([role="tab"]) {
+  background: transparent !important;
+  border: none !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  position: relative !important;
+  box-shadow: none !important;
+  height: 100% !important;
+  min-height: 48px !important;
+}
+
+:deep([role="tab"]:not(:last-child)) {
+  border-right: none !important;
+}
+
+:deep([role="tab"]::before),
+:deep([role="tab"]::after) {
+  display: none !important;
+  box-shadow: none !important;
+}
+
+:deep([role="tab"] *) {
+  box-shadow: none !important;
+}
+
+:deep([role="tab"][data-state="active"]) {
+  color: var(--color-text-foreground) !important;
+  box-shadow: none !important;
+}
+
+:deep([role="tab"][data-state="inactive"]) {
+  color: var(--color-text-muted-foreground) !important;
+  box-shadow: none !important;
+}
+</style>
 

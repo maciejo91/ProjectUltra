@@ -91,11 +91,13 @@ export const useLeadsStore = defineStore('leads', () => {
     error.value = null
     try {
       const updated = await leadsApi.updateLead(id, updates)
-      const index = leads.value.findIndex(l => l.id === id)
+      const numericId = parseInt(id, 10)
+      const index = leads.value.findIndex(l => l.id === numericId)
       if (index !== -1) {
-        leads.value[index] = updated
+        // Replace array so computeds (e.g. allTasks → drawerTask) reliably update
+        leads.value = leads.value.map(l => (l.id === numericId ? updated : l))
       }
-      if (currentLead.value?.id === id) {
+      if (currentLead.value?.id === numericId) {
         currentLead.value = updated
       }
       return updated
@@ -112,7 +114,8 @@ export const useLeadsStore = defineStore('leads', () => {
     error.value = null
     try {
       await leadsApi.deleteLead(id)
-      leads.value = leads.value.filter(l => l.id !== id)
+      const numericId = parseInt(id, 10)
+      leads.value = leads.value.filter(l => l.id !== numericId)
     } catch (err) {
       error.value = err.message
       throw err

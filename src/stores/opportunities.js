@@ -126,7 +126,8 @@ export const useOpportunitiesStore = defineStore('opportunities', () => {
     loading.value = true
     error.value = null
     try {
-      const currentOpp = currentOpportunity.value?.id === id ? currentOpportunity.value : opportunities.value.find(o => o.id === id)
+      const numericId = parseInt(id, 10)
+      const currentOpp = currentOpportunity.value?.id === numericId ? currentOpportunity.value : opportunities.value.find(o => o.id === numericId)
       
       // Auto-transition from "In Negotiation - Contract Pending" to "Closed Won - Awaiting Delivery"
       // when both delivery date and e-signatures are completed
@@ -219,11 +220,11 @@ export const useOpportunitiesStore = defineStore('opportunities', () => {
       }
       
       const updated = await opportunitiesApi.updateOpportunity(id, updates)
-      const index = opportunities.value.findIndex(o => o.id === id)
+      const index = opportunities.value.findIndex(o => o.id === numericId)
       if (index !== -1) {
         opportunities.value[index] = updated
       }
-      if (currentOpportunity.value?.id === id) {
+      if (currentOpportunity.value?.id === numericId) {
         currentOpportunity.value = updated
       }
       

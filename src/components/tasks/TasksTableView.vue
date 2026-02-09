@@ -222,8 +222,16 @@ const pagination = ref({
 
 const globalFilter = ref(props.initialGlobalFilter || '')
 const sorting = ref([])
-const columnFilters = ref([])
-const columnVisibility = ref({})
+// Default filter: type = lead
+const columnFilters = ref([{ key: 'type', value: 'lead', operator: 'eq' }])
+// Default visible columns: Task details, Due date, Customer, Vehicle, Assigned (hide Created, Attempts, VIN, Request message, Source)
+const columnVisibility = ref({
+  createdAt: false,
+  contactAttempts: false,
+  vin: false,
+  requestMessage: false,
+  source: false
+})
 
 // Watch globalFilter changes and emit to parent
 watch(globalFilter, (newValue) => {
@@ -235,12 +243,6 @@ const { filterDefinitions } = useTasksTableFilters({
   typeFilter: computed(() => 'all'),
   showTypeFilter: computed(() => true),
   tasks: computed(() => props.tasks)
-})
-
-const hasActiveFilters = computed(() => {
-  const hasColumnFilters = Array.isArray(columnFilters.value) && columnFilters.value.length > 0
-  const hasSearch = Boolean(globalFilter.value && String(globalFilter.value).trim())
-  return hasColumnFilters || hasSearch
 })
 
 const assigneeOptions = computed(() => {
@@ -628,10 +630,7 @@ const tableMeta = computed(() => ({
   border: none !important;
 }
 
-/* Hide filter row when no filter is applied */
-.hide-table-filter :deep([data-slot="table-filter"]) {
-  display: none !important;
-}
+/* Filter row is always shown so filters (e.g. default Type: Lead) are explicit */
 
 /* Filter button - white background like reference */
 :deep(button[aria-label*="filter"]),
