@@ -83,19 +83,6 @@
           </div>
         </div>
 
-        <!-- Scheduled Follow-up Call Banner (contact attempts moved to same line as Call Again button) -->
-        <div v-if="hasScheduledFollowUp" class="mb-3 bg-muted border border-border rounded-lg p-3">
-          <div class="flex items-center gap-2">
-            <CalendarCheck class="w-4 h-4 shrink-0 text-blue-600" />
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-foreground">Scheduled Follow-up Call:</span>
-              <span class="text-sm text-muted-foreground">
-                {{ formatDate(lead.scheduledAppointment.start) }} at {{ formatTime(lead.scheduledAppointment.start) }}
-              </span>
-            </div>
-          </div>
-        </div>
-
         <!-- Call Interface Component -->
         <CallInterface
           :is-call-active="isCallActive"
@@ -134,10 +121,10 @@
                 variant="outline"
                 :model-value="selectedOutcome === 'no-answer'"
                 @update:model-value="(p) => selectOutcome(p ? 'no-answer' : null)"
-                class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
-                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-muted">
-                  <PhoneOff :size="4" class="text-muted-foreground" />
+                <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
+                  <PhoneOff :size="14" class="text-muted-foreground" />
                 </span>
                 <span>No answer</span>
               </Toggle>
@@ -145,10 +132,10 @@
                 variant="outline"
                 :model-value="selectedOutcome === 'not-valid'"
                 @update:model-value="(p) => selectOutcome(p ? 'not-valid' : null)"
-                class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
-                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-muted">
-                  <ThumbsDown :size="4" class="text-muted-foreground" />
+                <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
+                  <ThumbsDown :size="14" class="text-muted-foreground" />
                 </span>
                 <span>No interest/invalid</span>
               </Toggle>
@@ -156,10 +143,10 @@
                 variant="outline"
                 :model-value="selectedOutcome === 'interested'"
                 @update:model-value="(p) => selectOutcome(p ? 'interested' : null)"
-                class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
-                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-muted">
-                  <Check :size="4" class="text-muted-foreground" />
+                <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
+                  <Check :size="14" class="text-muted-foreground" />
                 </span>
                 <span>Interested</span>
               </Toggle>
@@ -781,41 +768,6 @@
                 @update="handleCommunicationsUpdate"
               />
             </div>
-
-            <!-- Existing Appointment (if lead already has one) -->
-            <div v-if="hasExistingAppointment && qualificationMethod === 'assign-only'" class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <div class="flex items-start justify-between mb-3">
-                <div class="flex items-center gap-2">
-                  <CalendarCheck class="w-4 h-4 shrink-0 text-blue-600" />
-                  <h5 class="font-semibold text-foreground text-sm">Existing Appointment</h5>
-                </div>
-                <span class="text-sm font-semibold text-blue-600 uppercase">Scheduled</span>
-              </div>
-              <div class="grid grid-cols-2 gap-3 text-sm mb-3">
-                <div>
-                  <span class="text-muted-foreground">Date:</span>
-                  <span class="ml-2 font-medium text-foreground">{{ formatDate(lead.scheduledAppointment.start) }}</span>
-                </div>
-                <div>
-                  <span class="text-muted-foreground">Time:</span>
-                  <span class="ml-2 font-medium text-foreground">{{ formatTime(lead.scheduledAppointment.start) }}</span>
-                </div>
-                <div>
-                  <span class="text-muted-foreground">Type:</span>
-                  <span class="ml-2 font-medium text-foreground capitalize">{{ lead.scheduledAppointment.type }}</span>
-                </div>
-                <div>
-                  <span class="text-muted-foreground">Assigned to:</span>
-                  <span class="ml-2 font-medium text-foreground">{{ lead.scheduledAppointment.assignee }}</span>
-                </div>
-              </div>
-              <Button
-                label="Reschedule Appointment"
-                variant="outline"
-                size="small"
-                @click="showScheduleAppointmentModal = true"
-              />
-            </div>
           </div>
         </div>
         
@@ -957,14 +909,6 @@
       @cancel="showNoteModal = false"
     />
 
-    <!-- Schedule Appointment Modal -->
-    <ScheduleAppointmentModal
-      :show="showScheduleAppointmentModal"
-      :preselected-assignee="assignment.assignee"
-      @confirm="handleScheduleAppointmentConfirm"
-      @close="showScheduleAppointmentModal = false"
-    />
-
     <!-- Assignment Modal -->
     <ReassignUserModal
       :show="showAssignmentModal"
@@ -1044,7 +988,6 @@ import {
 } from '@motork/component-library/future/primitives'
 import { Check, PhoneOff, ThumbsDown, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, ChevronLeft, ChevronRight, Plus, Users } from 'lucide-vue-next'
 import NoteWidget from '@/components/customer/activities/NoteWidget.vue'
-import ScheduleAppointmentModal from '@/components/modals/ScheduleAppointmentModal.vue'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
@@ -1382,17 +1325,11 @@ const dynamicDescription = computed(() => {
 })
 
 const isOverdue = computed(() => {
-  // Only show overdue if there's an appointment that is overdue
-  // Tasks without initial call should not be marked overdue
-  if (!props.lead.scheduledAppointment) return false
-  
-  const appointmentDate = new Date(props.lead.scheduledAppointment.start)
+  // Lead tasks use nextActionDue only (scheduled appointments are for opportunities)
+  if (!props.lead.nextActionDue) return false
+  const due = new Date(props.lead.nextActionDue)
   const now = new Date()
-  return appointmentDate < now
-})
-
-const hasScheduledFollowUp = computed(() => {
-  return !!props.lead.scheduledAppointment
+  return due < now
 })
 
 
@@ -1414,7 +1351,6 @@ const {
   showOutcomeSelection,
   selectedOutcome,
   showNoteModal,
-  showScheduleAppointmentModal,
   followupChannels,
   followupChannel,
   selectedTemplate,
@@ -1427,7 +1363,6 @@ const {
   preferences,
   messageTemplates,
   messagePreview,
-  hasExistingAppointment,
   selectOutcome,
   cancelOutcome,
   calculateNextCallDate,
@@ -2155,7 +2090,6 @@ const handlers = useLQWidgetHandlers(
 
 const {
   logManualCall,
-  handleScheduleAppointmentConfirm,
   handleQualify,
   handleDisqualifyFromInterested,
   handleNoAnswerConfirm,

@@ -1,4 +1,4 @@
-import { mockCustomers, mockCalendarEvents, mockUsers } from './mockData'
+import { mockCustomers, mockUsers } from './mockData'
 import { leadService } from '@/services/leadService'
 import { ActivityRepository } from '@/repositories/ActivityRepository'
 import { LeadRepository } from '@/repositories/LeadRepository'
@@ -105,52 +105,6 @@ export const deleteLeadActivity = async (leadId, activityId) => {
 // Helper function for enrichment (used by other functions)
 function enrichLeadWithCustomer(lead) {
   return leadService.enrichWithCustomer(lead)
-}
-
-// Schedule follow-up appointment for lead
-// NOTE: Calendar events will need their own repository in the future
-export const scheduleLeadFollowUp = async (leadId, appointmentData) => {
-  await delay()
-  const lead = await leadService.findById(leadId)
-  if (!lead) throw new Error('Lead not found')
-  
-  // Create calendar event
-  const eventId = mockCalendarEvents.length > 0 ? Math.max(...mockCalendarEvents.map(e => e.id)) + 1 : 1
-  const appointmentStart = new Date(appointmentData.dateTime)
-  const appointmentEnd = new Date(appointmentStart.getTime() + 30 * 60000) // +30 minutes
-  
-  const enrichedLead = enrichLeadWithCustomer(lead)
-  const customer = enrichedLead.customer
-  
-  const calendarEvent = {
-    id: eventId,
-    title: 'Follow-up Call',
-    start: appointmentStart.toISOString(),
-    end: appointmentEnd.toISOString(),
-    type: 'call',
-    customer: customer.name,
-    customerId: customer.id,
-    leadId: lead.id,
-    opportunityId: null,
-    assignee: appointmentData.assignee || lead.assignee,
-    assigneeId: appointmentData.assigneeId || null,
-    assigneeType: appointmentData.assigneeType || 'user',
-    teamId: appointmentData.teamId || null,
-    team: appointmentData.team || 'BDC',
-    dealership: lead.fiscalEntity || 'Main',
-    status: 'scheduled'
-  }
-  
-  mockCalendarEvents.push(calendarEvent)
-  
-  // Update lead with appointment reference and due date using service
-  await leadService.update(leadId, {
-    scheduledAppointment: calendarEvent,
-    nextActionDue: appointmentStart.toISOString(),
-    lastActivity: new Date().toISOString()
-  })
-  
-  return calendarEvent
 }
 
 // Conversion helpers

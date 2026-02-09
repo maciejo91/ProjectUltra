@@ -74,11 +74,7 @@ export function getTaskActionTitle(item) {
   const displayStage = getDisplayStage(item, type)
 
   if (type === 'lead') {
-    // If there's a scheduled appointment with a title, use it for better context
-    if (item.scheduledAppointment && item.scheduledAppointment.title) {
-      return item.scheduledAppointment.title
-    }
-
+    // Leads do not have scheduled appointments (only opportunities do)
     const config = LEAD_STATE_CONFIG[displayStage]
     if (!config || !config.primaryAction) {
       return null

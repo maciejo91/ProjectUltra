@@ -47,42 +47,7 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
       }
       
       await leadsStore.updateLead(lead.id, updates)
-      
-      // Create appointment if requested
-      if (data.createAppointment) {
-        const endTime = new Date(dueDateTime)
-        endTime.setHours(endTime.getHours() + 1)
-        
-        await leadsStore.updateLead(lead.id, {
-          scheduledAppointment: {
-            id: Date.now(),
-            title: 'Follow-up Call',
-            start: isoTimestamp,
-            end: endTime.toISOString(),
-            type: 'Call',
-            assignee: data.assignee || lead.assignee,
-            assigneeId: data.assigneeId || lead.assigneeId,
-            assigneeType: data.assigneeType || lead.assigneeType || 'user',
-            teamId: data.teamId || lead.teamId,
-            team: data.team || lead.team,
-            status: 'scheduled'
-          }
-        })
-        
-        await leadsStore.addActivity(lead.id, {
-          type: 'appointment',
-          user: userStore.currentUser?.name || 'You',
-          action: 'scheduled follow-up call',
-          content: `Follow-up call scheduled for ${formatDate(dueDateTime)} at ${formatTime(dueDateTime)}`,
-          data: {
-            type: 'Call',
-            date: data.date,
-            time: data.time,
-            assignee: data.assignee || lead.assignee
-          }
-        })
-      }
-      
+
       await leadsStore.addActivity(lead.id, {
         type: 'note',
         user: 'You',
@@ -114,24 +79,15 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
       
       if (data.scheduleFollowUp && data.appointmentData) {
         const appointmentDateTime = new Date(`${data.appointmentData.date}T${data.appointmentData.time}:00`)
-        
-        await leadsStore.scheduleFollowUp(lead.id, {
-          dateTime: appointmentDateTime.toISOString(),
-          assignee: data.appointmentData.assignee || lead.assignee,
-          assigneeId: data.appointmentData.assigneeId || null,
-          assigneeType: data.appointmentData.assigneeType || 'user',
-          teamId: data.appointmentData.teamId || null,
-          team: data.appointmentData.team || null
-        })
-        
+        await leadsStore.updateLead(lead.id, { nextActionDue: appointmentDateTime.toISOString() })
         await leadsStore.addActivity(lead.id, {
-          type: 'appointment',
+          type: 'note',
           user: 'You',
-          action: 'scheduled follow-up call',
-          content: `Follow-up call scheduled for ${formatDate(appointmentDateTime)} at ${formatTime(appointmentDateTime)}`
+          action: 'scheduled follow-up',
+          content: `Follow-up scheduled for ${formatDate(appointmentDateTime)} at ${formatTime(appointmentDateTime)}`
         })
       }
-      
+
       await leadsStore.fetchLeadById(lead.id)
     } catch (err) {
       console.error('Failed to validate lead:', err)
@@ -279,72 +235,9 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
     emit('open-trade-in')
   }
 
-  async function handleAppointmentScheduled(appointmentData) {
-    const lead = getLead()
-    if (!lead) return
-
-    try {
-      const appointmentDateTime = appointmentData.datetime 
-        ? new Date(appointmentData.datetime).toISOString().split('T')[0] + 'T' + appointmentData.time + ':00'
-        : `${appointmentData.date}T${appointmentData.time}:00`
-      const endTime = new Date(appointmentDateTime)
-      const duration = appointmentData.duration || 60 // Default to 60 minutes
-      endTime.setMinutes(endTime.getMinutes() + duration)
-      
-      // Update lead assignment if provided
-      const updates = {
-        scheduledAppointment: {
-          id: Date.now(),
-          title: `${appointmentData.type} - ${lead.customer.name}`,
-          start: appointmentDateTime,
-          end: endTime.toISOString(),
-          type: appointmentData.type,
-          assignee: appointmentData.assignee,
-          assigneeId: appointmentData.assigneeId || appointmentData.salespersonId || appointmentData.teamId,
-          assigneeType: appointmentData.assigneeType || (appointmentData.salespersonId ? 'user' : 'team'),
-          teamId: appointmentData.teamId || null,
-          team: appointmentData.team || null,
-          salesperson: appointmentData.salesperson || null,
-          salespersonId: appointmentData.salespersonId || null,
-          status: 'scheduled',
-          location: appointmentData.location || '',
-          notes: appointmentData.notes || ''
-        }
-      }
-      
-      // Also update lead assignee fields if not already set
-      if (appointmentData.assigneeId || appointmentData.salespersonId || appointmentData.teamId) {
-        updates.assignee = appointmentData.assignee || appointmentData.salesperson || appointmentData.team
-        updates.assigneeId = appointmentData.assigneeId || appointmentData.salespersonId || appointmentData.teamId
-        updates.assigneeType = appointmentData.assigneeType || (appointmentData.salespersonId ? 'user' : 'team')
-        if (appointmentData.teamId) {
-          updates.teamId = appointmentData.teamId
-          updates.team = appointmentData.team
-        }
-      }
-      
-      await leadsStore.updateLead(lead.id, updates)
-      
-      await leadsStore.addActivity(lead.id, {
-        type: 'appointment',
-        user: userStore.currentUser?.name || 'You',
-        action: 'scheduled an appointment',
-        content: `${appointmentData.type} scheduled for ${formatDate(new Date(appointmentDateTime))} at ${appointmentData.time}`,
-        data: {
-          type: appointmentData.type,
-          date: appointmentData.date || formatDate(new Date(appointmentDateTime)),
-          time: appointmentData.time,
-          assignee: appointmentData.assignee,
-          assigneeId: appointmentData.assigneeId,
-          team: appointmentData.team,
-          salesperson: appointmentData.salesperson
-        }
-      })
-      
-      await leadsStore.fetchLeadById(lead.id)
-    } catch (err) {
-      console.error('Failed to schedule appointment:', err)
-    }
+  // Scheduled appointments are only on opportunities; lead "schedule" is handled via nextActionDue in postpone/validate
+  async function handleAppointmentScheduled() {
+    // No-op: leads do not have scheduled appointments
   }
 
   async function handleDisqualified(data) {

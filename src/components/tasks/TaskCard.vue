@@ -21,9 +21,11 @@
         <h3 v-if="actionTitle" class="font-bold text-foreground text-base truncate">{{ actionTitle }}</h3>
       </div>
       <div class="flex items-center gap-2 overflow-hidden">
-        <span class="text-muted-foreground text-sm truncate">{{ getName(item) }}</span>
+        <span class="text-muted-foreground text-sm truncate">
+          {{ getName(item) }}{{ callAttemptsCount > 0 ? ` - Attempts ${callAttemptsValue}` : '' }}
+        </span>
       </div>
-      
+
       <!-- Badges -->
       <div class="mt-2">
         <TaskBadges :task="item" />
@@ -36,7 +38,10 @@
 import { computed } from 'vue'
 import { formatDueDate, getDeadlineStatus } from '@/utils/formatters'
 import { getTaskActionTitle } from '@/utils/taskActionTitle'
+import { useSettingsStore } from '@/stores/settings'
 import TaskBadges from './shared/TaskBadges.vue'
+
+const settingsStore = useSettingsStore()
 
 const props = defineProps({
   item: {
@@ -120,6 +125,10 @@ const displayDate = computed(() => {
   }
   return deadline.value
 })
+
+const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
+const callAttemptsCount = computed(() => props.item.contactAttempts?.length ?? 0)
+const callAttemptsValue = computed(() => `${callAttemptsCount.value}/${maxContactAttempts.value}`)
 </script>
 
 <style scoped>

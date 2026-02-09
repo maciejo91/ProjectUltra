@@ -16,6 +16,7 @@
       <div
         class="data-table-inner table-search-wrapper"
         :class="{ 'hide-table-filter': !hasActiveFilters }"
+        @click="onTableContainerClick"
       >
       <DataTable 
         :data="paginatedData" 
@@ -89,6 +90,7 @@ import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useCustomersTable } from '@/composables/useCustomersTable'
 import { useTableRowSelection } from '@/composables/useTableRowSelection'
+import { useTableRowClick } from '@/composables/useTableRowClick'
 import { useDataTableData, getNestedProperty } from '@/composables/useDataTableData'
 
 const customersStore = useCustomersStore()
@@ -188,6 +190,8 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
   ],
   getFilterValue: getCustomerFilterValue
 })
+
+const { onTableContainerClick } = useTableRowClick(paginatedData, handleRowClick)
 
 const customersSourceOptions = computed(() => {
   const def = filterDefinitions.value?.find(d => d.key === 'source')

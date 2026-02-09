@@ -178,6 +178,12 @@ label[for] {
   background-color: var(--base-muted, #f5f5f5);
 }
 
+/* Page with white/surface background (e.g. Customers, Tasks table) - override muted grey */
+.page-container.bg-surface,
+.page-container.bg-white {
+  background-color: var(--base-surface, #fff);
+}
+
 /* Page with proper spacing */
 .page-wrapper {
   width: 100%;
@@ -947,6 +953,18 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 /* ========================================
    DataTable Styling - Minimal Overrides
    ======================================== */
+
+/* White table card (Tasks + Customers): same radius when inside page-container scroll area */
+/* Scroll area: rounded top so container top edge is rounded (Tasks + Customers) */
+.page-container .overflow-y-auto:has(.bg-white .data-table-inner) {
+  border-top-left-radius: var(--table-outer-radius);
+  border-top-right-radius: var(--table-outer-radius);
+}
+
+.page-container .overflow-y-auto .bg-white:has(.data-table-inner) {
+  border-radius: var(--table-outer-radius);
+  overflow: hidden;
+}
 
 /* Note: DataTable styling uses Motork component library's default styles */
 /* All custom table overrides have been removed to use Motork's out-of-the-box styling */

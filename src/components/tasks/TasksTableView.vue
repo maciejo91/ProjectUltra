@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container flex-1 flex flex-col overflow-hidden min-w-0">
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
     <!-- Header: Title + View Toggle + Show Closed -->
     <header class="page-header shrink-0">
       <div class="page-header-main">
@@ -63,29 +63,30 @@
       </div>
     </header>
 
-    <!-- Search bar with AI mode: above filter bar and table -->
-    <div class="shrink-0 px-4 md:px-8 pt-4 pb-1 bg-white">
-      <UnifiedSearchBar
-        active-tab="opportunities"
-        placeholder="Search tasks..."
-        :pagination="pagination"
-        :assignee-options="assigneeOptions"
-        :request-type-options="requestTypeOptions"
-        :status-options="tasksStatusOptions"
-        :source-options="tasksSourceOptions"
-        @update:global-filter="globalFilter = $event"
-        @update:column-filters="columnFilters = $event"
-        @update:pagination="pagination = $event"
-      />
-    </div>
-
-    <!-- Table: scrollable area (hide built-in search row inside this wrapper only) -->
-    <div
-      ref="tableScrollContainer"
-      class="flex-1 overflow-y-auto px-4 md:px-8 pb-4 md:pb-8 bg-white min-h-0 data-table-inner table-search-wrapper"
-      :class="{ 'hide-table-filter': !hasActiveFilters }"
-    >
-      <DataTable 
+    <!-- Same as Customers: one scroll area with padding, one white card (search + table) -->
+    <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide min-h-0">
+      <div class="bg-white mb-8">
+        <div class="mb-1">
+          <UnifiedSearchBar
+            active-tab="opportunities"
+            placeholder="Search tasks..."
+            :pagination="pagination"
+            :assignee-options="assigneeOptions"
+            :request-type-options="requestTypeOptions"
+            :status-options="tasksStatusOptions"
+            :source-options="tasksSourceOptions"
+            @update:global-filter="globalFilter = $event"
+            @update:column-filters="columnFilters = $event"
+            @update:pagination="pagination = $event"
+          />
+        </div>
+        <div
+          ref="tableScrollContainer"
+          class="data-table-inner table-search-wrapper"
+          :class="{ 'hide-table-filter': !hasActiveFilters }"
+          @click="onTableContainerClick"
+        >
+          <DataTable 
             :data="displayedData" 
             :columns="columns"
             :meta="tableMeta"
@@ -144,6 +145,8 @@
               </div>
             </template>
           </DataTable>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -160,6 +163,7 @@ import { useSettingsStore } from '@/stores/settings'
 import { useUsersStore } from '@/stores/users'
 import { useTasksTableFilters } from '@/composables/useTasksTableFilters'
 import { useTableRowSelection } from '@/composables/useTableRowSelection'
+import { useTableRowClick } from '@/composables/useTableRowClick'
 import { useDataTableData, getNestedProperty } from '@/composables/useDataTableData'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
@@ -591,6 +595,8 @@ const handleRowClick = (record) => {
   emit('select', record.compositeId)
 }
 
+const { onTableContainerClick } = useTableRowClick(displayedData, handleRowClick)
+
 // Bulk delete handler
 const handleBulkDelete = () => {
   const selectedTasks = getSelectedRows(sortedData.value)
@@ -683,11 +689,6 @@ const tableMeta = computed(() => ({
 :deep([data-slot="table-container"]),
 :deep(.table-wrapper) {
   border: none !important;
-}
-
-/* Frame panel - should have gray background */
-:deep([data-slot="frame-panel"]) {
-  background-color: rgba(245, 245, 245, 1) !important;
 }
 
 /* Pagination dropdown - transparent in footer */

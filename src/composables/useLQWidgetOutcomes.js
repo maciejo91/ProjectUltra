@@ -190,9 +190,8 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     return messageTemplates.value[selectedTemplate.value] || ''
   })
 
-  const hasExistingAppointment = computed(() => {
-    return !!lead.value?.scheduledAppointment
-  })
+  // Scheduled appointments are only on opportunities, not leads
+  const hasExistingAppointment = computed(() => false)
 
   const calculateAISuggestion = () => {
     // AI logic: Suggest best time based on lead characteristics

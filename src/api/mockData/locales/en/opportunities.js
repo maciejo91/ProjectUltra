@@ -31,6 +31,7 @@ export const mockOpportunities = [
     assignee: 'Salsabeel Khaleel',
     createdAt: createDateOffset(-2),
     lastActivity: createDateOffset(-1),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null,
     tradeIns: [
       { id: 't1', label: '2015 Mercedes', valuation: 8000 },
@@ -92,6 +93,7 @@ export const mockOpportunities = [
     assignee: 'Sarah Jenkins',
     createdAt: createDateOffset(-5),
     lastActivity: createDateOffset(-2),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 10,
       start: createDateTimeOffset(0, 14, 0),
@@ -158,6 +160,7 @@ export const mockOpportunities = [
       date.setDate(date.getDate() - 3)
       return date.toISOString()
     })(),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 20,
       start: (() => {
@@ -269,6 +272,7 @@ export const mockOpportunities = [
       date.setDate(date.getDate() - 5)
       return date.toISOString()
     })(),
+    nextActionDue: createDateOffset(1),
     closedDate: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 5)
@@ -349,6 +353,7 @@ export const mockOpportunities = [
     assignee: 'David Miller',
     createdAt: createDateOffset(-12),
     lastActivity: createDateOffset(-6),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 331,
       start: createDateTimeOffset(0, 10, 0),
@@ -436,6 +441,7 @@ export const mockOpportunities = [
       date.setDate(date.getDate() - 8)
       return date.toISOString()
     })(),
+    nextActionDue: createDateOffset(1),
     contractDate: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 8)
@@ -664,6 +670,7 @@ model: 'Macan',
       date.setDate(date.getDate() - 6)
       return date.toISOString()
     })(),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
 
@@ -708,6 +715,7 @@ model: 'Macan',
       date.setDate(date.getDate() - 35)
       return date.toISOString()
     })(),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
 
@@ -807,6 +815,7 @@ model: 'Macan',
       date.setDate(date.getDate() - 2)
       return date.toISOString()
     })(),
+    nextActionDue: createDateOffset(1),
     closedDate: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 10)
@@ -921,6 +930,7 @@ model: 'Macan',
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
+    nextActionDue: createDateOffset(1),
     closedDate: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 3)
@@ -976,6 +986,7 @@ model: 'Macan',
       date.setHours(date.getHours() - 2)
       return date.toISOString()
     })(),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 40,
       start: (() => {
@@ -1064,6 +1075,7 @@ model: 'Macan',
       date.setHours(date.getHours() - 2)
       return date.toISOString()
     })(),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
 
@@ -1131,6 +1143,7 @@ model: 'Macan',
       date.setHours(date.getHours() - 1)
       return date.toISOString()
     })(),
+    nextActionDue: createDateOffset(1),
     contractDate: (() => {
       const date = new Date()
       date.setHours(date.getHours() - 1)
@@ -1235,6 +1248,7 @@ model: 'Macan',
       date.setDate(date.getDate() - 4)
       return date.toISOString()
     })(),
+    nextActionDue: createDateOffset(1),
     closedDate: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 15)
@@ -1326,6 +1340,7 @@ model: 'Macan',
     assigneeInitials: 'SJ',
     createdAt: '2025-03-10T10:00:00',
     lastActivity: '2025-03-25T14:00:00',
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 'appt-201',
       start: (() => {
@@ -1396,9 +1411,10 @@ model: 'Macan',
     assigneeInitials: 'DM',
     createdAt: '2025-03-15T09:00:00',
     lastActivity: '2025-03-24T16:00:00',
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
-  
+
   // Opportunity for Ferrari Dealership Group (account-level, references Giovanni Rossi)
   {
     id: 203,
@@ -1468,9 +1484,10 @@ model: 'Macan',
     assigneeInitials: 'SJ',
     createdAt: '2025-03-12T10:00:00',
     lastActivity: '2025-03-24T16:00:00',
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
-  
+
   // ========================================
   // COMPREHENSIVE COVERAGE - All Stage/Date/Assignment Combinations
   // IDs 200-299 for systematic coverage
@@ -1505,6 +1522,7 @@ model: 'Macan',
     assignee: 'Salsabeel Khaleel',
     createdAt: createDateOffset(-10),
     lastActivity: createDateOffset(-7),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -1535,6 +1553,7 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-5),
     lastActivity: createDateOffset(-1),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -1565,6 +1584,7 @@ model: 'Macan',
     assignee: 'David Miller',
     createdAt: createDateOffset(-3),
     lastActivity: createDateOffset(-1),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -1595,6 +1615,7 @@ model: 'Macan',
     assignee: 'Sarah Jenkins',
     createdAt: createDateOffset(-10), // 10 days ago - triggers OOFB (7-13 days)
     lastActivity: createDateOffset(-10),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -1625,6 +1646,7 @@ model: 'Macan',
     assignee: 'Michael Thomas',
     createdAt: createDateOffset(-20), // 20 days ago - triggers UFB (14+ days)
     lastActivity: createDateOffset(-20),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -1655,6 +1677,7 @@ model: 'Macan',
     assignee: 'Salsabeel Khaleel',
     createdAt: createDateOffset(-2),
     lastActivity: createDateOffset(-1),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 205,
       title: 'Test Drive Appointment',
@@ -1704,6 +1727,7 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-1),
     lastActivity: createDateOffset(-1),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 206,
       title: 'Consultation',
@@ -1752,6 +1776,7 @@ model: 'Macan',
     assignee: 'David Miller',
     createdAt: createDateOffset(-8),
     lastActivity: createDateOffset(-3),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 207,
       title: 'Past Appointment',
@@ -1803,6 +1828,7 @@ model: 'Macan',
     assignee: 'Sarah Jenkins',
     createdAt: createDateOffset(-5),
     lastActivity: createDateOffset(-2),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 210,
       title: 'Future Appointment',
@@ -1852,6 +1878,7 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-15),
     lastActivity: createDateOffset(-10),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 211,
       title: 'Past No-Show Appointment',
@@ -1902,6 +1929,7 @@ model: 'Macan',
     assignee: 'David Miller',
     createdAt: createDateOffset(-7),
     lastActivity: createDateOffset(-1),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 212,
       title: 'Today Appointment',
@@ -1950,6 +1978,7 @@ model: 'Macan',
     assignee: 'Salsabeel Khaleel',
     createdAt: createDateOffset(-12),
     lastActivity: createDateOffset(-5),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 213,
       title: 'NS2 Appointment',
@@ -2000,6 +2029,7 @@ model: 'Macan',
     assignee: 'David Miller',
     createdAt: createDateOffset(-20),
     lastActivity: createDateOffset(-10),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 214,
       title: 'NS3 Appointment - Should Auto-Close',
@@ -2070,6 +2100,7 @@ model: 'Macan',
     assignee: 'Sarah Jenkins',
     createdAt: createDateOffset(-5),
     lastActivity: createDateOffset(-2),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -2118,6 +2149,7 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-10),
     lastActivity: createDateOffset(-1),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -2183,6 +2215,7 @@ model: 'Macan',
     assignee: 'David Miller',
     createdAt: createDateOffset(-8),
     lastActivity: createDateOffset(-2),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -2231,6 +2264,7 @@ model: 'Macan',
     assignee: 'Michael Thomas',
     createdAt: createDateOffset(-4),
     lastActivity: createDateOffset(-1),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 223,
       title: 'Test Drive',
@@ -2300,6 +2334,7 @@ model: 'Macan',
     assignee: 'Sarah Jenkins',
     createdAt: createDateOffset(-10),
     lastActivity: createDateOffset(-5),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -2365,6 +2400,7 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-15),
     lastActivity: createDateOffset(-4),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -2413,6 +2449,7 @@ model: 'Macan',
     assignee: 'David Miller',
     createdAt: createDateOffset(-12),
     lastActivity: createDateOffset(-6),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: {
       id: 232,
       title: 'Follow-up Appointment',
@@ -2485,6 +2522,7 @@ model: 'Macan',
     assignee: 'Salsabeel Khaleel',
     createdAt: createDateOffset(-20),
     lastActivity: createDateOffset(-2),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -2553,9 +2591,10 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-25),
     lastActivity: createDateOffset(-5),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
-  
+
   // 250-259: In Negotiation - Contract Pending Variations
   {
     id: 250,
@@ -2613,6 +2652,7 @@ model: 'Macan',
     assignee: 'Salsabeel Khaleel',
     createdAt: createDateOffset(-20),
     lastActivity: createDateOffset(-8),
+    nextActionDue: createDateOffset(1),
     contractDate: createDateOffset(-8),
     scheduledAppointment: null
   },
@@ -2680,6 +2720,7 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-15),
     lastActivity: createDateOffset(-1),
+    nextActionDue: createDateOffset(1),
     contractDate: createDateOffset(-1),
     scheduledAppointment: null
   },
@@ -2739,6 +2780,7 @@ model: 'Macan',
     assignee: 'David Miller',
     createdAt: createDateOffset(-12),
     lastActivity: createDateOffset(0),
+    nextActionDue: createDateOffset(1),
     contractDate: createDateOffset(0),
     scheduledAppointment: null
   },
@@ -2814,6 +2856,7 @@ model: 'Macan',
     assignee: 'Sarah Jenkins',
     createdAt: createDateOffset(-30),
     lastActivity: createDateOffset(-15),
+    nextActionDue: createDateOffset(1),
     contractDate: createDateOffset(-15),
     deliveryDate: null,
     scheduledAppointment: null
@@ -2913,6 +2956,7 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-35),
     lastActivity: createDateOffset(-10),
+    nextActionDue: createDateOffset(1),
     contractDate: createDateOffset(-10),
     deliveryDate: null,
     scheduledAppointment: null
@@ -2989,6 +3033,7 @@ model: 'Macan',
     assignee: 'David Miller',
     createdAt: createDateOffset(-25),
     lastActivity: createDateOffset(-5),
+    nextActionDue: createDateOffset(1),
     contractDate: createDateOffset(-12),
     deliveryDate: createDateString(5), // Future delivery date
     scheduledAppointment: null
@@ -3063,6 +3108,7 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-30),
     lastActivity: createDateOffset(-3),
+    nextActionDue: createDateOffset(1),
     contractDate: createDateOffset(-15),
     deliveryDate: createDateString(3), // Future delivery date
     scheduledAppointment: null
@@ -3139,6 +3185,7 @@ model: 'Macan',
     assignee: 'Sarah Jenkins',
     createdAt: createDateOffset(-40),
     lastActivity: createDateOffset(-5), // 5 days after delivery - triggers DFB (3+ days)
+    nextActionDue: createDateOffset(1),
     contractDate: createDateOffset(-25),
     deliveryDate: createDateString(-5), // Past delivery date
     scheduledAppointment: null
@@ -3230,6 +3277,7 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-45),
     lastActivity: createDateOffset(-4), // 4 days after delivery - triggers DFB
+    nextActionDue: createDateOffset(1),
     contractDate: createDateOffset(-22),
     deliveryDate: createDateString(-4), // Past delivery date
     scheduledAppointment: null
@@ -3293,6 +3341,7 @@ model: 'Macan',
     assignee: 'Michael Thomas',
     createdAt: createDateOffset(-20),
     lastActivity: createDateOffset(-5),
+    nextActionDue: createDateOffset(1),
     contractDate: null,
     closedReason: 'Customer chose competitor',
     closedDate: createDateOffset(-5), // Past closed date
@@ -3345,6 +3394,7 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-15),
     lastActivity: createDateOffset(0), // Today closed
+    nextActionDue: createDateOffset(1),
     contractDate: null,
     closedReason: 'No longer interested',
     closedDate: createDateOffset(0), // Today
@@ -3379,6 +3429,7 @@ model: 'Macan',
     assignee: 'Sarah Jenkins',
     createdAt: createDateOffset(-25),
     lastActivity: createDateOffset(-10),
+    nextActionDue: createDateOffset(1),
     contractDate: null,
     closedReason: 'NS3 - Third No-Show',
     closedDate: createDateOffset(-10), // Past closed date
@@ -3412,6 +3463,7 @@ model: 'Macan',
     assignee: 'David Miller',
     createdAt: createDateOffset(-50), // 50 days ago
     lastActivity: createDateOffset(-35), // 35 days inactive - triggers Abandoned
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
   {
@@ -3442,6 +3494,7 @@ model: 'Macan',
     assignee: null, // Unassigned
     createdAt: createDateOffset(-45), // 45 days ago
     lastActivity: createDateOffset(-32), // 32 days inactive - triggers Abandoned
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   }
 ]

@@ -7,7 +7,6 @@
 
 // Import base mock data (non-translatable)
 import { mockUsers } from './users.js'
-import { mockTasks } from './tasks.js'
 import { mockContacts } from './contacts.js'
 import { mockVehicles } from './vehicles.js'
 import { calendarEventTypes, calendarDealerships, calendarTeams, mockCalendarEvents } from './calendar.js'
@@ -23,11 +22,12 @@ import {
   mockManagerFunnelMetrics
 } from './dashboard.js'
 
-// Import locale-specific data
+// Import locale-specific data (English as default)
 import { mockLeads as enLeads } from './locales/en/leads.js'
 import { mockCustomers as enCustomers } from './locales/en/customers.js'
 import { mockOpportunities as enOpportunities } from './locales/en/opportunities.js'
 import { mockActivities as enActivities } from './locales/en/activities.js'
+import { mockTasks as enTasks } from './locales/en/tasks.js'
 
 import { mockLeads as itLeads } from './locales/it/leads.js'
 import { mockCustomers as itCustomers } from './locales/it/customers.js'
@@ -119,7 +119,7 @@ export function getMockData() {
     mockCustomers,
     mockLeads: data.leads,
     mockOpportunities: data.opportunities,
-    mockTasks, // Tasks use stage names that are translated in components
+    mockTasks: enTasks, // English default; task labels translated in components
     mockContacts, // Contacts are derived from customers
     mockVehicles, // Vehicles use technical names
     mockCalendarEvents, // Calendar events use technical data

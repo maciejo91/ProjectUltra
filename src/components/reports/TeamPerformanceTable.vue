@@ -204,13 +204,11 @@ const { paginatedData, totalFilteredCount } = useDataTableData({
 }
 
 :deep(div[data-slot='frame-panel'].relative.bg-clip-padding) {
-  background-color: rgba(245, 245, 245, 1) !important;
   border-top-left-radius: 10px !important;
   border-top-right-radius: 10px !important;
 }
 
 :deep(footer.flex.items-center.justify-between) {
-  background-color: rgba(245, 245, 245, 1) !important;
   border-bottom-left-radius: 10px !important;
   border-bottom-right-radius: 10px !important;
 }
@@ -243,11 +241,6 @@ const { paginatedData, totalFilteredCount } = useDataTableData({
 :deep([data-slot="table-container"]),
 :deep(.table-wrapper) {
   border: none !important;
-}
-
-/* Frame panel - should have gray background */
-:deep([data-slot="frame-panel"]) {
-  background-color: rgba(245, 245, 245, 1) !important;
 }
 
 /* Pagination dropdown - transparent in footer */

@@ -176,21 +176,6 @@ export const useLeadsStore = defineStore('leads', () => {
     }
   }
 
-  const scheduleFollowUp = async (leadId, appointmentData) => {
-    loading.value = true
-    error.value = null
-    try {
-      const event = await leadsApi.scheduleLeadFollowUp(leadId, appointmentData)
-      await fetchLeadById(leadId)
-      return event
-    } catch (err) {
-      error.value = err.message
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
   const convertLeadToOpportunity = async (leadId, qualifiedData = null) => {
     loading.value = true
     error.value = null
@@ -237,7 +222,6 @@ export const useLeadsStore = defineStore('leads', () => {
     addActivity,
     updateActivity,
     deleteActivity,
-    scheduleFollowUp,
     convertLeadToOpportunity
   }
 })

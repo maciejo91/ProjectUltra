@@ -89,7 +89,11 @@ export const mockLeads = [
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: null, // No next action due
+    nextActionDue: (() => {
+      const date = new Date()
+      date.setDate(date.getDate() + 3)
+      return date.toISOString()
+    })(), // Follow-up after test drive
     tags: ['Premium'],
     stage: 'Open', // Changed to Open to trigger urgency banner
     isDisqualified: false,
@@ -225,7 +229,11 @@ export const mockLeads = [
       date.setDate(date.getDate() - 2)
       return date.toISOString()
     })(),
-    nextActionDue: null,
+    nextActionDue: (() => {
+      const date = new Date()
+      date.setDate(date.getDate() - 1)
+      return date.toISOString()
+    })(),
     tags: [],
     stage: 'Not Valid',
     isDisqualified: true,
@@ -272,7 +280,11 @@ export const mockLeads = [
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: null,
+    nextActionDue: (() => {
+      const date = new Date()
+      date.setDate(date.getDate() - 1)
+      return date.toISOString()
+    })(),
     tags: [],
     stage: 'Not Interested',
     isDisqualified: true,
@@ -331,7 +343,11 @@ export const mockLeads = [
       date.setDate(date.getDate() - 3)
       return date.toISOString()
     })(),
-    nextActionDue: null,
+    nextActionDue: (() => {
+      const date = new Date()
+      date.setDate(date.getDate() - 1)
+      return date.toISOString()
+    })(),
     tags: [],
     stage: 'Closed Failed',
     isDisqualified: true,
@@ -1294,7 +1310,11 @@ export const mockLeads = [
       date.setDate(date.getDate() - 3)
       return date.toISOString()
     })(),
-    nextActionDue: null,
+    nextActionDue: (() => {
+      const date = new Date()
+      date.setDate(date.getDate() - 1)
+      return date.toISOString()
+    })(),
     tags: [],
     stage: 'Not Valid',
     isDisqualified: true,
@@ -1365,7 +1385,11 @@ export const mockLeads = [
       date.setDate(date.getDate() - 2)
       return date.toISOString()
     })(),
-    nextActionDue: null,
+    nextActionDue: (() => {
+      const date = new Date()
+      date.setDate(date.getDate() - 1)
+      return date.toISOString()
+    })(),
     tags: [],
     stage: 'Not Interested',
     isDisqualified: true,
@@ -1498,7 +1522,11 @@ export const mockLeads = [
       date.setHours(date.getHours() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: null, // No deadline set yet - very fresh lead
+    nextActionDue: (() => {
+      const date = new Date()
+      date.setDate(date.getDate() + 1)
+      return date.toISOString()
+    })(), // Initial follow-up due tomorrow
     tags: [],
     stage: 'Open',
     isDisqualified: false,

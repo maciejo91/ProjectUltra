@@ -206,7 +206,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
         {
           accessorKey: 'customer',
           header: 'Customer',
-          meta: { 
+          meta: {
             title: 'Customer',
             onOpen: (row) => handleRowClick(row.original)
           },
@@ -340,7 +340,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
         {
           accessorKey: 'customer',
           header: 'Customer',
-          meta: { 
+          meta: {
             title: 'Customer',
             onOpen: (row) => handleRowClick(row.original)
           },

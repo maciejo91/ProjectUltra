@@ -15,7 +15,7 @@
         @update:pagination="pagination = $event"
       />
       </div>
-      <div class="data-table-inner table-search-wrapper">
+      <div class="data-table-inner table-search-wrapper" @click="onTableContainerClick">
       <DataTable 
         :data="paginatedData" 
         :columns="columns"
@@ -88,6 +88,7 @@ import { formatDueDate, formatDeadlineFull, getDeadlineStatus } from '@/utils/fo
 import { useCustomersTable } from '@/composables/useCustomersTable'
 import { getDisplayStage } from '@/utils/stageMapper'
 import { useTableRowSelection } from '@/composables/useTableRowSelection'
+import { useTableRowClick } from '@/composables/useTableRowClick'
 import { useDataTableData } from '@/composables/useDataTableData'
 
 const opportunitiesStore = useOpportunitiesStore()
@@ -171,6 +172,8 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
     row.lastActivity
   ]
 })
+
+const { onTableContainerClick } = useTableRowClick(paginatedData, handleRowClick)
 
 const assigneeOptions = computed(() => {
   const names = [...new Set(rows.value.map(r => r.assignee).filter(Boolean))]

@@ -174,9 +174,8 @@
       </div>
     </div>
     
-    <!-- Table View - Takes remaining space, drawer shown on top when task selected.
-         Table uses allTasks only; TaskFilters (button + chips) apply to card view list only. -->
-    <div v-if="viewMode === 'table'" class="flex-1 flex flex-col overflow-hidden min-w-0 relative">
+    <!-- Table View - Same structure as Customers: page-container, scroll area with padding, white card. -->
+    <div v-if="viewMode === 'table'" class="page-container relative flex flex-col flex-1 overflow-hidden min-w-0 h-full bg-surface">
       <TasksTableView
         :tasks="allTasks"
         :current-task-id="drawerTask?.compositeId"
