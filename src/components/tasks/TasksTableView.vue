@@ -399,10 +399,24 @@ const columns = computed(() => [
       const condition = getVehicleConditionDisplay(task)
       const priceStr = price != null && price !== '' ? `€${formatCurrency(price)}` : ''
       const conditionStr = condition ? ` (${condition})` : ''
+      const metaLine = [priceStr, conditionStr].filter(Boolean).join('')
       return h('div', { class: 'flex flex-col min-w-0' }, [
         h('div', { class: 'text-content font-medium text-foreground truncate' }, vehicleInfo),
-        h('div', { class: 'text-meta' }, `${priceStr}${conditionStr}`.trim() || '—')
+        h('div', { class: 'text-meta' }, metaLine || '—')
       ])
+    }
+  },
+  {
+    id: 'vin',
+    accessorKey: 'vin',
+    header: 'VIN',
+    meta: { title: 'VIN' },
+    cell: ({ row }) => {
+      const task = row.original
+      const vehicle = task.type === 'lead' ? task.requestedCar : (task.vehicle || task.requestedCar)
+      const vin = vehicle?.vin ?? task.requestedCar?.vin
+      if (!vin) return h('span', { class: 'text-meta' }, '—')
+      return h('div', { class: 'text-meta text-xs truncate font-mono min-w-0' }, vin)
     }
   },
   {
@@ -483,6 +497,7 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
     row.customer?.phone,
     getCustomerCity(row),
     getVehicleInfo(row),
+    (row.vehicle || row.requestedCar)?.vin,
     row.type === 'lead' ? row.status : (row.displayStage ?? row.stage),
     row.type,
     row.source,

@@ -17,7 +17,8 @@ export const mockOpportunities = [
       kilometers: 0,
       status: 'New',
       stockDays: 5,
-      requestMessage: 'What are the financing options for the 3 Series?'
+      requestMessage: 'What are the financing options for the 3 Series?',
+      vin: 'WBA3B1C50EK123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -59,7 +60,8 @@ export const mockOpportunities = [
       kilometers: 0,
       status: 'New',
       stockDays: 8,
-      requestMessage: 'What is the warranty coverage on this vehicle?'
+      requestMessage: 'What is the warranty coverage on this vehicle?',
+      vin: 'WAUZZZ8V9KA123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -130,7 +132,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 5000,
       status: 'Used',
-      stockDays: 20
+      stockDays: 20,
+      vin: 'WDDWF4KB0KR123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -208,7 +211,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 30
+      stockDays: 30,
+      vin: 'WP0ZZZ9XZPS123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -296,7 +300,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 12
+      stockDays: 12,
+      vin: 'WBA5R7C05NG123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -383,7 +388,8 @@ export const mockOpportunities = [
       gearType: 'Manual',
       kilometers: 0,
       status: 'New',
-      stockDays: 8
+      stockDays: 8,
+      vin: 'WP0ZZZ99ZPS234567'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -444,8 +450,8 @@ export const mockOpportunities = [
     customerId: 11,
     requestedCar: { 
       brand: 'Porsche', 
-      model: 'Macan', 
-      year: 2024, 
+model: 'Macan',
+      year: 2024,
       price: 85000,
       image: 'https://images.unsplash.com/photo-1611651338412-8403fa6e3599?w=900&auto=format&fit=crop&q=60',
       dealership: 'Frankfurt',
@@ -453,7 +459,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 0
+      stockDays: 0,
+      vin: 'WP0ZZZ9YZPS345678'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -567,7 +574,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 18
+      stockDays: 18,
+      vin: 'WDD2GA4E78K123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -674,7 +682,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 25
+      stockDays: 25,
+      vin: 'SALWA2FK4LA123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -717,7 +726,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 3
+      stockDays: 3,
+      vin: 'WAUZZZ4G5EN123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -830,7 +840,8 @@ export const mockOpportunities = [
       gearType: 'Manual',
       kilometers: 0,
       status: 'New',
-      stockDays: 7
+      stockDays: 7,
+      vin: 'WVWZZZ3CZWE123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -939,7 +950,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 2
+      stockDays: 2,
+      vin: '5YJ3E1EA1NF123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1004,7 +1016,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 10
+      stockDays: 10,
+      vin: 'YV1LS56A1X1123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1069,7 +1082,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 4
+      stockDays: 4,
+      vin: 'JTJHY7AX0K4123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1140,7 +1154,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 0
+      stockDays: 0,
+      vin: 'WBA3B1C50EK654321'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1261,7 +1276,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 0
+      stockDays: 0,
+      vin: 'ZFF79RHA5R1234567'
     },
     vehicle: {
       brand: 'Ferrari',
@@ -1348,7 +1364,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 0
+      stockDays: 0,
+      vin: 'ZFF79RHA5R1234567'
     },
     vehicle: {
       brand: 'BMW',
@@ -1401,7 +1418,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 0
+      stockDays: 0,
+      vin: 'ZFF79RHA5R1234567'
     },
     vehicle: {
       brand: 'Ferrari',
@@ -1473,7 +1491,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 5
+      stockDays: 5,
+      vin: 'WBA3B1C50EK789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1502,7 +1521,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 8
+      stockDays: 8,
+      vin: 'WAUZZZ8V9KA789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1531,7 +1551,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 10
+      stockDays: 10,
+      vin: 'YV1LS56A1X1123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1560,7 +1581,8 @@ export const mockOpportunities = [
       gearType: 'Manual',
       kilometers: 0,
       status: 'New',
-      stockDays: 7
+      stockDays: 7,
+      vin: 'WVWZZZ3CZWE123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1589,7 +1611,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 12
+      stockDays: 12,
+      vin: 'WBA5R7C05NG789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1618,7 +1641,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 15
+      stockDays: 15,
+      vin: 'WAUZZZ4G8EN789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1666,7 +1690,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 8
+      stockDays: 8,
+      vin: 'WAUZZZ8V9KA789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1713,7 +1738,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 6
+      stockDays: 6,
+      vin: 'WBA5R9C08NG789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1763,7 +1789,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 9
+      stockDays: 9,
+      vin: 'WDD2GA4E79K789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1811,7 +1838,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 11
+      stockDays: 11,
+      vin: 'WAUZZZ4G5EN789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1860,7 +1888,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 14
+      stockDays: 14,
+      vin: 'WBA5R7C05NG654321'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1907,7 +1936,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 3
+      stockDays: 3,
+      vin: 'WAUZZZ4G5EN123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -1956,7 +1986,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 1
+      stockDays: 1,
+      vin: '5YJ3E1EA1NF789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2007,7 +2038,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 10
+      stockDays: 10,
+      vin: 'YV1LS56A1X1123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2054,7 +2086,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 8
+      stockDays: 8,
+      vin: 'WAUZZZ8V9KA789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2101,7 +2134,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 12
+      stockDays: 12,
+      vin: 'WBA5R7C05NG789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2165,7 +2199,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 2
+      stockDays: 2,
+      vin: '5YJ3E1EA1NF123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2233,7 +2268,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 13
+      stockDays: 13,
+      vin: 'WP0ZZZ9XZPS789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2280,7 +2316,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 7
+      stockDays: 7,
+      vin: 'WVWZZZ3CZWE123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2344,7 +2381,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 9
+      stockDays: 9,
+      vin: 'WDD2GA4E79K789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2412,7 +2450,8 @@ export const mockOpportunities = [
       gearType: 'Manual',
       kilometers: 0,
       status: 'New',
-      stockDays: 2
+      stockDays: 2,
+      vin: '5YJ3E1EA1NF123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2462,7 +2501,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 1
+      stockDays: 1,
+      vin: '5YJ3E1EA1NF789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2531,7 +2571,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 4
+      stockDays: 4,
+      vin: 'JTJHY7AX0K4123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2589,7 +2630,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 0
+      stockDays: 0,
+      vin: 'WBA3B1C50EK654321'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2655,7 +2697,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 3
+      stockDays: 3,
+      vin: 'WAUZZZ4G5EN123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -2715,7 +2758,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 5
+      stockDays: 5,
+      vin: 'WBA5R9C08NG123457'
     },
     vehicle: { 
       brand: 'Porsche', 
@@ -2788,7 +2832,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 6
+      stockDays: 6,
+      vin: 'WBA5R9C08NG123458'
     },
     vehicle: { 
       brand: 'BMW', 
@@ -2888,7 +2933,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 4
+      stockDays: 4,
+      vin: 'JTJHY7AX0K4123457'
     },
     vehicle: { 
       brand: 'Audi', 
@@ -2961,7 +3007,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 2
+      stockDays: 2,
+      vin: '5YJ3E1EA1NF123457'
     },
     vehicle: { 
       brand: 'Mercedes-Benz', 
@@ -3036,7 +3083,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 1
+      stockDays: 1,
+      vin: '5YJ3E1EA1NF123458'
     },
     vehicle: { 
       brand: 'BMW', 
@@ -3109,7 +3157,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 0
+      stockDays: 0,
+      vin: 'ZFF79RHA5R1234567'
     },
     vehicle: { 
       brand: 'Porsche', 
@@ -3202,7 +3251,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 10
+      stockDays: 10,
+      vin: 'YV1LS56A1X1123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -3263,7 +3313,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 7
+      stockDays: 7,
+      vin: 'WVWZZZ3CZWE123456'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -3314,7 +3365,8 @@ export const mockOpportunities = [
       gearType: 'Manual',
       kilometers: 0,
       status: 'New',
-      stockDays: 12
+      stockDays: 12,
+      vin: 'WBA5R7C05NG789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -3346,7 +3398,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 9
+      stockDays: 9,
+      vin: 'WDD2GA4E79K789012'
     },
     vehicle: null,
     selectedVehicle: null,
@@ -3375,7 +3428,8 @@ export const mockOpportunities = [
       gearType: 'Automatic',
       kilometers: 0,
       status: 'New',
-      stockDays: 11
+      stockDays: 11,
+      vin: 'WAUZZZ4G5EN789012'
     },
     vehicle: null,
     selectedVehicle: null,

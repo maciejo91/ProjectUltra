@@ -53,6 +53,7 @@
               if (!task.requestedCar) return 'No vehicle specified'
               const car = task.requestedCar
               const parts = [`${car.brand} ${car.model}`]
+              if (car.vin) parts.push(car.vin)
               if (car.kilometers !== undefined && car.kilometers !== null) {
                 parts.push(`${car.kilometers} km`)
               }
@@ -65,6 +66,7 @@
             const vehicle = task.vehicle || task.requestedCar
             if (!vehicle) return 'No vehicle specified'
             const parts = [`${vehicle.brand} ${vehicle.model}`]
+            if (vehicle.vin) parts.push(vehicle.vin)
             if (vehicle.kilometers !== undefined && vehicle.kilometers !== null) {
               parts.push(`${vehicle.kilometers} km`)
             }
