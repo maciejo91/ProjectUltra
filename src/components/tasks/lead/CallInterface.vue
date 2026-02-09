@@ -1,7 +1,7 @@
 <template>
   <div>
-    <!-- Call Action Buttons Row (hidden when hideButton is true or call is already active) -->
-    <div v-if="!hideButton && !isCallActive && !callEnded" class="flex items-center justify-between gap-3 mb-1 w-full">
+    <!-- Call Action Buttons Row (hidden when hideButton is true or call is already active; stays visible after call ends for Call Again) -->
+    <div v-if="!hideButton && !isCallActive" class="flex items-center justify-between gap-3 mb-1 w-full">
       <Button
         variant="default"
         :disabled="isCallActive"
@@ -143,14 +143,6 @@
                 </div>
               </div>
 
-              <!-- Extract information: always visible under transcript, right-aligned -->
-              <div v-if="callEnded && !isCallActive" class="flex justify-end pt-3 shrink-0">
-                <AIButton
-                  label="Extract information"
-                  size="small"
-                  @click="$emit('extract-information')"
-                />
-              </div>
             </div>
           </div>
 
@@ -174,11 +166,12 @@
                 type="button"
                 variant="outline"
                 size="icon"
-                class="w-10 h-10 rounded-full shrink-0 bg-greys-800 hover:bg-greys-700 border-0 text-white"
+                class="call-popup-mic-btn w-10 h-10 rounded-full shrink-0 bg-greys-800 hover:bg-greys-800 border-0 text-white"
                 :aria-label="isMuted ? 'Unmute' : 'Mute'"
                 @click="$emit('toggle-mute')"
               >
-                <Mic :size="20" aria-hidden="true" />
+                <MicOff v-if="isMuted" :size="20" aria-hidden="true" />
+                <Mic v-else :size="20" aria-hidden="true" />
               </Button>
               <Button
                 v-if="isCallActive"
@@ -187,19 +180,27 @@
                 size="icon"
                 class="w-10 h-10 rounded-full shrink-0 bg-red-600 hover:bg-red-700 border-0 text-white"
                 :aria-label="t('common.call.endCall')"
-                @click="$emit('end-call')"
+                @click="onEndCallClick"
               >
                 <PhoneOff :size="20" aria-hidden="true" />
               </Button>
-              <Button
-                v-if="callEnded && !isCallActive"
-                type="button"
-                variant="outline"
-                class="shrink-0 rounded-sm bg-greys-800 border border-greys-700 text-white hover:bg-greys-700 hover:text-white"
-                @click="$emit('close')"
-              >
-                {{ t('common.buttons.close') }}
-              </Button>
+              <template v-if="callEnded && !isCallActive">
+                <AIButton
+                  label="Extract with AI"
+                  size="small"
+                  class="extract-with-ai-btn shrink-0"
+                  :loading="extractLoading"
+                  @click="onExtractAndClose"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  class="shrink-0 rounded-sm bg-greys-800 border border-greys-700 text-white hover:bg-greys-700 hover:text-white"
+                  @click="emit('close')"
+                >
+                  {{ t('common.buttons.close') }}
+                </Button>
+              </template>
             </div>
           </div>
         </div>
@@ -240,8 +241,8 @@
 </template>
 
 <script setup>
-import { Phone, ChevronDown, Sparkles, Mic, PhoneOff, AlertTriangle } from 'lucide-vue-next'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { Phone, ChevronDown, Sparkles, Mic, MicOff, PhoneOff, AlertTriangle } from 'lucide-vue-next'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   Button,
@@ -315,8 +316,8 @@ const emit = defineEmits(['start-call', 'end-call', 'close', 'toggle-mute', 'log
 
 const { t } = useI18n()
 const headerIconSize = 20
-const detailsVisible = ref(false)
-const transcriptExpanded = ref(false)
+const detailsVisible = ref(true)
+const transcriptExpanded = ref(true)
 const transcriptPreviewCount = 3
 
 const transcriptLines = computed(() => {
@@ -336,6 +337,7 @@ const visibleTranscriptLines = computed(() => {
   return transcriptLines.value.slice(0, transcriptPreviewCount)
 })
 const showCloseConfirm = ref(false)
+const extractLoading = ref(false)
 const floatingPanelRef = ref(null)
 
 // Draggable state
@@ -368,12 +370,34 @@ const floatingPanelStyle = computed(() => {
   }
 })
 
+// When call ends, expand popup to show transcription
+watch(() => props.callEnded, (ended) => {
+  if (ended) {
+    detailsVisible.value = true
+    transcriptExpanded.value = true
+  }
+})
+
 function onCloseClick() {
   if (props.isCallActive) {
     showCloseConfirm.value = true
   } else {
     emit('close')
   }
+}
+
+function onEndCallClick() {
+  emit('end-call')
+}
+
+function onExtractAndClose() {
+  extractLoading.value = true
+  emit('extract-information')
+  const simulatedDelayMs = 1500
+  setTimeout(() => {
+    extractLoading.value = false
+    emit('close')
+  }, simulatedDelayMs)
 }
 
 function confirmClose() {
@@ -427,3 +451,10 @@ onUnmounted(() => {
 })
 
 </script>
+
+<style scoped>
+.call-popup-mic-btn:hover,
+.call-popup-mic-btn:hover :deep(svg) {
+  color: white;
+}
+</style>

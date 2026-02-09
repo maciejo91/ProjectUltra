@@ -47,9 +47,15 @@
             <!-- Show Closed Toggle -->
             <button
               @click="$emit('toggle-closed', !showClosed)"
-              class="group flex items-center gap-2 rounded-xl border border-border px-3 py-1.5 bg-surface text-sm font-medium text-muted-foreground hover:border-red-100 hover:bg-red-50 hover:text-brand-red transition-all"
+              :class="[
+                'group flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium transition-all',
+                showClosed
+                  ? 'border-red-200 bg-red-50 text-brand-red'
+                  : 'border-border bg-surface text-muted-foreground hover:border-red-100 hover:bg-red-50 hover:text-brand-red'
+              ]"
+              :aria-pressed="showClosed"
             >
-              <EyeOff class="w-4 h-4 shrink-0 text-muted-foreground group-hover:text-brand-red" />
+              <EyeOff :class="['w-4 h-4 shrink-0', showClosed ? 'text-brand-red' : 'text-muted-foreground group-hover:text-brand-red']" />
               <span class="hidden sm:inline">Show Closed</span>
             </button>
           </div>
@@ -80,9 +86,10 @@
       :class="{ 'hide-table-filter': !hasActiveFilters }"
     >
       <DataTable 
-            :data="paginatedData" 
+            :data="displayedData" 
             :columns="columns"
             :meta="tableMeta"
+            :loading="tableLoading"
             @row-click="handleRowClick"
             :columnFiltersOptions="{
               filterDefs: filterDefinitions
@@ -142,7 +149,7 @@
 </template>
 
 <script setup>
-import { ref, computed, h, watch, nextTick } from 'vue'
+import { ref, computed, h, watch, nextTick, onUnmounted } from 'vue'
 import { Table, LayoutGrid, EyeOff, ListTodo, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
@@ -222,8 +229,10 @@ const pagination = ref({
 
 const globalFilter = ref(props.initialGlobalFilter || '')
 const sorting = ref([])
-// Default filter: type = lead
-const columnFilters = ref([{ key: 'type', value: 'lead', operator: 'eq' }])
+const columnFilters = ref([
+  { id: 'type-1', field: 'type', value: '', operator: 'eq', pinned: true },
+  { id: 'status-1', field: 'status', value: [], operator: 'in', pinned: true }
+])
 // Default visible columns: Task details, Due date, Customer, Vehicle, Assigned (hide Created, Attempts, VIN, Request message, Source)
 const columnVisibility = ref({
   createdAt: false,
@@ -238,9 +247,14 @@ watch(globalFilter, (newValue) => {
   emit('update:globalFilter', newValue)
 })
 
+const hasActiveFilters = computed(() => {
+  const hasColumnFilters = Array.isArray(columnFilters.value) && columnFilters.value.length > 0
+  const hasSearch = Boolean(globalFilter.value && String(globalFilter.value).trim())
+  return hasColumnFilters || hasSearch
+})
+
 // Table has its own filters (column filters); TaskFilters button/chips apply to card view only.
 const { filterDefinitions } = useTasksTableFilters({
-  typeFilter: computed(() => 'all'),
   showTypeFilter: computed(() => true),
   tasks: computed(() => props.tasks)
 })
@@ -465,14 +479,30 @@ const columns = computed(() => [
   }
 ])
 
-// Filter → sort → paginate for DataTable (guide pattern) - must be after columns
+// Filter → sort → paginate for DataTable - maps filter keys to row values (aligned with columns)
 const getTaskFilterValue = (row, key) => {
   if (key === 'requestedCarBrand') {
-    const car = row.type === 'lead' ? row.requestedCar : row.vehicle
+    const car = row.type === 'lead' ? row.requestedCar : (row.vehicle || row.requestedCar)
     return car?.brand
   }
   if (key === 'status') {
-    return row.type === 'lead' ? row.status : (row.displayStage ?? row.stage)
+    return row.displayStage ?? row.status ?? row.stage
+  }
+  if (key === 'assignee') {
+    const val = row.assignee
+    return val || '__unassigned__'
+  }
+  if (key === 'nextActionDue') {
+    return row.nextActionDue ?? row.dueDate
+  }
+  if (key === 'urgencyLevel') {
+    if (row.type !== 'lead') return undefined
+    if (row.urgencyLevel) return row.urgencyLevel
+    try {
+      return calculateLeadUrgency(row).level
+    } catch {
+      return undefined
+    }
   }
   return getNestedProperty(row, key)
 }
@@ -518,6 +548,43 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
     row.taskStatusBadge
   ],
   getFilterValue: getTaskFilterValue
+})
+
+// Simulate backend filtering: show loading state only when user changes filters/sort/pagination (not when tasks list reference changes e.g. opening drawer)
+const BACKEND_FILTER_DELAY_MS = 250
+const tableLoading = ref(true)
+const displayedData = ref([])
+let fetchTimeout = null
+
+function applySimulatedBackendFetch() {
+  if (fetchTimeout) clearTimeout(fetchTimeout)
+  tableLoading.value = true
+  fetchTimeout = setTimeout(() => {
+    displayedData.value = [...paginatedData.value]
+    tableLoading.value = false
+    fetchTimeout = null
+  }, BACKEND_FILTER_DELAY_MS)
+}
+
+// User-initiated changes: show loading then update table
+watch(
+  [globalFilter, columnFilters, sorting, pagination],
+  applySimulatedBackendFetch,
+  { immediate: true, deep: true }
+)
+
+// Tasks list changed (e.g. one lead updated when opening drawer): refresh table data without loading
+watch(
+  () => props.tasks,
+  () => {
+    displayedData.value = [...paginatedData.value]
+    tableLoading.value = false
+  },
+  { deep: true }
+)
+
+onUnmounted(() => {
+  if (fetchTimeout) clearTimeout(fetchTimeout)
 })
 
 const handleRowClick = (record) => {

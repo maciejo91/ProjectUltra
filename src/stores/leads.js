@@ -54,11 +54,9 @@ export const useLeadsStore = defineStore('leads', () => {
       const loadedLead = await leadsApi.fetchLeadById(id)
       currentLead.value = loadedLead
       
-      // Sync back to leads list to keep list and detail view in sync
-      const index = leads.value.findIndex(l => l.id === parseInt(id))
-      if (index !== -1) {
-        leads.value[index] = loadedLead
-      }
+      // Sync back to leads list so computeds (e.g. allTasks → drawerTask) reliably update
+      const numericId = parseInt(id, 10)
+      leads.value = leads.value.map(l => (l.id === numericId ? loadedLead : l))
       
       // Activities will be loaded via watch on currentLead
       

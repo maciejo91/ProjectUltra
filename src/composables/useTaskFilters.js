@@ -5,7 +5,10 @@ import { useUserStore } from '@/stores/user'
 import { useUsersStore } from '@/stores/users'
 import { useSettingsStore } from '@/stores/settings'
 import { getDisplayStage } from '@/utils/stageMapper'
+import { OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 import { calculateLeadUrgency } from '@/composables/useLeadUrgency'
+
+const CLOSED_OPPORTUNITY_STAGES = [OPPORTUNITY_STAGES.CLOSED_WON, OPPORTUNITY_STAGES.CLOSED_LOST, OPPORTUNITY_STAGES.ABANDONED]
 
 /**
  * Composable for task filtering logic
@@ -44,7 +47,14 @@ export function useTaskFilters(showClosed) {
       return task
     })
     
-    const opportunities = opportunitiesStore.opportunities.map(opp => {
+    const visibleOpportunities = showClosed.value
+      ? opportunitiesStore.opportunities
+      : opportunitiesStore.opportunities.filter(opp => {
+          const displayStage = getDisplayStage(opp, 'opportunity')
+          return !CLOSED_OPPORTUNITY_STAGES.includes(displayStage)
+        })
+
+    const opportunities = visibleOpportunities.map(opp => {
       // Calculate displayStage for opportunity
       const displayStage = getDisplayStage(opp, 'opportunity')
       

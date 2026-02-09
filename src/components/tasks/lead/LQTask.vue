@@ -66,7 +66,7 @@
       <!-- Contact block: white card -->
       <div class="pt-1 px-1">
         <div
-          class="bg-white rounded-lg shadow-nsc-card overflow-hidden border border-primary"
+          class="bg-white rounded-lg shadow-nsc-card overflow-hidden"
         >
         <DeadlineBanner
           :next-action-due="lead.nextActionDue"
@@ -136,8 +136,8 @@
                 @update:model-value="(p) => selectOutcome(p ? 'no-answer' : null)"
                 class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
               >
-                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-slate-500">
-                  <PhoneOff :size="4" class="text-white" />
+                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-muted">
+                  <PhoneOff :size="4" class="text-muted-foreground" />
                 </span>
                 <span>No answer</span>
               </Toggle>
@@ -147,8 +147,8 @@
                 @update:model-value="(p) => selectOutcome(p ? 'not-valid' : null)"
                 class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
               >
-                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-rose-500">
-                  <ThumbsDown :size="4" class="text-white" />
+                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-muted">
+                  <ThumbsDown :size="4" class="text-muted-foreground" />
                 </span>
                 <span>No interest/invalid</span>
               </Toggle>
@@ -158,8 +158,8 @@
                 @update:model-value="(p) => selectOutcome(p ? 'interested' : null)"
                 class="outcome-toggle-item w-full h-14 min-w-0 shadow-mk-dashboard-card border-0 text-2xl"
               >
-                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-emerald-500">
-                  <Check :size="4" class="text-white" />
+                <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-md bg-muted">
+                  <Check :size="4" class="text-muted-foreground" />
                 </span>
                 <span>Interested</span>
               </Toggle>
@@ -1055,6 +1055,7 @@ import { useUserStore } from '@/stores/user'
 import { useSettingsStore } from '@/stores/settings'
 import { useLeadsStore } from '@/stores/leads'
 import { formatDate, formatTime } from '@/utils/formatters'
+import { mergeContactIntoDescription } from '@/utils/taskActionTitle'
 import { useLeadActions } from '@/composables/useLeadActions'
 import { LEAD_STAGES } from '@/utils/stageMapper'
 import { useLQWidgetCall } from '@/composables/useLQWidgetCall'
@@ -1374,7 +1375,10 @@ const dynamicTitle = computed(() => {
 })
 
 const dynamicDescription = computed(() => {
-  return leadState.primaryAction.value?.description || 'Begin lead qualification by verifying customer contact information.'
+  const base = leadState.primaryAction.value?.description || 'Begin lead qualification by verifying customer contact information.'
+  const name = props.lead.customer?.name ?? ''
+  const phone = props.lead.customer?.phone ?? ''
+  return mergeContactIntoDescription(base, name, phone)
 })
 
 const isOverdue = computed(() => {
@@ -2306,6 +2310,7 @@ const handleVehicleSave = async (data) => {
         ? list.map((t) => (String(t.id) === String(fullItem.id) ? fullItem : t))
         : [...list, fullItem]
       await leadsStore.updateLead(props.lead.id, { tradeIns: updatedList })
+      await leadsStore.fetchLeadById(props.lead.id)
       editingTradeIn.value = null
     } else {
       const { addVehicleToCustomer } = await import('@/api/contacts')

@@ -1,29 +1,29 @@
 import { computed } from 'vue'
+import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 
 /**
  * Composable for TasksTableView filter definitions
- * Provides filter definitions for DataTable component
- * 
+ * Provides filter definitions for DataTable component aligned with columns and task data
+ *
  * @param {Object} params - Parameters object
- * @param {import('vue').Ref<string>} params.typeFilter - Type filter ('all', 'lead', 'opportunity')
  * @param {import('vue').Ref<boolean>} params.showTypeFilter - Whether to show type filter
  * @param {Array} params.tasks - Tasks array for dynamic filter options
  * @returns {Object} Object containing filterDefinitions
  */
-export function useTasksTableFilters({ typeFilter, showTypeFilter, tasks }) {
+export function useTasksTableFilters({ showTypeFilter, tasks }) {
   const filterDefinitions = computed(() => {
+    const taskList = tasks.value ?? []
     const defs = []
-    
-    // Type filter (only if showTypeFilter is true)
+
+    // Type filter - matches Task details column (lead/opportunity badge)
     if (showTypeFilter.value) {
       defs.push({
         key: 'type',
         label: 'Type',
         type: 'select',
-        operators: [
-          { value: 'eq', label: 'is' }
-        ],
+        operators: [{ value: 'eq', label: 'is' }],
         options: [
+          { value: '', label: 'All' },
           { value: 'lead', label: 'Lead' },
           { value: 'opportunity', label: 'Opportunity' }
         ],
@@ -31,8 +31,19 @@ export function useTasksTableFilters({ typeFilter, showTypeFilter, tasks }) {
         pinned: true
       })
     }
-    
-    // Status/Stage filter
+
+    // Status/Stage filter - matches Task details column (status badge), dynamic options from tasks
+    const uniqueStatuses = [...new Set(
+      taskList.map(t => t.displayStage ?? t.status ?? t.stage).filter(Boolean)
+    )].sort()
+    const statusOptions = uniqueStatuses.length > 0
+      ? uniqueStatuses.map(s => ({ value: s, label: s }))
+      : [
+          ...Object.values(LEAD_STAGES),
+          ...Object.values(OPPORTUNITY_STAGES),
+          'In Negotiation - Offer Sent',
+          'In Negotiation - Contract Pending'
+        ].filter((v, i, a) => a.indexOf(v) === i).map(s => ({ value: s, label: s }))
     defs.push({
       key: 'status',
       label: 'Status',
@@ -41,56 +52,50 @@ export function useTasksTableFilters({ typeFilter, showTypeFilter, tasks }) {
         { value: 'in', label: 'is any of' },
         { value: 'notIn', label: 'is none of' }
       ],
-      options: [
-        { value: 'Valid', label: 'Valid' },
-        { value: 'Not valid', label: 'Not valid' },
-        { value: 'Qualified', label: 'Qualified' },
-        { value: 'In Negotiation', label: 'In Negotiation' },
-        { value: 'Won', label: 'Won' },
-        { value: 'Lost', label: 'Lost' },
-        { value: 'Not interested', label: 'Not interested' },
-        { value: 'Open', label: 'Open' }
-      ],
-      aiHint: 'Lead status or opportunity stage',
+      options: statusOptions,
+      aiHint: 'Lead status or opportunity stage (e.g. Valid, Qualified, In Negotiation)',
       pinned: true
     })
-    
-    // Priority filter
+
+    // Priority filter - matches task priority (leads)
     defs.push({
       key: 'priority',
       label: 'Priority',
       type: 'select',
-      operators: [
-        { value: 'eq', label: 'is' }
-      ],
+      operators: [{ value: 'eq', label: 'is' }],
       options: [
         { value: 'Hot', label: 'High' },
         { value: 'Normal', label: 'Normal' }
       ],
       aiHint: 'Task priority level'
     })
-    
-    // Urgency level filter (only for leads)
-    if (typeFilter.value === 'lead') {
-      defs.push({
-        key: 'urgencyLevel',
-        label: 'Urgency',
-        type: 'select',
-        operators: [
-          { value: 'eq', label: 'is' }
-        ],
-        options: [
-          { value: 'HOT', label: '🔥 Hot' },
-          { value: 'WARM', label: '🟡 Warm' },
-          { value: 'STANDARD', label: '🟢 Standard' },
-          { value: 'COLD', label: '⚪ Cold' }
-        ],
-        aiHint: 'Lead urgency level based on scoring',
-        pinned: true
-      })
-    }
-    
-    // Source filter
+
+    // Urgency level filter - for leads (displayStage/urgency)
+    defs.push({
+      key: 'urgencyLevel',
+      label: 'Urgency',
+      type: 'select',
+      operators: [{ value: 'eq', label: 'is' }],
+      options: [
+        { value: 'HOT', label: 'Hot' },
+        { value: 'WARM', label: 'Warm' },
+        { value: 'STANDARD', label: 'Standard' },
+        { value: 'COLD', label: 'Cold' }
+      ],
+      aiHint: 'Lead urgency level (leads only)',
+      pinned: true
+    })
+
+    // Source filter - matches Source column, dynamic options
+    const uniqueSources = [...new Set(taskList.map(t => t.source).filter(Boolean))].sort()
+    const sourceOptions = uniqueSources.length > 0
+      ? uniqueSources.map(s => ({ value: s, label: s }))
+      : [
+          { value: 'Marketing', label: 'Marketing' },
+          { value: 'Website', label: 'Website' },
+          { value: 'Referral', label: 'Referral' },
+          { value: 'Walk-in', label: 'Walk-in' }
+        ]
     defs.push({
       key: 'source',
       label: 'Source',
@@ -99,60 +104,54 @@ export function useTasksTableFilters({ typeFilter, showTypeFilter, tasks }) {
         { value: 'in', label: 'is any of' },
         { value: 'notIn', label: 'is none of' }
       ],
-      options: [
-        { value: 'Marketing', label: 'Marketing' },
-        { value: 'Website', label: 'Website' },
-        { value: 'Referral', label: 'Referral' },
-        { value: 'Walk-in', label: 'Walk-in' }
-      ],
+      options: sourceOptions,
       aiHint: 'Lead or opportunity source',
       pinned: true
     })
-    
-    // Assignee filter
-    const uniqueAssignees = [...new Set(tasks.value.map(t => t.assignee).filter(Boolean))]
-    if (uniqueAssignees.length > 0) {
-      defs.push({
-        key: 'assignee',
-        label: 'Assignee',
-        type: 'select',
-        operators: [
-          { value: 'eq', label: 'is' }
-        ],
-        options: uniqueAssignees.map(name => ({ value: name, label: name })),
-        aiHint: 'Person assigned to the task',
-        pinned: true
-      })
-    }
-    
-    // Requested car filter (for leads)
+
+    // Assignee filter - matches Assigned column
+    const uniqueAssignees = [...new Set(taskList.map(t => t.assignee).filter(Boolean))].sort()
+    const assigneeOptions = [
+      ...uniqueAssignees.map(name => ({ value: name, label: name })),
+      ...(taskList.some(t => !t.assignee) ? [{ value: '__unassigned__', label: 'Unassigned' }] : [])
+    ]
+    defs.push({
+      key: 'assignee',
+      label: 'Assigned',
+      type: 'select',
+      operators: [{ value: 'eq', label: 'is' }],
+      options: assigneeOptions.length > 0 ? assigneeOptions : [{ value: '__unassigned__', label: 'Unassigned' }],
+      aiHint: 'Person assigned to the task',
+      pinned: true
+    })
+
+    // Requested car / Vehicle brand - matches Vehicle column
     const uniqueBrands = [...new Set(
-      tasks.value
-        .map(t => {
-          const car = t.type === 'lead' ? t.requestedCar : t.vehicle
-          return car?.brand
-        })
-        .filter(Boolean)
-    )]
+      taskList.map(t => {
+        const car = t.type === 'lead' ? t.requestedCar : (t.vehicle || t.requestedCar)
+        return car?.brand
+      }).filter(Boolean)
+    )].sort()
     if (uniqueBrands.length > 0) {
       defs.push({
         key: 'requestedCarBrand',
-        label: 'Requested car',
+        label: 'Vehicle brand',
         type: 'multiselect',
         operators: [
           { value: 'in', label: 'is any of' },
           { value: 'notIn', label: 'is none of' }
         ],
         options: uniqueBrands.map(brand => ({ value: brand, label: brand })),
-        aiHint: 'Car brand requested by customer'
+        aiHint: 'Car brand requested or associated with the task'
       })
     }
-    
-    // Creation date filter
+
+    // Creation date - matches Created column
     defs.push({
       key: 'createdAt',
-      label: 'Creation date',
-      type: 'daterange',
+      label: 'Created',
+      type: 'inputrange',
+      inputType: 'date',
       operators: [
         { value: 'between', label: 'is between' },
         { value: 'gte', label: 'is after' },
@@ -160,7 +159,21 @@ export function useTasksTableFilters({ typeFilter, showTypeFilter, tasks }) {
       ],
       aiHint: 'Date when the task was created'
     })
-    
+
+    // Due date - matches Due date column
+    defs.push({
+      key: 'nextActionDue',
+      label: 'Due date',
+      type: 'inputrange',
+      inputType: 'date',
+      operators: [
+        { value: 'between', label: 'is between' },
+        { value: 'gte', label: 'is after' },
+        { value: 'lte', label: 'is before' }
+      ],
+      aiHint: 'Next action due date or task deadline'
+    })
+
     return defs
   })
 

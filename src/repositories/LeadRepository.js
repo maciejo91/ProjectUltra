@@ -1,30 +1,57 @@
 import { BaseRepository } from './BaseRepository.js'
 import { getMockData } from '@/api/mockData/localeLoader.js'
 
+const STORAGE_KEY = 'project-ultra-leads'
+
 /**
  * Lead Repository
  * 
  * Abstracts data access for leads.
  * Maps to REST API endpoint: /leads
  * 
- * Current implementation uses mock data arrays.
- * When real API is integrated, this will call REST endpoints:
- * - findAll() → GET /leads
- * - findById(id) → GET /leads/{id}
- * - create(data) → POST /leads
- * - update(id, data) → PUT /leads/{id}
- * - delete(id) → DELETE /leads/{id}
+ * Current implementation: in-memory array seeded from mock data (or localStorage
+ * if present). All create/update/delete persist to localStorage so changes survive
+ * page refresh. When real API is integrated, remove localStorage and call REST instead.
  */
 export class LeadRepository extends BaseRepository {
   constructor() {
     super([]) // Initialize with empty array, data loaded dynamically
   }
-  
+
+  /** @type {Array|null} Mutable copy of leads; rehydrated from localStorage or mock on first access */
+  _leadsCache = null
+
   /**
-   * Get current data source (locale-aware)
+   * Persist current leads to localStorage so data survives refresh.
+   */
+  _persist() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this._leadsCache))
+    } catch (e) {
+      // Ignore quota or private mode errors
+    }
+  }
+
+  /**
+   * Get current data source: from localStorage if previously saved, else deep-clone of mock leads.
    */
   get dataSource() {
-    return getMockData().mockLeads
+    if (this._leadsCache === null) {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY)
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          this._leadsCache = Array.isArray(parsed) ? parsed : []
+        }
+      } catch (_) {
+        this._leadsCache = []
+      }
+      if (this._leadsCache === null) {
+        const mock = getMockData().mockLeads
+        this._leadsCache = JSON.parse(JSON.stringify(mock || []))
+      }
+    }
+    return this._leadsCache
   }
 
   /**
@@ -111,6 +138,7 @@ export class LeadRepository extends BaseRepository {
     }
     
     this.dataSource.push(newLead)
+    this._persist()
     return newLead
   }
 
@@ -136,7 +164,7 @@ export class LeadRepository extends BaseRepository {
       ...updatesToStore, 
       lastActivity: new Date().toISOString() 
     }
-    
+    this._persist()
     return this.dataSource[index]
   }
 
@@ -154,6 +182,7 @@ export class LeadRepository extends BaseRepository {
     }
     
     this.dataSource.splice(index, 1)
+    this._persist()
     return { success: true }
   }
 

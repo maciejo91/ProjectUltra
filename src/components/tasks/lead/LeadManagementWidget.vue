@@ -26,6 +26,7 @@
         v-if="!leadState.isClosed.value && leadState.showLQWidget.value" 
         :key="lead.id"
         :lead="lead"
+        :activities="activities"
         :show-deadline-banner="leadState.showDeadlineBanner.value"
         @postponed="handlePostponed"
         @validated="handleValidated"
@@ -99,6 +100,10 @@ const props = defineProps({
   lead: {
     type: Object,
     required: true
+  },
+  activities: {
+    type: Array,
+    default: () => []
   }
 })
 
