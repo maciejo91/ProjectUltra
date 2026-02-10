@@ -851,6 +851,7 @@
       task-type="opportunity"
       :task-id="opportunity.id"
       :item="editingTradeIn"
+      :loading="tradeInActionLoading"
       @save="handleTradeInSave"
       @close="showTradeInModal = false; editingTradeIn = null"
     />
@@ -881,6 +882,7 @@
     v-if="showCreateOfferModal"
     :show="showCreateOfferModal"
     :opportunity="opportunity"
+    :trade-in-add-loading="tradeInActionLoading"
     @confirm="handleOfferCreatedFromModal"
     @cancel="closeCreateOfferModal"
     @open-add-tradein="editingTradeIn = null; showTradeInModal = true"
@@ -1557,6 +1559,7 @@ const showComingSoonModal = ref(false)
 const showViewAppointment = ref(false)
 const showEditAppointment = ref(false)
 const showTradeInModal = ref(false)
+const tradeInActionLoading = ref(false)
 const showFinancingModal = ref(false)
 const editingTradeIn = ref(null)
 const editingFinancingOption = ref(null)
@@ -2001,6 +2004,7 @@ async function handleFinancingSave(data) {
 }
 
 async function handleTradeInSave(data) {
+  tradeInActionLoading.value = true
   try {
     const opp = getCurrentOpportunity()
     const v = data.vehicle || {}
@@ -2021,6 +2025,8 @@ async function handleTradeInSave(data) {
     showTradeInModal.value = false
   } catch (error) {
     console.error('Failed to save trade-in:', error)
+  } finally {
+    tradeInActionLoading.value = false
   }
 }
 

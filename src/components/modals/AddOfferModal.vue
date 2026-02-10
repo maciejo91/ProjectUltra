@@ -170,6 +170,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TradeInsCard
                 :items="taskTradeIns"
+                :add-loading="tradeInAddLoading"
                 @open-add="$emit('open-add-tradein')"
                 @open-edit="(t) => $emit('open-edit-tradein', t)"
               />
@@ -553,7 +554,9 @@ const STEP_LABELS = [
 
 const props = defineProps({
   show: { type: Boolean, required: true },
-  opportunity: { type: Object, default: null }
+  opportunity: { type: Object, default: null },
+  /** When true, the Trade-ins card Add button shows loading (e.g. while saving a trade-in). */
+  tradeInAddLoading: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['confirm', 'cancel', 'open-add-tradein', 'open-add-financing', 'open-edit-tradein', 'open-edit-financing'])

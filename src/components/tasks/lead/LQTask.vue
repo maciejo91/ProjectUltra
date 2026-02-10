@@ -441,10 +441,12 @@
                   <Button
                     variant="secondary"
                     size="sm"
-                    class="gap-1.5"
+                    class="gap-1.5 inline-flex items-center"
+                    :disabled="tradeInActionLoading"
                     @click="editingTradeIn = null; showVehicleModal = true"
                   >
-                    <Plus class="size-3.5" />
+                    <Spinner v-if="tradeInActionLoading" class="size-3.5 shrink-0" aria-hidden />
+                    <Plus v-else class="size-3.5" />
                     Add trade-in
                   </Button>
                   <ul v-if="(lead.tradeIns || []).length" class="space-y-1.5">
@@ -938,6 +940,7 @@
       :task-id="lead.id"
       :customer-id="lead.customerId"
       :item="editingTradeIn"
+      :loading="tradeInActionLoading"
       @close="showVehicleModal = false; editingTradeIn = null"
       @save="handleVehicleSave"
       @delete="handleTradeInDelete"
@@ -2184,8 +2187,8 @@ async function handleTradeInDelete() {
   try {
     const list = (props.lead.tradeIns || []).filter((t) => String(t.id) !== String(editingTradeIn.value.id))
     await leadsStore.updateLead(props.lead.id, { tradeIns: list })
-    showVehicleModal.value = false
     editingTradeIn.value = null
+    showVehicleModal.value = false
   } catch (error) {
     console.error('Error deleting trade-in:', error)
   } finally {
@@ -2212,7 +2215,6 @@ const handleVehicleSave = async (data) => {
   const isTradeIn = data.vehicleType === 'tradein' || props.mode === 'tradein'
   if (isTradeIn) tradeInActionLoading.value = true
   try {
-    showVehicleModal.value = false
     const isEdit = !!editingTradeIn.value
 
     if (isTradeIn) {
@@ -2246,7 +2248,9 @@ const handleVehicleSave = async (data) => {
       await leadsStore.updateLead(props.lead.id, { tradeIns: updatedList })
       await leadsStore.fetchLeadById(props.lead.id)
       editingTradeIn.value = null
+      showVehicleModal.value = false
     } else {
+      showVehicleModal.value = false
       const { addVehicleToCustomer } = await import('@/api/contacts')
       await addVehicleToCustomer(props.lead.customerId, data.vehicle)
       emit('note-saved', { type: 'vehicle', vehicleType: data.vehicleType, ...data.vehicle })

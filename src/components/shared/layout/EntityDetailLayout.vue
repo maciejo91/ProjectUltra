@@ -307,6 +307,7 @@
             <TradeInsCard
               v-if="type !== 'lead' || (task.tradeIns || []).length > 0"
               :items="task.tradeIns || []"
+              :add-loading="overviewTradeInLoading"
               @open-add="openTradeInModalFromCard"
               @open-edit="openTradeInEdit"
             />
@@ -527,6 +528,7 @@
       :item="editingTradeIn"
       :task-type="type"
       :task-id="task.id"
+      :loading="overviewTradeInLoading"
       @save="handleOverviewModalSave"
       @delete="handleTradeInDelete"
       @close="closeOverviewModal"
@@ -910,6 +912,7 @@ const openTradeInModal = () => {
 }
 
 const editingTradeIn = ref(null)
+const overviewTradeInLoading = ref(false)
 const editingFinancingOption = ref(null)
 
 const openTradeInModalFromCard = () => {
@@ -1378,6 +1381,7 @@ async function handleFinancingDelete() {
 
 const handleOverviewModalSave = async (data) => {
   if (overviewModalType.value === 'tradein') {
+    overviewTradeInLoading.value = true
     try {
       if (!data.isEdit) {
         const { saveTradeInVehicle } = useTradeInVehicle()
@@ -1417,6 +1421,8 @@ const handleOverviewModalSave = async (data) => {
       closeOverviewModal()
     } catch (error) {
       console.error('Error saving trade-in:', error)
+    } finally {
+      overviewTradeInLoading.value = false
     }
   } else if (overviewModalType.value === 'purchase') {
     await handleWidgetSave(data)
@@ -1426,6 +1432,7 @@ const handleOverviewModalSave = async (data) => {
 
 async function handleTradeInDelete() {
   if (!editingTradeIn.value) return
+  overviewTradeInLoading.value = true
   try {
     const list = (props.task.tradeIns || []).filter((t) => String(t.id) !== String(editingTradeIn.value.id))
     if (props.type === 'lead') {
@@ -1438,6 +1445,8 @@ async function handleTradeInDelete() {
     closeOverviewModal()
   } catch (error) {
     console.error('Error deleting trade-in:', error)
+  } finally {
+    overviewTradeInLoading.value = false
   }
 }
 
