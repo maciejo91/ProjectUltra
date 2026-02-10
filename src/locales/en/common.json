@@ -10,6 +10,10 @@
     "addNew": "Add New",
     "addNewCustomer": "Add New Customer"
   },
+  "layout": {
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar"
+  },
   "buttons": {
     "save": "Save",
     "cancel": "Cancel",
@@ -104,6 +108,7 @@
   "tasks": {
     "filterAria": "Filter tasks",
     "sortAria": "Sort tasks",
+    "showClosed": "Show Closed",
     "filters": {
       "lead": "Leads",
       "opportunity": "Opportunities",

@@ -10,6 +10,10 @@
     "addNew": "Nieuw Toevoegen",
     "addNewCustomer": "Nieuwe Klant Toevoegen"
   },
+  "layout": {
+    "openSidebar": "Zijbalk openen",
+    "closeSidebar": "Zijbalk sluiten"
+  },
   "buttons": {
     "save": "Opslaan",
     "cancel": "Annuleren",
@@ -104,6 +108,7 @@
   "tasks": {
     "filterAria": "Taken filteren",
     "sortAria": "Taken sorteren",
+    "showClosed": "Gesloten tonen",
     "filters": {
       "lead": "Leads",
       "opportunity": "Opportunities",

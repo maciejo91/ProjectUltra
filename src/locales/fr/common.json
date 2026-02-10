@@ -10,6 +10,10 @@
     "addNew": "Ajouter Nouveau",
     "addNewCustomer": "Ajouter Nouveau Client"
   },
+  "layout": {
+    "openSidebar": "Ouvrir la barre latérale",
+    "closeSidebar": "Fermer la barre latérale"
+  },
   "buttons": {
     "save": "Enregistrer",
     "cancel": "Annuler",
@@ -104,6 +108,7 @@
   "tasks": {
     "filterAria": "Filtrer les tâches",
     "sortAria": "Trier les tâches",
+    "showClosed": "Afficher les clôturés",
     "filters": {
       "lead": "Leads",
       "opportunity": "Opportunités",

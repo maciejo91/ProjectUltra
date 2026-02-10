@@ -1,19 +1,5 @@
 <template>
   <div class="page-container relative flex flex-col overflow-hidden h-full bg-surface">
-    <!-- Header -->
-    <PageHeader title="Customers" class="shrink-0">
-      <template #actions>
-        <!-- Add New Button -->
-        <button
-          @click="router.push('/add-new')"
-          class="group flex items-center gap-2 rounded-xl border border-border px-3 py-1.5 bg-surface text-sm font-medium text-muted-foreground hover:border-red-100 hover:bg-red-50 hover:text-brand-red transition-all"
-        >
-          <Plus class="w-4 h-4 shrink-0 text-muted-foreground group-hover:text-brand-red" />
-          <span class="hidden sm:inline">Add new</span>
-        </button>
-      </template>
-    </PageHeader>
-    
     <!-- Filters + Table -->
     <div class="flex-1 flex flex-col overflow-hidden">
       <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide">
@@ -70,10 +56,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-import { Plus, Loader2 } from 'lucide-vue-next'
+import { ref, computed, watch, onMounted, inject, onBeforeUnmount } from 'vue'
+import { Loader2 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
-import PageHeader from '@/components/layout/PageHeader.vue'
 import AddCustomerModal from '@/components/modals/AddCustomerModal.vue'
 import TaskDetailView from '@/components/tasks/TaskDetailView.vue'
 import DrawerContainer from '@/components/shared/DrawerContainer.vue'
@@ -85,6 +70,7 @@ import { useTaskShell } from '@/composables/useTaskShell'
 import { useTaskFilters } from '@/composables/useTaskFilters'
 
 const router = useRouter()
+const headerActionsRef = inject('headerActionsRef', null)
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 
@@ -218,8 +204,18 @@ const handleDrawerTaskNavigate = (direction) => {
 }
 
 onMounted(async () => {
+  if (headerActionsRef) {
+    headerActionsRef.value = {
+      type: 'customers',
+      onAddNew: () => router.push('/add-new')
+    }
+  }
   await leadsStore.fetchLeads()
   await opportunitiesStore.fetchOpportunities()
+})
+
+onBeforeUnmount(() => {
+  if (headerActionsRef) headerActionsRef.value = null
 })
 </script>
 
