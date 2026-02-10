@@ -158,7 +158,7 @@ import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
 import { formatCurrency, formatDeadlineFull, formatDate, formatRelativeTime, getDeadlineStatus } from '@/utils/formatters'
-import { calculateLeadUrgency } from '@/composables/useLeadUrgency'
+import { calculateLeadUrgency, getUrgencyDotClass } from '@/composables/useLeadUrgency'
 import { useSettingsStore } from '@/stores/settings'
 import { useUsersStore } from '@/stores/users'
 import { useTasksTableFilters } from '@/composables/useTasksTableFilters'
@@ -235,7 +235,8 @@ const globalFilter = ref(props.initialGlobalFilter || '')
 const sorting = ref([])
 const columnFilters = ref([
   { id: 'type-1', field: 'type', value: '', operator: 'eq', pinned: true },
-  { id: 'status-1', field: 'status', value: [], operator: 'in', pinned: true }
+  { id: 'status-1', field: 'status', value: [], operator: 'in', pinned: true },
+  { id: 'urgencyLevel-1', field: 'urgencyLevel', value: [], operator: 'in', pinned: true }
 ])
 // Default visible columns: Task details, Due date, Customer, Vehicle, Assigned (hide Created, Attempts, VIN, Request message, Source)
 const columnVisibility = ref({
@@ -334,19 +335,40 @@ const columns = computed(() => [
     cell: ({ row }) => {
       const task = row.original
       const actionTitle = getTaskActionTitle(task)
-      const stageStatus = task.type === 'lead' ? task.status : (task.displayStage || task.stage)
+      const stageStatus = task.type === 'lead' ? (task.displayStage || task.status) : (task.displayStage || task.stage)
       const stageClass = props.getStageBadgeClass(stageStatus)
       const typeClass = task.type === 'lead' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-purple-50 text-purple-700 border-purple-200'
+      const badgeChildren = [
+        h('span', {
+          class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${typeClass} w-fit`
+        }, task.type === 'lead' ? 'Lead' : 'Opportunity'),
+        stageStatus && h('span', {
+          class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${stageClass} w-fit`
+        }, stageStatus)
+      ]
       return h('div', { class: 'flex flex-col gap-1 min-w-0' }, [
         h('div', { class: 'text-content font-semibold text-foreground truncate' }, actionTitle || '—'),
-        h('div', { class: 'flex flex-wrap items-center gap-1.5' }, [
-          h('span', {
-            class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${typeClass} w-fit`
-          }, task.type === 'lead' ? 'Lead' : 'Opportunity'),
-          stageStatus && h('span', {
-            class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${stageClass} w-fit`
-          }, stageStatus)
-        ])
+        h('div', { class: 'flex flex-wrap items-center gap-1.5' }, badgeChildren)
+      ])
+    }
+  },
+  {
+    id: 'urgencyLevel',
+    accessorKey: 'urgencyLevel',
+    header: 'Urgency',
+    meta: { title: 'Urgency' },
+    cell: ({ row }) => {
+      const task = row.original
+      const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') !== false
+      if (!urgencyEnabled || !task.urgencyLevel) {
+        return h('span', { class: 'text-meta' }, '—')
+      }
+      const dotClass = getUrgencyDotClass(task.urgencyLevel)
+      return h('span', {
+        class: 'inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none'
+      }, [
+        h('span', { class: ['shrink-0 rounded-full size-2', dotClass].join(' '), 'aria-hidden': 'true' }),
+        task.urgencyLevel
       ])
     }
   },
@@ -500,13 +522,15 @@ const getTaskFilterValue = (row, key) => {
     return row.nextActionDue ?? row.dueDate
   }
   if (key === 'urgencyLevel') {
-    if (row.type !== 'lead') return undefined
     if (row.urgencyLevel) return row.urgencyLevel
-    try {
-      return calculateLeadUrgency(row).level
-    } catch {
-      return undefined
+    if (row.type === 'lead') {
+      try {
+        return calculateLeadUrgency(row).level
+      } catch {
+        return undefined
+      }
     }
+    return undefined
   }
   return getNestedProperty(row, key)
 }
@@ -534,7 +558,7 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
     getCustomerCity(row),
     getVehicleInfo(row),
     (row.vehicle || row.requestedCar)?.vin,
-    row.type === 'lead' ? row.status : (row.displayStage ?? row.stage),
+    row.type === 'lead' ? (row.displayStage ?? row.status) : (row.displayStage ?? row.stage),
     row.type,
     row.source,
     row.sourceDetails,

@@ -2,6 +2,21 @@ import { useSettingsStore } from '@/stores/settings'
 import { calculateLeadUrgency } from '@/composables/useLeadUrgency'
 
 /**
+ * Map opportunity/lead priority label to a numeric urgency score using the same thresholds as leads.
+ * Used so "urgent first" sorts leads and opportunities on one scale.
+ */
+function priorityToUrgencyScore(priority, thresholds) {
+  const hot = thresholds?.hot ?? 80
+  const warm = thresholds?.warm ?? 50
+  const standard = thresholds?.standard ?? 20
+  const p = (priority || 'Cold').toLowerCase()
+  if (p === 'hot') return (hot + 100) / 2
+  if (p === 'warm') return (warm + hot - 1) / 2
+  if (p === 'standard' || p === 'normal') return (standard + warm - 1) / 2
+  return Math.max(0, (standard - 1) / 2)
+}
+
+/**
  * Composable for task sorting logic
  * Handles sorting tasks by urgency and date (recent-first, urgent-first, oldest-first).
  * Assignee filtering (assigned-to-me, assigned-to-my-team) is handled by useTaskFilters.
@@ -12,11 +27,10 @@ export function useTaskSorting() {
   /**
    * Sort tasks based on sort option
    * @param {Array} tasks - Tasks to sort
-   * @param {string} sortOption - Sort option: '', 'none', 'urgent-first', 'assigned-to-me', 'assigned-to-my-team', 'recent-first'
+   * @param {string} sortOption - Sort option: '', 'none', 'urgent-first', 'recent-first', 'oldest-first'
    * @returns {Array} Sorted tasks
    */
   const sortTasks = (tasks, sortOption) => {
-    // No sort or 'none': return tasks as-is (no sorting applied)
     if (!sortOption || sortOption === '' || sortOption === 'none') {
       return tasks
     }
@@ -39,57 +53,47 @@ export function useTaskSorting() {
 
     if (sortOption === 'urgent-first') {
       const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') !== false
-      
+      const thresholds = settingsStore.getSetting('urgencyThresholds') || { hot: 80, warm: 50, standard: 20 }
+
       if (urgencyEnabled) {
-        // Calculate urgency scores for leads
-        const tasksWithUrgency = tasks.map(task => {
-          if (task.type === 'lead' && !task.urgencyScore) {
-            const urgencyResult = calculateLeadUrgency(task)
+        const tasksWithScore = tasks.map(task => {
+          if (task.type === 'lead') {
+            const score = task.urgencyScore ?? calculateLeadUrgency(task).score
+            const level = task.urgencyLevel ?? calculateLeadUrgency(task).level
             return {
               ...task,
-              urgencyScore: urgencyResult.score,
-              urgencyLevel: urgencyResult.level
+              urgencyScore: score,
+              urgencyLevel: level,
+              _sortUrgencyScore: score
             }
           }
-          return task
+          if (task.type === 'opportunity') {
+            const score = priorityToUrgencyScore(task.priority, thresholds)
+            return { ...task, _sortUrgencyScore: score }
+          }
+          return { ...task, _sortUrgencyScore: 0 }
         })
 
-        // Sort: leads by urgency score DESC, then by createdAt DESC (tiebreaker)
-        return [...tasksWithUrgency].sort((a, b) => {
-          // If both are leads, sort by urgency score
-          if (a.type === 'lead' && b.type === 'lead') {
-            const scoreA = a.urgencyScore || 0
-            const scoreB = b.urgencyScore || 0
-            if (scoreA !== scoreB) {
-              return scoreB - scoreA // Higher score first
-            }
-            // Tiebreaker: most recent first
-            const dateA = new Date(a.createdAt || 0)
-            const dateB = new Date(b.createdAt || 0)
-            return dateB - dateA
-          }
-          // If one is lead and one is opportunity, leads come first when urgency sorting
-          if (a.type === 'lead' && b.type === 'opportunity') return -1
-          if (a.type === 'opportunity' && b.type === 'lead') return 1
-          // Both opportunities: use priority then date
-          if (a.priority === 'Hot' && b.priority !== 'Hot') return -1
-          if (a.priority !== 'Hot' && b.priority === 'Hot') return 1
-          const dateA = new Date(a.lastActivity || a.createdAt || 0)
-          const dateB = new Date(b.lastActivity || b.createdAt || 0)
-          return dateB - dateA
-        })
-      } else {
-        // Fallback to priority-based sorting if urgency disabled
-        return [...tasks].sort((a, b) => {
-          // Hot priority first
-          if (a.priority === 'Hot' && b.priority !== 'Hot') return -1
-          if (a.priority !== 'Hot' && b.priority === 'Hot') return 1
-          // Then by date (most recent first)
+        // Single order: by urgency score DESC, then by date DESC (tiebreaker)
+        return [...tasksWithScore].sort((a, b) => {
+          const scoreA = a._sortUrgencyScore ?? 0
+          const scoreB = b._sortUrgencyScore ?? 0
+          if (scoreA !== scoreB) return scoreB - scoreA
           const dateA = new Date(a.lastActivity || a.createdAt || 0)
           const dateB = new Date(b.lastActivity || b.createdAt || 0)
           return dateB - dateA
         })
       }
+
+      // Urgency disabled: sort by priority (Hot first) then date, for both types
+      return [...tasks].sort((a, b) => {
+        const scoreA = priorityToUrgencyScore(a.priority, thresholds)
+        const scoreB = priorityToUrgencyScore(b.priority, thresholds)
+        if (scoreA !== scoreB) return scoreB - scoreA
+        const dateA = new Date(a.lastActivity || a.createdAt || 0)
+        const dateB = new Date(b.lastActivity || b.createdAt || 0)
+        return dateB - dateA
+      })
     }
 
     return tasks

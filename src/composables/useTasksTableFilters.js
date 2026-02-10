@@ -70,19 +70,22 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
       aiHint: 'Task priority level'
     })
 
-    // Urgency level filter - for leads (displayStage/urgency)
+    // Urgency level filter - multiselect for leads and opportunities (opportunities use priority → urgencyLevel)
     defs.push({
       key: 'urgencyLevel',
       label: 'Urgency',
-      type: 'select',
-      operators: [{ value: 'eq', label: 'is' }],
+      type: 'multiselect',
+      operators: [
+        { value: 'in', label: 'is any of' },
+        { value: 'notIn', label: 'is none of' }
+      ],
       options: [
         { value: 'HOT', label: 'Hot' },
         { value: 'WARM', label: 'Warm' },
         { value: 'STANDARD', label: 'Standard' },
         { value: 'COLD', label: 'Cold' }
       ],
-      aiHint: 'Lead urgency level (leads only)',
+      aiHint: 'Task urgency level (leads and opportunities)',
       pinned: true
     })
 

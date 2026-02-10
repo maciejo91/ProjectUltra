@@ -18,17 +18,41 @@
 
     <div class="flex flex-col min-w-0 flex-1 pr-4">
       <div class="flex items-center gap-1 mb-0.5">
-        <h3 v-if="actionTitle" class="font-bold text-foreground text-base truncate">{{ actionTitle }}</h3>
+        <h3 class="font-bold text-foreground text-base truncate">{{ actionTitle || displayTitleFallback }}</h3>
       </div>
-      <div class="flex items-center gap-2 overflow-hidden">
+      <div class="flex items-center gap-2 overflow-hidden flex-wrap">
         <span class="text-muted-foreground text-sm truncate">
-          {{ getName(item) }}{{ callAttemptsCount > 0 ? ` - Attempts ${callAttemptsValue}` : '' }}
+          {{ getName(item) }}
+        </span>
+        <!-- Urgency: colored dot + grey text. Hot fallback when urgency disabled. -->
+        <span
+          v-if="showUrgencyBadge"
+          class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
+        >
+          <span
+            :class="['shrink-0 rounded-full size-2', urgencyDotClass]"
+            aria-hidden
+          />
+          {{ item.urgencyLevel }}
+        </span>
+        <span
+          v-else-if="showHotFallbackBadge"
+          class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
+        >
+          <span class="shrink-0 rounded-full size-2 bg-red-500" aria-hidden />
+          Hot
         </span>
       </div>
+      <p
+        v-if="callAttemptsCount > 0"
+        class="text-muted-foreground text-xs mt-0.5"
+      >
+        Attempts {{ callAttemptsValue }}
+      </p>
 
-      <!-- Badges -->
+      <!-- Badges (urgency is shown only next to customer name above) -->
       <div class="mt-2">
-        <TaskBadges :task="item" />
+        <TaskBadges :task="item" :urgency-shown-elsewhere="true" />
       </div>
     </div>
   </div>
@@ -39,6 +63,7 @@ import { computed } from 'vue'
 import { formatDueDate, getDeadlineStatus } from '@/utils/formatters'
 import { getTaskActionTitle } from '@/utils/taskActionTitle'
 import { useSettingsStore } from '@/stores/settings'
+import { getUrgencyDotClass } from '@/composables/useLeadUrgency'
 import TaskBadges from './shared/TaskBadges.vue'
 
 const settingsStore = useSettingsStore()
@@ -94,6 +119,14 @@ const selectedBorderClass = computed(() => {
 
 const actionTitle = computed(() => getTaskActionTitle(props.item))
 
+const displayTitleFallback = computed(() => {
+  const t = props.item
+  if (!t) return 'Task'
+  const name = t.customer?.name?.trim()
+  if (name) return name
+  return t.type === 'lead' ? 'Lead' : t.type === 'opportunity' ? 'Opportunity' : 'Task'
+})
+
 const deadline = computed(() => {
   const date = props.item.nextActionDue || props.item.dueDate
   if (!date) return null
@@ -129,6 +162,11 @@ const displayDate = computed(() => {
 const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
 const callAttemptsCount = computed(() => props.item.contactAttempts?.length ?? 0)
 const callAttemptsValue = computed(() => `${callAttemptsCount.value}/${maxContactAttempts.value}`)
+
+const urgencyEnabled = computed(() => settingsStore.getSetting('urgencyEnabled') !== false)
+const showUrgencyBadge = computed(() => urgencyEnabled.value && props.item?.urgencyLevel)
+const showHotFallbackBadge = computed(() => !urgencyEnabled.value && props.item?.priority === 'Hot')
+const urgencyDotClass = computed(() => getUrgencyDotClass(props.item?.urgencyLevel))
 </script>
 
 <style scoped>

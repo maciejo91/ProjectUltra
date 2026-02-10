@@ -40,15 +40,21 @@ export function calculateLeadDisplayStage(lead) {
     
     // Treat as API status and map to active display stage
     const apiStatus = stageValue
-    
-    // Map validated/qualified to Valid stage
-    if (apiStatus === API_STATUSES.VALIDATED || apiStatus === 'Qualified') {
-      return LEAD_STAGES.VALID
-    }
-    
-    // Check for callback scheduled
+
+    // Check for callback scheduled first (takes precedence for display)
     if (lead.callbackDate || lead.callbackScheduled) {
+      // Validated + callback → "Valid - to be called back"; Open + callback → "To be called back"
+      if (apiStatus === API_STATUSES.VALIDATED || apiStatus === 'Qualified') {
+        return LEAD_STAGES.VALID_TO_BE_CALLED_BACK
+      }
       return LEAD_STAGES.TO_BE_CALLED_BACK
+    }
+
+    // Map validated/qualified: "Valid - to be called back" if there are data logged (spoke-to-customer), else "Valid"
+    if (apiStatus === API_STATUSES.VALIDATED || apiStatus === 'Qualified') {
+      const hasDataLogged = Array.isArray(lead.contactAttempts) &&
+        lead.contactAttempts.some((a) => a.outcome === 'spoke-to-customer')
+      return hasDataLogged ? LEAD_STAGES.VALID_TO_BE_CALLED_BACK : LEAD_STAGES.VALID
     }
     
     // Default: New lead (for 'Open' and any other active status)

@@ -22,19 +22,19 @@ export const mockLeads = [
     },
     carStatus: 'In Stock',
     requestType: 'Quotation',
-    source: 'Google Ads',
+    source: 'Walk-in',
     fiscalEntity: 'MotorK',
     sourceDetails: 'ADD 2024',
     assignee: 'Salsabeel Khaleel', // Assign to manager so it shows up
     assigneeInitials: 'SK',
     createdAt: (() => {
       const date = new Date()
-      date.setDate(date.getDate() - 1) // 1 day ago - too new for urgency banner
+      date.setHours(date.getHours() - 4) // 4 hours ago → high freshness
       return date.toISOString()
     })(),
     lastActivity: (() => {
       const date = new Date()
-      date.setDate(date.getDate() - 1)
+      date.setHours(date.getHours() - 2)
       return date.toISOString()
     })(),
     nextActionDue: (() => {
@@ -43,12 +43,199 @@ export const mockLeads = [
       return date.toISOString()
     })(),
     tags: ['Premium', 'Automation'],
-    stage: 'Open', // Maps to "New" - Brand new lead, no contact attempts yet
+    stage: 'Open',
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: [], // Zero contact attempts - needs initial call
-    taskStatusBadge: 'Active now on website'
+    contactAttempts: [
+      {
+        timestamp: (() => {
+          const date = new Date()
+          date.setHours(date.getHours() - 2)
+          return date.toISOString()
+        })(),
+        outcome: 'spoke-to-customer',
+        channel: 'phone',
+        notes: 'Customer confirmed interest, ready for quote.',
+        transcription: null
+      }
+    ],
+    taskStatusBadge: 'Active now on website',
+    distanceKm: 5
+  },
+  // Score diversity: HOT – very recent, close, Walk-in, spoke-to-customer, vehicle in stock
+  {
+    id: 2,
+    customerId: 2,
+    status: 'Open',
+    priority: 'Hot',
+    requestedCar: {
+      brand: 'Volkswagen',
+      model: 'ID.4',
+      year: 2024,
+      price: 45000,
+      image: 'https://images.unsplash.com/photo-1607853203100-69829c08b88e?w=900&auto=format&fit=crop&q=60',
+      vin: '7015733W8749',
+      kilometers: 0,
+      status: 'New',
+      fuelType: 'Electric',
+      gearType: 'Automatic',
+      dealership: 'Firenze',
+      stockDays: 15,
+      requestMessage: 'Saw the ID.4 in showroom. Ready to buy this week.'
+    },
+    carStatus: 'In Stock',
+    requestType: 'Quotation',
+    source: 'Walk-in',
+    fiscalEntity: '',
+    sourceDetails: '',
+    assignee: 'Salsabeel Khaleel',
+    assigneeInitials: 'SK',
+    createdAt: (() => {
+      const date = new Date()
+      date.setHours(date.getHours() - 2) // 2 hours ago → freshness 1
+      return date.toISOString()
+    })(),
+    lastActivity: (() => {
+      const date = new Date()
+      date.setHours(date.getHours() - 1)
+      return date.toISOString()
+    })(),
+    nextActionDue: (() => {
+      const date = new Date()
+      date.setHours(date.getHours() + 4)
+      return date.toISOString()
+    })(),
+    tags: ['Premium'],
+    stage: 'Open',
+    isDisqualified: false,
+    disqualifyReason: null,
+    scheduledAppointment: null,
+    contactAttempts: [
+      {
+        timestamp: (() => {
+          const date = new Date()
+          date.setHours(date.getHours() - 1)
+          return date.toISOString()
+        })(),
+        outcome: 'spoke-to-customer',
+        channel: 'phone',
+        notes: 'Customer confirmed intent, wants quote today.',
+        transcription: null
+      }
+    ],
+    taskStatusBadge: 'Hot lead',
+    distanceKm: 3
+  },
+  // Score diversity: COLD – old, far, 3rd Party, no engagement
+  {
+    id: 3,
+    customerId: 3,
+    status: 'Open',
+    priority: 'Normal',
+    requestedCar: {
+      brand: 'Tesla',
+      model: 'Model 3',
+      year: 2023,
+      price: 42000,
+      image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=900&auto=format&fit=crop&q=60',
+      vin: 'TESLA999',
+      kilometers: 0,
+      status: 'New',
+      fuelType: 'Electric',
+      gearType: 'Automatic',
+      requestMessage: 'Generic inquiry from aggregator.'
+    },
+    carStatus: 'Not In Stock',
+    requestType: 'Quotation',
+    source: '3rd Party',
+    fiscalEntity: '',
+    sourceDetails: 'Lead aggregator',
+    assignee: null,
+    assigneeInitials: '',
+    createdAt: (() => {
+      const date = new Date()
+      date.setDate(date.getDate() - 14) // 14 days ago → freshness 0.1
+      return date.toISOString()
+    })(),
+    lastActivity: (() => {
+      const date = new Date()
+      date.setDate(date.getDate() - 14)
+      return date.toISOString()
+    })(),
+    nextActionDue: null,
+    tags: [],
+    stage: 'Open',
+    isDisqualified: false,
+    disqualifyReason: null,
+    scheduledAppointment: null,
+    contactAttempts: [],
+    taskStatusBadge: 'Low priority',
+    distanceKm: 120
+  },
+  // WARM lead: recent, Phone source, spoke-to-customer, close
+  {
+    id: 35,
+    customerId: 2,
+    status: 'Open',
+    priority: 'Normal',
+    requestedCar: {
+      brand: 'Volkswagen',
+      model: 'ID.3',
+      year: 2024,
+      price: 38000,
+      image: 'https://images.unsplash.com/photo-1607853203100-69829c08b88e?w=900&auto=format&fit=crop&q=60',
+      vin: 'VWID301234',
+      kilometers: 0,
+      status: 'New',
+      fuelType: 'Electric',
+      gearType: 'Automatic',
+      dealership: 'Berlin',
+      stockDays: 10,
+      requestMessage: 'Interested in ID.3. Test drive preferred.'
+    },
+    carStatus: 'In Stock',
+    requestType: 'Test Drive',
+    source: 'Phone',
+    fiscalEntity: '',
+    sourceDetails: '',
+    assignee: 'Salsabeel Khaleel',
+    assigneeInitials: 'SK',
+    createdAt: (() => {
+      const date = new Date()
+      date.setHours(date.getHours() - 8)
+      return date.toISOString()
+    })(),
+    lastActivity: (() => {
+      const date = new Date()
+      date.setHours(date.getHours() - 2)
+      return date.toISOString()
+    })(),
+    nextActionDue: (() => {
+      const date = new Date()
+      date.setHours(date.getHours() + 6)
+      return date.toISOString()
+    })(),
+    tags: [],
+    stage: 'Open',
+    isDisqualified: false,
+    disqualifyReason: null,
+    scheduledAppointment: null,
+    contactAttempts: [
+      {
+        timestamp: (() => {
+          const date = new Date()
+          date.setHours(date.getHours() - 2)
+          return date.toISOString()
+        })(),
+        outcome: 'spoke-to-customer',
+        channel: 'phone',
+        notes: 'Customer called in. Wants test drive this week.',
+        transcription: null
+      }
+    ],
+    taskStatusBadge: 'Hot lead',
+    distanceKm: 15
   },
   // GROUP A: Validated Stage Leads
   {
@@ -113,7 +300,8 @@ export const mockLeads = [
         transcription: null
       }
     ],
-    taskStatusBadge: 'Active Campaign - Summer Deals'
+    taskStatusBadge: 'Active Campaign - Summer Deals',
+    distanceKm: 25
   },
   {
     id: 5,
@@ -138,14 +326,14 @@ export const mockLeads = [
     },
     carStatus: 'In Stock',
     requestType: 'Quotation',
-    source: 'Facebook',
+    source: 'Walk-in',
     fiscalEntity: '',
     sourceDetails: '',
     assignee: 'Salsabeel Khaleel',
     assigneeInitials: 'SK',
     createdAt: (() => {
       const date = new Date()
-      date.setDate(date.getDate() - 2)
+      date.setHours(date.getHours() - 20) // ~1 day ago → good freshness
       return date.toISOString()
     })(),
     lastActivity: (() => {
@@ -159,7 +347,7 @@ export const mockLeads = [
       return date.toISOString()
     })(),
     tags: [],
-    stage: 'Validated', // Validated but NO appointment scheduled - needs follow-up to schedule
+    stage: 'Validated',
     isDisqualified: false,
     disqualifyReason: null,
     disqualifyCategory: null,
@@ -168,7 +356,7 @@ export const mockLeads = [
       {
         timestamp: (() => {
           const date = new Date()
-          date.setDate(date.getDate() - 2)
+          date.setHours(date.getHours() - 18)
           return date.toISOString()
         })(),
         outcome: 'no-answer',
@@ -188,7 +376,8 @@ export const mockLeads = [
         transcription: null
       }
     ],
-    taskStatusBadge: 'Vehicle ageing'
+    taskStatusBadge: 'Vehicle ageing',
+    distanceKm: 12
   },
   // GROUP B: Disqualified States
   {
@@ -513,8 +702,20 @@ export const mockLeads = [
         channel: 'phone',
         notes: 'Walk-in customer left details. Called but no answer.',
         transcription: null
+      },
+      {
+        timestamp: (() => {
+          const date = new Date()
+          date.setHours(date.getHours() - 3)
+          return date.toISOString()
+        })(),
+        outcome: 'spoke-to-customer',
+        channel: 'phone',
+        notes: 'Reached customer, very interested. Callback requested.',
+        transcription: null
       }
-    ]
+    ],
+    distanceKm: 8
   },
   // Lead 12 - Open Lead with 2 contact attempts (close to auto-disqualify threshold)
   {
@@ -665,17 +866,17 @@ export const mockLeads = [
     },
     carStatus: 'In Stock',
     requestType: 'Quotation',
-    source: 'Instagram',
+    source: 'Walk-in',
     assignee: 'David Miller',
     assigneeInitials: 'DM',
     createdAt: (() => {
       const date = new Date()
-      date.setDate(date.getDate() - 5)
+      date.setHours(date.getHours() - 24) // 1 day ago
       return date.toISOString()
     })(),
     lastActivity: (() => {
       const date = new Date()
-      date.setDate(date.getDate() - 2)
+      date.setHours(date.getHours() - 4)
       return date.toISOString()
     })(),
     nextActionDue: (() => {
@@ -692,7 +893,7 @@ export const mockLeads = [
       {
         timestamp: (() => {
           const date = new Date()
-          date.setDate(date.getDate() - 2)
+          date.setHours(date.getHours() - 4)
           return date.toISOString()
         })(),
         outcome: 'spoke-to-customer',
@@ -700,7 +901,8 @@ export const mockLeads = [
         notes: 'Customer confirmed interest in Golf. First-time buyer, needs guidance on financing options. Validated contact details.',
         transcription: null
       }
-    ]
+    ],
+    distanceKm: 8
   },
   // Customer 3 (Liam Johnson) - Lead
   {
@@ -908,7 +1110,20 @@ export const mockLeads = [
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: []
+    contactAttempts: [
+      {
+        timestamp: (() => {
+          const date = new Date()
+          date.setHours(date.getHours() - 2)
+          return date.toISOString()
+        })(),
+        outcome: 'spoke-to-customer',
+        channel: 'phone',
+        notes: 'Customer in showroom. Urgent need - compact SUV. Ready to discuss.',
+        transcription: null
+      }
+    ],
+    distanceKm: 5
   },
   // Customer 13 (Nina Keller) - Lead
   {
@@ -1456,24 +1671,24 @@ export const mockLeads = [
     },
     carStatus: 'In Stock',
     requestType: 'Quotation',
-    source: 'Google Ads',
+    source: 'Walk-in',
     fiscalEntity: '',
     sourceDetails: '',
     assignee: 'David Miller',
     assigneeInitials: 'DM',
     createdAt: (() => {
       const date = new Date()
-      date.setDate(date.getDate() - 1)
+      date.setHours(date.getHours() - 6) // 6 hours ago
       return date.toISOString()
     })(),
     lastActivity: (() => {
       const date = new Date()
-      date.setDate(date.getDate() - 1)
+      date.setHours(date.getHours() - 2)
       return date.toISOString()
     })(),
     nextActionDue: (() => {
       const date = new Date()
-      date.setDate(date.getDate() + 2) // Upcoming deadline in 2 days - not urgent, not overdue
+      date.setDate(date.getDate() + 2)
       return date.toISOString()
     })(),
     tags: [],
@@ -1481,7 +1696,20 @@ export const mockLeads = [
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: []
+    contactAttempts: [
+      {
+        timestamp: (() => {
+          const date = new Date()
+          date.setHours(date.getHours() - 2)
+          return date.toISOString()
+        })(),
+        outcome: 'spoke-to-customer',
+        channel: 'phone',
+        notes: 'Customer interested in 1 Series. Wants quote.',
+        transcription: null
+      }
+    ],
+    distanceKm: 10
   },
   // Lead 27 - New lead with no deadline yet (very fresh, just created)
   {
@@ -1507,7 +1735,7 @@ export const mockLeads = [
     },
     carStatus: 'In Stock',
     requestType: 'Quotation',
-    source: 'Google Ads',
+    source: 'Walk-in',
     fiscalEntity: '',
     sourceDetails: '',
     assignee: 'Natalia Sung',
@@ -1526,13 +1754,26 @@ export const mockLeads = [
       const date = new Date()
       date.setDate(date.getDate() + 1)
       return date.toISOString()
-    })(), // Initial follow-up due tomorrow
+    })(),
     tags: [],
     stage: 'Open',
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: []
+    contactAttempts: [
+      {
+        timestamp: (() => {
+          const date = new Date()
+          date.setMinutes(date.getMinutes() - 30)
+          return date.toISOString()
+        })(),
+        outcome: 'spoke-to-customer',
+        channel: 'phone',
+        notes: 'Just spoke to customer at showroom. Ready to buy.',
+        transcription: null
+      }
+    ],
+    distanceKm: 3
   },
   // Lead for customer 2
   {

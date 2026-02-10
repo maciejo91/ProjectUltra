@@ -8,6 +8,14 @@
       {{ typeLabel }}
     </span>
     
+    <!-- Hot Priority Badge (when urgency disabled and not shown elsewhere e.g. next to name on card) -->
+    <span 
+      v-if="showHotPriorityBadge && !urgencyShownElsewhere"
+      class="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-red-50 text-red-700 border border-red-200 leading-none"
+    >
+      Hot
+    </span>
+    
     <!-- Base Status Badge (shown when there's a substatus) -->
     <span 
       v-if="baseStatus && hasSubstatus"
@@ -25,27 +33,42 @@
     >
       {{ displayStatus }}
     </span>
-    
-    <!-- Hot Priority Badge -->
-    <span 
-      v-if="task.priority === 'Hot'"
-      class="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-red-50 text-red-700 border border-red-200 leading-none"
-    >
-      Hot
-    </span>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { getDisplayStage as getCalculatedDisplayStageFromMapper, getStageColor as getStageColorFromMapper } from '@/utils/stageMapper'
+import { useSettingsStore } from '@/stores/settings'
+
+const settingsStore = useSettingsStore()
+
+/** For leads: use calculated display stage (New, Valid, etc.), not raw API status (Open, Validated). */
+const getLeadDisplayStage = (task) => {
+  if (!task || task.type !== 'lead') return null
+  try {
+    return getCalculatedDisplayStageFromMapper(task, 'lead')
+  } catch (e) {
+    return task.displayStage || task.stage || null
+  }
+}
 
 const props = defineProps({
   task: {
     type: Object,
     required: true
+  },
+  /** When true (e.g. on TaskCard), urgency/hot is shown next to customer name so we hide it here to avoid duplicate. */
+  urgencyShownElsewhere: {
+    type: Boolean,
+    default: false
   }
 })
+
+const urgencyEnabled = computed(() => settingsStore.getSetting('urgencyEnabled') !== false)
+const showHotPriorityBadge = computed(() =>
+  props.task?.priority === 'Hot' && !urgencyEnabled.value
+)
 
 const typeLabel = computed(() => {
   return props.task.type === 'lead' ? 'Lead' : 'Opportunity'
@@ -82,8 +105,8 @@ const displayStage = computed(() => {
   if (props.task.type === 'opportunity') {
     return getCalculatedDisplayStage(props.task) || getBaseStage(props.task) || 'New'
   }
-  
-  return props.task.stage || props.task.currentStage || props.task.displayStage || 'New'
+  // Leads: use calculated display stage (New, To be called back, Valid, etc.), not raw status (Open, Validated)
+  return getLeadDisplayStage(props.task) || props.task.displayStage || props.task.stage || props.task.currentStage || 'New'
 })
 
 const substatus = computed(() => {

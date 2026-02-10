@@ -42,7 +42,8 @@ export const mockOpportunities = [
       { id: 'f2', label: 'Loan 48 months', termMonths: 48 },
       { id: 'f3', label: 'Leasing 36 months', termMonths: 36 }
     ],
-    taskStatusBadge: 'Active now on website'
+    taskStatusBadge: 'Active now on website',
+    priority: 'Hot'
   },
 
   // 2. Opportunity - In Negotiation, appointment TODAY (not "Appointment Scheduled" status); Manage Appointment card shows last
@@ -116,7 +117,8 @@ export const mockOpportunities = [
       { id: 'f2', label: 'Loan 48 months', termMonths: 48 },
       { id: 'f3', label: 'Leasing 36 months', termMonths: 36 }
     ],
-    taskStatusBadge: 'Active Campaign - Summer Deals'
+    taskStatusBadge: 'Active Campaign - Summer Deals',
+    priority: 'Hot'
   },
 
   // 3. Opportunity - 1st No Show
@@ -196,7 +198,8 @@ export const mockOpportunities = [
       { id: 'f1', label: 'Cash' },
       { id: 'f2', label: 'Loan 48 months', termMonths: 48 },
       { id: 'f3', label: 'Leasing 36 months', termMonths: 36 }
-    ]
+    ],
+    priority: 'Warm'
   },
 
   // 4. Opportunity - Closed Lost (had offers, went with competitor)
@@ -375,7 +378,8 @@ export const mockOpportunities = [
       { id: 'f1', label: 'Cash' },
       { id: 'f2', label: 'Loan 48 months', termMonths: 48 },
       { id: 'f3', label: 'Leasing 36 months', termMonths: 36 }
-    ]
+    ],
+    priority: 'Hot'
   },
 
   // 7. Opportunity - In Negotiation - Contract Pending - Awaiting Contract Feedback (contract date 7+ days ago)
@@ -447,7 +451,8 @@ export const mockOpportunities = [
       date.setDate(date.getDate() - 8)
       return date.toISOString()
     })(),
-    scheduledAppointment: null
+    scheduledAppointment: null,
+    priority: 'Warm'
   },
 
   // 8. Opportunity - Closed Won - Delivered (contract signed, delivered, awaiting feedback)
@@ -671,7 +676,8 @@ model: 'Macan',
       return date.toISOString()
     })(),
     nextActionDue: createDateOffset(1),
-    scheduledAppointment: null
+    scheduledAppointment: null,
+    priority: 'Warm'
   },
 
   // 12. Opportunity - Abandoned (inactive for 30+ days)

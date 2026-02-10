@@ -84,7 +84,7 @@
           @sort-change="handleSortChange"
         >
           <template #badges="{ item: task }">
-            <!-- Type Badge -->
+            <!-- Type Badge (urgency is shown only next to customer name on TaskCard) -->
             <Badge
               v-if="task && task.type"
               :text="task.type === 'lead' ? 'Lead' : 'Opportunity'"
@@ -92,18 +92,9 @@
               :theme="task.type === 'lead' ? 'blue' : 'gray'"
             />
             
-            <!-- Urgency Badge (for leads when urgency is enabled) -->
-            <span
-              v-if="task && task.type === 'lead' && settingsStore.getSetting('urgencyEnabled') !== false && task.urgencyLevel"
-              :class="['inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold border', getUrgencyColorClass(task.urgencyLevel)]"
-            >
-              <component :is="getUrgencyIconComponent(task.urgencyLevel)" class="size-3 shrink-0" />
-              {{ task.urgencyLevel }}
-            </span>
-            
-            <!-- Hot Badge (for leads, fallback if urgency disabled) -->
+            <!-- Hot Badge (fallback when urgency disabled; when enabled, urgency chip is next to name on card) -->
             <Badge
-              v-if="task && task.priority === 'Hot' && (settingsStore.getSetting('urgencyEnabled') === false || task.type !== 'lead')"
+              v-if="task && task.priority === 'Hot' && settingsStore.getSetting('urgencyEnabled') === false"
               text="HOT"
               size="small"
               theme="red"
@@ -239,7 +230,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Flame, Sun, CheckCircle, Circle, ListTodo, Loader2 } from 'lucide-vue-next'
+import { ListTodo, Loader2 } from 'lucide-vue-next'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
@@ -257,13 +248,7 @@ import { useTaskSorting } from '@/composables/useTaskSorting'
 import { formatCurrency } from '@/utils/formatters'
 import { getStageBadgeClass } from '@/utils/formatters'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
-import { getUrgencyIcon, getUrgencyColorClass } from '@/composables/useLeadUrgency'
 import { useSettingsStore } from '@/stores/settings'
-
-const urgencyIconComponents = { Flame, Sun, CheckCircle, Circle }
-function getUrgencyIconComponent(level) {
-  return urgencyIconComponents[getUrgencyIcon(level)] || Circle
-}
 
 const route = useRoute()
 const router = useRouter()

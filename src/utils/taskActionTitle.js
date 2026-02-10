@@ -60,68 +60,91 @@ export function mergeContactIntoDescription(baseDescription, name, phone) {
 }
 
 /**
- * Get the descriptive action title for a task card based on the next primary action
+ * Get the descriptive action title for a task card based on the next primary action.
+ * Never returns null/empty for lead or opportunity; uses stage + customer name fallback.
  * @param {Object} item - Lead or Opportunity item
- * @returns {string} Action title text
+ * @returns {string|null} Action title text, or null only when item is null
  */
 export function getTaskActionTitle(item) {
   if (!item) return null
 
-  // If item explicitly has a title (like a specific Task entity), use it
-  if (item.title) return item.title
-
-  const type = item.type || (item.customer ? 'opportunity' : 'lead')
-  const displayStage = getDisplayStage(item, type)
-
-  if (type === 'lead') {
-    // Leads do not have scheduled appointments (only opportunities do)
-    const config = LEAD_STATE_CONFIG[displayStage]
-    if (!config || !config.primaryAction) {
-      return null
-    }
-
-    const primaryAction = config.primaryAction
-    const context = { lead: item, displayStage }
-    const action = typeof primaryAction === 'function'
-      ? primaryAction(context)
-      : primaryAction
-
-    if (!action) return null
-
-    const label = typeof action.label === 'function' ? action.label(context) : action.label
-    const title = typeof action.title === 'function' ? action.title(context) : action.title
-    return label || title || null
+  const safeFallback = (entityType, namePart = '') => {
+    const name = (item?.customer?.name?.trim() || namePart || 'Customer').trim()
+    return name ? `${entityType} – ${name}` : entityType
   }
 
-  if (type === 'opportunity') {
-    // If there's a scheduled appointment with a title, use it for better context
-    if (item.scheduledAppointment && item.scheduledAppointment.title) {
-      return item.scheduledAppointment.title
+  try {
+    // If item explicitly has a title (like a specific Task entity), use it
+    if (item.title && String(item.title).trim()) return String(item.title).trim()
+
+    const type = item.type || (item.customer ? 'opportunity' : 'lead')
+    let displayStage
+    try {
+      displayStage = getDisplayStage(item, type)
+    } catch (_) {
+      displayStage = item.stage || item.displayStage || null
     }
 
-    const config = OPPORTUNITY_STATE_CONFIG[displayStage]
-    if (!config || !config.primaryAction) {
-      return null
+    const name = item?.customer?.name?.trim() || ''
+
+    if (type === 'lead') {
+      const config = displayStage && LEAD_STATE_CONFIG[displayStage]
+      if (config && config.primaryAction) {
+        const primaryAction = config.primaryAction
+        const context = { lead: item, displayStage }
+        const action = typeof primaryAction === 'function'
+          ? primaryAction(context)
+          : primaryAction
+
+        if (action) {
+          const label = typeof action.label === 'function' ? action.label(context) : action.label
+          const title = typeof action.title === 'function' ? action.title(context) : action.title
+          const resolved = (label || title || '').toString().trim()
+          if (resolved) return resolved
+        }
+      }
+
+      const leadName = name || 'Lead'
+      return displayStage ? `${displayStage} – ${leadName}` : leadName
     }
 
-    const primaryAction = config.primaryAction
-    const context = {
-      deliverySubstatus: item.deliverySubstatus || getDeliverySubstatus(item, item.activities || []),
-      hasOffers: !!(item.offers && item.offers.length > 0) || !!(item.activities && item.activities.some(a => a.type === 'offer')),
-      scheduledAppointment: item.scheduledAppointment,
-      opportunity: item,
-      formatDateTime: (date) => new Date(date).toLocaleDateString()
+    if (type === 'opportunity') {
+      if (item.scheduledAppointment && item.scheduledAppointment.title) {
+        const t = String(item.scheduledAppointment.title).trim()
+        if (t) return t
+      }
+
+      const config = displayStage && OPPORTUNITY_STATE_CONFIG[displayStage]
+      const context = {
+        deliverySubstatus: item.deliverySubstatus || getDeliverySubstatus(item, item.activities || []),
+        hasOffers: !!(item.offers && item.offers.length > 0) || !!(item.activities && item.activities.some(a => a.type === 'offer')),
+        scheduledAppointment: item.scheduledAppointment,
+        opportunity: item,
+        formatDateTime: (date) => new Date(date).toLocaleDateString()
+      }
+
+      if (config && config.primaryAction) {
+        const primaryAction = config.primaryAction
+        const action = typeof primaryAction === 'function'
+          ? primaryAction(context)
+          : primaryAction
+
+        if (action) {
+          const label = typeof action.label === 'function' ? action.label(context) : action.label
+          const title = typeof action.title === 'function' ? action.title(context) : action.title
+          const resolved = (label || title || '').toString().trim()
+          if (resolved) return resolved
+        }
+      }
+
+      const oppName = name || 'Customer'
+      return displayStage ? `${displayStage} – ${oppName}` : `Opportunity – ${oppName}`
     }
-    const action = typeof primaryAction === 'function'
-      ? primaryAction(context)
-      : primaryAction
 
-    if (!action) return null
-
-    const label = typeof action.label === 'function' ? action.label(context) : action.label
-    const title = typeof action.title === 'function' ? action.title(context) : action.title
-    return label || title || null
+    // Unknown type: still show something
+    return displayStage ? `${displayStage} – ${name || 'Task'}` : safeFallback('Task', String(item.id || ''))
+  } catch (_) {
+    const entityType = item.type === 'lead' ? 'Lead' : item.type === 'opportunity' ? 'Opportunity' : 'Task'
+    return safeFallback(entityType, String(item.id || ''))
   }
-
-  return null
 }

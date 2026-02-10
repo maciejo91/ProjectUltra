@@ -35,17 +35,33 @@ const DEFAULT_SETTINGS = {
   // Task Widgets
   autoCloseWidgetsOnClose: true,
   
-  // Lead Urgency Scoring
+  // Lead Urgency (level thresholds; score now from Lead Scoring)
   urgencyEnabled: true,
-  urgencyWeights: {
-    intent: 40,
-    behavioral: 35,
-    temporal: 25
-  },
   urgencyThresholds: {
     hot: 80,
     warm: 50,
     standard: 20
+  },
+
+  // Lead Scoring (Opportunity Score for sorting)
+  leadScoring: {
+    weights: {
+      freshness: 25,
+      proximity: 20,
+      vehicleMatch: 25,
+      sourceQuality: 15,
+      engagement: 15
+    },
+    sourcePriority: [
+      'Walk-in',
+      'Phone',
+      'Website',
+      'Google Ads',
+      'Facebook',
+      '3rd Party'
+    ],
+    prioritizeOldStock: true,
+    agingFactor: 0.5
   },
   
   // UI Theme
@@ -92,7 +108,14 @@ function loadSettings() {
           ...parsed.navigationVisibility
         }
       }
-      
+      if (parsed.leadScoring) {
+        parsed.leadScoring = {
+          ...DEFAULT_SETTINGS.leadScoring,
+          ...parsed.leadScoring,
+          weights: { ...DEFAULT_SETTINGS.leadScoring.weights, ...(parsed.leadScoring.weights || {}) }
+        }
+      }
+      delete parsed.urgencyWeights
       // Merge with defaults to handle new settings added in future
       return { ...DEFAULT_SETTINGS, ...parsed }
     }

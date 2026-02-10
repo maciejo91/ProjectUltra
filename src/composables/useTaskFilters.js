@@ -10,6 +10,15 @@ import { calculateLeadUrgency } from '@/composables/useLeadUrgency'
 
 const CLOSED_OPPORTUNITY_STAGES = [OPPORTUNITY_STAGES.CLOSED_WON, OPPORTUNITY_STAGES.CLOSED_LOST, OPPORTUNITY_STAGES.ABANDONED]
 
+/** Map opportunity/lead priority label to urgency level (HOT/WARM/STANDARD/COLD) for display. */
+function priorityToUrgencyLevel(priority) {
+  const p = (priority || '').toLowerCase()
+  if (p === 'hot') return 'HOT'
+  if (p === 'warm') return 'WARM'
+  if (p === 'standard' || p === 'normal') return 'STANDARD'
+  return 'COLD'
+}
+
 /**
  * Composable for task filtering logic
  * Handles combining leads and opportunities, role-based filtering, and type filtering
@@ -20,30 +29,39 @@ export function useTaskFilters(showClosed) {
   const opportunitiesStore = useOpportunitiesStore()
   const userStore = useUserStore()
   const usersStore = useUsersStore()
+  const settingsStore = useSettingsStore()
 
   // Combine leads and opportunities with type property and composite key
-  // Filter based on user role
+  // Filter based on user role. Depends on urgency/leadScoring settings so urgency is recomputed when they change.
   const allTasks = computed(() => {
+    const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') !== false
+    const _urgencyThresholds = settingsStore.getSetting('urgencyThresholds')
+    const _leadScoring = settingsStore.getSetting('leadScoring')
+
     // Filter out disqualified leads (unless showClosed is enabled)
-    const visibleLeads = showClosed.value 
-      ? leadsStore.leads 
+    const visibleLeads = showClosed.value
+      ? leadsStore.leads
       : leadsStore.leads.filter(lead => !lead.isDisqualified)
-    
+
     const leads = visibleLeads.map(lead => {
-      // Calculate displayStage for lead
       const displayStage = getDisplayStage(lead, 'lead')
-      
-      // Ensure customer object is preserved
-      const task = { 
-        ...lead, 
-        type: 'lead', 
+
+      const task = {
+        ...lead,
+        type: 'lead',
         compositeId: `lead-${lead.id}`,
         displayStage
       }
-      // Explicitly ensure customer is present
       if (!task.customer && lead.customer) {
         task.customer = lead.customer
       }
+
+      if (urgencyEnabled) {
+        const urgencyResult = calculateLeadUrgency(lead)
+        task.urgencyScore = urgencyResult.score
+        task.urgencyLevel = urgencyResult.level
+      }
+
       return task
     })
     
@@ -55,19 +73,19 @@ export function useTaskFilters(showClosed) {
         })
 
     const opportunities = visibleOpportunities.map(opp => {
-      // Calculate displayStage for opportunity
       const displayStage = getDisplayStage(opp, 'opportunity')
-      
-      // Ensure customer object is preserved
-      const task = { 
-        ...opp, 
-        type: 'opportunity', 
+
+      const task = {
+        ...opp,
+        type: 'opportunity',
         compositeId: `opportunity-${opp.id}`,
         displayStage
       }
-      // Explicitly ensure customer is present
       if (!task.customer && opp.customer) {
         task.customer = opp.customer
+      }
+      if (urgencyEnabled) {
+        task.urgencyLevel = priorityToUrgencyLevel(opp.priority)
       }
       return task
     })
