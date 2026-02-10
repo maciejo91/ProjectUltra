@@ -5,10 +5,12 @@
       <Button
         variant="secondary"
         size="sm"
-        class="gap-1.5 shrink-0"
+        class="gap-1.5 shrink-0 inline-flex items-center"
+        :disabled="addLoading"
         @click="$emit('open-add')"
       >
-        <Plus class="size-3.5" />
+        <Spinner v-if="addLoading" class="size-3.5 shrink-0" aria-hidden />
+        <Plus v-else class="size-3.5" />
         Add
       </Button>
     </div>
@@ -28,12 +30,17 @@
 
 <script setup>
 import { Plus } from 'lucide-vue-next'
-import { Button } from '@motork/component-library/future/primitives'
+import { Button, Spinner } from '@motork/component-library/future/primitives'
 
 defineProps({
   items: {
     type: Array,
     default: () => []
+  },
+  /** When true, the Add button shows a loading spinner and is disabled (e.g. while saving a trade-in). */
+  addLoading: {
+    type: Boolean,
+    default: false
   }
 })
 

@@ -1,9 +1,9 @@
 <template>
   <Dialog :open="show" @update:open="handleOpenChange">
     <DialogPortal>
-      <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
+      <DialogOverlay class="fixed inset-0 z-[100] bg-black/50" />
       <DialogContent
-        class="w-full sm:max-w-lg max-h-[calc(100vh-4rem)] flex flex-col"
+        class="w-full sm:max-w-lg max-h-[calc(100vh-4rem)] flex flex-col z-[100]"
         :show-close-button="true"
       >
         <DialogHeader class="flex-shrink-0">
@@ -58,7 +58,7 @@
                     />
                   </PopoverAnchor>
                   <PopoverContent
-                    class="w-(--radix-popover-trigger-width) min-w-(--radix-popover-trigger-width) p-0"
+                    class="z-[110] w-(--radix-popover-trigger-width) min-w-(--radix-popover-trigger-width) p-0"
                     align="start"
                     @open-auto-focus.prevent
                   >
@@ -94,7 +94,7 @@
                     />
                   </PopoverAnchor>
                   <PopoverContent
-                    class="w-(--radix-popover-trigger-width) min-w-(--radix-popover-trigger-width) p-0"
+                    class="z-[110] w-(--radix-popover-trigger-width) min-w-(--radix-popover-trigger-width) p-0"
                     align="start"
                     @open-auto-focus.prevent
                   >
@@ -417,11 +417,16 @@
             </Button>
             <Button
               variant="default"
-              class="rounded-sm w-full sm:w-auto"
-              :disabled="!isValid"
+              class="rounded-sm w-full sm:w-auto inline-flex items-center gap-2"
+              :disabled="!isValid || loading"
               @click="handleSubmit"
             >
-              {{ item ? 'Update Trade-In' : (isTradeIn ? 'Save Trade-In' : 'Add Vehicle') }}
+              <Spinner
+                v-if="loading"
+                class="size-4 shrink-0"
+                aria-hidden
+              />
+              <span>{{ item ? 'Update Trade-In' : (isTradeIn ? 'Save Trade-In' : 'Add Vehicle') }}</span>
             </Button>
           </div>
         </DialogFooter>
@@ -457,7 +462,8 @@ import {
   CommandList,
   CommandEmpty,
   CommandGroup,
-  CommandItem
+  CommandItem,
+  Spinner
 } from '@motork/component-library/future/primitives'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
 import { VEHICLE_BRANDS, getModelsForBrand, getAllModels } from '@/constants/vehicleSuggestions'
@@ -483,6 +489,11 @@ const props = defineProps({
   taskId: {
     type: [String, Number],
     default: null
+  },
+  /** When true, modal cannot be closed (save/delete in progress). */
+  loading: {
+    type: Boolean,
+    default: false
   }
 })
 

@@ -111,6 +111,7 @@
                 <TradeInsCard
                   v-if="task.type !== 'lead' || (task.tradeIns || []).length > 0"
                   :items="task.tradeIns || []"
+                  :add-loading="tradeInActionLoading"
                   @open-add="editingTradeIn = null; showTradeInModal = true"
                   @open-edit="openTradeInEdit"
                 />
@@ -209,6 +210,7 @@
       :task-type="task?.type || 'lead'"
       :task-id="task?.id"
       :item="editingTradeIn"
+      :loading="tradeInActionLoading"
       @save="handleTradeInSave"
       @delete="handleTradeInDelete"
       @close="showTradeInModal = false; editingTradeIn = null"
@@ -311,6 +313,7 @@ const showEmailModal = ref(false)
 const showComingSoonModal = ref(false)
 const showFinancingModal = ref(false)
 const showTradeInModal = ref(false)
+const tradeInActionLoading = ref(false)
 const editingTradeIn = ref(null)
 const editingFinancingOption = ref(null)
 const showOfferModal = ref(false)
@@ -626,6 +629,7 @@ async function handleFinancingDelete() {
 
 const handleTradeInSave = async (data) => {
   if (!props.storeAdapter || !props.task) return
+  tradeInActionLoading.value = true
   try {
     const v = data.vehicle || {}
     const parts = [v.brand, v.model].filter(Boolean)
@@ -661,11 +665,14 @@ const handleTradeInSave = async (data) => {
     editingTradeIn.value = null
   } catch (error) {
     console.error('Error saving trade-in:', error)
+  } finally {
+    tradeInActionLoading.value = false
   }
 }
 
 async function handleTradeInDelete() {
   if (!editingTradeIn.value || !props.storeAdapter || !props.task) return
+  tradeInActionLoading.value = true
   try {
     const list = (props.task.tradeIns || []).filter((t) => String(t.id) !== String(editingTradeIn.value.id))
     if (props.task.type === 'lead') {
@@ -679,6 +686,8 @@ async function handleTradeInDelete() {
     editingTradeIn.value = null
   } catch (error) {
     console.error('Error deleting trade-in:', error)
+  } finally {
+    tradeInActionLoading.value = false
   }
 }
 
