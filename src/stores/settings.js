@@ -34,7 +34,12 @@ const DEFAULT_SETTINGS = {
   
   // Task Widgets
   autoCloseWidgetsOnClose: true,
-  
+
+  // Assigning rules (lead/opportunity assignment preferences)
+  assigningRules: {
+    assignLeadToSameCustomerEmployee: false
+  },
+
   // Lead Urgency (level thresholds; score now from Lead Scoring)
   urgencyEnabled: true,
   urgencyThresholds: {

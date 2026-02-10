@@ -124,20 +124,20 @@ export function getStageColor(displayStage, entityType = 'opportunity') {
     [OPPORTUNITY_STAGES.AWAITING_APPOINTMENT]: 'bg-blue-100 text-blue-700',
     [OPPORTUNITY_STAGES.APPOINTMENT_SCHEDULED]: 'bg-purple-100 text-purple-700',
     [OPPORTUNITY_STAGES.IN_NEGOTIATION]: 'bg-yellow-100 text-yellow-700',
-    [OPPORTUNITY_STAGES.CONTRACT_PENDING]: 'bg-emerald-100 text-emerald-700',
-    [OPPORTUNITY_STAGES.CLOSED_WON]: 'bg-green-100 text-green-700',
-    [OPPORTUNITY_STAGES.CLOSED_LOST]: 'bg-red-100 text-red-700',
+    [OPPORTUNITY_STAGES.CONTRACT_PENDING]: 'bg-badge-green text-emerald-700',
+    [OPPORTUNITY_STAGES.CLOSED_WON]: 'bg-badge-green text-green-700',
+    [OPPORTUNITY_STAGES.CLOSED_LOST]: 'bg-badge-red text-red-700',
     [OPPORTUNITY_STAGES.ABANDONED]: 'bg-gray-100 text-gray-700'
   }
   
   const leadColors = {
-    [LEAD_STAGES.NEW]: 'bg-gray-100 text-gray-700',
+    [LEAD_STAGES.NEW]: 'bg-badge-green text-emerald-700',
     [LEAD_STAGES.TO_BE_CALLED_BACK]: 'bg-purple-100 text-purple-700',
-    [LEAD_STAGES.VALID_TO_BE_CALLED_BACK]: 'bg-emerald-100 text-emerald-700',
-    [LEAD_STAGES.VALID]: 'bg-emerald-100 text-emerald-700',
+    [LEAD_STAGES.VALID_TO_BE_CALLED_BACK]: 'bg-badge-green text-emerald-700',
+    [LEAD_STAGES.VALID]: 'bg-badge-green text-emerald-700',
     [LEAD_STAGES.CLOSED_INVALID]: 'bg-gray-100 text-gray-600',
-    [LEAD_STAGES.CLOSED_NOT_INTERESTED]: 'bg-red-100 text-red-700',
-    [LEAD_STAGES.CLOSED_DUPLICATE]: 'bg-orange-100 text-orange-700'
+    [LEAD_STAGES.CLOSED_NOT_INTERESTED]: 'bg-badge-red text-red-700',
+    [LEAD_STAGES.CLOSED_DUPLICATE]: 'bg-badge-orange text-orange-700'
   }
   
   const colors = entityType === 'opportunity' ? opportunityColors : leadColors
@@ -148,7 +148,7 @@ export function getStageColor(displayStage, entityType = 'opportunity') {
 export function getDeliverySubstatusColor(substatus) {
   const substatusColors = {
     [DELIVERY_SUBSTATUS.AWAITING_DELIVERY]: 'bg-teal-50 text-teal-700 border-teal-200',
-    [DELIVERY_SUBSTATUS.DELIVERED]: 'bg-green-50 text-green-700 border-green-200'
+    [DELIVERY_SUBSTATUS.DELIVERED]: 'bg-badge-green text-green-700 border-green-200'
   }
   
   return substatusColors[substatus] || 'bg-gray-50 text-gray-700 border-gray-200'

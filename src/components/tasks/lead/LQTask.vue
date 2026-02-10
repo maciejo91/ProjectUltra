@@ -209,7 +209,7 @@
                 </Toggle>
               </div>
               
-              <!-- Template and Message Preview (only show if channel selected and not 'dont-send') -->
+              <!-- Template and editable message (only show if channel selected and not 'dont-send') -->
               <div v-if="followupChannel && followupChannel !== 'dont-send'" class="space-y-3">
                 <!-- Template -->
                 <div>
@@ -225,15 +225,15 @@
                   </Select>
                 </div>
                 
-                <!-- Message Preview -->
+                <!-- Editable message -->
                 <div>
-                  <Label class="form-label">Message preview</Label>
-                  <textarea
-                    :value="messagePreview"
+                  <Label class="form-label">Message</Label>
+                  <Textarea
+                    v-model="followupMessageBody"
                     rows="4"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-muted-foreground bg-white resize-none"
-                    readonly
-                  ></textarea>
+                    class="w-full resize-none border-border bg-background text-foreground"
+                    placeholder="Select a template or type your message..."
+                  />
                 </div>
               </div>
             </div>
@@ -1364,9 +1364,11 @@ const {
   disqualifyReason,
   assignment,
   preferences,
-  messageTemplates,
-  messagePreview,
-  selectOutcome,
+    messageTemplates,
+    messagePreview,
+    followupMessageBody,
+    resolveFollowupMessage,
+    selectOutcome,
   cancelOutcome,
   calculateNextCallDate,
   surveyCompleted,
@@ -2262,11 +2264,13 @@ const handleVehicleSave = async (data) => {
   }
 }
 
-// Handle follow-up communication send
+// Handle follow-up communication send (uses editable message body; placeholders resolved when sending)
 const handleFollowupSend = async (data) => {
   try {
     followupChannel.value = data.type
     selectedTemplate.value = data.template || ''
+    const nextCallDateIso = data.nextCallDate ?? null
+    const resolvedMessage = resolveFollowupMessage(followupMessageBody.value, nextCallDateIso)
     
     // Map communication type to activity action
     const actionMap = {
@@ -2275,16 +2279,12 @@ const handleFollowupSend = async (data) => {
       'whatsapp': 'sent a WhatsApp message'
     }
     
-    // Get user name
     const userName = currentUser.value?.name || 'You'
-    
-    // Build content string
-    let content = data.message || ''
+    let content = data.message ?? resolvedMessage
     if (data.type === 'email' && data.subject) {
       content = `${data.subject}: ${content}`
     }
     
-    // Save communication activity
     await leadsStore.addActivity(props.lead.id, {
       type: data.type,
       user: userName,

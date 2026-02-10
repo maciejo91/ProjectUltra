@@ -169,6 +169,7 @@ import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useTaskHelpers } from '@/composables/useTaskHelpers'
 import { getTaskActionTitle } from '@/utils/taskActionTitle'
+import { getDisplayStage } from '@/utils/stageMapper'
 
 const props = defineProps({
   tasks: { type: Array, required: true },
@@ -238,8 +239,9 @@ const columnFilters = ref([
   { id: 'status-1', field: 'status', value: [], operator: 'in', pinned: true },
   { id: 'urgencyLevel-1', field: 'urgencyLevel', value: [], operator: 'in', pinned: true }
 ])
-// Default visible columns: Task details, Due date, Customer, Vehicle, Assigned (hide Created, Attempts, VIN, Request message, Source)
+// Default visible columns: hide Task title, Created, Attempts, VIN, Request message, Source
 const columnVisibility = ref({
+  taskTitle: false,
   createdAt: false,
   contactAttempts: false,
   vin: false,
@@ -322,34 +324,19 @@ const getCarPrice = (task) => {
   return vehicle?.price
 }
 
-// DataTable columns: Task details (with badge), Created, Due date, Attempts, Customer, Vehicle, Request message, Source, Assigned
+// DataTable columns order: Type, Urgency, Task title, Customer, Vehicle, VIN, Request message, Status, Created, Due date, Attempts, Source, Assigned
 const columns = computed(() => [
   {
-    id: 'taskDetails',
-    accessorKey: 'compositeId',
-    header: 'Task details',
-    meta: {
-      title: 'Task details',
-      onOpen: (row) => handleRowClick(row.original)
-    },
+    id: 'type',
+    accessorKey: 'type',
+    header: 'Type',
+    meta: { title: 'Type' },
     cell: ({ row }) => {
       const task = row.original
-      const actionTitle = getTaskActionTitle(task)
-      const stageStatus = task.type === 'lead' ? (task.displayStage || task.status) : (task.displayStage || task.stage)
-      const stageClass = props.getStageBadgeClass(stageStatus)
       const typeClass = task.type === 'lead' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-purple-50 text-purple-700 border-purple-200'
-      const badgeChildren = [
-        h('span', {
-          class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${typeClass} w-fit`
-        }, task.type === 'lead' ? 'Lead' : 'Opportunity'),
-        stageStatus && h('span', {
-          class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${stageClass} w-fit`
-        }, stageStatus)
-      ]
-      return h('div', { class: 'flex flex-col gap-1 min-w-0' }, [
-        h('div', { class: 'text-content font-semibold text-foreground truncate' }, actionTitle || '—'),
-        h('div', { class: 'flex flex-wrap items-center gap-1.5' }, badgeChildren)
-      ])
+      return h('span', {
+        class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${typeClass} w-fit`
+      }, task.type === 'lead' ? 'Lead' : 'Opportunity')
     }
   },
   {
@@ -373,43 +360,17 @@ const columns = computed(() => [
     }
   },
   {
-    id: 'createdAt',
-    accessorKey: 'createdAt',
-    header: 'Created',
-    meta: { title: 'Created' },
+    id: 'taskTitle',
+    accessorKey: 'taskTitle',
+    header: 'Task title',
+    meta: {
+      title: 'Task title',
+      onOpen: (row) => handleRowClick(row.original)
+    },
     cell: ({ row }) => {
       const task = row.original
-      if (!task.createdAt) return h('span', { class: 'text-meta' }, '—')
-      return h('span', { class: 'text-meta' }, formatRelativeTime(task.createdAt))
-    }
-  },
-  {
-    id: 'dueDate',
-    accessorKey: 'nextActionDue',
-    header: 'Due date',
-    meta: { title: 'Due date' },
-    cell: ({ row }) => {
-      const task = row.original
-      const date = task.nextActionDue ?? task.dueDate
-      if (!date) {
-        return h('span', { class: 'text-meta' }, 'Not set')
-      }
-      const status = getDeadlineStatus(date)
-      return h('span', {
-        class: `inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold border ${status.bgClass} ${status.textClass} ${status.borderClass}`
-      }, getDateDisplay(date))
-    }
-  },
-  {
-    id: 'contactAttempts',
-    accessorKey: 'contactAttempts',
-    header: 'Attempts',
-    meta: { title: 'Attempts' },
-    cell: ({ row }) => {
-      const task = row.original
-      const attempts = task.contactAttempts?.length || 0
-      const max = maxContactAttempts.value
-      return h('span', { class: 'text-content font-medium text-foreground' }, `${attempts}/${max}`)
+      const actionTitle = getTaskActionTitle(task)
+      return h('div', { class: 'text-content font-semibold text-foreground truncate min-w-0' }, actionTitle || '—')
     }
   },
   {
@@ -472,6 +433,62 @@ const columns = computed(() => [
     }
   },
   {
+    id: 'status',
+    accessorKey: 'status',
+    header: 'Status',
+    meta: { title: 'Status' },
+    cell: ({ row }) => {
+      const task = row.original
+      const displayStage = getDisplayStage(task, task.type === 'lead' ? 'lead' : 'opportunity')
+      const stageClass = props.getStageBadgeClass(displayStage)
+      return displayStage
+        ? h('span', {
+            class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${stageClass} w-fit`
+          }, displayStage)
+        : h('span', { class: 'text-meta' }, '—')
+    }
+  },
+  {
+    id: 'createdAt',
+    accessorKey: 'createdAt',
+    header: 'Created',
+    meta: { title: 'Created' },
+    cell: ({ row }) => {
+      const task = row.original
+      if (!task.createdAt) return h('span', { class: 'text-meta' }, '—')
+      return h('span', { class: 'text-meta' }, formatRelativeTime(task.createdAt))
+    }
+  },
+  {
+    id: 'dueDate',
+    accessorKey: 'nextActionDue',
+    header: 'Due date',
+    meta: { title: 'Due date' },
+    cell: ({ row }) => {
+      const task = row.original
+      const date = task.nextActionDue ?? task.dueDate
+      if (!date) {
+        return h('span', { class: 'text-meta' }, 'Not set')
+      }
+      const status = getDeadlineStatus(date)
+      return h('span', {
+        class: `text-xs font-medium ${status.textClass}`
+      }, getDateDisplay(date))
+    }
+  },
+  {
+    id: 'contactAttempts',
+    accessorKey: 'contactAttempts',
+    header: 'Attempts',
+    meta: { title: 'Attempts' },
+    cell: ({ row }) => {
+      const task = row.original
+      const attempts = task.contactAttempts?.length || 0
+      const max = maxContactAttempts.value
+      return h('span', { class: 'text-content font-medium text-foreground' }, `${attempts}/${max}`)
+    }
+  },
+  {
     id: 'source',
     accessorKey: 'source',
     header: 'Source',
@@ -484,7 +501,7 @@ const columns = computed(() => [
       return h('div', { class: 'flex flex-col gap-1 min-w-0' }, [
         h('span', { class: 'text-meta' }, `${main}${details}`.trim()),
         ...(badge ? [h('span', {
-          class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-50 text-green-700 border border-green-200 w-fit'
+          class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200 w-fit'
         }, badge)] : [])
       ])
     }
@@ -507,12 +524,15 @@ const columns = computed(() => [
 
 // Filter → sort → paginate for DataTable - maps filter keys to row values (aligned with columns)
 const getTaskFilterValue = (row, key) => {
+  if (key === 'taskTitle') {
+    return getTaskActionTitle(row) ?? ''
+  }
   if (key === 'requestedCarBrand') {
     const car = row.type === 'lead' ? row.requestedCar : (row.vehicle || row.requestedCar)
     return car?.brand
   }
   if (key === 'status') {
-    return row.displayStage ?? row.status ?? row.stage
+    return getDisplayStage(row, row.type === 'lead' ? 'lead' : 'opportunity') ?? row.displayStage ?? row.status ?? row.stage
   }
   if (key === 'assignee') {
     const val = row.assignee

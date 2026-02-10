@@ -11,7 +11,7 @@
     <!-- Hot Priority Badge (when urgency disabled and not shown elsewhere e.g. next to name on card) -->
     <span 
       v-if="showHotPriorityBadge && !urgencyShownElsewhere"
-      class="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-red-50 text-red-700 border border-red-200 leading-none"
+      class="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-badge-red text-red-700 border border-red-200 leading-none"
     >
       Hot
     </span>
@@ -154,8 +154,9 @@ const getStageColorClass = (stage) => {
       if (baseColor.includes('pink')) return baseColor + ' border-pink-200'
       if (baseColor.includes('indigo')) return baseColor + ' border-indigo-200'
       if (baseColor.includes('emerald')) return baseColor + ' border-emerald-200'
-      if (baseColor.includes('green')) return baseColor + ' border-green-200'
-      if (baseColor.includes('red')) return baseColor + ' border-red-200'
+      if (baseColor.includes('badge-green') || baseColor.includes('green')) return baseColor + ' border-green-200'
+      if (baseColor.includes('badge-red') || baseColor.includes('red')) return baseColor + ' border-red-200'
+      if (baseColor.includes('badge-orange') || baseColor.includes('orange')) return baseColor + ' border-orange-200'
       if (baseColor.includes('gray')) return baseColor + ' border-gray-200'
       return baseColor + ' border-gray-200'
     } catch (e) {
@@ -163,10 +164,10 @@ const getStageColorClass = (stage) => {
     }
   }
   
-  // Fallback colors for leads or when stage mapper fails
+  // Fallback colors for leads or when stage mapper fails (New = green per screenshot)
   const stageLower = stage.toLowerCase()
-  if (stageLower.includes('new')) return 'bg-blue-50 text-blue-600 border-blue-200'
-  if (stageLower.includes('qualif')) return 'bg-green-50 text-green-600 border-green-200'
+  if (stageLower.includes('new')) return 'bg-badge-green text-emerald-700 border-emerald-200'
+  if (stageLower.includes('qualif')) return 'bg-badge-green text-green-600 border-green-200'
   if (stageLower.includes('negotiat')) return 'bg-purple-50 text-purple-600 border-purple-200'
   if (stageLower.includes('close')) return 'bg-muted text-muted-foreground border-border'
   return 'bg-gray-50 text-gray-700 border-gray-200'

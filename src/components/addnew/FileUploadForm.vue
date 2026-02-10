@@ -16,8 +16,8 @@
         />
         <Card
           @click="fileInputRef?.click()"
-          class="border-2 border-dashed cursor-pointer transition-all hover:border-brand-primary/50 w-full"
-          :class="{ 'opacity-50 cursor-not-allowed': loading, 'border-border': !loading }"
+          class="upload-drop-zone cursor-pointer transition-all w-full"
+          :class="{ 'opacity-50 cursor-not-allowed': loading }"
         >
           <CardContent class="flex flex-col items-center text-center py-8">
             <Upload class="w-5 h-5 shrink-0 text-muted-foreground mb-3" />
@@ -142,3 +142,12 @@ defineExpose({
   headers
 })
 </script>
+
+<style scoped>
+.upload-drop-zone {
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+}
+.upload-drop-zone:hover:not(.opacity-50) {
+  border-color: rgba(4, 112, 233, 0.4);
+}
+</style>

@@ -86,6 +86,11 @@
   --brand-primary-600: #0470e9;
   --brand-primary-700: #0359c0;
   
+  /* Badge background colors (green / red / orange) */
+  --badge-green-bg: #eef9f5;
+  --badge-red-bg: #ffeff0;
+  --badge-orange-bg: #fff6ea;
+
   /* Figma Design System Colors */
   --figma-cyan: #40B3E9; /* Accent color for focus states */
   --figma-border: #E5E5E5; /* Border color for filter dropdowns and buttons */
@@ -269,9 +274,23 @@ label[for] {
   flex-shrink: 0;
 }
 
+/* Page header with bottom slot: single block, tabs on bottom line */
+.page-header-no-border {
+  border-bottom: none !important;
+}
+
+.section-header-bottom {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: -0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 /* Section header (inside pages) */
 .section-header {
-  padding: 1.5rem 0 1rem 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -286,7 +305,7 @@ label[for] {
 }
 
 .section-header-title {
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
   font-weight: 600;
   margin: 0;
   color: var(--foreground);
@@ -304,6 +323,22 @@ label[for] {
   color: var(--muted-foreground);
   margin: 0;
 }
+
+/* Typography hierarchy: title > subtitle > label > supporting (use theme tokens) */
+.text-title {
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.375;
+}
+.text-subtitle {
+  font-size: var(--text-base, 1rem);
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.5;
+}
+/* Labels: text-sm (same as .text-content); use .text-content or .form-label for form labels */
+/* Supporting: .text-meta = text-xs, muted */
 
 /* ========================================
    Layout Component Classes
@@ -542,7 +577,7 @@ button[aria-pressed="true"]:hover:not(:disabled) {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   border-radius: 0.5rem;
   border: 1px solid var(--border);
@@ -582,7 +617,7 @@ button[aria-pressed="true"]:hover:not(:disabled) {
   align-items: center;
   gap: 0.5rem;
   padding: 0.625rem 1rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   border-radius: 0.5rem;
   border: 1px solid var(--border);
@@ -597,7 +632,7 @@ button[aria-pressed="true"]:hover:not(:disabled) {
   gap: 0.5rem;
   width: 100%;
   padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   border-radius: 0.5rem;
   border: 1px solid var(--border);
@@ -611,7 +646,7 @@ button[aria-pressed="true"]:hover:not(:disabled) {
 
 .form-label {
   display: block;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   line-height: 1.25rem;
   color: var(--foreground);
@@ -621,7 +656,7 @@ button[aria-pressed="true"]:hover:not(:disabled) {
 .form-label.optional,
 .form-label .optional {
   color: var(--muted-foreground);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 400;
 }
 
@@ -722,7 +757,7 @@ button[class*="size-icon-lg"] {
   align-items: center;
   justify-content: center;
   padding: 0.75rem 1rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--text-sub, #737373);
   background: transparent;
@@ -733,7 +768,7 @@ button[class*="size-icon-lg"] {
 }
 
 .page-header-title {
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   font-weight: 500;
   margin: 0;
   color: var(--foreground);
@@ -747,7 +782,6 @@ button[class*="size-icon-lg"] {
 }
 
 .section-header {
-  padding: 1.5rem 0 1rem 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -911,7 +945,7 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 /* Extract with AI button (call popup) – compact size, icon in gold */
 .extract-with-ai-btn {
   padding: 0.375rem 0.75rem !important;
-  font-size: 0.75rem !important;
+  font-size: var(--text-xs) !important;
   line-height: 1rem !important;
   min-height: 2rem !important;
   height: auto !important;
@@ -966,8 +1000,56 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
   overflow: hidden;
 }
 
+/* Table typography (Tasks + Customers): match reference font sizes using theme tokens */
+.data-table-inner thead th,
+.data-table-inner [data-slot="table-container"] thead th,
+.data-table-inner thead [role="columnheader"] {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+/* Primary table cell text (customer names, main data): 14px, foreground */
+.text-content {
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--foreground);
+}
+
+/* Secondary table cell text (email, meta line): 12–13px, muted */
+.text-meta {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--muted-foreground);
+}
+
+/* Customers table: text-fluid-* map to same sizes (Tasks table uses .text-content / .text-meta) */
+.data-table-inner .text-fluid-sm {
+  font-size: var(--text-sm, 0.875rem);
+}
+.data-table-inner .text-fluid-xs {
+  font-size: var(--text-xs, 0.75rem);
+}
+
+/* Badge background utilities (use with text-* and border-* for full badge styling) */
+.bg-badge-green { background-color: var(--badge-green-bg); }
+.bg-badge-red { background-color: var(--badge-red-bg); }
+.bg-badge-orange { background-color: var(--badge-orange-bg); }
+
+/* Table badges: consistent small semibold label (reinforce theme token size) */
+.data-table-inner span.inline-flex.rounded[class*="px-2"] {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+}
+
 /* Note: DataTable styling uses Motork component library's default styles */
-/* All custom table overrides have been removed to use Motork's out-of-the-box styling */
+/* Typography and badge utilities above are minimal overrides for table pages */
+
+/* Add New manual tab: card titles = title level (larger than labels) */
+.add-new-manual [data-slot="card-title"],
+.add-new-manual [class*="card-title"] {
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: 600;
+  color: var(--foreground);
+}
 
 /* Empty state styling for DataTables */
 .empty-state {
@@ -987,7 +1069,7 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 }
 
 .empty-state-text {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   margin: 0;
   color: var(--muted-foreground);
 }

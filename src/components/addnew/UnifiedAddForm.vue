@@ -1,16 +1,16 @@
 <template>
   <form v-click-outside="() => (showResults = false)" @submit.prevent="handleSubmit" class="w-full">
     <!-- Customer Section -->
-    <Card class="mb-4">
+    <Card class="mb-6">
       <CardHeader>
         <CardTitle>Customer Information</CardTitle>
       </CardHeader>
-      <CardContent class="space-y-6">
+      <CardContent class="space-y-8">
         
         <!-- Toggle and Search (hidden if hideContactSelection is true) -->
-        <div v-if="!hideContactSelection" class="space-y-6">
+        <div v-if="!hideContactSelection" class="space-y-8">
           <!-- Radio: Existing vs New -->
-          <div class="space-y-2">
+          <div class="space-y-3">
             <Label class="block text-sm font-semibold text-foreground">Customer Type</Label>
             <div class="flex gap-6">
               <Label class="flex items-center gap-2 cursor-pointer">
@@ -36,7 +36,7 @@
         
           <!-- Contact Search (if existing) -->
           <div v-if="contactMode === 'existing'" class="space-y-6">
-            <div class="relative space-y-2">
+            <div class="relative space-y-3">
               <Label class="block text-sm font-semibold text-foreground">Search Customer</Label>
               <div class="relative w-full">
                 <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 shrink-0 text-muted-foreground z-10" />
@@ -66,8 +66,8 @@
                       {{ contact.initials }}
                     </div>
                     <div class="flex-1 min-w-0">
-                      <div class="font-semibold text-foreground text-xs truncate">{{ contact.name }}</div>
-                      <div class="text-muted-foreground text-xs truncate">{{ contact.email }}</div>
+                      <div class="text-sm font-semibold text-foreground truncate">{{ contact.name }}</div>
+                      <div class="text-xs text-muted-foreground truncate">{{ contact.email }}</div>
                     </div>
                     <ChevronRight class="w-3 h-3 shrink-0 text-muted-foreground" />
                   </div>
@@ -84,8 +84,8 @@
                       {{ selectedContact.initials }}
                     </div>
                     <div>
-                      <div class="font-bold text-foreground text-xs">{{ selectedContact.name }}</div>
-                      <div class="text-muted-foreground text-xs">{{ selectedContact.email }}</div>
+                      <div class="text-sm font-semibold text-foreground">{{ selectedContact.name }}</div>
+                      <div class="text-xs text-muted-foreground">{{ selectedContact.email }}</div>
                     </div>
                   </div>
                   <Button
@@ -102,8 +102,8 @@
           </div>
         
           <!-- Customer Form Fields (if new) -->
-          <div v-else class="space-y-6">
-            <div class="space-y-2">
+          <div v-else class="space-y-8">
+            <div class="space-y-3">
               <Label class="block text-sm font-semibold text-foreground">
                 Customer Name <span class="text-brand-red">*</span>
               </Label>
@@ -119,7 +119,7 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-2">
+              <div class="space-y-3">
                 <Label class="block text-sm font-semibold text-foreground">
                   Email <span class="text-brand-red">*</span>
                 </Label>
@@ -134,7 +134,7 @@
                 <p v-if="errors.email" class="text-brand-red text-xs mt-1">{{ errors.email }}</p>
               </div>
               
-              <div class="space-y-2">
+              <div class="space-y-3">
                 <Label class="block text-sm font-semibold text-foreground">Phone</Label>
                 <Input 
                   v-model="contactFormData.phone"
@@ -145,7 +145,7 @@
               </div>
             </div>
             
-            <div class="space-y-2">
+            <div class="space-y-3">
               <Label class="block text-sm font-semibold text-foreground">Company (optional)</Label>
               <Input 
                 v-model="contactFormData.company"
@@ -165,8 +165,8 @@
                 {{ selectedContact.initials }}
               </div>
               <div>
-                <div class="font-bold text-foreground text-xs">{{ selectedContact.name }}</div>
-                <div class="text-muted-foreground text-xs">{{ selectedContact.email }}</div>
+                <div class="text-sm font-semibold text-foreground">{{ selectedContact.name }}</div>
+                <div class="text-xs text-muted-foreground">{{ selectedContact.email }}</div>
               </div>
             </div>
           </CardContent>
@@ -175,19 +175,19 @@
     </Card>
     
     <!-- Vehicle Details Section (Optional) -->
-    <Card class="mb-4">
+    <Card class="mb-6">
       <CardHeader>
         <CardTitle>
           Vehicle Details 
-          <span class="text-meta font-normal text-xs">(Optional)</span>
+          <span class="text-xs font-normal text-muted-foreground">(Optional)</span>
         </CardTitle>
       </CardHeader>
       <CardContent class="space-y-8">
         <!-- Basic Information -->
-        <div class="space-y-4">
-          <h4 class="text-xs font-bold uppercase text-muted-foreground tracking-wider">Basic Information</h4>
+        <div class="space-y-5">
+          <h4 class="text-subtitle uppercase text-muted-foreground tracking-wider">Basic Information</h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            <div class="space-y-2">
+            <div class="space-y-3">
               <Label class="block text-sm font-semibold text-foreground">Brand</Label>
               <Input 
                 v-model="vehicleFormData.brand"
@@ -197,7 +197,7 @@
               />
             </div>
             
-            <div class="space-y-2">
+            <div class="space-y-3">
               <Label class="block text-sm font-semibold text-foreground">Model</Label>
               <Input 
                 v-model="vehicleFormData.model"
@@ -207,7 +207,7 @@
               />
             </div>
             
-            <div class="space-y-2">
+            <div class="space-y-3">
               <Label class="block text-sm font-semibold text-foreground">Year</Label>
               <Input 
                 v-model="vehicleFormData.year"
@@ -219,7 +219,7 @@
               />
             </div>
             
-            <div class="space-y-2">
+            <div class="space-y-3">
               <Label class="block text-sm font-semibold text-foreground">Price</Label>
               <Input 
                 v-model="vehicleFormData.price"
@@ -234,10 +234,10 @@
       
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <!-- Request Details -->
-          <div class="space-y-4">
-            <h4 class="text-xs font-bold uppercase text-muted-foreground tracking-wider">Request Details</h4>
+          <div class="space-y-5">
+            <h4 class="text-subtitle uppercase text-muted-foreground tracking-wider">Request Details</h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div class="space-y-2">
+              <div class="space-y-3">
                 <Label class="block text-sm font-semibold text-foreground">Request Type</Label>
                 <Select v-model="vehicleFormData.requestType">
                   <SelectTrigger class="w-full h-10">
@@ -252,7 +252,7 @@
                 </Select>
               </div>
               
-              <div class="space-y-2">
+              <div class="space-y-3">
                 <Label class="block text-sm font-semibold text-foreground">Source</Label>
                 <Select v-model="vehicleFormData.source">
                   <SelectTrigger class="w-full h-10">
@@ -271,10 +271,10 @@
           </div>
           
           <!-- Vehicle Specs -->
-          <div class="space-y-4">
-            <h4 class="text-xs font-bold uppercase text-muted-foreground tracking-wider">Vehicle Specs</h4>
+          <div class="space-y-5">
+            <h4 class="text-subtitle uppercase text-muted-foreground tracking-wider">Vehicle Specs</h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div class="space-y-2">
+              <div class="space-y-3">
                 <Label class="block text-sm font-semibold text-foreground">Fuel Type</Label>
                 <Select v-model="vehicleFormData.fuelType">
                   <SelectTrigger class="w-full h-10">
@@ -289,7 +289,7 @@
                 </Select>
               </div>
               
-              <div class="space-y-2">
+              <div class="space-y-3">
                 <Label class="block text-sm font-semibold text-foreground">Gear Type</Label>
                 <Select v-model="vehicleFormData.gearType">
                   <SelectTrigger class="w-full h-10">
@@ -305,7 +305,7 @@
           </div>
         </div>
 
-        <div class="space-y-2">
+        <div class="space-y-3">
           <Label class="block text-sm font-semibold text-foreground">Request Message</Label>
           <Textarea 
             v-model="vehicleFormData.requestMessage"
@@ -318,17 +318,17 @@
     </Card>
     
     <!-- Task Creation Checkboxes -->
-    <Card class="bg-muted border-border mb-4">
+    <Card class="bg-muted border-border mb-6">
       <CardHeader>
         <CardTitle>Create Task (Optional)</CardTitle>
       </CardHeader>
-      <CardContent class="space-y-3">
-        <p class="text-muted-foreground text-xs">
+      <CardContent class="space-y-5">
+        <p class="text-sm text-muted-foreground">
           Convert this customer to a lead or opportunity. 
           <span class="font-semibold text-muted-foreground">Requires vehicle details.</span>
         </p>
         
-        <div v-if="!forceType" class="flex flex-col md:flex-row gap-3">
+        <div v-if="!forceType" class="flex flex-col md:flex-row gap-4">
           <Card 
             class="flex-1 border-border"
             :class="hasVehicleData ? 'cursor-pointer hover:border-primary/30' : 'cursor-not-allowed opacity-60'"
@@ -341,12 +341,12 @@
               />
               <div>
                 <span 
-                  class="text-xs font-bold"
+                  class="text-sm font-semibold"
                   :class="hasVehicleData ? 'text-foreground' : 'text-muted-foreground'"
                 >
                   Mark as Lead
                 </span>
-                <p class="text-xs text-muted-foreground">New lead task</p>
+                <p class="text-xs text-muted-foreground mt-0.5">New lead task</p>
               </div>
             </CardContent>
           </Card>
@@ -363,12 +363,12 @@
               />
               <div>
                 <span 
-                  class="text-xs font-bold"
+                  class="text-sm font-semibold"
                   :class="hasVehicleData ? 'text-foreground' : 'text-muted-foreground'"
                 >
                   Mark as Opportunity
                 </span>
-                <p class="text-xs text-muted-foreground">New opportunity</p>
+                <p class="text-xs text-muted-foreground mt-0.5">New opportunity</p>
               </div>
             </CardContent>
           </Card>
@@ -379,7 +379,7 @@
           <CardContent class="flex items-center gap-3">
             <Info class="w-4 h-4 shrink-0 text-primary" />
             <div>
-              <p class="text-xs font-bold text-foreground">
+              <p class="text-sm font-semibold text-foreground">
                 Converting to {{ forceType === 'lead' ? 'Lead' : 'Opportunity' }}
               </p>
             </div>

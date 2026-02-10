@@ -138,9 +138,9 @@ export function getDeadlineStatus(isoTimestamp) {
       icon: 'fa-clock',
       relativeTime: 'No deadline',
       statusText: 'No deadline',
-      bgClass: 'bg-gray-50',
-      textClass: 'text-gray-700',
-      borderClass: 'border-gray-200',
+      bgClass: 'bg-muted',
+      textClass: 'text-muted-foreground',
+      borderClass: 'border-border',
       iconClass: 'fa-solid fa-clock'
     }
   }
@@ -156,9 +156,9 @@ export function getDeadlineStatus(isoTimestamp) {
       icon: 'fa-exclamation-triangle',
       relativeTime: 'OVERDUE',
       statusText: 'OVERDUE',
-      bgClass: 'bg-red-50',
-      textClass: 'text-red-700',
-      borderClass: 'border-red-200',
+      bgClass: 'bg-rose-100',
+      textClass: 'text-rose-600',
+      borderClass: 'border-rose-200',
       iconClass: 'fa-solid fa-exclamation-triangle'
     }
   } else if (hoursUntil < 2) {
@@ -171,9 +171,9 @@ export function getDeadlineStatus(isoTimestamp) {
       icon: 'fa-clock',
       relativeTime: hours > 0 ? `${hours}h ${mins}m` : `${mins}m`,
       statusText: 'URGENT',
-      bgClass: 'bg-orange-50',
-      textClass: 'text-orange-700',
-      borderClass: 'border-orange-200',
+      bgClass: 'bg-amber-100',
+      textClass: 'text-amber-700',
+      borderClass: 'border-amber-200',
       iconClass: 'fa-solid fa-clock'
     }
   } else if (hoursUntil < 24) {
@@ -185,9 +185,9 @@ export function getDeadlineStatus(isoTimestamp) {
       icon: 'fa-clock',
       relativeTime: `${hours}h ${minutes}m`,
       statusText: 'TODAY',
-      bgClass: 'bg-blue-50',
-      textClass: 'text-blue-700',
-      borderClass: 'border-blue-200',
+      bgClass: 'bg-amber-100',
+      textClass: 'text-amber-700',
+      borderClass: 'border-amber-200',
       iconClass: 'fa-solid fa-clock'
     }
   } else {
@@ -198,9 +198,9 @@ export function getDeadlineStatus(isoTimestamp) {
       icon: 'fa-calendar',
       relativeTime: `${daysUntil} day${daysUntil !== 1 ? 's' : ''}`,
       statusText: 'UPCOMING',
-      bgClass: 'bg-gray-50',
-      textClass: 'text-gray-700',
-      borderClass: 'border-gray-200',
+      bgClass: 'bg-muted',
+      textClass: 'text-muted-foreground',
+      borderClass: 'border-border',
       iconClass: 'fa-solid fa-calendar'
     }
   }
@@ -213,27 +213,38 @@ export function getDeadlineStatus(isoTimestamp) {
  */
 export function getStageBadgeClass(stage) {
   const classes = {
-    // Opportunity stages
+    // Lead stages (stageMapper display values) – New = green per screenshot
+    'New': 'bg-badge-green text-emerald-700',
+    'To be called back': 'bg-purple-100 text-purple-700',
+    'Valid - to be called back': 'bg-badge-green text-emerald-700',
+    'Valid': 'bg-badge-green text-emerald-700',
+    'Closed - Invalid': 'bg-muted text-muted-foreground',
+    'Closed - Not Interested': 'bg-badge-red text-rose-600',
+    'Closed - Duplicate': 'bg-badge-orange text-amber-700',
+    // Opportunity stages (stageMapper display values)
+    'Qualified': 'bg-muted text-muted-foreground',
+    'Awaiting Appointment': 'bg-blue-100 text-blue-700',
+    'Appointment Scheduled': 'bg-purple-100 text-purple-700',
+    'In Negotiation': 'bg-badge-orange text-amber-700',
+    'In Negotiation - Contract Pending': 'bg-badge-green text-emerald-700',
+    'Closed Won': 'bg-badge-green text-emerald-700',
+    'Closed Lost': 'bg-badge-red text-rose-600',
+    'Abandoned': 'bg-muted text-muted-foreground',
+    // Legacy/alternate keys
     'Open': 'bg-blue-50 text-blue-700',
     'Open Opportunities': 'bg-blue-50 text-blue-700',
     'Open opportunity': 'bg-blue-50 text-blue-700',
-    'Qualified': 'bg-purple-50 text-purple-700',
-    'In Negotiation': 'bg-orange-50 text-orange-700',
-    'Opportunity in negotiation': 'bg-orange-50 text-orange-700',
+    'Opportunity in negotiation': 'bg-badge-orange text-amber-700',
     'Registration': 'bg-indigo-50 text-indigo-700',
-    'Closed': 'bg-gray-100 text-gray-700',
-    'Closed opportunity': 'bg-gray-100 text-gray-700',
-    'Closed Lost': 'bg-red-50 text-red-700',
-    'Closed Won': 'bg-green-50 text-green-700',
-    'Won': 'bg-green-50 text-green-700',
-    'Lost': 'bg-red-50 text-red-700',
-    // Lead statuses
-    'Valid': 'bg-green-50 text-green-700',
-    'Not valid': 'bg-red-50 text-red-700',
-    'To be validated': 'bg-yellow-50 text-yellow-700',
-    'Not interested': 'bg-gray-100 text-gray-700'
+    'Closed': 'bg-muted text-muted-foreground',
+    'Closed opportunity': 'bg-muted text-muted-foreground',
+    'Won': 'bg-badge-green text-emerald-700',
+    'Lost': 'bg-badge-red text-rose-600',
+    'Not valid': 'bg-badge-red text-rose-600',
+    'To be validated': 'bg-badge-orange text-amber-700',
+    'Not interested': 'bg-badge-red text-rose-600'
   }
-  return classes[stage] || 'bg-gray-100 text-gray-700'
+  return classes[stage] || 'bg-muted text-muted-foreground'
 }
 
 /**
