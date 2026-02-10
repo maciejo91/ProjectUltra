@@ -2,8 +2,15 @@
   <div
     class="rounded-lg flex flex-col bg-muted"
   >
+    <!-- Loading state before outcome (closing / postponing) -->
+    <template v-if="outcomeSaving">
+      <div class="flex-1 min-h-0 flex items-center justify-center rounded-lg bg-muted/80 py-4" aria-busy="true" aria-label="Saving outcome">
+        <Spinner class="size-8 text-foreground shrink-0" />
+      </div>
+    </template>
+
     <!-- Success state (post qualify / disqualify / no-answer) -->
-    <template v-if="successState">
+    <template v-else-if="successState">
       <div class="pt-1 px-1">
         <div
           class="bg-white rounded-lg p-4 shadow-nsc-card flex flex-col relative"
@@ -43,7 +50,7 @@
             </div>
           </div>
         </div>
-        <div v-if="successState.kind !== 'valid-to-be-called-back'" class="flex justify-end mt-4">
+        <div v-if="successState.kind === 'not-interested'" class="flex justify-end mt-4">
           <Button
             variant="outline"
             size="small"
@@ -1024,11 +1031,14 @@ const props = defineProps({
   showDeadlineBanner: {
     type: Boolean,
     default: true
+  },
+  outcomeSaving: {
+    type: Boolean,
+    default: false
   }
 })
 
-
-const emit = defineEmits(['postponed', 'validated', 'qualified', 'disqualified', 'call-attempt-logged', 'note-saved', 'open-purchase-method', 'appointment-scheduled', 'survey-completed', 'survey-refused', 'not-responding'])
+const emit = defineEmits(['postponed', 'validated', 'qualified', 'disqualified', 'call-attempt-logged', 'note-saved', 'open-purchase-method', 'appointment-scheduled', 'survey-completed', 'survey-refused', 'not-responding', 'update:outcomeSaving'])
 
 const usersStore = useUsersStore()
 const userStore = useUserStore()
@@ -2067,10 +2077,13 @@ const canConfirmAction = computed(() => {
   return false
 })
 
-const handleConfirmAction = () => {
+const handleConfirmAction = async () => {
   if (selectedOutcome.value === 'no-answer') {
-    handleNoAnswerConfirm()
+    emit('update:outcomeSaving', true)
+    await handleNoAnswerConfirm()
+    // Parent clears loading when it finishes handling @postponed / @disqualified
   } else if (selectedOutcome.value === 'not-valid') {
+    emit('update:outcomeSaving', true)
     handleNotValidConfirm()
   } else if (selectedOutcome.value === 'interested') {
     handleQualify()
