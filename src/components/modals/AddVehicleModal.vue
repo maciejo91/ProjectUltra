@@ -8,7 +8,7 @@
       >
         <DialogHeader class="flex-shrink-0">
           <DialogTitle>{{ getTitle() }}</DialogTitle>
-          <DialogDescription>{{ getDescription() }}</DialogDescription>
+          <DialogDescription v-if="!isTradeIn">{{ getDescription() }}</DialogDescription>
         </DialogHeader>
 
         <div class="flex-1 overflow-y-auto py-4 w-full">
@@ -122,7 +122,7 @@
             <!-- Year and Kilometers in same row -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="space-y-2">
-                <Label class="block text-sm font-medium text-foreground">Year (or registration year) <span class="text-muted-foreground">*</span></Label>
+                <Label class="block text-sm font-medium text-foreground">Registration year <span class="text-muted-foreground">*</span></Label>
                 <Input 
                   v-model="vehicleData.year"
                   type="number" 
@@ -148,6 +148,7 @@
             <CollapsibleSection
               title="More details"
               :is-expanded="moreDetailsExpanded"
+              :no-side-padding="true"
               @toggle="moreDetailsExpanded = !moreDetailsExpanded"
             >
               <div class="space-y-4">
@@ -212,8 +213,7 @@
               <Label class="block text-sm font-medium text-foreground">Note</Label>
               <Textarea 
                 v-model="vehicleData.note"
-                rows="3"
-                placeholder="Add unquantifiable requests, such as the customer's desired value for the car..." 
+                rows="6"
                 class="w-full resize-none"
               />
             </div>
@@ -244,7 +244,7 @@
                 />
               </div>
               <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">Year</Label>
+                <Label class="block text-sm font-semibold text-foreground">Registration year</Label>
                 <Input 
                   v-model="vehicleData.year"
                   type="number" 
@@ -338,7 +338,6 @@
               <Input 
                 v-model="vehicleData.registration"
                 type="text" 
-                placeholder="MM/YYYY (e.g., 01/2024)" 
                 class="w-full"
               />
             </div>

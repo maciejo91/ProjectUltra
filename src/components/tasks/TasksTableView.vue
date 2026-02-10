@@ -168,7 +168,7 @@ import { useDataTableData, getNestedProperty } from '@/composables/useDataTableD
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useTaskHelpers } from '@/composables/useTaskHelpers'
-import { getTaskActionTitle } from '@/utils/taskActionTitle'
+import { getTaskActionTitle, getTaskDisplayTitle } from '@/utils/taskActionTitle'
 import { getDisplayStage } from '@/utils/stageMapper'
 
 const props = defineProps({
@@ -369,8 +369,8 @@ const columns = computed(() => [
     },
     cell: ({ row }) => {
       const task = row.original
-      const actionTitle = getTaskActionTitle(task)
-      return h('div', { class: 'text-content font-semibold text-foreground truncate min-w-0' }, actionTitle || '—')
+      const displayTitle = getTaskDisplayTitle(task)
+      return h('div', { class: 'text-content font-semibold text-foreground truncate min-w-0' }, displayTitle || '—')
     }
   },
   {

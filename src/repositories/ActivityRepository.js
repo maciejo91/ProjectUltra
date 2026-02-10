@@ -35,7 +35,7 @@ export class ActivityRepository extends BaseRepository {
    * @returns {Promise<Array>} Array of activities
    */
   async findAll(filters = {}) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     
     let results = [...this.dataSource]
     
@@ -77,7 +77,7 @@ export class ActivityRepository extends BaseRepository {
    * @returns {Promise<Object|null>} Activity or null if not found
    */
   async findById(id) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     const activity = this.dataSource.find(a => a.id === parseInt(id))
     return activity || null
   }
@@ -88,7 +88,7 @@ export class ActivityRepository extends BaseRepository {
    * @returns {Promise<Object>} Created activity
    */
   async create(data) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     
     // Generate ID (in real API, server generates this)
     const newId = this.dataSource.length > 0 
@@ -118,7 +118,7 @@ export class ActivityRepository extends BaseRepository {
    * @returns {Promise<Object>} Updated activity
    */
   async update(id, updates) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     
     const activity = this.dataSource.find(a => a.id === parseInt(id))
     if (!activity) {
@@ -135,7 +135,7 @@ export class ActivityRepository extends BaseRepository {
    * @returns {Promise<Object>} Success object
    */
   async delete(id) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     
     const index = this.dataSource.findIndex(a => a.id === parseInt(id))
     if (index === -1) {
@@ -153,7 +153,7 @@ export class ActivityRepository extends BaseRepository {
    * @returns {Promise<Object|null>} Activity or null if not found
    */
   async findByLeadIdAndActivityId(leadId, activityId) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     const activity = this.dataSource.find(
       a => a.id === parseInt(activityId) && a.leadId === parseInt(leadId)
     )
@@ -167,7 +167,7 @@ export class ActivityRepository extends BaseRepository {
    * @returns {Promise<Object|null>} Activity or null if not found
    */
   async findByOpportunityIdAndActivityId(opportunityId, activityId) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     const activity = this.dataSource.find(
       a => a.id === parseInt(activityId) && a.opportunityId === parseInt(opportunityId)
     )
@@ -181,7 +181,7 @@ export class ActivityRepository extends BaseRepository {
    * @returns {Promise<Object>} Success object
    */
   async deleteByLeadIdAndActivityId(leadId, activityId) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     const index = this.dataSource.findIndex(
       a => a.id === parseInt(activityId) && a.leadId === parseInt(leadId)
     )
@@ -199,7 +199,7 @@ export class ActivityRepository extends BaseRepository {
    * @returns {Promise<Object>} Success object
    */
   async deleteByOpportunityIdAndActivityId(opportunityId, activityId) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     const index = this.dataSource.findIndex(
       a => a.id === parseInt(activityId) && a.opportunityId === parseInt(opportunityId)
     )

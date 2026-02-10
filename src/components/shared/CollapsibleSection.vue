@@ -3,18 +3,22 @@
     <!-- Section Header -->
     <button
       @click="$emit('toggle')"
-      class="w-full flex items-center justify-between px-4 py-3 bg-muted/30 hover:bg-muted/50 transition-colors"
+      class="w-full flex items-center justify-between py-3 transition-colors"
+      :class="[
+        noSidePadding ? 'px-0' : 'px-4',
+        cardStyle ? 'bg-white hover:bg-muted/30' : 'bg-muted/30 hover:bg-muted/50'
+      ]"
     >
-      <h6 class="font-semibold text-foreground text-sm">{{ title }}</h6>
+      <h5 class="font-semibold text-foreground text-sm mb-0" :class="noSidePadding ? 'px-4' : ''">{{ title }}</h5>
       <ChevronDown
         class="w-3 h-3 shrink-0 text-muted-foreground transition-transform duration-200"
-        :class="{ 'rotate-180': isExpanded }"
+        :class="[{ 'rotate-180': isExpanded }, noSidePadding ? 'mr-4' : '']"
       />
     </button>
     
     <!-- Section Content -->
     <transition name="expand">
-      <div v-if="isExpanded" class="px-4 pb-4">
+      <div v-if="isExpanded" class="pb-4" :class="noSidePadding ? '' : 'px-4'">
         <slot />
       </div>
     </transition>
@@ -30,6 +34,14 @@ defineProps({
     required: true
   },
   isExpanded: {
+    type: Boolean,
+    default: false
+  },
+  noSidePadding: {
+    type: Boolean,
+    default: false
+  },
+  cardStyle: {
     type: Boolean,
     default: false
   }

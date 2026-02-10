@@ -75,13 +75,10 @@
         />
         <div class="p-4">
           <div class="flex justify-between items-start mb-3">
-          <div>
-            <h4 class="text-base leading-normal font-medium text-foreground">{{ dynamicTitle }}</h4>
-            <p class="text-sm leading-normal font-normal text-muted-foreground mt-0.5">
-              {{ dynamicDescription }}
-            </p>
+            <div class="min-w-0">
+              <p class="text-base leading-normal font-medium text-foreground">{{ dynamicDescription }}</p>
+            </div>
           </div>
-        </div>
 
         <!-- Call Interface Component -->
         <CallInterface
@@ -363,10 +360,15 @@
                 class="w-full"
               />
             </div>
-            <!-- Enrich Lead Card -->
-            <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
-              <h5 class="font-semibold text-foreground text-sm mb-4">Enrich lead</h5>
-              <div class="space-y-4">
+            <!-- Enrich Lead Card (collapsible, collapsed by default) -->
+            <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden">
+              <CollapsibleSection
+                title="Enrich lead"
+                :is-expanded="enrichLeadExpanded"
+                card-style
+                @toggle="enrichLeadExpanded = !enrichLeadExpanded"
+              >
+                <div class="space-y-4 pt-1">
                 <!-- Customer interest level -->
                 <div>
                   <Label class="form-label">Customer interest level?</Label>
@@ -443,7 +445,7 @@
                     size="sm"
                     class="gap-1.5 inline-flex items-center"
                     :disabled="tradeInActionLoading"
-                    @click="editingTradeIn = null; showVehicleModal = true"
+                    @click="handleAddTradeInClick"
                   >
                     <Spinner v-if="tradeInActionLoading" class="size-3.5 shrink-0" aria-hidden />
                     <Plus v-else class="size-3.5" />
@@ -468,10 +470,12 @@
                   <Button
                     variant="secondary"
                     size="sm"
-                    class="gap-1.5"
-                    @click="editingFinancingOption = null; showFinancingModal = true"
+                    class="gap-1.5 inline-flex items-center"
+                    :disabled="financingActionLoading"
+                    @click="handleAddFinancingClick"
                   >
-                    <Plus class="size-3.5" />
+                    <Spinner v-if="financingActionLoading" class="size-3.5 shrink-0" aria-hidden />
+                    <Plus v-else class="size-3.5" />
                     Add financing
                   </Button>
                   <ul v-if="(lead.financingOptions || []).length" class="space-y-1.5">
@@ -497,16 +501,17 @@
                     placeholder="Any relevant information about customer interest or preferences..."
                   />
                 </div>
-              </div>
-              
-              <div class="flex justify-end gap-2 mt-4">
-                <Button
-                  label="Save"
-                  variant="primary"
-                  size="small"
-                  @click="handleEnrichLeadSave"
-                />
-              </div>
+                </div>
+
+                <div class="flex justify-end gap-2 mt-4">
+                  <Button
+                    label="Save"
+                    variant="primary"
+                    size="small"
+                    @click="handleEnrichLeadSave"
+                  />
+                </div>
+              </CollapsibleSection>
             </div>
 
             <!-- Qualification method -->
@@ -921,13 +926,16 @@
     />
 
 
-    <!-- Purchase Method Modal -->
+    <!-- Purchase Method Modal (standalone: skip intermediate purchaseMethodsStore call) -->
     <PurchaseMethodModal
       :show="showFinancingModal"
       :task-type="'lead'"
       :task-id="lead.id"
       :purchase-method="editingFinancingOption"
+      standalone
       @save="handlePurchaseMethodSave"
+      @save-start="financingActionLoading = true"
+      @save-end="financingActionLoading = false"
       @delete="handleFinancingDelete"
       @close="showFinancingModal = false; editingFinancingOption = null"
     />
@@ -945,18 +953,6 @@
       @save="handleVehicleSave"
       @delete="handleTradeInDelete"
     />
-
-    <!-- Loading overlay when trade-in or financing action is in progress -->
-    <Teleport to="body">
-      <div
-        v-if="(tradeInActionLoading && showVehicleModal) || (financingActionLoading && showFinancingModal)"
-        class="fixed inset-0 z-60 flex items-center justify-center bg-black/30"
-        aria-busy="true"
-        aria-label="Loading"
-      >
-        <Spinner class="size-8 text-foreground" />
-      </div>
-    </Teleport>
 
   </div>
 </template>
@@ -1000,6 +996,7 @@ import { useUsersStore } from '@/stores/users'
 import { useUserStore } from '@/stores/user'
 import { useSettingsStore } from '@/stores/settings'
 import { useLeadsStore } from '@/stores/leads'
+import { useToastStore } from '@/stores/toast'
 import { formatDate, formatTime } from '@/utils/formatters'
 import { mergeContactIntoDescription } from '@/utils/taskActionTitle'
 import { useLeadActions } from '@/composables/useLeadActions'
@@ -1011,6 +1008,7 @@ import CallInterface from '@/components/tasks/lead/CallInterface.vue'
 import DeadlineBanner from '@/components/tasks/shared/DeadlineBanner.vue'
 import AppointmentCommunications from '@/components/shared/communication/AppointmentCommunications.vue'
 import CloseAsLostForm from '@/components/shared/CloseAsLostForm.vue'
+import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
 import { getAvailabilityForAssignee } from '@/services/availabilityService'
 import { simulateCallExtraction } from '@/simulation/callExtractionSimulation'
 
@@ -1036,6 +1034,7 @@ const usersStore = useUsersStore()
 const userStore = useUserStore()
 const settingsStore = useSettingsStore()
 const leadsStore = useLeadsStore()
+const toastStore = useToastStore()
 
 // Use lead actions composable
 const leadState = useLeadActions(() => props.lead, {})
@@ -1068,6 +1067,7 @@ const showAssignmentModal = ref(false)
 const showFinancingModal = ref(false)
 const showVehicleModal = ref(false)
 const showPostponeRescheduleBlock = ref(false)
+const enrichLeadExpanded = ref(false)
 const editingTradeIn = ref(null)
 const editingFinancingOption = ref(null)
 const tradeInActionLoading = ref(false)
@@ -1314,10 +1314,6 @@ const leadSummary = computed(() => {
     ? `${formatDate(props.lead.createdAt)}, ${formatTime(props.lead.createdAt)}`
     : ''
   return `${name} is interested in ${vehicle}. Lead comes from ${source}${created ? `, created ${created}` : ''}.`
-})
-
-const dynamicTitle = computed(() => {
-  return leadState.primaryAction.value?.title || 'Call to Verify Contact Details'
 })
 
 const dynamicDescription = computed(() => {
@@ -2122,34 +2118,42 @@ const successPerformedAtLabel = computed(() => {
 // Trade-in handler
 const { saveTradeInVehicle } = useTradeInVehicle()
 
+const handleAddTradeInClick = async () => {
+  tradeInActionLoading.value = true
+  editingTradeIn.value = null
+  await nextTick()
+  showVehicleModal.value = true
+  tradeInActionLoading.value = false
+}
+
+const handleAddFinancingClick = async () => {
+  financingActionLoading.value = true
+  editingFinancingOption.value = null
+  await nextTick()
+  showFinancingModal.value = true
+  financingActionLoading.value = false
+}
+
 const handlePurchaseMethodSave = async (purchaseMethodData) => {
   financingActionLoading.value = true
+  const editingItem = editingFinancingOption.value
+  const isEdit = !!editingItem
+
+  // Close modal; loading stays visible until save completes (same as trade-in)
+  editingFinancingOption.value = null
+  showFinancingModal.value = false
+
   try {
-    showFinancingModal.value = false
     preferences.value.financing = true
-    const isEdit = !!editingFinancingOption.value
     const typeLabel = purchaseMethodData.type === 'FIN' ? 'Captive Financing'
       : purchaseMethodData.type === 'LEA' ? 'Leasing'
       : 'Long-Term Rental'
     const monthly = purchaseMethodData.fields?.monthlyInstalment || 0
-    if (!isEdit) {
-      await leadsStore.addActivity(props.lead.id, {
-        type: 'purchase-method',
-        user: currentUser.value?.name || 'You',
-        action: `added a ${typeLabel} purchase method`,
-        content: `${typeLabel}: €${monthly.toLocaleString()}/month for ${purchaseMethodData.fields?.duration || 0} months`,
-        data: {
-          purchaseMethodId: purchaseMethodData.id,
-          type: purchaseMethodData.type,
-          ...purchaseMethodData.fields
-        },
-        timestamp: new Date().toISOString()
-      })
-    }
+
     const duration = purchaseMethodData.fields?.duration ?? purchaseMethodData.termMonths ?? null
     const foLabel = purchaseMethodData.label ?? (duration ? `${typeLabel} - ${duration} months` : typeLabel)
     const fullItem = {
-      id: purchaseMethodData.id || editingFinancingOption.value?.id || `fo-${Date.now()}`,
+      id: purchaseMethodData.id || editingItem?.id || `fo-${Date.now()}`,
       label: foLabel,
       termMonths: duration ?? null,
       type: purchaseMethodData.type,
@@ -2162,11 +2166,28 @@ const handlePurchaseMethodSave = async (purchaseMethodData) => {
     const updatedList = isEdit
       ? list.map((f) => (String(f.id) === String(fullItem.id) ? fullItem : f))
       : [...list, fullItem]
-    await leadsStore.updateLead(props.lead.id, { financingOptions: updatedList })
-    editingFinancingOption.value = null
+
+    // Run addActivity and updateLead in parallel (both independent)
+    await Promise.all([
+      !isEdit ? leadsStore.addActivity(props.lead.id, {
+        type: 'purchase-method',
+        user: currentUser.value?.name || 'You',
+        action: `added a ${typeLabel} purchase method`,
+        content: `${typeLabel}: €${monthly.toLocaleString()}/month for ${purchaseMethodData.fields?.duration || 0} months`,
+        data: {
+          purchaseMethodId: purchaseMethodData.id,
+          type: purchaseMethodData.type,
+          ...purchaseMethodData.fields
+        },
+        timestamp: new Date().toISOString()
+      }) : Promise.resolve(),
+      leadsStore.updateLead(props.lead.id, { financingOptions: updatedList })
+    ])
+
     emit('note-saved', { type: 'purchase-method', ...purchaseMethodData })
   } catch (error) {
     console.error('Error saving purchase method:', error)
+    toastStore.pushToast('error', 'Failed to save financing option')
   } finally {
     financingActionLoading.value = false
   }
@@ -2184,30 +2205,32 @@ function openFinancingEdit(f) {
 }
 
 async function handleTradeInDelete() {
-  if (!editingTradeIn.value) return
+  const toRemove = editingTradeIn.value
+  if (!toRemove) return
+  const newList = (props.lead.tradeIns || []).filter((t) => String(t.id) !== String(toRemove.id))
+  editingTradeIn.value = null
+  showVehicleModal.value = false
   tradeInActionLoading.value = true
   try {
-    const list = (props.lead.tradeIns || []).filter((t) => String(t.id) !== String(editingTradeIn.value.id))
-    await leadsStore.updateLead(props.lead.id, { tradeIns: list })
-    editingTradeIn.value = null
-    showVehicleModal.value = false
+    await leadsStore.updateLead(props.lead.id, { tradeIns: newList })
   } catch (error) {
-    console.error('Error deleting trade-in:', error)
+    toastStore.pushToast('error', 'Failed to delete trade-in')
   } finally {
     tradeInActionLoading.value = false
   }
 }
 
 async function handleFinancingDelete() {
-  if (!editingFinancingOption.value) return
+  const toRemove = editingFinancingOption.value
+  if (!toRemove) return
+  const newList = (props.lead.financingOptions || []).filter((f) => String(f.id) !== String(toRemove.id))
+  editingFinancingOption.value = null
+  showFinancingModal.value = false
   financingActionLoading.value = true
   try {
-    const list = (props.lead.financingOptions || []).filter((f) => String(f.id) !== String(editingFinancingOption.value.id))
-    await leadsStore.updateLead(props.lead.id, { financingOptions: list })
-    showFinancingModal.value = false
-    editingFinancingOption.value = null
+    await leadsStore.updateLead(props.lead.id, { financingOptions: newList })
   } catch (error) {
-    console.error('Error deleting financing option:', error)
+    toastStore.pushToast('error', 'Failed to delete financing option')
   } finally {
     financingActionLoading.value = false
   }
@@ -2215,29 +2238,26 @@ async function handleFinancingDelete() {
 
 const handleVehicleSave = async (data) => {
   const isTradeIn = data.vehicleType === 'tradein' || props.mode === 'tradein'
+  const editingItem = editingTradeIn.value
+  const isEdit = !!editingItem
   if (isTradeIn) tradeInActionLoading.value = true
-  try {
-    const isEdit = !!editingTradeIn.value
 
+  // Close modal immediately so user can continue working
+  if (isTradeIn) {
+    editingTradeIn.value = null
+    showVehicleModal.value = false
+  }
+
+  try {
     if (isTradeIn) {
-      if (!isEdit) {
-        const result = await saveTradeInVehicle('lead', props.lead.id, data.vehicle, data.valuation || {})
-        preferences.value.tradeIn = true
-        emit('note-saved', {
-          type: 'tradein',
-          id: result.activity.id,
-          action: 'added a trade-in',
-          vehicleId: result.vehicle.id,
-          data: result.activity.data,
-          timestamp: result.activity.timestamp
-        })
-      }
+      // Save in background
+      preferences.value.tradeIn = true
       const v = data.vehicle || {}
       const parts = [v.brand, v.model].filter(Boolean)
       const label = (parts.length ? parts.join(' ') + (v.year ? ` (${v.year})` : '') : 'Trade-in') || 'Trade-in'
       const valuation = data.valuation?.tradeInPrice ?? 0
       const fullItem = {
-        id: isEdit ? editingTradeIn.value.id : `ti-${Date.now()}`,
+        id: isEdit ? editingItem.id : `ti-${Date.now()}`,
         label: label || 'Trade-in',
         valuation: typeof valuation === 'number' ? valuation : parseFloat(valuation) || 0,
         vehicle: v,
@@ -2247,18 +2267,32 @@ const handleVehicleSave = async (data) => {
       const updatedList = isEdit
         ? list.map((t) => (String(t.id) === String(fullItem.id) ? fullItem : t))
         : [...list, fullItem]
-      await leadsStore.updateLead(props.lead.id, { tradeIns: updatedList })
-      await leadsStore.fetchLeadById(props.lead.id)
-      editingTradeIn.value = null
-      showVehicleModal.value = false
+
+      // Run updateLead and saveTradeInVehicle in parallel (both independent)
+      await Promise.all([
+        leadsStore.updateLead(props.lead.id, { tradeIns: updatedList }),
+        !isEdit ? saveTradeInVehicle('lead', props.lead.id, data.vehicle, data.valuation || {}).then(result => {
+          emit('note-saved', {
+            type: 'tradein',
+            id: result.activity.id,
+            action: 'added a trade-in',
+            vehicleId: result.vehicle.id,
+            data: result.activity.data,
+            timestamp: result.activity.timestamp
+          })
+        }) : Promise.resolve()
+      ])
     } else {
-      showVehicleModal.value = false
       const { addVehicleToCustomer } = await import('@/api/contacts')
       await addVehicleToCustomer(props.lead.customerId, data.vehicle)
+      showVehicleModal.value = false
       emit('note-saved', { type: 'vehicle', vehicleType: data.vehicleType, ...data.vehicle })
     }
   } catch (err) {
     console.error('Error saving vehicle:', err)
+    if (isTradeIn) {
+      toastStore.pushToast('error', 'Failed to save trade-in')
+    }
   } finally {
     if (isTradeIn) tradeInActionLoading.value = false
   }

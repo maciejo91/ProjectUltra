@@ -85,25 +85,46 @@ export const useLeadsStore = defineStore('leads', () => {
   }
 
   const updateLead = async (id, updates) => {
-    loading.value = true
+    const numericId = parseInt(id, 10)
+    
+    // Optimistic update for better UX
+    const index = leads.value.findIndex(l => l.id === numericId)
+    const hadOptimistic = index !== -1
+    if (hadOptimistic) {
+      const optimisticLead = { ...leads.value[index], ...updates }
+      leads.value = leads.value.map(l => (l.id === numericId ? optimisticLead : l))
+      if (currentLead.value?.id === numericId) {
+        currentLead.value = optimisticLead
+      }
+    }
+    
     error.value = null
     try {
       const updated = await leadsApi.updateLead(id, updates)
-      const numericId = parseInt(id, 10)
-      const index = leads.value.findIndex(l => l.id === numericId)
-      if (index !== -1) {
-        // Replace array so computeds (e.g. allTasks → drawerTask) reliably update
-        leads.value = leads.value.map(l => (l.id === numericId ? updated : l))
-      }
-      if (currentLead.value?.id === numericId) {
-        currentLead.value = updated
+      // Skip redundant reactive writes when the optimistic update already applied
+      // the changes. Re-assigning leads.value and currentLead.value would trigger
+      // a second full reactivity cascade across all watching components.
+      if (!hadOptimistic) {
+        const newIndex = leads.value.findIndex(l => l.id === numericId)
+        if (newIndex !== -1) {
+          leads.value = leads.value.map(l => (l.id === numericId ? updated : l))
+        }
+        if (currentLead.value?.id === numericId) {
+          currentLead.value = updated
+        }
       }
       return updated
     } catch (err) {
       error.value = err.message
+      // Revert optimistic update on error
+      if (hadOptimistic) {
+        const revertedLead = await leadsApi.fetchLeadById(id)
+        leads.value = leads.value.map(l => (l.id === numericId ? revertedLead : l))
+        if (currentLead.value?.id === numericId) {
+          currentLead.value = revertedLead
+        }
+      }
       throw err
-    } finally {
-      loading.value = false
     }
   }
 
@@ -123,20 +144,39 @@ export const useLeadsStore = defineStore('leads', () => {
   }
 
   const addActivity = async (leadId, activity) => {
-    loading.value = true
+    const numericId = parseInt(leadId)
+    
+    // Optimistic update: add activity immediately to avoid reload
+    if (currentLead.value?.id === numericId) {
+      currentLeadActivities.value = [...currentLeadActivities.value, {
+        ...activity,
+        id: `temp-${Date.now()}`
+      }]
+    }
+    
     error.value = null
     try {
       const newActivity = await leadsApi.addLeadActivity(leadId, activity)
-      if (currentLead.value?.id === parseInt(leadId)) {
-        // Reload activities via API wrapper
-        currentLeadActivities.value = await leadsApi.fetchLeadActivities(leadId)
+      if (currentLead.value?.id === numericId) {
+        // Replace temp activity with real one via in-place mutation.
+        // This avoids creating a new array and triggering a full reactivity
+        // cascade – only the affected item re-renders.
+        const tempIndex = currentLeadActivities.value.findIndex(a => a.id && a.id.toString().startsWith('temp-'))
+        if (tempIndex !== -1) {
+          currentLeadActivities.value[tempIndex] = newActivity
+        } else {
+          // Fallback: reload all activities
+          currentLeadActivities.value = await leadsApi.fetchLeadActivities(leadId)
+        }
       }
       return newActivity
     } catch (err) {
       error.value = err.message
+      // Revert optimistic update on error
+      if (currentLead.value?.id === numericId) {
+        currentLeadActivities.value = await leadsApi.fetchLeadActivities(leadId)
+      }
       throw err
-    } finally {
-      loading.value = false
     }
   }
 

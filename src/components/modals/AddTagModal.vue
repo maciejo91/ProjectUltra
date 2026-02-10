@@ -118,17 +118,18 @@ const handleOpenChange = (isOpen) => {
 watch(() => props.show, (newValue) => {
   if (newValue) {
     tagName.value = ''
-    selectedColor.value = ''
+    selectedColor.value = TAG_COLORS[0]
   }
 })
 
 const handleSave = () => {
   const name = tagName.value.trim()
   if (!name || !selectedColor.value) return
-  if (props.existingTags.includes(name)) return
+  const existing = (props.existingTags || []).map((t) => (typeof t === 'string' ? t : t.name))
+  if (existing.includes(name)) return
   emit('add', { name, color: selectedColor.value })
   emit('close')
   tagName.value = ''
-  selectedColor.value = ''
+  selectedColor.value = TAG_COLORS[0]
 }
 </script>

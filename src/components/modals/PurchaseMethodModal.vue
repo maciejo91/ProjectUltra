@@ -7,18 +7,17 @@
         :show-close-button="true"
       >
         <DialogHeader class="flex-shrink-0">
-          <DialogTitle>{{ isEditMode ? 'Edit Purchase Method' : 'Add Purchase Method' }}</DialogTitle>
+          <DialogTitle>Financing</DialogTitle>
         </DialogHeader>
 
         <div class="flex-1 overflow-y-auto py-4 w-full space-y-6">
-          <!-- Purchase Method Type (toggle buttons) -->
-          <div class="space-y-2">
-            <Label class="block text-sm font-medium text-foreground">Purchase Method Type</Label>
-            <div class="outcome-toggle-group flex flex-wrap gap-3">
+          <!-- Type selection -->
+          <div>
+            <div class="outcome-toggle-group grid grid-cols-3 gap-3">
               <Toggle
                 variant="outline"
                 :model-value="formData.type === 'FIN'"
-                class="outcome-toggle-item"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
                 @update:model-value="(p) => selectType(p ? 'FIN' : '')"
               >
                 <span>Financing</span>
@@ -26,7 +25,7 @@
               <Toggle
                 variant="outline"
                 :model-value="formData.type === 'LEA'"
-                class="outcome-toggle-item"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
                 @update:model-value="(p) => selectType(p ? 'LEA' : '')"
               >
                 <span>Leasing</span>
@@ -34,7 +33,7 @@
               <Toggle
                 variant="outline"
                 :model-value="formData.type === 'LTR'"
-                class="outcome-toggle-item"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
                 @update:model-value="(p) => selectType(p ? 'LTR' : '')"
               >
                 <span>Long-Term Rental</span>
@@ -44,10 +43,6 @@
 
           <!-- Dynamic Form Based on Type -->
           <div v-if="formData.type" class="space-y-4">
-            <h3 class="text-base font-medium text-foreground">
-              {{ getTypeLabel(formData.type) }} Details
-            </h3>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="space-y-2">
                 <Label class="block text-sm font-medium text-foreground">Monthly Instalment <span class="text-muted-foreground">*</span></Label>
@@ -66,7 +61,6 @@
                   />
                 </div>
                 <p v-if="errors.monthlyInstalment" class="text-xs text-destructive">{{ errors.monthlyInstalment }}</p>
-                <p class="text-xs text-muted-foreground">Customer's desired monthly payment amount</p>
               </div>
 
               <div class="space-y-2">
@@ -86,7 +80,6 @@
                   />
                 </div>
                 <p v-if="errors.downPayment" class="text-xs text-destructive">{{ errors.downPayment }}</p>
-                <p class="text-xs text-muted-foreground">Amount at contract signing</p>
               </div>
             </div>
 
@@ -145,16 +138,21 @@
                 </Select>
                 <p v-if="errors.customerType" class="text-xs text-destructive">{{ errors.customerType }}</p>
               </div>
+            </template>
 
-              <div class="bg-muted p-4 rounded-lg border border-border">
-                <div class="flex justify-between items-center">
-                  <span class="text-sm font-medium text-muted-foreground">Total Rental Amount:</span>
-                  <span class="text-lg font-bold text-foreground">€ {{ formatCurrency(totalRentalAmount) }}</span>
-                </div>
-                <p class="text-xs text-muted-foreground mt-1">(Monthly × Duration + Down Payment)</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+              <div class="space-y-2">
+                <Label class="block text-sm font-medium text-foreground">Offer Valid From</Label>
+                <Input v-model="formData.offerValidFrom" type="date" class="w-full" />
               </div>
+              <div class="space-y-2">
+                <Label class="block text-sm font-medium text-foreground">Offer Valid To</Label>
+                <Input v-model="formData.offerValidTo" type="date" class="w-full" />
+              </div>
+            </div>
 
-              <div class="flex flex-col gap-3">
+            <template v-if="formData.type === 'LTR'">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4">
                 <div class="flex items-center gap-2">
                   <Checkbox id="ltr-insurance" v-model:checked="formData.fields.insuranceIncluded" />
                   <Label for="ltr-insurance" class="text-sm text-muted-foreground cursor-pointer">Insurance Included</Label>
@@ -168,18 +166,13 @@
                   <Label for="ltr-registration" class="text-sm text-muted-foreground cursor-pointer">Registration/Taxes Included</Label>
                 </div>
               </div>
+              <div class="bg-muted p-4 rounded-lg border border-border mt-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-muted-foreground">Total Rental Amount:</span>
+                  <span class="text-lg font-bold text-foreground">€ {{ formatCurrency(totalRentalAmount) }}</span>
+                </div>
+              </div>
             </template>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-border">
-              <div class="space-y-2">
-                <Label class="block text-sm font-medium text-foreground">Offer Valid From</Label>
-                <Input v-model="formData.offerValidFrom" type="date" class="w-full" />
-              </div>
-              <div class="space-y-2">
-                <Label class="block text-sm font-medium text-foreground">Offer Valid To</Label>
-                <Input v-model="formData.offerValidTo" type="date" class="w-full" />
-              </div>
-            </div>
           </div>
 
           <div v-if="validationErrors.length > 0" class="bg-destructive/10 border border-border rounded-lg p-4">
@@ -289,7 +282,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close', 'save', 'delete'])
+const emit = defineEmits(['close', 'save', 'delete', 'save-start', 'save-end'])
 
 const purchaseMethodsStore = usePurchaseMethodsStore()
 const userStore = useUserStore()
@@ -530,6 +523,8 @@ const handleSubmit = async () => {
   }
 
   saving.value = true
+  emit('save-start')
+  emit('close')
 
   try {
     const purchaseMethodData = {
@@ -603,6 +598,7 @@ const handleSubmit = async () => {
       toShow = []
     }
     validationErrors.value = toShow
+    emit('save-end')
   } finally {
     saving.value = false
   }

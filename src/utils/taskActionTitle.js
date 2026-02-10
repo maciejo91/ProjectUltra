@@ -29,7 +29,7 @@ export function mergeContactIntoTitle(baseTitle, name, phone) {
     return hasPhone ? `Call ${who} back on ${phone}` : `Call ${who} back`
   }
   const parts = [who, phone].filter(Boolean)
-  return parts.length ? `${baseTitle} — ${parts.join(', ')}` : baseTitle
+  return parts.length ? `${baseTitle} – ${parts.join(', ')}` : baseTitle
 }
 
 /**
@@ -56,7 +56,7 @@ export function mergeContactIntoDescription(baseDescription, name, phone) {
     return hasPhone ? `Call was interrupted after interest. Call ${who} back on ${phone} at scheduled time.` : `Call was interrupted after interest. Call ${who} back at scheduled time.`
   }
   const parts = [who, phone].filter(Boolean)
-  return parts.length ? `${baseDescription} — ${parts.join(', ')}` : baseDescription
+  return parts.length ? `${baseDescription} – ${parts.join(', ')}` : baseDescription
 }
 
 /**
@@ -147,4 +147,31 @@ export function getTaskActionTitle(item) {
     const entityType = item.type === 'lead' ? 'Lead' : item.type === 'opportunity' ? 'Opportunity' : 'Task'
     return safeFallback(entityType, String(item.id || ''))
   }
+}
+
+/** Normalize title: at most one dash separator, no double dashes. */
+function normalizeTitleDashes(str) {
+  if (!str || typeof str !== 'string') return str
+  return str
+    .replace(/\s*[–—]\s*[–—]\s*/g, ' – ')
+    .replace(/\s*[–—]\s*$/, '')
+    .replace(/^\s*[–—]\s*/, '')
+    .trim()
+}
+
+/**
+ * Task display title including customer name when available.
+ * Use this for card titles, table "Task title" column, and detail header.
+ * Avoids double dashes: if the action title already contains " – ", customer name is not appended.
+ * @param {Object} item - Lead or Opportunity item
+ * @returns {string|null} Title with customer name appended when possible
+ */
+export function getTaskDisplayTitle(item) {
+  let title = getTaskActionTitle(item)
+  if (!title) return null
+  const name = item?.customer?.name?.trim()
+  if (!name) return normalizeTitleDashes(title)
+  if (title.includes(name)) return normalizeTitleDashes(title)
+  if (title.includes(' – ')) return normalizeTitleDashes(title)
+  return normalizeTitleDashes(`${title} – ${name}`)
 }

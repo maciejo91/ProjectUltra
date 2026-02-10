@@ -18,6 +18,12 @@
       <div class="flex flex-1 min-h-0 overflow-hidden">
         <!-- Center Panel: Task Management Widget Only -->
         <div class="flex-1 flex flex-col min-h-0 overflow-hidden bg-white min-w-0">
+          <TaskAssigneeDateBar
+            v-if="task"
+            :task="task"
+            @reassigned="handleReassigned"
+            @postpone-expected-close="handlePostponeExpectedClose"
+          />
           <div class="flex-1 min-h-0 overflow-y-auto">
             <div class="p-2">
               <TaskManagementCard
@@ -242,7 +248,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-libr
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
+import { useToastStore } from '@/stores/toast'
 import TaskDetailHeader from './TaskDetailHeader.vue'
+import TaskAssigneeDateBar from './TaskAssigneeDateBar.vue'
 import TaskManagementCard from './TaskManagementCard.vue'
 import TaskContactCard from './TaskContactCard.vue'
 import OtherCustomerRequestsCard from './OtherCustomerRequestsCard.vue'
@@ -293,6 +301,7 @@ const emit = defineEmits(['task-navigate', 'close', 'postpone-expected-close'])
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
+const toastStore = useToastStore()
 
 const activityAuthor = computed(() =>
   props.task?.assignee || userStore.currentUser?.name || 'You'
@@ -610,20 +619,19 @@ const handleFinancingSave = async (data) => {
 }
 
 async function handleFinancingDelete() {
-  if (!editingFinancingOption.value || !props.storeAdapter || !props.task) return
+  const toRemove = editingFinancingOption.value
+  if (!toRemove || !props.storeAdapter || !props.task) return
+  const newList = (props.task.financingOptions || []).filter((f) => String(f.id) !== String(toRemove.id))
+  showFinancingModal.value = false
+  editingFinancingOption.value = null
   try {
-    const list = (props.task.financingOptions || []).filter((f) => String(f.id) !== String(editingFinancingOption.value.id))
     if (props.task.type === 'lead') {
-      await props.storeAdapter.updateLead?.(props.task.id, { financingOptions: list })
-      await props.storeAdapter.loadLeadById?.(props.task.id)
+      await props.storeAdapter.updateLead?.(props.task.id, { financingOptions: newList })
     } else {
-      await props.storeAdapter.updateOpportunity?.(props.task.id, { financingOptions: list })
-      await props.storeAdapter.loadOpportunityById?.(props.task.id)
+      await props.storeAdapter.updateOpportunity?.(props.task.id, { financingOptions: newList })
     }
-    showFinancingModal.value = false
-    editingFinancingOption.value = null
   } catch (error) {
-    console.error('Error deleting financing option:', error)
+    toastStore.pushToast('error', 'Failed to delete financing option')
   }
 }
 
@@ -671,21 +679,20 @@ const handleTradeInSave = async (data) => {
 }
 
 async function handleTradeInDelete() {
-  if (!editingTradeIn.value || !props.storeAdapter || !props.task) return
+  const toRemove = editingTradeIn.value
+  if (!toRemove || !props.storeAdapter || !props.task) return
+  const newList = (props.task.tradeIns || []).filter((t) => String(t.id) !== String(toRemove.id))
+  showTradeInModal.value = false
+  editingTradeIn.value = null
   tradeInActionLoading.value = true
   try {
-    const list = (props.task.tradeIns || []).filter((t) => String(t.id) !== String(editingTradeIn.value.id))
     if (props.task.type === 'lead') {
-      await props.storeAdapter.updateLead?.(props.task.id, { tradeIns: list })
-      await props.storeAdapter.loadLeadById?.(props.task.id)
+      await props.storeAdapter.updateLead?.(props.task.id, { tradeIns: newList })
     } else {
-      await props.storeAdapter.updateOpportunity?.(props.task.id, { tradeIns: list })
-      await props.storeAdapter.loadOpportunityById?.(props.task.id)
+      await props.storeAdapter.updateOpportunity?.(props.task.id, { tradeIns: newList })
     }
-    showTradeInModal.value = false
-    editingTradeIn.value = null
   } catch (error) {
-    console.error('Error deleting trade-in:', error)
+    toastStore.pushToast('error', 'Failed to delete trade-in')
   } finally {
     tradeInActionLoading.value = false
   }

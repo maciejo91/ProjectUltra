@@ -1,30 +1,13 @@
 <template>
   <div 
     ref="cardRef"
-    class="task-card bg-white rounded-xl p-4 flex items-center justify-between cursor-pointer relative transition-all border group"
+    class="task-card bg-white rounded-xl p-4 flex flex-col cursor-pointer relative transition-all border group"
     :class="[cardClass, selectedBorderClass]"
     @click="$emit('select', itemId)"
   >
-    <!-- Top Right: Due Date -->
-    <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
-      <span 
-        v-if="displayDate"
-        class="text-xs font-bold uppercase leading-none shrink-0"
-        :class="displayDate.status.textClass"
-      >
-        {{ displayDate.text }}
-      </span>
-    </div>
-
-    <div class="flex flex-col min-w-0 flex-1 pr-4">
-      <div class="flex items-center gap-1 mb-0.5">
-        <h3 class="font-bold text-foreground text-base truncate">{{ actionTitle || displayTitleFallback }}</h3>
-      </div>
-      <div class="flex items-center gap-2 overflow-hidden flex-wrap">
-        <span class="text-muted-foreground text-sm truncate">
-          {{ getName(item) }}
-        </span>
-        <!-- Urgency: colored dot + grey text. Hot fallback when urgency disabled. -->
+    <!-- Top row: Urgency (left) + Due Date (right) -->
+    <div class="flex items-center justify-between gap-2 w-full shrink-0 mb-1">
+      <div class="flex items-center gap-1.5 min-w-0">
         <span
           v-if="showUrgencyBadge"
           class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
@@ -43,17 +26,35 @@
           Hot
         </span>
       </div>
+      <span
+        v-if="displayDate"
+        class="text-xs font-bold uppercase leading-none shrink-0"
+        :class="displayDate.status.textClass"
+      >
+        {{ displayDate.text }}
+      </span>
+    </div>
+
+    <div class="flex flex-col min-w-0 flex-1 pr-2">
+      <div class="flex items-center gap-1 mb-0.5">
+        <h3 class="font-bold text-foreground text-base break-words">{{ cardTitle }}</h3>
+      </div>
+      <div v-if="showCustomerSubtitle" class="flex items-center gap-2 overflow-hidden flex-wrap">
+        <span class="text-muted-foreground text-sm truncate">
+          {{ getName(item) }}
+        </span>
+      </div>
       <p
         v-if="callAttemptsCount > 0"
         class="text-muted-foreground text-xs mt-0.5"
       >
         Attempts {{ callAttemptsValue }}
       </p>
+    </div>
 
-      <!-- Badges (urgency is shown only next to customer name above) -->
-      <div class="mt-2">
-        <TaskBadges :task="item" :urgency-shown-elsewhere="true" />
-      </div>
+    <!-- Badges: full-width row -->
+    <div class="mt-2 w-full shrink-0">
+      <TaskBadges :task="item" :urgency-shown-elsewhere="true" />
     </div>
   </div>
 </template>
@@ -61,7 +62,7 @@
 <script setup>
 import { computed } from 'vue'
 import { formatDueDate, getDeadlineStatus } from '@/utils/formatters'
-import { getTaskActionTitle } from '@/utils/taskActionTitle'
+import { getTaskDisplayTitle } from '@/utils/taskActionTitle'
 import { useSettingsStore } from '@/stores/settings'
 import { getUrgencyDotClass } from '@/composables/useLeadUrgency'
 import TaskBadges from './shared/TaskBadges.vue'
@@ -117,14 +118,29 @@ const selectedBorderClass = computed(() => {
 })
 
 
-const actionTitle = computed(() => getTaskActionTitle(props.item))
-
 const displayTitleFallback = computed(() => {
   const t = props.item
   if (!t) return 'Task'
   const name = t.customer?.name?.trim()
   if (name) return name
   return t.type === 'lead' ? 'Lead' : t.type === 'opportunity' ? 'Opportunity' : 'Task'
+})
+
+function removeDashesFromTitle(str) {
+  if (!str || typeof str !== 'string') return str
+  return str.replace(/\s*[–—]\s*/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+const rawTitle = computed(() => getTaskDisplayTitle(props.item) || displayTitleFallback.value)
+
+const cardTitle = computed(() => removeDashesFromTitle(rawTitle.value))
+
+const customerName = computed(() => props.item?.customer?.name?.trim() || '')
+
+const showCustomerSubtitle = computed(() => {
+  if (!customerName.value) return false
+  const title = cardTitle.value || ''
+  return !title.includes(customerName.value)
 })
 
 const deadline = computed(() => {
