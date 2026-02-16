@@ -1,68 +1,5 @@
 <template>
   <div class="flex-1 flex flex-col overflow-hidden min-w-0">
-    <!-- Header: Title + View Toggle + Show Closed -->
-    <header class="page-header shrink-0">
-      <div class="page-header-main">
-        <div class="page-header-content">
-          <div class="page-header-title-container">
-            <h1 class="page-header-title">Tasks</h1>
-          </div>
-          
-          <!-- Right Actions: View Toggle + Show Closed -->
-          <div class="page-header-actions">
-            <!-- View Toggle: Cards (left) → Table (right); highlighted = current view -->
-            <div class="bg-white p-0.5 rounded-btn inline-flex gap-0.5">
-              <Button
-                variant="secondary"
-                size="icon"
-                @click="$emit('view-change', 'card')"
-                :class="[
-                  'h-7 w-7',
-                  viewMode === 'card'
-                    ? 'bg-brand-gray text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                ]"
-                title="Card View"
-                :aria-pressed="viewMode === 'card'"
-              >
-                <LayoutGrid :size="14" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                @click="$emit('view-change', 'table')"
-                :class="[
-                  'h-7 w-7',
-                  viewMode === 'table'
-                    ? 'bg-brand-gray text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                ]"
-                title="Table View"
-                :aria-pressed="viewMode === 'table'"
-              >
-                <Table :size="14" />
-              </Button>
-            </div>
-            
-            <!-- Show Closed Toggle -->
-            <button
-              @click="$emit('toggle-closed', !showClosed)"
-              :class="[
-                'group flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium transition-all',
-                showClosed
-                  ? 'border-red-200 bg-red-50 text-brand-red'
-                  : 'border-border bg-surface text-muted-foreground hover:border-red-100 hover:bg-red-50 hover:text-brand-red'
-              ]"
-              :aria-pressed="showClosed"
-            >
-              <EyeOff :class="['w-4 h-4 shrink-0', showClosed ? 'text-brand-red' : 'text-muted-foreground group-hover:text-brand-red']" />
-              <span class="hidden sm:inline">Show Closed</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
-
     <!-- Same as Customers: one scroll area with padding, one white card (search + table) -->
     <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide min-h-0">
       <div class="bg-white mb-8">
@@ -153,7 +90,7 @@
 
 <script setup>
 import { ref, computed, h, watch, nextTick, onUnmounted } from 'vue'
-import { Table, LayoutGrid, EyeOff, ListTodo, Trash2, X } from 'lucide-vue-next'
+import { ListTodo, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'

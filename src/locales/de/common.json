@@ -10,6 +10,10 @@
     "addNew": "Neu Hinzufügen",
     "addNewCustomer": "Neuen Kunden Hinzufügen"
   },
+  "layout": {
+    "openSidebar": "Seitenleiste öffnen",
+    "closeSidebar": "Seitenleiste schließen"
+  },
   "buttons": {
     "save": "Speichern",
     "cancel": "Abbrechen",
@@ -104,6 +108,7 @@
   "tasks": {
     "filterAria": "Aufgaben filtern",
     "sortAria": "Aufgaben sortieren",
+    "showClosed": "Geschlossene anzeigen",
     "filters": {
       "lead": "Leads",
       "opportunity": "Opportunities",

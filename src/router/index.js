@@ -15,48 +15,57 @@ const routes = [
       {
         path: 'home',
         name: 'home-dashboard',
-        component: () => import('@/views/Home.vue')
+        component: () => import('@/views/Home.vue'),
+        meta: { titleKey: 'common.navigation.home' }
       },
       {
         path: 'add-new',
         name: 'add-new',
-        component: () => import('@/views/AddNew.vue')
+        component: () => import('@/views/AddNew.vue'),
+        meta: { titleKey: 'common.navigation.addNewCustomer' }
       },
       {
         path: 'tasks/:id?',
         name: 'task-detail',
-        component: () => import('@/views/Tasks.vue')
+        component: () => import('@/views/Tasks.vue'),
+        meta: { titleKey: 'common.navigation.tasks' }
       },
       {
         path: 'customer/:id',
         name: 'customer-view',
         component: () => import('@/views/Customer.vue'),
-        props: true
+        props: true,
+        meta: { titleKey: 'entities.customer.title' }
       },
       {
         path: 'vehicles',
         name: 'vehicles',
-        component: () => import('@/views/Vehicles.vue')
+        component: () => import('@/views/Vehicles.vue'),
+        meta: { titleKey: 'common.navigation.vehicles' }
       },
       {
         path: 'customers',
         name: 'customers',
-        component: () => import('@/views/Customers.vue')
+        component: () => import('@/views/Customers.vue'),
+        meta: { titleKey: 'common.navigation.customers' }
       },
       {
         path: 'calendar',
         name: 'calendar',
-        component: () => import('@/views/Calendar.vue')
+        component: () => import('@/views/Calendar.vue'),
+        meta: { titleKey: 'common.navigation.calendar' }
       },
       {
         path: 'reports',
         name: 'reports',
-        component: () => import('@/views/Reports.vue')
+        component: () => import('@/views/Reports.vue'),
+        meta: { titleKey: 'common.navigation.reports' }
       },
       {
         path: 'settings',
         name: 'settings',
         component: () => import('@/views/Settings.vue'),
+        meta: { titleKey: 'common.navigation.settings' },
         beforeEnter: (to, from, next) => {
           const userStore = useUserStore()
           if (userStore.canAccessSettings()) {
@@ -69,7 +78,8 @@ const routes = [
       {
         path: 'access-denied',
         name: 'access-denied',
-        component: () => import('@/views/AccessDenied.vue')
+        component: () => import('@/views/AccessDenied.vue'),
+        meta: { title: 'Access Denied' }
       }
     ]
   }

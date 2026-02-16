@@ -17,14 +17,14 @@
       <!-- Header -->
       <div class="p-3 sm:p-4 border-b border-white/10 flex items-center justify-between shrink-0">
         <router-link :to="firstVisibleRoute" @click="$emit('close')" class="flex items-center gap-2 sm:gap-3">
-          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-md flex items-center justify-center">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-md flex items-center justify-center bg-transparent">
             <img 
-              src="@/assets/images/logo.svg" 
-              alt="ProjectUltra Logo" 
+              src="@/assets/images/leadspark-logo.png" 
+              alt="LeadSparK" 
               class="h-8 w-auto sm:h-9 object-contain rounded-md"
             />
           </div>
-          <span class="text-white font-bold text-sm sm:text-base">Project Ultra</span>
+          <span class="text-white font-bold text-sm sm:text-base">LeadSparK</span>
         </router-link>
         <button 
           @click="handleClose"

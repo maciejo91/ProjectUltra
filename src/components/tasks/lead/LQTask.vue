@@ -138,8 +138,8 @@
                 @update:model-value="(p) => selectOutcome(p ? 'not-valid' : null)"
                 class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
-                <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
-                  <ThumbsDown :size="14" class="text-muted-foreground" />
+                <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-destructive/10">
+                  <ThumbsDown :size="14" class="text-destructive" />
                 </span>
                 <span>No interest/invalid</span>
               </Toggle>
@@ -149,8 +149,8 @@
                 @update:model-value="(p) => selectOutcome(p ? 'interested' : null)"
                 class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
-                <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
-                  <Check :size="14" class="text-muted-foreground" />
+                <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-emerald-500/10">
+                  <Check :size="14" class="text-emerald-600" />
                 </span>
                 <span>Interested</span>
               </Toggle>

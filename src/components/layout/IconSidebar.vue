@@ -1,253 +1,259 @@
 <template>
-  <div 
+  <div
     :class="[
-      'sidebar-container hidden md:flex flex-col items-stretch py-2 gap-2 shrink-0 z-20 h-screen fixed left-0 top-0 border-r border-border'
+      'dark sidebar-container hidden md:flex flex-col items-stretch py-2 gap-2 shrink-0 z-20 h-screen fixed left-0 top-0 border-r border-border overflow-hidden',
+      { 'sidebar-expanded': expanded }
     ]"
   >
-    <!-- Logo at Top -->
-    <div class="w-full px-2 pt-2 pb-2">
-      <router-link :to="firstVisibleRoute" class="block">
-        <div class="w-full h-8 rounded-md flex items-center justify-center">
-          <img 
-            src="@/assets/images/logo.svg" 
-            alt="ProjectUltra Logo" 
-            class="h-7 w-auto object-contain rounded-md"
+    <!-- Logo -->
+    <div class="w-full px-2 pt-2 pb-2 shrink-0">
+      <router-link :to="firstVisibleRoute" class="flex items-center gap-2 overflow-hidden">
+        <div
+          :class="[
+            'flex shrink-0 items-center justify-center rounded-md bg-transparent',
+            expanded ? 'h-8 w-8' : 'h-8 w-full'
+          ]"
+        >
+          <img
+            src="@/assets/images/leadspark-logo.png"
+            alt="LeadSparK"
+            :class="expanded ? 'h-6 w-6 object-contain' : 'h-7 w-auto object-contain'"
           />
         </div>
+        <span
+          v-if="expanded"
+          class="truncate text-sm font-semibold text-white"
+        >
+          LeadSparK
+        </span>
       </router-link>
     </div>
 
-    <!-- Create New Button -->
-    <div class="w-full px-2">
+    <!-- Add New -->
+    <div class="w-full px-2 shrink-0">
       <router-link
         to="/add-new"
-        class="relative group w-full h-8 bg-brand-red rounded-md flex items-center justify-center hover:bg-brand-redDark transition-colors"
+        :class="[
+          'relative group flex items-center justify-center transition-colors rounded-md border border-border bg-transparent text-white hover:bg-white/10',
+          expanded ? 'h-9 w-full gap-2' : 'h-9 w-full rounded-full'
+        ]"
         aria-label="Add New Customer"
         title="Add New Customer"
       >
-        <Plus
-          :size="16"
-          class="text-white shrink-0"
-        />
+        <Plus :size="16" class="shrink-0" />
+        <span v-if="expanded" class="truncate text-sm font-medium">{{ $t('common.navigation.addNew') }}</span>
         <span
+          v-else
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Add New Customer
         </span>
       </router-link>
     </div>
-    
-    <!-- Navigation Icons -->
-    <div class="flex flex-col gap-2 flex-1 w-full px-2">
-      <!-- Home -->
+
+    <!-- Nav -->
+    <div class="flex min-h-0 flex-1 flex-col gap-1 w-full px-2">
       <router-link
         v-if="navigationVisibility.home !== false"
         to="/tasks"
         :class="[
-          'relative group w-full h-8 rounded-md flex items-center justify-center transition-colors cursor-pointer',
-          isActive('/tasks') ? 'bg-white/20' : 'hover:bg-white/10',
+          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 px-3' : 'h-8 justify-center',
+          isActive('/tasks') ? 'bg-white/20' : 'hover:bg-white/10'
         ]"
         aria-label="Home"
         title="Home"
       >
-        <Home
-          :size="16"
-          class="text-white shrink-0"
-        />
+        <Home :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">Home</span>
         <span
+          v-else
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Home
         </span>
       </router-link>
-      
-      <!-- Tasks -->
-      <router-link 
+
+      <router-link
         v-if="navigationVisibility.tasks !== false"
-        to="/tasks" 
+        to="/tasks"
         :class="[
-          'relative group w-full h-8 rounded-md flex items-center justify-center transition-colors cursor-pointer',
-          isActive('/tasks') ? 'bg-white/20' : 'hover:bg-white/10',
+          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 px-3' : 'h-8 justify-center',
+          isActive('/tasks') ? 'bg-white/20' : 'hover:bg-white/10'
         ]"
         aria-label="Tasks"
         title="Tasks"
       >
-        <List
-          :size="16"
-          class="text-white shrink-0"
-        />
-        <div v-if="hotLeadsCount > 0" class="absolute -right-1 top-0 w-2 h-2 bg-brand-red rounded-full"></div>
+        <List :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">Tasks</span>
+        <div v-if="hotLeadsCount > 0" :class="expanded ? 'absolute right-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-brand-red rounded-full' : 'absolute -right-1 top-0 w-2 h-2 bg-brand-red rounded-full'" />
         <span
+          v-else
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Tasks
         </span>
       </router-link>
-      
-      <!-- Customers -->
-      <router-link 
+
+      <router-link
         v-if="navigationVisibility.customers !== false"
-        to="/customers" 
+        to="/customers"
         :class="[
-          'relative group w-full h-8 rounded-md flex items-center justify-center transition-colors cursor-pointer',
-          isActive('/customers') ? 'bg-white/20' : 'hover:bg-white/10',
+          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 px-3' : 'h-8 justify-center',
+          isActive('/customers') ? 'bg-white/20' : 'hover:bg-white/10'
         ]"
         aria-label="Customers"
         title="Customers"
       >
-        <Users
-          :size="16"
-          class="text-white shrink-0"
-        />
+        <Users :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">Customers</span>
         <span
+          v-else
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Customers
         </span>
       </router-link>
-      
-      <!-- Calendar -->
-      <router-link 
+
+      <router-link
         v-if="navigationVisibility.calendar !== false"
-        to="/calendar" 
+        to="/calendar"
         :class="[
-          'relative group w-full h-8 rounded-md flex items-center justify-center transition-colors cursor-pointer',
-          isActive('/calendar') ? 'bg-white/20' : 'hover:bg-white/10',
+          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 px-3' : 'h-8 justify-center',
+          isActive('/calendar') ? 'bg-white/20' : 'hover:bg-white/10'
         ]"
         aria-label="Calendar"
         title="Calendar"
       >
-        <Calendar
-          :size="16"
-          class="text-white shrink-0"
-        />
+        <Calendar :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">Calendar</span>
         <span
+          v-else
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Calendar
         </span>
       </router-link>
-      
-      <!-- Reports -->
-      <router-link 
+
+      <router-link
         v-if="userStore.canAccessReports() && navigationVisibility.reports !== false"
-        to="/reports" 
+        to="/reports"
         :class="[
-          'relative group w-full h-8 rounded-md flex items-center justify-center transition-colors cursor-pointer',
-          isActive('/reports') ? 'bg-white/20' : 'hover:bg-white/10',
+          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 px-3' : 'h-8 justify-center',
+          isActive('/reports') ? 'bg-white/20' : 'hover:bg-white/10'
         ]"
         aria-label="Reports"
         title="Reports"
       >
-        <LineChart
-          :size="16"
-          class="text-white shrink-0"
-        />
+        <LineChart :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">Reports</span>
         <span
+          v-else
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Reports
         </span>
       </router-link>
-      
-      <!-- Lists Icon with Dropdown -->
+
       <div v-if="navigationVisibility.lists !== false" class="relative" v-click-outside="() => (showListsMenu = false)">
         <button
+          type="button"
           @click.stop="toggleListsMenu"
           :class="[
-            'relative group w-full h-8 rounded-md flex items-center justify-center transition-colors cursor-pointer',
-            (isActive('/vehicles') || showListsMenu) ? 'bg-white/20' : 'hover:bg-white/10',
+            'relative group flex w-full items-center gap-3 rounded-md transition-colors cursor-pointer',
+            expanded ? 'h-9 px-3' : 'h-8 justify-center',
+            (isActive('/vehicles') || showListsMenu) ? 'bg-white/20' : 'hover:bg-white/10'
           ]"
           aria-label="Lists"
           title="Lists"
         >
-          <List
-            :size="16"
-            class="text-white shrink-0"
-          />
+          <List :size="16" class="text-white shrink-0" />
+          <span v-if="expanded" class="truncate text-sm text-white">Lists</span>
           <span
+            v-else
             class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
           >
             Lists
           </span>
         </button>
-        
-        <!-- Lists Dropdown Menu -->
         <transition name="dropdown">
-          <div 
+          <div
             v-if="showListsMenu"
             class="absolute left-full ml-2 bottom-0 mb-0 w-48 bg-white border border-border rounded-md shadow-mk-dashboard-card overflow-hidden z-50"
             @click.stop
           >
-            <router-link 
+            <router-link
               to="/vehicles"
               @click="showListsMenu = false"
-              class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3"
+              class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 transition-colors hover:bg-gray-50"
               :class="{ 'bg-red-50 text-brand-red': isActive('/vehicles') }"
             >
-              <CarFront :size="20" class="text-gray-400" :class="{ 'text-brand-red': isActive('/vehicles') }" /> Vehicles
+              <CarFront :size="20" class="text-gray-400" :class="{ 'text-brand-red': isActive('/vehicles') }" />
+              Vehicles
             </router-link>
           </div>
         </transition>
       </div>
     </div>
     
-    <!-- Bottom Icons -->
-    <div class="w-full px-2 flex flex-col gap-2">
-      <!-- Search Icon -->
+    <!-- Bottom: Search, Language, Settings -->
+    <div class="w-full px-2 flex flex-col gap-1 shrink-0">
       <button
         v-if="navigationVisibility.search !== false"
+        type="button"
         @click="showSearchModal = true"
         :class="[
-          'relative group w-full h-8 rounded-md flex items-center justify-center transition-colors cursor-pointer',
-          'hover:bg-white/10',
+          'relative group flex items-center rounded-md transition-colors cursor-pointer hover:bg-white/10',
+          expanded ? 'h-9 gap-3 px-3' : 'h-8 w-full justify-center'
         ]"
         aria-label="Search"
         title="Search"
       >
-        <Search
-          :size="16"
-          class="text-white shrink-0"
-        />
+        <Search :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">Search</span>
         <span
+          v-else
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Search
         </span>
       </button>
 
-      <!-- Language Selector -->
       <div v-if="navigationVisibility.language !== false" class="relative" v-click-outside="() => (showLanguageMenu = false)">
         <button
+          type="button"
           @click.stop="toggleLanguageMenu"
           :class="[
-            'relative group w-full h-8 rounded-md flex items-center justify-center transition-colors cursor-pointer',
-            showLanguageMenu ? 'bg-white/20' : 'hover:bg-white/10',
+            'relative group flex w-full items-center rounded-md transition-colors cursor-pointer',
+            expanded ? 'h-9 gap-3 px-3' : 'h-8 justify-center',
+            showLanguageMenu ? 'bg-white/20' : 'hover:bg-white/10'
           ]"
           aria-label="Language"
           title="Language"
         >
-          <Globe
-            :size="16"
-            class="text-white shrink-0"
-          />
+          <Globe :size="16" class="text-white shrink-0" />
+          <span v-if="expanded" class="truncate text-sm text-white">Language</span>
           <span
+            v-else
             class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
           >
             Language
           </span>
         </button>
-        
-        <!-- Language Dropdown Menu -->
         <transition name="dropdown">
-          <div 
+          <div
             v-if="showLanguageMenu"
             class="absolute left-full ml-2 bottom-0 mb-0 w-48 bg-white border border-border rounded-md shadow-mk-dashboard-card overflow-hidden z-50"
             @click.stop
           >
-            <button 
+            <button
               v-for="lang in languages"
               :key="lang.code"
+              type="button"
               @click="changeLanguage(lang.code)"
               class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3"
               :class="{ 'bg-red-50 text-brand-red': currentLocale === lang.code }"
@@ -258,23 +264,22 @@
           </div>
         </transition>
       </div>
-      
-      <!-- Settings Icon -->
+
       <router-link
         v-if="userStore.canAccessSettings()"
         to="/settings"
         :class="[
-          'relative group w-full h-8 rounded-md flex items-center justify-center transition-colors cursor-pointer',
-          isActive('/settings') ? 'bg-white/20' : 'hover:bg-white/10',
+          'relative group flex items-center rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 gap-3 px-3' : 'h-8 justify-center',
+          isActive('/settings') ? 'bg-white/20' : 'hover:bg-white/10'
         ]"
         aria-label="Settings"
         title="Settings"
       >
-        <Settings
-          :size="16"
-          class="text-white shrink-0"
-        />
+        <Settings :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">Settings</span>
         <span
+          v-else
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Settings
@@ -282,20 +287,35 @@
       </router-link>
     </div>
 
-    <!-- User Avatar at Bottom with Dropdown -->
+    <!-- User Avatar -->
     <div class="w-full px-2 pb-2">
       <div class="relative" v-click-outside="() => (showUserMenu = false)">
         <button
           @click.stop="toggleUserMenu"
-          class="w-full h-8 rounded-md flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"
+          :class="[
+            'relative group w-full rounded-md flex items-center transition-colors cursor-pointer hover:bg-white/10',
+            expanded ? 'h-9 gap-3 px-3' : 'h-8 justify-center'
+          ]"
           aria-label="User Menu"
           title="User Menu"
         >
-          <div 
-            class="user-avatar user-avatar-logo rounded-full flex items-center justify-center font-medium text-white"
+          <div
+            class="user-avatar user-avatar-logo rounded-full flex items-center justify-center font-medium text-white shrink-0"
           >
             {{ userInitials }}
           </div>
+          <span
+            v-if="expanded"
+            class="truncate text-sm text-white"
+          >
+            {{ userStore.currentUser?.name }}
+          </span>
+          <span
+            v-else
+            class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+          >
+            {{ userStore.currentUser?.name }}
+          </span>
         </button>
         
         <!-- User Dropdown Menu -->
@@ -357,30 +377,45 @@
       </div>
     </div>
 
+    <!-- COMO dropdown (below avatar) -->
+    <div v-if="expanded" class="w-full px-2 pb-2 shrink-0">
+      <button
+        type="button"
+        class="flex w-full items-center gap-3 rounded-md border border-border bg-transparent px-3 py-2 text-white hover:bg-white/10 transition-colors"
+      >
+        <div class="min-w-0 flex-1 text-left">
+          <div class="truncate text-sm font-semibold">COMO</div>
+          <div class="truncate text-xs text-white/70">Paris</div>
+        </div>
+        <ChevronDown :size="16" class="shrink-0 text-white/70" />
+      </button>
+    </div>
+
     <!-- Floating Search Modal -->
-    <FloatingSearchModal 
-      :show="showSearchModal" 
-      @close="showSearchModal = false"
+    <FloatingSearchModal
+      :show="showSearchModal"
+      @close="handleCloseSearchModal"
       @search="handleSearch"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useLayoutStore } from '@/stores/layout'
 import { useLeadsStore } from '@/stores/leads'
 import { useUserStore } from '@/stores/user'
 import { useSettingsStore } from '@/stores/settings'
 import { useTheme } from '@/composables/useTheme'
-import { 
-  Plus, 
-  Home, 
-  List, 
-  Users, 
-  Calendar, 
-  LineChart, 
+import {
+  Plus,
+  Home,
+  List,
+  Users,
+  Calendar,
+  LineChart,
   Settings,
   CarFront,
   Search,
@@ -390,18 +425,33 @@ import {
   Headphones,
   Moon,
   Sun,
-  LogOut
+  LogOut,
+  ChevronDown
 } from 'lucide-vue-next'
 import FloatingSearchModal from '@/components/shared/FloatingSearchModal.vue'
 
 const router = useRouter()
 const route = useRoute()
 const { locale, t } = useI18n()
+const layoutStore = useLayoutStore()
 const leadsStore = useLeadsStore()
 const userStore = useUserStore()
 const settingsStore = useSettingsStore()
 const { isDark, toggleTheme } = useTheme()
 
+watch(
+  () => layoutStore.searchModalOpen,
+  (open) => {
+    showSearchModal.value = open
+  }
+)
+
+function handleCloseSearchModal() {
+  showSearchModal.value = false
+  layoutStore.setSearchModalOpen(false)
+}
+
+const expanded = computed(() => layoutStore.sidebarExpanded)
 const navigationVisibility = computed(() => settingsStore.getSetting('navigationVisibility') || {})
 
 // Computed property to get the first visible route from the navbar
@@ -486,9 +536,7 @@ const toggleDarkMode = () => {
 }
 
 const handleSearch = (query) => {
-  // Global search is not implemented yet; this is a no-op hook
-  // that can be connected to a backend or in-memory search later.
-  // TODO: Implement global search functionality
+  handleCloseSearchModal()
 }
 </script>
 

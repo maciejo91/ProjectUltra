@@ -228,7 +228,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ListTodo, Loader2 } from 'lucide-vue-next'
 import { useLeadsStore } from '@/stores/leads'
@@ -252,6 +252,7 @@ import { useSettingsStore } from '@/stores/settings'
 
 const route = useRoute()
 const router = useRouter()
+const headerActionsRef = inject('headerActionsRef', null)
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
@@ -343,6 +344,27 @@ const handleViewChange = (newViewMode, searchQuery = '') => {
 const activeFilters = ref([]) // Array of active filter keys: ['lead', 'due-in-24h', etc.] - no filters by default
 const sortOption = ref('') // '', 'urgent-first', 'assigned-to-me', 'assigned-to-my-team', 'recent-first'
 const showClosed = ref(false) // Toggle to show/hide closed leads and closed opportunities
+
+function toggleShowClosed() {
+  showClosed.value = !showClosed.value
+}
+
+onMounted(() => {
+  if (headerActionsRef) {
+    headerActionsRef.value = {
+      type: 'tasks',
+      viewModeRef: viewMode,
+      showClosedRef: showClosed,
+      onViewChange: handleViewChange,
+      onToggleClosed: toggleShowClosed
+    }
+  }
+})
+
+onBeforeUnmount(() => {
+  if (headerActionsRef) headerActionsRef.value = null
+})
+
 const showTaskListMobile = ref(false)
 const showReassignModal = ref(false)
 const taskToReassign = ref(null)

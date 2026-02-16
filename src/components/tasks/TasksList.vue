@@ -2,54 +2,6 @@
   <div 
     class="tasks-list-container border-r border-border flex flex-col shrink-0 w-full lg:w-80 h-full"
   >
-    <!-- Header: Title + View Toggle -->
-    <header class="page-header shrink-0">
-      <div class="page-header-main">
-        <div class="page-header-content">
-          <div class="page-header-title-container">
-            <h1 class="page-header-title">{{ displayTitle }}</h1>
-          </div>
-          
-          <!-- View Toggle: Cards (left) → Table (right); highlighted = current view -->
-          <div class="page-header-actions">
-            <div class="bg-white p-0.5 rounded-btn inline-flex gap-0.5">
-              <Button
-                variant="secondary"
-                size="icon"
-                @click="$emit('view-change', 'card')"
-                :class="[
-                  'h-7 w-7',
-                  viewMode === 'card'
-                    ? 'bg-brand-gray text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                ]"
-                title="Card View"
-                :aria-pressed="viewMode === 'card'"
-              >
-                <LayoutGrid :size="14" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                @click="$emit('view-change', 'table')"
-                :class="[
-                  'h-7 w-7',
-                  viewMode === 'table'
-                    ? 'bg-brand-gray text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                ]"
-                title="Table View"
-                :aria-pressed="viewMode === 'table'"
-              >
-                <Table :size="14" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
-    
-    
     <!-- Search: same Motork InputGroup as DataTable, no custom styling -->
     <div class="px-5 py-3">
       <div class="flex items-center gap-2">
@@ -109,8 +61,8 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue'
-import { Table, LayoutGrid, Search } from 'lucide-vue-next'
-import { Button, InputGroup, InputGroupInput, InputGroupAddon } from '@motork/component-library/future/primitives'
+import { Search } from 'lucide-vue-next'
+import { InputGroup, InputGroupInput, InputGroupAddon } from '@motork/component-library/future/primitives'
 import TaskCard from '@/components/tasks/TaskCard.vue'
 import TaskFilters from '@/components/tasks/TaskFilters.vue'
 
