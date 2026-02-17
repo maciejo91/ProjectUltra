@@ -1,103 +1,96 @@
 <template>
-  <div class="rounded-lg flex flex-col bg-muted">
-    <div class="pt-1 px-1">
-      <div class="bg-white rounded-lg shadow-nsc-card overflow-visible">
-        <div class="p-6">
-          <div class="mb-3">
-            <h4 class="font-bold text-foreground text-sm">Manage Offers & Follow Up</h4>
-            <p class="text-sm text-muted-foreground mt-0.5">
-              <template v-if="opportunity.offers && opportunity.offers.length > 0">
-                <template v-if="meetsOFBCondition">
-                  This opportunity has been in negotiation for {{ daysInNegotiation }} days without a contract. Follow up with customer to get feedback and move forward.
-                </template>
-                <template v-else>
-                  Follow up with customer about offers
-                </template>
+  <div class="flex flex-col">
+    <!-- Main card: header + toggles only (LQTask-style) -->
+    <div class="bg-white rounded-lg shadow-nsc-card overflow-visible">
+      <div class="p-6">
+        <div class="mb-3">
+          <h4 class="font-bold text-foreground text-sm">Manage Offers & Follow Up</h4>
+          <p class="text-sm text-muted-foreground mt-0.5">
+            <template v-if="opportunity.offers && opportunity.offers.length > 0">
+              <template v-if="meetsOFBCondition">
+                This opportunity has been in negotiation for {{ daysInNegotiation }} days without a contract. Follow up with customer to get feedback and move forward.
               </template>
               <template v-else>
-                Create an offer to continue negotiation
+                Follow up with customer about offers
               </template>
-            </p>
-          </div>
-          <!-- Offers Carousel is now shown globally in OpportunityManagementWidget for all stages -->
-          <div v-if="!opportunity.offers || opportunity.offers.length === 0" class="mb-4 p-4 bg-muted rounded-lg">
-            <p class="text-sm text-muted-foreground">No offers yet. Create your first offer to continue.</p>
-          </div>
-          <div class="flex flex-wrap gap-3 items-center">
-            <!-- Actions for Offer Sent -->
-            <template v-if="opportunity.negotiationSubstatus === 'Offer Sent'">
-              <div class="outcome-toggle-group flex flex-wrap gap-3">
-                <Toggle
-                  variant="outline"
-                  :model-value="showNegotiationSection"
-                  @update:model-value="(p) => { $emit('update:show-negotiation-section', p); if (p) { $emit('update:show-add-offer-section', false); $emit('update:show-survey-section', false); } else { $emit('reset-negotiation-form') } }"
-                  class="outcome-toggle-item"
-                >
-                  <Phone class="w-4 h-4 shrink-0" />
-                  <span>Follow Up</span>
-                </Toggle>
-                <Toggle
-                  v-if="meetsOFBCondition"
-                  variant="outline"
-                  :model-value="showSurveySection"
-                  @update:model-value="(p) => { $emit('update:show-survey-section', p); if (p) { $emit('update:show-negotiation-section', false); $emit('update:show-add-offer-section', false); } }"
-                  class="outcome-toggle-item"
-                >
-                  <ClipboardList class="w-4 h-4 shrink-0" />
-                  <span>Complete Survey</span>
-                </Toggle>
-              </div>
             </template>
-            
-            <!-- Regular Actions for other substatuses -->
             <template v-else>
-              <div class="outcome-toggle-group flex flex-wrap gap-3">
-                <Toggle
-                  variant="outline"
-                  :model-value="showNegotiationSection"
-                  @update:model-value="(p) => { $emit('update:show-negotiation-section', p); if (p) { $emit('update:show-add-offer-section', false); $emit('update:show-survey-section', false); } else { $emit('reset-negotiation-form') } }"
-                  class="outcome-toggle-item"
-                >
-                  <Phone class="w-4 h-4 shrink-0" />
-                  <span>{{ (opportunity.negotiationSubstatus === 'Offer Feedback') ? 'Request Feedback' : 'Follow Up' }}</span>
-                </Toggle>
-                <Button
-                  variant="outline"
-                  size="small"
-                  class="gap-2"
-                  @click="$emit('open-add-offer-modal')"
-                >
-                  <Plus class="w-4 h-4 shrink-0" />
-                  <span>Add Offer</span>
-                </Button>
-                <Toggle
-                  v-if="meetsOFBCondition"
-                  variant="outline"
-                  :model-value="showSurveySection"
-                  @update:model-value="(p) => { $emit('update:show-survey-section', p); if (p) { $emit('update:show-negotiation-section', false); $emit('update:show-add-offer-section', false); } }"
-                  class="outcome-toggle-item"
-                >
-                  <ClipboardList class="w-4 h-4 shrink-0" />
-                  <span>Complete Survey</span>
-                </Toggle>
-              </div>
+              Create an offer to continue negotiation
             </template>
-            
-            <!-- Secondary Actions Dropdown -->
-            <SecondaryActionsDropdown
-              v-if="secondaryActions && secondaryActions.length > 0"
-              :actions="secondaryActions"
-              @action-selected="handleSecondaryActionClick"
-            />
-          </div>
+          </p>
+        </div>
+        <div v-if="!opportunity.offers || opportunity.offers.length === 0" class="mb-4 p-4 bg-muted rounded-lg">
+          <p class="text-sm text-muted-foreground">No offers yet. Create your first offer to continue.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 items-center">
+          <template v-if="opportunity.negotiationSubstatus === 'Offer Sent'">
+            <div class="outcome-toggle-group flex flex-wrap gap-3">
+              <Toggle
+                variant="outline"
+                :model-value="showNegotiationSection"
+                @update:model-value="(p) => { $emit('update:show-negotiation-section', p); if (p) { $emit('update:show-add-offer-section', false); $emit('update:show-survey-section', false); } else { $emit('reset-negotiation-form') } }"
+                class="outcome-toggle-item"
+              >
+                <Phone class="w-4 h-4 shrink-0" />
+                <span>Follow Up</span>
+              </Toggle>
+              <Toggle
+                v-if="meetsOFBCondition"
+                variant="outline"
+                :model-value="showSurveySection"
+                @update:model-value="(p) => { $emit('update:show-survey-section', p); if (p) { $emit('update:show-negotiation-section', false); $emit('update:show-add-offer-section', false); } }"
+                class="outcome-toggle-item"
+              >
+                <ClipboardList class="w-4 h-4 shrink-0" />
+                <span>Complete Survey</span>
+              </Toggle>
+            </div>
+          </template>
+          <template v-else>
+            <div class="outcome-toggle-group flex flex-wrap gap-3">
+              <Toggle
+                variant="outline"
+                :model-value="showNegotiationSection"
+                @update:model-value="(p) => { $emit('update:show-negotiation-section', p); if (p) { $emit('update:show-add-offer-section', false); $emit('update:show-survey-section', false); } else { $emit('reset-negotiation-form') } }"
+                class="outcome-toggle-item"
+              >
+                <Phone class="w-4 h-4 shrink-0" />
+                <span>{{ (opportunity.negotiationSubstatus === 'Offer Feedback') ? 'Request Feedback' : 'Follow Up' }}</span>
+              </Toggle>
+              <Button
+                v-if="!hasOffers"
+                variant="outline"
+                size="small"
+                class="gap-2"
+                @click="$emit('open-add-offer-modal')"
+              >
+                <Plus class="w-4 h-4 shrink-0" />
+                <span>Add Offer</span>
+              </Button>
+              <Toggle
+                v-if="meetsOFBCondition"
+                variant="outline"
+                :model-value="showSurveySection"
+                @update:model-value="(p) => { $emit('update:show-survey-section', p); if (p) { $emit('update:show-negotiation-section', false); $emit('update:show-add-offer-section', false); } }"
+                class="outcome-toggle-item"
+              >
+                <ClipboardList class="w-4 h-4 shrink-0" />
+                <span>Complete Survey</span>
+              </Toggle>
+            </div>
+          </template>
+          <SecondaryActionsDropdown
+            v-if="secondaryActions && secondaryActions.length > 0"
+            :actions="secondaryActions"
+            @action-selected="handleSecondaryActionClick"
+          />
         </div>
       </div>
     </div>
-    
-    <div class="px-4 py-4 space-y-4">
-      <!-- Inline Follow Up Section -->
+
+    <!-- Expanded content as cards below the main card (LQTask-style) -->
+    <div class="mk-expanded-cards-area space-y-4">
       <div v-if="showNegotiationSection" class="space-y-4">
-        <!-- Communication Options -->
         <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
           <h5 class="font-semibold text-foreground text-sm mb-4">Contact Customer</h5>
           
@@ -403,7 +396,7 @@ const meetsOFBCondition = computed(() => {
 // Check if OFB task should be shown (only in expanded view, only for Offer Sent)
 const shouldShowOFBTask = computed(() => {
   // TEMPORARY: For opportunity 33 evaluation, show even when not expanded
-  const isEvaluationMode = props.opportunity?.id === 33
+  const isEvaluationMode = props.opportunity?.id === 3
   
   if (!isEvaluationMode && !props.showNegotiationSection) {
     return false

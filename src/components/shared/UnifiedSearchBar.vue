@@ -4,8 +4,9 @@
       class="relative flex items-center rounded-lg transition-all duration-300 ease-in-out"
       :class="[
         isAIMode
-          ? 'p-px bg-gradient-to-r from-[#40B3E9] via-[#8873FF] to-[#FF8B42] w-full max-w-2xl'
-          : 'w-full max-w-md',
+          ? 'p-px bg-gradient-to-r from-[#40B3E9] via-[#8873FF] to-[#FF8B42] w-full'
+          : 'w-full',
+        !fullWidth && (isAIMode ? 'max-w-2xl' : 'max-w-md'),
       ]"
     >
       <div
@@ -62,6 +63,7 @@ import { useNaturalLanguageQuery } from '@/composables/useNaturalLanguageQuery'
 
 const props = defineProps({
   activeTab: { type: String, default: 'opportunities' },
+  fullWidth: { type: Boolean, default: false },
   placeholder: { type: String, default: '' },
   assigneeOptions: { type: Array, default: () => [] },
   volvoModelOptions: { type: Array, default: () => [] },

@@ -1,5 +1,5 @@
+import { getMockData } from './mockData/localeLoader.js'
 import { mockCustomers } from './mockData'
-import { mockLeads, mockOpportunities, mockActivities, mockCalendarEvents, mockTasks } from './mockData'
 
 const delay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -138,6 +138,7 @@ export const convertContactToOpportunity = async (contactId) => {
 // Fetch all leads associated with a customer or account
 export const fetchLeadsByCustomerId = async (customerId, accountId = null) => {
   await delay()
+  const { mockLeads } = getMockData()
   let leads = []
   
   if (accountId) {
@@ -166,6 +167,7 @@ export const fetchLeadsByCustomerId = async (customerId, accountId = null) => {
 // Fetch all opportunities associated with a customer or account
 export const fetchOpportunitiesByCustomerId = async (customerId, accountId = null) => {
   await delay()
+  const { mockOpportunities } = getMockData()
   let opportunities = []
   
   if (accountId) {
@@ -204,6 +206,7 @@ export const fetchOpportunitiesByAccountId = async (accountId) => {
 // Fetch all cars associated with a customer or account (requested, offered, drove, purchased, owned)
 export const fetchCustomerCars = async (customerId) => {
   await delay()
+  const { mockLeads, mockOpportunities, mockActivities, mockCalendarEvents } = getMockData()
   const cars = []
   
   // Get customer/account from mockCustomers
@@ -389,6 +392,7 @@ export const addVehicleToCustomer = async (customerId, vehicleData) => {
 // Fetch all tasks associated with a customer
 export const fetchTasksByCustomerId = async (customerId) => {
   await delay()
+  const { mockTasks } = getMockData()
   const tasks = mockTasks.filter(task => task.customerId === parseInt(customerId))
   return { data: tasks, total: tasks.length }
 }
@@ -396,11 +400,15 @@ export const fetchTasksByCustomerId = async (customerId) => {
 // Fetch all tasks associated with a lead
 export const fetchTasksByLeadId = async (leadId) => {
   await delay()
+  const { mockTasks } = getMockData()
   const tasks = mockTasks.filter(task => task.leadId === parseInt(leadId))
   return { data: tasks, total: tasks.length }
-}// Fetch all tasks associated with an opportunity
+}
+
+// Fetch all tasks associated with an opportunity
 export const fetchTasksByOpportunityId = async (opportunityId) => {
   await delay()
+  const { mockTasks } = getMockData()
   const tasks = mockTasks.filter(task => task.opportunityId === parseInt(opportunityId))
   return { data: tasks, total: tasks.length }
 }

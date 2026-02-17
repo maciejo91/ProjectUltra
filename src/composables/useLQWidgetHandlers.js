@@ -10,6 +10,11 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
   const {
     showOutcomeSelection,
     selectedOutcome,
+    selectedNextStep,
+    outcomeLabel,
+    nextStepLabel,
+    followupChannel,
+    followUpChannelLabel,
     assignment,
     preferences,
     cancelOutcome,
@@ -39,6 +44,19 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
     clearSuccessState,
     resetOutcomeState
   } = outcomeState
+
+  const buildAttempt = (outcome, overrides = {}) => ({
+    timestamp: callLogDateTime.value ? new Date(callLogDateTime.value).toISOString() : new Date().toISOString(),
+    outcome,
+    channel: callData.value?.channel || 'phone',
+    notes: callData.value?.notes || '',
+    transcription: callData.value?.transcription || null,
+    duration: callData.value?.duration ?? null,
+    outcomeLabel: outcomeLabel.value || overrides.outcomeLabel,
+    nextStep: nextStepLabel.value || overrides.nextStep,
+    followUpChannel: followUpChannelLabel.value || overrides.followUpChannel || null,
+    ...overrides
+  })
 
   const actorName = () => (currentUserRef?.value?.name) || 'Unknown'
 
@@ -70,13 +88,7 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
   }
 
   const handleQualify = async () => {
-    const attempt = {
-      timestamp: new Date().toISOString(),
-      outcome: 'interested',
-      channel: callData.value?.channel || 'phone',
-      notes: callData.value?.notes || '',
-      transcription: callData.value?.transcription || null
-    }
+    const attempt = buildAttempt('answer', { nextStep: 'Interested' })
 
     emit('call-attempt-logged', attempt)
     emit('validated', { scheduleFollowUp: false })
@@ -324,29 +336,14 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
   }
 
   const handleDisqualifyFromInterested = () => {
-    // Log the attempt first
-    const attempt = {
-      timestamp: new Date().toISOString(),
-      outcome: 'interested',
-      channel: callData.value?.channel || 'phone',
-      notes: callData.value?.notes || '',
-      transcription: callData.value?.transcription || null
-    }
+    const attempt = buildAttempt('answer', { nextStep: 'Not interested' })
     emit('call-attempt-logged', attempt)
-    
-    // Then switch to disqualify outcome
-    selectedOutcome.value = 'not-valid'
+    selectedOutcome.value = 'answer'
+    selectedNextStep.value = 'not-interested'
   }
 
   const handleNoAnswerConfirm = async () => {
-    const attempt = {
-      timestamp: new Date().toISOString(),
-      outcome: 'no-answer',
-      channel: callData.value?.channel || 'phone',
-      notes: callData.value?.notes || '',
-      transcription: callData.value?.transcription || null
-    }
-    
+    const attempt = buildAttempt('no-answer')
     emit('call-attempt-logged', attempt)
     
     const nextCallDate = calculateNextCallDate()
@@ -383,14 +380,19 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
     cancelOutcome()
   }
 
+  const handleNoAnswerCloseLead = async () => {
+    const attempt = buildAttempt('no-answer', { nextStep: 'Close lead' })
+    emit('call-attempt-logged', attempt)
+    const reason = outcomeState.disqualifyReason.value || 'Unreachable'
+    const category = outcomeState.disqualifyCategory.value || 'Not Interested'
+    emit('disqualified', { category, reason })
+    successState.value = { kind: 'no-answer', statusText: `Closed - ${reason}`, reason, actorName: actorName() }
+    successPerformedAt.value = new Date()
+    cancelOutcome()
+  }
+
   const handlePostponeFromInterested = async () => {
-    const attempt = {
-      timestamp: callLogDateTime.value ? new Date(callLogDateTime.value).toISOString() : new Date().toISOString(),
-      outcome: 'postponed-interested',
-      channel: callData.value?.channel || 'phone',
-      notes: callData.value?.notes || '',
-      transcription: callData.value?.transcription || null
-    }
+    const attempt = buildAttempt('answer', { outcome: 'postponed-interested', nextStep: 'Postpone' })
     emit('call-attempt-logged', attempt)
 
     const nextCallDate = calculateNextCallDate()
@@ -434,14 +436,7 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
   }
 
   const handleNotValidConfirm = () => {
-    const attempt = {
-      timestamp: new Date().toISOString(),
-      outcome: 'not-valid',
-      channel: callData.value?.channel || 'phone',
-      notes: callData.value?.notes || '',
-      transcription: callData.value?.transcription || null
-    }
-    
+    const attempt = buildAttempt('not-valid')
     emit('call-attempt-logged', attempt)
     emit('disqualified', {
       category: outcomeState.disqualifyCategory.value,
@@ -485,6 +480,7 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
     handleQualify,
     handleDisqualifyFromInterested,
     handleNoAnswerConfirm,
+    handleNoAnswerCloseLead,
     handlePostponeFromInterested,
     handleNotValidConfirm,
     handleNoteSave,

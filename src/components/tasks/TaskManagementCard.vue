@@ -7,6 +7,8 @@
       :opportunity="type === 'opportunity' ? task : undefined"
       :activities="activities"
       v-bind="filteredAttrs"
+      @postpone-expected-close="$emit('postpone-expected-close')"
+      @reassigned="$emit('reassigned', $event)"
     />
   </div>
 </template>

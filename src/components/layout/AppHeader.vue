@@ -1,74 +1,67 @@
 <template>
   <header
-    class="hidden md:flex h-12 shrink-0 items-center justify-between gap-4 border-b border-border bg-background pl-1 pr-4 md:pl-1 md:pr-6"
+    class="hidden md:flex h-12 shrink-0 items-center justify-between gap-4 border-b border-border bg-background pl-4 md:pl-6 pr-4 md:pr-6 app-header"
   >
-    <div class="flex min-w-0 flex-1 items-center gap-3">
-      <Button
-        variant="ghost"
-        size="icon"
-        :aria-label="layoutStore.sidebarExpanded ? t('common.layout.closeSidebar') : t('common.layout.openSidebar')"
-        :aria-expanded="layoutStore.sidebarExpanded"
-        class="h-10 w-10 shrink-0 text-muted-foreground hover:text-foreground"
-        @click="layoutStore.toggleSidebar()"
-      >
-        <PanelLeftClose v-if="layoutStore.sidebarExpanded" :size="20" />
-        <PanelLeft v-else :size="20" />
-      </Button>
-      <h1 class="truncate text-base font-medium text-foreground">
+    <!-- Title always on the very left; when cards view is selected the header shrinks and brings the action buttons closer -->
+    <div class="flex min-w-0 flex-1 items-center">
+      <h1 class="truncate text-base font-medium text-foreground min-w-0">
         {{ pageTitle }}
       </h1>
     </div>
 
-    <div v-if="customersHeaderActions" class="flex shrink-0 items-center gap-3">
-      <button
-        type="button"
-        class="group flex items-center gap-2 rounded-xl border border-border px-3 py-1.5 bg-surface text-sm font-medium text-muted-foreground hover:border-red-100 hover:bg-red-50 hover:text-brand-red transition-all"
-        @click="customersHeaderActions.onAddNew()"
-      >
-        <Plus class="w-4 h-4 shrink-0 text-muted-foreground group-hover:text-brand-red" />
-        <span class="hidden sm:inline">{{ t('common.navigation.addNew') }}</span>
-      </button>
-    </div>
-    <div v-else-if="tasksHeaderActions" class="flex shrink-0 items-center gap-3">
-      <div class="app-header-view-toggle outcome-toggle-group bg-white p-0.5 rounded-btn inline-flex gap-0.5">
-        <Toggle
-          variant="outline"
-          :model-value="tasksHeaderActions.viewModeRef.value === 'card'"
-          class="app-header-view-toggle-btn h-7 w-7 rounded-md inline-flex items-center justify-center border transition-colors min-w-7 p-0"
-          title="Card View"
-          @update:model-value="(p) => p && tasksHeaderActions.onViewChange('card')"
-        >
-          <LayoutGrid :size="14" />
-        </Toggle>
-        <Toggle
-          variant="outline"
-          :model-value="tasksHeaderActions.viewModeRef.value === 'table'"
-          class="app-header-view-toggle-btn h-7 w-7 rounded-md inline-flex items-center justify-center border transition-colors min-w-7 p-0"
-          title="Table View"
-          @update:model-value="(p) => p && tasksHeaderActions.onViewChange('table')"
-        >
-          <Table :size="14" />
-        </Toggle>
-      </div>
-      <button
-        type="button"
-        :class="[
-          'group flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium transition-all',
-          tasksHeaderActions.showClosedRef.value
-            ? 'border-red-200 bg-red-50 text-brand-red'
-            : 'border-border bg-surface text-muted-foreground hover:border-red-100 hover:bg-red-50 hover:text-brand-red'
-        ]"
-        :aria-pressed="tasksHeaderActions.showClosedRef.value"
-        @click="tasksHeaderActions.onToggleClosed()"
-      >
-        <EyeOff
+    <!-- Action buttons on the very right (same as all pages); ml-auto keeps them right when header is narrow -->
+    <div class="flex shrink-0 items-center gap-3 ml-auto">
+      <template v-if="tasksHeaderActions">
+        <div class="app-header-view-toggle outcome-toggle-group bg-white p-0.5 rounded-btn inline-flex gap-0.5 shrink-0">
+          <Toggle
+            variant="outline"
+            :model-value="tasksHeaderActions.viewModeRef.value === 'card'"
+            class="app-header-view-toggle-btn h-7 w-7 rounded-md inline-flex items-center justify-center border transition-colors min-w-7 p-0"
+            title="Card View"
+            @update:model-value="(p) => p && tasksHeaderActions.onViewChange('card')"
+          >
+            <LayoutGrid :size="14" />
+          </Toggle>
+          <Toggle
+            variant="outline"
+            :model-value="tasksHeaderActions.viewModeRef.value === 'table'"
+            class="app-header-view-toggle-btn h-7 w-7 rounded-md inline-flex items-center justify-center border transition-colors min-w-7 p-0"
+            title="Table View"
+            @update:model-value="(p) => p && tasksHeaderActions.onViewChange('table')"
+          >
+            <Table :size="14" />
+          </Toggle>
+        </div>
+        <button
+          type="button"
           :class="[
-            'w-4 h-4 shrink-0',
-            tasksHeaderActions.showClosedRef.value ? 'text-brand-red' : 'text-muted-foreground group-hover:text-brand-red'
+            'group flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium transition-all shrink-0',
+            tasksHeaderActions.showClosedRef.value
+              ? 'border-red-200 bg-red-50 text-brand-red'
+              : 'border-border bg-surface text-muted-foreground hover:border-red-100 hover:bg-red-50 hover:text-brand-red'
           ]"
-        />
-        <span class="hidden sm:inline">{{ t('common.tasks.showClosed') }}</span>
-      </button>
+          :aria-pressed="tasksHeaderActions.showClosedRef.value"
+          @click="tasksHeaderActions.onToggleClosed()"
+        >
+          <EyeOff
+            :class="[
+              'w-4 h-4 shrink-0',
+              tasksHeaderActions.showClosedRef.value ? 'text-brand-red' : 'text-muted-foreground group-hover:text-brand-red'
+            ]"
+          />
+          <span class="hidden sm:inline">{{ t('common.tasks.showClosed') }}</span>
+        </button>
+      </template>
+      <template v-if="customHeaderActions">
+        <button
+          type="button"
+          class="group flex items-center gap-2 rounded-xl border border-border px-3 py-1.5 bg-surface text-sm font-medium text-muted-foreground hover:border-red-100 hover:bg-red-50 hover:text-brand-red transition-all"
+          @click="customHeaderActions.onAddNew()"
+        >
+          <Plus class="w-4 h-4 shrink-0 text-muted-foreground group-hover:text-brand-red" />
+          <span class="hidden sm:inline">{{ t('common.navigation.addNew') }}</span>
+        </button>
+      </template>
     </div>
   </header>
 </template>
@@ -77,18 +70,16 @@
 import { computed, inject } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { useLayoutStore } from '@/stores/layout'
-import { PanelLeft, PanelLeftClose, LayoutGrid, Table, EyeOff, Plus } from 'lucide-vue-next'
-import { Button, Toggle } from '@motork/component-library/future/primitives'
+import { LayoutGrid, Table, EyeOff, Plus } from 'lucide-vue-next'
+import { Toggle } from '@motork/component-library/future/primitives'
 
 const route = useRoute()
 const { t } = useI18n()
-const layoutStore = useLayoutStore()
 
 const headerActionsRef = inject('headerActionsRef', null)
-const customersHeaderActions = computed(() => {
+const customHeaderActions = computed(() => {
   const ref = headerActionsRef?.value
-  if (ref?.type === 'customers') return ref
+  if (ref?.type === 'customers' || ref?.type === 'vehicles') return ref
   return null
 })
 

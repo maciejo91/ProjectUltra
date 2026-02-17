@@ -12,7 +12,7 @@
   <transition name="slide-right">
     <div 
       v-if="show"
-      class="fixed top-0 right-0 bottom-0 w-full lg:w-4/5 xl:w-3/4 bg-background z-50 shadow-xl flex flex-col overflow-hidden"
+      class="fixed top-0 right-0 bottom-0 w-full lg:w-4/5 xl:w-3/4 bg-background z-50 shadow-xl flex flex-col overflow-hidden border-l border-border"
     >
       <!-- Content Slot - fills height so TaskDetailView can use independent scroll -->
       <div class="flex-1 min-h-0 flex flex-col overflow-hidden">

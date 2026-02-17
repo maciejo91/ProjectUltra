@@ -7,11 +7,8 @@
       </p>
     </div>
 
-    <div class="flex justify-end gap-2">
-      <Button variant="outline" size="small" @click="$emit('cancel')">
-        Cancel
-      </Button>
-      <Button variant="default" size="small" @click="$emit('open-create-offer-modal')">
+    <div class="flex justify-end">
+      <Button variant="default" @click="$emit('open-create-offer-modal')">
         Create Offer
       </Button>
     </div>
@@ -26,5 +23,5 @@ defineProps({
   scheduledAppointment: { type: Object, required: true }
 })
 
-defineEmits(['offer-created', 'cancel', 'open-create-offer-modal'])
+defineEmits(['offer-created', 'open-create-offer-modal'])
 </script>

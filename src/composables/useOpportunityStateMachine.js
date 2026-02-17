@@ -202,7 +202,32 @@ export const OPPORTUNITY_STATE_CONFIG = {
   },
 
   'In Negotiation - Offer Sent': {
-    primaryAction: null, // Actions are in NegotiationManagementSection
+    // With scheduled appointment: Manage appointment is primary. Without: Manage Offers & Follow Up is primary (never both).
+    primaryAction: (context) => {
+      if (context.scheduledAppointment && context.scheduledAppointment.start) {
+        return {
+          key: 'manage-appointment',
+          title: 'Manage Appointment',
+          description: (ctx) => {
+            const appointmentDate = new Date(ctx.scheduledAppointment.start)
+            return `Appointment scheduled for ${ctx.formatDateTime ? ctx.formatDateTime(ctx.scheduledAppointment.start) : appointmentDate.toLocaleString()}`
+          },
+          label: 'Manage Appointment',
+          icon: 'fa-solid fa-calendar-check',
+          buttonClass: 'bg-purple-600 hover:bg-purple-700 text-white',
+          colorScheme: { background: 'bg-purple-50/50', border: 'border-purple-100' }
+        }
+      }
+      return {
+        key: 'manage-offers-follow-up',
+        title: 'Manage Offers & Follow Up',
+        description: 'Send and manage offers, request feedback, and follow up with the customer',
+        label: 'Manage Offers & Follow Up',
+        icon: 'fa-solid fa-file-invoice-dollar',
+        buttonClass: 'bg-yellow-600 hover:bg-yellow-700 text-white',
+        colorScheme: { background: 'bg-yellow-50/50', border: 'border-yellow-100' }
+      }
+    },
     secondaryActions: [
       {
         key: 'add-offer',
@@ -222,7 +247,7 @@ export const OPPORTUNITY_STATE_CONFIG = {
         icon: 'fa-solid fa-xmark'
       }
     ],
-    taskWidgets: [] // Manage Offers & Follow Up card handles this
+    taskWidgets: []
   },
 
   'In Negotiation - Contract Pending': {

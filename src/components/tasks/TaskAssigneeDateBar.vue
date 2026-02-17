@@ -1,64 +1,11 @@
 <template>
   <div
     v-if="task && (isAssigned || showDueDate || showExpectedCloseDate)"
-    class="flex items-center gap-4 flex-wrap px-4 py-3 border-b border-border bg-muted/50 text-sm"
+    class="flex items-center justify-between flex-wrap pt-1.5 pb-1.5 px-4"
   >
-    <!-- Date: left -->
-    <template v-if="showDueDate || showExpectedCloseDate">
-      <div v-if="showDueDate" class="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <CalendarDays class="w-3 h-3 shrink-0" />
-        <span>{{ dueDateLabel }}: {{ formattedDueDate }}</span>
-      </div>
+    <div v-if="isAssigned" class="flex items-center gap-2 shrink-0">
       <div
-        v-if="showExpectedCloseDate"
-        class="relative"
-      >
-        <button
-          type="button"
-          class="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          :class="{ 'cursor-default': isTaskClosed }"
-          :aria-expanded="showExpectedCloseMenu && !isTaskClosed"
-          aria-haspopup="true"
-          aria-label="Expected close date"
-          @click.stop="!isTaskClosed && (showExpectedCloseMenu = !showExpectedCloseMenu)"
-        >
-          <CalendarDays class="w-3 h-3 shrink-0" />
-          <span>Expected Close: {{ formattedExpectedCloseDate }}</span>
-          <ChevronDown
-            v-if="!isTaskClosed"
-            :size="10"
-            stroke-width="2"
-            class="shrink-0 transition-transform ml-1"
-            :class="{ 'rotate-180': showExpectedCloseMenu }"
-          />
-        </button>
-        <div
-          v-if="showExpectedCloseMenu && !isTaskClosed && expectedCloseMenuItems.length > 0"
-          v-click-outside="() => (showExpectedCloseMenu = false)"
-          class="absolute left-0 top-full mt-2 z-50 w-56 bg-white border border-border rounded-lg shadow-nsc-card py-1"
-          @click.stop
-        >
-          <button
-            v-for="item in expectedCloseMenuItems"
-            :key="item.key"
-            type="button"
-            class="w-full px-3 py-2 text-left text-xs text-foreground hover:bg-muted flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            :disabled="!!item.disabled"
-            @click="item.onClick()"
-          >
-            {{ item.label }}
-          </button>
-        </div>
-      </div>
-    </template>
-
-    <!-- Spacer to push assignee to the right -->
-    <div v-if="isAssigned" class="flex-1 min-w-0" />
-
-    <!-- Assigned: compact avatar + name + change dropdown (right) -->
-    <div v-if="isAssigned" class="flex items-center gap-1.5 shrink-0">
-      <div
-        class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] shrink-0"
+        class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
         :class="getRoleAvatarClass(ownerInfo.role)"
       >
         {{ getInitials(ownerInfo.name) }}
@@ -69,10 +16,10 @@
           <Button
             variant="ghost"
             size="icon-sm"
-            class="h-5 w-5"
+            class="h-6 w-6"
             aria-label="Change assignee"
           >
-            <ChevronDown :size="10" stroke-width="2" aria-hidden="true" />
+            <ChevronDown :size="12" stroke-width="2" aria-hidden="true" />
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -83,6 +30,51 @@
           <AssigneeDropdownContent show-remove-assignee @select="handleAssigneeFromDropdown" />
         </PopoverContent>
       </Popover>
+    </div>
+    <div v-if="showDueDate" class="flex items-center gap-2 text-xs text-muted-foreground">
+      <CalendarDays class="w-4 h-4 shrink-0" />
+      <span>{{ dueDateLabel }}: {{ formattedDueDate }}</span>
+    </div>
+    <div
+      v-if="showExpectedCloseDate"
+      class="relative"
+    >
+      <button
+        type="button"
+        class="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        :class="{ 'cursor-default': isTaskClosed }"
+        :aria-expanded="showExpectedCloseMenu && !isTaskClosed"
+        aria-haspopup="true"
+        aria-label="Expected close date"
+        @click.stop="!isTaskClosed && (showExpectedCloseMenu = !showExpectedCloseMenu)"
+      >
+        <CalendarDays class="w-4 h-4 shrink-0" />
+        <span>Expected Close: {{ formattedExpectedCloseDate }}</span>
+        <ChevronDown
+          v-if="!isTaskClosed"
+          :size="12"
+          stroke-width="2"
+          class="shrink-0 transition-transform ml-1"
+          :class="{ 'rotate-180': showExpectedCloseMenu }"
+        />
+      </button>
+      <div
+        v-if="showExpectedCloseMenu && !isTaskClosed && expectedCloseMenuItems.length > 0"
+        v-click-outside="() => (showExpectedCloseMenu = false)"
+        class="absolute left-0 top-full mt-2 z-50 w-56 bg-white border border-border rounded-lg shadow-nsc-card py-1"
+        @click.stop
+      >
+        <button
+          v-for="item in expectedCloseMenuItems"
+          :key="item.key"
+          type="button"
+          class="w-full px-3 py-2 text-left text-xs text-foreground hover:bg-muted flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="!!item.disabled"
+          @click="item.onClick()"
+        >
+          {{ item.label }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -104,7 +96,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['reassigned', 'postpone-expected-close'])
+const emit = defineEmits(['postpone-expected-close', 'reassigned'])
 
 const showExpectedCloseMenu = ref(false)
 const assigneeDropdownOpen = ref(false)

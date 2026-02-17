@@ -4,9 +4,21 @@ import { ref, computed, watch } from 'vue'
  * Composable for LQWidget outcome selection logic
  * Manages outcome selection state, assignment, preferences, and related handlers
  */
+/** Human-readable outcome labels for logging */
+const OUTCOME_LABELS = { answer: 'Answer', 'no-answer': 'No answer', 'not-valid': 'Not valid' }
+
+/** Human-readable next-step labels for logging */
+const NEXT_STEP_LABELS = {
+  postpone: 'Postpone',
+  'close-lead': 'Close lead',
+  interested: 'Interested',
+  'not-interested': 'Not interested'
+}
+
 export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contactAttemptsRef, maxContactAttemptsRef, currentUserRef) {
   const showOutcomeSelection = ref(true)
-  const selectedOutcome = ref(null)
+  const selectedOutcome = ref(null) // 'answer' | 'no-answer' | 'not-valid'
+  const selectedNextStep = ref(null)   // no-answer: 'postpone'|'close-lead'; answer: 'interested'|'not-interested'|'postpone'; not-valid: none
   const showNoteModal = ref(false)
   const showScheduleAppointmentModal = ref(false)
   
@@ -319,9 +331,23 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     followupMessageBody.value = raw ? resolveFollowupMessage(raw, calculateNextCallDate() || null) : ''
   }, { immediate: true })
 
+  const setNextStep = (step) => {
+    selectedNextStep.value = step
+    // Default to qualify without appointment when entering Interested flow
+    if (step === 'interested') {
+      qualificationMethod.value = 'assign-only'
+    }
+  }
+
   const selectOutcome = (outcome) => {
     selectedOutcome.value = outcome
-    
+    // Reset next step; default no-answer to postpone so content shows
+    if (outcome === 'no-answer') {
+      selectedNextStep.value = 'postpone'
+    } else if (outcome === 'answer' || outcome === 'not-valid') {
+      selectedNextStep.value = null
+    }
+
     // Initialize datetime to "now" when an outcome is selected
     if (!callLogDateTime.value) {
       const now = new Date()
@@ -343,8 +369,8 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
       nextAttemptAssignee.value = { ...callLogAssignee.value, type: 'user' }
     }
 
-    if (outcome === 'interested') {
-      // Reset survey state when selecting interested outcome
+    if (outcome === 'answer') {
+      // Reset survey state when selecting answer -> interested path
       surveyCompleted.value = false
       surveyResponses.value = null
       showSurvey.value = true
@@ -357,6 +383,17 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     }
   }
 
+  // Labels for logging (human-readable)
+  const outcomeLabel = computed(() => selectedOutcome.value ? OUTCOME_LABELS[selectedOutcome.value] || selectedOutcome.value : null)
+  const nextStepLabel = computed(() => selectedNextStep.value ? NEXT_STEP_LABELS[selectedNextStep.value] || selectedNextStep.value : null)
+  const followUpChannelLabel = computed(() => {
+    if (followupChannel.value === 'dont-send') return "Don't send"
+    if (followupChannel.value === 'whatsapp') return 'WhatsApp'
+    if (followupChannel.value === 'sms') return 'SMS'
+    if (followupChannel.value === 'email') return 'Email'
+    return followupChannel.value || null
+  })
+
   // Watch for AI suggestion selection
   const handleAISuggestionClick = () => {
     rescheduleTime.value = 'monday'
@@ -365,11 +402,13 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
 
   const cancelOutcome = () => {
     selectedOutcome.value = null
+    selectedNextStep.value = null
     showCallLogForm.value = false
   }
 
   const resetOutcomeState = () => {
     selectedOutcome.value = null
+    selectedNextStep.value = null
     showOutcomeSelection.value = true
     followupChannel.value = 'dont-send'
     selectedTemplate.value = 'followup-1'
@@ -415,7 +454,8 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     if (!draft) return
     successState.value = null
     successPerformedAt.value = null
-    selectedOutcome.value = 'interested'
+    selectedOutcome.value = 'answer'
+    selectedNextStep.value = 'interested'
     showOutcomeSelection.value = true
     qualificationMethod.value = draft.qualificationMethod ?? 'assign-only'
     qualificationEventType.value = draft.qualificationEventType ?? ''
@@ -473,6 +513,11 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     // State
     showOutcomeSelection,
     selectedOutcome,
+    selectedNextStep,
+    setNextStep,
+    outcomeLabel,
+    nextStepLabel,
+    followUpChannelLabel,
     showNoteModal,
     showScheduleAppointmentModal,
     followupChannels,

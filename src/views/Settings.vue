@@ -1,10 +1,8 @@
 <template>
   <div class="page-container overflow-y-auto">
     <Tabs v-model="activeTab">
-      <!-- Header with tabs in bottom slot -->
-      <PageHeader title="Settings">
-        <template #actions>
-        </template>
+      <!-- Tabs only (title shown in top AppHeader) -->
+      <PageHeader title="">
         <template #bottom>
           <div class="pb-0">
             <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
@@ -177,12 +175,13 @@
 
           <!-- Scores Tab Content (Lead & opportunity scoring) -->
           <TabsContent value="scores" class="data-[state=inactive]:hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- Scoring Weights -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+              <!-- Left: main scoring card -->
               <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card flex flex-col">
                 <h3 class="text-title mb-4">Scoring weights (leads & opportunities)</h3>
                 <p class="text-meta mb-6">Score formula = (Freshness × {{ scoringWeightsSummary.freshness }}% + Proximity × {{ scoringWeightsSummary.proximity }}% + Vehicle match × {{ scoringWeightsSummary.vehicleMatch }}% + Source quality × {{ scoringWeightsSummary.sourceQuality }}% + Engagement × {{ scoringWeightsSummary.engagement }}%)</p>
                 <div class="space-y-6">
+                  <!-- Freshness -->
                   <div class="space-y-3">
                     <div class="flex items-center justify-between">
                       <Label class="text-content font-medium text-foreground">Freshness</Label>
@@ -197,6 +196,7 @@
                       class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
                     />
                   </div>
+                  <!-- Proximity -->
                   <div class="space-y-3">
                     <div class="flex items-center justify-between">
                       <Label class="text-content font-medium text-foreground">Proximity</Label>
@@ -211,6 +211,7 @@
                       class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
                     />
                   </div>
+                  <!-- Vehicle Match + expandable -->
                   <div class="space-y-3">
                     <div class="flex items-center justify-between">
                       <Label class="text-content font-medium text-foreground">Vehicle Match</Label>
@@ -224,7 +225,37 @@
                       max="100"
                       class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
                     />
+                    <div class="mt-3 border-t border-border pt-3">
+                      <CollapsibleSection
+                        title="Inventory age bonus"
+                        :is-expanded="vehicleMatchExpanded"
+                        @toggle="vehicleMatchExpanded = !vehicleMatchExpanded"
+                      >
+                      <p class="text-meta mb-4">Prioritize selling older stock by giving a bonus for days in stock.</p>
+                      <div class="space-y-5">
+                        <div class="flex items-center gap-3">
+                          <Checkbox
+                            id="scores-prioritizeOldStock"
+                            v-model="localSettings.leadScoring.prioritizeOldStock"
+                          />
+                          <Label for="scores-prioritizeOldStock" class="text-content font-medium text-foreground cursor-pointer">Prioritize old stock</Label>
+                        </div>
+                        <div v-if="localSettings.leadScoring.prioritizeOldStock" class="flex items-center gap-3 pt-2">
+                          <Label class="text-content font-medium text-foreground shrink-0">Aging factor</Label>
+                          <Input
+                            type="number"
+                            v-model.number="localSettings.leadScoring.agingFactor"
+                            min="0"
+                            max="2"
+                            step="0.1"
+                            class="w-full max-w-xs"
+                          />
+                        </div>
+                      </div>
+                      </CollapsibleSection>
+                    </div>
                   </div>
+                  <!-- Source Quality + expandable -->
                   <div class="space-y-3">
                     <div class="flex items-center justify-between">
                       <Label class="text-content font-medium text-foreground">Source Quality</Label>
@@ -238,7 +269,47 @@
                       max="100"
                       class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
                     />
+                    <div class="mt-3 border-t border-border pt-3">
+                      <CollapsibleSection
+                        title="Source priority"
+                        :is-expanded="sourceQualityExpanded"
+                        @toggle="sourceQualityExpanded = !sourceQualityExpanded"
+                      >
+                      <p class="text-meta mb-4">Order sources from highest to lowest quality. Top of the list gets max points.</p>
+                      <ul class="space-y-0 divide-y divide-border">
+                        <li
+                          v-for="(source, index) in (localSettings.leadScoring?.sourcePriority ?? [])"
+                          :key="source"
+                          class="flex items-center gap-3 py-3 first:pt-0"
+                        >
+                          <span class="text-content font-medium text-foreground w-6 shrink-0">{{ index + 1 }}.</span>
+                          <span class="text-content text-foreground flex-1 min-w-0">{{ source }}</span>
+                          <div class="flex gap-1 shrink-0">
+                            <button
+                              type="button"
+                              class="p-1.5 rounded-sm border border-border hover:bg-muted text-foreground disabled:opacity-50 disabled:pointer-events-none"
+                              :disabled="index === 0"
+                              @click="moveSourcePriority(index, -1)"
+                              aria-label="Move up"
+                            >
+                              <ChevronUp class="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              class="p-1.5 rounded-sm border border-border hover:bg-muted text-foreground disabled:opacity-50 disabled:pointer-events-none"
+                              :disabled="index === (localSettings.leadScoring?.sourcePriority?.length ?? 0) - 1"
+                              @click="moveSourcePriority(index, 1)"
+                              aria-label="Move down"
+                            >
+                              <ChevronDown class="w-4 h-4" />
+                            </button>
+                          </div>
+                        </li>
+                      </ul>
+                      </CollapsibleSection>
+                    </div>
                   </div>
+                  <!-- Engagement -->
                   <div class="space-y-3">
                     <div class="flex items-center justify-between">
                       <Label class="text-content font-medium text-foreground">Engagement</Label>
@@ -256,71 +327,9 @@
                 </div>
               </div>
 
-              <!-- Source Priority -->
+              <!-- Right: Urgency labels card -->
               <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card flex flex-col">
-                <h3 class="text-title mb-4">Source Priority</h3>
-                <p class="text-meta mb-6">Order sources from highest to lowest quality. Top of the list gets max points.</p>
-                <ul class="space-y-0 divide-y divide-border">
-                  <li
-                    v-for="(source, index) in (localSettings.leadScoring?.sourcePriority ?? [])"
-                    :key="source"
-                    class="flex items-center gap-3 py-3 first:pt-0"
-                  >
-                    <span class="text-content font-medium text-foreground w-6 shrink-0">{{ index + 1 }}.</span>
-                    <span class="text-content text-foreground flex-1 min-w-0">{{ source }}</span>
-                    <div class="flex gap-1 shrink-0">
-                      <button
-                        type="button"
-                        class="p-1.5 rounded-sm border border-border hover:bg-muted text-foreground disabled:opacity-50 disabled:pointer-events-none"
-                        :disabled="index === 0"
-                        @click="moveSourcePriority(index, -1)"
-                        aria-label="Move up"
-                      >
-                        <ChevronUp class="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        class="p-1.5 rounded-sm border border-border hover:bg-muted text-foreground disabled:opacity-50 disabled:pointer-events-none"
-                        :disabled="index === (localSettings.leadScoring?.sourcePriority?.length ?? 0) - 1"
-                        @click="moveSourcePriority(index, 1)"
-                        aria-label="Move down"
-                      >
-                        <ChevronDown class="w-4 h-4" />
-                      </button>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-
-              <!-- Inventory Age Bonus -->
-              <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card flex flex-col">
-                <h3 class="text-title mb-4">Inventory Age Bonus</h3>
-                <p class="text-meta mb-6">Prioritize selling older stock by giving a bonus for days in stock.</p>
-                <div class="space-y-5">
-                  <div class="flex items-center gap-3">
-                    <Checkbox
-                      id="scores-prioritizeOldStock"
-                      v-model="localSettings.leadScoring.prioritizeOldStock"
-                    />
-                    <Label for="scores-prioritizeOldStock" class="text-content font-medium text-foreground cursor-pointer">Prioritize old stock</Label>
-                  </div>
-                  <div v-if="localSettings.leadScoring.prioritizeOldStock" class="flex items-center gap-3 pt-2">
-                    <Label class="text-content font-medium text-foreground shrink-0">Aging factor</Label>
-                    <Input
-                      type="number"
-                      v-model.number="localSettings.leadScoring.agingFactor"
-                      min="0"
-                      max="2"
-                      step="0.1"
-                      class="w-full max-w-xs"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Urgency level thresholds -->
-              <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card flex flex-col">
-                <h3 class="text-title mb-4">Urgency level thresholds</h3>
+                <h3 class="text-title mb-4">Urgency labels (HOT / WARM / STANDARD / COLD)</h3>
                 <p class="text-meta mb-6">The same score used for sorting drives the HOT/WARM/STANDARD/COLD level on leads and opportunities. Set the minimum score for each level.</p>
                 <div class="flex items-center gap-3 mb-6">
                   <Checkbox
@@ -393,9 +402,11 @@
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Placeholder -->
-              <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card opacity-75 lg:col-span-2">
+            <!-- Customer scoring placeholder (full width below) -->
+            <div class="mt-6">
+              <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card opacity-75 max-w-2xl">
                 <h3 class="text-title mb-4">Customer scoring</h3>
                 <p class="text-meta">Coming soon.</p>
               </div>
@@ -466,7 +477,7 @@
                 </div>
                 <div class="mt-5 p-4 bg-muted border border-border rounded-lg">
                   <p class="text-meta">
-                    <strong class="text-foreground">Note:</strong> The Settings icon is always visible to ensure you can access this page.
+                    <strong class="text-foreground">Note:</strong> The Settings icon is always visible to ensure you can access this page. Vehicles is always shown in the sidebar.
                   </p>
                 </div>
               </div>
@@ -498,6 +509,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useSettingsStore } from '@/stores/settings'
 import { Button, Checkbox, Tabs, TabsList, TabsTrigger, TabsContent, Input, Label, Dialog, DialogContent, DialogDescription, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@motork/component-library/future/primitives'
 import PageHeader from '@/components/layout/PageHeader.vue'
+import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
 import { NAV_ITEMS } from '@/constants/navigationItems'
 import { ChevronUp, ChevronDown } from 'lucide-vue-next'
 
@@ -505,6 +517,10 @@ const settingsStore = useSettingsStore()
 
 // Tab state
 const activeTab = ref('tasks')
+
+// Scores tab: expandable sections (all collapsed by default)
+const sourceQualityExpanded = ref(false)
+const vehicleMatchExpanded = ref(false)
 
 // Score formula explanation popup (Scores tab)
 const showScoreFormulaDialog = ref(false)

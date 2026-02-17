@@ -186,16 +186,29 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
         lastContactAttempt: attempt.timestamp,
         totalContactAttempts: currentAttempts.length + 1
       })
+
+      const contentParts = []
+      if (attempt.outcomeLabel) contentParts.push(`Outcome: ${attempt.outcomeLabel}`)
+      if (attempt.nextStep) contentParts.push(`What's next: ${attempt.nextStep}`)
+      if (attempt.followUpChannel) contentParts.push(`Follow-up: ${attempt.followUpChannel}`)
+      const logContent = contentParts.length
+        ? contentParts.join('. ')
+        : (attempt.notes || `Call attempt via ${attempt.channel}`)
       
       await leadsStore.addActivity(lead.id, {
         type: 'call',
         user: 'You',
-        action: `logged call attempt - ${attempt.outcome}`,
-        content: attempt.notes || `Call attempt via ${attempt.channel}`,
+        action: `logged call attempt - ${attempt.outcomeLabel || attempt.outcome}`,
+        content: logContent,
         data: {
           outcome: attempt.outcome,
+          outcomeLabel: attempt.outcomeLabel,
+          nextStep: attempt.nextStep,
+          followUpChannel: attempt.followUpChannel,
           channel: attempt.channel,
-          duration: attempt.duration
+          duration: attempt.duration,
+          notes: attempt.notes,
+          transcription: attempt.transcription
         }
       })
       

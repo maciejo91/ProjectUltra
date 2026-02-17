@@ -2,6 +2,7 @@
   <div class="border border-border rounded-lg overflow-hidden">
     <!-- Section Header -->
     <button
+      type="button"
       @click="$emit('toggle')"
       class="w-full flex items-center justify-between py-3 transition-colors"
       :class="[

@@ -13,6 +13,7 @@
     v-model:globalFilter="globalFilterModel"
     v-model:sorting="sortingModel"
     v-model:columnFilters="columnFiltersModel"
+    v-model:columnVisibility="columnVisibilityModel"
     v-model:rowSelection="rowSelection"
     :paginationOptions="{
       rowCount: rowCount ?? filteredVehicles.length
@@ -107,13 +108,17 @@ const props = defineProps({
     type: Array,
     required: true
   },
+  columnVisibility: {
+    type: Object,
+    default: () => ({})
+  },
   rowCount: {
     type: Number,
     default: undefined
   }
 })
 
-const emit = defineEmits(['row-click', 'update:pagination', 'update:globalFilter', 'update:sorting', 'update:columnFilters'])
+const emit = defineEmits(['row-click', 'update:pagination', 'update:globalFilter', 'update:sorting', 'update:columnFilters', 'update:columnVisibility'])
 
 const vehiclesStore = useVehiclesStore()
 
@@ -155,6 +160,11 @@ const sortingModel = computed({
 const columnFiltersModel = computed({
   get: () => props.columnFilters,
   set: (value) => emit('update:columnFilters', value)
+})
+
+const columnVisibilityModel = computed({
+  get: () => props.columnVisibility,
+  set: (value) => emit('update:columnVisibility', value)
 })
 </script>
 

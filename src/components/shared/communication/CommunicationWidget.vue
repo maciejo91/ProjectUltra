@@ -1,20 +1,32 @@
 <template>
   <div v-if="!inline" class="space-y-4">
-    <!-- Channel Selector Chips -->
-    <div class="grid grid-cols-4 gap-2">
-      <button 
+    <!-- Channel Selector -->
+    <div class="followup-channel-toggle-group flex flex-wrap gap-2">
+      <Toggle
         v-for="channel in channels"
         :key="channel.id"
-        @click="selectedChannel = channel.id" 
-        :class="chipClass(channel.id)"
+        variant="outline"
+        :model-value="selectedChannel === channel.id"
+        @update:model-value="(p) => p && setSelectedChannel(channel.id)"
+        class="followup-toggle-item"
       >
-        <component :is="getLucideIcon(channel.icon)" class="w-4 h-4 shrink-0 text-sm" />
-        <span class="text-xs font-bold uppercase tracking-wider">{{ channel.label }}</span>
-      </button>
+        <component :is="getLucideIcon(channel.icon)" class="w-3 h-3 shrink-0" />
+        <span>{{ channel.label }}</span>
+      </Toggle>
     </div>
     
-    <!-- Selected Form Container -->
-    <div>
+    <!-- Call form: same width as selection card -->
+    <template v-if="selectedChannel === 'call'">
+      <div class="w-full min-w-0">
+        <CallForm
+          :phone-number="phoneNumber"
+          :contact-name="contactName"
+          @call="handleCall"
+          @cancel="handleCancel"
+        />
+      </div>
+    </template>
+    <div v-else-if="selectedChannel" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
       <EmailForm
         v-if="selectedChannel === 'email'"
         :initial-template="initialTemplate"
@@ -36,35 +48,46 @@
         :initial-template="initialTemplate"
         :initial-message="initialMessage"
         @send="handleSend"
-        @cancel="handleCancel"
-      />
-      
-      <CallForm
-        v-else-if="selectedChannel === 'call'"
-        :phone-number="phoneNumber"
-        @call="handleCall"
         @cancel="handleCancel"
       />
     </div>
   </div>
 
-  <!-- Inline version without container -->
+  <!-- Inline version: selection card + form card below (form not inside selection card) -->
   <div v-else class="space-y-4">
-    <!-- Channel Selector Chips -->
-    <div class="grid grid-cols-4 gap-2">
-      <button 
-        v-for="channel in channels"
-        :key="channel.id"
-        @click="selectedChannel = channel.id" 
-        :class="chipClass(channel.id)"
-      >
-        <component :is="getLucideIcon(channel.icon)" class="w-4 h-4 shrink-0 text-sm" />
-        <span class="text-xs font-bold uppercase tracking-wider">{{ channel.label }}</span>
-      </button>
+    <!-- Card 1: Channel selection only -->
+    <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+      <div v-if="selectionCardTitle || selectionCardDescription" class="space-y-1.5 mb-4">
+        <h2 v-if="selectionCardTitle" class="text-sm font-semibold leading-5 text-foreground">{{ selectionCardTitle }}</h2>
+        <p v-if="selectionCardDescription" class="text-sm text-muted-foreground">{{ selectionCardDescription }}</p>
+      </div>
+      <div class="followup-channel-toggle-group flex flex-wrap gap-2">
+        <Toggle
+          v-for="channel in channels"
+          :key="channel.id"
+          variant="outline"
+          :model-value="selectedChannel === channel.id"
+          @update:model-value="(p) => p && setSelectedChannel(channel.id)"
+          class="followup-toggle-item"
+        >
+          <component :is="getLucideIcon(channel.icon)" class="w-3 h-3 shrink-0" />
+          <span>{{ channel.label }}</span>
+        </Toggle>
+      </div>
     </div>
-    
-    <!-- Selected Form Container -->
-    <div v-if="selectedChannel">
+
+    <!-- Call form: same width as selection card above -->
+    <template v-if="selectedChannel === 'call'">
+      <div class="w-full min-w-0">
+        <CallForm
+          :phone-number="phoneNumber"
+          :contact-name="contactName"
+          @call="handleCall"
+          @cancel="handleCancel"
+        />
+      </div>
+    </template>
+    <div v-else-if="selectedChannel" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
       <EmailForm
         v-if="selectedChannel === 'email'"
         :initial-template="initialTemplate"
@@ -86,13 +109,6 @@
         :initial-template="initialTemplate"
         :initial-message="initialMessage"
         @send="handleSend"
-        @cancel="handleCancel"
-      />
-      
-      <CallForm
-        v-else-if="selectedChannel === 'call'"
-        :phone-number="phoneNumber"
-        @call="handleCall"
         @cancel="handleCancel"
       />
     </div>
@@ -100,7 +116,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
+import { Toggle } from '@motork/component-library/future/primitives'
 import { getLucideIcon } from '@/utils/lucideIcons'
 import EmailForm from '@/components/shared/communication/EmailForm.vue'
 import SMSForm from '@/components/shared/communication/SMSForm.vue'
@@ -124,6 +141,10 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  contactName: {
+    type: String,
+    default: 'Customer'
+  },
   showArrow: {
     type: Boolean,
     default: true
@@ -131,6 +152,14 @@ const props = defineProps({
   inline: {
     type: Boolean,
     default: false
+  },
+  selectionCardTitle: {
+    type: String,
+    default: ''
+  },
+  selectionCardDescription: {
+    type: String,
+    default: ''
   },
   initialTemplate: {
     type: String,
@@ -151,31 +180,22 @@ const channels = [
   { id: 'sms', label: 'SMS', icon: 'fa-solid fa-message' }
 ]
 
-// Initialize selected channel from prop, null if not specified
-const selectedChannel = ref(props.type)
+// Initialize selected channel from prop; default to 'call' when not specified (e.g. Communicate tab)
+const selectedChannel = ref(props.type ?? 'call')
 
 // Watch for prop changes to update selected channel
 watch(() => props.type, (newType) => {
-  if (newType) {
-    selectedChannel.value = newType
-  } else {
-    selectedChannel.value = null
-  }
+  selectedChannel.value = newType ?? 'call'
 })
 
-// Reset selection when task changes
+// Reset selection when task changes (e.g. navigate to different entity)
 watch(() => props.taskId, () => {
-  selectedChannel.value = null
+  selectedChannel.value = props.type ?? 'call'
 })
 
-// Chip styling based on selected state
-const chipClass = computed(() => (channel) => {
-  const baseClasses = 'bg-surface border-2 rounded-lg h-12 flex flex-col items-center justify-center gap-1 transition-all'
-  const selected = 'border-brand-dark bg-muted text-brand-dark shadow-nsc-card'
-  const unselected = 'border-border text-muted-foreground hover:border-brand-dark/30 hover:bg-muted/30 hover:text-muted-foreground'
-  
-  return `${baseClasses} ${selectedChannel.value === channel ? selected : unselected}`
-})
+function setSelectedChannel(id) {
+  selectedChannel.value = id
+}
 
 const handleSend = (data) => {
   // Emit both 'save' (for customer profile) and 'send' (for compatibility)
@@ -193,25 +213,33 @@ const handleSend = (data) => {
 }
 
 const handleCall = (data) => {
+  const action =
+    data.option === 'log' && data.outcome
+      ? `Logged call (${data.outcome === 'answer' ? 'Answer' : data.outcome === 'no-answer' ? 'No answer' : 'Not valid'})`
+      : `called via ${data.option}`
   emit('save', {
     type: 'communication',
-    action: `called via ${data.option}`,
+    action,
     content: data.notes || 'Call attempt logged',
     communicationType: 'call',
-    callOption: data.option
+    callOption: data.option,
+    outcome: data.outcome ?? undefined,
+    callLogDateTime: data.callLogDateTime ?? undefined,
+    timestamp: data.callLogDateTime ? new Date(data.callLogDateTime).toISOString() : undefined
   })
-  
-  // Also emit 'send' for compatibility
+
   emit('send', {
     type: 'call',
     option: data.option,
     phoneNumber: data.phoneNumber,
-    notes: data.notes
+    notes: data.notes,
+    outcome: data.outcome,
+    callLogDateTime: data.callLogDateTime
   })
 }
 
 const handleCancel = () => {
-  selectedChannel.value = null
+  selectedChannel.value = 'call'
   emit('cancel')
 }
 </script>

@@ -79,7 +79,7 @@ const DEFAULT_SETTINGS = {
     customers: true,
     calendar: false,
     reports: false,
-    lists: false,
+    lists: true,
     search: false,
     language: false
     // Note: Settings is always visible

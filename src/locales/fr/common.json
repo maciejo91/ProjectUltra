@@ -2,6 +2,7 @@
   "navigation": {
     "home": "Accueil",
     "tasks": "Tâches",
+    "requests": "Demandes",
     "customers": "Clients",
     "calendar": "Calendrier",
     "reports": "Rapports",

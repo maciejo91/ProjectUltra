@@ -1,7 +1,7 @@
 <template>
   <div 
     ref="cardRef"
-    class="task-card bg-white rounded-xl p-4 flex flex-col cursor-pointer relative transition-all border group border-black/5"
+    class="task-card bg-muted rounded-xl p-4 flex flex-col cursor-pointer relative transition-all border group border-black/5"
     :class="[cardClass, selectedBorderClass]"
     @click="$emit('select', itemId)"
   >
@@ -80,11 +80,11 @@ const props = defineProps({
   },
   selectedClass: {
     type: [String, Function],
-    default: 'bg-white border-2 border-blue-500'
+    default: 'bg-muted border-2 border-blue-500'
   },
   unselectedClass: {
     type: [String, Function],
-    default: 'bg-white hover:border-muted-foreground/30'
+    default: 'bg-muted hover:border-muted-foreground/30'
   },
   getName: {
     type: Function,

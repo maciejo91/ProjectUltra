@@ -151,6 +151,14 @@
     0 24px 24px -12px rgba(14, 63, 126, 0.04) !important;
 }
 
+/* Expanded cards below main card: same top space and horizontal padding everywhere */
+.mk-expanded-cards-area {
+  padding-top: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
+}
+
 /* ========================================
    Interactive elements: pointer cursor on hover
    ======================================== */
@@ -289,6 +297,13 @@ label[for] {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+/* Tabs only (no title row): minimal gap under app header */
+.section-header-bottom-tabs-only {
+  margin-top: 0;
+  padding-top: 0.25rem;
+  padding-bottom: 0;
 }
 
 /* Section header (inside pages) */
@@ -1068,14 +1083,6 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 
 /* Note: DataTable styling uses Motork component library's default styles */
 /* Typography and badge utilities above are minimal overrides for table pages */
-
-/* Add New manual tab: card titles = title level (larger than labels) */
-.add-new-manual [data-slot="card-title"],
-.add-new-manual [class*="card-title"] {
-  font-size: var(--text-lg, 1.125rem);
-  font-weight: 600;
-  color: var(--foreground);
-}
 
 /* Empty state styling for DataTables */
 .empty-state {
