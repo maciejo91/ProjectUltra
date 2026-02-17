@@ -2,10 +2,11 @@
   <div class="flex-1 flex flex-col overflow-hidden min-w-0">
     <!-- Same as Customers: one scroll area with padding, one white card (search + table) -->
     <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide min-h-0">
-      <div class="bg-white mb-8">
+      <div class="bg-background mb-8">
         <div class="mb-1">
           <UnifiedSearchBar
             active-tab="opportunities"
+            full-width
             placeholder="Search tasks..."
             :pagination="pagination"
             :assignee-options="assigneeOptions"

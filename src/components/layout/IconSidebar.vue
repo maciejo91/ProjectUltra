@@ -1,10 +1,28 @@
 <template>
   <div
     :class="[
-      'dark sidebar-container hidden md:flex flex-col items-stretch py-2 gap-2 shrink-0 z-20 h-screen fixed left-0 top-0 border-r border-border overflow-hidden',
+      'dark sidebar-container hidden md:flex flex-col items-stretch py-2 gap-2 shrink-0 z-40 h-screen fixed left-0 top-0 border-r border-border overflow-visible',
       { 'sidebar-expanded': expanded }
     ]"
   >
+    <!-- Sidebar expand/collapse -->
+    <div class="w-full px-2 pt-2 pb-2 shrink-0 border-b border-white/10">
+      <button
+        type="button"
+        :aria-label="expanded ? t('common.layout.closeSidebar') : t('common.layout.openSidebar')"
+        :aria-expanded="expanded"
+        :class="[
+          'flex w-full items-center rounded-md text-white/80 hover:bg-white/10 transition-colors',
+          expanded ? 'h-9 gap-3 px-3' : 'h-9 justify-center'
+        ]"
+        @click="layoutStore.toggleSidebar()"
+      >
+        <PanelLeftClose v-if="expanded" :size="18" class="shrink-0" />
+        <PanelLeft v-else :size="18" class="shrink-0" />
+        <span v-if="expanded" class="truncate text-sm">{{ t('common.layout.closeSidebar') }}</span>
+      </button>
+    </div>
+
     <!-- Logo -->
     <div class="w-full px-2 pt-2 pb-2 shrink-0">
       <router-link :to="firstVisibleRoute" class="flex items-center gap-2 overflow-hidden">
@@ -52,7 +70,7 @@
     </div>
 
     <!-- Nav -->
-    <div class="flex min-h-0 flex-1 flex-col gap-1 w-full px-2">
+    <div class="flex min-h-0 flex-1 flex-col gap-1 w-full px-2 overflow-y-auto overflow-x-visible">
       <router-link
         v-if="navigationVisibility.home !== false"
         to="/tasks"
@@ -159,49 +177,50 @@
         </span>
       </router-link>
 
-      <div v-if="navigationVisibility.lists !== false" class="relative" v-click-outside="() => (showListsMenu = false)">
-        <button
-          type="button"
-          @click.stop="toggleListsMenu"
-          :class="[
-            'relative group flex w-full items-center gap-3 rounded-md transition-colors cursor-pointer',
-            expanded ? 'h-9 px-3' : 'h-8 justify-center',
-            (isActive('/vehicles') || showListsMenu) ? 'bg-white/20' : 'hover:bg-white/10'
-          ]"
-          aria-label="Lists"
-          title="Lists"
+      <router-link
+        to="/vehicles"
+        :class="[
+          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 px-3' : 'h-8 justify-center',
+          isActive('/vehicles') ? 'bg-white/20' : 'hover:bg-white/10'
+        ]"
+        aria-label="Vehicles"
+        title="Vehicles"
+      >
+        <CarFront :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">Vehicles</span>
+        <span
+          v-else
+          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
-          <List :size="16" class="text-white shrink-0" />
-          <span v-if="expanded" class="truncate text-sm text-white">Lists</span>
-          <span
-            v-else
-            class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-          >
-            Lists
-          </span>
-        </button>
-        <transition name="dropdown">
-          <div
-            v-if="showListsMenu"
-            class="absolute left-full ml-2 bottom-0 mb-0 w-48 bg-white border border-border rounded-md shadow-mk-dashboard-card overflow-hidden z-50"
-            @click.stop
-          >
-            <router-link
-              to="/vehicles"
-              @click="showListsMenu = false"
-              class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 transition-colors hover:bg-gray-50"
-              :class="{ 'bg-red-50 text-brand-red': isActive('/vehicles') }"
-            >
-              <CarFront :size="20" class="text-gray-400" :class="{ 'text-brand-red': isActive('/vehicles') }" />
-              Vehicles
-            </router-link>
-          </div>
-        </transition>
-      </div>
+          Vehicles
+        </span>
+      </router-link>
+
+      <router-link
+        v-if="navigationVisibility.requests !== false"
+        to="/requests"
+        :class="[
+          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 px-3' : 'h-8 justify-center',
+          isActive('/requests') ? 'bg-white/20' : 'hover:bg-white/10'
+        ]"
+        aria-label="Requests"
+        :title="$t('common.navigation.requests')"
+      >
+        <FileText :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">{{ $t('common.navigation.requests') }}</span>
+        <span
+          v-else
+          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+        >
+          {{ $t('common.navigation.requests') }}
+        </span>
+      </router-link>
     </div>
     
     <!-- Bottom: Search, Language, Settings -->
-    <div class="w-full px-2 flex flex-col gap-1 shrink-0">
+    <div class="relative z-10 w-full px-2 flex flex-col gap-1 shrink-0">
       <button
         v-if="navigationVisibility.search !== false"
         type="button"
@@ -247,7 +266,7 @@
         <transition name="dropdown">
           <div
             v-if="showLanguageMenu"
-            class="absolute left-full ml-2 bottom-0 mb-0 w-48 bg-white border border-border rounded-md shadow-mk-dashboard-card overflow-hidden z-50"
+            class="absolute left-full ml-2 bottom-0 mb-0 w-48 bg-white border border-border rounded-md shadow-mk-dashboard-card overflow-hidden z-[100]"
             @click.stop
           >
             <button
@@ -322,10 +341,10 @@
         <transition name="dropdown">
           <div 
             v-if="showUserMenu"
-            class="absolute left-full ml-2 bottom-0 mb-0 w-56 bg-white border border-border rounded-md shadow-mk-dashboard-card overflow-hidden z-50"
+            class="sidebar-user-dropdown absolute left-full ml-2 bottom-0 mb-0 w-56 border border-border rounded-md shadow-mk-dashboard-card overflow-hidden z-[100]"
             @click.stop
           >
-            <div class="p-3 border-b border-border bg-muted">
+            <div class="p-3 border-b border-border sidebar-user-dropdown-header">
               <div class="text-sm font-semibold text-foreground">{{ userStore.currentUser.name }}</div>
               <div class="text-xs text-muted-foreground">{{ userStore.currentUser.email }}</div>
             </div>
@@ -413,6 +432,7 @@ import {
   Plus,
   Home,
   List,
+  FileText,
   Users,
   Calendar,
   LineChart,
@@ -426,7 +446,9 @@ import {
   Moon,
   Sun,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  PanelLeft,
+  PanelLeftClose
 } from 'lucide-vue-next'
 import FloatingSearchModal from '@/components/shared/FloatingSearchModal.vue'
 
@@ -465,12 +487,12 @@ const firstVisibleRoute = computed(() => {
   if (nav.calendar !== false) return '/calendar'
   if (userStore.canAccessReports() && nav.reports !== false) return '/reports'
   if (nav.lists !== false) return '/vehicles'
+  if (nav.requests !== false) return '/requests'
   
   // Fallback to tasks (home) if all are hidden
   return '/tasks'
 })
 
-const showListsMenu = ref(false)
 const showLanguageMenu = ref(false)
 const showUserMenu = ref(false)
 const showSearchModal = ref(false)
@@ -500,10 +522,6 @@ const userInitials = computed(() => {
 
 const isActive = (path) => {
   return route.path.startsWith(path)
-}
-
-const toggleListsMenu = () => {
-  showListsMenu.value = !showListsMenu.value
 }
 
 const toggleLanguageMenu = () => {
@@ -553,14 +571,23 @@ const handleSearch = (query) => {
   transform: translateX(-10px);
 }
 
+/* User dropdown: solid opaque panel so it never looks transparent or under another layer */
+.sidebar-user-dropdown {
+  isolation: isolate;
+  background-color: var(--background, var(--base-background));
+}
+
+.sidebar-user-dropdown-header {
+  background-color: var(--muted, var(--base-muted));
+}
+
 /* User Avatar Logo - Responsive sizing */
 .user-avatar-logo {
-  width: 1.75rem;
-  height: 1.75rem;
-  min-width: 1.75rem;
-  min-height: 1.75rem;
-  /* Font size scales with container: 50% of container size, clamped between 0.625rem and 0.875rem */
-  font-size: clamp(0.625rem, 1rem, 0.875rem);
+  width: 1.5rem;
+  height: 1.5rem;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  font-size: 0.75rem;
   line-height: 1;
   display: flex;
   align-items: center;

@@ -1,8 +1,8 @@
 <template>
   <div class="space-y-4">
-    <!-- Step 1: Event Type Selection -->
+    <!-- Step 1: Event Type Selection (same as LQTask) -->
     <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
-      <Label class="block text-sm font-medium text-muted-foreground mb-2">Event type <span class="text-red-600">*</span></Label>
+      <Label class="form-label mb-2">Event type <span class="text-red-600">*</span></Label>
       <SelectMenu
         v-model="eventType"
         :items="eventTypeOptionsForSelect"
@@ -16,12 +16,12 @@
       </SelectMenu>
     </div>
 
-    <!-- Step 2: Assign appointment to -->
+    <!-- Step 2: Assign appointment to (show when event type selected) -->
     <div v-if="eventType" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
       <h5 class="font-semibold text-foreground text-sm mb-4">Assign appointment to</h5>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <Label class="block text-sm font-medium text-muted-foreground mb-1.5">Team</Label>
+          <Label class="form-label">Team</Label>
           <SelectMenu
             v-model="selectedTeamId"
             :items="teamSelectOptions"
@@ -39,11 +39,11 @@
           </SelectMenu>
         </div>
         <div>
-          <Label class="block text-sm font-medium text-muted-foreground mb-1.5">Salesperson (optional)</Label>
+          <Label class="form-label">Salesperson <span class="optional">(optional)</span></Label>
           <SelectMenu
             v-model="selectedSalesmanId"
             :items="salespersonSelectOptions"
-            :disabled="!selectedTeam"
+            :disabled="!salespersonSelectOptions.length"
             placeholder="Search and select salesperson..."
             value-key="id"
             class="w-full"
@@ -64,8 +64,8 @@
       </div>
     </div>
 
-    <!-- Step 3: Schedule (Calendar and Time Slots) -->
-    <div v-if="eventType && selectedTeam" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+    <!-- Step 3: Schedule (Calendar and Time Slots) - only after event type is selected (same as LQTask) -->
+    <div v-if="eventType" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
       <h5 class="font-semibold text-foreground text-sm mb-4">Schedule <span class="text-red-600">*</span></h5>
       <div class="bg-white border border-border rounded-lg overflow-hidden">
         <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-black/5">
@@ -88,7 +88,7 @@
               </button>
             </div>
             <div class="grid grid-cols-7 gap-1 mb-2">
-              <div v-for="label in calendarDayLabels" :key="label" class="text-center text-xs font-semibold text-muted-foreground py-1">
+              <div v-for="label in calendarDayLabels" :key="label" class="text-center text-xs font-medium text-muted-foreground py-2">
                 {{ label }}
               </div>
             </div>
@@ -147,8 +147,8 @@
       @update="handleCommunicationsUpdate"
     />
 
-    <!-- Unified buttons: always visible when form shown, same style -->
-    <div class="flex justify-end gap-2 px-4 pb-4 pt-3">
+    <!-- Action buttons below cards (same as LQTask outcome buttons) -->
+    <div class="flex justify-end gap-2 pt-3">
       <Button
         variant="secondary"
         @click="onCancel"

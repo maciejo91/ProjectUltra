@@ -7,6 +7,8 @@ export const useLayoutStore = defineStore('layout', () => {
   const stored = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null
   const sidebarExpanded = ref(stored !== null ? stored === 'true' : false)
   const searchModalOpen = ref(false)
+  /** When true, MainLayout hides the desktop header so task detail (card view) gets full height. */
+  const hideHeaderForTaskDetail = ref(false)
 
   function toggleSidebar() {
     sidebarExpanded.value = !sidebarExpanded.value
@@ -30,12 +32,18 @@ export const useLayoutStore = defineStore('layout', () => {
     searchModalOpen.value = Boolean(value)
   }
 
+  function setHideHeaderForTaskDetail(value) {
+    hideHeaderForTaskDetail.value = Boolean(value)
+  }
+
   return {
     sidebarExpanded,
     searchModalOpen,
+    hideHeaderForTaskDetail,
     toggleSidebar,
     setSidebarExpanded,
     openSearchModal,
-    setSearchModalOpen
+    setSearchModalOpen,
+    setHideHeaderForTaskDetail
   }
 })

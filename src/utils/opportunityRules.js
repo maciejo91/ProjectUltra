@@ -109,7 +109,7 @@ export const OpportunityConditions = {
   'negotiation-5-plus-days-no-contract-has-offers': (context) => {
     // OFB never appears during negotiation phase per new requirements
     // TEMPORARY: Enable for opportunity 33 evaluation
-    if (context.opportunity?.id === 33) {
+    if (context.opportunity?.id === 3) {
       // Check if has offers and no contract
       if (!context.hasOffers) return false
       if (context.opportunity.contractDate) return false

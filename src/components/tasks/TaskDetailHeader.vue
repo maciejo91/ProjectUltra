@@ -1,16 +1,16 @@
 <template>
-  <div class="border-b border-border bg-white px-6 h-16 min-h-16 shrink-0">
-    <div class="flex items-center justify-between gap-4 w-full h-full">
-      <div class="flex flex-col min-w-0">
-        <!-- Task Title + Badges + Tags + Add tag: same line -->
-        <div class="flex items-center gap-2 min-w-0 flex-wrap">
-          <h3 v-if="task && taskTitle" class="task-detail-title font-bold text-foreground break-words">
+  <header class="task-detail-header shrink-0 px-4 sm:px-6">
+    <div class="task-detail-header-content">
+      <div class="min-w-0 flex-1 flex items-center gap-1.5 sm:gap-2 min-h-0">
+        <!-- Task Title + Badges + Tags: same line -->
+        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-wrap">
+          <h3 v-if="task && taskTitle" class="task-detail-title text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
             {{ taskTitle }}
           </h3>
-          <h3 v-else-if="task" class="task-detail-title font-bold text-foreground break-words">
+          <h3 v-else-if="task" class="task-detail-title text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
             {{ task.type === 'lead' ? 'Lead Qualification Task' : 'Opportunity Management Task' }}
           </h3>
-          <h3 v-else class="task-detail-title font-bold text-foreground">
+          <h3 v-else class="task-detail-title text-sm sm:text-base font-semibold text-foreground leading-tight">
             No task selected
           </h3>
           <template v-if="task">
@@ -18,32 +18,46 @@
             <template v-for="tag in normalizedTags" :key="tag.name">
               <span
                 v-if="tag.color"
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white shrink-0"
+                class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-xs font-medium shrink-0"
+                :class="isLightColor(tag.color) ? 'text-foreground' : 'text-white'"
                 :style="{ backgroundColor: tag.color }"
               >
-                {{ tag.name }}
+                <span class="min-w-0 truncate">{{ tag.name }}</span>
+                <button
+                  type="button"
+                  class="tag-remove rounded p-0.5 shrink-0 opacity-70 hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  :aria-label="`Remove tag ${tag.name}`"
+                  @click.stop="openRemoveTagConfirm(tag.name)"
+                >
+                  <X :size="12" />
+                </button>
               </span>
-              <Badge
-                v-else
-                :text="tag.name"
-                size="small"
-                theme="blue"
-              />
+              <span v-else class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-xs font-medium shrink-0 bg-primary/15 text-foreground">
+                <span class="min-w-0 truncate">{{ tag.name }}</span>
+                <button
+                  type="button"
+                  class="tag-remove rounded p-0.5 shrink-0 opacity-70 hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  :aria-label="`Remove tag ${tag.name}`"
+                  @click.stop="openRemoveTagConfirm(tag.name)"
+                >
+                  <X :size="12" />
+                </button>
+              </span>
             </template>
             <button
               @click.stop="showAddTagModal = true"
-              class="text-xs text-muted-foreground hover:text-primary font-medium hover:underline transition-colors whitespace-nowrap"
+              class="text-xs text-muted-foreground hover:text-primary font-medium hover:underline transition-colors whitespace-nowrap shrink-0"
             >
               + tag
             </button>
           </template>
         </div>
       </div>
-      <div class="flex items-center gap-3 shrink-0">
-        <!-- Use MotorK Button component -->
+      <div class="task-detail-header-actions shrink-0">
         <Button 
           variant="secondary" 
           size="icon" 
+          class="task-detail-header-btn"
           @click="$emit('previous')" 
           :disabled="!hasPrevious"
         >
@@ -52,19 +66,18 @@
         <Button 
           variant="secondary" 
           size="icon" 
+          class="task-detail-header-btn"
           @click="$emit('next')" 
           :disabled="!hasNext"
         >
           <ChevronRight :size="16" class="text-muted-foreground" />
         </Button>
-        
-        <!-- Close button (only shown in drawer view) -->
         <Button 
           v-if="isDrawerView"
           variant="secondary" 
           size="icon" 
+          class="task-detail-header-btn ml-0.5 sm:ml-1"
           @click="$emit('close')"
-          class="ml-1"
         >
           <X :size="16" class="text-muted-foreground" />
         </Button>
@@ -78,12 +91,56 @@
       @close="showAddTagModal = false"
       @add="handleAddTag"
     />
-  </div>
+
+    <!-- Remove tag confirmation -->
+    <Dialog :open="!!tagToRemove" @update:open="handleRemoveTagConfirmOpenChange">
+      <DialogPortal>
+        <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
+        <DialogContent
+          class="w-full sm:max-w-md"
+          :show-close-button="true"
+        >
+          <DialogHeader class="shrink-0">
+            <DialogTitle>Remove tag</DialogTitle>
+            <DialogDescription>
+              Remove “{{ tagToRemove }}” from this task? This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
+            <Button
+              variant="outline"
+              class="rounded-sm w-full sm:w-auto"
+              @click="closeRemoveTagConfirm"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              class="rounded-sm w-full sm:w-auto"
+              @click="confirmRemoveTag"
+            >
+              Remove
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
+  </header>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
-import { Button, Badge } from '@motork/component-library/future/primitives'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle
+} from '@motork/component-library/future/primitives'
 import { ChevronLeft, ChevronRight, X } from 'lucide-vue-next'
 import TaskBadges from './shared/TaskBadges.vue'
 import { getTaskDisplayTitle } from '@/utils/taskActionTitle'
@@ -104,9 +161,10 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['previous', 'next', 'close', 'postpone-expected-close', 'tag-updated', 'reassigned'])
+const emit = defineEmits(['previous', 'next', 'close', 'tag-updated'])
 
 const showAddTagModal = ref(false)
+const tagToRemove = ref(null)
 
 const hasPrevious = computed(() => {
   if (!props.task || !props.filteredTasks.length) return false
@@ -132,6 +190,18 @@ const hasNext = computed(() => {
 function removeDashesFromTitle(str) {
   if (!str || typeof str !== 'string') return str
   return str.replace(/\s*[–—]\s*/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+/** Returns true if the hex color is light (use dark text); false for dark backgrounds (use white text). */
+function isLightColor(hex) {
+  if (!hex || typeof hex !== 'string') return false
+  const m = hex.replace(/^#/, '').match(/^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
+  if (!m) return false
+  const r = parseInt(m[1], 16) / 255
+  const g = parseInt(m[2], 16) / 255
+  const b = parseInt(m[3], 16) / 255
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+  return luminance > 0.5
 }
 
 const taskTitle = computed(() => {
@@ -166,23 +236,52 @@ const handleAddTag = async (payload) => {
   showAddTagModal.value = false
 }
 
+function openRemoveTagConfirm(tagName) {
+  tagToRemove.value = tagName
+}
+
+function closeRemoveTagConfirm() {
+  tagToRemove.value = null
+}
+
+function handleRemoveTagConfirmOpenChange(open) {
+  if (!open) tagToRemove.value = null
+}
+
+function confirmRemoveTag() {
+  if (!props.task || !tagToRemove.value) return
+  const current = (props.task.tags || []).map((t) =>
+    typeof t === 'string' ? { name: t, color: null } : { name: t.name, color: t.color || null }
+  )
+  const updatedTags = current.filter((t) => t.name !== tagToRemove.value)
+  emit('tag-updated', { taskId: props.task.id, taskType: props.task.type, tags: updatedTags })
+  tagToRemove.value = null
+}
+
 </script>
 
 <style scoped>
-/* Match TaskCard title: same font size and line-height */
-.task-detail-title {
-  font-size: 1rem;
-  line-height: 1.5rem;
+/* Compact header – smaller than page header */
+.task-detail-header {
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+  height: 3rem;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
 }
 
-/* Fluid typography for responsive text sizes */
-.text-lg {
-  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
-  line-height: 1.4;
+.task-detail-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
 }
 
-.text-sm {
-  font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-  line-height: 1.5;
+.task-detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 </style>

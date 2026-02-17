@@ -82,15 +82,16 @@ import {
   DialogTitle
 } from '@motork/component-library/future/primitives'
 
+// Light/pastel versions of the tag palette (same hues, higher lightness)
 const TAG_COLORS = [
-  '#ef4444',
-  '#f97316',
-  '#eab308',
-  '#22c55e',
-  '#06b6d4',
-  '#3b82f6',
-  '#8b5cf6',
-  '#ec4899'
+  '#fecaca', // red
+  '#fed7aa', // orange
+  '#fef08a', // yellow
+  '#bbf7d0', // green
+  '#a5f3fc', // cyan
+  '#bfdbfe', // blue
+  '#ddd6fe', // violet
+  '#fbcfe8'  // pink
 ]
 
 const props = defineProps({

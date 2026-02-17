@@ -1,31 +1,25 @@
 <template>
-  <div class="space-y-4">
-    <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
-      <h5 class="font-semibold text-foreground text-sm mb-4">Close Opportunity as Lost</h5>
-      
-      <div class="space-y-4">
-        <!-- Reason Selection -->
-        <CloseAsLostForm
-          ref="closeAsLostFormRef"
-          :preselected-reason="reason"
-          @update:reason="(value) => { reason.value = value }"
-        />
-        
-        <!-- Additional Notes -->
-        <div>
-          <Label class="block text-sm font-medium text-muted-foreground mb-2">Additional Notes (Optional)</Label>
-          <Textarea 
-            v-model="notes"
-            rows="4"
-            placeholder="Add any relevant details about why this opportunity was lost..."
-            class="w-full"
-          />
-        </div>
-      </div>
+  <div class="mk-expanded-cards-area space-y-4">
+    <!-- Reason: single card (same as LQTask not-interested) -->
+    <CloseAsLostForm
+      ref="closeAsLostFormRef"
+      :preselected-reason="reason"
+      @update:reason="(value) => { reason.value = value }"
+    />
+
+    <!-- Additional Notes: optional second card -->
+    <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
+      <Label class="block text-sm font-medium text-muted-foreground mb-1.5">Additional Notes (Optional)</Label>
+      <Textarea
+        v-model="notes"
+        rows="3"
+        placeholder="Add any relevant details about why this opportunity was lost..."
+        class="w-full"
+      />
     </div>
-    
-    <!-- Close as Lost Buttons -->
-    <div class="flex justify-end gap-2">
+
+    <!-- Action buttons below cards (same as LQTask outcome buttons) -->
+    <div class="flex justify-end gap-2 pt-1">
       <Button
         variant="secondary"
         @click="handleCancel"
@@ -36,7 +30,7 @@
         variant="default"
         :disabled="!canSubmit"
         @click="handleConfirm"
-        class="!bg-red-600 !hover:bg-red-700 !text-white"
+        class="bg-primary text-white"
       >
         Close as Lost
       </Button>

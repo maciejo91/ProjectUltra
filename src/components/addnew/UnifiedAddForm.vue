@@ -45,7 +45,7 @@
                   @input="handleSearch"
                   @focus="showResults = true"
                   type="text" 
-                  placeholder="Search by name, email, or company..."
+                  placeholder="Search by name, email, phone, or company..."
                   class="pl-9 w-full h-10"
                 />
               </div>
@@ -102,8 +102,8 @@
           </div>
         
           <!-- Customer Form Fields (if new) -->
-          <div v-else class="space-y-8">
-            <div class="space-y-3">
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-3 w-full">
               <Label class="block text-sm font-semibold text-foreground">
                 Customer Name <span class="text-brand-red">*</span>
               </Label>
@@ -118,39 +118,37 @@
               <p v-if="errors.name" class="text-brand-red text-xs mt-1">{{ errors.name }}</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-3">
-                <Label class="block text-sm font-semibold text-foreground">
-                  Email <span class="text-brand-red">*</span>
-                </Label>
-                <Input 
-                  v-model="contactFormData.email"
-                  type="email" 
-                  placeholder="customer@example.com"
-                  class="w-full h-10"
-                  :required="contactMode === 'new'"
-                  :error="errors.email"
-                />
-                <p v-if="errors.email" class="text-brand-red text-xs mt-1">{{ errors.email }}</p>
-              </div>
-              
-              <div class="space-y-3">
-                <Label class="block text-sm font-semibold text-foreground">Phone</Label>
-                <Input 
-                  v-model="contactFormData.phone"
-                  type="tel" 
-                  placeholder="+49..."
-                  class="w-full h-10"
-                />
-              </div>
-            </div>
-            
-            <div class="space-y-3">
+            <div class="space-y-3 w-full">
               <Label class="block text-sm font-semibold text-foreground">Company (optional)</Label>
               <Input 
                 v-model="contactFormData.company"
                 type="text" 
                 placeholder="Company name..."
+                class="w-full h-10"
+              />
+            </div>
+            
+            <div class="space-y-3 w-full">
+              <Label class="block text-sm font-semibold text-foreground">
+                Email <span class="text-brand-red">*</span>
+              </Label>
+              <Input 
+                v-model="contactFormData.email"
+                type="email" 
+                placeholder="customer@example.com"
+                class="w-full h-10"
+                :required="contactMode === 'new'"
+                :error="errors.email"
+              />
+              <p v-if="errors.email" class="text-brand-red text-xs mt-1">{{ errors.email }}</p>
+            </div>
+            
+            <div class="space-y-3 w-full">
+              <Label class="block text-sm font-semibold text-foreground">Phone</Label>
+              <Input 
+                v-model="contactFormData.phone"
+                type="tel" 
+                placeholder="+49..."
                 class="w-full h-10"
               />
             </div>
@@ -183,11 +181,9 @@
         </CardTitle>
       </CardHeader>
       <CardContent class="space-y-8">
-        <!-- Basic Information -->
         <div class="space-y-5">
-          <h4 class="text-subtitle uppercase text-muted-foreground tracking-wider">Basic Information</h4>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            <div class="space-y-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-3 w-full">
               <Label class="block text-sm font-semibold text-foreground">Brand</Label>
               <Input 
                 v-model="vehicleFormData.brand"
@@ -197,7 +193,7 @@
               />
             </div>
             
-            <div class="space-y-3">
+            <div class="space-y-3 w-full">
               <Label class="block text-sm font-semibold text-foreground">Model</Label>
               <Input 
                 v-model="vehicleFormData.model"
@@ -207,7 +203,7 @@
               />
             </div>
             
-            <div class="space-y-3">
+            <div class="space-y-3 w-full">
               <Label class="block text-sm font-semibold text-foreground">Year</Label>
               <Input 
                 v-model="vehicleFormData.year"
@@ -219,7 +215,7 @@
               />
             </div>
             
-            <div class="space-y-3">
+            <div class="space-y-3 w-full">
               <Label class="block text-sm font-semibold text-foreground">Price</Label>
               <Input 
                 v-model="vehicleFormData.price"
@@ -232,76 +228,66 @@
           </div>
         </div>
       
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Request Details -->
-          <div class="space-y-5">
-            <h4 class="text-subtitle uppercase text-muted-foreground tracking-wider">Request Details</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div class="space-y-3">
-                <Label class="block text-sm font-semibold text-foreground">Request Type</Label>
-                <Select v-model="vehicleFormData.requestType">
-                  <SelectTrigger class="w-full h-10">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Quotation">Quotation</SelectItem>
-                    <SelectItem value="Test Drive">Test Drive</SelectItem>
-                    <SelectItem value="Information">Information</SelectItem>
-                    <SelectItem value="Purchase">Purchase</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div class="space-y-3">
-                <Label class="block text-sm font-semibold text-foreground">Source</Label>
-                <Select v-model="vehicleFormData.source">
-                  <SelectTrigger class="w-full h-10">
-                    <SelectValue placeholder="Select source" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Marketing">Marketing</SelectItem>
-                    <SelectItem value="Website">Website</SelectItem>
-                    <SelectItem value="Phone">Phone</SelectItem>
-                    <SelectItem value="Walk-in">Walk-in</SelectItem>
-                    <SelectItem value="Referral">Referral</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+          <div class="space-y-3 w-full">
+            <Label class="block text-sm font-semibold text-foreground">Request Type</Label>
+            <Select v-model="vehicleFormData.requestType">
+              <SelectTrigger class="w-full h-10">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Quotation">Quotation</SelectItem>
+                <SelectItem value="Test Drive">Test Drive</SelectItem>
+                <SelectItem value="Information">Information</SelectItem>
+                <SelectItem value="Purchase">Purchase</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div class="space-y-3 w-full">
+            <Label class="block text-sm font-semibold text-foreground">Source</Label>
+            <Select v-model="vehicleFormData.source">
+              <SelectTrigger class="w-full h-10">
+                <SelectValue placeholder="Select source" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Marketing">Marketing</SelectItem>
+                <SelectItem value="Website">Website</SelectItem>
+                <SelectItem value="Phone">Phone</SelectItem>
+                <SelectItem value="Walk-in">Walk-in</SelectItem>
+                <SelectItem value="Referral">Referral</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
           <!-- Vehicle Specs -->
-          <div class="space-y-5">
-            <h4 class="text-subtitle uppercase text-muted-foreground tracking-wider">Vehicle Specs</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div class="space-y-3">
-                <Label class="block text-sm font-semibold text-foreground">Fuel Type</Label>
-                <Select v-model="vehicleFormData.fuelType">
-                  <SelectTrigger class="w-full h-10">
-                    <SelectValue placeholder="Select fuel" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Petrol">Petrol</SelectItem>
-                    <SelectItem value="Diesel">Diesel</SelectItem>
-                    <SelectItem value="Electric">Electric</SelectItem>
-                    <SelectItem value="Hybrid">Hybrid</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div class="space-y-3">
-                <Label class="block text-sm font-semibold text-foreground">Gear Type</Label>
-                <Select v-model="vehicleFormData.gearType">
-                  <SelectTrigger class="w-full h-10">
-                    <SelectValue placeholder="Select gear" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Manual">Manual</SelectItem>
-                    <SelectItem value="Automatic">Automatic</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+          <div class="space-y-3 w-full">
+            <Label class="block text-sm font-semibold text-foreground">Fuel Type</Label>
+            <Select v-model="vehicleFormData.fuelType">
+              <SelectTrigger class="w-full h-10">
+                <SelectValue placeholder="Select fuel" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Petrol">Petrol</SelectItem>
+                <SelectItem value="Diesel">Diesel</SelectItem>
+                <SelectItem value="Electric">Electric</SelectItem>
+                <SelectItem value="Hybrid">Hybrid</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div class="space-y-3 w-full">
+            <Label class="block text-sm font-semibold text-foreground">Gear Type</Label>
+            <Select v-model="vehicleFormData.gearType">
+              <SelectTrigger class="w-full h-10">
+                <SelectValue placeholder="Select gear" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Manual">Manual</SelectItem>
+                <SelectItem value="Automatic">Automatic</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -394,6 +380,17 @@
         </Card>
       </CardContent>
     </Card>
+
+    <div class="flex justify-end pt-4">
+      <Button
+        type="submit"
+        variant="default"
+        :disabled="!canSubmit || isSubmitting"
+        class="rounded-sm w-full sm:w-auto"
+      >
+        {{ isSubmitting ? 'Saving...' : 'Save' }}
+      </Button>
+    </div>
   </form>
 </template>
 
@@ -506,6 +503,7 @@ const filteredContacts = computed(() => {
   return customersStore.customers.filter(contact => 
     contact.name.toLowerCase().includes(query) ||
     contact.email.toLowerCase().includes(query) ||
+    (contact.phone && contact.phone.toLowerCase().includes(query)) ||
     (contact.company && contact.company.toLowerCase().includes(query))
   ).slice(0, 10)
 })

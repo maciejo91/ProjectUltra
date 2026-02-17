@@ -135,7 +135,7 @@ export class OpportunityRepository extends BaseRepository {
       financingOptions: data.financingOptions || []
     }
     
-    this.dataSource.push(newOpportunity)
+    // Persist only to localStorage; do not mutate the locale mock array
     const created = this.getCreatedOpportunities()
     created.push(newOpportunity)
     this.saveCreatedOpportunities(created)

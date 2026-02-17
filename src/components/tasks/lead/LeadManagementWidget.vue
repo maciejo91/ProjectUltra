@@ -11,16 +11,16 @@
   </div>
 
   <TaskManagementWidget v-else :task="lead" hide-title hide-border>
-    <template #primary-action>
-      <!-- Blue banner with Assign to me only when unassigned; assigned state is in header -->
-      <TaskAssignee
-        v-if="!leadState.isClosed.value && !(lead.assignee || lead.owner || lead.assignedTo)"
+    <template #assignee-date-bar>
+      <TaskAssigneeDateBar
+        v-if="lead"
         :task="lead"
-        task-type="lead"
-        @reassigned="handleOwnerReassigned"
-        class="mb-3"
+        @postpone-expected-close="$emit('postpone-expected-close')"
+        @reassigned="$emit('reassigned', $event)"
       />
-      
+    </template>
+    <template #primary-action>
+      <!-- Assign to me banner is shown in TaskDetailView above the assignee/due date row -->
       <!-- Primary action = LQTask -->
       <LQTask
         v-if="!leadState.isClosed.value && leadState.showLQWidget.value"
@@ -39,6 +39,8 @@
         @open-purchase-method="handleOpenPurchaseMethod"
         @open-trade-in="handleOpenTradeIn"
         @appointment-scheduled="handleAppointmentScheduled"
+        @postpone-expected-close="$emit('postpone-expected-close')"
+        @reassigned="$emit('reassigned', $event)"
       />
 
       <!-- Fallback: if LQTask is not shown for a stage, show the generic primary action -->
@@ -96,6 +98,7 @@ import { useLeadManagementHandlers } from '@/composables/useLeadManagementHandle
 import TaskManagementWidget from '@/components/tasks/shared/TaskManagementWidget.vue'
 import PrimaryActionWidget from '@/components/tasks/shared/PrimaryActionWidget.vue'
 import TaskAssignee from '@/components/tasks/TaskAssignee.vue'
+import TaskAssigneeDateBar from '@/components/tasks/TaskAssigneeDateBar.vue'
 import LQTask from '@/components/tasks/lead/LQTask.vue'
 
 const props = defineProps({
@@ -109,7 +112,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['open-purchase-method', 'open-trade-in'])
+const emit = defineEmits(['open-purchase-method', 'open-trade-in', 'postpone-expected-close', 'reassigned'])
 
 const leadsStore = useLeadsStore()
 

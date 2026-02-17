@@ -2,7 +2,7 @@
   <div class="flex flex-wrap items-center gap-2">
     <!-- Type Badge (Lead/Opportunity) -->
     <span 
-      class="px-1.5 py-0.5 rounded text-xs font-bold uppercase border leading-none"
+      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase border leading-none"
       :class="typeBadgeClass"
     >
       {{ typeLabel }}
@@ -11,7 +11,7 @@
     <!-- Hot Priority Badge (when urgency disabled and not shown elsewhere e.g. next to name on card) -->
     <span 
       v-if="showHotPriorityBadge && !urgencyShownElsewhere"
-      class="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-badge-red text-red-700 border border-red-200 leading-none"
+      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase bg-badge-red text-red-700 border border-red-200 leading-none"
     >
       Hot
     </span>
@@ -19,7 +19,7 @@
     <!-- Base Status Badge (shown when there's a substatus) -->
     <span 
       v-if="baseStatus && hasSubstatus"
-      class="px-1.5 py-0.5 rounded text-xs font-bold uppercase border leading-none"
+      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase border leading-none"
       :class="getStageColorClass(baseStatus)"
     >
       {{ baseStatus }}
@@ -28,7 +28,7 @@
     <!-- Substatus Badge (or single status if no substatus) -->
     <span 
       v-if="displayStatus"
-      class="px-1.5 py-0.5 rounded text-xs font-bold uppercase border leading-none"
+      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase border leading-none"
       :class="getStageColorClass(displayStatus)"
     >
       {{ displayStatus }}

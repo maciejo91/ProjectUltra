@@ -119,16 +119,15 @@
             <span>Reports</span>
           </router-link>
 
-          <!-- Lists Submenu -->
+          <!-- Vehicles (Lists) Submenu -->
           <button
-            v-if="navigationVisibility.lists !== false"
             @click="toggleListsMenu"
             class="mobile-sidebar-link w-full"
             :class="{ 'mobile-sidebar-link-active': isActive('/vehicles') || showListsMenu }"
           >
             <List :size="18" class="shrink-0 sm:hidden" />
             <List :size="20" class="shrink-0 hidden sm:block" />
-            <span>Lists</span>
+            <span>Vehicles</span>
             <ChevronDown :size="14" class="ml-auto transition-transform sm:hidden" :class="{ 'rotate-180': showListsMenu }" />
             <ChevronDown :size="16" class="ml-auto transition-transform hidden sm:block" :class="{ 'rotate-180': showListsMenu }" />
           </button>
@@ -146,6 +145,19 @@
               <span>Vehicles</span>
             </router-link>
           </div>
+
+          <!-- Requests -->
+          <router-link
+            v-if="navigationVisibility.requests !== false"
+            to="/requests"
+            @click="$emit('close')"
+            class="mobile-sidebar-link"
+            :class="{ 'mobile-sidebar-link-active': isActive('/requests') }"
+          >
+            <FileText :size="18" class="shrink-0 sm:hidden" />
+            <FileText :size="20" class="shrink-0 hidden sm:block" />
+            <span>{{ $t('common.navigation.requests') }}</span>
+          </router-link>
         </div>
 
         <!-- Divider -->
@@ -305,6 +317,7 @@ import {
   Plus, 
   Home, 
   List, 
+  FileText,
   Users, 
   Calendar, 
   LineChart, 

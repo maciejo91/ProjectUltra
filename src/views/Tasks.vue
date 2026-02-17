@@ -7,11 +7,116 @@
       @back="handleBackToTaskList"
     />
 
-    <!-- Card View - Similar structure to table view -->
-    <div v-if="viewMode === 'card'" class="flex-1 flex flex-col lg:flex-row overflow-hidden min-w-0">
-      <!-- Card List (left side on desktop, full screen on mobile when no task selected) -->
-      <div 
-        class="flex flex-col overflow-hidden"
+    <!-- Card View: when header-over-list layout (desktop), teleport list and right panel to layout slots.
+         Only mount Teleports after targets exist (avoids "Failed to locate Teleport target" on Tasks mount).
+         Use disabled when route changes so content renders in place before unmount (avoids insertBefore null). -->
+    <div v-show="useTeleport" class="shrink-0 size-0 overflow-hidden">
+      <template v-if="teleportTargetsReady">
+      <Teleport to="#tasks-list-teleport" :disabled="!useTeleport">
+        <div class="h-full flex flex-col overflow-hidden bg-surface">
+          <EntityListSidebar
+            title="Tasks"
+            :items="filteredTasks"
+            :selected-id="currentTask ? String(currentTask.compositeId) : null"
+            :view-mode="viewMode"
+            :initial-search-query="cardSearchQuery"
+            @view-change="handleViewChange"
+            :selected-class="(task) => task.type === 'lead' ? 'bg-muted border-2 border-blue-500' : 'bg-muted border-2 border-purple-500'"
+            :unselected-class="getUnselectedClass"
+            :getName="(task) => {
+              const customer = task.customer
+              if (customer && customer.name) return customer.name
+              if (customer && !customer.name && customer.email) return customer.email.split('@')[0] || 'Unknown'
+              return 'Unknown'
+            }"
+            :getInitials="(task) => {
+              const customer = task.customer
+              if (customer && customer.initials) return customer.initials
+              if (customer && customer.name) {
+                const initials = customer.name.split(' ').map(n => n[0]).filter(Boolean).join('').toUpperCase().slice(0, 2)
+                return initials || '?'
+              }
+              return '?'
+            }"
+            :getVehicleInfo="(task) => {
+              if (task.type === 'lead') {
+                if (!task.requestedCar) return 'No vehicle specified'
+                const car = task.requestedCar
+                const parts = [`${car.brand} ${car.model}`]
+                if (car.vin) parts.push(car.vin)
+                if (car.kilometers !== undefined && car.kilometers !== null) parts.push(`${car.kilometers} km`)
+                if (car.status) parts.push(car.status)
+                return parts.join(' • ')
+              }
+              const vehicle = task.vehicle || task.requestedCar
+              if (!vehicle) return 'No vehicle specified'
+              const parts = [`${vehicle.brand} ${vehicle.model}`]
+              if (vehicle.vin) parts.push(vehicle.vin)
+              if (vehicle.kilometers !== undefined && vehicle.kilometers !== null) parts.push(`${vehicle.kilometers} km`)
+              if (vehicle.status) parts.push(vehicle.status)
+              return parts.join(' • ')
+            }"
+            :avatarClass="(task) => task.type === 'lead' ? 'bg-orange-100 text-orange-600' : 'bg-purple-100 text-purple-600'"
+            :show-mobile-close="false"
+            @select="selectTask"
+            @close="handleBackToTaskList"
+            :active-filters="activeFilters"
+            @filter-change="activeFilters = $event"
+            @sort-change="handleSortChange"
+          >
+            <template #badges="{ item: task }">
+              <Badge v-if="task && task.type" :text="task.type === 'lead' ? 'Lead' : 'Opportunity'" size="small" :theme="task.type === 'lead' ? 'blue' : 'gray'" />
+              <Badge v-if="task && task.priority === 'Hot' && settingsStore.getSetting('urgencyEnabled') === false" text="HOT" size="small" theme="red" />
+            </template>
+            <template #location="{ item: task }">{{ getCustomerCity(task) || 'Unknown' }}</template>
+            <template #source="{ item: task }">{{ task.source || task.customer?.source || 'Unknown' }}</template>
+            <template #owner="{ item: task }">
+              <template v-if="task.assignee">
+                <div class="flex items-center gap-2">
+                  <div class="w-3 h-3 rounded-full bg-black text-white font-medium flex items-center justify-center text-xs shrink-0" style="font-size: 0.5rem;">{{ getAssigneeInitials(task.assignee) }}</div>
+                  <span class="text-gray-600 font-medium">{{ task.assignee }}</span>
+                </div>
+              </template>
+              <span v-else>Unassigned</span>
+            </template>
+            <template #dates="{ item: task }">
+              <template v-if="task.type === 'lead' && task.nextActionDue"><span>Due: {{ getDateDisplay(task.nextActionDue) }}</span></template>
+              <template v-else-if="task.type === 'opportunity' && task.nextActionDue"><span>Due: {{ getDateDisplay(task.nextActionDue) }}</span></template>
+              <template v-else><span>Due: No deadline</span></template>
+            </template>
+          </EntityListSidebar>
+        </div>
+      </Teleport>
+      <Teleport to="#tasks-detail-teleport" :disabled="!useTeleport">
+        <TaskDetailView
+          v-if="currentTask && managementWidget && storeAdapter && addNewConfig"
+          :key="currentTask?.compositeId || 'card-empty'"
+          :task="currentTask"
+          :management-widget="managementWidget"
+          :store-adapter="storeAdapter"
+          :add-new-config="addNewConfig"
+          :filtered-tasks="filteredTasks"
+          @task-navigate="handleTaskNavigate"
+        />
+        <div v-else class="flex-1 flex flex-col w-full min-h-0 overflow-hidden bg-surface">
+          <div class="flex-1 flex items-center justify-center w-full p-8">
+            <div class="text-center max-w-sm">
+              <div class="w-16 h-16 mx-auto mb-4 rounded-lg bg-muted flex items-center justify-center">
+                <ListTodo class="w-8 h-8 shrink-0 text-muted-foreground" />
+              </div>
+              <h3 class="text-content-bold mb-2">No task selected</h3>
+              <p class="text-meta">Select a task from the list to view its details and manage activities</p>
+            </div>
+          </div>
+        </div>
+      </Teleport>
+      </template>
+    </div>
+
+    <!-- Card View - Normal layout (no task selected, or mobile) -->
+    <div v-if="viewMode === 'card' && !useTeleport" class="flex-1 flex flex-col lg:flex-row overflow-hidden min-w-0">
+      <div
+        class="flex flex-col overflow-hidden border-r border-border"
         :class="currentTask ? 'hidden lg:flex shrink-0' : 'w-full lg:w-auto lg:shrink-0'"
       >
         <EntityListSidebar
@@ -21,27 +126,17 @@
           :view-mode="viewMode"
           :initial-search-query="cardSearchQuery"
           @view-change="handleViewChange"
-          :selected-class="(task) => task.type === 'lead' ? 'bg-surface border-2 border-blue-500' : 'bg-surface border-2 border-purple-500'"
+          :selected-class="(task) => task.type === 'lead' ? 'bg-muted border-2 border-blue-500' : 'bg-muted border-2 border-purple-500'"
           :unselected-class="getUnselectedClass"
           :getName="(task) => {
-            // Ensure customer exists and has name
             const customer = task.customer
-            if (customer && customer.name) {
-              return customer.name
-            }
-            // Generate from name if initials exist but name doesn't (shouldn't happen, but defensive)
-            if (customer && !customer.name && customer.email) {
-              return customer.email.split('@')[0] || 'Unknown'
-            }
+            if (customer && customer.name) return customer.name
+            if (customer && !customer.name && customer.email) return customer.email.split('@')[0] || 'Unknown'
             return 'Unknown'
           }"
           :getInitials="(task) => {
-            // Ensure customer exists
             const customer = task.customer
-            if (customer && customer.initials) {
-              return customer.initials
-            }
-            // Generate from name if available
+            if (customer && customer.initials) return customer.initials
             if (customer && customer.name) {
               const initials = customer.name.split(' ').map(n => n[0]).filter(Boolean).join('').toUpperCase().slice(0, 2)
               return initials || '?'
@@ -54,25 +149,16 @@
               const car = task.requestedCar
               const parts = [`${car.brand} ${car.model}`]
               if (car.vin) parts.push(car.vin)
-              if (car.kilometers !== undefined && car.kilometers !== null) {
-                parts.push(`${car.kilometers} km`)
-              }
-              if (car.status) {
-                parts.push(car.status)
-              }
+              if (car.kilometers !== undefined && car.kilometers !== null) parts.push(`${car.kilometers} km`)
+              if (car.status) parts.push(car.status)
               return parts.join(' • ')
             }
-            // For opportunities: prefer vehicle over requestedCar
             const vehicle = task.vehicle || task.requestedCar
             if (!vehicle) return 'No vehicle specified'
             const parts = [`${vehicle.brand} ${vehicle.model}`]
             if (vehicle.vin) parts.push(vehicle.vin)
-            if (vehicle.kilometers !== undefined && vehicle.kilometers !== null) {
-              parts.push(`${vehicle.kilometers} km`)
-            }
-            if (vehicle.status) {
-              parts.push(vehicle.status)
-            }
+            if (vehicle.kilometers !== undefined && vehicle.kilometers !== null) parts.push(`${vehicle.kilometers} km`)
+            if (vehicle.status) parts.push(vehicle.status)
             return parts.join(' • ')
           }"
           :avatarClass="(task) => task.type === 'lead' ? 'bg-orange-100 text-orange-600' : 'bg-purple-100 text-purple-600'"
@@ -84,89 +170,54 @@
           @sort-change="handleSortChange"
         >
           <template #badges="{ item: task }">
-            <!-- Type Badge (urgency is shown only next to customer name on TaskCard) -->
-            <Badge
-              v-if="task && task.type"
-              :text="task.type === 'lead' ? 'Lead' : 'Opportunity'"
-              size="small"
-              :theme="task.type === 'lead' ? 'blue' : 'gray'"
-            />
-            
-            <!-- Hot Badge (fallback when urgency disabled; when enabled, urgency chip is next to name on card) -->
-            <Badge
-              v-if="task && task.priority === 'Hot' && settingsStore.getSetting('urgencyEnabled') === false"
-              text="HOT"
-              size="small"
-              theme="red"
-            />
+            <Badge v-if="task && task.type" :text="task.type === 'lead' ? 'Lead' : 'Opportunity'" size="small" :theme="task.type === 'lead' ? 'blue' : 'gray'" />
+            <Badge v-if="task && task.priority === 'Hot' && settingsStore.getSetting('urgencyEnabled') === false" text="HOT" size="small" theme="red" />
           </template>
-          
-          <template #location="{ item: task }">
-            {{ getCustomerCity(task) || 'Unknown' }}
-          </template>
-          
-          <template #source="{ item: task }">
-            {{ task.source || task.customer?.source || 'Unknown' }}
-          </template>
-          
+          <template #location="{ item: task }">{{ getCustomerCity(task) || 'Unknown' }}</template>
+          <template #source="{ item: task }">{{ task.source || task.customer?.source || 'Unknown' }}</template>
           <template #owner="{ item: task }">
             <template v-if="task.assignee">
               <div class="flex items-center gap-2">
-                <div 
-                  class="w-3 h-3 rounded-full bg-black text-white font-medium flex items-center justify-center text-xs shrink-0"
-                  style="font-size: 0.5rem;"
-                >
-                  {{ getAssigneeInitials(task.assignee) }}
-                </div>
+                <div class="w-3 h-3 rounded-full bg-black text-white font-medium flex items-center justify-center text-xs shrink-0" style="font-size: 0.5rem;">{{ getAssigneeInitials(task.assignee) }}</div>
                 <span class="text-gray-600 font-medium">{{ task.assignee }}</span>
               </div>
             </template>
             <span v-else>Unassigned</span>
           </template>
-          
           <template #dates="{ item: task }">
-            <template v-if="task.type === 'lead' && task.nextActionDue">
-              <span>Due: {{ getDateDisplay(task.nextActionDue) }}</span>
-            </template>
-            <template v-else-if="task.type === 'opportunity' && task.nextActionDue">
-              <span>Due: {{ getDateDisplay(task.nextActionDue) }}</span>
-            </template>
-            <template v-else>
-              <span>Due: No deadline</span>
-            </template>
+            <template v-if="task.type === 'lead' && task.nextActionDue"><span>Due: {{ getDateDisplay(task.nextActionDue) }}</span></template>
+            <template v-else-if="task.type === 'opportunity' && task.nextActionDue"><span>Due: {{ getDateDisplay(task.nextActionDue) }}</span></template>
+            <template v-else><span>Due: No deadline</span></template>
           </template>
-          
         </EntityListSidebar>
       </div>
-      
-      <!-- Task Detail Panel for Card View (right side on desktop, full screen on mobile) -->
-      <TaskDetailView
-        v-if="currentTask && managementWidget && storeAdapter && addNewConfig"
-        :key="currentTask?.compositeId || 'card-empty'"
-        :task="currentTask"
-        :management-widget="managementWidget"
-        :store-adapter="storeAdapter"
-        :add-new-config="addNewConfig"
-        :filtered-tasks="filteredTasks"
-        @task-navigate="handleTaskNavigate"
-      />
-      
-      <!-- Empty State for Card View (right side on desktop, hidden on mobile) -->
-      <div v-if="!currentTask" class="hidden lg:flex flex-1 flex-col overflow-hidden lg:border-l border">
-        <div class="flex-1 flex items-center justify-center p-8">
-          <div class="text-center max-w-sm">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-lg bg-muted flex items-center justify-center">
-              <ListTodo class="w-8 h-8 shrink-0 text-muted-foreground" />
+      <div class="flex-1 flex flex-col min-w-0 overflow-hidden border-l border-border">
+        <TaskDetailView
+          v-if="currentTask && managementWidget && storeAdapter && addNewConfig"
+          :key="currentTask?.compositeId || 'card-empty'"
+          :task="currentTask"
+          :management-widget="managementWidget"
+          :store-adapter="storeAdapter"
+          :add-new-config="addNewConfig"
+          :filtered-tasks="filteredTasks"
+          @task-navigate="handleTaskNavigate"
+        />
+        <div v-if="!currentTask" class="hidden lg:flex flex-1 flex-col w-full min-h-0 overflow-hidden bg-surface">
+          <div class="flex-1 flex items-center justify-center w-full p-8">
+            <div class="text-center max-w-sm">
+              <div class="w-16 h-16 mx-auto mb-4 rounded-lg bg-muted flex items-center justify-center">
+                <ListTodo class="w-8 h-8 shrink-0 text-muted-foreground" />
+              </div>
+              <h3 class="text-content-bold mb-2">No task selected</h3>
+              <p class="text-meta">Select a task from the list to view its details and manage activities</p>
             </div>
-            <h3 class="text-content-bold mb-2">No task selected</h3>
-            <p class="text-meta">Select a task from the list to view its details and manage activities</p>
           </div>
         </div>
       </div>
     </div>
     
     <!-- Table View - Same structure as Customers: page-container, scroll area with padding, white card. -->
-    <div v-if="viewMode === 'table'" class="page-container relative flex flex-col flex-1 overflow-hidden min-w-0 h-full bg-surface">
+    <div v-if="viewMode === 'table'" class="page-container relative flex flex-col flex-1 overflow-hidden min-w-0 h-full bg-surface border-r border-border">
       <TasksTableView
         :tasks="allTasks"
         :current-task-id="drawerTask?.compositeId"
@@ -228,7 +279,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch, inject } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, inject, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ListTodo, Loader2 } from 'lucide-vue-next'
 import { useLeadsStore } from '@/stores/leads'
@@ -249,6 +300,7 @@ import { formatCurrency } from '@/utils/formatters'
 import { getStageBadgeClass } from '@/utils/formatters'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
 import { useSettingsStore } from '@/stores/settings'
+import { useLayoutStore } from '@/stores/layout'
 
 const route = useRoute()
 const router = useRouter()
@@ -258,6 +310,7 @@ const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
 const usersStore = useUsersStore()
 const settingsStore = useSettingsStore()
+const layoutStore = useLayoutStore()
 
 // Use task helpers composable
 const {
@@ -275,6 +328,16 @@ const {
 
 // View mode state with localStorage persistence (default to table)
 const viewMode = ref(localStorage.getItem('tasksViewMode') || 'table')
+
+// True when list/detail should be teleported to layout slots (card view + task selected on desktop).
+// Require route.name === 'task-detail' so teleports are disabled before unmount when navigating away
+// (avoids "Cannot read properties of null (reading 'insertBefore')" in moveTeleport).
+const useTeleport = computed(
+  () => route.name === 'task-detail' && viewMode.value === 'card' && layoutStore.hideHeaderForTaskDetail
+)
+
+// Only mount Teleport components after their targets exist in DOM (avoids "Failed to locate Teleport target").
+const teleportTargetsReady = ref(false)
 
 // Card view search query (for when switching from table view)
 const cardSearchQuery = ref('')
@@ -359,6 +422,13 @@ onMounted(() => {
       onToggleClosed: toggleShowClosed
     }
   }
+  // Defer mounting Teleports until targets exist in DOM (MainLayout renders them as siblings of router-view)
+  nextTick(() => {
+    teleportTargetsReady.value = !!(
+      document.getElementById('tasks-list-teleport') &&
+      document.getElementById('tasks-detail-teleport')
+    )
+  })
 })
 
 onBeforeUnmount(() => {
@@ -475,6 +545,22 @@ watch(currentTask, (task) => {
     }
   }
 }, { immediate: true })
+
+// On desktop only: header over list column so task detail gets full height
+const isDesktop = ref(typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches)
+if (typeof window !== 'undefined') {
+  const mq = window.matchMedia('(min-width: 768px)')
+  mq.addEventListener('change', (e) => { isDesktop.value = e.matches })
+}
+watch(
+  () => isDesktop.value && viewMode.value === 'card',
+  (hide) => { layoutStore.setHideHeaderForTaskDetail(hide) },
+  { immediate: true }
+)
+
+onBeforeUnmount(() => {
+  layoutStore.setHideHeaderForTaskDetail(false)
+})
 
 // Watch for drawer task changes to load activities
 watch(drawerTask, (task) => {

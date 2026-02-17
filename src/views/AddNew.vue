@@ -1,7 +1,7 @@
 <template>
   <div class="page-container overflow-y-auto">
     <Tabs v-model="activeTab">
-      <PageHeader title="Add New Customer">
+      <PageHeader title="">
         <template #bottom>
           <div class="pb-0">
             <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
@@ -23,7 +23,7 @@
         </template>
       </PageHeader>
 
-      <div class="pt-2 px-4 pb-8 md:pt-3 md:px-6 md:pb-10 lg:pt-4 lg:px-8 lg:pb-12">
+      <div class="pt-2 px-4 pb-8 md:pt-3 md:px-6 md:pb-10 lg:pt-4 lg:px-8 lg:pb-12 text-sm">
         <div class="max-w-6xl mx-auto">
           <TabsContent value="manual" class="add-new-manual data-[state=inactive]:hidden">
             <ManualTab ref="manualTabRef" @submit="handleSubmit" />

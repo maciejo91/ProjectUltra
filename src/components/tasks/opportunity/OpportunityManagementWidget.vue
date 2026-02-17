@@ -1,5 +1,13 @@
 <template>
   <TaskManagementWidget :task="opportunity" hide-title hide-border>
+    <template #assignee-date-bar>
+      <TaskAssigneeDateBar
+        v-if="opportunity"
+        :task="opportunityAsTask"
+        @postpone-expected-close="openPostponeExpectedCloseModal"
+        @reassigned="handleOwnerReassigned"
+      />
+    </template>
     <template #deadline-banner>
       <div class="px-4 pt-4">
         <DeadlineBanner
@@ -12,64 +20,21 @@
     </template>
     
     <template #primary-action>
-      <!-- Blue banner with Assign to me only when unassigned; assigned state is in header -->
-      <TaskAssignee
-        v-if="!(opportunity.assignee || opportunity.owner || opportunity.assignedTo)"
-        :task="opportunity"
-        task-type="opportunity"
-        :readonly="opportunityState.isClosed.value"
-        @reassigned="handleOwnerReassigned"
-        class="mb-3"
-      />
-
-      <!-- Primary action -->
-      <!-- Regular primary action widget -->
-      <!-- Hide for Contract Pending - delivery date is handled inline in ContractPendingManagementSection -->
+      <!-- One next action card (no extra container); assignee/due already in grey area above -->
       <PrimaryActionWidget
-        v-if="!opportunityState.isClosed.value && !isInNegotiation && !isContractPending && opportunityState.primaryAction.value"
-        :action="opportunityState.primaryAction.value"
-        :color-scheme="opportunityState.primaryAction.value.colorScheme"
-        @action-clicked="opportunityState.primaryAction.value.handler"
+        v-if="nextActionCard"
+        :actions="nextActionCard.actions"
+        :color-scheme="nextActionCard.colorScheme"
+        @action-clicked="() => {}"
       />
 
-      <!-- Offers Carousel - Show for all stages when offers exist -->
-      <div v-show="hasOffers" class="mt-4" :key="`offers-wrapper-${opportunity.id}`">
-        <OfferCarousel
-          v-if="hasOffers"
-          ref="offerCarouselRef"
-          :key="`carousel-${opportunity.id}`"
-          :offers="opportunity.offers || []"
-          :opportunity-id="opportunity.id"
-          @offer-activated="handleOfferActivated"
-          @generate-pdf="handleOfferPDFGenerate"
-          @add="openCreateOfferModal"
-        />
-      </div>
-      
-      <!-- Contract Carousel (Contract Pending) -->
-      <div v-if="isContractPending && !opportunityActions.isClosed.value" class="mt-4">
-        <ContractCarousel
-          ref="contractCarouselRef"
-          :contracts="contracts"
-          :opportunity-id="opportunity.id"
-          :max-contract-date="maxContractDate"
-          @generate-pdf="handleContractPDFGenerate"
-          @collect-esignatures="handleCollectESignaturesFromContract"
-          @add="openCreateContractModal"
-        />
-      </div>
-      
-      <!-- Contract Pending Management Section -->
       <ContractPendingManagementSection
         v-if="!opportunityActions.isClosed.value && opportunity.stage === 'In Negotiation' && getDisplayStage(opportunity, 'opportunity') === 'In Negotiation - Contract Pending'"
         ref="contractPendingManagementSectionRef"
         :opportunity="opportunity"
         :has-contracts="contracts.length > 0"
-        :show-close-as-lost-section="showCloseAsLostSection"
         :show-schedule-appointment-contract-pending-section="showScheduleAppointmentContractPendingSection"
         :show-set-delivery-date-section="showSetDeliveryDateSection"
-        :close-as-lost-reason="closeAsLostReason"
-        :close-as-lost-notes="closeAsLostNotes"
         :delivery-date-form="deliveryDateForm"
         :has-delivery-date="hasDeliveryDate"
         :contract-pending-actions="contractPendingActions"
@@ -89,14 +54,11 @@
         @schedule-appointment-contract-pending-submit="handleScheduleAppointmentContractPendingSubmit"
         @cancel-schedule-appointment-contract-pending="handleCancelScheduleAppointmentContractPending"
         @contract-pending-action="handleContractPendingAction"
-        @close-as-lost-cancel="handleCancelCloseAsLost"
-        @close-as-lost-confirm="handleConfirmCloseAsLost"
-        class="mt-4"
       />
-      
-      <!-- In Negotiation Management Section (exclude Contract Pending) - Show below carousel -->
+
+      <!-- In Offer Sent: show only one — Manage appointment if scheduled, else Manage Offers & Follow Up -->
       <NegotiationManagementSection
-        v-if="isInNegotiation"
+        v-if="isInNegotiation && !(scheduledAppointment && scheduledAppointment.start)"
         ref="negotiationManagementSectionRef"
         :opportunity="opportunity"
         :show-negotiation-section="showNegotiationSection"
@@ -129,7 +91,6 @@
         @survey-cancelled="handleSurveyCancelled"
       />
 
-      <!-- Manage Appointment: last among conditionally shown cards (shows independently when appointment scheduled) -->
       <AppointmentManagementSection
         v-if="!opportunityState.isClosed.value && scheduledAppointment && scheduledAppointment.start"
         ref="appointmentManagementSectionRef"
@@ -162,25 +123,11 @@
         @offer-assignment-cancel="handleCancelOfferAssignment"
         @open-create-offer-modal="openCreateOfferModalFromAssignment"
         @secondary-action="handleSecondaryAction"
-        @close-as-lost-confirmed="handleCloseAsLostFromAppointment"
         @customer-click="handleCustomerClick"
-        class="mt-4"
       />
     </template>
 
     <template #task-widgets>
-      <!-- Closed Won - Contract Carousel -->
-      <div v-if="isClosedWon && contracts.length > 0" class="mb-4">
-        <ContractCarousel
-          ref="contractCarouselRef"
-          :contracts="contracts"
-          :opportunity-id="opportunity.id"
-          :max-contract-date="maxContractDate"
-          @generate-pdf="handleContractPDFGenerate"
-          @collect-esignatures="handleCollectESignaturesFromContract"
-        />
-      </div>
-
       <!-- Qualified and Awaiting Appointment Schedule Form -->
       <div v-if="shouldShowScheduleForm" class="space-y-4">
         <!-- Assignment Note Card -->
@@ -194,15 +141,9 @@
           </div>
         </div>
 
-        <!-- Call and Schedule Appointment Container (matching LQTask.vue design) -->
-        <div
-          class="rounded-lg flex flex-col bg-muted"
-        >
-          <div class="pt-1 px-1">
-            <!-- Call Interface (always visible) -->
-            <div
-              class="bg-white rounded-lg shadow-nsc-card overflow-hidden"
-            >
+        <!-- Call to Schedule Appointment: main card (call) + schedule form in expanded area (LQTask-style) -->
+        <div class="flex flex-col">
+          <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden">
             <div class="p-6">
               <div class="mb-3">
                 <h4 class="font-bold text-foreground text-sm">Call to Schedule Appointment</h4>
@@ -234,10 +175,7 @@
               />
             </div>
           </div>
-          </div>
-
-          <!-- Unified schedule form (same as reschedule); always visible, buttons in form -->
-          <div class="px-4 py-4">
+          <div class="mk-expanded-cards-area">
             <OpportunityScheduleForm
               ref="scheduleFormRef"
               :opportunity="opportunity"
@@ -246,7 +184,6 @@
               @cancel="cancelScheduleForm"
             />
           </div>
-
         </div>
       </div>
 
@@ -325,7 +262,7 @@
           </div>
         </div>
         
-        <div class="px-4 py-4 space-y-4">
+        <div class="mk-expanded-cards-area space-y-4">
         <!-- Schedule Delivery Section -->
         <div v-if="showScheduleDeliverySection">
           <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
@@ -561,7 +498,7 @@
         </div>
         
         <!-- Complete Checklist Section -->
-        <div v-if="showCompleteChecklistSection" class="px-4 py-4">
+        <div v-if="showCompleteChecklistSection" class="mk-expanded-cards-area">
           <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
             <h5 class="font-semibold text-foreground text-sm mb-4">Complete Delivery Checklist</h5>
             <p class="text-sm text-muted-foreground mb-4">
@@ -676,7 +613,7 @@
           </div>
         </div>
         
-        <div class="px-4 py-4 space-y-4">
+        <div class="mk-expanded-cards-area space-y-4">
           <!-- Reopen Confirmation Section -->
           <div v-if="showReopenSection">
             <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
@@ -703,10 +640,9 @@
         </div>
       </div>
 
-      <!-- Inline Close as Lost Section -->
-      <!-- Only show if AppointmentManagementSection is not visible (it handles its own close as lost) -->
+      <!-- Single Close as Lost (from any next action card / More actions) -->
       <CloseAsLostCard
-        v-if="showCloseAsLostSection && !opportunityState.isClosed.value && !(scheduledAppointment && scheduledAppointment.start) && !(isContractPending)"
+        v-if="showCloseAsLostSection && !opportunityState.isClosed.value"
         ref="closeAsLostCardRef"
         :preselected-reason="closeAsLostReason"
         :preselected-notes="closeAsLostNotes"
@@ -716,7 +652,7 @@
 
       <!-- Inline Schedule Appointment Section (from More Actions) -->
       <div v-if="showInlineScheduleSection && !opportunityState.isClosed.value" class="rounded-lg flex flex-col bg-muted">
-        <div class="px-4 py-4">
+        <div class="mk-expanded-cards-area">
           <OpportunityScheduleForm
             ref="inlineScheduleFormRef"
             :opportunity="opportunity"
@@ -747,6 +683,41 @@
       <!-- Secondary actions now shown inline with management buttons -->
     </template>
   </TaskManagementWidget>
+
+  <!-- Offers and contracts outside the grey container -->
+  <div v-show="hasOffers" class="mt-4" :key="`offers-wrapper-${opportunity.id}`">
+    <OfferCarousel
+      v-if="hasOffers"
+      ref="offerCarouselRef"
+      :key="`carousel-${opportunity.id}`"
+      :offers="opportunity.offers || []"
+      :opportunity-id="opportunity.id"
+      @offer-activated="handleOfferActivated"
+      @generate-pdf="handleOfferPDFGenerate"
+      @add="openCreateOfferModal"
+    />
+  </div>
+  <div v-if="isContractPending && !opportunityActions.isClosed.value" class="mt-4">
+    <ContractCarousel
+      ref="contractCarouselRef"
+      :contracts="contracts"
+      :opportunity-id="opportunity.id"
+      :max-contract-date="maxContractDate"
+      @generate-pdf="handleContractPDFGenerate"
+      @collect-esignatures="handleCollectESignaturesFromContract"
+      @add="openCreateContractModal"
+    />
+  </div>
+  <div v-if="isClosedWon && contracts.length > 0" class="mt-4">
+    <ContractCarousel
+      ref="contractCarouselRef"
+      :contracts="contracts"
+      :opportunity-id="opportunity.id"
+      :max-contract-date="maxContractDate"
+      @generate-pdf="handleContractPDFGenerate"
+      @collect-esignatures="handleCollectESignaturesFromContract"
+    />
+  </div>
 
   <!-- Appointment Modals -->
   <CreateEventModal
@@ -967,6 +938,7 @@ import TaskManagementWidget from '@/components/tasks/shared/TaskManagementWidget
 import PrimaryActionWidget from '@/components/tasks/shared/PrimaryActionWidget.vue'
 import SecondaryActionsDropdown from '@/components/shared/SecondaryActionsDropdown.vue'
 import TaskAssignee from '@/components/tasks/TaskAssignee.vue'
+import TaskAssigneeDateBar from '@/components/tasks/TaskAssigneeDateBar.vue'
 import DeadlineBanner from '@/components/tasks/shared/DeadlineBanner.vue'
 import CreateEventModal from '@/components/modals/CreateEventModal.vue'
 import VehicleSelectionModal from '@/components/modals/VehicleSelectionModal.vue'
@@ -1029,6 +1001,12 @@ const getCurrentOpportunity = () => {
 
 // Computed opportunity for template use (uses store if available, otherwise props)
 const opportunity = computed(() => getCurrentOpportunity())
+
+// Task shape for TaskAssigneeDateBar (ensures type: 'opportunity' for expected close display)
+const opportunityAsTask = computed(() => {
+  const opp = opportunity.value
+  return opp ? { ...opp, type: 'opportunity' } : null
+})
 
 // Use scheduledAppointment from prop if provided, otherwise from opportunity object
 const scheduledAppointment = computed(() => {
@@ -1413,11 +1391,6 @@ const showReopenSection = ref(false)
 const showCloseAsLostSection = ref(false)
 const { reason: closeAsLostReason, notes: closeAsLostNotes, cardRef: closeAsLostCardRef, reset: resetCloseAsLost } = useCloseAsLost()
 
-// Dropdown visibility states
-const showSecondaryActionsDropdown = ref(false)
-const showSecondaryActionsDropdownNegotiation = ref(false)
-const showContractPendingDropdown = ref(false)
-
 // Contract Pending Management section state
 const showAddOfferContractPendingSection = ref(false)
 const showScheduleAppointmentContractPendingSection = ref(false)
@@ -1465,39 +1438,9 @@ const contractPendingActions = computed(() => {
   return actions
 })
 
-// Menu items for dropdowns
-const secondaryActionsMenuItems = computed(() => {
-  return (opportunityState.secondaryActions.value || []).map(action => ({
-    key: action.key,
-    label: action.label,
-    disabled: !!action.disabled,
-    onClick: () => {
-      showSecondaryActionsDropdown.value = false
-      showSecondaryActionsDropdownNegotiation.value = false
-      handleSecondaryAction(action)
-    }
-  }))
-})
-
-const contractPendingMenuItems = computed(() => {
-  return (contractPendingActions.value || []).map(action => ({
-    key: action.key,
-    label: action.label,
-    disabled: !!action.disabled,
-    onClick: () => {
-      showContractPendingDropdown.value = false
-      if (action.handler) {
-        action.handler()
-      }
-    }
-  }))
-})
-
-function handleContractPendingAction(action) {
-  // The handler is already called by SecondaryActionsDropdown
-  // This is just for any additional logic if needed
+function handleContractPendingAction() {
+  // No-op: SecondaryActionsDropdown calls each action's handler directly
 }
-
 
 // Computed for NS task count - this represents which NS task to show (1, 2, or 3)
 const nsTaskCount = computed(() => {
@@ -1830,6 +1773,67 @@ const filteredSecondaryActions = computed(() => {
   }
   
   return filtered
+})
+
+// Single next action card: always one card; merge primary + same-priority secondaries into one CTA block
+const DEFAULT_NEXT_ACTION_SCHEME = { background: 'bg-muted', border: 'border-border' }
+const nextActionCard = computed(() => {
+  if (opportunityState.isClosed.value || isContractPending || isInNegotiation) {
+    return null
+  }
+  const primary = opportunityState.primaryAction.value
+  const secondaries = filteredSecondaryActions.value || []
+  const mergedActions = []
+  let title = 'Next steps'
+  let description = 'Choose an action to continue'
+  let colorScheme = DEFAULT_NEXT_ACTION_SCHEME
+
+  if (primary) {
+    title = primary.title
+    description = primary.description ?? description
+    colorScheme = primary.colorScheme || colorScheme
+    mergedActions.push({
+      key: primary.key,
+      title: primary.title,
+      description: primary.description,
+      label: primary.label,
+      icon: primary.icon,
+      buttonClass: primary.buttonClass || 'bg-primary text-white hover:opacity-90',
+      handler: primary.handler
+    })
+    // Merge up to 2 secondaries with same priority (exclude primary key and close-lost from merged CTAs)
+    const extra = secondaries
+      .filter(s => s.key !== primary.key && s.key !== 'close-lost')
+      .slice(0, 2)
+    extra.forEach(s => {
+      mergedActions.push({
+        key: s.key,
+        label: s.label,
+        icon: s.icon,
+        buttonClass: 'bg-muted hover:bg-muted/80 text-foreground border border-border',
+        handler: s.handler
+      })
+    })
+  } else {
+    // No primary: use first 3 secondaries as merged CTAs
+    secondaries.slice(0, 3).forEach((s, i) => {
+      mergedActions.push({
+        key: s.key,
+        title: i === 0 ? title : undefined,
+        description: i === 0 ? (s.description || description) : undefined,
+        label: s.label,
+        icon: s.icon,
+        buttonClass: i === 0 ? 'bg-primary text-white hover:opacity-90' : 'bg-muted hover:bg-muted/80 text-foreground border border-border',
+        handler: s.handler
+      })
+    })
+    if (mergedActions.length > 0 && mergedActions[0].description) {
+      description = mergedActions[0].description
+    }
+  }
+
+  if (mergedActions.length === 0) return null
+  return { title, description, colorScheme, actions: mergedActions }
 })
 
 // Helper function (kept for backward compatibility)
@@ -2374,31 +2378,6 @@ async function handleConfirmCloseAsLost(data) {
     })
     
     handleCancelCloseAsLost()
-  } catch (error) {
-    console.error('Failed to close opportunity as lost:', error)
-  }
-}
-
-// Handle close as lost from AppointmentManagementSection inline form
-async function handleCloseAsLostFromAppointment(data) {
-  try {
-    await handleClosedLost({
-      reason: data.reason,
-      notes: data.notes
-    })
-    
-    // Add activity
-    await opportunitiesStore.addActivity(props.opportunity.id, {
-      type: 'close-lost',
-      user: userStore.currentUser?.name || 'You',
-      action: 'closed opportunity as lost',
-      content: `Opportunity closed as lost. Reason: ${data.reason}${data.notes ? `. Notes: ${data.notes}` : ''}`,
-      data: {
-        reason: data.reason,
-        notes: data.notes
-      },
-      timestamp: new Date().toISOString()
-    })
   } catch (error) {
     console.error('Failed to close opportunity as lost:', error)
   }

@@ -941,7 +941,7 @@ export const mockActivities = [
     action: 'made a call',
     content: 'Discussed BMW X7 features and luxury options.',
     timestamp: '2025-03-26T10:00:00',
-    opportunityId: 6
+    opportunityId: 5
   },
   {
     id: 126,
@@ -950,7 +950,7 @@ export const mockActivities = [
     action: 'added a note',
     content: 'Customer wants X7 M60i with Executive Drive Pro package.',
     timestamp: '2025-03-25T14:00:00',
-    opportunityId: 6
+    opportunityId: 5
   },
   {
     id: 127,
@@ -959,7 +959,7 @@ export const mockActivities = [
     action: 'sent an email',
     content: 'Sent X7 M60i configuration with all requested options.',
     timestamp: '2025-03-24T11:00:00',
-    opportunityId: 6
+    opportunityId: 5
   },
   {
     id: 128,
@@ -969,7 +969,7 @@ export const mockActivities = [
     content: 'BMW X7 M60i detailed specification sheet',
     fileName: 'BMW_X7_M60i_Specs.pdf',
     timestamp: '2025-03-23T15:00:00',
-    opportunityId: 6
+    opportunityId: 5
   },
   {
     id: 129,
@@ -986,7 +986,7 @@ export const mockActivities = [
       value: 55000
     },
     timestamp: '2025-03-22T10:00:00',
-    opportunityId: 6
+    opportunityId: 5
   },
   {
     id: 130,
@@ -1003,7 +1003,7 @@ export const mockActivities = [
       status: 'approved'
     },
     timestamp: '2025-03-21T14:00:00',
-    opportunityId: 6
+    opportunityId: 5
   },
   {
     id: 131,
@@ -1012,7 +1012,7 @@ export const mockActivities = [
     action: 'sent an SMS',
     content: 'Robert, great news! Your financing is approved. Ready to order your X7!',
     timestamp: '2025-03-21T15:00:00',
-    opportunityId: 6
+    opportunityId: 5
   },
   {
     id: 132,
@@ -1021,7 +1021,7 @@ export const mockActivities = [
     action: 'sent a WhatsApp message',
     content: 'I found the perfect X7 in Tanzanite Blue. Want to see photos?',
     timestamp: '2025-03-20T12:00:00',
-    opportunityId: 6
+    opportunityId: 5
   },
   
   // Opportunity 7 (Lisa Anderson) - Add missing types
@@ -1033,7 +1033,7 @@ export const mockActivities = [
     content: 'Audi Q8 e-tron brochure and pricing',
     fileName: 'Audi_Q8_etron_Brochure.pdf',
     timestamp: '2025-03-24T10:00:00',
-    opportunityId: 7
+    opportunityId: 5
   },
   {
     id: 134,
@@ -1042,7 +1042,7 @@ export const mockActivities = [
     action: 'sent an SMS',
     content: 'Lisa, your Q8 e-tron test drive is confirmed for Saturday at 11 AM!',
     timestamp: '2025-03-23T16:00:00',
-    opportunityId: 7
+    opportunityId: 5
   },
   {
     id: 135,
@@ -1051,7 +1051,7 @@ export const mockActivities = [
     action: 'sent a WhatsApp message',
     content: 'The Q8 e-tron you liked is still available. Let me know if you want to proceed!',
     timestamp: '2025-03-22T14:00:00',
-    opportunityId: 7
+    opportunityId: 5
   },
   
   // Opportunity 8 (James White) - Add missing types

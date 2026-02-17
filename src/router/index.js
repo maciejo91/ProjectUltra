@@ -44,6 +44,12 @@ const routes = [
         meta: { titleKey: 'common.navigation.vehicles' }
       },
       {
+        path: 'requests',
+        name: 'requests',
+        component: () => import('@/views/Requests.vue'),
+        meta: { titleKey: 'common.navigation.requests' }
+      },
+      {
         path: 'customers',
         name: 'customers',
         component: () => import('@/views/Customers.vue'),

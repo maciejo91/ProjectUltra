@@ -28,7 +28,7 @@
       </div>
     </div>
     
-    <div v-if="showSurvey" class="px-4 py-4 space-y-4">
+    <div v-if="showSurvey" class="mk-expanded-cards-area space-y-4">
       <ContractFeedbackSurvey
         ref="surveyRef"
         :opportunity="opportunity"

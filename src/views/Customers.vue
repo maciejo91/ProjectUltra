@@ -5,7 +5,7 @@
       <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide">
         <!-- Customers table (tabs hidden for now) -->
         <Suspense>
-          <CustomersTab @row-click="handleRowClick" />
+          <CustomersTab ref="customersTabRef" @row-click="handleRowClick" />
           <template #fallback>
             <div class="flex items-center justify-center py-12">
               <div class="text-center">
@@ -27,7 +27,9 @@
         :customer-type="'contact'"
         :show-close-button="true"
         :close-on-convert="true"
+        :filtered-customer-rows="drawerCustomerRows"
         @close="closeDrawer"
+        @customer-navigate="handleCustomerNavigate"
       />
       
       <!-- Task Detail View -->
@@ -91,6 +93,15 @@ const newItem = ref({
 const showDrawer = ref(false)
 const drawerEntity = ref(null) // { type: 'customer' | 'task', id: number }
 const drawerTaskCompositeId = ref(null) // 'lead-1' or 'opportunity-1' - used to resolve live task from store
+const customersTabRef = ref(null)
+
+// Current page customer rows for drawer prev/next (from CustomersTab)
+const drawerCustomerRows = computed(() => {
+  const tab = customersTabRef.value
+  if (!tab?.paginatedData) return []
+  const data = tab.paginatedData
+  return Array.isArray(data) ? data : (data?.value ?? [])
+})
 
 // Use task filters composable for drawer navigation
 const { allTasks } = useTaskFilters(ref(false))
@@ -180,6 +191,22 @@ const closeDrawer = () => {
   showDrawer.value = false
   drawerEntity.value = null
   drawerTaskCompositeId.value = null
+}
+
+// Handle customer drawer prev/next
+const handleCustomerNavigate = (direction) => {
+  const rows = drawerCustomerRows.value
+  const currentId = drawerEntity.value?.id
+  if (!currentId || !rows.length) return
+  const index = rows.findIndex((r) => (r.customerId ?? parseInt(String(r.id).replace('customer-', ''), 10)) === currentId)
+  if (index === -1) return
+  if (direction === 'previous' && index > 0) {
+    const prev = rows[index - 1]
+    drawerEntity.value = { type: 'customer', id: prev.customerId ?? parseInt(String(prev.id).replace('customer-', ''), 10) }
+  } else if (direction === 'next' && index < rows.length - 1) {
+    const next = rows[index + 1]
+    drawerEntity.value = { type: 'customer', id: next.customerId ?? parseInt(String(next.id).replace('customer-', ''), 10) }
+  }
 }
 
 // Handle drawer task navigation

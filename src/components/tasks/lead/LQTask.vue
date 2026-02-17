@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="rounded-lg flex flex-col bg-muted"
-  >
+  <div class="flex flex-col">
     <!-- Loading state before outcome (closing / postponing) -->
     <template v-if="outcomeSaving">
       <div class="flex-1 min-h-0 flex items-center justify-center rounded-lg bg-muted/80 py-4" aria-busy="true" aria-label="Saving outcome">
@@ -70,7 +68,7 @@
     </template>
 
     <template v-else>
-      <!-- Contact block: white card -->
+      <!-- Contact block: white card (padding matches opportunity management cards) -->
       <div class="pt-1 px-1">
         <div
           class="bg-white rounded-lg shadow-nsc-card overflow-hidden"
@@ -114,13 +112,24 @@
         </div>
       </div>
 
-      <!-- Grey outcome area: outcome selection -->
-      <div class="px-4 py-4 space-y-3">
+      <!-- Grey outcome area: outcome selection and expanded cards -->
+      <div class="mk-expanded-cards-area space-y-3">
         <!-- Inline Outcome Selection -->
         <div v-if="!successState" class="space-y-4">
             <div>
-            <p class="text-sm font-medium text-foreground leading-normal mb-3">Log what is happening?</p>
+            <p class="text-sm font-medium text-foreground leading-normal mb-3">What's the outcome?</p>
             <div class="outcome-toggle-group grid grid-cols-3 gap-3">
+              <Toggle
+                variant="outline"
+                :model-value="selectedOutcome === 'answer'"
+                @update:model-value="(p) => selectOutcome(p ? 'answer' : null)"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
+              >
+                <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
+                  <Phone :size="14" class="text-muted-foreground" />
+                </span>
+                <span>Answer</span>
+              </Toggle>
               <Toggle
                 variant="outline"
                 :model-value="selectedOutcome === 'no-answer'"
@@ -138,27 +147,73 @@
                 @update:model-value="(p) => selectOutcome(p ? 'not-valid' : null)"
                 class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
-                <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-destructive/10">
-                  <ThumbsDown :size="14" class="text-destructive" />
+                <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
+                  <X :size="14" class="text-muted-foreground" />
                 </span>
-                <span>No interest/invalid</span>
-              </Toggle>
-              <Toggle
-                variant="outline"
-                :model-value="selectedOutcome === 'interested'"
-                @update:model-value="(p) => selectOutcome(p ? 'interested' : null)"
-                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
-              >
-                <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-emerald-500/10">
-                  <Check :size="14" class="text-emerald-600" />
-                </span>
-                <span>Interested</span>
+                <span>Not valid</span>
               </Toggle>
             </div>
           </div>
 
-          <!-- No Answer Follow-up (Inline) -->
-          <div v-if="selectedOutcome === 'no-answer'" ref="expandedOutcomeRef" class="space-y-4">
+          <!-- What's next? (when outcome is no-answer or answer) -->
+          <div v-if="selectedOutcome === 'no-answer'" class="space-y-2">
+            <p class="text-sm font-medium text-foreground leading-normal mb-2">What's next?</p>
+            <div class="outcome-toggle-group grid grid-cols-2 gap-3 w-4/5">
+              <Toggle
+                variant="outline"
+                :model-value="selectedNextStep === 'postpone'"
+                @update:model-value="(p) => setNextStep(p ? 'postpone' : null)"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
+              >
+                <Clock :size="14" class="shrink-0 text-muted-foreground" />
+                <span>Postpone</span>
+              </Toggle>
+              <Toggle
+                variant="outline"
+                :model-value="selectedNextStep === 'close-lead'"
+                @update:model-value="(p) => setNextStep(p ? 'close-lead' : null)"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
+              >
+                <X :size="14" class="shrink-0 text-muted-foreground" />
+                <span>Close</span>
+              </Toggle>
+            </div>
+          </div>
+          <div v-if="selectedOutcome === 'answer'" class="space-y-2 w-full">
+            <p class="text-sm font-medium text-foreground leading-normal mb-2">What's next?</p>
+            <div class="outcome-toggle-group grid grid-cols-3 gap-3 w-4/5">
+              <Toggle
+                variant="outline"
+                :model-value="selectedNextStep === 'interested'"
+                @update:model-value="(p) => setNextStep(p ? 'interested' : null)"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
+              >
+                <ThumbsUp :size="14" class="shrink-0 text-muted-foreground" />
+                <span>Interested</span>
+              </Toggle>
+              <Toggle
+                variant="outline"
+                :model-value="selectedNextStep === 'not-interested'"
+                @update:model-value="(p) => setNextStep(p ? 'not-interested' : null)"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
+              >
+                <ThumbsDown :size="14" class="shrink-0 text-muted-foreground" />
+                <span>Not interested</span>
+              </Toggle>
+              <Toggle
+                variant="outline"
+                :model-value="selectedNextStep === 'postpone'"
+                @update:model-value="(p) => setNextStep(p ? 'postpone' : null)"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
+              >
+                <Clock :size="14" class="shrink-0 text-muted-foreground" />
+                <span>Postpone</span>
+              </Toggle>
+            </div>
+          </div>
+
+          <!-- No Answer + Postpone: follow-up and next call attempt -->
+          <div v-if="selectedOutcome === 'no-answer' && selectedNextStep === 'postpone'" ref="expandedOutcomeRef" class="space-y-4">
             <!-- When did you call field -->
             <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
               <Label class="form-label">When did you call?</Label>
@@ -331,8 +386,27 @@
             </div>
           </div>
 
-          <!-- Not Valid (Inline) -->
-          <div v-if="selectedOutcome === 'not-valid'" ref="expandedOutcomeRef" class="space-y-4">
+          <!-- No Answer + Close lead: reuse close reason card -->
+          <div v-if="selectedOutcome === 'no-answer' && selectedNextStep === 'close-lead'" ref="expandedOutcomeRef" class="space-y-4">
+            <div class="bg-white rounded-lg p-4 shadow-nsc-card">
+              <Label class="form-label">When did you call?</Label>
+              <Input
+                type="datetime-local"
+                v-model="callLogDateTime"
+                class="w-full"
+              />
+            </div>
+            <CloseAsLostForm
+              :preselected-reason="disqualifyReason"
+              close-button-label="Close"
+              @close="handleCloseFromFormNoAnswer"
+              @cancel="cancelOutcome"
+              @update:reason="setDisqualifyReason"
+            />
+          </div>
+
+          <!-- Not Valid (or Answer + Not interested): close as lost -->
+          <div v-if="(selectedOutcome === 'not-valid') || (selectedOutcome === 'answer' && selectedNextStep === 'not-interested')" ref="expandedOutcomeRef" class="space-y-4">
             <!-- When did you call field -->
             <div class="bg-white rounded-lg p-4 shadow-nsc-card">
               <Label class="form-label">When did you call?</Label>
@@ -344,15 +418,15 @@
             </div>
             <CloseAsLostForm
               :preselected-reason="disqualifyReason"
-              close-button-label="Close as not valid"
+              close-button-label="Close"
               @close="handleCloseFromForm"
               @cancel="cancelOutcome"
               @update:reason="setDisqualifyReason"
             />
           </div>
 
-      <!-- Interested (Inline) -->
-          <div v-if="selectedOutcome === 'interested'" ref="expandedOutcomeRef" class="space-y-4">
+      <!-- Answer + Interested (Inline) -->
+          <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'interested'" ref="expandedOutcomeRef" class="space-y-4">
             <!-- Info note -->
             <div class="text-xs text-muted-foreground px-2">
               <span class="text-red-600">*</span> Required fields
@@ -534,7 +608,7 @@
                   "
                 >
                   <input v-model="qualificationMethod" type="radio" value="assign-only" class="shrink-0" />
-                  <span class="text-sm text-foreground">Assign only</span>
+                  <span class="text-sm text-foreground">Qualify without appointment</span>
                 </label>
                 <label
                   class="flex items-center gap-3 border rounded-lg px-3 py-2 cursor-pointer transition-colors"
@@ -785,20 +859,13 @@
           </div>
         </div>
         
-        <!-- Unified Action Buttons at Bottom Right of Gray Wrapper -->
-        <div v-if="selectedOutcome && !successState" class="flex justify-end gap-2 px-4 pb-4 pt-3 flex-wrap">
+        <!-- Unified Action Buttons at Bottom Right of Gray Wrapper (hidden for Answer + Postpone; buttons appear below postpone card) -->
+        <div v-if="hasActiveOutcomeSelection && !successState && !(selectedOutcome === 'answer' && selectedNextStep === 'postpone')" class="flex justify-end gap-2 px-4 pb-4 pt-3 flex-wrap">
           <Button
             variant="secondary"
             @click="cancelOutcome"
           >
             Cancel
-          </Button>
-          <Button
-            v-if="selectedOutcome === 'interested'"
-            variant="outline"
-            @click="onPostponeClick"
-          >
-            Postpone
           </Button>
           <Button
             variant="primary"
@@ -810,9 +877,9 @@
           </Button>
         </div>
 
-        <!-- Next call attempt (below buttons, shown when Postpone is clicked) -->
-        <div v-if="selectedOutcome === 'interested' && showPostponeRescheduleBlock" ref="postponeBlockRef" class="px-4 pb-4">
-          <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+        <!-- Next call attempt: when Answer + Postpone -->
+        <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'postpone'" ref="postponeBlockRef" class="pb-4">
+          <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6 w-full">
             <h5 class="font-semibold text-foreground text-sm mb-4">Next call attempt</h5>
             <div class="reschedule-toggle-group flex flex-wrap gap-2">
               <Toggle
@@ -895,17 +962,22 @@
                 </template>
               </SelectMenu>
             </div>
-            <div class="flex justify-end mt-4">
-              <Button
-                variant="primary"
-                size="small"
-                :disabled="!canPostponeFromInterested"
-                @click="onConfirmPostpone"
-              >
-                Confirm postpone
-              </Button>
-            </div>
           </div>
+        </div>
+
+        <!-- Cancel + Confirm postpone below the card (Answer + Postpone only) -->
+        <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'postpone' && !successState" class="flex justify-end gap-2 px-4 pb-4 pt-3 flex-wrap">
+          <Button variant="secondary" @click="cancelOutcome">
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            :disabled="!canPostponeFromInterested"
+            @click="onConfirmPostpone"
+            class="bg-primary text-white"
+          >
+            Postpone
+          </Button>
         </div>
       </div>
     </template>
@@ -992,7 +1064,7 @@ import {
   DialogPortal,
   DialogTitle
 } from '@motork/component-library/future/primitives'
-import { Check, PhoneOff, ThumbsDown, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, ChevronLeft, ChevronRight, Plus, Users } from 'lucide-vue-next'
+import { Check, PhoneOff, ThumbsUp, ThumbsDown, Clock, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, ChevronLeft, ChevronRight, Plus, Users } from 'lucide-vue-next'
 import NoteWidget from '@/components/customer/activities/NoteWidget.vue'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
@@ -1038,7 +1110,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['postponed', 'validated', 'qualified', 'disqualified', 'call-attempt-logged', 'note-saved', 'open-purchase-method', 'appointment-scheduled', 'survey-completed', 'survey-refused', 'not-responding', 'update:outcomeSaving'])
+const emit = defineEmits(['postponed', 'validated', 'qualified', 'disqualified', 'call-attempt-logged', 'note-saved', 'open-purchase-method', 'appointment-scheduled', 'survey-completed', 'survey-refused', 'not-responding', 'update:outcomeSaving', 'postpone-expected-close', 'reassigned'])
 
 const usersStore = useUsersStore()
 const userStore = useUserStore()
@@ -1283,7 +1355,9 @@ function handleExtractInformation() {
   }
   if (result.tradeIn) preferences.value.tradeIn = true
   if (result.financing) preferences.value.financing = true
-  selectOutcome('interested')
+  selectOutcome('answer')
+  setNextStep('interested')
+  enrichLeadExpanded.value = true
 }
 
 async function addCallActivity() {
@@ -1359,6 +1433,8 @@ const outcomeState = useLQWidgetOutcomes(
 const {
   showOutcomeSelection,
   selectedOutcome,
+  selectedNextStep,
+  setNextStep,
   showNoteModal,
   followupChannels,
   followupChannel,
@@ -1370,11 +1446,11 @@ const {
   disqualifyReason,
   assignment,
   preferences,
-    messageTemplates,
-    messagePreview,
-    followupMessageBody,
-    resolveFollowupMessage,
-    selectOutcome,
+  messageTemplates,
+  messagePreview,
+  followupMessageBody,
+  resolveFollowupMessage,
+  selectOutcome,
   cancelOutcome,
   calculateNextCallDate,
   surveyCompleted,
@@ -1668,9 +1744,9 @@ watch(qualificationEventType, (eventType) => {
   }
 }, { immediate: true })
 
-// Use lead.assignee (set by TaskAssignee component) when entering "interested" flow (for assign-only)
-watch(selectedOutcome, (outcome) => {
-  if (outcome === 'interested' && qualificationMethod.value === 'assign-only' && !assignment.value?.assignee) {
+// Use lead.assignee (set by TaskAssignee component) when entering answer + interested flow (for assign-only)
+watch([selectedOutcome, selectedNextStep], ([outcome, next]) => {
+  if (outcome === 'answer' && next === 'interested' && qualificationMethod.value === 'assign-only' && !assignment.value?.assignee) {
     // Try to use the assignee from the lead object (set by TaskAssignee component)
     if (props.lead.assignee) {
       const assigneeUser = assignableUsers.value?.find(u => u.name === props.lead.assignee)
@@ -1762,9 +1838,16 @@ const selectSoonestAvailability = (assigneeId) => {
 }
 
 
-// Check if everything is selected for "Send and postpone" button
+// Show action buttons when outcome is set and (for answer/no-answer) next step is set
+const hasActiveOutcomeSelection = computed(() => {
+  if (!selectedOutcome.value) return false
+  if (selectedOutcome.value === 'not-valid') return true
+  return selectedNextStep.value != null
+})
+
+// Check if everything is selected for "Send and postpone" button (no-answer + postpone)
 const canSendAndPostpone = computed(() => {
-  if (selectedOutcome.value !== 'no-answer') return false
+  if (selectedOutcome.value !== 'no-answer' || selectedNextStep.value !== 'postpone') return false
   if (!followupChannel.value) return false
   if (followupChannel.value !== 'dont-send' && !selectedTemplate.value) return false
   if (!rescheduleTime.value) return false
@@ -1773,15 +1856,11 @@ const canSendAndPostpone = computed(() => {
 })
 
 const canPostponeFromInterested = computed(() => {
-  if (selectedOutcome.value !== 'interested') return false
+  if (selectedOutcome.value !== 'answer' || (selectedNextStep.value !== 'interested' && selectedNextStep.value !== 'postpone')) return false
   if (!rescheduleTime.value) return false
   if (rescheduleTime.value === 'custom' && (!customDate.value || !customTime.value)) return false
   return true
 })
-
-function onPostponeClick() {
-  showPostponeRescheduleBlock.value = !showPostponeRescheduleBlock.value
-}
 
 async function onConfirmPostpone() {
   if (!canPostponeFromInterested.value) return
@@ -1802,24 +1881,15 @@ watch(selectedOutcome, (newOutcome) => {
   }
 })
 
-watch(showPostponeRescheduleBlock, (show) => {
-  if (show) {
-    scrollToExpandedContent(() => postponeBlockRef.value)
-    // Autofill reassign with current assignee when opening postpone "Next call attempt" card
-    if (!nextAttemptAssignee.value && currentUser?.value) {
-      nextAttemptAssignee.value = { ...currentUser.value, type: 'user' }
-    }
-  }
-})
-
 watch(qualificationEventType, (eventType) => {
   if (eventType) {
     scrollToExpandedContent(() => eventTypeExpandedRef.value)
   }
 })
 
-watch(selectedOutcome, (newOutcome) => {
-  if (newOutcome !== 'interested') {
+watch([selectedOutcome, selectedNextStep], ([outcome, next]) => {
+  const isAnswerInterested = outcome === 'answer' && next === 'interested'
+  if (!isAnswerInterested) {
     showPostponeRescheduleBlock.value = false
     enrichLeadData.value = {
       interestLevel: '',
@@ -2040,53 +2110,70 @@ const canCloseAsNotValid = computed(() => {
   return !!disqualifyReason.value
 })
 
-// Handle close from CloseAsLostForm
+// Handle close from CloseAsLostForm (Not valid / Answer + Not interested)
 function handleCloseFromForm(reason) {
   disqualifyReason.value = reason
-  // Set a default category based on the reason if needed
   if (!disqualifyCategory.value) {
-    // Default to "Not Valid" for lead disqualification
     disqualifyCategory.value = 'Not Valid'
   }
   handleNotValidConfirm()
 }
 
+// Handle close from CloseAsLostForm when No Answer + Close lead
+function handleCloseFromFormNoAnswer() {
+  handleNoAnswerCloseLead()
+}
+
 const actionButtonLabel = computed(() => {
   if (selectedOutcome.value === 'no-answer') {
+    if (selectedNextStep.value === 'close-lead') return 'Close'
     return followupChannel.value === 'dont-send' ? 'Postpone' : 'Send and postpone'
   }
-  if (selectedOutcome.value === 'not-valid') {
-    return disqualifyCategory.value ? `Close as ${disqualifyCategory.value}` : 'Close'
+  if (selectedOutcome.value === 'not-valid' || (selectedOutcome.value === 'answer' && selectedNextStep.value === 'not-interested')) {
+    return 'Close'
   }
-  if (selectedOutcome.value === 'interested') {
+  if (selectedOutcome.value === 'answer' && selectedNextStep.value === 'interested') {
     return qualificationMethod.value === 'assign-only' ? 'Qualify' : 'Schedule and qualify'
+  }
+  if (selectedOutcome.value === 'answer' && selectedNextStep.value === 'postpone') {
+    return 'Postpone'
   }
   return ''
 })
 
 const canConfirmAction = computed(() => {
   if (selectedOutcome.value === 'no-answer') {
+    if (selectedNextStep.value === 'close-lead') return canCloseAsNotValid.value
     return canSendAndPostpone.value
   }
-  if (selectedOutcome.value === 'not-valid') {
+  if (selectedOutcome.value === 'not-valid' || (selectedOutcome.value === 'answer' && selectedNextStep.value === 'not-interested')) {
     return canCloseAsNotValid.value
   }
-  if (selectedOutcome.value === 'interested') {
+  if (selectedOutcome.value === 'answer' && selectedNextStep.value === 'interested') {
     return canQualify.value
+  }
+  if (selectedOutcome.value === 'answer' && selectedNextStep.value === 'postpone') {
+    return canPostponeFromInterested.value
   }
   return false
 })
 
 const handleConfirmAction = async () => {
   if (selectedOutcome.value === 'no-answer') {
-    emit('update:outcomeSaving', true)
-    await handleNoAnswerConfirm()
-    // Parent clears loading when it finishes handling @postponed / @disqualified
-  } else if (selectedOutcome.value === 'not-valid') {
+    if (selectedNextStep.value === 'close-lead') {
+      emit('update:outcomeSaving', true)
+      await handleNoAnswerCloseLead()
+    } else {
+      emit('update:outcomeSaving', true)
+      await handleNoAnswerConfirm()
+    }
+  } else if (selectedOutcome.value === 'not-valid' || (selectedOutcome.value === 'answer' && selectedNextStep.value === 'not-interested')) {
     emit('update:outcomeSaving', true)
     handleNotValidConfirm()
-  } else if (selectedOutcome.value === 'interested') {
+  } else if (selectedOutcome.value === 'answer' && selectedNextStep.value === 'interested') {
     handleQualify()
+  } else if (selectedOutcome.value === 'answer' && selectedNextStep.value === 'postpone') {
+    await onConfirmPostpone()
   }
 }
 
@@ -2107,6 +2194,7 @@ const {
   handleQualify,
   handleDisqualifyFromInterested,
   handleNoAnswerConfirm,
+  handleNoAnswerCloseLead,
   handlePostponeFromInterested,
   handleNotValidConfirm,
   handleNoteSave,

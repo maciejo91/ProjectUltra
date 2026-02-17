@@ -4,6 +4,7 @@
       <div class="mb-1">
       <UnifiedSearchBar
         active-tab="customers"
+        full-width
         placeholder="Search customers..."
         :pagination="pagination"
         :source-options="customersSourceOptions"
@@ -192,6 +193,8 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
 })
 
 const { onTableContainerClick } = useTableRowClick(paginatedData, handleRowClick)
+
+defineExpose({ paginatedData })
 
 const customersSourceOptions = computed(() => {
   const def = filterDefinitions.value?.find(d => d.key === 'source')

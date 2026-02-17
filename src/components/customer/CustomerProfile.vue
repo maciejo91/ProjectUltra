@@ -1,173 +1,91 @@
 <template>
   <div class="h-full flex flex-col overflow-hidden bg-surface">
-    <!-- Customer Detail Content -->
-    <EntityDetailLayout
-      :task="task"
-      :type="taskType"
-      :management-widget="managementWidget"
-      :store-adapter="storeAdapter"
-      :add-new-config="addNewConfig"
-      :show-close-button="showCloseButton"
-      @close="$emit('close')"
-      @car-added="handleContactCarAdded"
-      @convert-to-lead="handleConvertToLead"
-      @convert-to-opportunity="handleConvertToOpportunity"
-      @tag-updated="handleTagUpdated"
-      @appointment-created="handleAppointmentCreated"
+    <!-- Drawer header (matches TaskDetailHeader when in drawer) -->
+    <header
+      v-if="showCloseButton"
+      class="customer-profile-drawer-header shrink-0 px-4 sm:px-6"
     >
-      <template #pinned-extra="{ task }">
-        <!-- Responsive Grid Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 auto-rows-min">
-          <!-- Contact Details Card - Row 1, Col 1 (Desktop) -->
-          <div class="h-auto">
-            <CustomerContactDetailsCard
-              :name="customerData?.name || task?.customer?.name || ''"
-              :first-name="customerData?.firstName || ''"
-              :last-name="customerData?.lastName || ''"
-              :initials="customerData?.initials || task?.customer?.initials || ''"
-              :title="customerData?.title || customerData?.salutation || ''"
-              :salutation="customerData?.salutation || customerData?.title || ''"
-              :job-title="customerData?.jobTitle || ''"
-              :birth-date="customerData?.birthDate || ''"
-              :gender="customerData?.gender || ''"
-              :place-of-birth="customerData?.placeOfBirth || ''"
-              :email="customerData?.email || task?.customer?.email || ''"
-              :secondary-email="customerData?.secondaryEmail || ''"
-              :phone="customerData?.phone || task?.customer?.phone || ''"
-              :secondary-phone="customerData?.secondaryPhone || ''"
-              :mobile-phone="customerData?.mobilePhone || ''"
-              :preferred-contact-method="customerData?.preferredContactMethod || customerData?.preferredChannel || ''"
-              :preferred-channel="customerData?.preferredChannel || ''"
-              :address="customerData?.address || task?.customer?.address || ''"
-              :street-address1="customerData?.streetAddress1 || customerData?.streetAddress || customerData?.address?.streetLine1 || ''"
-              :street-address2="customerData?.streetAddress2 || customerData?.address?.streetLine2 || ''"
-              :city="customerData?.city || customerData?.address?.city || ''"
-              :postal-code="customerData?.postalCode || customerData?.zipCode || customerData?.address?.postalCode || ''"
-              :region="customerData?.region || customerData?.state || customerData?.county || customerData?.address?.region || ''"
-              :country="customerData?.country || customerData?.address?.country || ''"
-              :contact-custom-fields="customerData?.customFields || customerData?.contactCustomFields || {}"
-              :external-id="customerData?.externalId || customerData?.contactExternalId || ''"
-              :created-at="customerData?.createdAt || customerData?.createdDate || ''"
-              :created-date="customerData?.createdDate || customerData?.createdAt || ''"
-              :updated-at="customerData?.updatedAt || customerData?.lastUpdatedDate || customerData?.lastContact || ''"
-              :last-updated-date="customerData?.lastUpdatedDate || customerData?.updatedAt || ''"
-              :last-activity-date="customerData?.lastActivityDate || ''"
-              :is-master-contact="isMasterContact"
-              :account-name="accountData?.name || accountData?.companyName || ''"
-              :loading="loadingCustomer"
-            />
-          </div>
-          
-          <!-- Customer Insights Card - Row 1, Col 2 (Desktop) -->
-          <div class="h-auto">
-            <CustomerSummaryWidget 
-              :summary="task?.summary || customerData?.summary"
-              :preferences="task?.preferences || customerData?.preferences"
-              :customer-data="customerData"
-              :loading="loadingCustomer"
-            />
-          </div>
-          
-          <!-- Account Details Card - Row 2, Col 1 (Desktop, only for company accounts) -->
-          <div v-if="accountData && accountData.type === 'Company'" class="h-auto">
-            <AccountDetailsCard
-              :account-data="accountData"
-              :current-contact-id="customerId"
-              :account-status="accountData?.status || accountData?.accountStatus || 'Active'"
-              :company-website="accountData?.website || accountData?.companyWebsite || ''"
-              :company-phone="accountData?.companyPhone || accountData?.phone || ''"
-              :company-email="accountData?.companyEmail || accountData?.email || ''"
-              :company-address="accountData?.companyAddress || accountData?.address || ''"
-              :company-street-address1="accountData?.companyAddress?.streetLine1 || accountData?.streetAddress1 || accountData?.companyStreetAddress || accountData?.address?.streetLine1 || (typeof accountData?.address === 'string' ? accountData?.address?.split(',')[0] : '') || ''"
-              :company-street-address2="accountData?.companyAddress?.streetLine2 || accountData?.streetAddress2 || accountData?.address?.streetLine2 || ''"
-              :company-city="accountData?.companyAddress?.city || accountData?.city || accountData?.companyCity || accountData?.address?.city || ''"
-              :company-postal-code="accountData?.companyAddress?.postalCode || accountData?.postalCode || accountData?.zipCode || accountData?.companyPostalCode || accountData?.address?.postalCode || ''"
-              :company-region="accountData?.companyAddress?.region || accountData?.region || accountData?.state || accountData?.county || accountData?.companyRegion || accountData?.address?.region || ''"
-              :company-country="accountData?.companyAddress?.country || accountData?.country || accountData?.companyCountry || accountData?.address?.country || ''"
-              :fiscal-entity="accountData?.fiscalEntity || accountData?.fiscalEntityName || ''"
-              :account-external-id="accountData?.externalId || accountData?.accountExternalId || ''"
-              :account-custom-fields="accountData?.customFields || accountData?.accountCustomFields || {}"
-              :account-created-at="accountData?.createdAt || accountData?.createdDate || ''"
-              :created-date="accountData?.createdDate || accountData?.createdAt || ''"
-              :account-updated-at="accountData?.updatedAt || accountData?.lastUpdatedDate || accountData?.lastContact || ''"
-              :last-updated-date="accountData?.lastUpdatedDate || accountData?.updatedAt || ''"
-              :last-activity="accountData?.lastActivity || accountData?.lastActivityDate || accountData?.lastContact || ''"
-              :last-activity-date="accountData?.lastActivityDate || accountData?.lastActivity || ''"
-              :related-contacts-count="relatedContacts.length"
-              :related-leads-count="customerLeads.length"
-              :related-opportunities-count="customerOpportunities.length"
-              :related-vehicles-count="customerCars.length"
-              :account-tags="accountData?.tags || []"
-              :payment-terms="accountData?.paymentTerms || ''"
-              :credit-limit="accountData?.creditLimit || ''"
-              :loading="loadingAccount"
-            />
-          </div>
-          
-          <!-- Related Contacts Widget - Row 2, Col 2 (Desktop, only for company accounts) -->
-          <div v-if="accountData && accountData.type === 'Company'" class="h-auto">
-            <RelatedContactsWidget
-              :related-contacts="relatedContacts"
-              :master-contact-id="accountData?.masterContactId || accountData?.masterContact?.id"
-              :current-contact-id="customerId"
-              :account-data="accountData"
-              :loading="loadingRelatedContacts"
-            />
-          </div>
-          
-          <!-- Suggested Next Action - Row 3, Full Width -->
-          <div class="lg:col-span-2 h-auto">
-            <SuggestedNextAction 
-              :leads="customerLeads"
-              :opportunities="customerOpportunities"
-              :activities="customerActivities"
-              :loading="loadingLeads || loadingOpportunities || loadingActivities"
-            />
-          </div>
-          
-          <!-- Recent Activities - Row 4, Full Width -->
-          <div class="lg:col-span-2 h-auto">
-            <RecentActivitiesWidget
-              :next-appointment="nextAppointment"
-              :activities="customerActivities"
-              :leads="customerLeads"
-              :opportunities="customerOpportunities"
-              :customer-id="customerId"
-              :loading="loadingActivities || loadingAppointments || loadingLeads || loadingOpportunities"
-            />
-          </div>
-          
-          <!-- Customer Cars Carousel - Row 5, Full Width -->
-          <div v-if="customerCars.length > 0 || loadingCars" class="lg:col-span-2 h-auto">
-            <VehiclesCarousel :cars="customerCars" />
-          </div>
+      <div class="customer-profile-drawer-header-content">
+        <div class="min-w-0 flex-1 flex items-center min-h-0">
+          <h3 class="text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
+            {{ customerDisplayName || 'Customer' }}
+          </h3>
         </div>
-      </template>
-
-      <template #tab-negotiations>
-        <div class="flex flex-col gap-6 mb-6">
-          <CustomerLeadsWidget 
-            :leads="customerLeads" 
-            :all-tasks="customerTasks"
-            :loading="loadingLeads"
-            @add-lead="openAddModal('lead')"
-          />
-          <CustomerOpportunitiesWidget 
-            :opportunities="customerOpportunities" 
-            :all-tasks="customerTasks"
-            :activities="customerActivities"
-            :loading="loadingOpportunities"
-            @add-opportunity="openAddModal('opportunity')"
-          />
+        <div class="customer-profile-drawer-header-actions shrink-0">
+          <Button
+            variant="secondary"
+            size="icon"
+            class="rounded-sm"
+            aria-label="Previous"
+            :disabled="!hasPrevious"
+            @click="emit('customer-navigate', 'previous')"
+          >
+            <ChevronLeft :size="16" class="text-muted-foreground" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            class="rounded-sm"
+            aria-label="Next"
+            :disabled="!hasNext"
+            @click="emit('customer-navigate', 'next')"
+          >
+            <ChevronRight :size="16" class="text-muted-foreground" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            class="rounded-sm ml-0.5 sm:ml-1"
+            aria-label="Close"
+            @click="emit('close')"
+          >
+            <X :size="16" class="text-muted-foreground" />
+          </Button>
         </div>
-      </template>
+      </div>
+    </header>
+    <div class="flex-1 flex min-h-0 overflow-hidden">
+    <!-- Left Sidebar: Customer Profile Card -->
+    <div class="w-[350px] shrink-0 border-r border-border h-full overflow-y-auto bg-white">
+      <CustomerProfileSidebar
+        :customer="customerData"
+        :account="accountData"
+        :cars="customerCars"
+        :loading="loadingCustomer"
+        :show-open-in-new-tab="showCloseButton"
+        :customer-id="customerId"
+        :customer-type="customerType"
+        @add-tag="showAddTagModal = true"
+        @action="handleSidebarAction"
+      />
+    </div>
 
-      <template #tab-appointments>
-        <CustomerAppointmentsWidget :appointments="customerAppointments" :loading="loadingAppointments" />
-      </template>
-    </EntityDetailLayout>
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-muted/30">
+      <CustomerProfileContent
+        v-model:active-tab="activeTab"
+        :summary="customerSummary"
+        :activities="customerActivities"
+        :appointments="customerAppointments"
+        :leads="customerLeads"
+        :opportunities="customerOpportunities"
+        :loading="loadingActivities"
+        :phone-number="customer?.phone || ''"
+        :customer-id="customerId"
+        :customer-initials="customer?.initials || '?'"
+        :hide-tab-counts="showCloseButton"
+        @add-activity="handleAddActivity"
+        @add-appointment="showCreateAppointmentModal = true"
+        @communication-save="handleCommunicationSave"
+        @note-save="handleNoteSave"
+        @note-delete="handleNoteDelete"
+        @attachment-save="handleAttachmentSave"
+        @attachment-delete="handleAttachmentDelete"
+      />
+    </div>
+    </div>
 
-    <!-- Add Lead/Opportunity Modal -->
+    <!-- Modals -->
     <AddLeadOpportunityModal
       v-if="customer"
       :show="showAddModal"
@@ -176,32 +94,53 @@
       @close="showAddModal = false"
       @save="handleAddModalSave"
     />
+    
+    <CreateEventModal
+      v-if="showCreateAppointmentModal"
+      :show="showCreateAppointmentModal"
+      :customer="customer"
+      :assignee="currentUser"
+      :disabled-fields="['customer']"
+      @create="handleAppointmentCreated"
+      @cancel="showCreateAppointmentModal = false"
+    />
+    
+    <AddTagModal
+      :show="showAddTagModal"
+      :existing-tags="customerData?.tags || []"
+      @close="showAddTagModal = false"
+      @add="handleAddTag"
+    />
+    
+    <!-- Placeholder modals for actions -->
+    <ComingSoonModal
+      :show="showComingSoonModal"
+      :title="comingSoonTitle"
+      @close="showComingSoonModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { Button } from '@motork/component-library/future/primitives'
+import { X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useCustomersStore } from '@/stores/customers'
-import EntityDetailLayout from '@/components/shared/layout/EntityDetailLayout.vue'
-import CustomerLeadsWidget from '@/components/customer/CustomerLeadsWidget.vue'
-import CustomerOpportunitiesWidget from '@/components/customer/CustomerOpportunitiesWidget.vue'
-import CustomerAppointmentsWidget from '@/components/customer/CustomerAppointmentsWidget.vue'
-import VehiclesCarousel from '@/components/shared/vehicles/VehiclesCarousel.vue'
+import { useUserStore } from '@/stores/user'
+import CustomerProfileSidebar from '@/components/customer/profile/CustomerProfileSidebar.vue'
+import CustomerProfileContent from '@/components/customer/profile/CustomerProfileContent.vue'
 import AddLeadOpportunityModal from '@/components/modals/AddLeadOpportunityModal.vue'
-import CustomerSummaryWidget from '@/components/customer/CustomerSummaryWidget.vue'
-import SuggestedNextAction from '@/components/customer/SuggestedNextAction.vue'
-import RecentActivitiesWidget from '@/components/customer/RecentActivitiesWidget.vue'
-import CustomerContactDetailsCard from '@/components/customer/CustomerContactDetailsCard.vue'
-import AccountDetailsCard from '@/components/customer/AccountDetailsCard.vue'
-import RelatedContactsWidget from '@/components/customer/RelatedContactsWidget.vue'
+import CreateEventModal from '@/components/modals/CreateEventModal.vue'
+import AddTagModal from '@/components/modals/AddTagModal.vue'
+import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
 import { fetchLeadsByCustomerId, fetchOpportunitiesByCustomerId, fetchCustomerCars, fetchTasksByCustomerId, fetchContactsByAccountId } from '@/api/contacts'
 import { fetchAccountById } from '@/api/accounts'
 import { fetchLeadActivities } from '@/api/leads'
 import { fetchOpportunityActivities } from '@/api/opportunities'
-import { fetchAppointmentsByCustomerId } from '@/api/calendar'
+import { fetchAppointmentsByCustomerId, createCalendarEvent } from '@/api/calendar'
 
 const props = defineProps({
   customerId: {
@@ -210,7 +149,7 @@ const props = defineProps({
   },
   customerType: {
     type: String,
-    default: 'contact', // 'contact' or 'account'
+    default: 'contact',
     validator: (value) => ['contact', 'account'].includes(value)
   },
   showCloseButton: {
@@ -220,308 +159,79 @@ const props = defineProps({
   closeOnConvert: {
     type: Boolean,
     default: false
+  },
+  filteredCustomerRows: {
+    type: Array,
+    default: () => []
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'customer-navigate'])
 
 const router = useRouter()
-const leadsStore = useLeadsStore()
-const opportunitiesStore = useOpportunitiesStore()
 const customersStore = useCustomersStore()
+const userStore = useUserStore()
 
-// Individual loading states for each data type
+// Loading states
 const loadingCustomer = ref(false)
 const loadingAccount = ref(false)
-const loadingRelatedContacts = ref(false)
 const loadingLeads = ref(false)
 const loadingOpportunities = ref(false)
-const loadingCars = ref(false)
 const loadingActivities = ref(false)
 const loadingAppointments = ref(false)
 const error = ref(null)
 
-// Customer-related data
+// Data
 const customerData = ref(null)
 const accountData = ref(null)
-const relatedContacts = ref([])
 const customerLeads = ref([])
 const customerOpportunities = ref([])
-const customerTasks = ref([])
-const customerCars = ref([])
 const customerActivities = ref([])
 const customerAppointments = ref([])
+const customerTasks = ref([])
+const customerCars = ref([])
 
-const taskType = computed(() => 'contact')
-
-// Get customer from store
-const customer = computed(() => {
-  return customerData.value || customersStore.currentCustomer
-})
-
-// Check if current contact is master contact
-const isMasterContact = computed(() => {
-  if (!accountData.value || !customerData.value) {
-    // Also check if contact has isMasterContact flag directly
-    return customerData.value?.isMasterContact === true
-  }
-  const masterId = accountData.value.masterContactId || accountData.value.masterContact?.id
-  const contactId = customerData.value.id || customerData.value.contactId
-  return (masterId && String(masterId) === String(contactId)) || customerData.value?.isMasterContact === true
-})
-
-// Get task from customer data
-const task = computed(() => {
-  const cust = customer.value
-  if (!cust) {
-    // Return a minimal task structure when customer is loading
-    return {
-      id: null,
-      type: 'contact',
-      summary: null,
-      preferences: [],
-      customer: {
-        id: null,
-        name: '',
-        email: '',
-        phone: '',
-        address: '',
-        initials: '?'
-      },
-      source: 'Direct',
-      tags: [],
-      stage: 'Contact',
-      assignee: null,
-      assigneeId: null
-    }
-  }
-  // Map customer/contact to task-like structure
-  return {
-    ...cust,
-    id: cust.id,
-    type: 'contact',
-    customer: {
-      id: cust.id,
-      name: cust.name,
-      email: cust.email,
-      phone: cust.phone,
-      address: cust.address || '',
-      initials: cust.initials
-    },
-    source: cust.source || 'Direct',
-    tags: cust.tags || [],
-    stage: 'Contact',
-    assignee: null,
-    assigneeId: null
-  }
-})
-
-// Next upcoming appointment (first future one by start time)
-const nextAppointment = computed(() => {
-  const now = new Date()
-  const future = (customerAppointments.value || []).filter(
-    (apt) => apt?.start && new Date(apt.start) >= now
-  )
-  future.sort((a, b) => new Date(a.start) - new Date(b.start))
-  return future.length > 0 ? future[0] : null
-})
-
-// Management widget should NEVER appear on customer profile
-const managementWidget = computed(() => null)
-
-// Store adapter for contacts only
-const storeAdapter = computed(() => ({
-  currentActivities: computed(() => customerActivities.value),
-  addActivity: async () => {},
-  updateActivity: async () => {},
-  deleteActivity: async () => {}
-}))
-
-// Add new config for contacts only
-const addNewConfig = computed(() => ({
-  overviewActions: [],
-  tabActions: ['note', 'email', 'sms', 'whatsapp', 'attachment']
-}))
-
-// Load customer-related data
-const loadCustomerData = async () => {
-  if (!props.customerId) return
-  
-  try {
-    // Set all loading states to true initially
-    loadingCustomer.value = true
-    loadingLeads.value = true
-    loadingOpportunities.value = true
-    loadingCars.value = true
-    loadingActivities.value = true
-    loadingAppointments.value = true
-    
-    // Fetch customer data and tasks first
-    const [customer, tasksResult] = await Promise.all([
-      customersStore.fetchCustomerById(props.customerId, props.customerType).finally(() => {
-        loadingCustomer.value = false
-      }),
-      fetchTasksByCustomerId(props.customerId)
-    ])
-    
-    customerData.value = customer || customersStore.currentCustomer
-    customerTasks.value = tasksResult.data || []
-    
-    // Fetch account data if contact has accountId (support both account_id and accountId)
-    const accountId = customerData.value?.accountId || customerData.value?.account_id
-    if (accountId) {
-      try {
-        loadingAccount.value = true
-        accountData.value = await fetchAccountById(accountId)
-        
-        // If account type is Company, fetch related contacts (support both type and accountType)
-        if (accountData.value?.type === 'Company' || accountData.value?.accountType === 'Company') {
-          try {
-            loadingRelatedContacts.value = true
-            const relatedContactsResult = await fetchContactsByAccountId(accountId)
-            // Filter out current contact from related contacts
-            relatedContacts.value = (relatedContactsResult.data || []).filter(
-              contact => contact.id !== props.customerId
-            )
-          } catch (err) {
-            console.error('Failed to load related contacts:', err)
-            relatedContacts.value = []
-          } finally {
-            loadingRelatedContacts.value = false
-          }
-        } else {
-          relatedContacts.value = []
-        }
-      } catch (err) {
-        console.error('Failed to load account data:', err)
-        accountData.value = null
-        relatedContacts.value = []
-      } finally {
-        loadingAccount.value = false
-      }
-    } else {
-      accountData.value = null
-      relatedContacts.value = []
-    }
-    
-    // Fetch leads and opportunities by account_id if available, otherwise by customerId
-    const [leadsResult, oppsResult, carsResult] = await Promise.all([
-      fetchLeadsByCustomerId(props.customerId, accountId || null).finally(() => {
-        loadingLeads.value = false
-      }),
-      fetchOpportunitiesByCustomerId(props.customerId, accountId || null).finally(() => {
-        loadingOpportunities.value = false
-      }),
-      // Fetch vehicles by account_id (vehicles are owned by accounts), fallback to customerId
-      fetchCustomerCars(accountId || props.customerId).finally(() => {
-        loadingCars.value = false
-      })
-    ])
-    
-    customerLeads.value = leadsResult.data || []
-    customerOpportunities.value = oppsResult.data || []
-    customerCars.value = carsResult.data || []
-    
-    // Fetch activities using API wrappers
-    const allActivities = []
-    for (const lead of customerLeads.value) {
-      try {
-        const leadActivities = await fetchLeadActivities(lead.id)
-        allActivities.push(...leadActivities)
-      } catch (err) {
-        console.error(`Failed to load activities for lead ${lead.id}:`, err)
-      }
-    }
-    for (const opp of customerOpportunities.value) {
-      try {
-        const oppActivities = await fetchOpportunityActivities(opp.id)
-        allActivities.push(...oppActivities)
-      } catch (err) {
-        console.error(`Failed to load activities for opportunity ${opp.id}:`, err)
-      }
-    }
-    customerActivities.value = allActivities
-    loadingActivities.value = false
-    
-    // Fetch all appointments
-    try {
-      customerAppointments.value = await fetchAppointmentsByCustomerId(props.customerId)
-    } catch (err) {
-      console.error('Failed to load appointments:', err)
-      customerAppointments.value = []
-    } finally {
-      loadingAppointments.value = false
-    }
-  } catch (err) {
-    console.error('Error loading customer data:', err)
-    error.value = err.message || 'Failed to load customer'
-    // Reset all loading states on error
-    loadingCustomer.value = false
-    loadingAccount.value = false
-    loadingRelatedContacts.value = false
-    loadingLeads.value = false
-    loadingOpportunities.value = false
-    loadingCars.value = false
-    loadingActivities.value = false
-    loadingAppointments.value = false
-  }
-}
-
-// Handle contact car addition
-const handleContactCarAdded = async (carData) => {
-  try {
-    await customersStore.addRequestedCar(props.customerId, carData)
-    await loadCustomerData()
-  } catch (err) {
-    console.error('Error adding car to customer:', err)
-    error.value = err.message || 'Failed to add car'
-  }
-}
-
-// Handle contact to lead conversion
-const handleConvertToLead = async () => {
-  try {
-    loadingLeads.value = true
-    const newLead = await customersStore.convertToLead(props.customerId)
-    // Close drawer if needed, then navigate
-    if (props.closeOnConvert) {
-      emit('close')
-    }
-    router.push({ path: `/tasks/${newLead.id}`, query: { type: 'lead' } })
-  } catch (err) {
-    console.error('Error converting to lead:', err)
-    error.value = err.message || 'Failed to convert to lead'
-    loadingLeads.value = false
-  }
-}
-
-// Handle contact to opportunity conversion
-const handleConvertToOpportunity = async () => {
-  try {
-    loadingOpportunities.value = true
-    const newOpp = await customersStore.convertToOpportunity(props.customerId)
-    // Close drawer if needed, then navigate
-    if (props.closeOnConvert) {
-      emit('close')
-    }
-    router.push({ path: `/tasks/${newOpp.id}`, query: { type: 'opportunity' } })
-  } catch (err) {
-    console.error('Error converting to opportunity:', err)
-    error.value = err.message || 'Failed to convert to opportunity'
-    loadingOpportunities.value = false
-  }
-}
-
-// Add Lead/Opportunity Modal State
+// Modals
 const showAddModal = ref(false)
 const addModalType = ref('lead')
+const showCreateAppointmentModal = ref(false)
+const showAddTagModal = ref(false)
+const showComingSoonModal = ref(false)
+const comingSoonTitle = ref('')
 
-// Get contact data for modal
+const activeTab = ref('overview')
+
+const currentUser = computed(() => userStore.currentUser)
+
+const customer = computed(() => customerData.value || customersStore.currentCustomer)
+
+const customerSummary = computed(() => {
+   return customerData.value?.summary || ''
+})
+
+const customerDisplayName = computed(() => {
+  const c = customer.value
+  if (!c) return ''
+  return c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Customer'
+})
+
+const currentCustomerIndex = computed(() => {
+  const rows = props.filteredCustomerRows || []
+  if (!rows.length || props.customerId == null) return -1
+  const id = Number(props.customerId)
+  return rows.findIndex((r) => (r.customerId ?? parseInt(String(r.id).replace('customer-', ''), 10)) === id)
+})
+const hasPrevious = computed(() => currentCustomerIndex.value > 0)
+const hasNext = computed(() => {
+  const idx = currentCustomerIndex.value
+  const rows = props.filteredCustomerRows || []
+  return idx >= 0 && idx < rows.length - 1
+})
+
 const getContactForModal = computed(() => {
   if (!customer.value) {
     return { id: null, name: 'Unknown', email: '', phone: '', initials: '?' }
   }
-  
   const cust = customer.value
   return {
     id: cust.id,
@@ -532,63 +242,240 @@ const getContactForModal = computed(() => {
   }
 })
 
-const openAddModal = (type) => {
-  addModalType.value = type
-  showAddModal.value = true
-}
-
-const handleAddModalSave = async (data) => {
+const loadCustomerData = async () => {
+  if (!props.customerId) return
+  
   try {
-    if (addModalType.value === 'lead') {
-      loadingLeads.value = true
-    } else {
-      loadingOpportunities.value = true
-    }
-    showAddModal.value = false
+    loadingCustomer.value = true
+    loadingLeads.value = true
+    loadingOpportunities.value = true
+    loadingActivities.value = true
+    loadingAppointments.value = true
     
-    if (!props.customerId) {
-      throw new Error('Customer ID not found')
-    }
+    // Fetch customer
+    const customer = await customersStore.fetchCustomerById(props.customerId, props.customerType)
+    customerData.value = customer || customersStore.currentCustomer
+    loadingCustomer.value = false
+
+    const accountId = customerData.value?.accountId || customerData.value?.account_id
     
-    // Process the data from UnifiedAddForm
-    if (addModalType.value === 'lead') {
-      await customersStore.convertToLead(props.customerId)
-    } else {
-      await customersStore.convertToOpportunity(props.customerId)
-    }
+    // Fetch related data in parallel
+    const [leadsResult, oppsResult, tasksResult, appointmentsResult, carsResult] = await Promise.all([
+      fetchLeadsByCustomerId(props.customerId, accountId),
+      fetchOpportunitiesByCustomerId(props.customerId, accountId),
+      fetchTasksByCustomerId(props.customerId),
+      fetchAppointmentsByCustomerId(props.customerId),
+      fetchCustomerCars(accountId || props.customerId)
+    ])
     
-    // Reload data to show the new item
-    await loadCustomerData()
+    customerLeads.value = leadsResult.data || []
+    customerOpportunities.value = oppsResult.data || []
+    customerTasks.value = tasksResult.data || []
+    customerAppointments.value = appointmentsResult || []
+    customerCars.value = carsResult.data || []
+    
+    loadingLeads.value = false
+    loadingOpportunities.value = false
+    loadingAppointments.value = false
+    
+    // Fetch account if exists
+    if (customerData.value?.accountId) {
+      loadingAccount.value = true
+      try {
+        accountData.value = await fetchAccountById(customerData.value.accountId)
+      } catch (e) {
+        console.error('Failed to load account', e)
+      } finally {
+        loadingAccount.value = false
+      }
+    }
+
+    // Fetch activities (aggregate from leads/opps)
+    const allActivities = []
+    // Add logic to fetch activities... simplified for now
+    // In a real app, you'd likely have an endpoint for customer activities
+    // For now, let's mock or use what we have
+    // Reuse logic from original file:
+    for (const lead of customerLeads.value) {
+      try {
+        const acts = await fetchLeadActivities(lead.id)
+        allActivities.push(...acts)
+      } catch (e) {}
+    }
+    for (const opp of customerOpportunities.value) {
+      try {
+        const acts = await fetchOpportunityActivities(opp.id)
+        allActivities.push(...acts)
+      } catch (e) {}
+    }
+    customerActivities.value = allActivities
+    loadingActivities.value = false
+
   } catch (err) {
-    console.error(`Error adding ${addModalType.value}:`, err)
-    error.value = err.message || `Failed to add ${addModalType.value}`
-    if (addModalType.value === 'lead') {
-      loadingLeads.value = false
-    } else {
-      loadingOpportunities.value = false
-    }
+    console.error('Error loading customer data:', err)
+    error.value = err.message
+    loadingCustomer.value = false
   }
 }
 
-// Handle tag updates - reload customer data to reflect changes
-const handleTagUpdated = async () => {
+const handleSidebarAction = (action) => {
+  if (action === 'call' || action === 'email') {
+    activeTab.value = 'communicate'
+  } else if (action === 'note') {
+    activeTab.value = 'notes'
+  } else if (action === 'appointment') {
+    activeTab.value = 'appointments'
+  } else {
+    comingSoonTitle.value = 'More Actions'
+    showComingSoonModal.value = true
+  }
+}
+
+const handleAddActivity = () => {
+  comingSoonTitle.value = 'Add Activity'
+  showComingSoonModal.value = true
+}
+
+const handleCommunicationSave = (data) => {
+  const user = userStore.currentUser?.name || 'You'
+  const activityType = data.communicationType || data.type || 'communication'
+  const timestamp = data.timestamp && !Number.isNaN(Date.parse(data.timestamp))
+    ? data.timestamp
+    : new Date().toISOString()
+  customerActivities.value = [
+    {
+      id: `comm-${Date.now()}`,
+      type: activityType,
+      user,
+      action: data.action || `logged ${activityType}`,
+      content: data.content || '',
+      timestamp
+    },
+    ...customerActivities.value
+  ]
+}
+
+const handleNoteSave = (data) => {
+  const user = userStore.currentUser?.name || 'You'
+  const activity = {
+    id: data.id || `note-${Date.now()}`,
+    type: 'note',
+    user,
+    action: data.action || 'added a note',
+    content: data.content || data.message || '',
+    timestamp: data.timestamp || new Date().toISOString()
+  }
+  if (data.isEdit) {
+    customerActivities.value = customerActivities.value.map((a) =>
+      String(a.id) === String(activity.id) ? activity : a
+    )
+  } else {
+    customerActivities.value = [activity, ...customerActivities.value]
+  }
+}
+
+const handleNoteDelete = (item) => {
+  customerActivities.value = customerActivities.value.filter((a) => a.id !== item.id)
+}
+
+const handleAttachmentSave = (data) => {
+  const user = userStore.currentUser?.name || 'You'
+  const activity = {
+    id: data.id || `att-${Date.now()}`,
+    type: 'attachment',
+    user,
+    action: data.action || 'uploaded an attachment',
+    fileName: data.fileName || '',
+    content: data.fileName ? `Attachment: ${data.fileName}` : '',
+    timestamp: data.timestamp || new Date().toISOString()
+  }
+  if (data.isEdit) {
+    customerActivities.value = customerActivities.value.map((a) =>
+      String(a.id) === String(activity.id) ? activity : a
+    )
+  } else {
+    customerActivities.value = [activity, ...customerActivities.value]
+  }
+}
+
+const handleAttachmentDelete = (item) => {
+  customerActivities.value = customerActivities.value.filter((a) => a.id !== item.id)
+}
+
+
+const handleAppointmentCreated = async (eventData) => {
+  // Create appointment logic
+  const payload = {
+    ...eventData,
+    customerId: props.customerId,
+    customer: customerData.value?.name
+  }
+  try {
+    await createCalendarEvent(payload)
+    await loadCustomerData() // reload
+  } catch (e) {
+    console.error(e)
+  }
+  showCreateAppointmentModal.value = false
+}
+
+const handleAddTag = async (tag) => {
+  // Tag logic
+  const tagName = typeof tag === 'string' ? tag : tag.name
+  const currentTags = customerData.value?.tags || []
+  if (!currentTags.includes(tagName)) {
+    const newTags = [...currentTags, tagName]
+    try {
+      await customersStore.updateCustomer(props.customerId, { tags: newTags }, props.customerType)
+      await loadCustomerData()
+    } catch (e) {
+      console.error(e)
+    }
+  }
+  showAddTagModal.value = false
+}
+
+const handleAddModalSave = async () => {
+  // Logic from original file
+  if (addModalType.value === 'lead') {
+    await customersStore.convertToLead(props.customerId)
+  } else {
+    await customersStore.convertToOpportunity(props.customerId)
+  }
+  showAddModal.value = false
   await loadCustomerData()
 }
 
-// Handle appointment created (from modal or inline form) - refresh appointments list
-const handleAppointmentCreated = async () => {
-  await loadCustomerData()
-}
-
-// Load customer data on mount
-onMounted(async () => {
-  await loadCustomerData()
+onMounted(() => {
+  loadCustomerData()
 })
 
-// Watch for customerId changes
-watch(() => props.customerId, (newId) => {
-  if (newId) {
-    loadCustomerData()
-  }
+watch(() => props.customerId, () => {
+  loadCustomerData()
 })
 </script>
+
+<style scoped>
+.customer-profile-drawer-header {
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+  height: 3rem;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+}
+
+.customer-profile-drawer-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.customer-profile-drawer-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+</style>

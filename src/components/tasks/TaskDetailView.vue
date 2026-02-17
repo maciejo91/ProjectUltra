@@ -9,23 +9,22 @@
         @previous="handlePrevious"
         @next="handleNext"
         @close="$emit('close')"
-        @postpone-expected-close="handlePostponeExpectedClose"
         @tag-updated="handleTagUpdated"
-        @reassigned="handleReassigned"
       />
 
       <!-- Center + Right Panels Row -->
       <div class="flex flex-1 min-h-0 overflow-hidden">
         <!-- Center Panel: Task Management Widget Only -->
         <div class="flex-1 flex flex-col min-h-0 overflow-hidden bg-white min-w-0">
-          <TaskAssigneeDateBar
-            v-if="displayTask"
-            :task="displayTask"
-            @reassigned="handleReassigned"
-            @postpone-expected-close="handlePostponeExpectedClose"
-          />
           <div class="flex-1 min-h-0 overflow-y-auto">
             <div class="p-2">
+              <div v-if="showAssignToMeBanner" class="px-2 mb-2">
+                <TaskAssignee
+                  :task="displayTask"
+                  :task-type="displayTask.type"
+                  @reassigned="handleReassigned"
+                />
+              </div>
               <TaskManagementCard
                 v-if="managementWidget && storeAdapter"
                 ref="managementCardRef"
@@ -34,6 +33,8 @@
                 :management-widget="managementWidget"
                 :activities="allActivities"
                 v-bind="$attrs"
+                @postpone-expected-close="handlePostponeExpectedClose"
+                @reassigned="handleReassigned"
               />
             </div>
           </div>
@@ -251,7 +252,7 @@ import { useUserStore } from '@/stores/user'
 import { useToastStore } from '@/stores/toast'
 import { getDisplayStage } from '@/utils/stageMapper'
 import TaskDetailHeader from './TaskDetailHeader.vue'
-import TaskAssigneeDateBar from './TaskAssigneeDateBar.vue'
+import TaskAssignee from './TaskAssignee.vue'
 import TaskManagementCard from './TaskManagementCard.vue'
 import TaskContactCard from './TaskContactCard.vue'
 import OtherCustomerRequestsCard from './OtherCustomerRequestsCard.vue'
@@ -327,6 +328,14 @@ const displayTask = computed(() => {
     }
   }
   return t
+})
+
+const showAssignToMeBanner = computed(() => {
+  const t = displayTask.value
+  if (!t) return false
+  const isClosed = t.stage === 'Closed Won' || t.stage === 'Closed Lost' || t.isClosed
+  const isUnassigned = !(t.assignee || t.owner || t.assignedTo)
+  return !isClosed && isUnassigned
 })
 
 const activityAuthor = computed(() =>

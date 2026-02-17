@@ -1,11 +1,10 @@
 <template>
-  <div class="rounded-lg flex flex-col bg-muted">
-    <div class="pt-1 px-1">
-      <!-- Add contract card: only when no contracts -->
-      <div
-        v-if="!hasContracts"
-        class="bg-white rounded-lg shadow-nsc-card overflow-visible"
-      >
+  <div class="flex flex-col">
+    <!-- Main card: Add contract (no contracts) or Set Delivery Date (header + toggles only) -->
+    <div
+      v-if="!hasContracts"
+      class="bg-white rounded-lg shadow-nsc-card overflow-visible"
+    >
         <div class="p-6">
           <div class="mb-3">
             <h4 class="font-bold text-foreground text-sm">Add contract</h4>
@@ -19,14 +18,14 @@
               @action-selected="$emit('contract-pending-action', $event)"
             />
           </div>
-        </div>
       </div>
+    </div>
 
-      <!-- Set Delivery Date card: only when at least one contract -->
-      <div
-        v-else
-        class="bg-white rounded-lg shadow-nsc-card overflow-visible"
-      >
+    <!-- Set Delivery Date card: only when at least one contract -->
+    <div
+      v-else
+      class="bg-white rounded-lg shadow-nsc-card overflow-visible"
+    >
         <div class="p-6">
           <div class="mb-3">
             <h4 class="font-bold text-foreground text-sm">Set Delivery Date</h4>
@@ -53,28 +52,19 @@
             />
           </div>
         </div>
-      </div>
     </div>
 
-    <div class="px-4 py-4 space-y-4">
-      <!-- Inline Close as Lost Section -->
-      <div v-if="showCloseAsLostSection">
-        <CloseAsLostCard
-          ref="closeAsLostCardRef"
-          :preselected-reason="closeAsLostReason"
-          :preselected-notes="closeAsLostNotes"
-          @cancel="$emit('close-as-lost-cancel')"
-          @confirm="$emit('close-as-lost-confirm', $event)"
-        />
-      </div>
-
-      <!-- Inline Set Delivery Date Section -->
+    <!-- Expanded content: subcard for adding delivery date and saving (progresses state machine) -->
+    <div class="mk-expanded-cards-area space-y-4">
       <div v-if="showSetDeliveryDateSection">
         <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
-          <h5 class="font-semibold text-foreground text-sm mb-4">Set Delivery Date</h5>
+          <h5 class="font-semibold text-foreground text-sm mb-1">Add delivery date</h5>
+          <p class="text-sm text-muted-foreground mb-4">
+            Set the date and save to progress to the next step (Collect e-signatures).
+          </p>
           <div class="space-y-4">
             <div>
-              <Label class="block text-sm font-medium text-muted-foreground mb-2">Delivery Date <span class="text-red-600">*</span></Label>
+              <Label class="form-label">Delivery Date <span class="text-red-600">*</span></Label>
               <Input
                 type="date"
                 :model-value="deliveryDateForm.deliveryDate"
@@ -84,7 +74,7 @@
               />
             </div>
             <div>
-              <Label class="block text-sm font-medium text-muted-foreground mb-2">Time (Optional)</Label>
+              <Label class="form-label">Time <span class="optional">(optional)</span></Label>
               <Input
                 type="time"
                 :model-value="deliveryDateForm.deliveryTime"
@@ -93,7 +83,7 @@
               />
             </div>
             <div>
-              <Label class="block text-sm font-medium text-muted-foreground mb-2">Delivery Location</Label>
+              <Label class="form-label">Delivery Location</Label>
               <Select
                 :model-value="deliveryDateForm.deliveryLocation"
                 @update:model-value="$emit('update:delivery-date-form', { ...deliveryDateForm, deliveryLocation: $event })"
@@ -109,28 +99,28 @@
               </Select>
             </div>
             <div>
-              <Label class="block text-sm font-medium text-muted-foreground mb-2">Notes (Optional)</Label>
+              <Label class="form-label">Notes <span class="optional">(optional)</span></Label>
               <Textarea
                 :model-value="deliveryDateForm.notes"
                 @update:model-value="$emit('update:delivery-date-form', { ...deliveryDateForm, notes: $event })"
-                rows="4"
+                rows="3"
                 placeholder="Add any relevant delivery details..."
                 class="w-full"
               />
             </div>
           </div>
-        </div>
-        <div class="flex justify-end gap-2 mt-4">
-          <Button variant="secondary" @click="$emit('cancel-set-delivery-date')">
-            Cancel
-          </Button>
-          <Button
-            variant="default"
-            :disabled="!canSubmitSetDeliveryDate"
-            @click="$emit('confirm-set-delivery-date')"
-          >
-            Set Delivery Date
-          </Button>
+          <div class="flex justify-end gap-2 mt-4 pt-4 border-t border-border">
+            <Button variant="secondary" @click="$emit('cancel-set-delivery-date')">
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              :disabled="!canSubmitSetDeliveryDate"
+              @click="$emit('confirm-set-delivery-date')"
+            >
+              Save and continue
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -154,16 +144,12 @@ import { Truck } from 'lucide-vue-next'
 import { Button, Toggle, Label, Input, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@motork/component-library/future/primitives'
 import SecondaryActionsDropdown from '@/components/shared/SecondaryActionsDropdown.vue'
 import OpportunityScheduleForm from '@/components/tasks/opportunity/OpportunityScheduleForm.vue'
-import CloseAsLostCard from '@/components/shared/CloseAsLostCard.vue'
 
 const props = defineProps({
   opportunity: { type: Object, required: true },
   hasContracts: { type: Boolean, default: false },
-  showCloseAsLostSection: { type: Boolean, default: false },
   showScheduleAppointmentContractPendingSection: { type: Boolean, default: false },
   showSetDeliveryDateSection: { type: Boolean, default: false },
-  closeAsLostReason: { type: String, default: '' },
-  closeAsLostNotes: { type: String, default: '' },
   deliveryDateForm: { type: Object, required: true },
   hasDeliveryDate: { type: Boolean, default: false },
   minDeliveryDate: { type: String, default: '' },
@@ -179,16 +165,12 @@ defineEmits([
   'cancel-set-delivery-date',
   'schedule-appointment-contract-pending-submit',
   'cancel-schedule-appointment-contract-pending',
-  'contract-pending-action',
-  'close-as-lost-cancel',
-  'close-as-lost-confirm'
+  'contract-pending-action'
 ])
 
 const scheduleAppointmentContractPendingFormRef = ref(null)
-const closeAsLostCardRef = ref(null)
 
 defineExpose({
-  scheduleAppointmentContractPendingFormRef,
-  closeAsLostCardRef
+  scheduleAppointmentContractPendingFormRef
 })
 </script>

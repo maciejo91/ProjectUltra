@@ -2,6 +2,7 @@
   "navigation": {
     "home": "Home",
     "tasks": "Tasks",
+    "requests": "Requests",
     "customers": "Customers",
     "calendar": "Calendar",
     "reports": "Reports",

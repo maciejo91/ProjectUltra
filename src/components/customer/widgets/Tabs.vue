@@ -12,7 +12,7 @@
       >
         <span>{{ tab.label }}</span>
         <span 
-          v-if="tab.count !== undefined && tab.count > 0"
+          v-if="!hideCounts && tab.count !== undefined && tab.count > 0"
           class="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-xs font-bold leading-none"
           :class="modelValue === tab.key 
             ? 'bg-primary text-white' 
@@ -40,6 +40,10 @@ defineProps({
   tabs: {
     type: Array,
     required: true
+  },
+  hideCounts: {
+    type: Boolean,
+    default: false
   }
 })
 

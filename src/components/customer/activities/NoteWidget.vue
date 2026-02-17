@@ -48,38 +48,38 @@
   </Dialog>
 
   <!-- Inline Mode -->
-  <div 
+  <div
     v-else
-    class="animate-fade-in relative"
-    :class="{ 'bg-surface border border-border rounded-xl p-5 shadow-nsc-card mb-6': !hideHeader }"
+    class="animate-fade-in relative bg-white rounded-lg border border-border p-6 shadow-nsc-card"
   >
-    <div v-if="!hideHeader" class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-surface border-t border-l border-border rotate-45"></div>
+    <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-border rotate-45"></div>
     <div v-if="!hideHeader" class="flex justify-between items-center mb-4">
       <h5 class="text-sm font-semibold text-foreground">{{ item ? 'Edit Note' : 'Add Note' }}</h5>
-      <button @click="handleCancel" class="text-muted-foreground hover:text-muted-foreground"><X class="w-4 h-4 shrink-0" /></button>
+      <button type="button" @click="handleCancel" class="text-muted-foreground hover:text-foreground p-1 rounded" aria-label="Close"><X class="w-4 h-4 shrink-0" /></button>
+    </div>
+    <div v-else class="flex justify-end mb-2">
+      <button type="button" @click="handleCancel" class="text-muted-foreground hover:text-foreground p-1 rounded" aria-label="Close"><X class="w-4 h-4 shrink-0" /></button>
     </div>
     <div>
-      <label class="block text-xs font-medium text-muted-foreground mb-1">Note</label>
-      <textarea 
+      <Label class="form-label">Note</Label>
+      <Textarea
         v-model="noteText"
-        rows="4" 
-        class="input"
-        placeholder="Enter your note..."
-      ></textarea>
+        rows="4"
+        class="w-full resize-none min-h-[120px]"
+        placeholder="Type your note here..."
+      />
     </div>
-    <div v-if="!hideActions" class="flex justify-end gap-2 mt-6 border-t border-border pt-4">
+    <div v-if="!hideActions" class="flex justify-end gap-2 mt-6 pt-4 border-t border-border">
+      <Button variant="secondary" @click="handleCancel">
+        Cancel
+      </Button>
       <Button
-        label="Cancel"
-        variant="outline"
-        size="small"
-        @click="handleCancel"
-      />
-      <Button
-        label="Save"
         variant="primary"
-        size="small"
+        :disabled="!noteText.trim() || saving"
         @click="handleSave"
-      />
+      >
+        {{ saving ? 'Saving...' : 'Save' }}
+      </Button>
     </div>
   </div>
 </template>

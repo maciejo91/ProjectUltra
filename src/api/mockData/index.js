@@ -1,14 +1,17 @@
 // Mock data index - re-exports all mock data from organized files
-// This file provides a centralized export point for all mock data
-// Now uses locale-aware data loader
+// This file provides a centralized export point for all mock data.
+// Locale-aware data (opportunities, leads, customers, activities) is read via getMockData()
+// so the app always uses the same source as OpportunityRepository and other repositories.
 
 import { getMockData } from './localeLoader.js'
 
-// Get locale-aware mock data
+// Re-export so consumers can get fresh locale-aware data (e.g. after locale change)
+export { getMockData } from './localeLoader.js'
+
+// Snapshot at load time for backward compatibility; for locale-aware data prefer getMockData()
 const mockData = getMockData()
 
-// Export all mock data (locale-aware)
-export const { 
+export const {
   mockUsers,
   mockCustomers,
   mockLeads,

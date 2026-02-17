@@ -1,278 +1,233 @@
 <template>
-  <div class="page-container">
-    <!-- Header -->
-    <PageHeader title="Vehicles Inventory">
-      <template #actions>
-        <Button
-          @click="showAddModal = true"
-          variant="outline"
-          size="small"
-          class="flex items-center gap-2"
-        >
-          <Plus class="w-4 h-4 shrink-0" />
-          <span class="hidden sm:inline">Add new</span>
-        </Button>
-      </template>
-    </PageHeader>
-    
-    <!-- Content with padding -->
-    <div class="p-4 md:p-8">
-      <!-- Search bar with AI mode: on top of filter bar and table -->
-      <div class="mb-1">
-        <UnifiedSearchBar
-          active-tab="vehicles"
-          placeholder="Search vehicles..."
-          :pagination="pagination"
-          :status-options="vehicleStatusOptions"
-          :volvo-model-options="volvoModelOptions"
-          @update:global-filter="globalFilter = $event"
-          @update:column-filters="columnFilters = $event"
-          @update:pagination="pagination = $event"
-        />
+  <div class="page-container relative flex flex-col overflow-hidden h-full bg-surface">
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide min-h-0">
+        <div class="bg-white mb-8">
+          <div class="mb-1">
+            <UnifiedSearchBar
+              active-tab="vehicles"
+              full-width
+              placeholder="Search vehicles..."
+              :pagination="pagination"
+              :status-options="vehicleStatusOptions"
+              :volvo-model-options="volvoModelOptions"
+              @update:global-filter="globalFilter = $event"
+              @update:column-filters="columnFilters = $event"
+              @update:pagination="pagination = $event"
+            />
+          </div>
+          <div class="data-table-inner table-search-wrapper">
+            <VehicleGrid
+              :filtered-vehicles="paginatedData"
+              :row-count="totalFilteredCount"
+              :columns="columns"
+              :loading="vehiclesStore.loading"
+              :table-meta="tableMeta"
+              :filter-definitions="filterDefinitions"
+              v-model:pagination="pagination"
+              v-model:global-filter="globalFilter"
+              v-model:sorting="sorting"
+              v-model:column-filters="columnFilters"
+              v-model:column-visibility="columnVisibility"
+              @row-click="handleRowClick"
+            />
+          </div>
+        </div>
       </div>
-      <!-- Filter Tabs -->
-      <VehicleFilters
-        :vehicle-tabs="vehicleTabs"
-        :vehicle-filter="vehicleFilter"
-        @filter-change="setVehicleFilter"
-      />
-
-      <!-- Table -->
-      <VehicleGrid
-        :filtered-vehicles="paginatedData"
-        :row-count="totalFilteredCount"
-        :columns="columns"
-        :loading="vehiclesStore.loading"
-        :table-meta="tableMeta"
-        :filter-definitions="filterDefinitions"
-        v-model:pagination="pagination"
-        v-model:global-filter="globalFilter"
-        v-model:sorting="sorting"
-        v-model:column-filters="columnFilters"
-        @row-click="handleRowClick"
-      >
-      </VehicleGrid>
     </div>
 
-    <!-- Add Vehicle Modal -->
-    <Dialog :open="showAddModal" @update:open="handleAddModalOpenChange">
-      <DialogPortal>
-        <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-        <DialogContent class="w-full sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Add Customer Vehicle</DialogTitle>
-            <DialogDescription>Fill in the details for the new customer vehicle.</DialogDescription>
-          </DialogHeader>
-
+    <!-- Add Vehicle Drawer -->
+    <DrawerContainer :show="showAddModal" @close="handleCloseModal">
+      <div class="h-full flex flex-col overflow-hidden bg-background">
+        <header class="shrink-0 flex items-center justify-between gap-4 border-b border-border px-4 py-3 md:px-6">
+          <h2 class="text-base font-medium text-foreground">Add Vehicle</h2>
+          <button
+            type="button"
+            class="flex items-center justify-center w-9 h-9 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            aria-label="Close"
+            @click="handleCloseModal"
+          >
+            <X class="w-5 h-5 shrink-0" />
+          </button>
+        </header>
+        <div class="flex-1 overflow-y-auto py-4 px-4 md:px-6 w-full">
           <form @submit.prevent="handleSubmit" class="space-y-4">
-        <!-- Vehicle Information -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <Label class="form-label">Brand</Label>
-            <Input
-              v-model="newVehicle.brand"
-              type="text"
-              placeholder="e.g., Volkswagen"
-              required
-            />
-          </div>
-          <div>
-            <Label class="form-label">Model</Label>
-            <Input
-              v-model="newVehicle.model"
-              type="text"
-              placeholder="e.g., ID.4"
-              required
-            />
-          </div>
-          <div>
-            <Label class="form-label">Year</Label>
-            <Input
-              v-model="newVehicle.year"
-              type="number"
-              placeholder="e.g., 2024"
-              :min="1900"
-              :max="new Date().getFullYear() + 1"
-              required
-            />
-          </div>
-        </div>
-
-        <!-- Identification -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label class="form-label">VIN</Label>
-            <Input
-              v-model="newVehicle.vin"
-              type="text"
-              placeholder="Vehicle Identification Number"
-            />
-          </div>
-          <div>
-            <Label class="form-label">Plates</Label>
-            <Input
-              v-model="newVehicle.plates"
-              type="text"
-              placeholder="License plate number"
-            />
-          </div>
-        </div>
-
-        <!-- Vehicle Details -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <Label class="form-label">Fuel Type</Label>
-            <Select v-model="newVehicle.fuelType">
-              <SelectTrigger>
-                <SelectValue placeholder="Select fuel type..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Petrol">Petrol</SelectItem>
-                <SelectItem value="Diesel">Diesel</SelectItem>
-                <SelectItem value="Electric">Electric</SelectItem>
-                <SelectItem value="Hybrid">Hybrid</SelectItem>
-                <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label class="form-label">Gear Type</Label>
-            <Select v-model="newVehicle.gearType">
-              <SelectTrigger>
-                <SelectValue placeholder="Select gear type..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Manual">Manual</SelectItem>
-                <SelectItem value="Automatic">Automatic</SelectItem>
-                <SelectItem value="CVT">CVT</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label class="form-label">Mileage (km)</Label>
-            <Input
-              v-model.number="newVehicle.kilometers"
-              type="number"
-              placeholder="0"
-              :min="0"
-            />
-          </div>
-        </div>
-
-        <!-- Registration & Ownership -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label class="form-label">Registered At</Label>
-            <Input
-              v-model="newVehicle.registration"
-              type="text"
-              placeholder="MM/YYYY (e.g., 01/2024)"
-            />
-          </div>
-          <div>
-            <Label class="form-label">Owned Since</Label>
-            <Input
-              v-model="newVehicle.ownedSince"
-              type="text"
-              placeholder="MM/YYYY (e.g., 01/2024)"
-            />
-          </div>
-        </div>
-
-        <!-- Owner Information -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label class="form-label">Owner</Label>
-            <Input
-              v-model="newVehicle.owner"
-              type="text"
-              placeholder="Owner name"
-            />
-          </div>
-          <div>
-            <Label class="form-label">Ownership Type</Label>
-            <Select v-model="newVehicle.ownershipType">
-              <SelectTrigger>
-                <SelectValue placeholder="Select ownership type..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Private">Private</SelectItem>
-                <SelectItem value="Company">Company</SelectItem>
-                <SelectItem value="Lease">Lease</SelectItem>
-                <SelectItem value="Fleet">Fleet</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <!-- Warranty -->
-        <div>
-          <Label class="form-label">Warranty Info</Label>
-          <Textarea
-            v-model="newVehicle.warrantyInfo"
-            :rows="3"
-            placeholder="Warranty information..."
-          />
-        </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="w-full">
+                <Label class="form-label text-foreground">Brand</Label>
+                <Input
+                  v-model="newVehicle.brand"
+                  type="text"
+                  placeholder="e.g., Volkswagen"
+                  class="w-full"
+                  required
+                />
+              </div>
+              <div class="w-full">
+                <Label class="form-label text-foreground">Model</Label>
+                <Input
+                  v-model="newVehicle.model"
+                  type="text"
+                  placeholder="e.g., ID.4"
+                  class="w-full"
+                  required
+                />
+              </div>
+              <div class="w-full">
+                <Label class="form-label text-foreground">Year</Label>
+                <Input
+                  v-model="newVehicle.year"
+                  type="number"
+                  placeholder="e.g., 2024"
+                  :min="1900"
+                  :max="new Date().getFullYear() + 1"
+                  class="w-full"
+                  required
+                />
+              </div>
+              <div class="w-full">
+                <Label class="form-label text-foreground">VIN</Label>
+                <Input
+                  v-model="newVehicle.vin"
+                  type="text"
+                  placeholder="Vehicle Identification Number"
+                  class="w-full"
+                />
+              </div>
+              <div class="w-full">
+                <Label class="form-label text-foreground">Plates</Label>
+                <Input
+                  v-model="newVehicle.plates"
+                  type="text"
+                  placeholder="License plate number"
+                  class="w-full"
+                />
+              </div>
+              <div class="w-full">
+                <Label class="form-label text-foreground">Fuel Type</Label>
+                <Select v-model="newVehicle.fuelType">
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select fuel type..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Petrol">Petrol</SelectItem>
+                    <SelectItem value="Diesel">Diesel</SelectItem>
+                    <SelectItem value="Electric">Electric</SelectItem>
+                    <SelectItem value="Hybrid">Hybrid</SelectItem>
+                    <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div class="w-full">
+                <Label class="form-label text-foreground">Gear Type</Label>
+                <Select v-model="newVehicle.gearType">
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select gear type..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Manual">Manual</SelectItem>
+                    <SelectItem value="Automatic">Automatic</SelectItem>
+                    <SelectItem value="CVT">CVT</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div class="w-full">
+                <Label class="form-label text-foreground">Mileage (km)</Label>
+                <Input
+                  v-model.number="newVehicle.kilometers"
+                  type="number"
+                  placeholder="0"
+                  :min="0"
+                  class="w-full"
+                />
+              </div>
+              <div class="w-full">
+                <Label class="form-label text-foreground">Registered At</Label>
+                <Input
+                  v-model="newVehicle.registration"
+                  type="text"
+                  placeholder="MM/YYYY (e.g., 01/2024)"
+                  class="w-full"
+                />
+              </div>
+              <div class="w-full">
+                <Label class="form-label text-foreground">Owned Since</Label>
+                <Input
+                  v-model="newVehicle.ownedSince"
+                  type="text"
+                  placeholder="MM/YYYY (e.g., 01/2024)"
+                  class="w-full"
+                />
+              </div>
+              <div class="w-full">
+                <Label class="form-label text-foreground">Owner</Label>
+                <Input
+                  v-model="newVehicle.owner"
+                  type="text"
+                  placeholder="Owner name"
+                  class="w-full"
+                />
+              </div>
+              <div class="w-full">
+                <Label class="form-label text-foreground">Ownership Type</Label>
+                <Select v-model="newVehicle.ownershipType">
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select ownership type..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Private">Private</SelectItem>
+                    <SelectItem value="Company">Company</SelectItem>
+                    <SelectItem value="Lease">Lease</SelectItem>
+                    <SelectItem value="Fleet">Fleet</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div class="w-full md:col-span-2">
+                <Label class="form-label text-foreground">Warranty Info</Label>
+                <Textarea
+                  v-model="newVehicle.warrantyInfo"
+                  :rows="3"
+                  placeholder="Warranty information..."
+                  class="w-full"
+                />
+              </div>
+            </div>
           </form>
-
-          <DialogFooter class="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
-            <Button
-              label="Cancel"
-              variant="outline"
-              class="w-full sm:w-auto"
-              @click="handleCloseModal"
-            />
-            <Button
-              label="Add Vehicle"
-              variant="primary"
-              class="w-full sm:w-auto"
-              @click="handleSubmit"
-            />
-          </DialogFooter>
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
+        </div>
+        <footer class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 border-t border-border px-4 py-3 md:px-6">
+          <Button
+            variant="outline"
+            class="rounded-sm w-full sm:w-auto"
+            @click="handleCloseModal"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="default"
+            class="rounded-sm w-full sm:w-auto"
+            @click="handleSubmit"
+          >
+            Add Vehicle
+          </Button>
+        </footer>
+      </div>
+    </DrawerContainer>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, h } from 'vue'
-import { Plus } from 'lucide-vue-next'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onBeforeUnmount, inject, h, nextTick } from 'vue'
+import { X } from 'lucide-vue-next'
 import { useVehiclesStore } from '@/stores/vehicles'
-import PageHeader from '@/components/layout/PageHeader.vue'
-import { Button, Badge } from '@motork/component-library/future/primitives'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-  Input,
-  Label,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  Textarea
-} from '@motork/component-library/future/primitives'
-import VehicleFilters from '@/components/vehicles/VehicleFilters.vue'
+import { Button, Badge, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea } from '@motork/component-library/future/primitives'
+import DrawerContainer from '@/components/shared/DrawerContainer.vue'
 import VehicleGrid from '@/components/vehicles/VehicleGrid.vue'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
 import { useVehicleDetail } from '@/composables/useVehicleDetail'
 import { useDataTableData } from '@/composables/useDataTableData'
 
-const router = useRouter()
-
+const headerActionsRef = inject('headerActionsRef', null)
 const vehiclesStore = useVehiclesStore()
-
-// Vehicle filter state
-const vehicleFilter = ref('in-stock') // 'in-stock' or 'customer-vehicles'
 
 // DataTable state management
 const pagination = ref({
@@ -282,50 +237,49 @@ const pagination = ref({
 
 const globalFilter = ref('')
 const sorting = ref([])
-const columnFilters = ref([])
+// Default filter: Type = In stock (filter by type applied on load)
+const defaultTypeFilter = () => [
+  { key: 'inventoryType', id: 'inventoryType', value: 'in-stock', operator: 'eq' }
+]
+const columnFilters = ref(defaultTypeFilter())
 
-const handleAddModalOpenChange = (isOpen) => {
-  if (!isOpen) {
-    handleCloseModal()
-  }
-}
-
-// Filter vehicles based on active filter
-const filteredVehicles = computed(() => {
-  if (vehicleFilter.value === 'in-stock') {
-    // In stock: vehicles with stockDays !== null
-    return vehiclesStore.vehicles.filter(v => v.stockDays !== null && v.stockDays !== undefined)
-  } else {
-    // Customer vehicles: vehicles with stockDays === null or undefined
-    return vehiclesStore.vehicles.filter(v => v.stockDays === null || v.stockDays === undefined)
-  }
+// Column visibility: hide columns with mostly empty/N/A data (column selector lets users show them)
+const columnVisibility = ref({
+  engine: false,
+  stockDays: false,
+  dealership: false,
+  ownershipType: false,
+  ownedSince: false,
+  warrantyInfo: false
 })
 
-// Vehicle tabs
-const vehicleTabs = computed(() => [
-  {
-    key: 'in-stock',
-    label: 'In stock',
-    count: vehiclesStore.vehicles.filter(v => v.stockDays !== null && v.stockDays !== undefined).length,
-    borderColor: 'border-t-blue-600'
-  },
-  {
-    key: 'customer-vehicles',
-    label: "Customers' vehicles",
-    count: vehiclesStore.vehicles.filter(v => v.stockDays === null || v.stockDays === undefined).length,
-    borderColor: 'border-t-purple-600'
-  }
-])
-
-const setVehicleFilter = (key) => {
-  vehicleFilter.value = key
-}
+// All vehicles with inventoryType for filtering (one merged table)
+const vehiclesWithType = computed(() =>
+  vehiclesStore.vehicles.map((v) => ({
+    ...v,
+    inventoryType: v.stockDays !== null && v.stockDays !== undefined ? 'in-stock' : 'customer-vehicles'
+  }))
+)
 
 // Use composable for vehicle detail modal logic
 const { showAddModal, newVehicle, handleCloseModal, handleSubmit } = useVehicleDetail()
 
-// Filter definitions for AI-powered filtering
+// Filter definitions (inventoryType first so filter is always visible with default)
 const filterDefinitions = [
+  {
+    key: 'inventoryType',
+    label: 'Type',
+    type: 'select',
+    operators: [
+      { value: 'eq', label: 'is' },
+      { value: 'ne', label: 'is not' }
+    ],
+    options: [
+      { value: 'in-stock', label: 'In stock' },
+      { value: 'customer-vehicles', label: "Customers' vehicles" }
+    ],
+    aiHint: 'Inventory type: in stock or customer vehicle'
+  },
   {
     key: 'status',
     label: 'Status',
@@ -400,7 +354,25 @@ const volvoModelOptions = computed(() => [
 ])
 
 onMounted(() => {
+  if (headerActionsRef) {
+    headerActionsRef.value = {
+      type: 'vehicles',
+      onAddNew: () => { showAddModal.value = true }
+    }
+  }
   vehiclesStore.fetchVehicles()
+  // Ensure filter by type (In stock) is applied by default after table has mounted
+  nextTick(() => {
+    const current = columnFilters.value
+    const hasTypeFilter = Array.isArray(current) && current.some(f => (f.key || f.field || f.id) === 'inventoryType')
+    if (!hasTypeFilter) {
+      columnFilters.value = defaultTypeFilter()
+    }
+  })
+})
+
+onBeforeUnmount(() => {
+  if (headerActionsRef) headerActionsRef.value = null
 })
 
 // Handle row click - navigate to vehicle detail or show vehicle info
@@ -449,265 +421,168 @@ const formatRegistration = (registration) => {
   return registration
 }
 
-// DataTable columns configuration - dynamic based on filter
-const columns = computed(() => {
-  if (vehicleFilter.value === 'in-stock') {
-    // In stock columns
-    return [
-      {
-        accessorKey: 'image',
-        header: 'Photo',
-        meta: {
-          title: 'Photo'
-        },
-        cell: ({ row }) => {
-          const vehicle = row.original
-          if (vehicle.image) {
-            return h('img', {
-              src: vehicle.image,
-              alt: `${vehicle.brand} ${vehicle.model}`,
-              class: 'w-16 h-16 object-cover rounded-md'
-            })
-          }
-          return h('div', { class: 'w-16 h-16 bg-surface border border-border rounded-md flex items-center justify-center shrink-0' }, [
-            h('i', { class: 'fa-solid fa-car text-2xl text-muted-foreground' })
-          ])
-        }
-      },
-      {
-        accessorKey: 'brand',
-        header: 'Vehicle',
-        meta: {
-          title: 'Vehicle'
-        },
-        cell: ({ row }) => {
-          const vehicle = row.original
-          return h('div', [
-            h('div', { class: 'text-content-bold' }, `${vehicle.brand} ${vehicle.model}`),
-            h('div', { class: 'text-meta' }, vehicle.year)
-          ])
-        }
-      },
-      {
-        accessorKey: 'type',
-        header: 'Type',
-        meta: {
-          title: 'Type'
-        },
-        cell: ({ row }) => {
-          const vehicle = row.original
-          const type = getVehicleType(vehicle)
-          return h('span', { class: 'text-meta' }, type)
-        }
-      },
-      {
-        accessorKey: 'engine',
-        header: 'Engine',
-        meta: {
-          title: 'Engine'
-        },
-        cell: ({ row }) => {
-          // Engine info not in mock data, show N/A
-          return h('span', { class: 'text-meta' }, 'N/A')
-        }
-      },
-      {
-        accessorKey: 'fuelType',
-        header: 'Fuel type',
-        meta: {
-          title: 'Fuel type'
-        },
-        cell: ({ row }) => {
-          return h('span', { class: 'text-meta' }, row.original.fuelType || 'N/A')
-        }
-      },
-      {
-        accessorKey: 'gearType',
-        header: 'Gear type',
-        meta: {
-          title: 'Gear type'
-        },
-        cell: ({ row }) => {
-          return h('span', { class: 'text-meta' }, row.original.gearType || 'N/A')
-        }
-      },
-      {
-        accessorKey: 'registration',
-        header: 'Registered at',
-        meta: {
-          title: 'Registered at'
-        },
-        cell: ({ row }) => {
-          const vehicle = row.original
-          return h('span', { class: 'text-meta' }, formatRegistration(vehicle.registration) || 'N/A')
-        }
-      },
-      {
-        accessorKey: 'kilometers',
-        header: 'Mileage',
-        meta: {
-          title: 'Mileage'
-        },
-        cell: ({ row }) => {
-          return h('span', { class: 'text-meta' }, `${formatNumber(row.original.kilometers)} km`)
-        }
-      },
-      {
-        accessorKey: 'stockDays',
-        header: 'Days in stock',
-        meta: {
-          title: 'Days in stock'
-        },
-        cell: ({ row }) => {
-          const stockDays = row.original.stockDays
-          const textClass = stockDays > 300 ? 'text-red-600' : 'text-gray-600'
-          return h('span', { class: `text-sm font-medium ${textClass}` }, `${stockDays} days`)
-        }
-      },
-      {
-        accessorKey: 'dealership',
-        header: 'Dealership',
-        meta: {
-          title: 'Dealership'
-        },
-        cell: ({ row }) => {
-          return h('span', { class: 'text-meta' }, row.original.dealership || 'N/A')
-        }
-      },
-      {
-        accessorKey: 'status',
-        header: 'Availability',
-        meta: {
-          title: 'Availability'
-        },
-        cell: ({ row }) => {
-          const status = row.original.status
-          const theme = status === 'Available' 
-            ? 'green' 
-            : status === 'In Stock' 
-            ? 'blue' 
-            : 'gray'
-          return h(Badge, { 
-            text: status,
-            size: 'small',
-            theme: theme
-          })
-        }
+// Single merged table: all columns, Inventory type as first data column
+const columns = [
+  {
+    accessorKey: 'image',
+    header: 'Photo',
+    meta: { title: 'Photo' },
+    cell: ({ row }) => {
+      const vehicle = row.original
+      if (vehicle.image) {
+        return h('img', {
+          src: vehicle.image,
+          alt: `${vehicle.brand} ${vehicle.model}`,
+          class: 'w-16 h-16 object-cover rounded-md'
+        })
       }
-    ]
-  } else {
-    // Customers' vehicles columns
-    return [
-      {
-        accessorKey: 'brand',
-        header: 'Vehicle',
-        meta: {
-          title: 'Vehicle'
-        },
-        cell: ({ row }) => {
-          const vehicle = row.original
-          return h('div', [
-            h('div', { class: 'text-content-bold' }, `${vehicle.brand} ${vehicle.model}`),
-            h('div', { class: 'text-meta' }, vehicle.year)
-          ])
-        }
-      },
-      {
-        accessorKey: 'plates',
-        header: 'Plates',
-        meta: {
-          title: 'Plates'
-        },
-        cell: ({ row }) => {
-          // Plates not in mock data, derive from VIN or show N/A
-          const vehicle = row.original
-          const plates = vehicle.plates || (vehicle.vin ? vehicle.vin.slice(-6) : null) || 'N/A'
-          return h('span', { class: 'text-meta' }, plates)
-        }
-      },
-      {
-        accessorKey: 'kilometers',
-        header: 'Mileage',
-        meta: {
-          title: 'Mileage'
-        },
-        cell: ({ row }) => {
-          return h('span', { class: 'text-meta' }, `${formatNumber(row.original.kilometers)} km`)
-        }
-      },
-      {
-        accessorKey: 'registration',
-        header: 'Registered at',
-        meta: {
-          title: 'Registered at'
-        },
-        cell: ({ row }) => {
-          const vehicle = row.original
-          return h('span', { class: 'text-meta' }, formatRegistration(vehicle.registration) || 'N/A')
-        }
-      },
-      {
-        accessorKey: 'owner',
-        header: 'Owner',
-        meta: {
-          title: 'Owner'
-        },
-        cell: ({ row }) => {
-          // Owner not in mock data, show N/A or derive from requestedBy
-          const vehicle = row.original
-          const owner = vehicle.owner || (vehicle.requestedBy && vehicle.requestedBy.length > 0 ? vehicle.requestedBy[0] : null) || 'N/A'
-          return h('span', { class: 'text-meta' }, owner)
-        }
-      },
-      {
-        accessorKey: 'ownershipType',
-        header: 'Ownership type',
-        meta: {
-          title: 'Ownership type'
-        },
-        cell: ({ row }) => {
-          // Ownership type not in mock data
-          return h('span', { class: 'text-meta' }, 'N/A')
-        }
-      },
-      {
-        accessorKey: 'ownedSince',
-        header: 'Owned since',
-        meta: {
-          title: 'Owned since'
-        },
-        cell: ({ row }) => {
-          // Owned since not in mock data, could derive from registration
-          const vehicle = row.original
-          return h('span', { class: 'text-meta' }, formatRegistration(vehicle.registration) || 'N/A')
-        }
-      },
-      {
-        accessorKey: 'warrantyInfo',
-        header: 'Warranty info',
-        meta: {
-          title: 'Warranty info'
-        },
-        cell: ({ row }) => {
-          // Warranty info not in mock data
-          return h('span', { class: 'text-meta' }, 'N/A')
-        }
-      }
-    ]
+      return h('div', { class: 'w-16 h-16 bg-surface border border-border rounded-md flex items-center justify-center shrink-0' }, [
+        h('i', { class: 'fa-solid fa-car text-2xl text-muted-foreground' })
+      ])
+    }
+  },
+  {
+    accessorKey: 'brand',
+    header: 'Vehicle',
+    meta: { title: 'Vehicle' },
+    cell: ({ row }) => {
+      const vehicle = row.original
+      return h('div', { class: 'flex flex-col min-w-0' }, [
+        h('div', { class: 'text-content font-medium text-foreground truncate' }, `${vehicle.brand} ${vehicle.model}`),
+        h('div', { class: 'text-meta' }, vehicle.year)
+      ])
+    }
+  },
+  {
+    accessorKey: 'type',
+    header: 'Type',
+    meta: { title: 'Type' },
+    cell: ({ row }) => {
+      const vehicle = row.original
+      return h('span', { class: 'text-meta' }, getVehicleType(vehicle))
+    }
+  },
+  {
+    accessorKey: 'inventoryType',
+    header: 'Inventory',
+    meta: { title: 'Inventory' },
+    cell: ({ row }) => {
+      const type = row.original.inventoryType
+      const label = type === 'in-stock' ? 'In stock' : "Customers' vehicles"
+      return h('span', { class: 'text-meta' }, label)
+    }
+  },
+  {
+    accessorKey: 'engine',
+    header: 'Engine',
+    meta: { title: 'Engine' },
+    cell: () => h('span', { class: 'text-meta' }, 'N/A')
+  },
+  {
+    accessorKey: 'fuelType',
+    header: 'Fuel type',
+    meta: { title: 'Fuel type' },
+    cell: ({ row }) => h('span', { class: 'text-meta' }, row.original.fuelType || 'N/A')
+  },
+  {
+    accessorKey: 'gearType',
+    header: 'Gear type',
+    meta: { title: 'Gear type' },
+    cell: ({ row }) => h('span', { class: 'text-meta' }, row.original.gearType || 'N/A')
+  },
+  {
+    accessorKey: 'registration',
+    header: 'Registered at',
+    meta: { title: 'Registered at' },
+    cell: ({ row }) => h('span', { class: 'text-meta' }, formatRegistration(row.original.registration) || 'N/A')
+  },
+  {
+    accessorKey: 'kilometers',
+    header: 'Mileage',
+    meta: { title: 'Mileage' },
+    cell: ({ row }) => h('span', { class: 'text-meta' }, `${formatNumber(row.original.kilometers)} km`)
+  },
+  {
+    accessorKey: 'stockDays',
+    header: 'Days in stock',
+    meta: { title: 'Days in stock' },
+    cell: ({ row }) => {
+      const stockDays = row.original.stockDays
+      if (stockDays == null) return h('span', { class: 'text-meta' }, '—')
+      const textClass = stockDays > 300 ? 'text-destructive' : 'text-muted-foreground'
+      return h('span', { class: `text-content font-medium ${textClass}` }, `${stockDays} days`)
+    }
+  },
+  {
+    accessorKey: 'dealership',
+    header: 'Dealership',
+    meta: { title: 'Dealership' },
+    cell: ({ row }) => h('span', { class: 'text-meta' }, row.original.dealership || 'N/A')
+  },
+  {
+    accessorKey: 'status',
+    header: 'Availability',
+    meta: { title: 'Availability' },
+    cell: ({ row }) => {
+      const status = row.original.status
+      if (status == null) return h('span', { class: 'text-meta' }, '—')
+      const theme = status === 'Available' ? 'green' : status === 'In Stock' ? 'blue' : 'gray'
+      return h(Badge, { text: status, size: 'small', theme })
+    }
+  },
+  {
+    accessorKey: 'plates',
+    header: 'Plates',
+    meta: { title: 'Plates' },
+    cell: ({ row }) => {
+      const vehicle = row.original
+      const plates = vehicle.plates || (vehicle.vin ? vehicle.vin.slice(-6) : null) || 'N/A'
+      return h('span', { class: 'text-meta' }, plates)
+    }
+  },
+  {
+    accessorKey: 'owner',
+    header: 'Owner',
+    meta: { title: 'Owner' },
+    cell: ({ row }) => {
+      const vehicle = row.original
+      const owner = vehicle.owner || (vehicle.requestedBy && vehicle.requestedBy.length > 0 ? vehicle.requestedBy[0] : null) || 'N/A'
+      return h('span', { class: 'text-meta' }, owner)
+    }
+  },
+  {
+    accessorKey: 'ownershipType',
+    header: 'Ownership type',
+    meta: { title: 'Ownership type' },
+    cell: () => h('span', { class: 'text-meta' }, 'N/A')
+  },
+  {
+    accessorKey: 'ownedSince',
+    header: 'Owned since',
+    meta: { title: 'Owned since' },
+    cell: ({ row }) => h('span', { class: 'text-meta' }, formatRegistration(row.original.registration) || 'N/A')
+  },
+  {
+    accessorKey: 'warrantyInfo',
+    header: 'Warranty info',
+    meta: { title: 'Warranty info' },
+    cell: () => h('span', { class: 'text-meta' }, 'N/A')
   }
-})
+]
 
 // Filter → sort → paginate for DataTable (guide pattern)
 const filterDefsRef = computed(() => filterDefinitions)
+const columnsRef = computed(() => columns)
 const { paginatedData, totalFilteredCount } = useDataTableData({
-  rawData: filteredVehicles,
-  columns,
+  rawData: vehiclesWithType,
+  columns: columnsRef,
   globalFilter,
   columnFilters,
   sorting,
   pagination,
   filterDefs: filterDefsRef,
   searchableFields: (row) => [
+    row.inventoryType,
     row.brand,
     row.model,
     row.vin,

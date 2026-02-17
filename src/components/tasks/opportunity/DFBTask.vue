@@ -49,7 +49,7 @@
       </div>
     </div>
     
-    <div v-if="showSurvey" class="px-4 py-4 space-y-4">
+    <div v-if="showSurvey" class="mk-expanded-cards-area space-y-4">
       <PostDeliverySurvey
         ref="surveyRef"
         :opportunity="opportunity"
@@ -73,7 +73,7 @@
       </div>
     </div>
     
-    <div v-if="showReschedule" class="px-4 py-4 space-y-4">
+    <div v-if="showReschedule" class="mk-expanded-cards-area space-y-4">
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-foreground mb-2">New Delivery Date</label>

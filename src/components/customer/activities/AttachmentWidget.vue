@@ -56,48 +56,42 @@
   </Dialog>
 
   <!-- Inline Mode -->
-  <div 
+  <div
     v-else
-    class="bg-surface border border-border rounded-xl p-5 shadow-nsc-card mb-6 animate-fade-in relative"
+    class="bg-white border border-border rounded-lg p-6 shadow-nsc-card animate-fade-in relative"
   >
-    <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-surface border-t border-l border-border rotate-45"></div>
+    <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-border rotate-45"></div>
     <div class="flex justify-between items-center mb-4">
       <h5 class="text-sm font-semibold text-foreground">{{ item ? 'Edit Attachment' : 'Add Attachment' }}</h5>
       <button @click="handleCancel" class="text-muted-foreground hover:text-muted-foreground"><X class="w-4 h-4 shrink-0" /></button>
     </div>
-    <div>
-      <label class="block text-xs font-medium text-slate-700 mb-1">File</label>
-      <div class="flex items-center gap-3">
-        <input 
-          type="file" 
+    <div class="w-full">
+      <label class="block text-xs font-medium text-muted-foreground mb-1">File</label>
+      <div class="flex flex-wrap items-center gap-3 w-full">
+        <input
+          type="file"
           @change="handleFileSelect"
           ref="fileInput"
           class="hidden"
         />
-        <Button
-          label="Choose File"
-          variant="outline"
-          size="small"
-          @click="$refs.fileInput.click()"
-        />
-        <span v-if="selectedFileName" class="text-sm text-slate-600">{{ selectedFileName }}</span>
+        <Button variant="outline" @click="triggerFileInput">
+          Choose File
+        </Button>
+        <span v-if="selectedFileName" class="text-sm text-muted-foreground truncate">{{ selectedFileName }}</span>
         <span v-else class="text-sm text-muted-foreground">No file selected</span>
       </div>
     </div>
-    <div class="flex justify-end gap-2 mt-6 border-t border-border pt-4">
+    <div class="flex justify-end gap-2 mt-6 pt-4 border-t border-border">
+      <Button variant="secondary" @click="handleCancel">
+        Cancel
+      </Button>
       <Button
-        label="Cancel"
-        variant="outline"
-        size="small"
-        @click="handleCancel"
-      />
-      <Button
-        label="Save"
         variant="primary"
-        size="small"
-        :disabled="!selectedFile"
+        :disabled="!selectedFile || saving"
         @click="handleSave"
-      />
+      >
+        {{ saving ? 'Saving...' : 'Save' }}
+      </Button>
     </div>
   </div>
 </template>
@@ -176,6 +170,10 @@ watch(() => props.show, (isOpen) => {
     }, 300)
   }
 })
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
 
 const handleFileSelect = (event) => {
   const file = event.target.files[0]

@@ -2,7 +2,7 @@
   <div class="space-y-6">
     <!-- Template Selection -->
     <div class="space-y-2">
-      <Label class="block text-sm font-semibold text-foreground">Template</Label>
+      <Label class="form-label">Template</Label>
       <Select v-model="selectedTemplate" @update:model-value="onTemplateChange">
         <SelectTrigger class="w-full h-10">
           <SelectValue placeholder="Select a template..." />
@@ -18,30 +18,23 @@
 
     <!-- Message -->
     <div class="space-y-2">
-      <Label class="block text-sm font-semibold text-foreground">Message</Label>
-      <Textarea 
+      <Label class="form-label">Message</Label>
+      <Textarea
         v-model="message"
         rows="5"
         placeholder="Type your SMS message here..."
         maxlength="160"
-        class="w-full min-h-[120px] resize-none"
+        class="w-full"
       />
       <p class="text-xs text-muted-foreground mt-1">{{ message.length }}/160 characters</p>
     </div>
 
-    <div v-if="showActions" class="flex justify-end gap-3">
-      <Button
-        variant="outline"
-        size="small"
-        class="rounded-sm"
-        @click="$emit('cancel')"
-      >
+    <div v-if="showActions" class="flex justify-end gap-2">
+      <Button variant="secondary" @click="$emit('cancel')">
         Cancel
       </Button>
       <Button
-        variant="default"
-        size="small"
-        class="rounded-sm"
+        variant="primary"
         :disabled="!canSubmit()"
         @click="handleSend"
       >
