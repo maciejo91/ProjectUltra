@@ -2,7 +2,12 @@
   <div class="flex flex-col h-full bg-muted/30">
     <!-- Tabs -->
     <div class="bg-white border-b border-border px-6 sticky top-0 z-10">
-      <Tabs v-model="activeTab" :tabs="tabs" />
+      <Tabs
+        :model-value="activeTab"
+        :tabs="tabs"
+        :hide-counts="hideTabCounts"
+        @update:model-value="$emit('update:activeTab', $event)"
+      />
     </div>
 
     <!-- Tab Content -->
@@ -172,13 +177,14 @@ const props = defineProps({
   loading: Boolean,
   phoneNumber: { type: String, default: '' },
   customerId: { type: [Number, String], default: null },
-  customerInitials: { type: String, default: '?' }
+  customerInitials: { type: String, default: '?' },
+  hideTabCounts: { type: Boolean, default: false },
+  activeTab: { type: String, default: 'overview' }
 })
 
-const emit = defineEmits(['add-activity', 'add-appointment', 'communication-save', 'note-save', 'note-delete', 'attachment-save', 'attachment-delete'])
+const emit = defineEmits(['add-activity', 'add-appointment', 'communication-save', 'note-save', 'note-delete', 'attachment-save', 'attachment-delete', 'update:activeTab'])
 
 const router = useRouter()
-const activeTab = ref('overview')
 const showNoteWidget = ref(false)
 const editingNoteItem = ref(null)
 const showAttachmentWidget = ref(false)

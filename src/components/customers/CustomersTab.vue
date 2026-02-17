@@ -194,6 +194,8 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
 
 const { onTableContainerClick } = useTableRowClick(paginatedData, handleRowClick)
 
+defineExpose({ paginatedData })
+
 const customersSourceOptions = computed(() => {
   const def = filterDefinitions.value?.find(d => d.key === 'source')
   return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []

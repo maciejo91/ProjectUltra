@@ -1,99 +1,101 @@
 <template>
   <div class="page-container relative flex flex-col overflow-hidden h-full bg-surface">
-    <div class="flex-1 flex flex-col overflow-y-auto p-4 md:p-8 scrollbar-hide min-h-0">
-      <div class="flex flex-wrap items-center gap-2 py-2 mb-4">
-        <div class="outcome-toggle-group flex flex-wrap gap-3">
-          <Toggle
-            v-for="chip in filterChips"
-            :key="chip.key"
-            variant="outline"
-            :model-value="selectedSegment === chip.key"
-            :aria-pressed="selectedSegment === chip.key"
-            class="outcome-toggle-item rounded-sm"
-            @update:model-value="(p) => p && (selectedSegment = chip.key)"
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide min-h-0">
+        <div class="bg-white mb-8">
+          <div class="flex flex-wrap items-center gap-2 py-2 mb-4">
+            <div class="outcome-toggle-group flex flex-wrap gap-3">
+              <Toggle
+                v-for="chip in filterChips"
+                :key="chip.key"
+                variant="outline"
+                :model-value="selectedSegment === chip.key"
+                :aria-pressed="selectedSegment === chip.key"
+                class="outcome-toggle-item rounded-sm"
+                @update:model-value="(p) => p && (selectedSegment = chip.key)"
+              >
+                {{ chip.label }} ({{ chip.count }})
+              </Toggle>
+            </div>
+          </div>
+          <div class="mb-1">
+            <UnifiedSearchBar
+              active-tab="opportunities"
+              full-width
+              placeholder="Search requests..."
+              :pagination="pagination"
+              :assignee-options="assigneeOptions"
+              :status-options="statusOptions"
+              :source-options="sourceOptions"
+              @update:global-filter="globalFilter = $event"
+              @update:column-filters="columnFilters = $event"
+              @update:pagination="pagination = $event"
+            />
+          </div>
+          <div
+            ref="tableScrollContainer"
+            class="data-table-inner table-search-wrapper"
+            :class="{ 'hide-table-filter': !hasActiveFilters }"
           >
-            {{ chip.label }} ({{ chip.count }})
-          </Toggle>
-        </div>
-      </div>
-      <div class="bg-background rounded-xl border border-border shadow-mk-dashboard-card overflow-hidden flex-1 min-h-0 flex flex-col mb-8">
-        <div class="mb-1">
-          <UnifiedSearchBar
-            active-tab="opportunities"
-            full-width
-            placeholder="Search requests..."
-            :pagination="pagination"
-            :assignee-options="assigneeOptions"
-            :status-options="statusOptions"
-            :source-options="sourceOptions"
-            @update:global-filter="globalFilter = $event"
-            @update:column-filters="columnFilters = $event"
-            @update:pagination="pagination = $event"
-          />
-        </div>
-        <div
-          ref="tableScrollContainer"
-          class="data-table-inner table-search-wrapper"
-          :class="{ 'hide-table-filter': !hasActiveFilters }"
-        >
-          <DataTable
-            :data="displayedData"
-            :columns="columnsWithSelection"
-            :meta="tableMeta"
-            :loading="tableLoading"
-            :columnFiltersOptions="{
-              filterDefs: filterDefinitions
-            }"
-            v-model:pagination="pagination"
-            v-model:globalFilter="globalFilter"
-            v-model:sorting="sorting"
-            v-model:columnFilters="columnFilters"
-            v-model:columnVisibility="columnVisibility"
-            v-model:rowSelection="rowSelection"
-            :paginationOptions="{
-              rowCount: totalFilteredCount
-            }"
-            :globalFilterOptions="{
-              debounce: 300,
-              placeholder: 'Search requests...',
-              show: true
-            }"
-            class="h-full"
-          >
-            <template #empty-state>
-              <div class="empty-state">
-                <FileText class="empty-state-icon w-8 h-8 shrink-0 text-muted-foreground" />
-                <p class="empty-state-text text-muted-foreground">{{ emptyStateText }}</p>
-              </div>
-            </template>
-            <template #batch-action-bar>
-              <div v-if="hasSelection" class="flex items-center gap-2">
-                <div class="flex items-center gap-2 mr-1">
-                  <div class="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-blue-600 text-white text-fluid-xs font-medium">
-                    {{ selectedCount }}
-                  </div>
-                  <span class="text-white text-fluid-sm font-medium whitespace-nowrap">Items selected</span>
+            <DataTable
+              :data="displayedData"
+              :columns="columns"
+              :meta="tableMeta"
+              :loading="tableLoading"
+              :columnFiltersOptions="{
+                filterDefs: filterDefinitions
+              }"
+              v-model:pagination="pagination"
+              v-model:globalFilter="globalFilter"
+              v-model:sorting="sorting"
+              v-model:columnFilters="columnFilters"
+              v-model:columnVisibility="columnVisibility"
+              v-model:rowSelection="rowSelection"
+              :paginationOptions="{
+                rowCount: totalFilteredCount
+              }"
+              :globalFilterOptions="{
+                debounce: 300,
+                placeholder: 'Search requests...',
+                show: true
+              }"
+              class="h-full"
+            >
+              <template #empty-state>
+                <div class="empty-state">
+                  <FileText class="empty-state-icon w-8 h-8 shrink-0 text-muted-foreground" />
+                  <p class="empty-state-text text-muted-foreground">{{ emptyStateText }}</p>
                 </div>
-                <div class="h-4 w-px bg-greys-700"></div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  @click="handleBulkDelete"
-                >
-                  <Trash2 class="w-4 h-4 shrink-0 mr-2" />
-                  Delete
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  @click="clearSelection"
-                >
-                  <X class="w-4 h-4 shrink-0 mr-2" />
-                  Close
-                </Button>
-              </div>
-            </template>
-          </DataTable>
+              </template>
+              <template #batch-action-bar>
+                <div v-if="hasSelection" class="flex items-center gap-2">
+                  <div class="flex items-center gap-2 mr-1">
+                    <div class="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-blue-600 text-white text-fluid-xs font-medium">
+                      {{ selectedCount }}
+                    </div>
+                    <span class="text-white text-fluid-sm font-medium whitespace-nowrap">Items selected</span>
+                  </div>
+                  <div class="h-4 w-px bg-greys-700"></div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    @click="handleBulkDelete"
+                  >
+                    <Trash2 class="w-4 h-4 shrink-0 mr-2" />
+                    Delete
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    @click="clearSelection"
+                  >
+                    <X class="w-4 h-4 shrink-0 mr-2" />
+                    Close
+                  </Button>
+                </div>
+              </template>
+            </DataTable>
+          </div>
         </div>
       </div>
     </div>
@@ -129,7 +131,7 @@ const opportunitiesStore = useOpportunitiesStore()
 
 const tableScrollContainer = ref(null)
 
-const { rowSelection, selectedCount, hasSelection, getSelectedRows, clearSelection, createSelectionColumn } = useTableRowSelection((row) => row.compositeId)
+const { rowSelection, selectedCount, hasSelection, getSelectedRows, clearSelection } = useTableRowSelection((row) => row.compositeId)
 
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
 const sorting = ref([])
@@ -268,7 +270,6 @@ const getRequestFilterValue = (row, key) => {
   return getNestedProperty(row, key)
 }
 
-const columnsWithSelection = computed(() => [createSelectionColumn(), ...columns.value])
 
 watch(selectedSegment, () => {
   pagination.value.pageIndex = 0
@@ -276,7 +277,7 @@ watch(selectedSegment, () => {
 
 const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
   rawData: filteredList,
-  columns: columnsWithSelection,
+  columns: columns,
   globalFilter,
   columnFilters,
   sorting,

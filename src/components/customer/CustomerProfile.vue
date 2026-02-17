@@ -1,5 +1,50 @@
 <template>
-  <div class="h-full flex overflow-hidden bg-surface">
+  <div class="h-full flex flex-col overflow-hidden bg-surface">
+    <!-- Drawer header (matches TaskDetailHeader when in drawer) -->
+    <header
+      v-if="showCloseButton"
+      class="customer-profile-drawer-header shrink-0 px-4 sm:px-6"
+    >
+      <div class="customer-profile-drawer-header-content">
+        <div class="min-w-0 flex-1 flex items-center min-h-0">
+          <h3 class="text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
+            {{ customerDisplayName || 'Customer' }}
+          </h3>
+        </div>
+        <div class="customer-profile-drawer-header-actions shrink-0">
+          <Button
+            variant="secondary"
+            size="icon"
+            class="rounded-sm"
+            aria-label="Previous"
+            :disabled="!hasPrevious"
+            @click="emit('customer-navigate', 'previous')"
+          >
+            <ChevronLeft :size="16" class="text-muted-foreground" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            class="rounded-sm"
+            aria-label="Next"
+            :disabled="!hasNext"
+            @click="emit('customer-navigate', 'next')"
+          >
+            <ChevronRight :size="16" class="text-muted-foreground" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            class="rounded-sm ml-0.5 sm:ml-1"
+            aria-label="Close"
+            @click="emit('close')"
+          >
+            <X :size="16" class="text-muted-foreground" />
+          </Button>
+        </div>
+      </div>
+    </header>
+    <div class="flex-1 flex min-h-0 overflow-hidden">
     <!-- Left Sidebar: Customer Profile Card -->
     <div class="w-[350px] shrink-0 border-r border-border h-full overflow-y-auto bg-white">
       <CustomerProfileSidebar
@@ -18,6 +63,7 @@
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-muted/30">
       <CustomerProfileContent
+        v-model:active-tab="activeTab"
         :summary="customerSummary"
         :activities="customerActivities"
         :appointments="customerAppointments"
@@ -27,6 +73,7 @@
         :phone-number="customer?.phone || ''"
         :customer-id="customerId"
         :customer-initials="customer?.initials || '?'"
+        :hide-tab-counts="showCloseButton"
         @add-activity="handleAddActivity"
         @add-appointment="showCreateAppointmentModal = true"
         @communication-save="handleCommunicationSave"
@@ -35,6 +82,7 @@
         @attachment-save="handleAttachmentSave"
         @attachment-delete="handleAttachmentDelete"
       />
+    </div>
     </div>
 
     <!-- Modals -->
@@ -76,6 +124,8 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { Button } from '@motork/component-library/future/primitives'
+import { X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useCustomersStore } from '@/stores/customers'
@@ -109,10 +159,14 @@ const props = defineProps({
   closeOnConvert: {
     type: Boolean,
     default: false
+  },
+  filteredCustomerRows: {
+    type: Array,
+    default: () => []
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'customer-navigate'])
 
 const router = useRouter()
 const customersStore = useCustomersStore()
@@ -145,12 +199,33 @@ const showAddTagModal = ref(false)
 const showComingSoonModal = ref(false)
 const comingSoonTitle = ref('')
 
+const activeTab = ref('overview')
+
 const currentUser = computed(() => userStore.currentUser)
 
 const customer = computed(() => customerData.value || customersStore.currentCustomer)
 
 const customerSummary = computed(() => {
    return customerData.value?.summary || ''
+})
+
+const customerDisplayName = computed(() => {
+  const c = customer.value
+  if (!c) return ''
+  return c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Customer'
+})
+
+const currentCustomerIndex = computed(() => {
+  const rows = props.filteredCustomerRows || []
+  if (!rows.length || props.customerId == null) return -1
+  const id = Number(props.customerId)
+  return rows.findIndex((r) => (r.customerId ?? parseInt(String(r.id).replace('customer-', ''), 10)) === id)
+})
+const hasPrevious = computed(() => currentCustomerIndex.value > 0)
+const hasNext = computed(() => {
+  const idx = currentCustomerIndex.value
+  const rows = props.filteredCustomerRows || []
+  return idx >= 0 && idx < rows.length - 1
 })
 
 const getContactForModal = computed(() => {
@@ -244,17 +319,12 @@ const loadCustomerData = async () => {
 }
 
 const handleSidebarAction = (action) => {
-  if (action === 'call') {
-    comingSoonTitle.value = 'Call Feature'
-    showComingSoonModal.value = true
-  } else if (action === 'email') {
-    comingSoonTitle.value = 'Email Feature'
-    showComingSoonModal.value = true
+  if (action === 'call' || action === 'email') {
+    activeTab.value = 'communicate'
   } else if (action === 'note') {
-    comingSoonTitle.value = 'Add Note'
-    showComingSoonModal.value = true
+    activeTab.value = 'notes'
   } else if (action === 'appointment') {
-    showCreateAppointmentModal.value = true
+    activeTab.value = 'appointments'
   } else {
     comingSoonTitle.value = 'More Actions'
     showComingSoonModal.value = true
@@ -384,3 +454,28 @@ watch(() => props.customerId, () => {
   loadCustomerData()
 })
 </script>
+
+<style scoped>
+.customer-profile-drawer-header {
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+  height: 3rem;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+}
+
+.customer-profile-drawer-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.customer-profile-drawer-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+</style>
