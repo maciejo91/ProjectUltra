@@ -119,8 +119,7 @@
         <Label class="text-xs font-medium text-muted-foreground mb-1">Registration Year/Month</Label>
         <Input 
           v-model="vehicleData.registration"
-          type="text" 
-          placeholder="MM/YYYY (e.g., 01/2024)" 
+          type="text"
         />
       </div>
 

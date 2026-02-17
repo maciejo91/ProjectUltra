@@ -97,7 +97,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
   // Table meta configuration
   const tableMeta = computed(() => ({
     class: {
-      tr: 'cursor-pointer hover:bg-gray-50 transition-colors border-black/5'
+      tr: 'cursor-pointer hover:bg-muted transition-colors border-black/5'
     }
   }))
 
@@ -217,8 +217,8 @@ export function useCustomersTable(activeTab, handleRowClick) {
                 class: 'w-9 h-9 rounded-full flex items-center justify-center text-fluid-xs font-bold shrink-0 bg-orange-100 text-orange-600'
               }, rowData.initials),
               h('div', { class: 'min-w-0' }, [
-                h('div', { class: 'text-fluid-sm font-semibold text-gray-900 truncate' }, rowData.customer),
-                h('div', { class: 'text-fluid-xs text-gray-500 truncate hidden sm:block' }, rowData.email)
+                h('div', { class: 'text-fluid-sm font-semibold text-foreground truncate' }, rowData.customer),
+                h('div', { class: 'text-fluid-xs text-muted-foreground truncate hidden sm:block' }, rowData.email)
               ])
             ])
           }
@@ -232,10 +232,10 @@ export function useCustomersTable(activeTab, handleRowClick) {
             if (!rowData.nextActionFull) return '-'
             return h('div', { class: 'text-fluid-sm' }, [
               h('div', {
-                class: `font-medium mb-0.5 ${rowData.deadlineStatus?.textClass || 'text-gray-600'}`
+                class: `font-medium mb-0.5 ${rowData.deadlineStatus?.textClass || 'text-foreground'}`
               }, rowData.nextActionFull),
               h('div', {
-                class: `text-fluid-xs flex items-center gap-1 ${rowData.deadlineStatus?.textClass || 'text-gray-500'}`
+                class: `text-fluid-xs flex items-center gap-1 ${rowData.deadlineStatus?.textClass || 'text-muted-foreground'}`
               }, [
                 rowData.deadlineStatus?.iconClass ? h(getLucideIcon(rowData.deadlineStatus.iconClass), { size: 14, class: 'shrink-0 text-fluid-xs' }) : null,
                 h('span', rowData.nextAction)
@@ -249,8 +249,8 @@ export function useCustomersTable(activeTab, handleRowClick) {
           meta: { title: 'Requested car' },
           cell: ({ row }) => {
             return h('div', { class: 'flex items-center gap-2' }, [
-              h(getLucideIcon('fa-brands fa-volkswagen'), { size: 14, class: 'shrink-0 text-gray-400 text-fluid-sm' }),
-              h('span', { class: 'text-fluid-sm font-medium text-gray-900 truncate max-w-[120px]' }, row.original.car || 'N/A')
+              h(getLucideIcon('fa-brands fa-volkswagen'), { size: 14, class: 'shrink-0 text-muted-foreground text-fluid-sm' }),
+              h('span', { class: 'text-fluid-sm font-medium text-foreground truncate max-w-[120px]' }, row.original.car || 'N/A')
             ])
           }
         },
@@ -269,7 +269,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           header: 'Request type',
           meta: { title: 'Request type' },
           cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.requestType || 'N/A')
+            return h('span', { class: 'text-fluid-sm text-muted-foreground' }, row.original.requestType || 'N/A')
           }
         },
         {
@@ -278,7 +278,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           meta: { title: 'Source' },
           cell: ({ row }) => {
             return h('span', {
-              class: 'inline-flex items-center px-2 py-0.5 rounded text-fluid-xs font-semibold bg-gray-100 text-gray-700'
+              class: 'inline-flex items-center px-2 py-0.5 rounded text-fluid-xs font-semibold bg-muted text-muted-foreground'
             }, row.original.source || 'N/A')
           }
         },
@@ -289,9 +289,9 @@ export function useCustomersTable(activeTab, handleRowClick) {
           cell: ({ row }) => {
             return h('div', { class: 'flex items-center gap-2' }, [
               h('div', {
-                class: 'w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-fluid-xs font-bold text-gray-600 shrink-0'
+                class: 'w-6 h-6 rounded-full bg-muted flex items-center justify-center text-fluid-xs font-bold text-muted-foreground shrink-0'
               }, row.original.assigneeInitials),
-              h('span', { class: 'text-fluid-sm text-gray-600 truncate max-w-[80px] hidden md:inline' }, row.original.assignee || 'N/A')
+              h('span', { class: 'text-fluid-sm text-muted-foreground truncate max-w-[80px] hidden md:inline' }, row.original.assignee || 'N/A')
             ])
           }
         },
@@ -300,7 +300,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           header: 'Created at',
           meta: { title: 'Created at' },
           cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.createdAt || 'N/A')
+            return h('span', { class: 'text-fluid-sm text-muted-foreground' }, row.original.createdAt || 'N/A')
           }
         },
         {
@@ -308,7 +308,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           header: 'Last activity',
           meta: { title: 'Last activity' },
           cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.lastActivity || 'N/A')
+            return h('span', { class: 'text-fluid-sm text-muted-foreground' }, row.original.lastActivity || 'N/A')
           }
         },
         {
@@ -327,7 +327,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           meta: { title: 'Actions' },
           cell: () => {
             return h('button', {
-              class: 'text-gray-400 hover:text-gray-600'
+              class: 'text-muted-foreground hover:text-foreground'
             }, [
               h('i', { class: 'fa-solid fa-ellipsis-vertical' })
             ])
@@ -351,8 +351,8 @@ export function useCustomersTable(activeTab, handleRowClick) {
                 class: 'w-9 h-9 rounded-full flex items-center justify-center text-fluid-xs font-bold shrink-0 bg-purple-100 text-purple-600'
               }, rowData.initials),
               h('div', { class: 'min-w-0' }, [
-                h('div', { class: 'text-fluid-sm font-semibold text-gray-900 truncate' }, rowData.customer),
-                h('div', { class: 'text-fluid-xs text-gray-500 truncate hidden sm:block' }, rowData.email)
+                h('div', { class: 'text-fluid-sm font-semibold text-foreground truncate' }, rowData.customer),
+                h('div', { class: 'text-fluid-xs text-muted-foreground truncate hidden sm:block' }, rowData.email)
               ])
             ])
           }
@@ -366,10 +366,10 @@ export function useCustomersTable(activeTab, handleRowClick) {
             if (!rowData.nextActionFull) return '-'
             return h('div', { class: 'text-fluid-sm' }, [
               h('div', {
-                class: `font-medium mb-0.5 ${rowData.deadlineStatus?.textClass || 'text-gray-600'}`
+                class: `font-medium mb-0.5 ${rowData.deadlineStatus?.textClass || 'text-foreground'}`
               }, rowData.nextActionFull),
               h('div', {
-                class: `text-fluid-xs flex items-center gap-1 ${rowData.deadlineStatus?.textClass || 'text-gray-500'}`
+                class: `text-fluid-xs flex items-center gap-1 ${rowData.deadlineStatus?.textClass || 'text-muted-foreground'}`
               }, [
                 rowData.deadlineStatus?.iconClass ? h(getLucideIcon(rowData.deadlineStatus.iconClass), { size: 14, class: 'shrink-0 text-fluid-xs' }) : null,
                 h('span', rowData.nextAction)
@@ -383,8 +383,8 @@ export function useCustomersTable(activeTab, handleRowClick) {
           meta: { title: 'Offered car' },
           cell: ({ row }) => {
             return h('div', { class: 'flex items-center gap-2' }, [
-              h(getLucideIcon('fa-brands fa-volkswagen'), { size: 14, class: 'shrink-0 text-gray-400 text-fluid-sm' }),
-              h('span', { class: 'text-fluid-sm font-medium text-gray-900 truncate max-w-[120px]' }, row.original.car || 'N/A')
+              h(getLucideIcon('fa-brands fa-volkswagen'), { size: 14, class: 'shrink-0 text-muted-foreground text-fluid-sm' }),
+              h('span', { class: 'text-fluid-sm font-medium text-foreground truncate max-w-[120px]' }, row.original.car || 'N/A')
             ])
           }
         },
@@ -403,7 +403,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           header: 'Request type',
           meta: { title: 'Request type' },
           cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.requestType || 'N/A')
+            return h('span', { class: 'text-fluid-sm text-muted-foreground' }, row.original.requestType || 'N/A')
           }
         },
         {
@@ -412,7 +412,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           meta: { title: 'Source' },
           cell: ({ row }) => {
             return h('span', {
-              class: 'inline-flex items-center px-2 py-0.5 rounded text-fluid-xs font-semibold bg-gray-100 text-gray-700'
+              class: 'inline-flex items-center px-2 py-0.5 rounded text-fluid-xs font-semibold bg-muted text-muted-foreground'
             }, row.original.source || 'N/A')
           }
         },
@@ -423,9 +423,9 @@ export function useCustomersTable(activeTab, handleRowClick) {
           cell: ({ row }) => {
             return h('div', { class: 'flex items-center gap-2' }, [
               h('div', {
-                class: 'w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-fluid-xs font-bold text-gray-600 shrink-0'
+                class: 'w-6 h-6 rounded-full bg-muted flex items-center justify-center text-fluid-xs font-bold text-muted-foreground shrink-0'
               }, row.original.assigneeInitials),
-              h('span', { class: 'text-fluid-sm text-gray-600 truncate max-w-[80px] hidden md:inline' }, row.original.assignee || 'N/A')
+              h('span', { class: 'text-fluid-sm text-muted-foreground truncate max-w-[80px] hidden md:inline' }, row.original.assignee || 'N/A')
             ])
           }
         },
@@ -434,7 +434,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           header: 'Created at',
           meta: { title: 'Created at' },
           cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.createdAt || 'N/A')
+            return h('span', { class: 'text-fluid-sm text-muted-foreground' }, row.original.createdAt || 'N/A')
           }
         },
         {
@@ -442,7 +442,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           header: 'Last appointment',
           meta: { title: 'Last appointment' },
           cell: ({ row }) => {
-            return h('span', { class: 'text-fluid-sm text-gray-600' }, row.original.lastAppointment || 'N/A')
+            return h('span', { class: 'text-fluid-sm text-muted-foreground' }, row.original.lastAppointment || 'N/A')
           }
         },
         {
@@ -461,7 +461,7 @@ export function useCustomersTable(activeTab, handleRowClick) {
           meta: { title: 'Actions' },
           cell: () => {
             return h('button', {
-              class: 'text-gray-400 hover:text-gray-600'
+              class: 'text-muted-foreground hover:text-foreground'
             }, [
               h('i', { class: 'fa-solid fa-ellipsis-vertical' })
             ])

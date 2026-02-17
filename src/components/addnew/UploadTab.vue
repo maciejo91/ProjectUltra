@@ -6,19 +6,13 @@
         <CardTitle>Select Source</CardTitle>
       </CardHeader>
       <CardContent class="space-y-6">
-        <p class="text-muted-foreground text-xs">
-          Choose what type of data you want to import.
-        </p>
-        
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <Card
         v-for="type in sources"
         :key="type.value"
         @click="selectedSource = type.value"
-        class="cursor-pointer transition-all p-1"
-        :class="selectedSource === type.value
-          ? 'border-2 border-brand-primary bg-white shadow-md'
-          : 'border-border hover:border-brand-primary/30 bg-white'"
+        class="upload-source-card cursor-pointer transition-all p-1 border border-border bg-white hover:border-border"
+        :class="{ 'upload-source-card-selected': selectedSource === type.value }"
       >
         <CardContent class="p-4">
           <div class="flex items-center gap-3 mb-1">
@@ -393,3 +387,9 @@ const processRow = async (row) => {
   }
 }
 </script>
+
+<style scoped>
+.upload-source-card-selected {
+  border: 2px solid var(--base-primary) !important;
+}
+</style>

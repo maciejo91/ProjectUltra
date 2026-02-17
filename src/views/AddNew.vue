@@ -1,43 +1,40 @@
 <template>
   <div class="page-container overflow-y-auto">
-    <!-- Header -->
-    <PageHeader title="Add New Customer" />
-    
-    <div class="px-4 md:px-8 py-8">
-      <div class="max-w-6xl mx-auto">
-        <!-- Tabs using Motork Tabs components -->
-        <div class="mb-2 -mt-2">
-          <Tabs v-model="activeTab" class="w-full">
-            <TabsList class="flex shrink-0 border-b border-border bg-white rounded-none w-full relative h-full">
+    <Tabs v-model="activeTab">
+      <PageHeader title="Add New Customer">
+        <template #bottom>
+          <div class="pb-0">
+            <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
               <TabsTrigger
                 v-for="tab in tabs"
                 :key="tab.key"
                 :value="tab.key"
-                class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full shrink-0"
-                :class="activeTab === tab.key 
-                  ? 'text-foreground' 
-                  : 'text-muted-foreground hover:text-muted-foreground'"
+                class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+                :class="activeTab === tab.key ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
               >
                 <span class="whitespace-nowrap">{{ tab.label }}</span>
-                <span 
+                <span
                   v-if="activeTab === tab.key"
                   class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
-                ></span>
+                />
               </TabsTrigger>
             </TabsList>
+          </div>
+        </template>
+      </PageHeader>
 
-            <!-- Tab Content -->
-            <TabsContent value="manual">
-              <ManualTab ref="manualTabRef" @submit="handleSubmit" />
-            </TabsContent>
+      <div class="pt-2 px-4 pb-8 md:pt-3 md:px-6 md:pb-10 lg:pt-4 lg:px-8 lg:pb-12">
+        <div class="max-w-6xl mx-auto">
+          <TabsContent value="manual" class="add-new-manual data-[state=inactive]:hidden">
+            <ManualTab ref="manualTabRef" @submit="handleSubmit" />
+          </TabsContent>
 
-            <TabsContent value="upload">
-              <UploadTab />
-            </TabsContent>
-          </Tabs>
+          <TabsContent value="upload" class="data-[state=inactive]:hidden">
+            <UploadTab />
+          </TabsContent>
         </div>
       </div>
-    </div>
+    </Tabs>
   </div>
 </template>
 
@@ -179,10 +176,10 @@ const handleSubmit = async (formData) => {
 </script>
 
 <style scoped>
-/* Tab styling to match Customers.vue */
+/* Tab styling to match Settings.vue */
 :deep([role="tablist"]) {
   border: none !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border-bottom: 1px solid var(--color-border) !important;
   padding: 0 !important;
   margin: 0 !important;
   gap: 0 !important;
@@ -198,7 +195,7 @@ const handleSubmit = async (formData) => {
   border-right: none !important;
   border-bottom: none !important;
   margin: 0 !important;
-  padding: 6px 16px 12px 16px !important;
+  padding: 12px 16px !important;
   position: relative !important;
   box-shadow: none !important;
   height: 100% !important;

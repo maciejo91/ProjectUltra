@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 /**
  * Composable for LQWidget outcome selection logic
@@ -171,24 +171,60 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     return dates
   })
 
-  const messageTemplates = computed(() => {
+  // Template bodies with placeholders: {{customer_name}}, {{car_brand}}, {{car_model}}, {{next_call_date}}, {{dealership}}
+  const TEMPLATES_WITH_PLACEHOLDERS = {
+    'followup-1': 'Hi {{customer_name}}! I tried calling you earlier but couldn\'t reach you. When would be a good time to discuss the {{car_brand}} {{car_model}}?',
+    'followup-2': 'Hello {{customer_name}}, this is regarding your inquiry about the {{car_brand}} {{car_model}}. Please let me know when you\'re available for a call.',
+    custom: ''
+  }
+
+  const messageTemplates = computed(() => ({
+    'followup-1': TEMPLATES_WITH_PLACEHOLDERS['followup-1'],
+    'followup-2': TEMPLATES_WITH_PLACEHOLDERS['followup-2'],
+    custom: TEMPLATES_WITH_PLACEHOLDERS.custom
+  }))
+
+  // Editable message body (template with placeholders); user can edit in the multiline input
+  const followupMessageBody = ref('')
+
+  const messagePreview = computed(() => followupMessageBody.value)
+
+  /**
+   * Resolve placeholders in the message body using lead data and next call date.
+   * Placeholders: {{customer_name}}, {{car_brand}}, {{car_model}}, {{next_call_date}}, {{dealership}}
+   */
+  const resolveFollowupMessage = (body, nextCallDateIso = null) => {
+    if (!body || typeof body !== 'string') return ''
     const customerName = lead.value?.customer?.name?.split(' ')[0] || ''
     const carBrand = lead.value?.requestedCar?.brand || ''
     const carModel = lead.value?.requestedCar?.model || ''
-    
-    return {
-      'followup-1': `Hi ${customerName}! I tried calling you earlier but couldn't reach you. When would be a good time to discuss the ${carBrand} ${carModel}?`,
-      'followup-2': `Hello ${customerName}, this is regarding your inquiry about the ${carBrand} ${carModel}. Please let me know when you're available for a call.`,
-      'custom': ''
-    }
-  })
-
-  const messagePreview = computed(() => {
-    if (selectedTemplate.value === 'custom') {
-      return 'Type your custom message...'
-    }
-    return messageTemplates.value[selectedTemplate.value] || ''
-  })
+    const dealership = lead.value?.requestedCar?.dealership || lead.value?.customer?.dealership || ''
+    const nextCallDate = nextCallDateIso != null
+      ? (() => {
+          try {
+            const d = new Date(nextCallDateIso)
+            return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+          } catch {
+            return ''
+          }
+        })()
+      : (() => {
+          try {
+            const iso = calculateNextCallDate()
+            if (!iso) return ''
+            const d = new Date(iso)
+            return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+          } catch {
+            return ''
+          }
+        })()
+    return body
+      .replace(/\{\{customer_name\}\}/g, customerName)
+      .replace(/\{\{car_brand\}\}/g, carBrand)
+      .replace(/\{\{car_model\}\}/g, carModel)
+      .replace(/\{\{next_call_date\}\}/g, nextCallDate)
+      .replace(/\{\{dealership\}\}/g, dealership)
+  }
 
   // Scheduled appointments are only on opportunities, not leads
   const hasExistingAppointment = computed(() => false)
@@ -276,6 +312,12 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     tomorrow.setHours(9, 0, 0, 0)
     return tomorrow.toISOString()
   }
+
+  // Sync editable body when template selection changes; fill placeholders from lead data when available
+  watch(selectedTemplate, (templateId) => {
+    const raw = TEMPLATES_WITH_PLACEHOLDERS[templateId] ?? ''
+    followupMessageBody.value = raw ? resolveFollowupMessage(raw, calculateNextCallDate() || null) : ''
+  }, { immediate: true })
 
   const selectOutcome = (outcome) => {
     selectedOutcome.value = outcome
@@ -461,6 +503,8 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     // Computed
     messageTemplates,
     messagePreview,
+    followupMessageBody,
+    resolveFollowupMessage,
     hasExistingAppointment,
     // Methods
     selectOutcome,

@@ -126,7 +126,7 @@ const rows = computed(() => {
         deadlineStatus: getDeadlineStatus(opp.expectedCloseDate),
         car: `${opp.vehicle?.brand || ''} ${opp.vehicle?.model || ''}`.trim() || 'N/A',
         carStatus: opp.vehicle?.stockDays !== undefined && opp.vehicle?.stockDays !== null ? 'In Stock' : 'Out of Stock',
-        carStatusClass: opp.vehicle?.stockDays !== undefined && opp.vehicle?.stockDays !== null ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground',
+        carStatusClass: opp.vehicle?.stockDays !== undefined && opp.vehicle?.stockDays !== null ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-muted-foreground',
         requestType: opp.requestType || 'Opportunity',
         source: opp.source || 'Marketing',
         assignee: opp.assignee,
@@ -134,7 +134,7 @@ const rows = computed(() => {
         createdAt: formatDate(opp.createdAt),
         lastAppointment: lastAppointment ? formatDate(lastAppointment) : 'N/A',
         status: getDisplayStage(opp, 'opportunity'),
-        statusClass: 'bg-green-100 text-green-700',
+        statusClass: 'bg-emerald-100 text-emerald-700',
         priority: opp.priority || 'Normal'
       }
     })

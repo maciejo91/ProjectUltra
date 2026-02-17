@@ -1,6 +1,8 @@
 import { mockVehicles } from './mockData'
 
-const delay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms))
+// Simulate API delay (0 in dev for instant feedback; 50ms in prod)
+const delayMs = import.meta.env.DEV ? 0 : 50
+const delay = (ms = delayMs) => ms <= 0 ? Promise.resolve() : new Promise(resolve => setTimeout(resolve, ms))
 
 export const fetchVehicles = async (filters = {}) => {
   await delay()

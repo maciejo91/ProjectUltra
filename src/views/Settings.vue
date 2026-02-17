@@ -1,251 +1,164 @@
 <template>
-  <div class="page-container">
-    <!-- Header -->
-    <PageHeader title="Settings">
-      <template #actions>
-      </template>
-    </PageHeader>
-    
-    <!-- Content -->
-    <div class="pt-2 px-4 pb-4 md:pt-3 md:px-6 md:pb-6 lg:pt-4 lg:px-8 lg:pb-8">
-      <!-- Tabs -->
-      <Tabs v-model="activeTab" class="mb-6">
-        <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
-          <TabsTrigger
-            value="tasks"
-            class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
-            :class="activeTab === 'tasks' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
-          >
-            <span>Tasks</span>
-            <span
-              v-if="activeTab === 'tasks'"
-              class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
-            />
-          </TabsTrigger>
-          <TabsTrigger
-            value="scores"
-            class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
-            :class="activeTab === 'scores' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
-          >
-            <span>Scores</span>
-            <span
-              v-if="activeTab === 'scores'"
-              class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
-            />
-          </TabsTrigger>
-          <TabsTrigger
-            value="navigation"
-            class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
-            :class="activeTab === 'navigation' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
-          >
-            <span>Navigation</span>
-            <span
-              v-if="activeTab === 'navigation'"
-              class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
-            />
-          </TabsTrigger>
-        </TabsList>
+  <div class="page-container overflow-y-auto">
+    <Tabs v-model="activeTab">
+      <!-- Header with tabs in bottom slot -->
+      <PageHeader title="Settings">
+        <template #actions>
+        </template>
+        <template #bottom>
+          <div class="pb-0">
+            <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
+              <TabsTrigger
+                value="tasks"
+                class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+                :class="activeTab === 'tasks' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+              >
+                <span>Tasks</span>
+                <span
+                  v-if="activeTab === 'tasks'"
+                  class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+                />
+              </TabsTrigger>
+              <TabsTrigger
+                value="scores"
+                class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+                :class="activeTab === 'scores' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+              >
+                <span>Scores</span>
+                <span
+                  v-if="activeTab === 'scores'"
+                  class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+                />
+              </TabsTrigger>
+              <TabsTrigger
+                value="navigation"
+                class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+                :class="activeTab === 'navigation' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+              >
+                <span>Navigation</span>
+                <span
+                  v-if="activeTab === 'navigation'"
+                  class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+                />
+              </TabsTrigger>
+            </TabsList>
+          </div>
+        </template>
+      </PageHeader>
 
-        <form @submit.prevent="handleSave" class="mt-6 flex flex-col max-h-[calc(100vh-10rem)]">
+      <!-- Content -->
+      <div class="pt-2 px-4 pb-8 md:pt-3 md:px-6 md:pb-10 lg:pt-4 lg:px-8 lg:pb-12">
+        <form @submit.prevent="handleSave" class="mt-6 flex flex-col">
           <!-- Tasks Tab Content -->
-          <TabsContent value="tasks" class="flex flex-col flex-1 min-h-0 data-[state=inactive]:hidden">
-            <div class="overflow-y-auto flex-1 min-h-0">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 space-y-8">
-              <!-- Opportunity Expected Close Date -->
-              <div class="bg-card border border-border rounded-lg p-6">
-                <h2 class="text-lg font-semibold text-foreground mb-4">Expected Close Date</h2>
-                <p class="text-sm text-muted-foreground mb-6">Configure default expected close date for new opportunities.</p>
-                
-                <div class="space-y-6">
-                  <div>
-                    <Label class="text-sm font-medium text-foreground mb-2">Default Expected Close Date (Days)</Label>
-                    <p class="text-sm text-muted-foreground mb-2">Number of days from creation date to set as default expected close date</p>
-                    <Input
-                      type="number"
-                      v-model.number="localSettings.expectedCloseDateDays"
-                      min="1"
-                      class="w-full max-w-xs"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Lead Management -->
-              <div class="bg-card border border-border rounded-lg p-6">
-                <h2 class="text-lg font-semibold text-foreground mb-4">Lead Management</h2>
-                <p class="text-sm text-muted-foreground mb-6">Configure lead qualification and conversion settings.</p>
-                
-                <div class="space-y-6">
-                  <div>
-                    <Label class="text-sm font-medium text-foreground mb-2">Max Contact Attempts</Label>
-                    <p class="text-sm text-muted-foreground mb-2">Maximum number of contact attempts before auto-disqualification</p>
-                    <Input
-                      type="number"
-                      v-model.number="localSettings.maxContactAttempts"
-                      min="1"
-                      max="20"
-                      class="w-full max-w-xs"
-                    />
-                  </div>
-
-                  <Checkbox
-                    v-model="localSettings.excludeNotValidFromConversion"
-                    label='Exclude "NOT VALID" leads from conversion rate calculations'
-                  />
-                </div>
-              </div>
-
-              <!-- Opportunity Task Widget Thresholds -->
-              <div class="bg-card border border-border rounded-lg p-6 lg:col-span-2">
-                <h2 class="text-lg font-semibold text-foreground mb-4">Opportunity Task Widget Thresholds</h2>
-                <p class="text-sm text-muted-foreground mb-6">Configure the number of days before task widgets are triggered for opportunities.</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label class="text-sm font-medium text-foreground mb-2">OOFB (Overdue Offer Follow-up)</Label>
-                    <div class="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label class="text-sm text-muted-foreground mb-1">Min Days</Label>
-                        <Input
-                          type="number"
-                          v-model.number="localSettings.oofbMinDays"
-                          min="1"
-                          class="w-full"
-                        />
-                      </div>
-                      <div>
-                        <Label class="text-sm text-muted-foreground mb-1">Max Days</Label>
-                        <Input
-                          type="number"
-                          v-model.number="localSettings.oofbMaxDays"
-                          min="1"
-                          class="w-full"
-                        />
-                      </div>
+          <TabsContent value="tasks" class="data-[state=inactive]:hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <!-- Card: Opportunity settings -->
+              <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card flex flex-col">
+                <h3 class="text-title mb-6">Opportunity settings</h3>
+                <div class="space-y-8">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div class="space-y-3">
+                      <Label class="text-content font-medium text-foreground">Expected Close Date (Days)</Label>
+                      <Input type="number" v-model.number="localSettings.expectedCloseDateDays" min="1" class="w-full" />
+                    </div>
+                    <div class="space-y-3">
+                      <Label class="text-content font-medium text-foreground">Abandoned Threshold (Days)</Label>
+                      <Input type="number" v-model.number="localSettings.abandonedOpportunityDays" min="1" class="w-full" />
                     </div>
                   </div>
-                  <div>
-                    <Label class="text-sm font-medium text-foreground mb-2">UFB (Urgent Follow-up)</Label>
-                    <Label class="text-sm text-muted-foreground mb-1">Days Threshold</Label>
-                    <Input
-                      type="number"
-                      v-model.number="localSettings.ufbDays"
-                      min="1"
-                      class="w-full"
-                    />
-                  </div>
-                  <div>
-                    <Label class="text-sm font-medium text-foreground mb-2">OFB (Offer Follow-up)</Label>
-                    <Label class="text-sm text-muted-foreground mb-1">Days Threshold</Label>
-                    <Input
-                      type="number"
-                      v-model.number="localSettings.ofbDays"
-                      min="1"
-                      class="w-full"
-                    />
-                  </div>
-                  <div>
-                    <Label class="text-sm font-medium text-foreground mb-2">NFU (No Future Updates)</Label>
-                    <Label class="text-sm text-muted-foreground mb-1">Days Threshold</Label>
-                    <Input
-                      type="number"
-                      v-model.number="localSettings.nfuDays"
-                      min="1"
-                      class="w-full"
-                    />
-                  </div>
-                  <div>
-                    <Label class="text-sm font-medium text-foreground mb-2">CFB (Contract Follow-up)</Label>
-                    <Label class="text-sm text-muted-foreground mb-1">Days Threshold</Label>
-                    <Input
-                      type="number"
-                      v-model.number="localSettings.cfbDays"
-                      min="1"
-                      class="w-full"
-                    />
-                  </div>
-                  <div>
-                    <Label class="text-sm font-medium text-foreground mb-2">DFB (Delivery Feedback)</Label>
-                    <Label class="text-sm text-muted-foreground mb-1">Days Threshold</Label>
-                    <Input
-                      type="number"
-                      v-model.number="localSettings.dfbDays"
-                      min="1"
-                      class="w-full"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Task Postponement -->
-              <div class="bg-card border border-border rounded-lg p-6">
-                <h2 class="text-lg font-semibold text-foreground mb-4">Task Postponement</h2>
-                <p class="text-sm text-muted-foreground mb-6">Configure task postponement behavior.</p>
-                
-                <div class="space-y-6">
-                  <div>
-                    <Label class="text-sm font-medium text-foreground mb-2">Default Postpone Period (Days)</Label>
-                    <p class="text-sm text-muted-foreground mb-2">Default number of days to postpone a task when postponed</p>
-                    <Input
-                      type="number"
-                      v-model.number="localSettings.postponeTaskDays"
-                      min="1"
-                      class="w-full max-w-xs"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Opportunity Abandonment -->
-              <div class="bg-card border border-border rounded-lg p-6">
-                <h2 class="text-lg font-semibold text-foreground mb-4">Opportunity Abandonment</h2>
-                <p class="text-sm text-muted-foreground mb-6">Configure when opportunities are marked as abandoned.</p>
-                
-                <div class="space-y-6">
-                  <div>
-                    <Label class="text-sm font-medium text-foreground mb-2">Abandoned Threshold (Days)</Label>
-                    <p class="text-sm text-muted-foreground mb-2">Number of days with no activity before marking as abandoned</p>
-                    <Input
-                      type="number"
-                      v-model.number="localSettings.abandonedOpportunityDays"
-                      min="1"
-                      class="w-full max-w-xs"
-                    />
-                  </div>
-                  <div>
-                    <Label class="text-sm font-medium text-foreground mb-3">Eligible Stages</Label>
-                    <p class="text-sm text-muted-foreground mb-3">Select which stages can be marked as abandoned</p>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      <div
-                        v-for="stage in availableStages"
-                        :key="stage"
-                        class="flex items-center gap-2"
-                      >
+                  <div class="space-y-3">
+                    <Label class="text-content font-medium text-foreground">Eligible Stages (abandonment)</Label>
+                    <p class="text-meta">Stages that count toward abandonment.</p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                      <div v-for="stage in availableStages" :key="stage" class="flex items-center gap-2">
                         <Checkbox
                           :id="`tasks-stage-${stage}`"
                           :value="stage"
                           v-model="localSettings.abandonedEligibleStages"
                         />
-                        <Label :for="`tasks-stage-${stage}`" class="text-sm text-foreground cursor-pointer">{{ stage }}</Label>
+                        <Label :for="`tasks-stage-${stage}`" class="text-content font-medium text-foreground cursor-pointer">{{ stage }}</Label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="space-y-3">
+                    <Label class="text-content font-medium text-foreground">Task widgets</Label>
+                    <div class="flex items-center gap-2 pt-2">
+                      <Checkbox
+                        id="tasks-autoCloseWidgets"
+                        v-model="localSettings.autoCloseWidgetsOnClose"
+                      />
+                      <Label for="tasks-autoCloseWidgets" class="text-content font-medium text-foreground cursor-pointer">Auto-close NFU/OFB widgets when opportunity is closed (Won/Lost)</Label>
+                    </div>
+                  </div>
+                  <div class="space-y-4">
+                    <Label class="text-content font-medium text-foreground">Task thresholds & postponement</Label>
+                    <p class="text-meta">Days for each task type and postpone period.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-5">
+                      <div class="space-y-3">
+                        <Label class="text-meta">OOFB Min / Max</Label>
+                        <div class="flex gap-2">
+                          <Input type="number" v-model.number="localSettings.oofbMinDays" min="1" class="w-full" />
+                          <Input type="number" v-model.number="localSettings.oofbMaxDays" min="1" class="w-full" />
+                        </div>
+                      </div>
+                      <div class="space-y-3">
+                        <Label class="text-meta">UFB (Days)</Label>
+                        <Input type="number" v-model.number="localSettings.ufbDays" min="1" class="w-full" />
+                      </div>
+                      <div class="space-y-3">
+                        <Label class="text-meta">OFB (Days)</Label>
+                        <Input type="number" v-model.number="localSettings.ofbDays" min="1" class="w-full" />
+                      </div>
+                      <div class="space-y-3">
+                        <Label class="text-meta">NFU (Days)</Label>
+                        <Input type="number" v-model.number="localSettings.nfuDays" min="1" class="w-full" />
+                      </div>
+                      <div class="space-y-3">
+                        <Label class="text-meta">CFB (Days)</Label>
+                        <Input type="number" v-model.number="localSettings.cfbDays" min="1" class="w-full" />
+                      </div>
+                      <div class="space-y-3">
+                        <Label class="text-meta">DFB (Days)</Label>
+                        <Input type="number" v-model.number="localSettings.dfbDays" min="1" class="w-full" />
+                      </div>
+                      <div class="col-span-2 md:col-span-3 space-y-3">
+                        <Label class="text-content font-medium text-foreground">Postpone Period (Days)</Label>
+                        <Input type="number" v-model.number="localSettings.postponeTaskDays" min="1" class="w-full max-w-xs" />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Task Widgets -->
-              <div class="bg-card border border-border rounded-lg p-6">
-                <h2 class="text-lg font-semibold text-foreground mb-4">Task Widgets</h2>
-                <p class="text-sm text-muted-foreground mb-6">Configure task widget behavior.</p>
-                
-                <Checkbox
-                  v-model="localSettings.autoCloseWidgetsOnClose"
-                  label="Auto-close NFU/OFB widgets when opportunity is closed (Won/Lost)"
-                />
+              <!-- Card: Lead settings -->
+              <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card flex flex-col">
+                <h3 class="text-title mb-6">Lead settings</h3>
+                <div class="space-y-8">
+                  <div class="space-y-3">
+                    <Label class="text-content font-medium text-foreground">Max Contact Attempts</Label>
+                    <Input type="number" v-model.number="localSettings.maxContactAttempts" min="1" max="20" class="w-full max-w-xs" />
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <Checkbox
+                      id="tasks-excludeNotValid"
+                      v-model="localSettings.excludeNotValidFromConversion"
+                    />
+                    <Label for="tasks-excludeNotValid" class="text-content font-medium text-foreground cursor-pointer">Exclude "NOT VALID" leads from conversion rate calculations</Label>
+                  </div>
+                  <div class="space-y-4 pt-6 border-t border-border">
+                    <h4 class="text-subtitle">Assigning rules</h4>
+                    <div class="flex items-center gap-3">
+                      <Checkbox
+                        id="assigning-same-customer"
+                        v-model="localSettings.assigningRules.assignLeadToSameCustomerEmployee"
+                      />
+                      <Label for="assigning-same-customer" class="text-content font-medium text-foreground cursor-pointer">Assign leads to employees who worked with the same customer before</Label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            </div>
-            <div class="shrink-0 border-t border-border pt-4 mt-4 mb-12 flex justify-end gap-2 flex-wrap">
+            <div class="shrink-0 border-t border-border pt-6 mt-6 mb-12 flex justify-end gap-3 flex-wrap">
               <Button
                 variant="secondary"
                 @click="handleCancel"
@@ -263,20 +176,19 @@
           </TabsContent>
 
           <!-- Scores Tab Content (Lead & opportunity scoring) -->
-          <TabsContent value="scores" class="flex flex-col flex-1 min-h-0 data-[state=inactive]:hidden">
-            <div class="overflow-y-auto flex-1 min-h-0">
+          <TabsContent value="scores" class="data-[state=inactive]:hidden">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- Scoring Weights (leads & opportunities) -->
-              <div class="bg-card border border-border rounded-lg p-6">
-                <h2 class="text-lg font-semibold text-foreground mb-1">Scoring weights (leads & opportunities)</h2>
-                <p class="text-sm text-muted-foreground mb-6">Score formula = (Freshness × {{ scoringWeightsSummary.freshness }}% + Proximity × {{ scoringWeightsSummary.proximity }}% + Vehicle match × {{ scoringWeightsSummary.vehicleMatch }}% + Source quality × {{ scoringWeightsSummary.sourceQuality }}% + Engagement × {{ scoringWeightsSummary.engagement }}%)</p>
-                <div class="space-y-4">
-                  <div>
-                    <div class="flex items-center justify-between mb-2">
-                      <Label class="text-sm font-medium text-foreground">Freshness</Label>
-                      <span class="text-sm text-muted-foreground">{{ localSettings.leadScoring?.weights?.freshness ?? 25 }}%</span>
+              <!-- Scoring Weights -->
+              <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card flex flex-col">
+                <h3 class="text-title mb-4">Scoring weights (leads & opportunities)</h3>
+                <p class="text-meta mb-6">Score formula = (Freshness × {{ scoringWeightsSummary.freshness }}% + Proximity × {{ scoringWeightsSummary.proximity }}% + Vehicle match × {{ scoringWeightsSummary.vehicleMatch }}% + Source quality × {{ scoringWeightsSummary.sourceQuality }}% + Engagement × {{ scoringWeightsSummary.engagement }}%)</p>
+                <div class="space-y-6">
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <Label class="text-content font-medium text-foreground">Freshness</Label>
+                      <span class="text-meta">{{ localSettings.leadScoring?.weights?.freshness ?? 25 }}%</span>
                     </div>
-                    <p class="text-xs font-normal text-muted-foreground mb-1">Newer leads score higher (&lt;24h=100%, 24–48h=50%, &gt;48h=10%)</p>
+                    <p class="text-meta">Newer leads score higher (&lt;24h=100%, 24–48h=50%, &gt;48h=10%)</p>
                     <input
                       type="range"
                       v-model.number="localSettings.leadScoring.weights.freshness"
@@ -285,12 +197,12 @@
                       class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
                     />
                   </div>
-                  <div>
-                    <div class="flex items-center justify-between mb-2">
-                      <Label class="text-sm font-medium text-foreground">Proximity</Label>
-                      <span class="text-sm text-muted-foreground">{{ localSettings.leadScoring?.weights?.proximity ?? 20 }}%</span>
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <Label class="text-content font-medium text-foreground">Proximity</Label>
+                      <span class="text-meta">{{ localSettings.leadScoring?.weights?.proximity ?? 20 }}%</span>
                     </div>
-                    <p class="text-xs font-normal text-muted-foreground mb-1">Closer leads score higher (&lt;10km=100%, linear decay to 100km)</p>
+                    <p class="text-meta">Closer leads score higher (&lt;10km=100%, linear decay to 100km)</p>
                     <input
                       type="range"
                       v-model.number="localSettings.leadScoring.weights.proximity"
@@ -299,12 +211,12 @@
                       class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
                     />
                   </div>
-                  <div>
-                    <div class="flex items-center justify-between mb-2">
-                      <Label class="text-sm font-medium text-foreground">Vehicle Match</Label>
-                      <span class="text-sm text-muted-foreground">{{ localSettings.leadScoring?.weights?.vehicleMatch ?? 25 }}%</span>
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <Label class="text-content font-medium text-foreground">Vehicle Match</Label>
+                      <span class="text-meta">{{ localSettings.leadScoring?.weights?.vehicleMatch ?? 25 }}%</span>
                     </div>
-                    <p class="text-xs font-normal text-muted-foreground mb-1">Match to in-stock inventory; optional bonus for older stock</p>
+                    <p class="text-meta">Match to in-stock inventory; optional bonus for older stock</p>
                     <input
                       type="range"
                       v-model.number="localSettings.leadScoring.weights.vehicleMatch"
@@ -313,12 +225,12 @@
                       class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
                     />
                   </div>
-                  <div>
-                    <div class="flex items-center justify-between mb-2">
-                      <Label class="text-sm font-medium text-foreground">Source Quality</Label>
-                      <span class="text-sm text-muted-foreground">{{ localSettings.leadScoring?.weights?.sourceQuality ?? 15 }}%</span>
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <Label class="text-content font-medium text-foreground">Source Quality</Label>
+                      <span class="text-meta">{{ localSettings.leadScoring?.weights?.sourceQuality ?? 15 }}%</span>
                     </div>
-                    <p class="text-xs font-normal text-muted-foreground mb-1">Ranked by source priority list below</p>
+                    <p class="text-meta">Ranked by source priority list below</p>
                     <input
                       type="range"
                       v-model.number="localSettings.leadScoring.weights.sourceQuality"
@@ -327,12 +239,12 @@
                       class="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
                     />
                   </div>
-                  <div>
-                    <div class="flex items-center justify-between mb-2">
-                      <Label class="text-sm font-medium text-foreground">Engagement</Label>
-                      <span class="text-sm text-muted-foreground">{{ localSettings.leadScoring?.weights?.engagement ?? 15 }}%</span>
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <Label class="text-content font-medium text-foreground">Engagement</Label>
+                      <span class="text-meta">{{ localSettings.leadScoring?.weights?.engagement ?? 15 }}%</span>
                     </div>
-                    <p class="text-xs font-normal text-muted-foreground mb-1">Bonus when lead has replied (e.g. spoke-to-customer)</p>
+                    <p class="text-meta">Bonus when lead has replied (e.g. spoke-to-customer)</p>
                     <input
                       type="range"
                       v-model.number="localSettings.leadScoring.weights.engagement"
@@ -345,35 +257,35 @@
               </div>
 
               <!-- Source Priority -->
-              <div class="bg-card border border-border rounded-lg p-6">
-                <h2 class="text-lg font-semibold text-foreground mb-4">Source Priority</h2>
-                <p class="text-sm text-muted-foreground mb-4">Order sources from highest to lowest quality. Top of the list gets max points.</p>
-                <ul class="space-y-2">
+              <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card flex flex-col">
+                <h3 class="text-title mb-4">Source Priority</h3>
+                <p class="text-meta mb-6">Order sources from highest to lowest quality. Top of the list gets max points.</p>
+                <ul class="space-y-0 divide-y divide-border">
                   <li
                     v-for="(source, index) in (localSettings.leadScoring?.sourcePriority ?? [])"
                     :key="source"
-                    class="flex items-center gap-2 py-2 border-b border-border last:border-0"
+                    class="flex items-center gap-3 py-3 first:pt-0"
                   >
-                    <span class="text-sm font-medium text-foreground w-8">{{ index + 1 }}.</span>
-                    <span class="text-sm text-foreground flex-1">{{ source }}</span>
-                    <div class="flex gap-1">
+                    <span class="text-content font-medium text-foreground w-6 shrink-0">{{ index + 1 }}.</span>
+                    <span class="text-content text-foreground flex-1 min-w-0">{{ source }}</span>
+                    <div class="flex gap-1 shrink-0">
                       <button
                         type="button"
-                        class="p-1 rounded-sm border border-border hover:bg-muted"
+                        class="p-1.5 rounded-sm border border-border hover:bg-muted text-foreground disabled:opacity-50 disabled:pointer-events-none"
                         :disabled="index === 0"
                         @click="moveSourcePriority(index, -1)"
                         aria-label="Move up"
                       >
-                        <ChevronUp class="w-4 h-4 text-foreground" />
+                        <ChevronUp class="w-4 h-4" />
                       </button>
                       <button
                         type="button"
-                        class="p-1 rounded-sm border border-border hover:bg-muted"
+                        class="p-1.5 rounded-sm border border-border hover:bg-muted text-foreground disabled:opacity-50 disabled:pointer-events-none"
                         :disabled="index === (localSettings.leadScoring?.sourcePriority?.length ?? 0) - 1"
                         @click="moveSourcePriority(index, 1)"
                         aria-label="Move down"
                       >
-                        <ChevronDown class="w-4 h-4 text-foreground" />
+                        <ChevronDown class="w-4 h-4" />
                       </button>
                     </div>
                   </li>
@@ -381,48 +293,46 @@
               </div>
 
               <!-- Inventory Age Bonus -->
-              <div class="bg-card border border-border rounded-lg p-6">
-                <h2 class="text-lg font-semibold text-foreground mb-4">Inventory Age Bonus</h2>
-                <p class="text-sm text-muted-foreground mb-4">Prioritize selling older stock by giving a bonus for days in stock.</p>
-                <div class="space-y-4">
-                  <div class="flex items-center gap-2">
+              <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card flex flex-col">
+                <h3 class="text-title mb-4">Inventory Age Bonus</h3>
+                <p class="text-meta mb-6">Prioritize selling older stock by giving a bonus for days in stock.</p>
+                <div class="space-y-5">
+                  <div class="flex items-center gap-3">
                     <Checkbox
                       id="scores-prioritizeOldStock"
                       v-model="localSettings.leadScoring.prioritizeOldStock"
                     />
-                    <Label for="scores-prioritizeOldStock" class="text-sm text-foreground cursor-pointer">Prioritize old stock</Label>
+                    <Label for="scores-prioritizeOldStock" class="text-content font-medium text-foreground cursor-pointer">Prioritize old stock</Label>
                   </div>
-                  <div v-if="localSettings.leadScoring.prioritizeOldStock" class="flex items-center gap-2">
-                    <Label class="text-sm text-muted-foreground">Aging factor</Label>
+                  <div v-if="localSettings.leadScoring.prioritizeOldStock" class="flex items-center gap-3 pt-2">
+                    <Label class="text-content font-medium text-foreground shrink-0">Aging factor</Label>
                     <Input
                       type="number"
                       v-model.number="localSettings.leadScoring.agingFactor"
                       min="0"
                       max="2"
                       step="0.1"
-                      class="w-24"
+                      class="w-full max-w-xs"
                     />
                   </div>
                 </div>
               </div>
 
               <!-- Urgency level thresholds -->
-              <div class="bg-card border border-border rounded-lg p-6">
-                <h2 class="text-lg font-semibold text-foreground mb-4">Urgency level thresholds</h2>
-                <p class="text-sm text-muted-foreground mb-6">
-                  The same score used for sorting drives the HOT/WARM/STANDARD/COLD level on leads and opportunities. Set the minimum score for each level.
-                </p>
-                <div class="flex items-center gap-2 mb-6">
+              <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card flex flex-col">
+                <h3 class="text-title mb-4">Urgency level thresholds</h3>
+                <p class="text-meta mb-6">The same score used for sorting drives the HOT/WARM/STANDARD/COLD level on leads and opportunities. Set the minimum score for each level.</p>
+                <div class="flex items-center gap-3 mb-6">
                   <Checkbox
                     id="scores-urgencyEnabled"
                     v-model="localSettings.urgencyEnabled"
                   />
-                  <Label for="scores-urgencyEnabled" class="text-sm text-foreground cursor-pointer">Show urgency level on leads and opportunities (HOT/WARM/STANDARD/COLD)</Label>
+                  <Label for="scores-urgencyEnabled" class="text-content font-medium text-foreground cursor-pointer">Show urgency level on leads and opportunities (HOT/WARM/STANDARD/COLD)</Label>
                 </div>
-                <div v-if="localSettings.urgencyEnabled" class="space-y-4">
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label class="text-sm font-medium text-foreground mb-2">HOT (minimum score)</Label>
+                <div v-if="localSettings.urgencyEnabled" class="space-y-6">
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <div class="space-y-3">
+                      <Label class="text-content font-medium text-foreground">HOT (minimum score)</Label>
                       <Input
                         type="number"
                         v-model.number="localSettings.urgencyThresholds.hot"
@@ -431,8 +341,8 @@
                         class="w-full"
                       />
                     </div>
-                    <div>
-                      <Label class="text-sm font-medium text-foreground mb-2">WARM (minimum score)</Label>
+                    <div class="space-y-3">
+                      <Label class="text-content font-medium text-foreground">WARM (minimum score)</Label>
                       <Input
                         type="number"
                         v-model.number="localSettings.urgencyThresholds.warm"
@@ -441,8 +351,8 @@
                         class="w-full"
                       />
                     </div>
-                    <div>
-                      <Label class="text-sm font-medium text-foreground mb-2">STANDARD (minimum score)</Label>
+                    <div class="space-y-3">
+                      <Label class="text-content font-medium text-foreground">STANDARD (minimum score)</Label>
                       <Input
                         type="number"
                         v-model.number="localSettings.urgencyThresholds.standard"
@@ -453,30 +363,30 @@
                     </div>
                   </div>
                   <div class="bg-muted border border-border rounded-lg p-4">
-                    <h3 class="text-sm font-semibold text-foreground mb-3">Preview</h3>
-                    <table class="w-full text-sm text-foreground">
-                      <thead class="bg-muted">
-                        <tr>
-                          <th class="px-3 py-2 text-left font-semibold">Level</th>
-                          <th class="px-3 py-2 text-left font-semibold">Score range</th>
+                    <h4 class="text-subtitle mb-4">Preview</h4>
+                    <table class="w-full text-content text-foreground">
+                      <thead>
+                        <tr class="border-b border-border">
+                          <th class="px-3 py-2 text-left font-medium text-foreground">Level</th>
+                          <th class="px-3 py-2 text-left font-medium text-foreground">Score range</th>
                         </tr>
                       </thead>
                       <tbody class="divide-y divide-border">
                         <tr>
-                          <td class="px-3 py-2 font-medium">HOT</td>
-                          <td class="px-3 py-2">{{ localSettings.urgencyThresholds?.hot ?? 80 }}-100+</td>
+                          <td class="px-3 py-2 font-medium text-foreground">HOT</td>
+                          <td class="px-3 py-2 text-muted-foreground">{{ localSettings.urgencyThresholds?.hot ?? 80 }}-100+</td>
                         </tr>
                         <tr>
-                          <td class="px-3 py-2 font-medium">WARM</td>
-                          <td class="px-3 py-2">{{ localSettings.urgencyThresholds?.warm ?? 50 }}-{{ (localSettings.urgencyThresholds?.hot ?? 80) - 1 }}</td>
+                          <td class="px-3 py-2 font-medium text-foreground">WARM</td>
+                          <td class="px-3 py-2 text-muted-foreground">{{ localSettings.urgencyThresholds?.warm ?? 50 }}-{{ (localSettings.urgencyThresholds?.hot ?? 80) - 1 }}</td>
                         </tr>
                         <tr>
-                          <td class="px-3 py-2 font-medium">STANDARD</td>
-                          <td class="px-3 py-2">{{ localSettings.urgencyThresholds?.standard ?? 20 }}-{{ (localSettings.urgencyThresholds?.warm ?? 50) - 1 }}</td>
+                          <td class="px-3 py-2 font-medium text-foreground">STANDARD</td>
+                          <td class="px-3 py-2 text-muted-foreground">{{ localSettings.urgencyThresholds?.standard ?? 20 }}-{{ (localSettings.urgencyThresholds?.warm ?? 50) - 1 }}</td>
                         </tr>
                         <tr>
-                          <td class="px-3 py-2 font-medium">COLD</td>
-                          <td class="px-3 py-2">0-{{ (localSettings.urgencyThresholds?.standard ?? 20) - 1 }}</td>
+                          <td class="px-3 py-2 font-medium text-foreground">COLD</td>
+                          <td class="px-3 py-2 text-muted-foreground">0-{{ (localSettings.urgencyThresholds?.standard ?? 20) - 1 }}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -485,9 +395,9 @@
               </div>
 
               <!-- Placeholder -->
-              <div class="bg-card border border-border rounded-lg p-6 opacity-75 lg:col-span-2">
-                <h2 class="text-lg font-semibold text-foreground mb-2">Customer scoring</h2>
-                <p class="text-sm text-muted-foreground">Coming soon.</p>
+              <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card opacity-75 lg:col-span-2">
+                <h3 class="text-title mb-4">Customer scoring</h3>
+                <p class="text-meta">Coming soon.</p>
               </div>
             </div>
 
@@ -506,13 +416,13 @@
                     </DialogDescription>
                   </DialogHeader>
                   <div class="flex-1 overflow-y-auto py-4 w-full space-y-4">
-                    <p class="text-sm text-muted-foreground">
+                    <p class="text-content text-muted-foreground">
                       Each criterion contributes a value from 0 (worst) to 1 (best). The total is the weighted sum of these values, then scaled to 0–100. Vehicle match can add a small bonus for old stock, so the final score may exceed 100.
                     </p>
-                    <p class="text-sm text-muted-foreground">
+                    <p class="text-content text-muted-foreground">
                       <strong class="text-foreground">Formula:</strong> Total = (Freshness × {{ scoringWeightsSummary.freshness }}% + Proximity × {{ scoringWeightsSummary.proximity }}% + Vehicle match × {{ scoringWeightsSummary.vehicleMatch }}% + Source quality × {{ scoringWeightsSummary.sourceQuality }}% + Engagement × {{ scoringWeightsSummary.engagement }}%)
                     </p>
-                    <p class="text-xs text-muted-foreground">
+                    <p class="text-meta">
                       Effective weights update when you move the sliders. Freshness: newer leads score higher. Proximity: closer distance scores higher. Vehicle match: in-stock match scores higher; optional bonus for days in stock. Source quality: rank from the list below. Engagement: bonus if the lead has replied.
                     </p>
                   </div>
@@ -520,8 +430,7 @@
               </DialogPortal>
             </Dialog>
 
-            </div>
-            <div class="shrink-0 border-t border-border pt-4 mt-4 mb-12 flex justify-end gap-2 flex-wrap">
+            <div class="shrink-0 border-t border-border pt-6 mt-6 mb-12 flex justify-end gap-3 flex-wrap">
               <Button
                 variant="secondary"
                 @click="handleCancel"
@@ -539,33 +448,30 @@
           </TabsContent>
 
           <!-- Navigation Settings Tab Content -->
-          <TabsContent value="navigation" class="flex flex-col flex-1 min-h-0 data-[state=inactive]:hidden">
-            <div class="overflow-y-auto flex-1 min-h-0">
-            <div class="bg-card border border-border rounded-lg p-6">
-              <h2 class="text-lg font-semibold text-foreground mb-4">Navigation Menu Items</h2>
-              <p class="text-sm text-muted-foreground mb-6">Control which navigation items appear in the sidebar and mobile menu.</p>
-              
+          <TabsContent value="navigation" class="data-[state=inactive]:hidden">
+            <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card max-w-2xl">
+              <h3 class="text-title mb-4">Navigation Menu Items</h3>
+              <p class="text-meta mb-6">Control which navigation items appear in the sidebar and mobile menu.</p>
               <div class="space-y-4">
                 <div
                   v-for="item in NAV_ITEMS"
                   :key="item.id"
-                  class="flex items-center gap-2"
+                  class="flex items-center gap-3 py-2"
                 >
                   <Checkbox
                     :id="`nav-${item.id}`"
                     v-model="localSettings.navigationVisibility[item.id]"
                   />
-                  <Label :for="`nav-${item.id}`" class="text-sm text-foreground cursor-pointer">{{ item.label }}</Label>
+                  <Label :for="`nav-${item.id}`" class="text-content font-medium text-foreground cursor-pointer">{{ item.label }}</Label>
                 </div>
-                <div class="mt-6 p-3 bg-muted border border-border rounded-lg">
-                  <p class="text-xs text-muted-foreground">
-                    <strong>Note:</strong> The Settings icon is always visible to ensure you can access this page.
+                <div class="mt-5 p-4 bg-muted border border-border rounded-lg">
+                  <p class="text-meta">
+                    <strong class="text-foreground">Note:</strong> The Settings icon is always visible to ensure you can access this page.
                   </p>
                 </div>
               </div>
             </div>
-            </div>
-            <div class="shrink-0 border-t border-border pt-4 mt-4 mb-12 flex justify-end gap-2 flex-wrap">
+            <div class="shrink-0 border-t border-border pt-6 mt-6 mb-12 flex justify-end gap-3 flex-wrap">
               <Button
                 variant="secondary"
                 @click="handleCancel"
@@ -582,8 +488,8 @@
             </div>
           </TabsContent>
         </form>
-      </Tabs>
-    </div>
+      </div>
+    </Tabs>
   </div>
 </template>
 
@@ -640,6 +546,9 @@ const localSettings = ref({
     sourcePriority: ['Walk-in', 'Phone', 'Website', 'Google Ads', 'Facebook', '3rd Party'],
     prioritizeOldStock: true,
     agingFactor: 0.5
+  },
+  assigningRules: {
+    assignLeadToSameCustomerEmployee: false
   }
 })
 
@@ -709,6 +618,10 @@ function loadSettings() {
       sourcePriority: [...(settingsStore.settings.leadScoring?.sourcePriority ?? ['Walk-in', 'Phone', 'Website', 'Google Ads', 'Facebook', '3rd Party'])],
       prioritizeOldStock: settingsStore.settings.leadScoring?.prioritizeOldStock ?? true,
       agingFactor: settingsStore.settings.leadScoring?.agingFactor ?? 0.5
+    },
+    // Assigning rules
+    assigningRules: {
+      assignLeadToSameCustomerEmployee: settingsStore.settings.assigningRules?.assignLeadToSameCustomerEmployee ?? false
     }
   }
 }

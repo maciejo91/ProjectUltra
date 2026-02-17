@@ -1,9 +1,9 @@
 <template>
   <div class="relative flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
-    <div v-if="task" class="flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden">
+    <div v-if="displayTask" class="flex flex-col flex-1 min-h-0 overflow-hidden">
       <!-- Task Header -->
       <TaskDetailHeader
-        :task="task"
+        :task="displayTask"
         :filtered-tasks="filteredTasks"
         :is-drawer-view="isDrawerView"
         @previous="handlePrevious"
@@ -18,13 +18,19 @@
       <div class="flex flex-1 min-h-0 overflow-hidden">
         <!-- Center Panel: Task Management Widget Only -->
         <div class="flex-1 flex flex-col min-h-0 overflow-hidden bg-white min-w-0">
+          <TaskAssigneeDateBar
+            v-if="displayTask"
+            :task="displayTask"
+            @reassigned="handleReassigned"
+            @postpone-expected-close="handlePostponeExpectedClose"
+          />
           <div class="flex-1 min-h-0 overflow-y-auto">
             <div class="p-2">
               <TaskManagementCard
                 v-if="managementWidget && storeAdapter"
                 ref="managementCardRef"
-                :task="task"
-                :type="task.type"
+                :task="displayTask"
+                :type="displayTask.type"
                 :management-widget="managementWidget"
                 :activities="allActivities"
                 v-bind="$attrs"
@@ -91,33 +97,33 @@
               <!-- Request Tab -->
               <TabsContent value="request" class="space-y-2 p-2 mt-0 flex-1 min-h-full">
                 <TaskContactCard
-                  :task="task"
-                  :task-type="task.type"
-                  :customer-id="task.customerId || task.customer?.id"
+                  :task="displayTask"
+                  :task-type="displayTask.type"
+                  :customer-id="displayTask.customerId || displayTask.customer?.id"
                   @action="handleContactAction"
                 />
                 <VehicleRequestCard
-                  v-if="task.requestedCar || task.vehicle"
-                  :vehicle="task.requestedCar || task.vehicle"
-                  :request-message="task.requestMessage || task.requestedCar?.requestMessage"
-                  :source="task.source"
-                  :image-url="getCarImageUrl(task.requestedCar || task.vehicle)"
+                  v-if="displayTask.requestedCar || displayTask.vehicle"
+                  :vehicle="displayTask.requestedCar || displayTask.vehicle"
+                  :request-message="displayTask.requestMessage || displayTask.requestedCar?.requestMessage"
+                  :source="displayTask.source"
+                  :image-url="getCarImageUrl(displayTask.requestedCar || displayTask.vehicle)"
                   @open-ad="handleOpenAd"
                   @more-actions="handleMoreActions"
                 />
                 <OtherCustomerRequestsCard
-                  :task="task"
+                  :task="displayTask"
                 />
                 <TradeInsCard
-                  v-if="task.type !== 'lead' || (task.tradeIns || []).length > 0"
-                  :items="task.tradeIns || []"
+                  v-if="displayTask.type !== 'lead' || (displayTask.tradeIns || []).length > 0"
+                  :items="displayTask.tradeIns || []"
                   :add-loading="tradeInActionLoading"
                   @open-add="editingTradeIn = null; showTradeInModal = true"
                   @open-edit="openTradeInEdit"
                 />
                 <FinancingOptionsCard
-                  v-if="task.type !== 'lead' || (task.financingOptions || []).length > 0"
-                  :items="task.financingOptions || []"
+                  v-if="displayTask.type !== 'lead' || (displayTask.financingOptions || []).length > 0"
+                  :items="displayTask.financingOptions || []"
                   @open-add="editingFinancingOption = null; showFinancingModal = true"
                   @open-edit="openFinancingEdit"
                 />
@@ -154,8 +160,8 @@
     <NoteWidget
       modal
       :show="showNoteModal"
-      :task-type="task?.type || 'lead'"
-      :task-id="task?.id"
+      :task-type="displayTask?.type || 'lead'"
+      :task-id="displayTask?.id"
       @save="handleNoteSave"
       @close="showNoteModal = false"
     />
@@ -163,8 +169,8 @@
     <AttachmentWidget
       modal
       :show="showAttachmentModal"
-      :task-type="task?.type || 'lead'"
-      :task-id="task?.id"
+      :task-type="displayTask?.type || 'lead'"
+      :task-id="displayTask?.id"
       @save="handleAttachmentSave"
       @close="showAttachmentModal = false"
     />
@@ -195,8 +201,8 @@
     
     <PurchaseMethodModal
       :show="showFinancingModal"
-      :task-type="task?.type || 'lead'"
-      :task-id="task?.id"
+      :task-type="displayTask?.type || 'lead'"
+      :task-id="displayTask?.id"
       :purchase-method="editingFinancingOption"
       standalone
       @save="handleFinancingSave"
@@ -207,8 +213,8 @@
     <AddVehicleModal
       :show="showTradeInModal"
       mode="tradein"
-      :task-type="task?.type || 'lead'"
-      :task-id="task?.id"
+      :task-type="displayTask?.type || 'lead'"
+      :task-id="displayTask?.id"
       :item="editingTradeIn"
       :loading="tradeInActionLoading"
       @save="handleTradeInSave"
@@ -218,17 +224,17 @@
     
     <OfferModal
       :show="showOfferModal"
-      :task-type="task?.type || 'lead'"
-      :task-id="task?.id"
-      :customer="task?.customer"
+      :task-type="displayTask?.type || 'lead'"
+      :task-id="displayTask?.id"
+      :customer="displayTask?.customer"
       @save="handleOfferSave"
       @close="showOfferModal = false"
     />
     
     <CreateEventModal
       :show="showAppointmentModal"
-      :customer="task?.customer"
-      :assignee="task?.assignee"
+      :customer="displayTask?.customer"
+      :assignee="displayTask?.assignee"
       @create="handleAppointmentSave"
       @cancel="showAppointmentModal = false"
     />
@@ -242,7 +248,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-libr
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
+import { useToastStore } from '@/stores/toast'
+import { getDisplayStage } from '@/utils/stageMapper'
 import TaskDetailHeader from './TaskDetailHeader.vue'
+import TaskAssigneeDateBar from './TaskAssigneeDateBar.vue'
 import TaskManagementCard from './TaskManagementCard.vue'
 import TaskContactCard from './TaskContactCard.vue'
 import OtherCustomerRequestsCard from './OtherCustomerRequestsCard.vue'
@@ -293,9 +302,35 @@ const emit = defineEmits(['task-navigate', 'close', 'postpone-expected-close'])
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
+const toastStore = useToastStore()
+
+// Use store's current lead/opportunity when id matches so drawer and card view show the same loaded data and stay in sync after LQ actions (no-answer, not interested)
+const displayTask = computed(() => {
+  const t = props.task
+  if (!t) return null
+  if (t.type === 'lead' && leadsStore.currentLead?.id === t.id) {
+    const lead = leadsStore.currentLead
+    return {
+      ...lead,
+      type: 'lead',
+      compositeId: `lead-${lead.id}`,
+      displayStage: getDisplayStage(lead, 'lead')
+    }
+  }
+  if (t.type === 'opportunity' && opportunitiesStore.currentOpportunity?.id === t.id) {
+    const opp = opportunitiesStore.currentOpportunity
+    return {
+      ...opp,
+      type: 'opportunity',
+      compositeId: `opportunity-${opp.id}`,
+      displayStage: getDisplayStage(opp, 'opportunity')
+    }
+  }
+  return t
+})
 
 const activityAuthor = computed(() =>
-  props.task?.assignee || userStore.currentUser?.name || 'You'
+  displayTask.value?.assignee || userStore.currentUser?.name || 'You'
 )
 
 // Sidebar tab state
@@ -324,7 +359,7 @@ const managementCardRef = ref(null)
 function handlePostponeExpectedClose() {
   // Emit event - parent (Tasks.vue) will need to handle this
   // For now, we'll use a simpler approach: the event bubbles up
-  emit('postpone-expected-close', props.task)
+  emit('postpone-expected-close', displayTask.value ?? props.task)
 }
 
 // Activities
@@ -339,11 +374,11 @@ const activityCount = computed(() => {
 })
 
 const requestCount = computed(() => {
-  if (!props.task?.customer) return 0
-  
-  const customerEmail = props.task.customer.email
-  const customerPhone = props.task.customer.phone
-  const currentTaskId = props.task.compositeId || `${props.task.type}-${props.task.id}`
+  if (!displayTask.value?.customer) return 0
+
+  const customerEmail = displayTask.value.customer.email
+  const customerPhone = displayTask.value.customer.phone
+  const currentTaskId = displayTask.value.compositeId || `${displayTask.value.type}-${displayTask.value.id}`
   
   // Combine all leads and opportunities
   const allTasks = [
@@ -610,20 +645,19 @@ const handleFinancingSave = async (data) => {
 }
 
 async function handleFinancingDelete() {
-  if (!editingFinancingOption.value || !props.storeAdapter || !props.task) return
+  const toRemove = editingFinancingOption.value
+  if (!toRemove || !props.storeAdapter || !props.task) return
+  const newList = (props.task.financingOptions || []).filter((f) => String(f.id) !== String(toRemove.id))
+  showFinancingModal.value = false
+  editingFinancingOption.value = null
   try {
-    const list = (props.task.financingOptions || []).filter((f) => String(f.id) !== String(editingFinancingOption.value.id))
     if (props.task.type === 'lead') {
-      await props.storeAdapter.updateLead?.(props.task.id, { financingOptions: list })
-      await props.storeAdapter.loadLeadById?.(props.task.id)
+      await props.storeAdapter.updateLead?.(props.task.id, { financingOptions: newList })
     } else {
-      await props.storeAdapter.updateOpportunity?.(props.task.id, { financingOptions: list })
-      await props.storeAdapter.loadOpportunityById?.(props.task.id)
+      await props.storeAdapter.updateOpportunity?.(props.task.id, { financingOptions: newList })
     }
-    showFinancingModal.value = false
-    editingFinancingOption.value = null
   } catch (error) {
-    console.error('Error deleting financing option:', error)
+    toastStore.pushToast('error', 'Failed to delete financing option')
   }
 }
 
@@ -671,21 +705,20 @@ const handleTradeInSave = async (data) => {
 }
 
 async function handleTradeInDelete() {
-  if (!editingTradeIn.value || !props.storeAdapter || !props.task) return
+  const toRemove = editingTradeIn.value
+  if (!toRemove || !props.storeAdapter || !props.task) return
+  const newList = (props.task.tradeIns || []).filter((t) => String(t.id) !== String(toRemove.id))
+  showTradeInModal.value = false
+  editingTradeIn.value = null
   tradeInActionLoading.value = true
   try {
-    const list = (props.task.tradeIns || []).filter((t) => String(t.id) !== String(editingTradeIn.value.id))
     if (props.task.type === 'lead') {
-      await props.storeAdapter.updateLead?.(props.task.id, { tradeIns: list })
-      await props.storeAdapter.loadLeadById?.(props.task.id)
+      await props.storeAdapter.updateLead?.(props.task.id, { tradeIns: newList })
     } else {
-      await props.storeAdapter.updateOpportunity?.(props.task.id, { tradeIns: list })
-      await props.storeAdapter.loadOpportunityById?.(props.task.id)
+      await props.storeAdapter.updateOpportunity?.(props.task.id, { tradeIns: newList })
     }
-    showTradeInModal.value = false
-    editingTradeIn.value = null
   } catch (error) {
-    console.error('Error deleting trade-in:', error)
+    toastStore.pushToast('error', 'Failed to delete trade-in')
   } finally {
     tradeInActionLoading.value = false
   }

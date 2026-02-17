@@ -372,11 +372,13 @@ const showTaskDrawer = ref(false) // Control drawer visibility in table view
 const drawerTaskCompositeId = ref(null) // 'lead-1' or 'opportunity-1' - used to resolve live task from store
 
 // Use task filters composable
-const { allTasks, applyFilters, shouldShowTypeFilter } = useTaskFilters(showClosed)
+const { allTasks, allTasksIncludingClosed, applyFilters, shouldShowTypeFilter } = useTaskFilters(showClosed)
 
 const drawerTask = computed(() => {
   if (!drawerTaskCompositeId.value) return null
-  return allTasks.value.find(t => t.compositeId === drawerTaskCompositeId.value) || null
+  return allTasks.value.find(t => t.compositeId === drawerTaskCompositeId.value) ||
+    allTasksIncludingClosed.value.find(t => t.compositeId === drawerTaskCompositeId.value) ||
+    null
 })
 
 // Use task sorting composable
@@ -393,42 +395,26 @@ const filteredTasks = computed(() => {
   return tasks
 })
 
-// Get current task based on route ID and query param type
+// Get current task based on route ID and query param type (include closed so task detail stays open after close/postpone)
 const currentTask = computed(() => {
-  // If no ID in route, return null (show list only)
-  if (!route.params.id) {
-    return null
-  }
-  
+  if (!route.params.id) return null
+
   const taskId = parseInt(route.params.id)
-  // If taskId is NaN or invalid, return null
-  if (isNaN(taskId)) {
-    return null
+  if (isNaN(taskId)) return null
+
+  const routeType = route.query.type
+
+  const fromList = (list) => {
+    if (routeType) {
+      const compositeId = `${routeType}-${taskId}`
+      return list.find(t => t.compositeId === compositeId) || null
+    }
+    const leadCompositeId = `lead-${taskId}`
+    const oppCompositeId = `opportunity-${taskId}`
+    return list.find(t => t.compositeId === leadCompositeId || t.compositeId === oppCompositeId) || null
   }
-  
-  const routeType = route.query.type // 'lead' or 'opportunity' from query param
-  
-  // Always use compositeId for matching to avoid conflicts between leads and opportunities with same ID
-  if (routeType) {
-    const compositeId = `${routeType}-${taskId}`
-    return allTasks.value.find(t => t.compositeId === compositeId) || null
-  }
-  
-  // If no type specified, try to find by compositeId in filtered list first
-  const typeFilters = activeFilters.value.filter(f => f === 'lead' || f === 'opportunity')
-  const filtered = typeFilters.length > 0
-    ? allTasks.value.filter(t => typeFilters.includes(t.type))
-    : allTasks.value
-  
-  // Try both lead and opportunity compositeIds
-  const leadCompositeId = `lead-${taskId}`
-  const oppCompositeId = `opportunity-${taskId}`
-  
-  const task = filtered.find(t => t.compositeId === leadCompositeId || t.compositeId === oppCompositeId)
-  if (task) return task
-  
-  // Fallback: check all tasks by compositeId
-  return allTasks.value.find(t => t.compositeId === leadCompositeId || t.compositeId === oppCompositeId) || null
+
+  return fromList(allTasks.value) || fromList(allTasksIncludingClosed.value) || null
 })
 
 // Get current activities based on task type

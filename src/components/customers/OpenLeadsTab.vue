@@ -113,10 +113,10 @@ const formatDate = (dateString) => {
 
 const getStatusClass = (status) => {
   const statusMap = {
-    'Valid': 'bg-green-100 text-green-700',
-    'Not valid': 'bg-red-100 text-red-700',
+    'Valid': 'bg-emerald-100 text-emerald-700',
+    'Not valid': 'bg-rose-100 text-rose-600',
     'Qualified': 'bg-muted text-muted-foreground',
-    'Not interested': 'bg-red-100 text-red-700',
+    'Not interested': 'bg-rose-100 text-rose-600',
     'Open': 'bg-blue-100 text-blue-700'
   }
   return statusMap[status] || 'bg-muted text-muted-foreground'
@@ -141,7 +141,7 @@ const rows = computed(() => {
     deadlineStatus: getDeadlineStatus(lead.nextActionDue),
     car: `${lead.requestedCar?.brand || ''} ${lead.requestedCar?.model || ''}`.trim() || 'N/A',
     carStatus: lead.requestedCar?.stockDays !== undefined && lead.requestedCar?.stockDays !== null ? 'In Stock' : 'Out of Stock',
-    carStatusClass: lead.requestedCar?.stockDays !== undefined && lead.requestedCar?.stockDays !== null ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground',
+    carStatusClass: lead.requestedCar?.stockDays !== undefined && lead.requestedCar?.stockDays !== null ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-muted-foreground',
     requestType: lead.requestedCar?.requestType || 'Quotation',
     source: lead.source || 'Marketing',
     assignee: lead.assignee,

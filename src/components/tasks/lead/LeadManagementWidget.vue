@@ -23,15 +23,17 @@
       
       <!-- Primary action = LQTask -->
       <LQTask
-        v-if="!leadState.isClosed.value && leadState.showLQWidget.value" 
+        v-if="!leadState.isClosed.value && leadState.showLQWidget.value"
         :key="lead.id"
         :lead="lead"
         :activities="activities"
         :show-deadline-banner="leadState.showDeadlineBanner.value"
-        @postponed="handlePostponed"
+        :outcome-saving="outcomeSaving"
+        @update:outcome-saving="outcomeSaving = $event"
+        @postponed="onPostponed"
         @validated="handleValidated"
         @qualified="handleQualified"
-        @disqualified="handleDisqualified"
+        @disqualified="onDisqualified"
         @call-attempt-logged="handleCallAttemptLogged"
         @note-saved="handleNoteSaved"
         @open-purchase-method="handleOpenPurchaseMethod"
@@ -53,17 +55,17 @@
     </template>
 
     <template #closed-state>
-      <!-- Closed States -->
+      <!-- Closed / outcome state: show outcome and Reopen so user can act without the drawer closing -->
       <div
         v-if="leadState.isClosed.value"
         class="bg-muted/50 border border-border rounded-lg p-4"
       >
         <div class="flex justify-between items-start mb-3">
           <div>
-            <h4 class="font-bold text-foreground text-sm">Lead Closed</h4>
+            <h4 class="font-bold text-foreground text-sm">Outcome</h4>
             <p class="text-xs text-muted-foreground mt-0.5">
-              Status: {{ leadState.displayStage.value }}
-              <span v-if="lead.disqualifyReason"> - {{ lead.disqualifyReason }}</span>
+              {{ leadState.displayStage.value }}
+              <span v-if="lead.disqualifyReason"> – {{ lead.disqualifyReason }}</span>
             </p>
           </div>
         </div>
@@ -84,7 +86,7 @@
 
 <script setup>
 import { RotateCcw } from 'lucide-vue-next'
-import { toRef } from 'vue'
+import { ref, toRef } from 'vue'
 import { Button, Spinner } from '@motork/component-library/future/primitives'
 import { useLeadsStore } from '@/stores/leads'
 import { useLeadActions } from '@/composables/useLeadActions'
@@ -128,6 +130,9 @@ const actionHandlers = {
 // Use lead actions composable - matches opportunity pattern
 const leadState = useLeadActions(toRef(props, 'lead'), actionHandlers)
 
+// Loading state while saving outcome (close / postpone) so user sees spinner before outcome card
+const outcomeSaving = ref(false)
+
 // Use handlers composable
 const {
   isConvertingToOpportunity,
@@ -146,6 +151,24 @@ const {
   leadState,
   emit
 })
+
+async function onDisqualified(data) {
+  outcomeSaving.value = true
+  try {
+    await handleDisqualified(data)
+  } finally {
+    outcomeSaving.value = false
+  }
+}
+
+async function onPostponed(data) {
+  outcomeSaving.value = true
+  try {
+    await handlePostponed(data)
+  } finally {
+    outcomeSaving.value = false
+  }
+}
 
 // Handle owner reassignment from TaskAssignee component
 const handleOwnerReassigned = async (assignee) => {

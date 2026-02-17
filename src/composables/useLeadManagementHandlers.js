@@ -288,8 +288,9 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
           content: `Lead disqualified - Category: ${data.category}, Reason: ${data.reason}`
         })
       }
-      
-      router.push('/tasks')
+
+      await leadsStore.fetchLeadById(lead.id)
+      // Do not close the drawer: keep task detail open so the user sees the outcome card with Reopen
     } catch (err) {
       console.error('Failed to disqualify lead:', err)
     }

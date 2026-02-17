@@ -106,6 +106,47 @@ export function useTaskFilters(showClosed) {
     return tasks
   })
 
+  // Same as allTasks but always includes closed leads/opportunities (for keeping task detail open when task was just closed)
+  const allTasksIncludingClosed = computed(() => {
+    const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') !== false
+
+    const leads = leadsStore.leads.map(lead => {
+      const displayStage = getDisplayStage(lead, 'lead')
+      const task = {
+        ...lead,
+        type: 'lead',
+        compositeId: `lead-${lead.id}`,
+        displayStage
+      }
+      if (!task.customer && lead.customer) task.customer = lead.customer
+      if (urgencyEnabled) {
+        const urgencyResult = calculateLeadUrgency(lead)
+        task.urgencyScore = urgencyResult.score
+        task.urgencyLevel = urgencyResult.level
+      }
+      return task
+    })
+
+    const opportunities = opportunitiesStore.opportunities.map(opp => {
+      const displayStage = getDisplayStage(opp, 'opportunity')
+      const task = {
+        ...opp,
+        type: 'opportunity',
+        compositeId: `opportunity-${opp.id}`,
+        displayStage
+      }
+      if (!task.customer && opp.customer) task.customer = opp.customer
+      if (urgencyEnabled) task.urgencyLevel = priorityToUrgencyLevel(opp.priority)
+      return task
+    })
+
+    let tasks = []
+    if (userStore.isOperator()) tasks = leads
+    else if (userStore.isSalesman()) tasks = opportunities
+    else tasks = [...leads, ...opportunities]
+    return tasks
+  })
+
   // Filter tasks by type (supports array of types)
   const filterByType = (tasks, typeFilters) => {
     if (!typeFilters || typeFilters.length === 0) return tasks
@@ -212,6 +253,7 @@ export function useTaskFilters(showClosed) {
 
   return {
     allTasks,
+    allTasksIncludingClosed,
     filterByType,
     filterByDueIn24Hours,
     filterByToBeCalled,

@@ -60,8 +60,8 @@ export class LeadRepository extends BaseRepository {
    * @returns {Promise<Array>} Array of leads
    */
   async findAll(filters = {}) {
-    // Simulate API delay (will be removed when real API is integrated)
-    await new Promise(resolve => setTimeout(resolve, 300))
+    // Minimal delay; API layer provides main simulation
+    await new Promise(resolve => setTimeout(resolve, 0))
     
     let results = [...this.dataSource]
     
@@ -93,7 +93,7 @@ export class LeadRepository extends BaseRepository {
    * @returns {Promise<Object|null>} Lead or null if not found
    */
   async findById(id) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     const lead = this.dataSource.find(l => l.id === parseInt(id))
     return lead || null
   }
@@ -104,7 +104,7 @@ export class LeadRepository extends BaseRepository {
    * @returns {Promise<Object>} Created lead
    */
   async create(data) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     
     // Generate ID (in real API, server generates this)
     const newId = this.dataSource.length > 0 
@@ -149,7 +149,7 @@ export class LeadRepository extends BaseRepository {
    * @returns {Promise<Object>} Updated lead
    */
   async update(id, updates) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     
     const index = this.dataSource.findIndex(l => l.id === parseInt(id))
     if (index === -1) {
@@ -174,7 +174,7 @@ export class LeadRepository extends BaseRepository {
    * @returns {Promise<Object>} Success object
    */
   async delete(id) {
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 0))
     
     const index = this.dataSource.findIndex(l => l.id === parseInt(id))
     if (index === -1) {
