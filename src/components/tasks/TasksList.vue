@@ -1,9 +1,9 @@
 <template>
   <div 
-    class="tasks-list-container border-r border-border flex flex-col shrink-0 w-full lg:w-80 h-full"
+    class="tasks-list-container border-r border-border flex flex-col shrink-0 w-full lg:w-80 h-full bg-surface"
   >
     <!-- Search: same Motork InputGroup as DataTable, no custom styling -->
-    <div class="px-5 py-3">
+    <div class="px-2 py-3">
       <div class="flex items-center gap-2">
         <div class="flex-1 min-w-0">
           <InputGroup>
@@ -26,7 +26,7 @@
       </div>
     </div>
     
-    <div ref="scrollContainer" class="task-list-cards flex-1 overflow-y-auto px-5 space-y-3 pt-4 pb-6 scrollbar-hide">
+    <div ref="scrollContainer" class="task-list-cards flex-1 overflow-y-auto px-2 space-y-2 pt-2 pb-6 scrollbar-hide">
       <div
         v-for="item in filteredItems"
         :key="item.compositeId || `${item.type || 'task'}-${item.id}`"
@@ -179,9 +179,3 @@ const selectSort = (option) => {
 }
 </script>
 
-<style scoped>
-.tasks-list-container {
-  background-color: var(--brand-gray) !important;
-}
-
-</style>

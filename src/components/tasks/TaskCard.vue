@@ -1,7 +1,7 @@
 <template>
   <div 
     ref="cardRef"
-    class="task-card bg-white rounded-xl p-4 flex flex-col cursor-pointer relative transition-all border group"
+    class="task-card bg-white rounded-xl p-4 flex flex-col cursor-pointer relative transition-all border group border-black/5"
     :class="[cardClass, selectedBorderClass]"
     @click="$emit('select', itemId)"
   >
@@ -28,7 +28,7 @@
       </div>
       <span
         v-if="displayDate"
-        class="text-xs font-bold uppercase leading-none shrink-0"
+        class="text-xs font-medium uppercase leading-none shrink-0"
         :class="displayDate.status.textClass"
       >
         {{ displayDate.text }}
@@ -37,7 +37,7 @@
 
     <div class="flex flex-col min-w-0 flex-1 pr-2">
       <div class="flex items-center gap-1 mb-0.5">
-        <h3 class="font-bold text-foreground text-base break-words">{{ cardTitle }}</h3>
+        <h3 class="font-medium text-foreground text-sm break-words">{{ cardTitle }}</h3>
       </div>
       <div v-if="showCustomerSubtitle" class="flex items-center gap-2 overflow-hidden flex-wrap">
         <span class="text-muted-foreground text-sm truncate">
@@ -84,7 +84,7 @@ const props = defineProps({
   },
   unselectedClass: {
     type: [String, Function],
-    default: 'bg-white border border-gray-200 hover:border-gray-300'
+    default: 'bg-white hover:border-muted-foreground/30'
   },
   getName: {
     type: Function,
@@ -186,7 +186,7 @@ const urgencyDotClass = computed(() => getUrgencyDotClass(props.item?.urgencyLev
 </script>
 
 <style scoped>
-.task-card:hover {
+.task-card {
   box-shadow: var(--nsc-card-shadow);
 }
 

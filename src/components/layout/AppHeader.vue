@@ -1,6 +1,6 @@
 <template>
   <header
-    class="hidden md:flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4 md:px-6"
+    class="hidden md:flex h-12 shrink-0 items-center justify-between gap-4 border-b border-border bg-background pl-1 pr-4 md:pl-1 md:pr-6"
   >
     <div class="flex min-w-0 flex-1 items-center gap-3">
       <Button
@@ -14,7 +14,7 @@
         <PanelLeftClose v-if="layoutStore.sidebarExpanded" :size="20" />
         <PanelLeft v-else :size="20" />
       </Button>
-      <h1 class="truncate text-xl font-medium text-foreground">
+      <h1 class="truncate text-base font-medium text-foreground">
         {{ pageTitle }}
       </h1>
     </div>

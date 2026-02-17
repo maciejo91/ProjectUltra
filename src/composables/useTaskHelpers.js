@@ -149,9 +149,9 @@ export function useTaskHelpers() {
   // Helper function to get unselected class for task cards
   const getUnselectedClass = (task) => {
     if (task.type === 'lead') {
-      return 'bg-white border border-gray-200 hover:border-blue-300'
+      return 'bg-white hover:border-blue-300'
     }
-    return 'bg-white border border-gray-200 hover:border-purple-300'
+    return 'bg-white hover:border-purple-300'
   }
 
   return {
