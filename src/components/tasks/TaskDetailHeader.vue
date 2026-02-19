@@ -1,7 +1,7 @@
 <template>
   <header class="task-detail-header shrink-0 px-4 sm:px-6 pb-1">
-    <div class="task-detail-header-content">
-      <div class="min-w-0 flex-1 flex items-center gap-1.5 sm:gap-2 min-h-0 flex-wrap">
+    <div class="task-detail-header-grid">
+      <div class="task-detail-header-content min-w-0">
         <!-- Task Title + Badges + Tags -->
         <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-wrap">
           <h3 v-if="task && taskTitle" class="task-detail-title text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
@@ -53,15 +53,7 @@
           </template>
         </div>
       </div>
-      <TaskAssigneeDateBar
-        v-if="task && hasAssigneeOrDate"
-        :task="task"
-        variant="inline"
-        class="shrink-0 mr-1 self-center py-0"
-        @postpone-expected-close="$emit('postpone-expected-close')"
-        @reassigned="$emit('reassigned', $event)"
-      />
-      <div class="task-detail-header-actions shrink-0">
+      <div class="task-detail-header-actions">
         <Button 
           variant="secondary" 
           size="icon" 
@@ -90,6 +82,14 @@
           <X :size="16" class="text-muted-foreground" />
         </Button>
       </div>
+      <TaskAssigneeDateBar
+      v-if="task && hasAssigneeOrDate"
+      :task="task"
+      variant="inline"
+      class="mt-0.5 pt-0 pb-1 shrink-0 min-w-0"
+      @postpone-expected-close="$emit('postpone-expected-close')"
+      @reassigned="$emit('reassigned', $event)"
+    />
     </div>
     
     <!-- Add Tag Modal -->
@@ -287,20 +287,28 @@ function confirmRemoveTag() {
   flex-direction: column;
 }
 
+.task-detail-header-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: start;
+  gap: 0 0.75rem;
+  width: 100%;
+}
+
 .task-detail-header-content {
+  min-height: 2.25rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  width: 100%;
-  min-height: 3rem;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
 }
 
 .task-detail-header-actions {
+  grid-column: 2;
+  grid-row: 1 / -1;
   display: flex;
   align-items: center;
+  justify-content: center;
+  align-self: stretch;
   gap: 0.5rem;
 }
 </style>

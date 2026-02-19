@@ -1,30 +1,40 @@
-import { createDateOffset, createDateString, createDateTimeOffset } from '@/utils/mockDataHelpers'
+import { createDateOffset, createDateString, createDateTimeOffset, createHourOffset } from '@/utils/mockDataHelpers'
 
 /**
  * English mock opportunities – one per display stage/status for the state machine.
  * No duplicates; simplified set for default (EN) mock.
  */
 
-const baseRequestedCar = (brand, model, year, price, vin = 'WBA3B1C50EK123456') => ({
-  brand,
-  model,
-  year,
-  price,
-  image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=900&auto=format&fit=crop&q=60',
-  dealership: 'Munich',
-  fuelType: 'Petrol',
-  gearType: 'Automatic',
-  kilometers: 0,
-  status: 'New',
-  stockDays: 5,
-  vin
-})
+const baseRequestedCar = (brand, model, year, price, opts = {}) => {
+  const defaults = {
+    vin: 'WBA3B1C50EK123456',
+    image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=900&auto=format&fit=crop&q=60',
+    dealership: 'Munich',
+    fuelType: 'Petrol',
+    gearType: 'Automatic',
+    kilometers: 0,
+    status: 'New',
+    stockDays: 5,
+    registration: '01/2024',
+    requestMessage: `Interested in ${brand} ${model}. Ready to discuss pricing and availability.`,
+    requestType: 'Quotation',
+    adCampaign: 'Summer 2024',
+    adMedium: 'Display',
+    adSource: 'Google',
+    expectedPurchaseDate: createDateString(30)
+  }
+  return { brand, model, year, price, ...defaults, ...opts }
+}
 
 export const mockOpportunities = [
   // 1. Awaiting Appointment – Qualified, no appointment
   {
     id: 1,
     customerId: 1,
+    source: 'Walk-in',
+    sourceDetails: 'Showroom visit',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
     requestedCar: baseRequestedCar('BMW', '3 Series', 2024, 45000),
     vehicle: null,
     selectedVehicle: null,
@@ -35,9 +45,9 @@ export const mockOpportunities = [
     value: 45000,
     expectedCloseDate: createDateString(30),
     assignee: 'Salsabeel Khaleel',
-    createdAt: createDateOffset(-2),
-    lastActivity: createDateOffset(-1),
-    nextActionDue: createDateOffset(1),
+    createdAt: createHourOffset(-2),
+    lastActivity: createHourOffset(-1),
+    nextActionDue: createHourOffset(4),
     scheduledAppointment: null
   },
 
@@ -45,7 +55,11 @@ export const mockOpportunities = [
   {
     id: 2,
     customerId: 2,
-    requestedCar: baseRequestedCar('Audi', 'A4', 2024, 42000, 'WAUZZZ8V9KA123456'),
+    source: 'Google Ads',
+    sourceDetails: 'Summer Campaign 2024',
+    fiscalEntity: 'MotorK',
+    requestType: 'Test Drive',
+    requestedCar: baseRequestedCar('Audi', 'A4', 2024, 42000, { vin: 'WAUZZZ8V9KA123456' }),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Qualified',
@@ -55,9 +69,9 @@ export const mockOpportunities = [
     value: 42000,
     expectedCloseDate: createDateString(25),
     assignee: 'Sarah Jenkins',
-    createdAt: createDateOffset(-5),
-    lastActivity: createDateOffset(-2),
-    nextActionDue: createDateOffset(1),
+    createdAt: createHourOffset(-4),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createHourOffset(6),
     scheduledAppointment: {
       id: 2,
       start: createDateTimeOffset(5, 10, 0),
@@ -77,7 +91,11 @@ export const mockOpportunities = [
   {
     id: 3,
     customerId: 3,
-    requestedCar: baseRequestedCar('Mercedes-Benz', 'C-Class', 2024, 48000, 'WDDWF4KB0KR123456'),
+    source: 'Website',
+    sourceDetails: 'Contact form',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('Mercedes-Benz', 'C-Class', 2024, 48000, { vin: 'WDDWF4KB0KR123456' }),
     vehicle: null,
     selectedVehicle: null,
     stage: 'In Negotiation',
@@ -85,7 +103,7 @@ export const mockOpportunities = [
     offers: [
       {
         id: 'offer-3',
-        createdAt: createDateOffset(-3),
+        createdAt: createHourOffset(-3),
         vehicleBrand: 'Mercedes-Benz',
         vehicleModel: 'C-Class',
         vehicleYear: 2024,
@@ -98,9 +116,9 @@ export const mockOpportunities = [
     value: 48000,
     expectedCloseDate: createDateString(20),
     assignee: 'David Miller',
-    createdAt: createDateOffset(-10),
-    lastActivity: createDateOffset(-2),
-    nextActionDue: createDateOffset(1),
+    createdAt: createHourOffset(-5),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createHourOffset(8),
     scheduledAppointment: null
   },
 
@@ -108,7 +126,11 @@ export const mockOpportunities = [
   {
     id: 4,
     customerId: 4,
-    requestedCar: baseRequestedCar('Porsche', '911', 2024, 125000, 'WP0ZZZ99ZPS234567'),
+    source: 'Walk-in',
+    sourceDetails: 'Premium showroom',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('Porsche', '911', 2024, 125000, { vin: 'WP0ZZZ99ZPS234567' }),
     vehicle: null,
     selectedVehicle: null,
     stage: 'In Negotiation',
@@ -139,9 +161,9 @@ export const mockOpportunities = [
     value: 125000,
     expectedCloseDate: createDateString(14),
     assignee: 'David Miller',
-    createdAt: createDateOffset(-20),
-    lastActivity: createDateOffset(-5),
-    nextActionDue: createDateOffset(1),
+    createdAt: createHourOffset(-6),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createHourOffset(24),
     contractDate: createDateOffset(-5),
     scheduledAppointment: null
   },
@@ -150,7 +172,11 @@ export const mockOpportunities = [
   {
     id: 5,
     customerId: 5,
-    requestedCar: baseRequestedCar('Volkswagen', 'Golf', 2024, 32000, 'WVWZZZ3CZWE123456'),
+    source: 'Phone',
+    sourceDetails: '',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('Volkswagen', 'Golf', 2024, 32000, { vin: 'WVWZZZ3CZWE123456' }),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Closed Won',
@@ -183,9 +209,9 @@ export const mockOpportunities = [
     value: 32000,
     expectedCloseDate: null,
     assignee: 'Sarah Jenkins',
-    createdAt: createDateOffset(-30),
-    lastActivity: createDateOffset(-1),
-    nextActionDue: createDateOffset(1),
+    createdAt: createHourOffset(-8),
+    lastActivity: createHourOffset(-1),
+    nextActionDue: createHourOffset(12),
     closedDate: createDateOffset(-3),
     contractDate: createDateOffset(-3),
     deliveryDate: null,
@@ -196,7 +222,11 @@ export const mockOpportunities = [
   {
     id: 8,
     customerId: 8,
-    requestedCar: baseRequestedCar('Porsche', 'Cayenne', 2024, 95000, 'WP0ZZZ9XZPS123456'),
+    source: 'Facebook',
+    sourceDetails: 'Auto campaign',
+    fiscalEntity: '',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('Porsche', 'Cayenne', 2024, 95000, { vin: 'WP0ZZZ9XZPS123456' }),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Closed Lost',
@@ -218,9 +248,9 @@ export const mockOpportunities = [
     lostReason: 'Went with competitor',
     expectedCloseDate: null,
     assignee: 'David Miller',
-    createdAt: createDateOffset(-30),
-    lastActivity: createDateOffset(-5),
-    nextActionDue: createDateOffset(1),
+    createdAt: createHourOffset(-10),
+    lastActivity: createHourOffset(-3),
+    nextActionDue: createHourOffset(6),
     closedDate: createDateOffset(-5),
     scheduledAppointment: null
   },
@@ -229,7 +259,11 @@ export const mockOpportunities = [
   {
     id: 9,
     customerId: 9,
-    requestedCar: baseRequestedCar('Jaguar', 'F-Pace', 2024, 72000, 'SALWA2FK4LA123456'),
+    source: '3rd Party',
+    sourceDetails: 'Lead aggregator',
+    fiscalEntity: '',
+    requestType: 'Generic sales',
+    requestedCar: baseRequestedCar('Jaguar', 'F-Pace', 2024, 72000, { vin: 'SALWA2FK4LA123456' }),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Abandoned',
@@ -239,9 +273,9 @@ export const mockOpportunities = [
     value: 72000,
     expectedCloseDate: createDateString(35),
     assignee: 'Sarah Jenkins',
-    createdAt: createDateOffset(-45),
-    lastActivity: createDateOffset(-35),
-    nextActionDue: createDateOffset(1),
+    createdAt: createHourOffset(-4),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createHourOffset(24),
     scheduledAppointment: null
   }
 ]

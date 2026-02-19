@@ -79,6 +79,19 @@
                   >
                     <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> Out of stock
                   </div>
+                  <div
+                    v-if="vehicleCondition"
+                    class="inline-flex items-center px-2 py-1 bg-muted border border-border text-muted-foreground text-xs font-semibold rounded-md"
+                  >
+                    {{ vehicleCondition }}
+                  </div>
+                  <div
+                    v-if="vin"
+                    class="inline-flex items-center min-w-0 max-w-36 px-2 py-1 bg-muted border border-border text-muted-foreground text-xs font-mono rounded-md"
+                    :title="`VIN: ${vin}`"
+                  >
+                    <span class="truncate block min-w-0">VIN: {{ vin }}</span>
+                  </div>
                   <!-- Source next to stock availability -->
                   <div v-if="source" class="inline-flex items-center gap-1.5 px-2 py-1 bg-muted border border-border text-muted-foreground text-xs font-semibold rounded-md">
                     <span class="text-xs text-muted-foreground font-medium">Source:</span>
@@ -399,6 +412,18 @@ const gearType = computed(() => {
 
 const vin = computed(() => {
   return props.requestedCar?.vin || ''
+})
+
+// Vehicle condition display (same logic as TasksTableView: Km0, New, or Used)
+const vehicleCondition = computed(() => {
+  const v = props.requestedCar
+  if (!v) return null
+  const status = v.status || ''
+  const km = v.kilometers
+  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'New') {
+    return (status && status.toLowerCase() === 'new') || km === 0 ? 'Km0' : 'New'
+  }
+  return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Used'
 })
 
 const channel = computed(() => {

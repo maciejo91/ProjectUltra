@@ -5,23 +5,27 @@
     :class="variant === 'inline' ? 'gap-2' : 'justify-between gap-2 pt-1.5 pb-1.5 px-4'"
   >
     <div v-if="isAssigned" class="flex items-center gap-2 shrink-0">
-      <div
-        class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
-        :class="getRoleAvatarClass(ownerInfo.role)"
-      >
-        {{ getInitials(ownerInfo.name) }}
-      </div>
-      <span class="text-xs font-medium text-foreground truncate">{{ ownerInfo.name }}</span>
       <Popover :open="assigneeDropdownOpen" @update:open="(v) => (assigneeDropdownOpen = v)">
         <PopoverTrigger as-child>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            class="h-6 w-6"
+          <button
+            type="button"
+            class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Change assignee"
           >
-            <ChevronDown :size="12" stroke-width="2" aria-hidden="true" />
-          </Button>
+            <div
+              class="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+              :class="getRoleAvatarClass(ownerInfo.role)"
+            >
+              <span class="text-[10px] font-medium leading-none">{{ getInitials(ownerInfo.name) }}</span>
+            </div>
+            <span class="truncate">{{ ownerInfo.name }}</span>
+            <ChevronDown
+              :size="14"
+              stroke-width="2"
+              class="shrink-0 transition-transform ml-1"
+              aria-hidden="true"
+            />
+          </button>
         </PopoverTrigger>
         <PopoverContent
           class="w-auto p-0 rounded-lg shadow-nsc-card bg-background"
@@ -32,9 +36,8 @@
         </PopoverContent>
       </Popover>
     </div>
-    <span v-if="variant === 'inline' && isAssigned && (showDueDate || showExpectedCloseDate)" class="text-muted-foreground/60 shrink-0">|</span>
-    <div v-if="showDueDate" class="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
-      <CalendarDays class="w-4 h-4 shrink-0" />
+    <div v-if="showDueDate" class="flex items-center gap-1 text-sm text-muted-foreground shrink-0">
+      <Clock class="w-4 h-4 shrink-0" />
       <span>{{ dueDateLabel }}: {{ formattedDueDate }}</span>
     </div>
     <div
@@ -43,18 +46,18 @@
     >
       <button
         type="button"
-        class="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        class="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
         :class="{ 'cursor-default': isTaskClosed }"
         :aria-expanded="showExpectedCloseMenu && !isTaskClosed"
         aria-haspopup="true"
         aria-label="Expected close date"
         @click.stop="!isTaskClosed && (showExpectedCloseMenu = !showExpectedCloseMenu)"
       >
-        <CalendarDays class="w-4 h-4 shrink-0" />
+        <Clock class="w-4 h-4 shrink-0" />
         <span>Expected Close: {{ formattedExpectedCloseDate }}</span>
         <ChevronDown
           v-if="!isTaskClosed"
-          :size="12"
+          :size="14"
           stroke-width="2"
           class="shrink-0 transition-transform ml-1"
           :class="{ 'rotate-180': showExpectedCloseMenu }"
@@ -83,8 +86,8 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { Button, Popover, PopoverTrigger, PopoverContent } from '@motork/component-library/future/primitives'
-import { ChevronDown, CalendarDays } from 'lucide-vue-next'
+import { Popover, PopoverTrigger, PopoverContent } from '@motork/component-library/future/primitives'
+import { ChevronDown, Clock } from 'lucide-vue-next'
 import AssigneeDropdownContent from '@/components/tasks/AssigneeDropdownContent.vue'
 import { formatDueDate } from '@/utils/formatters'
 import { useUsersStore } from '@/stores/users'

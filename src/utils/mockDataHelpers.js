@@ -37,3 +37,14 @@ export function createDateTimeOffset(days, hours = 0, minutes = 0) {
   date.setHours(hours, minutes, 0, 0)
   return date.toISOString()
 }
+
+/**
+ * Create a timestamp offset by hours from now (positive = future, negative = past)
+ * @param {number} hours - Number of hours to offset
+ * @returns {string} ISO timestamp string
+ */
+export function createHourOffset(hours) {
+  const date = new Date()
+  date.setHours(date.getHours() + hours)
+  return date.toISOString()
+}

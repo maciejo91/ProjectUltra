@@ -31,18 +31,9 @@
         </Button>
       </div>
 
-      <div v-if="emailDisplay" class="flex items-center gap-2 min-w-0 min-h-8">
+      <div v-if="emailDisplay" class="flex items-center gap-2 min-w-0 min-h-8 select-none">
         <Mail class="size-4 shrink-0 text-muted-foreground" />
         <span class="text-sm text-foreground truncate min-w-0">{{ emailDisplay }}</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          class="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
-          aria-label="Copy email"
-          @click="copyToClipboard(task.customer.email, 'email')"
-        >
-          <Copy class="size-4" />
-        </Button>
       </div>
 
       <div v-if="addressDisplay" class="flex items-center gap-2 min-w-0 min-h-8">

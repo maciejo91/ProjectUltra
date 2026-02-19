@@ -1,3 +1,5 @@
+import { createHourOffset } from '@/utils/mockDataHelpers'
+
 export const mockLeads = [
   {
     id: 1,
@@ -18,6 +20,11 @@ export const mockLeads = [
       registration: '03/2016',
       dealership: 'Firenze',
       stockDays: 412,
+      requestType: 'Quotation',
+      adCampaign: 'ADD 2024',
+      adMedium: 'Display',
+      adSource: 'Website',
+      expectedPurchaseDate: '2025-04',
       requestMessage: 'Hello, I would like to know the details about the car: What is the suspension?'
     },
     carStatus: 'In Stock',
@@ -27,21 +34,9 @@ export const mockLeads = [
     sourceDetails: 'ADD 2024',
     assignee: 'Salsabeel Khaleel', // Assign to manager so it shows up
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 4) // 4 hours ago → high freshness
-      return date.toISOString()
-    })(),
-    lastActivity: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 2)
-      return date.toISOString()
-    })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 2) // 2 hours in the future - urgent, not overdue
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-2),
+    lastActivity: createHourOffset(-1),
+    nextActionDue: createHourOffset(2),
     tags: ['Premium', 'Automation'],
     stage: 'Open',
     isDisqualified: false,
@@ -82,6 +77,11 @@ export const mockLeads = [
       gearType: 'Automatic',
       dealership: 'Firenze',
       stockDays: 15,
+      requestType: 'Quotation',
+      adCampaign: 'Showroom 2024',
+      adMedium: 'Walk-in',
+      adSource: 'Direct',
+      expectedPurchaseDate: '2025-03',
       requestMessage: 'Saw the ID.4 in showroom. Ready to buy this week.'
     },
     carStatus: 'In Stock',
@@ -91,21 +91,9 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Salsabeel Khaleel',
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 2) // 2 hours ago → freshness 1
-      return date.toISOString()
-    })(),
-    lastActivity: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 1)
-      return date.toISOString()
-    })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 4)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-1),
+    lastActivity: createHourOffset(-0.5),
+    nextActionDue: createHourOffset(4),
     tags: ['Premium'],
     stage: 'Open',
     isDisqualified: false,
@@ -144,6 +132,13 @@ export const mockLeads = [
       status: 'New',
       fuelType: 'Electric',
       gearType: 'Automatic',
+      registration: '01/2023',
+      dealership: 'Remote',
+      requestType: 'Quotation',
+      adCampaign: 'Lead aggregator',
+      adMedium: '3rd Party',
+      adSource: 'Aggregator',
+      expectedPurchaseDate: '2025-06',
       requestMessage: 'Generic inquiry from aggregator.'
     },
     carStatus: 'Not In Stock',
@@ -153,16 +148,8 @@ export const mockLeads = [
     sourceDetails: 'Lead aggregator',
     assignee: null,
     assigneeInitials: '',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 14) // 14 days ago → freshness 0.1
-      return date.toISOString()
-    })(),
-    lastActivity: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 14)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-12),
+    lastActivity: createHourOffset(-12),
     nextActionDue: null,
     tags: [],
     stage: 'Open',
@@ -192,6 +179,11 @@ export const mockLeads = [
       gearType: 'Automatic',
       dealership: 'Berlin',
       stockDays: 10,
+      requestType: 'Test Drive',
+      adCampaign: 'Phone campaign',
+      adMedium: 'Phone',
+      adSource: 'Direct',
+      expectedPurchaseDate: '2025-04',
       requestMessage: 'Interested in ID.3. Test drive preferred.'
     },
     carStatus: 'In Stock',
@@ -201,21 +193,9 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Salsabeel Khaleel',
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 8)
-      return date.toISOString()
-    })(),
-    lastActivity: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 2)
-      return date.toISOString()
-    })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 6)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-3),
+    lastActivity: createHourOffset(-1),
+    nextActionDue: createHourOffset(6),
     tags: [],
     stage: 'Open',
     isDisqualified: false,
@@ -257,6 +237,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Munich',
       stockDays: 5,
+      requestType: 'Test Drive',
+      adCampaign: 'Summer 2024',
+      adMedium: 'Display',
+      adSource: 'Google',
+      expectedPurchaseDate: '2025-04',
       requestMessage: 'Interested in BMW iX. Ready for test drive this week.'
     },
     carStatus: 'In Stock',
@@ -266,21 +251,9 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Salsabeel Khaleel', // Assign to manager
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 10) // 10 days ago - within 7-14 day urgency window
-      return date.toISOString()
-    })(),
-    lastActivity: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() + 3)
-      return date.toISOString()
-    })(), // Follow-up after test drive
+    createdAt: createHourOffset(-2),
+    lastActivity: createHourOffset(-1),
+    nextActionDue: createHourOffset(8),
     tags: ['Premium'],
     stage: 'Open', // Changed to Open to trigger urgency banner
     isDisqualified: false,
@@ -322,6 +295,11 @@ export const mockLeads = [
       registration: '02/2024',
       dealership: 'Firenze',
       stockDays: 12,
+      requestType: 'Quotation',
+      adCampaign: 'Walk-in 2024',
+      adMedium: 'Showroom',
+      adSource: 'Direct',
+      expectedPurchaseDate: '2025-05',
       requestMessage: 'Looking for Q4 e-tron information and pricing.'
     },
     carStatus: 'In Stock',
@@ -331,21 +309,9 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Salsabeel Khaleel',
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 20) // ~1 day ago → good freshness
-      return date.toISOString()
-    })(),
-    lastActivity: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 4)
-      return date.toISOString()
-    })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 6) // Due in 6 hours
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-4),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createHourOffset(6),
     tags: [],
     stage: 'Validated',
     isDisqualified: false,
@@ -399,6 +365,11 @@ export const mockLeads = [
       registration: '05/2023',
       dealership: 'Berlin',
       stockDays: 45,
+      requestType: 'Quotation',
+      adCampaign: 'Google Summer',
+      adMedium: 'Display',
+      adSource: 'Google',
+      expectedPurchaseDate: '2025-06',
       requestMessage: 'Interested in ID.4 but need to check budget first.'
     },
     carStatus: 'In Stock',
@@ -408,21 +379,9 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Sarah Jenkins',
     assigneeInitials: 'SJ',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 15)
-      return date.toISOString()
-    })(),
-    lastActivity: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 2)
-      return date.toISOString()
-    })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-6),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createHourOffset(-1),
     tags: [],
     stage: 'Not Valid',
     isDisqualified: true,
@@ -450,6 +409,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Hamburg',
       stockDays: 8,
+      requestType: 'Test Drive',
+      adCampaign: 'Google Ads 2024',
+      adMedium: 'Display',
+      adSource: 'Google',
+      expectedPurchaseDate: '2025-05',
       requestMessage: 'Looking for GLC but considering other brands too.'
     },
     carStatus: 'In Stock',
@@ -459,21 +423,9 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'David Miller',
     assigneeInitials: 'DM',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 8)
-      return date.toISOString()
-    })(),
-    lastActivity: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-8),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createHourOffset(-2),
     tags: [],
     stage: 'Not Interested',
     isDisqualified: true,
@@ -513,6 +465,11 @@ export const mockLeads = [
       registration: '03/2016',
       dealership: 'Firenze',
       stockDays: 412,
+      requestType: 'Quotation',
+      adCampaign: 'ADD 2024',
+      adMedium: 'Display',
+      adSource: 'Google',
+      expectedPurchaseDate: '2025-04',
       requestMessage: 'Duplicate inquiry - same customer as Lead 1'
     },
     carStatus: 'In Stock',
@@ -522,21 +479,9 @@ export const mockLeads = [
     sourceDetails: 'ADD 2024',
     assignee: 'Sarah Jenkins',
     assigneeInitials: 'SJ',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 18)
-      return date.toISOString()
-    })(),
-    lastActivity: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 3)
-      return date.toISOString()
-    })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-12),
+    lastActivity: createHourOffset(-4),
+    nextActionDue: createHourOffset(-3),
     tags: [],
     stage: 'Closed Failed',
     isDisqualified: true,
@@ -565,6 +510,11 @@ export const mockLeads = [
       registration: '06/2023',
       dealership: 'Munich',
       stockDays: 20,
+      requestType: 'Test Drive',
+      adCampaign: 'Facebook Auto',
+      adMedium: 'Social',
+      adSource: 'Facebook',
+      expectedPurchaseDate: '2025-04',
       requestMessage: 'Interested in pre-owned 3 Series.'
     },
     carStatus: 'In Stock',
@@ -574,28 +524,10 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Salsabeel Khaleel', // Assign to manager
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 5)
-      return date.toISOString()
-    })(),
-    lastActivity: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 8) // Due in 8 hours
-      date.setMinutes(0, 0, 0)
-      return date.toISOString()
-    })(),
-    callbackDate: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 8) // Callback scheduled in 8 hours
-      date.setMinutes(0, 0, 0)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-4),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createHourOffset(8),
+    callbackDate: createHourOffset(8),
     callbackScheduled: true,
     tags: [],
     stage: 'Open', // Will map to "To be called back" due to callbackDate - customer requested specific callback time
@@ -659,6 +591,11 @@ export const mockLeads = [
       registration: '03/2024',
       dealership: 'Berlin',
       stockDays: 8,
+      requestType: 'Quotation',
+      adCampaign: 'Walk-in Premium',
+      adMedium: 'Showroom',
+      adSource: 'Direct',
+      expectedPurchaseDate: '2025-03',
       requestMessage: 'Looking for Cayenne Hybrid. Need urgent purchase for family.'
     },
     carStatus: 'In Stock',
@@ -668,23 +605,14 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Salsabeel Khaleel', // Assign to manager
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      date.setHours(10, 0, 0, 0)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-3),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 1)
       date.setHours(11, 0, 0, 0)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 2) // OVERDUE by 2 hours
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(-2),
     tags: ['Urgent'],
     stage: 'Open', // NEW state with 1 failed contact attempt - OVERDUE
     isDisqualified: false,
@@ -737,6 +665,11 @@ export const mockLeads = [
       registration: '05/2023',
       dealership: 'Hamburg',
       stockDays: 45,
+      requestType: 'Quotation',
+      adCampaign: 'Facebook Ads Campaign',
+      adMedium: 'Social',
+      adSource: 'Facebook',
+      expectedPurchaseDate: '2025-05',
       requestMessage: 'Interested in pre-owned Macan. Please contact me.'
     },
     carStatus: 'In Stock',
@@ -746,21 +679,13 @@ export const mockLeads = [
     sourceDetails: 'Facebook Ads Campaign',
     assignee: 'Salsabeel Khaleel', // Assign to manager
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 6)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-5),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 2)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1) // OVERDUE by 1 day
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(-4),
     tags: [],
     stage: 'Open', // NEW state with 2 contact attempts - one more attempt before auto-disqualify
     isDisqualified: false,
@@ -811,6 +736,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Milan',
       stockDays: 8,
+      requestType: 'Quotation',
+      adCampaign: 'ADD 2024',
+      adMedium: 'Display',
+      adSource: 'Google',
+      expectedPurchaseDate: '2025-05',
       requestMessage: 'Looking for a spacious SUV for family trips'
     },
     carStatus: 'In Stock',
@@ -820,21 +750,13 @@ export const mockLeads = [
     sourceDetails: 'ADD 2024',
     assignee: 'Sarah Jenkins',
     assigneeInitials: 'SJ',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 3)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-3),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() + 1)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(24),
     tags: ['Premium'],
     stage: 'Open',
     isDisqualified: false,
@@ -862,6 +784,11 @@ export const mockLeads = [
       registration: '06/2023',
       dealership: 'Berlin',
       stockDays: 120,
+      requestType: 'Quotation',
+      adCampaign: 'Walk-in 2024',
+      adMedium: 'Showroom',
+      adSource: 'Direct',
+      expectedPurchaseDate: '2025-06',
       requestMessage: 'First car purchase - need reliable hatchback'
     },
     carStatus: 'In Stock',
@@ -869,21 +796,13 @@ export const mockLeads = [
     source: 'Walk-in',
     assignee: 'David Miller',
     assigneeInitials: 'DM',
-    createdAt: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 24) // 1 day ago
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-8),
     lastActivity: (() => {
       const date = new Date()
       date.setHours(date.getHours() - 4)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() + 3)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(12),
     tags: [],
     stage: 'Validated',
     isDisqualified: false,
@@ -924,6 +843,11 @@ export const mockLeads = [
       registration: '02/2024',
       dealership: 'Berlin',
       stockDays: 15,
+      requestType: 'Test Drive',
+      adCampaign: 'Immo-scout',
+      adMedium: 'Portal',
+      adSource: 'Immo-scout',
+      expectedPurchaseDate: '2025-04',
       requestMessage: 'Sporty coupe for weekend drives'
     },
     carStatus: 'In Stock',
@@ -931,21 +855,13 @@ export const mockLeads = [
     source: 'Immo-scout',
     assignee: 'Sarah Jenkins',
     assigneeInitials: 'SJ',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 2)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-4),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() + 1)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(24),
     tags: ['Performance'],
     stage: 'Open',
     isDisqualified: false,
@@ -973,6 +889,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Munich',
       stockDays: 5,
+      requestType: 'Quotation',
+      adCampaign: 'Instagram 2024',
+      adMedium: 'Social',
+      adSource: 'Instagram',
+      expectedPurchaseDate: '2025-05',
       requestMessage: 'Premium SUV for family of 4'
     },
     carStatus: 'In Stock',
@@ -980,21 +901,13 @@ export const mockLeads = [
     source: 'Instagram',
     assignee: 'Salsabeel Khaleel',
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 4)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-3),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() + 2)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(10),
     tags: ['Premium'],
     stage: 'Validated',
     isDisqualified: false,
@@ -1034,6 +947,11 @@ export const mockLeads = [
       registration: '04/2023',
       dealership: 'Florence',
       stockDays: 90,
+      requestType: 'Quotation',
+      adCampaign: 'Facebook 2024',
+      adMedium: 'Social',
+      adSource: 'Facebook',
+      expectedPurchaseDate: '2025-06',
       requestMessage: 'Italian brand preference - family vehicle'
     },
     carStatus: 'In Stock',
@@ -1041,21 +959,13 @@ export const mockLeads = [
     source: 'Facebook',
     assignee: 'David Miller',
     assigneeInitials: 'DM',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 6)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-5),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 3)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() + 4)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(24),
     tags: [],
     stage: 'Open',
     isDisqualified: false,
@@ -1083,6 +993,11 @@ export const mockLeads = [
       registration: '03/2023',
       dealership: 'Berlin',
       stockDays: 60,
+      requestType: 'Quotation',
+      adCampaign: 'Walk-in 2024',
+      adMedium: 'Showroom',
+      adSource: 'Direct',
+      expectedPurchaseDate: '2025-04',
       requestMessage: 'Urgent need - compact SUV with safety features'
     },
     carStatus: 'In Stock',
@@ -1090,21 +1005,13 @@ export const mockLeads = [
     source: 'Walk-in',
     assignee: 'Sarah Jenkins',
     assigneeInitials: 'SJ',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-2),
     lastActivity: (() => {
       const date = new Date()
       date.setHours(date.getHours() - 2)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 4)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(4),
     tags: ['Urgent'],
     stage: 'Open',
     isDisqualified: false,
@@ -1145,6 +1052,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Frankfurt',
       stockDays: 3,
+      requestType: 'Test Drive',
+      adCampaign: 'Facebook 2024',
+      adMedium: 'Social',
+      adSource: 'Facebook',
+      expectedPurchaseDate: '2025-05',
       requestMessage: 'Stylish compact car for city driving'
     },
     carStatus: 'In Stock',
@@ -1152,21 +1064,13 @@ export const mockLeads = [
     source: 'Facebook',
     assignee: 'Salsabeel Khaleel',
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-2),
     lastActivity: (() => {
       const date = new Date()
       date.setHours(date.getHours() - 6)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() + 1)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(24),
     tags: ['VIP'],
     stage: 'Open',
     isDisqualified: false,
@@ -1194,6 +1098,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Düsseldorf',
       stockDays: 2,
+      requestType: 'Quotation',
+      adCampaign: 'Corporate 2024',
+      adMedium: 'B2B',
+      adSource: 'Direct',
+      expectedPurchaseDate: '2025-03',
       requestMessage: 'Executive vehicle for company car program'
     },
     carStatus: 'In Stock',
@@ -1201,21 +1110,13 @@ export const mockLeads = [
     source: 'Facebook',
     assignee: 'Salsabeel Khaleel',
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 2)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-4),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() + 1)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(24),
     tags: ['VIP', 'Premium'],
     stage: 'Open',
     isDisqualified: false,
@@ -1252,6 +1153,11 @@ export const mockLeads = [
       registration: '07/2023',
       dealership: 'Berlin',
       stockDays: 80,
+      requestType: 'Quotation',
+      adCampaign: 'Google Ads',
+      adMedium: 'Display',
+      adSource: 'Google',
+      expectedPurchaseDate: '2025-06',
       requestMessage: 'Looking for A4 sedan. Need to schedule callback.'
     },
     carStatus: 'In Stock',
@@ -1261,21 +1167,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'David Miller',
     assigneeInitials: 'DM',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 4)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-3),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 2)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 3) // OVERDUE callback by 3 hours
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(-3),
     callbackDate: (() => {
       const date = new Date()
       date.setHours(date.getHours() - 3) // Callback was scheduled 3 hours ago - OVERDUE
@@ -1332,6 +1230,11 @@ export const mockLeads = [
       registration: '02/2024',
       dealership: 'Munich',
       stockDays: 25,
+      requestType: 'Quotation',
+      adCampaign: 'Website 2024',
+      adMedium: 'Organic',
+      adSource: 'Website',
+      expectedPurchaseDate: '2025-04',
       requestMessage: 'Interested in X3. Call me back tomorrow morning.'
     },
     carStatus: 'In Stock',
@@ -1341,21 +1244,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Salsabeel Khaleel',
     assigneeInitials: 'SK',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 2)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-4),
     lastActivity: (() => {
       const date = new Date()
       date.setHours(date.getHours() - 12)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 2) // URGENT - callback in 2 hours
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(2),
     callbackDate: (() => {
       const date = new Date()
       date.setHours(date.getHours() + 2) // Callback scheduled in 2 hours - URGENT
@@ -1410,6 +1305,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Hamburg',
       stockDays: 10,
+      requestType: 'Test Drive',
+      adCampaign: 'Phone 2024',
+      adMedium: 'Phone',
+      adSource: 'Direct',
+      expectedPurchaseDate: '2025-05',
       requestMessage: 'Looking for C-Class sedan. Multiple attempts needed to reach me.'
     },
     carStatus: 'In Stock',
@@ -1419,21 +1319,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Sarah Jenkins',
     assigneeInitials: 'SJ',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 7)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-6),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() + 2)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(10),
     tags: [],
     stage: 'Validated',
     isDisqualified: false,
@@ -1506,6 +1398,11 @@ export const mockLeads = [
       registration: '08/2023',
       dealership: 'Berlin',
       stockDays: 150,
+      requestType: 'Quotation',
+      adCampaign: 'Website',
+      adMedium: 'Organic',
+      adSource: 'Website',
+      expectedPurchaseDate: '2025-06',
       requestMessage: 'Interested in Passat but vehicle was already sold.'
     },
     carStatus: 'Sold',
@@ -1515,21 +1412,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'David Miller',
     assigneeInitials: 'DM',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 10)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-8),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 3)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(-2),
     tags: [],
     stage: 'Not Valid',
     isDisqualified: true,
@@ -1581,6 +1470,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Firenze',
       stockDays: 12,
+      requestType: 'Quotation',
+      adCampaign: 'Google',
+      adMedium: 'Display',
+      adSource: 'Google',
+      expectedPurchaseDate: '2025-08',
       requestMessage: 'Interested in Q5 but decided to postpone purchase.'
     },
     carStatus: 'In Stock',
@@ -1590,21 +1484,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Sarah Jenkins',
     assigneeInitials: 'SJ',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 12)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-10),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 2)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(-2),
     tags: [],
     stage: 'Not Interested',
     isDisqualified: true,
@@ -1667,6 +1553,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Munich',
       stockDays: 18,
+      requestType: 'Test Drive',
+      adCampaign: 'Walk-in',
+      adMedium: 'Showroom',
+      adSource: 'Direct',
+      expectedPurchaseDate: '2025-05',
       requestMessage: 'Looking for compact BMW 1 Series. Standard follow-up timeline.'
     },
     carStatus: 'In Stock',
@@ -1676,21 +1567,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'David Miller',
     assigneeInitials: 'DM',
-    createdAt: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 6) // 6 hours ago
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-4),
     lastActivity: (() => {
       const date = new Date()
       date.setHours(date.getHours() - 2)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() + 2)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(10),
     tags: [],
     stage: 'Open',
     isDisqualified: false,
@@ -1731,6 +1614,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Berlin',
       stockDays: 5,
+      requestType: 'Quotation',
+      adCampaign: 'Website 2024',
+      adMedium: 'Organic',
+      adSource: 'Website',
+      expectedPurchaseDate: '2025-06',
       requestMessage: 'Just submitted inquiry. Very fresh lead with no deadline set yet.'
     },
     carStatus: 'In Stock',
@@ -1740,21 +1628,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Natalia Sung',
     assigneeInitials: 'NS',
-    createdAt: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() - 1) // Created 1 hour ago - very fresh
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-1),
     lastActivity: (() => {
       const date = new Date()
       date.setHours(date.getHours() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() + 1)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(24),
     tags: [],
     stage: 'Open',
     isDisqualified: false,
@@ -1795,6 +1675,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Berlin Mitte',
       stockDays: 42,
+      requestType: 'Quotation',
+      adCampaign: 'EV Campaign',
+      adMedium: 'Display',
+      adSource: 'Google',
+      expectedPurchaseDate: '2025-07',
       requestMessage: 'Interested in electric vehicles. Looking for reliable and fuel-efficient options.'
     },
     carStatus: 'In Stock',
@@ -1804,21 +1689,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Sarah Jenkins',
     assigneeInitials: 'SJ',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 2)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-4),
     lastActivity: (() => {
       const date = new Date()
       date.setHours(date.getHours() - 4)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 6)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(6),
     tags: [],
     stage: 'Open',
     isDisqualified: false,
@@ -1846,6 +1723,11 @@ export const mockLeads = [
       registration: '02/2024',
       dealership: 'Berlin',
       stockDays: 15,
+      requestType: 'Test Drive',
+      adCampaign: 'Sports 2024',
+      adMedium: 'Social',
+      adSource: 'Instagram',
+      expectedPurchaseDate: '2025-05',
       requestMessage: 'Interested in sporty coupes. Looking for performance vehicles.'
     },
     carStatus: 'In Stock',
@@ -1855,21 +1737,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'David Miller',
     assigneeInitials: 'DM',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-2),
     lastActivity: (() => {
       const date = new Date()
       date.setHours(date.getHours() - 2)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 4)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(4),
     tags: ['Hot'],
     stage: 'Open',
     isDisqualified: false,
@@ -1897,6 +1771,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Düsseldorf',
       stockDays: 8,
+      requestType: 'Quotation',
+      adCampaign: 'B2B 2024',
+      adMedium: 'Direct',
+      adSource: 'Direct',
+      expectedPurchaseDate: '2025-04',
       requestMessage: 'Looking for premium sedan for business use.'
     },
     carStatus: 'In Stock',
@@ -1906,21 +1785,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Michael Thomas',
     assigneeInitials: 'MT',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 3)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-3),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 8)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(8),
     tags: [],
     stage: 'Open',
     isDisqualified: false,
@@ -1948,6 +1819,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Hamburg',
       stockDays: 12,
+      requestType: 'Quotation',
+      adCampaign: 'Fleet 2024',
+      adMedium: 'B2B',
+      adSource: 'Direct',
+      expectedPurchaseDate: '2025-06',
       requestMessage: 'Corporate fleet inquiry. Need executive sedans for company.'
     },
     carStatus: 'In Stock',
@@ -1957,21 +1833,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'David Miller',
     assigneeInitials: 'DM',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 5)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-5),
     lastActivity: (() => {
       const date = new Date()
       date.setDate(date.getDate() - 2)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 12)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(12),
     tags: ['Corporate'],
     stage: 'Open',
     isDisqualified: false,
@@ -1999,6 +1867,11 @@ export const mockLeads = [
       registration: '01/2024',
       dealership: 'Frankfurt',
       stockDays: 20,
+      requestType: 'Quotation',
+      adCampaign: 'Family 2024',
+      adMedium: 'Display',
+      adSource: 'Google',
+      expectedPurchaseDate: '2025-05',
       requestMessage: 'Looking for reliable family vehicle with good fuel economy.'
     },
     carStatus: 'In Stock',
@@ -2008,21 +1881,13 @@ export const mockLeads = [
     sourceDetails: '',
     assignee: 'Sarah Jenkins',
     assigneeInitials: 'SJ',
-    createdAt: (() => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date.toISOString()
-    })(),
+    createdAt: createHourOffset(-2),
     lastActivity: (() => {
       const date = new Date()
       date.setHours(date.getHours() - 3)
       return date.toISOString()
     })(),
-    nextActionDue: (() => {
-      const date = new Date()
-      date.setHours(date.getHours() + 6)
-      return date.toISOString()
-    })(),
+    nextActionDue: createHourOffset(6),
     tags: [],
     stage: 'Open',
     isDisqualified: false,

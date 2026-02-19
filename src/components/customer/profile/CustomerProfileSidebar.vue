@@ -93,7 +93,7 @@
             <div class="font-medium text-foreground text-right truncate">-</div>
             
             <div class="text-muted-foreground">Email</div>
-            <div class="font-medium text-foreground text-right truncate">
+            <div class="font-medium text-foreground text-right truncate select-none">
                <a v-if="email" :href="`mailto:${email}`" class="hover:underline">{{ email }}</a>
                <span v-else>-</span>
             </div>

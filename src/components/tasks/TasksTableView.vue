@@ -95,7 +95,7 @@ import { ListTodo, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
-import { formatCurrency, formatDeadlineFull, formatDate, formatRelativeTime, getDeadlineStatus } from '@/utils/formatters'
+import { formatCurrency, formatDueDate, formatRelativeTime, getDeadlineStatus } from '@/utils/formatters'
 import { calculateLeadUrgency, getUrgencyDotClass } from '@/composables/useLeadUrgency'
 import { useSettingsStore } from '@/stores/settings'
 import { useUsersStore } from '@/stores/users'
@@ -236,25 +236,6 @@ const getVehicleInfo = (task) => {
   return vehicle ? `${vehicle.brand} ${vehicle.model}` : 'No vehicle specified'
 }
 
-const getDateDisplay = (date) => {
-  if (!date) return 'Not set'
-  
-  const now = new Date()
-  const dueDate = new Date(date)
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const due = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())
-  
-  const diffTime = due - today
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 0) return 'Today'
-  if (diffDays === 1) return 'Tomorrow'
-  if (diffDays === -1) return 'Yesterday'
-  if (diffDays > 1 && diffDays <= 7) return `In ${diffDays} days`
-  if (diffDays < -1 && diffDays >= -7) return `${Math.abs(diffDays)} days ago`
-  
-  return formatDeadlineFull(date)
-}
 
 // Helper to get car price (requestedCar or vehicle)
 const getCarPrice = (task) => {
@@ -404,14 +385,17 @@ const columns = computed(() => [
     meta: { title: 'Due date' },
     cell: ({ row }) => {
       const task = row.original
-      const date = task.nextActionDue ?? task.dueDate
+      const date = task.type === 'opportunity' && task.expectedCloseDate
+        ? task.expectedCloseDate
+        : (task.nextActionDue ?? task.dueDate)
       if (!date) {
         return h('span', { class: 'text-meta' }, 'Not set')
       }
       const status = getDeadlineStatus(date)
+      const text = formatDueDate(date)
       return h('span', {
-        class: `text-xs font-medium ${status.textClass}`
-      }, getDateDisplay(date))
+        class: `text-xs font-medium uppercase leading-none ${status.textClass}`
+      }, text)
     }
   },
   {
@@ -493,11 +477,13 @@ const getTaskFilterValue = (row, key) => {
   return getNestedProperty(row, key)
 }
 
-/** Due-date display label for table and search (same as getDateDisplay; "Not set" excluded from search). */
+/** Due-date display label for table and search (formatDueDate style; "Not set" excluded from search). */
 function getDueDateSearchLabel(row) {
-  const raw = row.nextActionDue ?? row.dueDate
+  const raw = row.type === 'opportunity' && row.expectedCloseDate
+    ? row.expectedCloseDate
+    : (row.nextActionDue ?? row.dueDate)
   if (!raw) return null
-  const label = getDateDisplay(raw)
+  const label = formatDueDate(raw)
   return label === 'Not set' ? null : label
 }
 
