@@ -1,6 +1,7 @@
 <template>
   <div>
     <component
+      ref="widgetRef"
       :is="managementWidget"
       v-if="managementWidget"
       :lead="type === 'lead' ? task : undefined"
@@ -14,7 +15,9 @@
 </template>
 
 <script setup>
-import { computed, useAttrs } from 'vue'
+import { computed, ref, useAttrs } from 'vue'
+
+const widgetRef = ref(null)
 
 const props = defineProps({
   task: {
@@ -47,7 +50,13 @@ const filteredAttrs = computed(() => {
   return filtered
 })
 
-// Pass through all emits from the management widget
+// Expose opportunity widget's postpone modal for TaskDetailHeader flow
+defineExpose({
+  openPostponeExpectedCloseModal() {
+    widgetRef.value?.openPostponeExpectedCloseModal?.()
+  }
+})
+
 defineOptions({
   inheritAttrs: false
 })

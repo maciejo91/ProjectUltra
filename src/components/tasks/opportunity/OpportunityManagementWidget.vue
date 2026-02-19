@@ -1,13 +1,5 @@
 <template>
   <TaskManagementWidget :task="opportunity" hide-title hide-border>
-    <template #assignee-date-bar>
-      <TaskAssigneeDateBar
-        v-if="opportunity"
-        :task="opportunityAsTask"
-        @postpone-expected-close="openPostponeExpectedCloseModal"
-        @reassigned="handleOwnerReassigned"
-      />
-    </template>
     <template #deadline-banner>
       <div class="px-4 pt-4">
         <DeadlineBanner
@@ -938,7 +930,6 @@ import TaskManagementWidget from '@/components/tasks/shared/TaskManagementWidget
 import PrimaryActionWidget from '@/components/tasks/shared/PrimaryActionWidget.vue'
 import SecondaryActionsDropdown from '@/components/shared/SecondaryActionsDropdown.vue'
 import TaskAssignee from '@/components/tasks/TaskAssignee.vue'
-import TaskAssigneeDateBar from '@/components/tasks/TaskAssigneeDateBar.vue'
 import DeadlineBanner from '@/components/tasks/shared/DeadlineBanner.vue'
 import CreateEventModal from '@/components/modals/CreateEventModal.vue'
 import VehicleSelectionModal from '@/components/modals/VehicleSelectionModal.vue'
@@ -1001,12 +992,6 @@ const getCurrentOpportunity = () => {
 
 // Computed opportunity for template use (uses store if available, otherwise props)
 const opportunity = computed(() => getCurrentOpportunity())
-
-// Task shape for TaskAssigneeDateBar (ensures type: 'opportunity' for expected close display)
-const opportunityAsTask = computed(() => {
-  const opp = opportunity.value
-  return opp ? { ...opp, type: 'opportunity' } : null
-})
 
 // Use scheduledAppointment from prop if provided, otherwise from opportunity object
 const scheduledAppointment = computed(() => {

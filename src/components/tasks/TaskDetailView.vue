@@ -10,6 +10,8 @@
         @next="handleNext"
         @close="$emit('close')"
         @tag-updated="handleTagUpdated"
+        @postpone-expected-close="handlePostponeExpectedClose"
+        @reassigned="handleReassigned"
       />
 
       <!-- Center + Right Panels Row -->
@@ -364,11 +366,14 @@ const showOfferModal = ref(false)
 const showAppointmentModal = ref(false)
 const managementCardRef = ref(null)
 
-// Handle postpone expected close date
+// Handle postpone expected close date (from header's TaskAssigneeDateBar)
 function handlePostponeExpectedClose() {
-  // Emit event - parent (Tasks.vue) will need to handle this
-  // For now, we'll use a simpler approach: the event bubbles up
-  emit('postpone-expected-close', displayTask.value ?? props.task)
+  const task = displayTask.value ?? props.task
+  if (task?.type === 'opportunity') {
+    managementCardRef.value?.openPostponeExpectedCloseModal?.()
+  } else {
+    emit('postpone-expected-close', task)
+  }
 }
 
 // Activities

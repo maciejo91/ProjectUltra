@@ -12,11 +12,6 @@
       </div>
     </div>
 
-    <!-- Assignee and due/expected close in grey container -->
-    <div v-if="$slots['assignee-date-bar']" class="shrink-0 pt-2">
-      <slot name="assignee-date-bar" />
-    </div>
-
     <!-- Content: no inner white card so action cards are not rendered inside a card -->
     <div class="flex flex-col pt-2 px-2 pb-2">
       <slot name="deadline-banner" />

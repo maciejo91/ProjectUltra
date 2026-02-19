@@ -1,7 +1,8 @@
 <template>
   <div
     v-if="task && (isAssigned || showDueDate || showExpectedCloseDate)"
-    class="flex items-center justify-between flex-wrap pt-1.5 pb-1.5 px-4"
+    class="flex items-center flex-wrap shrink-0"
+    :class="variant === 'inline' ? 'gap-2' : 'justify-between gap-2 pt-1.5 pb-1.5 px-4'"
   >
     <div v-if="isAssigned" class="flex items-center gap-2 shrink-0">
       <div
@@ -31,13 +32,14 @@
         </PopoverContent>
       </Popover>
     </div>
-    <div v-if="showDueDate" class="flex items-center gap-2 text-xs text-muted-foreground">
+    <span v-if="variant === 'inline' && isAssigned && (showDueDate || showExpectedCloseDate)" class="text-muted-foreground/60 shrink-0">|</span>
+    <div v-if="showDueDate" class="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
       <CalendarDays class="w-4 h-4 shrink-0" />
       <span>{{ dueDateLabel }}: {{ formattedDueDate }}</span>
     </div>
     <div
       v-if="showExpectedCloseDate"
-      class="relative"
+      class="relative shrink-0"
     >
       <button
         type="button"
@@ -93,6 +95,11 @@ const props = defineProps({
   task: {
     type: Object,
     default: null
+  },
+  variant: {
+    type: String,
+    default: 'bar',
+    validator: (v) => ['bar', 'inline'].includes(v)
   }
 })
 

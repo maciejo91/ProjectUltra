@@ -358,9 +358,9 @@
                   <Input type="time" v-model="customTime" class="w-full" />
                 </div>
               </div>
-              <!-- Reassign next attempt -->
+              <!-- Assigned to (next attempt) -->
               <div class="mt-4">
-                <Label class="form-label">Reassign</Label>
+                <Label class="form-label">Assigned to</Label>
                 <SelectMenu
                   v-model="selectedNextAttemptKey"
                   :items="nextAttemptAssigneeOptions"
@@ -669,9 +669,9 @@
                         </SelectMenu>
                       </div>
 
-                      <!-- Salesperson -->
+                      <!-- Assignee -->
                       <div>
-                        <Label class="form-label">Salesperson <span class="optional">(optional)</span></Label>
+                        <Label class="form-label">Assignee <span class="optional">(optional)</span></Label>
                         <SelectMenu
                           v-model="selectedSalesmanId"
                           :items="salespersonSelectOptions"
@@ -683,6 +683,7 @@
                           <template #item="{ item }">
                             <div class="flex items-center gap-2">
                               <div
+                                v-if="item.id !== SALESPERSON_NONE_ID"
                                 class="w-6 h-6 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
                                 :class="getRoleAvatarClass(item.role)"
                               >
@@ -877,7 +878,7 @@
                                   :key="slot"
                                   type="button"
                                   class="schedule-slot-by-assignee px-3 py-1.5 rounded-md text-sm font-medium transition-all border min-w-[4.5rem]"
-                                  :class="isSlotSelectedForAssignee(slot, item) ? [item.slotActiveClass, 'border-current'] : [item.slotInactiveClass, 'border-border hover:opacity-90']"
+                                  :class="isSlotSelectedForAssignee(slot, item) ? [item.slotActiveClass, 'border-2'] : [item.slotInactiveClass, 'border border-border hover:opacity-90']"
                                   @click="selectSlotAndAssignee(slot, item)"
                                 >
                                   {{ slot }}
@@ -994,9 +995,9 @@
                 <Input type="time" v-model="customTime" class="w-full" />
               </div>
             </div>
-            <!-- Reassign next attempt -->
+            <!-- Assigned to (next attempt) -->
             <div class="mt-4">
-              <Label class="form-label">Reassign</Label>
+              <Label class="form-label">Assigned to</Label>
               <SelectMenu
                 v-model="selectedNextAttemptKey"
                 :items="nextAttemptAssigneeOptions"
@@ -1650,11 +1651,7 @@ const availableScheduleSlots = computed(() => {
 })
 
 // Schedule assignees for assign-and-schedule: users + teams with avatar/slot colors
-const getRoleSlotRingClass = (role) => {
-  const rings = { manager: 'ring-blue-500', salesman: 'ring-purple-500', operator: 'ring-orange-500' }
-  return rings[role] || 'ring-muted-foreground'
-}
-
+// Selected slot border/ring uses blue (primary) for consistency
 const scheduleAssignees = computed(() => {
   const users = (assignableUsers.value || []).map(u => ({
     type: 'user',
@@ -1664,7 +1661,7 @@ const scheduleAssignees = computed(() => {
     assigneeId: `user-${u.id}`,
     avatarClass: getRoleAvatarClass(u.role),
     slotInactiveClass: getRoleAvatarClass(u.role),
-    slotActiveClass: `${getRoleAvatarClass(u.role)} ring-2 ring-offset-1 ${getRoleSlotRingClass(u.role)}`
+    slotActiveClass: `${getRoleAvatarClass(u.role)} ring-2 ring-offset-1 ring-primary border-primary`
   }))
   const teams = (assignableTeams.value || []).map(t => ({
     type: 'team',
@@ -1673,7 +1670,7 @@ const scheduleAssignees = computed(() => {
     assigneeId: `team-${t.id}`,
     avatarClass: 'bg-muted text-muted-foreground',
     slotInactiveClass: 'bg-muted text-muted-foreground',
-    slotActiveClass: 'bg-muted text-muted-foreground ring-2 ring-offset-1 ring-border'
+    slotActiveClass: 'bg-muted text-muted-foreground ring-2 ring-offset-1 ring-primary border-primary'
   }))
   return [...users, ...teams]
 })
@@ -1781,17 +1778,21 @@ const teamSelectOptions = computed(() => {
 })
 
 // Salesperson options for SelectMenu (filtered by selected team when set, otherwise all assignable users)
+// Includes "Unassigned" so assignee can be cleared (team only)
+const SALESPERSON_NONE_ID = '__none__'
 const salespersonSelectOptions = computed(() => {
+  const noneOption = { id: SALESPERSON_NONE_ID, name: 'Unassigned', label: 'Unassigned' }
   const users = qualificationSelectedTeam.value
     ? (assignableUsers.value?.filter(user =>
         user.team === qualificationSelectedTeam.value.name || user.teamId === qualificationSelectedTeam.value.id
       ) || [])
     : (assignableUsers.value || [])
-  return users.map(user => ({
+  const userOptions = users.map(user => ({
     ...user,
     label: user.name,
     value: user.id
   }))
+  return [noneOption, ...userOptions]
 })
 
 // Computed refs for SelectMenu v-model (convert between object and ID)
@@ -1808,21 +1809,24 @@ const selectedTeamId = computed({
 })
 
 const selectedSalesmanId = computed({
-  get: () => qualificationSelectedSalesman.value?.id || null,
+  get: () => {
+    const sid = qualificationSelectedSalesman.value?.id
+    return sid ? sid : SALESPERSON_NONE_ID
+  },
   set: (id) => {
-    if (!id) {
+    if (!id || id === SALESPERSON_NONE_ID) {
       qualificationSelectedSalesman.value = null
       return
     }
     const user = salespersonSelectOptions.value.find(u => u.id === id)
-    qualificationSelectedSalesman.value = user || null
+    qualificationSelectedSalesman.value = user && user.id !== SALESPERSON_NONE_ID ? user : null
   }
 })
 
 // Next attempt reassign: empty option + combined users + teams for SelectMenu (unique _key for value-key)
 const NEXT_ATTEMPT_NONE_KEY = '__none__'
 const nextAttemptAssigneeOptions = computed(() => {
-  const noneOption = { _key: NEXT_ATTEMPT_NONE_KEY, type: 'none', label: 'No one' }
+  const noneOption = { _key: NEXT_ATTEMPT_NONE_KEY, type: 'none', label: 'Unassigned' }
   const users = (assignableUsers.value || []).map(u => ({
     ...u,
     type: 'user',
@@ -1868,21 +1872,47 @@ watch(qualificationEventType, (eventType) => {
   }
 }, { immediate: true })
 
-// When entering answer + interested + assign-only: always default assignee to myself (task owner); optionally they can reassign
+// When entering answer + interested + assign-only: default to task assignee (lead assignee); fallback to team
 watch([selectedOutcome, selectedNextStep, qualificationMethod], ([outcome, next, method]) => {
   if (outcome === 'answer' && next === 'interested' && method === 'assign-only') {
-    const me = currentUser.value && assignableUsers.value?.find(u => u.id === currentUser.value?.id || u.name === currentUser.value?.name)
-    if (me) {
-      assignment.value = { ...assignment.value, assignee: { ...me, type: 'user' } }
-      qualificationSelectedSalesman.value = me
-      qualificationSelectedTeam.value = null
+    const assigneeName = props.lead?.assignee || props.lead?.owner || props.lead?.assignedTo
+    if (assigneeName) {
+      const assigneeUser = assignableUsers.value?.find(u => u.name === assigneeName)
+        ?? usersStore.users?.find(u => u.name === assigneeName)
+      const assigneeTeam = assignableTeams.value?.find(t => t.name === assigneeName)
+      if (assigneeUser) {
+        assignment.value = { ...assignment.value, assignee: { ...assigneeUser, type: 'user' } }
+        qualificationSelectedSalesman.value = assigneeUser
+        qualificationSelectedTeam.value = null
+        return
+      }
+      if (assigneeTeam) {
+        assignment.value = { ...assignment.value, assignee: { ...assigneeTeam, type: 'team' } }
+        qualificationSelectedTeam.value = assigneeTeam
+        qualificationSelectedSalesman.value = null
+        return
+      }
+    }
+    const teams = assignableTeams.value || []
+    const suggested = suggestedTeam.value
+    const defaultTeam = (suggested && teams.find(t => t.id === suggested.id || t.name === suggested.name))
+      || teams[0]
+    if (defaultTeam) {
+      assignment.value = { ...assignment.value, assignee: { ...defaultTeam, type: 'team' } }
+      qualificationSelectedTeam.value = defaultTeam
+      qualificationSelectedSalesman.value = null
     }
   }
 })
 
-// Watch for team selection to reset salesman selection
+// Watch for assignment changes: sync form dropdowns with assignment
+// When team: clear salesman so user picks from team. When user: sync salesman. When null: clear both.
 watch(() => assignment.value?.assignee, (newAssignee) => {
-  if (newAssignee?.type !== 'team') {
+  if (newAssignee?.type === 'team') {
+    qualificationSelectedSalesman.value = null
+  } else if (newAssignee?.type === 'user') {
+    qualificationSelectedSalesman.value = assignableUsers.value?.find(u => u.id === newAssignee.id) ?? newAssignee
+  } else {
     qualificationSelectedSalesman.value = null
   }
 })
@@ -1981,6 +2011,16 @@ watch(qualificationEventType, (eventType) => {
 watch([selectedOutcome, selectedNextStep], ([outcome, next]) => {
   const isAnswerInterested = outcome === 'answer' && next === 'interested'
   const isPostpone = (outcome === 'no-answer' && next === 'postpone') || (outcome === 'answer' && next === 'postpone')
+  if (isPostpone && props.lead?.assignee) {
+    const assigneeName = props.lead.assignee
+    const assigneeUser = assignableUsers.value?.find(u => u.name === assigneeName)
+    const assigneeTeam = assignableTeams.value?.find(t => t.name === assigneeName)
+    if (assigneeUser) {
+      nextAttemptAssignee.value = { ...assigneeUser, type: 'user' }
+    } else if (assigneeTeam) {
+      nextAttemptAssignee.value = { ...assigneeTeam, type: 'team' }
+    }
+  }
   if (!isAnswerInterested) {
     showPostponeRescheduleBlock.value = false
     enrichLeadData.value = {

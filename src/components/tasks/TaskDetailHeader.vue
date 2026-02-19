@@ -1,8 +1,8 @@
 <template>
-  <header class="task-detail-header shrink-0 px-4 sm:px-6">
+  <header class="task-detail-header shrink-0 px-4 sm:px-6 pb-1">
     <div class="task-detail-header-content">
-      <div class="min-w-0 flex-1 flex items-center gap-1.5 sm:gap-2 min-h-0">
-        <!-- Task Title + Badges + Tags: same line -->
+      <div class="min-w-0 flex-1 flex items-center gap-1.5 sm:gap-2 min-h-0 flex-wrap">
+        <!-- Task Title + Badges + Tags -->
         <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-wrap">
           <h3 v-if="task && taskTitle" class="task-detail-title text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
             {{ taskTitle }}
@@ -53,6 +53,14 @@
           </template>
         </div>
       </div>
+      <TaskAssigneeDateBar
+        v-if="task && hasAssigneeOrDate"
+        :task="task"
+        variant="inline"
+        class="shrink-0 mr-1 self-center py-0"
+        @postpone-expected-close="$emit('postpone-expected-close')"
+        @reassigned="$emit('reassigned', $event)"
+      />
       <div class="task-detail-header-actions shrink-0">
         <Button 
           variant="secondary" 
@@ -143,6 +151,7 @@ import {
 } from '@motork/component-library/future/primitives'
 import { ChevronLeft, ChevronRight, X } from 'lucide-vue-next'
 import TaskBadges from './shared/TaskBadges.vue'
+import TaskAssigneeDateBar from './TaskAssigneeDateBar.vue'
 import { getTaskDisplayTitle } from '@/utils/taskActionTitle'
 import AddTagModal from '@/components/modals/AddTagModal.vue'
 
@@ -161,7 +170,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['previous', 'next', 'close', 'tag-updated'])
+const emit = defineEmits(['previous', 'next', 'close', 'tag-updated', 'postpone-expected-close', 'reassigned'])
 
 const showAddTagModal = ref(false)
 const tagToRemove = ref(null)
@@ -219,6 +228,15 @@ const normalizedTags = computed(() => {
 
 const existingTagNames = computed(() => normalizedTags.value.map((t) => t.name))
 
+const hasAssigneeOrDate = computed(() => {
+  if (!props.task) return false
+  const hasAssignee = !!(props.task.assignee || props.task.owner || props.task.assignedTo)
+  const hasDue = props.task.type === 'lead' && props.task.nextActionDue
+  const hasExpectedClose = props.task.type === 'opportunity' && props.task.expectedCloseDate
+  const isClosed = props.task.stage === 'Closed Won' || props.task.stage === 'Closed Lost' || props.task.isClosed
+  return hasAssignee || (hasDue && !isClosed) || hasExpectedClose
+})
+
 // Handle tag addition: payload is { name, color } from AddTagModal
 const handleAddTag = async (payload) => {
   if (!props.task) return
@@ -265,10 +283,8 @@ function confirmRemoveTag() {
 .task-detail-header {
   background-color: var(--background);
   border-bottom: 1px solid var(--border);
-  height: 3rem;
-  min-height: 3rem;
   display: flex;
-  align-items: center;
+  flex-direction: column;
 }
 
 .task-detail-header-content {
@@ -277,6 +293,9 @@ function confirmRemoveTag() {
   justify-content: space-between;
   gap: 0.75rem;
   width: 100%;
+  min-height: 3rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
 .task-detail-header-actions {
