@@ -95,7 +95,7 @@ import { ListTodo, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
-import { formatCurrency, formatDueDate, formatRelativeTime, getDeadlineStatus } from '@/utils/formatters'
+import { formatCurrency, formatDueDateRelative, formatRelativeTime, getDeadlineStatus } from '@/utils/formatters'
 import { calculateLeadUrgency, getUrgencyDotClass } from '@/composables/useLeadUrgency'
 import { useSettingsStore } from '@/stores/settings'
 import { useUsersStore } from '@/stores/users'
@@ -177,9 +177,10 @@ const columnFilters = ref([
   { id: 'status-1', field: 'status', value: [], operator: 'in', pinned: true },
   { id: 'urgencyLevel-1', field: 'urgencyLevel', value: [], operator: 'in', pinned: true }
 ])
-// Default visible columns: hide Task title, Created, Attempts, VIN, Request message, Source
+// Default visible columns: show Task title, hide Urgency, Created, Attempts, VIN, Request message, Source
 const columnVisibility = ref({
-  taskTitle: false,
+  urgencyLevel: false,
+  taskTitle: true,
   createdAt: false,
   contactAttempts: false,
   vin: false,
@@ -392,7 +393,7 @@ const columns = computed(() => [
         return h('span', { class: 'text-meta' }, 'Not set')
       }
       const status = getDeadlineStatus(date)
-      const text = formatDueDate(date)
+      const text = formatDueDateRelative(date)
       return h('span', {
         class: `text-xs font-medium uppercase leading-none ${status.textClass}`
       }, text)
@@ -477,13 +478,13 @@ const getTaskFilterValue = (row, key) => {
   return getNestedProperty(row, key)
 }
 
-/** Due-date display label for table and search (formatDueDate style; "Not set" excluded from search). */
+/** Due-date display label for table and search (formatDueDateRelative style; "Not set" excluded from search). */
 function getDueDateSearchLabel(row) {
   const raw = row.type === 'opportunity' && row.expectedCloseDate
     ? row.expectedCloseDate
     : (row.nextActionDue ?? row.dueDate)
   if (!raw) return null
-  const label = formatDueDate(raw)
+  const label = formatDueDateRelative(raw)
   return label === 'Not set' ? null : label
 }
 

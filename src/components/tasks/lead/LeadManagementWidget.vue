@@ -1,5 +1,11 @@
 <template>
   <div class="relative">
+  <PostponeTaskDialog
+    :show="showPostponeDueDateDialog"
+    task-type="lead"
+    @close="showPostponeDueDateDialog = false"
+    @confirm="handlePostponeDueDateConfirm"
+  />
   <!-- Loader only while converting to opportunity; forms hidden until opportunity shows -->
   <div
     v-if="isConvertingToOpportunity"
@@ -91,6 +97,7 @@ import TaskManagementWidget from '@/components/tasks/shared/TaskManagementWidget
 import PrimaryActionWidget from '@/components/tasks/shared/PrimaryActionWidget.vue'
 import TaskAssignee from '@/components/tasks/TaskAssignee.vue'
 import LQTask from '@/components/tasks/lead/LQTask.vue'
+import PostponeTaskDialog from '@/components/tasks/shared/PostponeTaskDialog.vue'
 
 const props = defineProps({
   lead: {
@@ -126,6 +133,7 @@ const leadState = useLeadActions(toRef(props, 'lead'), actionHandlers)
 
 // Loading state while saving outcome (close / postpone) so user sees spinner before outcome card
 const outcomeSaving = ref(false)
+const showPostponeDueDateDialog = ref(false)
 
 // Use handlers composable
 const {
@@ -163,6 +171,22 @@ async function onPostponed(data) {
     outcomeSaving.value = false
   }
 }
+
+function openPostponeDueDateModal() {
+  showPostponeDueDateDialog.value = true
+}
+
+async function handlePostponeDueDateConfirm(data) {
+  outcomeSaving.value = true
+  try {
+    await handlePostponed({ date: data.date, time: data.time || '12:00', reason: data.reason })
+    showPostponeDueDateDialog.value = false
+  } finally {
+    outcomeSaving.value = false
+  }
+}
+
+defineExpose({ openPostponeDueDateModal })
 
 // Handle owner reassignment from TaskAssignee component
 const handleOwnerReassigned = async (assignee) => {

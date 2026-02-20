@@ -68,10 +68,7 @@ export function mergeContactIntoDescription(baseDescription, name, phone) {
 export function getTaskActionTitle(item) {
   if (!item) return null
 
-  const safeFallback = (entityType, namePart = '') => {
-    const name = (item?.customer?.name?.trim() || namePart || 'Customer').trim()
-    return name ? `${entityType} – ${name}` : entityType
-  }
+  const safeFallback = (entityType) => entityType
 
   try {
     // If item explicitly has a title (like a specific Task entity), use it
@@ -84,8 +81,6 @@ export function getTaskActionTitle(item) {
     } catch (_) {
       displayStage = item.stage || item.displayStage || null
     }
-
-    const name = item?.customer?.name?.trim() || ''
 
     if (type === 'lead') {
       const config = displayStage && LEAD_STATE_CONFIG[displayStage]
@@ -104,8 +99,7 @@ export function getTaskActionTitle(item) {
         }
       }
 
-      const leadName = name || 'Lead'
-      return displayStage ? `${displayStage} – ${leadName}` : leadName
+      return displayStage || 'Lead'
     }
 
     if (type === 'opportunity') {
@@ -137,15 +131,14 @@ export function getTaskActionTitle(item) {
         }
       }
 
-      const oppName = name || 'Customer'
-      return displayStage ? `${displayStage} – ${oppName}` : `Opportunity – ${oppName}`
+      return displayStage || 'Opportunity'
     }
 
     // Unknown type: still show something
-    return displayStage ? `${displayStage} – ${name || 'Task'}` : safeFallback('Task', String(item.id || ''))
+    return displayStage || safeFallback('Task')
   } catch (_) {
     const entityType = item.type === 'lead' ? 'Lead' : item.type === 'opportunity' ? 'Opportunity' : 'Task'
-    return safeFallback(entityType, String(item.id || ''))
+    return safeFallback(entityType)
   }
 }
 
@@ -160,18 +153,13 @@ function normalizeTitleDashes(str) {
 }
 
 /**
- * Task display title including customer name when available.
+ * Task display title – action only, no customer name.
  * Use this for card titles, table "Task title" column, and detail header.
- * Avoids double dashes: if the action title already contains " – ", customer name is not appended.
  * @param {Object} item - Lead or Opportunity item
- * @returns {string|null} Title with customer name appended when possible
+ * @returns {string|null} Action title only
  */
 export function getTaskDisplayTitle(item) {
-  let title = getTaskActionTitle(item)
+  const title = getTaskActionTitle(item)
   if (!title) return null
-  const name = item?.customer?.name?.trim()
-  if (!name) return normalizeTitleDashes(title)
-  if (title.includes(name)) return normalizeTitleDashes(title)
-  if (title.includes(' – ')) return normalizeTitleDashes(title)
-  return normalizeTitleDashes(`${title} – ${name}`)
+  return normalizeTitleDashes(title)
 }

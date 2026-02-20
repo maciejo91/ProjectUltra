@@ -74,6 +74,39 @@ export function formatDueDate(isoTimestamp) {
 }
 
 /**
+ * Format a due date as human-readable relative time (for tasks)
+ * Past: "34 minutes overdue", "2 hours overdue", "1 day overdue"
+ * Future: "in 34 minutes", "in 10 hours", "in 2 days"
+ * @param {string} isoTimestamp - ISO timestamp string
+ * @returns {string} Relative time string
+ */
+export function formatDueDateRelative(isoTimestamp) {
+  if (!isoTimestamp) return ''
+  const dueDate = new Date(isoTimestamp)
+  const now = new Date()
+  const diffMs = dueDate - now
+  const diffMin = Math.floor(Math.abs(diffMs) / (1000 * 60))
+  const diffHour = Math.floor(diffMin / 60)
+  const diffDay = Math.floor(diffHour / 24)
+
+  if (diffMs < 0) {
+    // Past (overdue) – show time passed and that it's overdue
+    if (diffMin < 1) return 'Overdue just now'
+    if (diffMin < 60) return `${diffMin} minute${diffMin !== 1 ? 's' : ''} overdue`
+    if (diffHour < 24) return `${diffHour} hour${diffHour !== 1 ? 's' : ''} overdue`
+    if (diffDay < 7) return `${diffDay} day${diffDay !== 1 ? 's' : ''} overdue`
+    return `${diffDay} days overdue`
+  }
+
+  // Future
+  if (diffMin < 1) return 'in less than a minute'
+  if (diffMin < 60) return `in ${diffMin} minute${diffMin !== 1 ? 's' : ''}`
+  if (diffHour < 24) return `in ${diffHour} hour${diffHour !== 1 ? 's' : ''}`
+  if (diffDay < 7) return `in ${diffDay} day${diffDay !== 1 ? 's' : ''}`
+  return dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+/**
  * Format a date for display
  * @param {Date|string} date - Date object or ISO string
  * @returns {string} Formatted date like "Dec 19, 2025"

@@ -9,18 +9,18 @@
         <PopoverTrigger as-child>
           <button
             type="button"
-            class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            class="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Change assignee"
           >
             <div
-              class="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+              class="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
               :class="getRoleAvatarClass(ownerInfo.role)"
             >
-              <span class="text-[10px] font-medium leading-none">{{ getInitials(ownerInfo.name) }}</span>
+              <span class="text-[9px] font-medium leading-none">{{ getInitials(ownerInfo.name) }}</span>
             </div>
             <span class="truncate">{{ ownerInfo.name }}</span>
             <ChevronDown
-              :size="14"
+              :size="12"
               stroke-width="2"
               class="shrink-0 transition-transform ml-1"
               aria-hidden="true"
@@ -36,9 +36,44 @@
         </PopoverContent>
       </Popover>
     </div>
-    <div v-if="showDueDate" class="flex items-center gap-1 text-sm text-muted-foreground shrink-0">
-      <Clock class="w-4 h-4 shrink-0" />
-      <span>{{ dueDateLabel }}: {{ formattedDueDate }}</span>
+    <div
+      v-if="showDueDate"
+      class="relative shrink-0"
+    >
+      <button
+        type="button"
+        class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        aria-expanded="showDueDateMenu"
+        aria-haspopup="true"
+        aria-label="Due date"
+        @click.stop="showDueDateMenu = !showDueDateMenu"
+      >
+        <Clock class="w-3.5 h-3.5 shrink-0" />
+        <span>{{ dueDateLabel }}: {{ formattedDueDate }}</span>
+        <ChevronDown
+          :size="12"
+          stroke-width="2"
+          class="shrink-0 transition-transform ml-1"
+          :class="{ 'rotate-180': showDueDateMenu }"
+        />
+      </button>
+      <div
+        v-if="showDueDateMenu && dueDateMenuItems.length > 0"
+        v-click-outside="() => (showDueDateMenu = false)"
+        class="absolute left-0 top-full mt-2 z-50 w-56 bg-white border border-border rounded-lg shadow-nsc-card py-1"
+        @click.stop
+      >
+        <button
+          v-for="item in dueDateMenuItems"
+          :key="item.key"
+          type="button"
+          class="w-full px-3 py-2 text-left text-xs text-foreground hover:bg-muted flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="!!item.disabled"
+          @click="item.onClick()"
+        >
+          {{ item.label }}
+        </button>
+      </div>
     </div>
     <div
       v-if="showExpectedCloseDate"
@@ -46,18 +81,18 @@
     >
       <button
         type="button"
-        class="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
         :class="{ 'cursor-default': isTaskClosed }"
         :aria-expanded="showExpectedCloseMenu && !isTaskClosed"
         aria-haspopup="true"
         aria-label="Expected close date"
         @click.stop="!isTaskClosed && (showExpectedCloseMenu = !showExpectedCloseMenu)"
       >
-        <Clock class="w-4 h-4 shrink-0" />
+        <Clock class="w-3.5 h-3.5 shrink-0" />
         <span>Expected Close: {{ formattedExpectedCloseDate }}</span>
         <ChevronDown
           v-if="!isTaskClosed"
-          :size="14"
+          :size="12"
           stroke-width="2"
           class="shrink-0 transition-transform ml-1"
           :class="{ 'rotate-180': showExpectedCloseMenu }"
@@ -89,7 +124,7 @@ import { computed, ref } from 'vue'
 import { Popover, PopoverTrigger, PopoverContent } from '@motork/component-library/future/primitives'
 import { ChevronDown, Clock } from 'lucide-vue-next'
 import AssigneeDropdownContent from '@/components/tasks/AssigneeDropdownContent.vue'
-import { formatDueDate } from '@/utils/formatters'
+import { formatDueDateRelative } from '@/utils/formatters'
 import { useUsersStore } from '@/stores/users'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
@@ -109,6 +144,7 @@ const props = defineProps({
 const emit = defineEmits(['postpone-expected-close', 'reassigned'])
 
 const showExpectedCloseMenu = ref(false)
+const showDueDateMenu = ref(false)
 const assigneeDropdownOpen = ref(false)
 
 const usersStore = useUsersStore()
@@ -205,7 +241,7 @@ const dueDateLabel = computed(() => 'Due Date')
 
 const formattedDueDate = computed(() => {
   if (!props.task?.nextActionDue) return ''
-  return formatDueDate(props.task.nextActionDue)
+  return formatDueDateRelative(props.task.nextActionDue)
 })
 
 const showExpectedCloseDate = computed(() => {
@@ -214,11 +250,25 @@ const showExpectedCloseDate = computed(() => {
 
 const formattedExpectedCloseDate = computed(() => {
   if (!props.task?.expectedCloseDate) return ''
-  return formatDueDate(props.task.expectedCloseDate)
+  return formatDueDateRelative(props.task.expectedCloseDate)
 })
 
 const isTaskClosed = computed(() => {
   return props.task?.stage === 'Closed Won' || props.task?.stage === 'Closed Lost' || props.task?.isClosed
+})
+
+const dueDateMenuItems = computed(() => {
+  if (props.task?.type !== 'lead') return []
+  return [
+    {
+      key: 'postpone',
+      label: 'Postpone',
+      onClick: () => {
+        showDueDateMenu.value = false
+        emit('postpone-expected-close')
+      }
+    }
+  ]
 })
 
 const expectedCloseMenuItems = computed(() => {

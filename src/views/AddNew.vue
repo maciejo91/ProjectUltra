@@ -23,16 +23,14 @@
         </template>
       </PageHeader>
 
-      <div class="pt-2 px-4 pb-8 md:pt-3 md:px-6 md:pb-10 lg:pt-4 lg:px-8 lg:pb-12 text-sm">
-        <div class="max-w-6xl mx-auto">
-          <TabsContent value="manual" class="add-new-manual data-[state=inactive]:hidden">
-            <ManualTab ref="manualTabRef" @submit="handleSubmit" />
-          </TabsContent>
+      <div class="pt-2 px-4 pb-8 md:pt-3 md:px-6 md:pb-10 lg:pt-4 lg:px-8 lg:pb-12 text-sm w-full">
+        <TabsContent value="manual" class="add-new-manual data-[state=inactive]:hidden w-full">
+          <ManualTab ref="manualTabRef" @submit="handleSubmit" />
+        </TabsContent>
 
-          <TabsContent value="upload" class="data-[state=inactive]:hidden">
-            <UploadTab />
-          </TabsContent>
-        </div>
+        <TabsContent value="upload" class="data-[state=inactive]:hidden w-full">
+          <UploadTab />
+        </TabsContent>
       </div>
     </Tabs>
   </div>

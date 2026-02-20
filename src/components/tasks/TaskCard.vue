@@ -5,7 +5,7 @@
     :class="[cardClass, selectedBorderClass]"
     @click="$emit('select', itemId)"
   >
-    <!-- Top row: Urgency (left) + Due Date (right) -->
+    <!-- Top row: Urgency (left) + Due Date + Attempts (right, stacked) -->
     <div class="flex items-center justify-between gap-2 w-full shrink-0 mb-1">
       <div class="flex items-center gap-1.5 min-w-0">
         <span
@@ -26,30 +26,33 @@
           Hot
         </span>
       </div>
-      <span
-        v-if="displayDate"
-        class="text-xs font-medium uppercase leading-none shrink-0"
-        :class="displayDate.status.textClass"
-      >
-        {{ displayDate.text }}
-      </span>
+      <div class="flex flex-col items-end shrink-0 gap-0.5">
+        <span
+          v-if="displayDate"
+          class="text-xs font-medium uppercase leading-none"
+          :class="displayDate.status.textClass"
+        >
+          {{ displayDate.text }}
+        </span>
+        <span
+          v-if="callAttemptsCount > 0"
+          class="text-xs font-normal text-muted-foreground leading-none"
+        >
+          Attempts {{ callAttemptsValue }}
+        </span>
+      </div>
     </div>
 
     <div class="flex flex-col min-w-0 flex-1 pr-2">
-      <div class="flex items-center gap-1 mb-0.5">
-        <h3 class="font-medium text-foreground text-sm break-words">{{ cardTitle }}</h3>
-      </div>
-      <div v-if="showCustomerSubtitle" class="flex items-center gap-2 overflow-hidden flex-wrap">
-        <span class="text-muted-foreground text-sm truncate">
+      <div class="flex items-center gap-x-2 gap-y-0 overflow-hidden flex-wrap mb-0.5 leading-none">
+        <h3 class="font-medium text-foreground text-sm break-words shrink-0 m-0">{{ cardTitle }}</h3>
+        <span
+          v-if="showCustomerSubtitle"
+          class="text-muted-foreground text-sm truncate shrink-0"
+        >
           {{ getName(item) }}
         </span>
       </div>
-      <p
-        v-if="callAttemptsCount > 0"
-        class="text-muted-foreground text-xs mt-0.5"
-      >
-        Attempts {{ callAttemptsValue }}
-      </p>
     </div>
 
     <!-- Badges: full-width row -->
@@ -61,7 +64,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { formatDueDate, getDeadlineStatus } from '@/utils/formatters'
+import { formatDueDateRelative, getDeadlineStatus } from '@/utils/formatters'
 import { getTaskDisplayTitle } from '@/utils/taskActionTitle'
 import { useSettingsStore } from '@/stores/settings'
 import { getUrgencyDotClass } from '@/composables/useLeadUrgency'
@@ -121,8 +124,6 @@ const selectedBorderClass = computed(() => {
 const displayTitleFallback = computed(() => {
   const t = props.item
   if (!t) return 'Task'
-  const name = t.customer?.name?.trim()
-  if (name) return name
   return t.type === 'lead' ? 'Lead' : t.type === 'opportunity' ? 'Opportunity' : 'Task'
 })
 
@@ -150,7 +151,7 @@ const deadline = computed(() => {
   const status = getDeadlineStatus(date)
   
   return {
-    text: formatDueDate(date),
+    text: formatDueDateRelative(date),
     status
   }
 })
@@ -162,7 +163,7 @@ const expectedCloseDate = computed(() => {
   const status = getDeadlineStatus(date)
   
   return {
-    text: formatDueDate(date),
+    text: formatDueDateRelative(date),
     status
   }
 })

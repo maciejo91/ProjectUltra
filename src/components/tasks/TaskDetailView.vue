@@ -366,11 +366,13 @@ const showOfferModal = ref(false)
 const showAppointmentModal = ref(false)
 const managementCardRef = ref(null)
 
-// Handle postpone expected close date (from header's TaskAssigneeDateBar)
+// Handle postpone expected close (opportunity) or due date (lead) from header's TaskAssigneeDateBar
 function handlePostponeExpectedClose() {
   const task = displayTask.value ?? props.task
   if (task?.type === 'opportunity') {
     managementCardRef.value?.openPostponeExpectedCloseModal?.()
+  } else if (task?.type === 'lead') {
+    managementCardRef.value?.openPostponeDueDateModal?.()
   } else {
     emit('postpone-expected-close', task)
   }

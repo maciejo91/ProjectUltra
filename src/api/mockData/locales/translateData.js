@@ -11,7 +11,8 @@ import { readFileSync, writeFileSync } from 'fs'
 import { translateObject } from './translations.js'
 
 const locales = ['it', 'de', 'fr', 'nl']
-const files = ['leads', 'customers', 'opportunities', 'activities']
+// leads, customers, opportunities, activities now re-export from en (single source per type)
+const files = []
 
 function translateFile(locale, fileName) {
   const filePath = `src/api/mockData/locales/${locale}/${fileName}.js`

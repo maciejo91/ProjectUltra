@@ -756,7 +756,7 @@ export const mockLeads = [
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: createHourOffset(24),
+    nextActionDue: createHourOffset(20),
     tags: ['Premium'],
     stage: 'Open',
     isDisqualified: false,
@@ -861,7 +861,7 @@ export const mockLeads = [
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: createHourOffset(24),
+    nextActionDue: createHourOffset(20),
     tags: ['Performance'],
     stage: 'Open',
     isDisqualified: false,
@@ -965,7 +965,7 @@ export const mockLeads = [
       date.setDate(date.getDate() - 3)
       return date.toISOString()
     })(),
-    nextActionDue: createHourOffset(24),
+    nextActionDue: createHourOffset(20),
     tags: [],
     stage: 'Open',
     isDisqualified: false,
@@ -1070,7 +1070,7 @@ export const mockLeads = [
       date.setHours(date.getHours() - 6)
       return date.toISOString()
     })(),
-    nextActionDue: createHourOffset(24),
+    nextActionDue: createHourOffset(20),
     tags: ['VIP'],
     stage: 'Open',
     isDisqualified: false,
@@ -1116,7 +1116,7 @@ export const mockLeads = [
       date.setDate(date.getDate() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: createHourOffset(24),
+    nextActionDue: createHourOffset(20),
     tags: ['VIP', 'Premium'],
     stage: 'Open',
     isDisqualified: false,
@@ -1634,7 +1634,7 @@ export const mockLeads = [
       date.setHours(date.getHours() - 1)
       return date.toISOString()
     })(),
-    nextActionDue: createHourOffset(24),
+    nextActionDue: createHourOffset(20),
     tags: [],
     stage: 'Open',
     isDisqualified: false,

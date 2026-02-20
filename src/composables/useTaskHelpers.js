@@ -1,28 +1,14 @@
-import { formatDeadlineFull, getDeadlineStatus, getStageBadgeClass } from '@/utils/formatters'
+import { formatDueDateRelative, getDeadlineStatus, getStageBadgeClass } from '@/utils/formatters'
 
 /**
  * Composable for task helper functions
  * Provides utility functions for task display and formatting
  */
 export function useTaskHelpers() {
-  // Helper function to display date with conditional logic (relative if today, absolute if future)
+  // Helper function to display date with human-readable relative time (for task list sidebar)
   const getDateDisplay = (isoTimestamp) => {
     if (!isoTimestamp) return 'No deadline'
-    
-    const deadlineStatus = getDeadlineStatus(isoTimestamp)
-    
-    // If overdue, show "OVERDUE"
-    if (deadlineStatus.type === 'overdue') {
-      return 'OVERDUE'
-    }
-    
-    // If today or urgent (within 2 hours), show relative time
-    if (deadlineStatus.type === 'today' || deadlineStatus.type === 'urgent') {
-      return deadlineStatus.relativeTime
-    }
-    
-    // For future dates (normal), show absolute date/time
-    return formatDeadlineFull(isoTimestamp)
+    return formatDueDateRelative(isoTimestamp)
   }
 
   // Helper function to get vehicle type from task

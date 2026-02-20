@@ -50,10 +50,13 @@ const filteredAttrs = computed(() => {
   return filtered
 })
 
-// Expose opportunity widget's postpone modal for TaskDetailHeader flow
+// Expose postpone modals for TaskDetailHeader flow (opportunity: expected close; lead: due date)
 defineExpose({
   openPostponeExpectedCloseModal() {
     widgetRef.value?.openPostponeExpectedCloseModal?.()
+  },
+  openPostponeDueDateModal() {
+    widgetRef.value?.openPostponeDueDateModal?.()
   }
 })
 
