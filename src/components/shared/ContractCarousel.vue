@@ -19,6 +19,7 @@
 
         <!-- Add New Entry Card -->
         <button
+          v-if="!hideAdd"
           class="flex-none w-36 h-[171px] snap-start bg-muted/50 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-muted/80 transition-colors group"
           @click="$emit('add')"
         >
@@ -31,18 +32,23 @@
     </div>
   </div>
   
-  <!-- Empty State -->
-  <div v-else class="flex flex-col items-center justify-center py-6 px-3 bg-muted border border-border rounded-lg gap-3">
-    <FileCheck class="w-8 h-8 shrink-0 text-muted-foreground" />
-    <p class="text-xs font-medium text-muted-foreground">No contracts created yet</p>
-    <p class="text-xs text-muted-foreground">Create a contract to track versions</p>
+  <!-- Empty State: add card when !hideAdd -->
+  <div v-else class="flex flex-col gap-2">
+    <h3 class="font-semibold text-foreground text-sm">Contracts (0)</h3>
     <button
-      class="inline-flex items-center justify-center gap-2 w-10 h-10 rounded-full bg-background border-2 border-dashed border-border text-muted-foreground hover:border-foreground hover:text-foreground transition-colors"
+      v-if="!hideAdd"
+      class="w-full max-w-36 h-[171px] bg-muted/50 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-muted/80 transition-colors group"
       @click="$emit('add')"
-      title="Add contract"
     >
-      <Plus :size="20" />
+      <div class="w-8 h-8 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground group-hover:text-foreground transition-colors shadow-sm">
+        <Plus :size="20" />
+      </div>
+      <span class="text-[10px] font-medium text-muted-foreground group-hover:text-foreground uppercase tracking-wider">New Contract</span>
     </button>
+    <div v-else class="text-center py-6 px-3 bg-muted border border-border rounded-lg">
+      <FileCheck class="w-8 h-8 shrink-0 text-muted-foreground mx-auto mb-2" />
+      <p class="text-xs font-medium text-muted-foreground">No contracts created yet</p>
+    </div>
   </div>
   
   <!-- Collect E-Signatures Modal -->
@@ -73,6 +79,10 @@ const props = defineProps({
   maxContractDate: {
     type: String,
     default: ''
+  },
+  hideAdd: {
+    type: Boolean,
+    default: false
   }
 })
 

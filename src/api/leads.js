@@ -1,3 +1,4 @@
+import { createHourOffset } from '@/utils/mockDataHelpers'
 import { mockCustomers, mockUsers } from './mockData'
 import { leadService } from '@/services/leadService'
 import { ActivityRepository } from '@/repositories/ActivityRepository'
@@ -58,7 +59,7 @@ export const createLeadFromContact = async (contactId, carData) => {
     assigneeInitials: '',
     createdAt: new Date().toISOString(),
     lastActivity: new Date().toISOString(),
-    nextActionDue: null,
+    nextActionDue: createHourOffset(24),
     tags: [],
     isDisqualified: false,
     disqualifyReason: null,
@@ -127,7 +128,7 @@ export const createLeadFromOpportunity = async (opportunityData, activities) => 
     assigneeInitials: opportunityData.assigneeInitials || 'MT',
     createdAt: new Date().toISOString(),
     lastActivity: new Date().toISOString(),
-    nextActionDue: '1h',
+    nextActionDue: createHourOffset(1),
     tags: opportunityData.tags || [],
     stage: 'Open',
     isDisqualified: false,

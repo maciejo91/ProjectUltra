@@ -108,10 +108,6 @@
           <span class="text-muted-foreground">Source</span>
           <span class="text-foreground font-medium">{{ task.source }}</span>
         </div>
-        <div v-if="task.requestType || task.requestedCar?.requestType" class="flex items-center justify-between text-xs">
-          <span class="text-muted-foreground">Request Type</span>
-          <span class="text-foreground font-medium">{{ task.requestType || task.requestedCar?.requestType }}</span>
-        </div>
         <div v-if="requestMessage" class="pt-2">
           <div class="text-xs text-muted-foreground mb-1">Message</div>
           <div class="bg-muted rounded-lg p-2">

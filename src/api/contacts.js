@@ -1,5 +1,6 @@
 import { getMockData } from './mockData/localeLoader.js'
 import { mockCustomers } from './mockData'
+import { ensureRequestedCarImage } from '@/utils/mockDataHelpers'
 
 const delay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -80,10 +81,9 @@ export const addRequestedCarToContact = async (contactId, carData) => {
   if (customerIndex === -1) throw new Error('Contact not found')
   
   // Set the requested car (replacing any existing one)
-  mockCustomers[customerIndex].requestedCar = {
-    ...carData,
-    id: Date.now()
-  }
+  const requestedCar = { ...carData, id: Date.now() }
+  ensureRequestedCarImage(requestedCar)
+  mockCustomers[customerIndex].requestedCar = requestedCar
   
   return { ...mockCustomers[customerIndex] }
 }
@@ -364,7 +364,7 @@ export const addVehicleToCustomer = async (customerId, vehicleData) => {
   // Handle different vehicle types
   if (vehicleData.type === 'requested') {
     // For requested type, also update requestedCar field for backward compatibility
-    customer.requestedCar = {
+    const requestedCar = {
       brand: vehicleData.brand,
       model: vehicleData.model,
       year: vehicleData.year,
@@ -378,6 +378,8 @@ export const addVehicleToCustomer = async (customerId, vehicleData) => {
       kilometers: vehicleData.kilometers,
       id: vehicle.id
     }
+    ensureRequestedCarImage(requestedCar)
+    customer.requestedCar = requestedCar
   }
   
   // Add vehicle to vehicles array

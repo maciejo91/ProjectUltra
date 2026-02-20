@@ -39,6 +39,18 @@
                   class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
                 />
               </TabsTrigger>
+              <TabsTrigger
+                v-if="isDev"
+                value="development"
+                class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+                :class="activeTab === 'development' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+              >
+                <span>Development</span>
+                <span
+                  v-if="activeTab === 'development'"
+                  class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+                />
+              </TabsTrigger>
             </TabsList>
           </div>
         </template>
@@ -498,6 +510,23 @@
               </Button>
             </div>
           </TabsContent>
+
+          <!-- Development Tab (dev only) -->
+          <TabsContent v-if="isDev" value="development" class="data-[state=inactive]:hidden">
+            <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card max-w-2xl">
+              <h3 class="text-title mb-4">Reset mock data</h3>
+              <p class="text-meta mb-6">
+                Clear localStorage for leads and opportunities so the app reloads from the current mock data.
+                Use this when mock data has been updated (e.g. due date fixes) and you want changes to take effect.
+              </p>
+              <Button
+                variant="outline"
+                @click="handleResetMockData"
+              >
+                Reset mock data and reload
+              </Button>
+            </div>
+          </TabsContent>
         </form>
       </div>
     </Tabs>
@@ -507,6 +536,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useSettingsStore } from '@/stores/settings'
+import { resetMockData } from '@/utils/resetMockData'
 import { Button, Checkbox, Tabs, TabsList, TabsTrigger, TabsContent, Input, Label, Dialog, DialogContent, DialogDescription, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@motork/component-library/future/primitives'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
@@ -514,6 +544,9 @@ import { NAV_ITEMS } from '@/constants/navigationItems'
 import { ChevronUp, ChevronDown } from 'lucide-vue-next'
 
 const settingsStore = useSettingsStore()
+
+// Show Development tab only in dev mode
+const isDev = import.meta.env.DEV
 
 // Tab state
 const activeTab = ref('tasks')
@@ -652,6 +685,12 @@ function handleReset() {
     settingsStore.resetToDefaults()
     loadSettings()
     alert('Settings reset to defaults.')
+  }
+}
+
+function handleResetMockData() {
+  if (confirm('Reset mock data and reload? Leads and opportunities will reload from mock data. User edits will be lost.')) {
+    resetMockData({ reload: true })
   }
 }
 

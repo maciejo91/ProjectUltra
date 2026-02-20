@@ -14,10 +14,18 @@
 
         <!-- Info Stack -->
         <div class="min-w-0 flex-1 flex flex-col justify-center">
-          <!-- Name and Tags -->
+          <!-- Name, Entity Type, and Tags -->
           <div class="flex items-center gap-2 flex-wrap">
             <h1 class="text-lg font-semibold text-foreground truncate leading-tight">{{ name }}</h1>
-            
+            <span
+              v-if="taskType && taskType !== 'contact'"
+              class="px-2 py-0.5 rounded text-xs font-medium border shrink-0"
+              :class="taskType === 'lead'
+                ? 'bg-blue-50 text-blue-700 border-blue-200'
+                : 'bg-purple-50 text-purple-700 border-purple-200'"
+            >
+              {{ taskType === 'lead' ? 'Lead' : 'Opportunity' }}
+            </span>
             <!-- Tags -->
             <div class="flex items-center gap-1.5">
               <Badge 

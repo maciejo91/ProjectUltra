@@ -95,6 +95,7 @@
             <OfferCarousel
               :offers="[item.data]"
               :opportunity-id="item.opportunityId || item.leadId || ''"
+              hide-add
             />
             <span v-if="item.data.isMainOffer" class="inline-block mt-2 bg-purple-600 text-white text-xs font-bold px-1 py-0.5 rounded">Main Offer</span>
           </div>

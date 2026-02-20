@@ -613,6 +613,16 @@ const handleOpenChange = (isOpen) => {
 watch(() => [props.show, props.purchaseMethod], ([isOpen, pm]) => {
   if (isOpen && pm) {
     loadPurchaseMethodIntoForm(pm)
+  } else if (isOpen && !pm) {
+    formData.value = {
+      type: 'FIN',
+      fields: defaultFormFields(),
+      currency: 'EUR',
+      offerValidFrom: null,
+      offerValidTo: null
+    }
+    errors.value = {}
+    validationErrors.value = []
   }
   if (!isOpen) {
     const timeoutId = setTimeout(() => {

@@ -25,7 +25,7 @@
         <!-- Profile Header -->
         <div class="flex flex-col items-center text-center space-y-4">
           <div class="relative">
-            <div class="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-2xl font-semibold">
+            <div class="w-20 h-20 rounded-full bg-black flex items-center justify-center text-white text-2xl font-semibold">
               {{ initials }}
             </div>
             <button class="absolute bottom-0 right-0 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center border border-gray-100 hover:bg-gray-50">

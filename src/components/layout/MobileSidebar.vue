@@ -74,8 +74,8 @@
             class="mobile-sidebar-link"
             :class="{ 'mobile-sidebar-link-active': isActive('/tasks') }"
           >
-            <List :size="18" class="shrink-0 sm:hidden" />
-            <List :size="20" class="shrink-0 hidden sm:block" />
+            <ListChecks :size="18" class="shrink-0 sm:hidden" />
+            <ListChecks :size="20" class="shrink-0 hidden sm:block" />
             <span>Tasks</span>
             <div v-if="hotLeadsCount > 0" class="ml-auto w-2 h-2 rounded-full bg-brand-red"></div>
           </router-link>
@@ -119,6 +119,19 @@
             <span>Reports</span>
           </router-link>
 
+          <!-- Requests -->
+          <router-link
+            v-if="navigationVisibility.requests !== false"
+            to="/requests"
+            @click="$emit('close')"
+            class="mobile-sidebar-link"
+            :class="{ 'mobile-sidebar-link-active': isActive('/requests') }"
+          >
+            <LayoutList :size="18" class="shrink-0 sm:hidden" />
+            <LayoutList :size="20" class="shrink-0 hidden sm:block" />
+            <span>{{ $t('common.navigation.requests') }}</span>
+          </router-link>
+
           <!-- Vehicles (Lists) Submenu -->
           <button
             @click="toggleListsMenu"
@@ -145,19 +158,6 @@
               <span>Vehicles</span>
             </router-link>
           </div>
-
-          <!-- Requests -->
-          <router-link
-            v-if="navigationVisibility.requests !== false"
-            to="/requests"
-            @click="$emit('close')"
-            class="mobile-sidebar-link"
-            :class="{ 'mobile-sidebar-link-active': isActive('/requests') }"
-          >
-            <FileText :size="18" class="shrink-0 sm:hidden" />
-            <FileText :size="20" class="shrink-0 hidden sm:block" />
-            <span>{{ $t('common.navigation.requests') }}</span>
-          </router-link>
         </div>
 
         <!-- Divider -->
@@ -317,7 +317,8 @@ import {
   Plus, 
   Home, 
   List, 
-  FileText,
+  ListChecks,
+  LayoutList,
   Users, 
   Calendar, 
   LineChart, 

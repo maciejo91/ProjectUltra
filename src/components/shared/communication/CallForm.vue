@@ -25,19 +25,6 @@
       @copy-number="copyNumber"
     />
 
-    <!-- Initiate call button -->
-    <div class="w-full px-6">
-      <Button
-        variant="default"
-        :disabled="isCallActive"
-        class="inline-flex items-center gap-2 shrink-0"
-        @click="startOutboundCall"
-      >
-        <Phone :size="16" class="shrink-0" aria-hidden="true" />
-        Initiate call
-      </Button>
-    </div>
-
     <!-- Outcome area: label grouped with Answer / No answer toggles -->
     <div class="mk-expanded-cards-area space-y-3 px-6 pt-4">
       <div class="space-y-4">
@@ -123,7 +110,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['call', 'cancel'])
+const emit = defineEmits(['call', 'cancel', 'call-panel-closed'])
 
 const notes = ref('')
 const showCallPanel = ref(false)
@@ -205,6 +192,7 @@ function onCallClose() {
   resetCall()
   showCallPanel.value = false
   extractedThenClosing.value = false
+  emit('call-panel-closed')
 }
 
 function submitLogCall() {
@@ -218,4 +206,6 @@ function submitLogCall() {
     notes: notes.value
   })
 }
+
+defineExpose({ startOutboundCall })
 </script>

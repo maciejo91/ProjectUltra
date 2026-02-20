@@ -1,5 +1,6 @@
 import { BaseRepository } from './BaseRepository.js'
 import { getMockData } from '@/api/mockData/localeLoader.js'
+import { DEFAULT_CAR_IMAGE, ensureRequestedCarImage } from '@/utils/mockDataHelpers'
 
 const STORAGE_KEY = 'projectUltra.createdOpportunities'
 
@@ -23,10 +24,45 @@ export class OpportunityRepository extends BaseRepository {
     super([]) // Initialize with empty array, data loaded dynamically
   }
 
+  /**
+   * Ensure every opportunity has requestedCar.image and each offer has image.
+   * Patches created opportunities loaded from localStorage.
+   */
+  _ensureOpportunityImages(opportunities) {
+    if (!Array.isArray(opportunities)) return false
+    let changed = false
+    for (const opp of opportunities) {
+      if (opp.requestedCar && !opp.requestedCar.image) {
+        opp.requestedCar.image = DEFAULT_CAR_IMAGE
+        changed = true
+      }
+      const offers = opp.offers || []
+      for (const offer of offers) {
+        const hasImage = offer.image || offer.data?.image
+        if (!hasImage) {
+          const img = opp.requestedCar?.image || DEFAULT_CAR_IMAGE
+          if (offer.data) {
+            offer.data = { ...offer.data, image: img }
+          } else {
+            offer.image = img
+          }
+          changed = true
+        }
+      }
+    }
+    return changed
+  }
+
   getCreatedOpportunities() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
-      return stored ? JSON.parse(stored) : []
+      const opportunities = stored ? JSON.parse(stored) : []
+      if (Array.isArray(opportunities)) {
+        const changed = this._ensureOpportunityImages(opportunities)
+        if (changed) this.saveCreatedOpportunities(opportunities)
+        return opportunities
+      }
+      return []
     } catch {
       return []
     }
@@ -39,7 +75,7 @@ export class OpportunityRepository extends BaseRepository {
       console.warn('Failed to persist opportunities to localStorage:', e)
     }
   }
-  
+
   /**
    * Get current data source (locale-aware)
    */
@@ -111,12 +147,14 @@ export class OpportunityRepository extends BaseRepository {
       ...this.getCreatedOpportunities().map(o => o.id)
     ]
     const newId = allIds.length > 0 ? Math.max(...allIds) + 1 : 1
-    
+    const requestedCar = data.requestedCar || data.vehicle || null
+    ensureRequestedCarImage(requestedCar)
+
     const newOpportunity = {
       id: newId,
       customerId: data.customerId,
-      requestedCar: data.requestedCar || null,
-      vehicle: data.vehicle || data.requestedCar || null,
+      requestedCar,
+      vehicle: data.vehicle || requestedCar || null,
       selectedVehicle: data.selectedVehicle || null,
       stage: data.stage || 'Qualified',
       tags: data.tags || [],
@@ -150,9 +188,10 @@ export class OpportunityRepository extends BaseRepository {
    */
   async update(id, updates) {
     await new Promise(resolve => setTimeout(resolve, 300))
-    
+
     const numId = parseInt(id)
     const { displayStage, ...updatesToStore } = updates
+    if (updatesToStore.requestedCar) ensureRequestedCarImage(updatesToStore.requestedCar)
     
     const index = this.dataSource.findIndex(o => o.id === numId)
     if (index !== -1) {

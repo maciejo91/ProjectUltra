@@ -76,7 +76,6 @@
         :hide-tab-counts="showCloseButton"
         @add-activity="handleAddActivity"
         @add-appointment="showCreateAppointmentModal = true"
-        @communication-save="handleCommunicationSave"
         @note-save="handleNoteSave"
         @note-delete="handleNoteDelete"
         @attachment-save="handleAttachmentSave"
@@ -319,14 +318,12 @@ const loadCustomerData = async () => {
 }
 
 const handleSidebarAction = (action) => {
-  if (action === 'call' || action === 'email') {
-    activeTab.value = 'communicate'
-  } else if (action === 'note') {
+  if (action === 'note') {
     activeTab.value = 'notes'
   } else if (action === 'appointment') {
     activeTab.value = 'appointments'
   } else {
-    comingSoonTitle.value = 'More Actions'
+    comingSoonTitle.value = action === 'call' || action === 'email' ? 'Communicate' : 'More Actions'
     showComingSoonModal.value = true
   }
 }
@@ -334,25 +331,6 @@ const handleSidebarAction = (action) => {
 const handleAddActivity = () => {
   comingSoonTitle.value = 'Add Activity'
   showComingSoonModal.value = true
-}
-
-const handleCommunicationSave = (data) => {
-  const user = userStore.currentUser?.name || 'You'
-  const activityType = data.communicationType || data.type || 'communication'
-  const timestamp = data.timestamp && !Number.isNaN(Date.parse(data.timestamp))
-    ? data.timestamp
-    : new Date().toISOString()
-  customerActivities.value = [
-    {
-      id: `comm-${Date.now()}`,
-      type: activityType,
-      user,
-      action: data.action || `logged ${activityType}`,
-      content: data.content || '',
-      timestamp
-    },
-    ...customerActivities.value
-  ]
 }
 
 const handleNoteSave = (data) => {

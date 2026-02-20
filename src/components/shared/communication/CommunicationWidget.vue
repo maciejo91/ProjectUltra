@@ -6,12 +6,21 @@
         v-for="channel in channels"
         :key="channel.id"
         variant="outline"
-        :model-value="selectedChannel === channel.id"
+        :model-value="channel.id === 'call' ? (selectedChannel === 'call' && !outboundCallActive) : selectedChannel === channel.id"
         @update:model-value="(p) => p && setSelectedChannel(channel.id)"
-        class="followup-toggle-item"
+        :class="['followup-toggle-item', channel.id === 'call' ? 'order-1' : 'order-3']"
       >
         <component :is="getLucideIcon(channel.icon)" class="w-3 h-3 shrink-0" />
         <span>{{ channel.label }}</span>
+      </Toggle>
+      <Toggle
+        variant="outline"
+        :model-value="outboundCallActive"
+        @update:model-value="(p) => p && onInitiateCallClick()"
+        class="followup-toggle-item order-2 inline-flex items-center gap-2"
+      >
+        <Phone class="w-3 h-3 shrink-0" />
+        <span>Outbound call</span>
       </Toggle>
     </div>
     
@@ -19,10 +28,12 @@
     <template v-if="selectedChannel === 'call'">
       <div class="w-full min-w-0">
         <CallForm
+          ref="callFormRef"
           :phone-number="phoneNumber"
           :contact-name="contactName"
           @call="handleCall"
           @cancel="handleCancel"
+          @call-panel-closed="outboundCallActive = false"
         />
       </div>
     </template>
@@ -66,12 +77,21 @@
           v-for="channel in channels"
           :key="channel.id"
           variant="outline"
-          :model-value="selectedChannel === channel.id"
+          :model-value="channel.id === 'call' ? (selectedChannel === 'call' && !outboundCallActive) : selectedChannel === channel.id"
           @update:model-value="(p) => p && setSelectedChannel(channel.id)"
-          class="followup-toggle-item"
+          :class="['followup-toggle-item', channel.id === 'call' ? 'order-1' : 'order-3']"
         >
           <component :is="getLucideIcon(channel.icon)" class="w-3 h-3 shrink-0" />
           <span>{{ channel.label }}</span>
+        </Toggle>
+        <Toggle
+          variant="outline"
+          :model-value="outboundCallActive"
+          @update:model-value="(p) => p && onInitiateCallClick()"
+          class="followup-toggle-item order-2 inline-flex items-center gap-2"
+        >
+          <Phone class="w-3 h-3 shrink-0" />
+          <span>Outbound call</span>
         </Toggle>
       </div>
     </div>
@@ -80,10 +100,12 @@
     <template v-if="selectedChannel === 'call'">
       <div class="w-full min-w-0">
         <CallForm
+          ref="callFormRef"
           :phone-number="phoneNumber"
           :contact-name="contactName"
           @call="handleCall"
           @cancel="handleCancel"
+          @call-panel-closed="outboundCallActive = false"
         />
       </div>
     </template>
@@ -116,7 +138,8 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
+import { Phone } from 'lucide-vue-next'
 import { Toggle } from '@motork/component-library/future/primitives'
 import { getLucideIcon } from '@/utils/lucideIcons'
 import EmailForm from '@/components/shared/communication/EmailForm.vue'
@@ -174,7 +197,7 @@ const props = defineProps({
 const emit = defineEmits(['save', 'cancel', 'send'])
 
 const channels = [
-  { id: 'call', label: 'Call', icon: 'fa-solid fa-phone' },
+  { id: 'call', label: 'Log call', icon: 'fa-solid fa-pen-to-square' },
   { id: 'whatsapp', label: 'WhatsApp', icon: 'fa-brands fa-whatsapp' },
   { id: 'email', label: 'Email', icon: 'fa-solid fa-envelope' },
   { id: 'sms', label: 'SMS', icon: 'fa-solid fa-message' }
@@ -182,6 +205,8 @@ const channels = [
 
 // Initialize selected channel from prop; default to 'call' when not specified (e.g. Communicate tab)
 const selectedChannel = ref(props.type ?? 'call')
+const callFormRef = ref(null)
+const outboundCallActive = ref(false)
 
 // Watch for prop changes to update selected channel
 watch(() => props.type, (newType) => {
@@ -191,10 +216,18 @@ watch(() => props.type, (newType) => {
 // Reset selection when task changes (e.g. navigate to different entity)
 watch(() => props.taskId, () => {
   selectedChannel.value = props.type ?? 'call'
+  outboundCallActive.value = false
 })
 
 function setSelectedChannel(id) {
   selectedChannel.value = id
+}
+
+async function onInitiateCallClick() {
+  selectedChannel.value = 'call'
+  outboundCallActive.value = true
+  await nextTick()
+  callFormRef.value?.startOutboundCall?.()
 }
 
 const handleSend = (data) => {
@@ -213,6 +246,7 @@ const handleSend = (data) => {
 }
 
 const handleCall = (data) => {
+  outboundCallActive.value = false
   const action =
     data.option === 'log' && data.outcome
       ? `Logged call (${data.outcome === 'answer' ? 'Answer' : data.outcome === 'no-answer' ? 'No answer' : 'Not valid'})`
@@ -240,6 +274,7 @@ const handleCall = (data) => {
 
 const handleCancel = () => {
   selectedChannel.value = 'call'
+  outboundCallActive.value = false
   emit('cancel')
 }
 </script>

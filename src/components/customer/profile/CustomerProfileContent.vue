@@ -58,27 +58,14 @@
         />
       </div>
 
-      <div v-else-if="activeTab === 'negotiations'">
-        <NegotiationsList 
+      <div v-else-if="activeTab === 'requests'">
+        <RequestsList 
           :leads="leads" 
           :opportunities="opportunities"
-          @click="handleNegotiationClick"
+          @click="handleRequestClick"
         />
       </div>
       
-      <div v-else-if="activeTab === 'communicate'">
-        <CommunicationWidget
-          :task-type="'contact'"
-          :task-id="customerId"
-          :phone-number="phoneNumber || ''"
-          :inline="true"
-          selection-card-title="Call or send message"
-          selection-card-description="Log a call outcome or send an email, SMS or WhatsApp to this customer."
-          @save="$emit('communication-save', $event)"
-          @cancel="() => {}"
-        />
-      </div>
-
       <div v-else-if="activeTab === 'notes'" class="space-y-4">
         <div v-if="!showNoteWidget" class="flex justify-end">
           <Button variant="outline" size="sm" @click="openAddNote">Add note</Button>
@@ -133,21 +120,10 @@
       </div>
       
       <div v-else-if="activeTab === 'appointments'" class="space-y-4">
-        <div class="flex justify-end">
-          <Button variant="outline" size="sm" @click="$emit('add-appointment')">Add</Button>
-        </div>
-        <template v-if="appointments.length > 0">
-          <UpcomingAppointments
-            v-for="app in appointments"
-            :key="app.id"
-            :title="app.title"
-            :date="formatDate(app.start)"
-            :location="app.location"
-            :customerName="app.customerName"
-            :vehicle="app.vehicle"
-          />
-        </template>
-        <div v-else class="text-center py-10 text-muted-foreground text-sm">No upcoming appointments.</div>
+        <AppointmentsTabContent
+          :appointments="appointments"
+          @add-appointment="$emit('add-appointment')"
+        />
       </div>
     </div>
   </div>
@@ -158,14 +134,14 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@motork/component-library/future/primitives'
 import Tabs from '@/components/customer/widgets/Tabs.vue'
-import CommunicationWidget from '@/components/shared/communication/CommunicationWidget.vue'
+import AppointmentsTabContent from '@/components/shared/AppointmentsTabContent.vue'
 import NoteWidget from '@/components/customer/activities/NoteWidget.vue'
 import AttachmentWidget from '@/components/customer/activities/AttachmentWidget.vue'
 import FeedItemCard from '@/components/customer/feed/FeedItemCard.vue'
 import HighlightsBox from './HighlightsBox.vue'
 import ActivityFeed from './ActivityFeed.vue'
 import UpcomingAppointments from './UpcomingAppointments.vue'
-import NegotiationsList from './NegotiationsList.vue'
+import RequestsList from './RequestsList.vue'
 import TaskActivityCard from '@/components/tasks/TaskActivityCard.vue'
 
 const props = defineProps({
@@ -182,7 +158,7 @@ const props = defineProps({
   activeTab: { type: String, default: 'overview' }
 })
 
-const emit = defineEmits(['add-activity', 'add-appointment', 'communication-save', 'note-save', 'note-delete', 'attachment-save', 'attachment-delete', 'update:activeTab'])
+const emit = defineEmits(['add-activity', 'add-appointment', 'note-save', 'note-delete', 'attachment-save', 'attachment-delete', 'update:activeTab'])
 
 const router = useRouter()
 const showNoteWidget = ref(false)
@@ -200,9 +176,8 @@ const attachmentItems = computed(() =>
 
 const tabs = computed(() => [
   { key: 'overview', label: 'Overview', count: 1 },
-  { key: 'communicate', label: 'Communicate', count: 0 },
   { key: 'activity', label: 'Activity', count: (props.activities || []).length },
-  { key: 'negotiations', label: 'Negotiations', count: props.leads.length + props.opportunities.length },
+  { key: 'requests', label: 'Requests', count: props.leads.length + props.opportunities.length },
   { key: 'notes', label: 'Notes', count: notesItems.value.length },
   { key: 'attachments', label: 'Attachments', count: attachmentItems.value.length },
   { key: 'appointments', label: 'Appointments', count: props.appointments.length }
@@ -232,11 +207,8 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
 
-const handleNegotiationClick = (item) => {
-  if (item.type === 'lead') {
-    router.push({ path: `/tasks/${item.id}`, query: { type: 'lead' } })
-  } else {
-    router.push({ path: `/tasks/${item.id}`, query: { type: 'opportunity' } })
-  }
+const handleRequestClick = (item) => {
+  const compositeId = item.type === 'lead' ? `lead-${item.id}` : `opportunity-${item.id}`
+  router.push({ path: '/requests', query: { open: compositeId } })
 }
 </script>

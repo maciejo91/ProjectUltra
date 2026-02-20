@@ -677,15 +677,15 @@
   </TaskManagementWidget>
 
   <!-- Offers and contracts outside the grey container -->
-  <div v-show="hasOffers" class="mt-4" :key="`offers-wrapper-${opportunity.id}`">
+  <div v-if="isInNegotiation || (opportunity.offers && opportunity.offers.length > 0)" class="mt-4" :key="`offers-wrapper-${opportunity.id}`">
     <OfferCarousel
-      v-if="hasOffers"
       ref="offerCarouselRef"
       :key="`carousel-${opportunity.id}`"
       :offers="opportunity.offers || []"
       :opportunity-id="opportunity.id"
       @offer-activated="handleOfferActivated"
       @generate-pdf="handleOfferPDFGenerate"
+      @offer-accepted="handleOfferAccepted"
       @add="openCreateOfferModal"
     />
   </div>

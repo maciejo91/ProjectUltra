@@ -1,5 +1,6 @@
 import { BaseRepository } from './BaseRepository.js'
 import { getMockData } from '@/api/mockData/localeLoader.js'
+import { DEFAULT_CAR_IMAGE, ensureRequestedCarImage } from '@/utils/mockDataHelpers'
 
 const STORAGE_KEY = 'project-ultra-leads'
 
@@ -33,6 +34,38 @@ export class LeadRepository extends BaseRepository {
   }
 
   /**
+   * Ensure every lead has nextActionDue so the UI does not show "Not set".
+   * Patches leads loaded from localStorage that may have been saved before the mock fix.
+   */
+  _ensureNextActionDue(leads) {
+    if (!Array.isArray(leads)) return
+    let changed = false
+    for (const lead of leads) {
+      if (lead.nextActionDue == null) {
+        lead.nextActionDue = lead.lastActivity || lead.createdAt || new Date().toISOString()
+        changed = true
+      }
+    }
+    if (changed) this._persist()
+  }
+
+  /**
+   * Ensure every lead with requestedCar has requestedCar.image.
+   * Patches leads loaded from localStorage that may have been saved before the image fix.
+   */
+  _ensureCarImages(leads) {
+    if (!Array.isArray(leads)) return
+    let changed = false
+    for (const lead of leads) {
+      if (lead.requestedCar && !lead.requestedCar.image) {
+        lead.requestedCar.image = DEFAULT_CAR_IMAGE
+        changed = true
+      }
+    }
+    if (changed) this._persist()
+  }
+
+  /**
    * Get current data source: from localStorage if previously saved, else deep-clone of mock leads.
    */
   get dataSource() {
@@ -42,6 +75,8 @@ export class LeadRepository extends BaseRepository {
         if (stored) {
           const parsed = JSON.parse(stored)
           this._leadsCache = Array.isArray(parsed) ? parsed : []
+          this._ensureNextActionDue(this._leadsCache)
+          this._ensureCarImages(this._leadsCache)
         }
       } catch (_) {
         this._leadsCache = []
@@ -111,6 +146,7 @@ export class LeadRepository extends BaseRepository {
       ? Math.max(...this.dataSource.map(l => l.id)) + 1 
       : 1
     
+    ensureRequestedCarImage(data.requestedCar)
     const newLead = {
       id: newId,
       customerId: data.customerId,
@@ -126,7 +162,7 @@ export class LeadRepository extends BaseRepository {
       assigneeInitials: data.assigneeInitials || '',
       createdAt: new Date().toISOString(),
       lastActivity: new Date().toISOString(),
-      nextActionDue: data.nextActionDue || null,
+      nextActionDue: data.nextActionDue ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       tags: data.tags || [],
       stage: data.stage || 'Open',
       isDisqualified: data.isDisqualified || false,
@@ -158,8 +194,9 @@ export class LeadRepository extends BaseRepository {
     
     // Remove computed fields that shouldn't be stored
     const { displayStage, ...updatesToStore } = updates
-    
-    this.dataSource[index] = { 
+    if (updatesToStore.requestedCar) ensureRequestedCarImage(updatesToStore.requestedCar)
+
+    this.dataSource[index] = {
       ...this.dataSource[index], 
       ...updatesToStore, 
       lastActivity: new Date().toISOString() 

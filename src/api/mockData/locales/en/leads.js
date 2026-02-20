@@ -1,11 +1,11 @@
-import { createHourOffset } from '@/utils/mockDataHelpers'
+import { createHourOffset, DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
 
 const baseRequestedCar = (brand, model, year, price) => ({
   brand,
   model,
   year,
   price,
-  image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=900&auto=format&fit=crop&q=60',
+  image: DEFAULT_CAR_IMAGE,
   vin: 'WBA3B1C50EK123456',
   kilometers: 0,
   status: 'New',
@@ -147,7 +147,7 @@ export const mockLeads = [
     assigneeInitials: '',
     createdAt: createHourOffset(-48),
     lastActivity: createHourOffset(-48),
-    nextActionDue: null,
+    nextActionDue: createHourOffset(-24),
     tags: [],
     stage: 'Not Valid',
     isDisqualified: true,
@@ -172,7 +172,7 @@ export const mockLeads = [
     assigneeInitials: 'DM',
     createdAt: createHourOffset(-24),
     lastActivity: createHourOffset(-2),
-    nextActionDue: null,
+    nextActionDue: createHourOffset(-12),
     tags: [],
     stage: 'Not Interested',
     isDisqualified: true,
@@ -199,7 +199,7 @@ export const mockLeads = [
     assigneeInitials: 'SK',
     createdAt: createHourOffset(-1),
     lastActivity: createHourOffset(-1),
-    nextActionDue: null,
+    nextActionDue: createHourOffset(-2),
     tags: [],
     stage: 'Closed Failed',
     isDisqualified: true,

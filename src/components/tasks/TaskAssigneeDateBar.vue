@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="task && (isAssigned || showDueDate || showExpectedCloseDate)"
+    v-if="task && (isAssigned || (showDueDate && !assigneeOnly) || (showExpectedCloseDate && !assigneeOnly))"
     class="flex items-center flex-wrap shrink-0"
     :class="variant === 'inline' ? 'gap-2' : 'justify-between gap-2 pt-1.5 pb-1.5 px-4'"
   >
@@ -37,7 +37,7 @@
       </Popover>
     </div>
     <div
-      v-if="showDueDate"
+      v-if="showDueDate && !assigneeOnly"
       class="relative shrink-0"
     >
       <button
@@ -76,7 +76,7 @@
       </div>
     </div>
     <div
-      v-if="showExpectedCloseDate"
+      v-if="showExpectedCloseDate && !assigneeOnly"
       class="relative shrink-0"
     >
       <button
@@ -138,6 +138,10 @@ const props = defineProps({
     type: String,
     default: 'bar',
     validator: (v) => ['bar', 'inline'].includes(v)
+  },
+  assigneeOnly: {
+    type: Boolean,
+    default: false
   }
 })
 

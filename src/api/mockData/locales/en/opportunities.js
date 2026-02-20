@@ -1,4 +1,4 @@
-import { createDateOffset, createDateString, createDateTimeOffset, createHourOffset } from '@/utils/mockDataHelpers'
+import { createDateOffset, createDateString, createDateTimeOffset, createHourOffset, DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
 
 /**
  * English mock opportunities – one per display stage/status for the state machine.
@@ -8,7 +8,7 @@ import { createDateOffset, createDateString, createDateTimeOffset, createHourOff
 const baseRequestedCar = (brand, model, year, price, opts = {}) => {
   const defaults = {
     vin: 'WBA3B1C50EK123456',
-    image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=900&auto=format&fit=crop&q=60',
+    image: DEFAULT_CAR_IMAGE,
     dealership: 'Munich',
     fuelType: 'Petrol',
     gearType: 'Automatic',
@@ -109,7 +109,7 @@ export const mockOpportunities = [
         vehicleYear: 2024,
         price: 48000,
         status: 'active',
-        data: { brand: 'Mercedes-Benz', model: 'C-Class', year: 2024, price: 48000, financingType: 'cash' }
+        data: { brand: 'Mercedes-Benz', model: 'C-Class', year: 2024, price: 48000, financingType: 'cash', image: 'https://images.unsplash.com/photo-1546518071-fddcdda7580a?w=900&auto=format&fit=crop&q=60' }
       }
     ],
     tags: [],
@@ -144,7 +144,7 @@ export const mockOpportunities = [
         vehicleYear: 2024,
         price: 125000,
         status: 'accepted',
-        data: { brand: 'Porsche', model: '911', year: 2024, price: 125000, financingType: 'cash' }
+        data: { brand: 'Porsche', model: '911', year: 2024, price: 125000, financingType: 'cash', image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=900&auto=format&fit=crop&q=60' }
       }
     ],
     contracts: [
@@ -191,7 +191,7 @@ export const mockOpportunities = [
         vehicleYear: 2024,
         price: 32000,
         status: 'accepted',
-        data: { brand: 'Volkswagen', model: 'Golf', year: 2024, price: 32000, financingType: 'cash' }
+        data: { brand: 'Volkswagen', model: 'Golf', year: 2024, price: 32000, financingType: 'cash', image: 'https://images.unsplash.com/photo-1607853203100-69829c08b88e?w=900&auto=format&fit=crop&q=60' }
       }
     ],
     contracts: [
@@ -240,7 +240,7 @@ export const mockOpportunities = [
         vehicleYear: 2024,
         price: 95000,
         status: 'archived',
-        data: { brand: 'Porsche', model: 'Cayenne', year: 2024, price: 95000, financingType: 'financing' }
+        data: { brand: 'Porsche', model: 'Cayenne', year: 2024, price: 95000, financingType: 'financing', image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=900&auto=format&fit=crop&q=60' }
       }
     ],
     tags: ['Premium'],
@@ -276,6 +276,41 @@ export const mockOpportunities = [
     createdAt: createHourOffset(-4),
     lastActivity: createHourOffset(-2),
     nextActionDue: createHourOffset(20),
+    scheduledAppointment: null
+  },
+
+  // 8. In Negotiation - Offer Feedback
+  {
+    id: 8,
+    customerId: 10,
+    source: 'Website',
+    sourceDetails: 'Contact form',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('BMW', 'iX xDrive50', 2024, 105000, { vin: 'WBA3B1C50EK789012' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'In Negotiation',
+    negotiationSubstatus: 'Offer Feedback',
+    offers: [
+      {
+        id: 'offer-8',
+        createdAt: createHourOffset(-5),
+        vehicleBrand: 'BMW',
+        vehicleModel: 'iX xDrive50',
+        vehicleYear: 2024,
+        price: 105000,
+        status: 'active',
+        data: { brand: 'BMW', model: 'iX xDrive50', year: 2024, price: 105000, financingType: 'cash', image: 'https://images.unsplash.com/photo-1605822102629-918beea85679?w=900&auto=format&fit=crop&q=60' }
+      }
+    ],
+    tags: [],
+    value: 105000,
+    expectedCloseDate: createHourOffset(16),
+    assignee: 'Sarah Jenkins',
+    createdAt: createHourOffset(-6),
+    lastActivity: createHourOffset(-1),
+    nextActionDue: createHourOffset(10),
     scheduledAppointment: null
   }
 ]

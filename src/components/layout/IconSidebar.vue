@@ -103,7 +103,7 @@
         aria-label="Tasks"
         title="Tasks"
       >
-        <List :size="16" class="text-white shrink-0" />
+        <ListChecks :size="16" class="text-white shrink-0" />
         <span v-if="expanded" class="truncate text-sm text-white">Tasks</span>
         <div v-if="hotLeadsCount > 0" :class="expanded ? 'absolute right-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-brand-red rounded-full' : 'absolute -right-1 top-0 w-2 h-2 bg-brand-red rounded-full'" />
         <span
@@ -178,6 +178,27 @@
       </router-link>
 
       <router-link
+        v-if="navigationVisibility.requests !== false"
+        to="/requests"
+        :class="[
+          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 px-3' : 'h-8 justify-center',
+          isActive('/requests') ? 'bg-white/20' : 'hover:bg-white/10'
+        ]"
+        aria-label="Requests"
+        :title="$t('common.navigation.requests')"
+      >
+        <LayoutList :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">{{ $t('common.navigation.requests') }}</span>
+        <span
+          v-else
+          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+        >
+          {{ $t('common.navigation.requests') }}
+        </span>
+      </router-link>
+
+      <router-link
         to="/vehicles"
         :class="[
           'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
@@ -194,27 +215,6 @@
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Vehicles
-        </span>
-      </router-link>
-
-      <router-link
-        v-if="navigationVisibility.requests !== false"
-        to="/requests"
-        :class="[
-          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
-          expanded ? 'h-9 px-3' : 'h-8 justify-center',
-          isActive('/requests') ? 'bg-white/20' : 'hover:bg-white/10'
-        ]"
-        aria-label="Requests"
-        :title="$t('common.navigation.requests')"
-      >
-        <FileText :size="16" class="text-white shrink-0" />
-        <span v-if="expanded" class="truncate text-sm text-white">{{ $t('common.navigation.requests') }}</span>
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          {{ $t('common.navigation.requests') }}
         </span>
       </router-link>
     </div>
@@ -431,8 +431,8 @@ import { useTheme } from '@/composables/useTheme'
 import {
   Plus,
   Home,
-  List,
-  FileText,
+  ListChecks,
+  LayoutList,
   Users,
   Calendar,
   LineChart,

@@ -117,10 +117,6 @@
 
         <!-- Request-only display (no car but request data exists) -->
         <div v-else class="space-y-3">
-          <div v-if="requestType" class="flex items-center gap-2">
-            <span class="text-xs text-muted-foreground font-medium">Request Type:</span>
-            <span class="text-sm font-semibold text-foreground">{{ requestType }}</span>
-          </div>
           <div v-if="requestMessage" class="bg-muted border border-border rounded-lg p-3">
             <div class="text-xs text-muted-foreground font-medium mb-2">Request Message</div>
             <p class="text-sm text-muted-foreground leading-relaxed">{{ requestMessage }}</p>
@@ -147,10 +143,6 @@
         <div class="mb-6">
           <h4 class="text-xs font-bold uppercase text-muted-foreground tracking-wider mb-4">REQUEST DETAILS</h4>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-6">
-            <div v-if="requestType">
-              <div class="text-xs text-muted-foreground mb-1">Request type</div>
-              <div class="font-medium text-muted-foreground">{{ requestType }}</div>
-            </div>
             <div v-if="source">
               <div class="text-xs text-muted-foreground mb-1">Source</div>
               <div class="font-medium text-muted-foreground">{{ source }}</div>
@@ -246,6 +238,7 @@ import { Pin, Car, ListChecks, ChevronDown } from 'lucide-vue-next'
 import { ref, computed } from 'vue'
 import { Badge, Button, Card, CardHeader, CardContent } from '@motork/component-library/future/primitives'
 import { getDeliverySubstatusColor, getStageColor } from '@/utils/stageMapper'
+import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
 
 const props = defineProps({
   // Stage/Owner/Source props
@@ -379,7 +372,8 @@ const carYear = computed(() => {
 })
 
 const carImage = computed(() => {
-  return props.requestedCar?.image || ''
+  const img = props.requestedCar?.image || ''
+  return img || (hasCar.value ? DEFAULT_CAR_IMAGE : '')
 })
 
 const carPrice = computed(() => {
