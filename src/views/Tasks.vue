@@ -61,8 +61,10 @@
             @select="selectTask"
             @close="handleBackToTaskList"
             :active-filters="activeFilters"
+            :show-closed="showClosed"
             @filter-change="activeFilters = $event"
             @sort-change="handleSortChange"
+            @toggle-closed="toggleShowClosed"
           >
             <template #badges="{ item: task }">
               <Badge v-if="task && task.type" :text="task.type === 'lead' ? 'Lead' : 'Opportunity'" size="small" :theme="task.type === 'lead' ? 'blue' : 'gray'" />
@@ -166,8 +168,10 @@
           @select="selectTask"
           @close="handleBackToTaskList"
           :active-filters="activeFilters"
+          :show-closed="showClosed"
           @filter-change="activeFilters = $event"
           @sort-change="handleSortChange"
+          @toggle-closed="toggleShowClosed"
         >
           <template #badges="{ item: task }">
             <Badge v-if="task && task.type" :text="task.type === 'lead' ? 'Lead' : 'Opportunity'" size="small" :theme="task.type === 'lead' ? 'blue' : 'gray'" />
@@ -417,9 +421,7 @@ onMounted(() => {
     headerActionsRef.value = {
       type: 'tasks',
       viewModeRef: viewMode,
-      showClosedRef: showClosed,
-      onViewChange: handleViewChange,
-      onToggleClosed: toggleShowClosed
+      onViewChange: handleViewChange
     }
   }
   // Defer mounting Teleports until targets exist in DOM (MainLayout renders them as siblings of router-view)

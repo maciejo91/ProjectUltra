@@ -293,9 +293,11 @@ export function useDataTableData({
     const filters = normalizeColumnFilters(columnFilters.value)
     if (filters.length > 0) {
       result = result.filter((row) =>
-        filters.every((f) =>
-          matchesColumnFilter(row, f, getDefByKey(f.key), getFilterValue)
-        )
+        filters.every((f) => {
+          const def = getDefByKey(f.key)
+          if (def?.externalFilter === true || f.key === 'showClosed') return true
+          return matchesColumnFilter(row, f, def, getFilterValue)
+        })
       )
     }
     return result

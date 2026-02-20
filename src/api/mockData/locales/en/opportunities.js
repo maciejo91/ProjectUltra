@@ -220,7 +220,7 @@ export const mockOpportunities = [
 
   // 6. Closed Lost
   {
-    id: 8,
+    id: 6,
     customerId: 8,
     source: 'Facebook',
     sourceDetails: 'Auto campaign',
@@ -233,7 +233,7 @@ export const mockOpportunities = [
     negotiationSubstatus: 'Offer Sent',
     offers: [
       {
-        id: 'offer-8',
+        id: 'offer-6',
         createdAt: createDateOffset(-12),
         vehicleBrand: 'Porsche',
         vehicleModel: 'Cayenne',
@@ -257,7 +257,7 @@ export const mockOpportunities = [
 
   // 7. Abandoned
   {
-    id: 9,
+    id: 7,
     customerId: 9,
     source: '3rd Party',
     sourceDetails: 'Lead aggregator',

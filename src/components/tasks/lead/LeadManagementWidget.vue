@@ -58,22 +58,19 @@
       <!-- Closed / outcome state: show outcome and Reopen so user can act without the drawer closing -->
       <div
         v-if="leadState.isClosed.value"
-        class="bg-muted/50 border border-border rounded-lg p-4"
+        class="bg-background border border-border rounded-lg p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4"
       >
-        <div class="flex justify-between items-start mb-3">
-          <div>
-            <h4 class="font-bold text-foreground text-sm">Outcome</h4>
-            <p class="text-xs text-muted-foreground mt-0.5">
-              {{ leadState.displayStage.value }}
-              <span v-if="lead.disqualifyReason"> – {{ lead.disqualifyReason }}</span>
-            </p>
-          </div>
+        <div>
+          <h4 class="font-bold text-foreground text-sm">Outcome</h4>
+          <p class="text-xs text-muted-foreground mt-0.5">
+            {{ leadState.displayStage.value }}
+            <span v-if="lead.disqualifyReason"> – {{ lead.disqualifyReason }}</span>
+          </p>
         </div>
         <Button
-          variant="primary"
-          size="small"
+          variant="default"
           @click="handleReopen"
-          class="flex items-center gap-2"
+          class="inline-flex items-center gap-2 shrink-0 sm:ml-auto"
         >
           <span>Reopen Lead</span>
           <RotateCcw class="w-4 h-4 shrink-0" />

@@ -173,6 +173,7 @@ const pagination = ref({
 const globalFilter = ref(props.initialGlobalFilter || '')
 const sorting = ref([])
 const columnFilters = ref([
+  { id: 'showClosed-1', field: 'showClosed', value: props.showClosed ? 'yes' : '', operator: 'eq', pinned: true },
   { id: 'type-1', field: 'type', value: '', operator: 'eq', pinned: true },
   { id: 'status-1', field: 'status', value: [], operator: 'in', pinned: true },
   { id: 'urgencyLevel-1', field: 'urgencyLevel', value: [], operator: 'in', pinned: true }
@@ -192,6 +193,35 @@ const columnVisibility = ref({
 watch(globalFilter, (newValue) => {
   emit('update:globalFilter', newValue)
 })
+
+// Sync showClosed filter from prop (e.g. when switching from card view)
+watch(
+  () => props.showClosed,
+  (showClosed) => {
+    const filters = [...columnFilters.value]
+    const idx = filters.findIndex((f) => (f.field ?? f.key) === 'showClosed')
+    const newVal = showClosed ? 'yes' : ''
+    if (idx >= 0 && filters[idx]?.value !== newVal) {
+      filters[idx] = { ...filters[idx], value: newVal }
+      columnFilters.value = filters
+    }
+  },
+  { immediate: true }
+)
+
+// When user changes showClosed filter in table, emit to parent
+watch(
+  columnFilters,
+  (filters) => {
+    const f = Array.isArray(filters) ? filters.find((x) => (x.field ?? x.key) === 'showClosed') : null
+    const val = f?.value
+    const isYes = val === 'yes' || val === true
+    if (isYes !== props.showClosed) {
+      emit('toggle-closed')
+    }
+  },
+  { deep: true }
+)
 
 const hasActiveFilters = computed(() => {
   const hasColumnFilters = Array.isArray(columnFilters.value) && columnFilters.value.length > 0

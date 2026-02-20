@@ -20,9 +20,11 @@
         <TaskFilters
           :active-filters="activeFilters"
           :sort-option="currentSort"
+          :show-closed="showClosed"
           :button-only="true"
           @filter-change="$emit('filter-change', $event)"
           @sort-change="selectSort"
+          @toggle-closed="$emit('toggle-closed')"
         />
       </div>
     </div>
@@ -78,10 +80,11 @@ const props = defineProps({
   getName: { type: Function, default: (item) => item.name || 'Unknown' },
   getVehicleInfo: { type: Function, default: () => 'No vehicle specified' },
   searchPlaceholder: { type: String, default: 'Search' },
-  viewMode: { type: String, default: 'card' }
+  viewMode: { type: String, default: 'card' },
+  showClosed: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['select', 'filter-change', 'sort-change', 'close', 'view-change'])
+const emit = defineEmits(['select', 'filter-change', 'sort-change', 'toggle-closed', 'close', 'view-change'])
 
 const searchQuery = ref(props.initialSearchQuery)
 const scrollContainer = ref(null)

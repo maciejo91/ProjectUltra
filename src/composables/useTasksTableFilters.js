@@ -15,6 +15,20 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
     const taskList = tasks.value ?? []
     const defs = []
 
+    // Show Closed - external filter (controls data source, not column); excluded from row-level filtering
+    defs.push({
+      key: 'showClosed',
+      label: 'Show Closed',
+      type: 'select',
+      operators: [{ value: 'eq', label: 'is' }],
+      options: [
+        { value: '', label: 'No' },
+        { value: 'yes', label: 'Yes' }
+      ],
+      externalFilter: true,
+      pinned: true
+    })
+
     // Type filter - matches Task details column (lead/opportunity badge)
     if (showTypeFilter.value) {
       defs.push({

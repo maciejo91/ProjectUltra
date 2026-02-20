@@ -58,15 +58,6 @@
               >
                 <span>Request</span>
                 <span 
-                  v-if="requestCount > 0"
-                  class="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-xs font-bold leading-none"
-                  :class="sidebarTab === 'request' 
-                    ? 'bg-primary text-white' 
-                    : 'bg-gray-200 text-foreground'"
-                >
-                  {{ requestCount }}
-                </span>
-                <span 
                   v-if="sidebarTab === 'request'"
                   class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
                 ></span>
@@ -387,30 +378,6 @@ const allActivities = computed(() => {
 // Badge counts
 const activityCount = computed(() => {
   return allActivities.value.length
-})
-
-const requestCount = computed(() => {
-  if (!displayTask.value?.customer) return 0
-
-  const customerEmail = displayTask.value.customer.email
-  const customerPhone = displayTask.value.customer.phone
-  const currentTaskId = displayTask.value.compositeId || `${displayTask.value.type}-${displayTask.value.id}`
-  
-  // Combine all leads and opportunities
-  const allTasks = [
-    ...(leadsStore.leads || []).map(lead => ({ ...lead, type: 'lead', compositeId: `lead-${lead.id}` })),
-    ...(opportunitiesStore.opportunities || []).map(opp => ({ ...opp, type: 'opportunity', compositeId: `opportunity-${opp.id}` }))
-  ]
-  
-  // Filter by same customer (email or phone match) and exclude current task
-  const relatedTasks = allTasks.filter(task => {
-    if (task.compositeId === currentTaskId) return false
-    if (!task.customer) return false
-    
-    return task.customer.email === customerEmail || task.customer.phone === customerPhone
-  })
-  
-  return relatedTasks.length
 })
 
 // Navigation handlers

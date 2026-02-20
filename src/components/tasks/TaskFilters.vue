@@ -20,10 +20,10 @@
           <DropdownMenuItem
             v-for="option in filterOptions"
             :key="option.key"
-            @select="(e) => { e.preventDefault(); toggleFilter(option.key); }"
+            @select="(e) => { e.preventDefault(); handleFilterOptionSelect(option); }"
             class="flex items-center gap-2 cursor-pointer"
           >
-            <Check v-if="activeFilters.includes(option.key)" class="w-4 h-4 shrink-0" />
+            <Check v-if="(option.key === 'show-closed' ? showClosed : activeFilters.includes(option.key))" class="w-4 h-4 shrink-0" />
             <span v-else class="w-4 h-4 shrink-0" aria-hidden="true"></span>
             <span>{{ option.label }}</span>
           </DropdownMenuItem>
@@ -80,10 +80,10 @@
         <DropdownMenuItem
           v-for="option in filterOptions"
           :key="option.key"
-          @select="(e) => { e.preventDefault(); toggleFilter(option.key); }"
+          @select="(e) => { e.preventDefault(); handleFilterOptionSelect(option); }"
           class="flex items-center gap-2 cursor-pointer"
         >
-          <Check v-if="activeFilters.includes(option.key)" class="w-4 h-4 shrink-0" />
+          <Check v-if="(option.key === 'show-closed' ? showClosed : activeFilters.includes(option.key))" class="w-4 h-4 shrink-0" />
           <span v-else class="w-4 h-4 shrink-0" aria-hidden="true"></span>
           <span>{{ option.label }}</span>
         </DropdownMenuItem>
@@ -146,7 +146,7 @@ const props = defineProps({
 
 const emit = defineEmits(['filter-change', 'sort-change', 'toggle-closed'])
 
-const hasActiveFilters = computed(() => props.activeFilters.length > 0)
+const hasActiveFilters = computed(() => props.activeFilters.length > 0 || props.showClosed)
 
 const hasActiveSort = computed(() =>
   Boolean(props.sortOption && props.sortOption !== '' && props.sortOption !== 'none')
@@ -159,8 +159,17 @@ const filterOptions = computed(() => [
   { key: 'to-be-called', label: t('common.tasks.filters.toBeCalled'), type: 'status' },
   { key: 'leads-1h', label: t('common.tasks.filters.leads1h'), type: 'date' },
   { key: 'assigned-to-me', label: t('common.tasks.filters.assignedToMe'), type: 'assignee' },
-  { key: 'assigned-to-my-team', label: t('common.tasks.filters.assignedToMyTeam'), type: 'assignee' }
+  { key: 'assigned-to-my-team', label: t('common.tasks.filters.assignedToMyTeam'), type: 'assignee' },
+  { key: 'show-closed', label: t('common.tasks.showClosed'), type: 'toggle' }
 ])
+
+function handleFilterOptionSelect(option) {
+  if (option.key === 'show-closed') {
+    emit('toggle-closed')
+    return
+  }
+  toggleFilter(option.key)
+}
 
 const toggleFilter = (filterKey) => {
   const currentFilters = [...props.activeFilters]

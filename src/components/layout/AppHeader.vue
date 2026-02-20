@@ -1,6 +1,9 @@
 <template>
   <header
-    class="hidden md:flex h-12 shrink-0 items-center justify-between gap-4 border-b border-border bg-background pl-4 md:pl-6 pr-4 md:pr-6 app-header"
+    :class="[
+      'hidden md:flex h-12 shrink-0 items-center justify-between gap-4 border-b border-border bg-background pl-4 md:pl-6 app-header',
+      isTasksCardViewNarrow ? 'pr-1 md:pr-2' : 'pr-4 md:pr-6'
+    ]"
   >
     <!-- Title always on the very left; when cards view is selected the header shrinks and brings the action buttons closer -->
     <div class="flex min-w-0 flex-1 items-center">
@@ -32,25 +35,6 @@
             <Table :size="14" />
           </Toggle>
         </div>
-        <button
-          type="button"
-          :class="[
-            'group flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium transition-all shrink-0',
-            tasksHeaderActions.showClosedRef.value
-              ? 'border-red-200 bg-red-50 text-brand-red'
-              : 'border-border bg-surface text-muted-foreground hover:border-red-100 hover:bg-red-50 hover:text-brand-red'
-          ]"
-          :aria-pressed="tasksHeaderActions.showClosedRef.value"
-          @click="tasksHeaderActions.onToggleClosed()"
-        >
-          <EyeOff
-            :class="[
-              'w-4 h-4 shrink-0',
-              tasksHeaderActions.showClosedRef.value ? 'text-brand-red' : 'text-muted-foreground group-hover:text-brand-red'
-            ]"
-          />
-          <span class="hidden sm:inline">{{ t('common.tasks.showClosed') }}</span>
-        </button>
       </template>
       <template v-if="customHeaderActions">
         <button
@@ -67,10 +51,10 @@
 </template>
 
 <script setup>
-import { computed, inject } from 'vue'
+import { computed, inject, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { LayoutGrid, Table, EyeOff, Plus } from 'lucide-vue-next'
+import { LayoutGrid, Table, Plus } from 'lucide-vue-next'
 import { Toggle } from '@motork/component-library/future/primitives'
 
 const route = useRoute()
@@ -87,6 +71,26 @@ const tasksHeaderActions = computed(() => {
   const ref = headerActionsRef?.value
   if (ref?.type === 'tasks') return ref
   return null
+})
+
+const isNarrow = ref(typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches)
+let narrowMq = null
+let narrowUpdate = null
+onMounted(() => {
+  if (typeof window === 'undefined') return
+  narrowMq = window.matchMedia('(max-width: 1023px)')
+  narrowUpdate = () => { isNarrow.value = narrowMq.matches }
+  narrowMq.addEventListener('change', narrowUpdate)
+})
+onBeforeUnmount(() => {
+  if (narrowMq && narrowUpdate) narrowMq.removeEventListener('change', narrowUpdate)
+})
+
+const isTasksCardViewNarrow = computed(() => {
+  const tasks = tasksHeaderActions.value
+  if (!tasks) return false
+  if (tasks.viewModeRef?.value !== 'card') return false
+  return isNarrow.value
 })
 
 const ROUTE_TITLE_MAP = {
