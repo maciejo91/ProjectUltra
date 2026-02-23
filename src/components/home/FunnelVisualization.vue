@@ -106,12 +106,12 @@ const props = defineProps({
 
 const getStageColorClass = (color) => {
   const colorMap = {
-    'red': 'bg-red-300',
-    'orange': 'bg-orange-300',
-    'blue': 'bg-blue-300',
-    'gray': 'bg-gray-300'
+    'red': 'bg-red-600',
+    'orange': 'bg-orange-600',
+    'blue': 'bg-primary',
+    'gray': 'bg-gray-600'
   }
-  return colorMap[color] || 'bg-gray-300'
+  return colorMap[color] || 'bg-gray-600'
 }
 
 const formatNumber = (num) => {

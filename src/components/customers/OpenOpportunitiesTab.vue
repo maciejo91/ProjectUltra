@@ -152,7 +152,7 @@ const handleRowClick = (row) => {
 }
 
 const activeTab = ref('open-opportunities')
-const { columns, filterDefinitions, tableMeta } = useCustomersTable(activeTab, handleRowClick)
+const { columns, filterDefinitions, tableMeta } = useCustomersTable(activeTab, handleRowClick, { rows })
 
 const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
   rawData: rows,

@@ -73,11 +73,11 @@
     <div class="flex min-h-0 flex-1 flex-col gap-1 w-full px-2 overflow-y-auto overflow-x-visible">
       <router-link
         v-if="navigationVisibility.home !== false"
-        to="/tasks"
+        to="/home"
         :class="[
           'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
           expanded ? 'h-9 px-3' : 'h-8 justify-center',
-          isActive('/tasks') ? 'bg-white/20' : 'hover:bg-white/10'
+          isActive('/home') ? 'bg-white/20' : 'hover:bg-white/10'
         ]"
         aria-label="Home"
         title="Home"
@@ -89,28 +89,6 @@
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Home
-        </span>
-      </router-link>
-
-      <router-link
-        v-if="navigationVisibility.tasks !== false"
-        to="/tasks"
-        :class="[
-          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
-          expanded ? 'h-9 px-3' : 'h-8 justify-center',
-          isActive('/tasks') ? 'bg-white/20' : 'hover:bg-white/10'
-        ]"
-        aria-label="Tasks"
-        title="Tasks"
-      >
-        <ListChecks :size="16" class="text-white shrink-0" />
-        <span v-if="expanded" class="truncate text-sm text-white">Tasks</span>
-        <div v-if="hotLeadsCount > 0" :class="expanded ? 'absolute right-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-brand-red rounded-full' : 'absolute -right-1 top-0 w-2 h-2 bg-brand-red rounded-full'" />
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          Tasks
         </span>
       </router-link>
 
@@ -136,6 +114,49 @@
       </router-link>
 
       <router-link
+        v-if="navigationVisibility.requests !== false"
+        to="/requests"
+        :class="[
+          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 px-3' : 'h-8 justify-center',
+          isActive('/requests') ? 'bg-white/20' : 'hover:bg-white/10'
+        ]"
+        aria-label="Requests"
+        :title="$t('common.navigation.requests')"
+      >
+        <FileBadge2 :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">{{ $t('common.navigation.requests') }}</span>
+        <span
+          v-else
+          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+        >
+          {{ $t('common.navigation.requests') }}
+        </span>
+      </router-link>
+
+      <router-link
+        v-if="navigationVisibility.tasks !== false"
+        to="/tasks"
+        :class="[
+          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 px-3' : 'h-8 justify-center',
+          isActive('/tasks') ? 'bg-white/20' : 'hover:bg-white/10'
+        ]"
+        aria-label="Tasks"
+        title="Tasks"
+      >
+        <ListTodo :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">Tasks</span>
+        <div v-if="hotLeadsCount > 0" :class="expanded ? 'absolute right-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-brand-red rounded-full' : 'absolute -right-1 top-0 w-2 h-2 bg-brand-red rounded-full'" />
+        <span
+          v-else
+          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+        >
+          Tasks
+        </span>
+      </router-link>
+
+      <router-link
         v-if="navigationVisibility.calendar !== false"
         to="/calendar"
         :class="[
@@ -156,6 +177,9 @@
         </span>
       </router-link>
 
+      <!-- Separator -->
+      <div class="h-px bg-white/10 my-1 mx-1" aria-hidden="true" />
+
       <router-link
         v-if="userStore.canAccessReports() && navigationVisibility.reports !== false"
         to="/reports"
@@ -174,27 +198,6 @@
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Reports
-        </span>
-      </router-link>
-
-      <router-link
-        v-if="navigationVisibility.requests !== false"
-        to="/requests"
-        :class="[
-          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
-          expanded ? 'h-9 px-3' : 'h-8 justify-center',
-          isActive('/requests') ? 'bg-white/20' : 'hover:bg-white/10'
-        ]"
-        aria-label="Requests"
-        :title="$t('common.navigation.requests')"
-      >
-        <LayoutList :size="16" class="text-white shrink-0" />
-        <span v-if="expanded" class="truncate text-sm text-white">{{ $t('common.navigation.requests') }}</span>
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          {{ $t('common.navigation.requests') }}
         </span>
       </router-link>
 
@@ -219,7 +222,7 @@
       </router-link>
     </div>
     
-    <!-- Bottom: Search, Language, Settings -->
+    <!-- Bottom: Search, Settings -->
     <div class="relative z-10 w-full px-2 flex flex-col gap-1 shrink-0">
       <button
         v-if="navigationVisibility.search !== false"
@@ -241,48 +244,6 @@
           Search
         </span>
       </button>
-
-      <div v-if="navigationVisibility.language !== false" class="relative" v-click-outside="() => (showLanguageMenu = false)">
-        <button
-          type="button"
-          @click.stop="toggleLanguageMenu"
-          :class="[
-            'relative group flex w-full items-center rounded-md transition-colors cursor-pointer',
-            expanded ? 'h-9 gap-3 px-3' : 'h-8 justify-center',
-            showLanguageMenu ? 'bg-white/20' : 'hover:bg-white/10'
-          ]"
-          aria-label="Language"
-          title="Language"
-        >
-          <Globe :size="16" class="text-white shrink-0" />
-          <span v-if="expanded" class="truncate text-sm text-white">Language</span>
-          <span
-            v-else
-            class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-          >
-            Language
-          </span>
-        </button>
-        <transition name="dropdown">
-          <div
-            v-if="showLanguageMenu"
-            class="absolute left-full ml-2 bottom-0 mb-0 w-48 bg-white border border-border rounded-md shadow-mk-dashboard-card overflow-hidden z-[100]"
-            @click.stop
-          >
-            <button
-              v-for="lang in languages"
-              :key="lang.code"
-              type="button"
-              @click="changeLanguage(lang.code)"
-              class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3"
-              :class="{ 'bg-red-50 text-brand-red': currentLocale === lang.code }"
-            >
-              <span class="text-base">{{ lang.flag }}</span>
-              <span>{{ lang.name }}</span>
-            </button>
-          </div>
-        </transition>
-      </div>
 
       <router-link
         v-if="userStore.canAccessSettings()"
@@ -372,6 +333,30 @@
               </button>
             </div>
             <div class="h-px bg-border mx-2"></div>
+            <div v-if="navigationVisibility.language !== false" class="p-2">
+              <button
+                type="button"
+                @click="showLanguageSubmenu = !showLanguageSubmenu"
+                class="w-full flex items-center justify-between px-3 py-2 text-sm text-muted-foreground hover:bg-muted rounded-lg transition-colors"
+              >
+                <span>{{ $t('common.labels.language') }}</span>
+                <ChevronDown :size="14" class="transition-transform" :class="{ 'rotate-180': showLanguageSubmenu }" />
+              </button>
+              <div v-if="showLanguageSubmenu" class="pl-4 pt-0.5 space-y-0.5">
+                <button
+                  v-for="lang in languages"
+                  :key="lang.code"
+                  type="button"
+                  @click="changeLanguage(lang.code)"
+                  class="w-full text-left px-3 py-2 text-sm text-muted-foreground hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
+                  :class="{ 'bg-red-50 text-brand-red': currentLocale === lang.code }"
+                >
+                  <span class="text-base">{{ lang.flag }}</span>
+                  <span>{{ lang.name }}</span>
+                </button>
+              </div>
+            </div>
+            <div class="h-px bg-border mx-2"></div>
             <div class="p-2">
               <button 
                 @click="toggleDarkMode"
@@ -431,15 +416,14 @@ import { useTheme } from '@/composables/useTheme'
 import {
   Plus,
   Home,
-  ListChecks,
-  LayoutList,
+  ListTodo,
+  FileBadge2,
   Users,
   Calendar,
   LineChart,
   Settings,
   CarFront,
   Search,
-  Globe,
   Shield,
   User,
   Headphones,
@@ -481,21 +465,26 @@ const firstVisibleRoute = computed(() => {
   const nav = navigationVisibility.value
   
   // Check routes in order of appearance
-  if (nav.home !== false) return '/tasks'
+  if (nav.home !== false) return '/home'
   if (nav.tasks !== false) return '/tasks'
   if (nav.customers !== false) return '/customers'
+  if (nav.requests !== false) return '/requests'
+  if (nav.tasks !== false) return '/tasks'
   if (nav.calendar !== false) return '/calendar'
   if (userStore.canAccessReports() && nav.reports !== false) return '/reports'
   if (nav.lists !== false) return '/vehicles'
-  if (nav.requests !== false) return '/requests'
   
   // Fallback to tasks (home) if all are hidden
   return '/tasks'
 })
 
-const showLanguageMenu = ref(false)
 const showUserMenu = ref(false)
+const showLanguageSubmenu = ref(false)
 const showSearchModal = ref(false)
+
+watch(showUserMenu, (open) => {
+  if (!open) showLanguageSubmenu.value = false
+})
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -524,14 +513,11 @@ const isActive = (path) => {
   return route.path.startsWith(path)
 }
 
-const toggleLanguageMenu = () => {
-  showLanguageMenu.value = !showLanguageMenu.value
-}
-
 const changeLanguage = (langCode) => {
   locale.value = langCode
   localStorage.setItem('app-locale', langCode)
-  showLanguageMenu.value = false
+  showLanguageSubmenu.value = false
+  showUserMenu.value = false
 }
 
 const toggleUserMenu = () => {
@@ -541,7 +527,7 @@ const toggleUserMenu = () => {
 const switchRole = (role) => {
   userStore.switchRole(role)
   showUserMenu.value = false
-  router.push('/tasks')
+  router.push('/home')
 }
 
 const handleLogout = () => {

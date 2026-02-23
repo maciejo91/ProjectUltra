@@ -577,6 +577,7 @@ const localSettings = ref({
   navigationVisibility: {
     home: true,
     tasks: true,
+    requests: true,
     customers: true,
     calendar: true,
     reports: true,
@@ -644,10 +645,11 @@ function loadSettings() {
       warm: settingsStore.settings.urgencyThresholds?.warm || 50,
       standard: settingsStore.settings.urgencyThresholds?.standard || 20
     },
-    // Ensure navigation visibility settings exist with defaults
+    // Ensure navigation visibility settings exist with defaults (all visible by default)
     navigationVisibility: {
       home: settingsStore.settings.navigationVisibility?.home ?? true,
       tasks: settingsStore.settings.navigationVisibility?.tasks ?? true,
+      requests: settingsStore.settings.navigationVisibility?.requests ?? true,
       customers: settingsStore.settings.navigationVisibility?.customers ?? true,
       calendar: settingsStore.settings.navigationVisibility?.calendar ?? true,
       reports: settingsStore.settings.navigationVisibility?.reports ?? true,

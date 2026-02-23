@@ -1,22 +1,50 @@
 <template>
-  <div class="page-container">
-    <!-- Content -->
-    <div class="p-4 md:p-6 lg:p-8">
+  <div class="page-container flex flex-col min-h-0">
+    <div class="flex-1 overflow-y-auto pt-4 px-4 pb-8 md:pt-6 md:px-6 md:pb-10 lg:pt-8 lg:px-8 lg:pb-12 min-h-0">
       <!-- Main Content Grid - 2/3 vs 1/3 starting from top -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 items-start">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full">
         
         <!-- Left Column - Main Content (2/3 width) -->
-        <div class="lg:col-span-2 space-y-4 md:space-y-6">
-          <!-- Performance Widget -->
-          <PerformanceWidget />
-          
-          <!-- Quick Actions Widget -->
-          <div class="rounded-lg flex flex-col bg-muted">
-            <!-- Title Section -->
-            <div class="px-4 py-4 flex items-center justify-between shrink-0">
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Today Card -->
+          <Card class="border border-border flex flex-col overflow-hidden shadow-mk-dashboard-card">
+            <CardHeader class="shrink-0 flex flex-row items-center justify-between gap-4">
               <div class="flex items-center gap-2">
-                <Zap class="w-4 h-4 shrink-0 text-foreground" />
-                <h2 class="text-sm font-medium text-foreground leading-5">Quick Actions</h2>
+                <CardTitle class="text-sm font-medium leading-5">Today</CardTitle>
+                <Badge
+                  v-if="todayItems.length > 0"
+                  :text="String(todayItems.length)"
+                  size="small"
+                  theme="blue"
+                />
+              </div>
+              <div class="flex items-center gap-1">
+                <Button
+                  label="Tasks"
+                  variant="ghost"
+                  size="small"
+                  @click="$router.push('/tasks')"
+                  class="text-xs"
+                />
+                <Button
+                  label="Calendar"
+                  variant="ghost"
+                  size="small"
+                  @click="$router.push('/calendar')"
+                  class="text-xs"
+                />
+              </div>
+            </CardHeader>
+            <CardContent class="pt-0">
+              <TodayFeed :items="todayItems" :loading="loadingToday" />
+            </CardContent>
+          </Card>
+
+          <!-- Quick Actions Widget -->
+          <Card class="border border-border flex flex-col overflow-hidden shadow-mk-dashboard-card">
+            <CardHeader class="shrink-0 flex flex-row items-center justify-between gap-4">
+              <div class="flex items-center gap-2">
+                <CardTitle class="text-sm font-medium leading-5">Quick Actions</CardTitle>
                 <Badge
                   v-if="totalNotificationsCount > 0"
                   :text="String(totalNotificationsCount)"
@@ -32,10 +60,8 @@
                 @click="$router.push('/tasks')"
                 class="text-xs"
               />
-            </div>
-            
-            <!-- Card Content -->
-            <div class="bg-white rounded-lg p-4 shadow-nsc-card flex flex-col">
+            </CardHeader>
+            <CardContent class="flex flex-col pt-0">
               <div class="space-y-3">
                 <!-- Loading Skeleton -->
                 <template v-if="loadingNotifications">
@@ -53,9 +79,9 @@
                 
                 <!-- Actual Content -->
                 <template v-else>
-                  <div v-if="notifications.length === 0" class="text-center py-8 text-muted-foreground">
-                    <CheckCircle class="w-10 h-10 shrink-0 mb-2 text-muted-foreground opacity-50" />
-                    <p class="text-sm">All caught up!</p>
+                  <div v-if="notifications.length === 0" class="text-center py-12 text-muted-foreground bg-muted/30 rounded-lg">
+                    <CheckCircle class="w-10 h-10 shrink-0 mx-auto mb-3 text-muted-foreground opacity-50" />
+                    <p class="text-sm font-medium">All caught up!</p>
                     <p class="text-xs mt-1">No quick actions needed</p>
                   </div>
                   <ActionableQuestionCard
@@ -70,69 +96,13 @@
                   />
                 </template>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
         
         <!-- Right Column - Sidebar (1/3 width) -->
-        <div class="space-y-4 md:space-y-6">
-          <!-- Tasks Due Today Widget -->
-          <div class="rounded-lg flex flex-col bg-muted">
-            <!-- Title Section -->
-            <div class="px-4 py-4 flex items-center justify-between shrink-0">
-              <div class="flex items-center gap-2">
-                <ListTodo class="w-4 h-4 shrink-0 text-foreground" />
-                <h2 class="text-sm font-medium text-foreground leading-5">Tasks Due Today</h2>
-                <Badge
-                  v-if="tasksDueToday.length > 0"
-                  :text="String(tasksDueToday.length)"
-                  size="small"
-                  theme="red"
-                />
-              </div>
-              <Button
-                label="View all tasks →"
-                variant="ghost"
-                size="small"
-                @click="$router.push('/tasks')"
-                class="text-xs"
-              />
-            </div>
-            
-            <!-- Card Content -->
-            <div class="bg-white rounded-lg p-4 shadow-nsc-card flex flex-col">
-              <TodaysTasks :tasks="tasksDueToday" :loading="loadingTasks" />
-            </div>
-          </div>
-          
-          <!-- Appointments Today Widget -->
-          <div class="rounded-lg flex flex-col bg-muted">
-            <!-- Title Section -->
-            <div class="px-4 py-4 flex items-center justify-between shrink-0">
-              <div class="flex items-center gap-2">
-                <Calendar class="w-4 h-4 shrink-0 text-foreground" />
-                <h2 class="text-sm font-medium text-foreground leading-5">Appointments Today</h2>
-                <Badge
-                  v-if="appointmentsToday.length > 0"
-                  :text="String(appointmentsToday.length)"
-                  size="small"
-                  theme="blue"
-                />
-              </div>
-              <Button
-                label="View calendar →"
-                variant="ghost"
-                size="small"
-                @click="$router.push('/calendar')"
-                class="text-xs"
-              />
-            </div>
-            
-            <!-- Card Content -->
-            <div class="bg-white rounded-lg p-4 shadow-nsc-card flex flex-col">
-              <TodaysAppointments :appointments="appointmentsToday" :loading="loadingAppointments" />
-            </div>
-          </div>
+        <div class="space-y-6">
+          <PerformanceWidget />
         </div>
       </div>
     </div>
@@ -147,34 +117,31 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Zap, CheckCircle, ListTodo, Calendar } from 'lucide-vue-next'
+import { ref, onMounted, onBeforeUnmount, inject } from 'vue'
+import { CheckCircle } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useActionableQuestions } from '@/composables/useActionableQuestions'
 import { useDashboard } from '@/composables/useDashboard'
 import { createNSTask, updateOpportunityAssignee } from '@/api/opportunities'
 import { saveDismissal } from '@/utils/dismissalStorage'
-import { Button, Badge } from '@motork/component-library/future/primitives'
+import { Button, Badge, Card, CardHeader, CardTitle, CardContent } from '@motork/component-library/future/primitives'
 import ActionableQuestionCard from '@/components/home/ActionableQuestionCard.vue'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
-import TodaysAppointments from '@/components/home/TodaysAppointments.vue'
-import TodaysTasks from '@/components/home/TodaysTasks.vue'
+import TodayFeed from '@/components/home/TodayFeed.vue'
 import PerformanceWidget from '@/components/home/PerformanceWidget.vue'
-import { formatDate } from '@/utils/formatters'
 
 const router = useRouter()
 const userStore = useUserStore()
+const headerActionsRef = inject('headerActionsRef', null)
 
 const { dismissQuestion, addFollowUpQuestion } = useActionableQuestions()
 const { 
   notifications, 
   totalNotificationsCount, 
-  appointmentsToday, 
-  tasksDueToday, 
+  todayItems, 
   loadingNotifications,
-  loadingAppointments,
-  loadingTasks,
+  loadingToday,
   loadDashboard 
 } = useDashboard()
 
@@ -182,7 +149,18 @@ const showReassignModal = ref(false)
 const currentQuestion = ref(null)
 
 onMounted(async () => {
+  if (headerActionsRef) {
+    headerActionsRef.value = {
+      type: 'home',
+      onRefresh: loadDashboard,
+      isLoading: () => loadingNotifications.value || loadingToday.value
+    }
+  }
   await loadDashboard()
+})
+
+onBeforeUnmount(() => {
+  if (headerActionsRef) headerActionsRef.value = null
 })
 
 const handleAnswerYes = async (question) => {

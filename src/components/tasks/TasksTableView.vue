@@ -5,7 +5,7 @@
       <div class="bg-background mb-8">
         <div class="mb-1">
           <UnifiedSearchBar
-            active-tab="opportunities"
+            active-tab="tasks"
             full-width
             placeholder="Search tasks..."
             :pagination="pagination"
@@ -13,6 +13,8 @@
             :request-type-options="requestTypeOptions"
             :status-options="tasksStatusOptions"
             :source-options="tasksSourceOptions"
+            :priority-options="tasksPriorityOptions"
+            :requested-car-brand-options="tasksRequestedCarBrandOptions"
             @update:global-filter="globalFilter = $event"
             @update:column-filters="columnFilters = $event"
             @update:pagination="pagination = $event"
@@ -252,6 +254,14 @@ const tasksSourceOptions = computed(() => {
   const def = filterDefinitions.value?.find(d => d.key === 'source')
   return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
 })
+const tasksPriorityOptions = [
+  { value: 'Hot', label: 'Hot' },
+  { value: 'Normal', label: 'Normal' }
+]
+const tasksRequestedCarBrandOptions = computed(() => {
+  const def = filterDefinitions.value?.find(d => d.key === 'requestedCarBrand')
+  return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
+})
 
 const isSelected = (task) => {
   // Check both currentTaskId (when task detail is shown) and highlightId (when switching from card to table)
@@ -283,7 +293,7 @@ const columns = computed(() => [
     meta: { title: 'Type' },
     cell: ({ row }) => {
       const task = row.original
-      const typeClass = task.type === 'lead' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-purple-50 text-purple-700 border-purple-200'
+      const typeClass = task.type === 'lead' ? 'bg-badge-green text-emerald-700 border-emerald-200' : 'bg-purple-50 text-purple-700 border-purple-200'
       return h('span', {
         class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${typeClass} w-fit`
       }, task.type === 'lead' ? 'Lead' : 'Opportunity')

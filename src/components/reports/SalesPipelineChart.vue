@@ -37,21 +37,10 @@
       <!-- Actual Content -->
       <template v-else>
         <!-- Title Section -->
-        <div class="px-4 py-4 flex items-center justify-between shrink-0">
+        <div class="px-4 py-4 shrink-0">
           <div class="flex items-center gap-2">
             <TrendingUp :size="16" class="text-foreground" />
             <h3 class="text-lg font-medium text-foreground leading-5">Sales Pipeline</h3>
-          </div>
-          <div class="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              class="relative"
-              @click="toggleTimeRange"
-            >
-              {{ selectedTimeRange }}
-              <ChevronDown :size="16" class="ml-1" />
-            </Button>
           </div>
         </div>
 
@@ -139,17 +128,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { ChevronDown, TrendingUp, Clock } from 'lucide-vue-next'
-import { Button } from '@motork/component-library/future/primitives'
-
-const selectedTimeRange = ref('This month')
-const timeRangeOptions = ['This month', 'Last month', 'This quarter']
-
-const toggleTimeRange = () => {
-  const currentIndex = timeRangeOptions.indexOf(selectedTimeRange.value)
-  selectedTimeRange.value = timeRangeOptions[(currentIndex + 1) % timeRangeOptions.length] || 'This month'
-}
+import { TrendingUp, Clock } from 'lucide-vue-next'
 
 const props = defineProps({
   pipeline: {

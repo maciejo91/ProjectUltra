@@ -136,7 +136,7 @@
                       :key="idx"
                       class="flex gap-2"
                     >
-                      <span :class="line.speaker === 'Lead' ? 'text-blue-400 font-semibold shrink-0' : 'text-green-400 font-semibold shrink-0'">{{ line.speaker }}:</span>
+                      <span :class="line.speaker === 'Lead' ? 'text-emerald-600 font-semibold shrink-0' : 'text-green-400 font-semibold shrink-0'">{{ line.speaker }}:</span>
                       <span class="text-white wrap-break-word">{{ line.text }}</span>
                     </div>
                   </div>

@@ -162,6 +162,7 @@ export function matchesColumnFilter(row, filter, filterDef, getFilterValue) {
   const filterStr = String(filterValue).toLowerCase().trim()
   if (operator === 'eq') return rowStr === filterStr
   if (operator === 'ne') return rowStr !== filterStr
+  if (operator === 'includes') return rowStr.includes(filterStr)
   return true
 }
 

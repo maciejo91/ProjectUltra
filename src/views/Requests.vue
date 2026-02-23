@@ -20,7 +20,7 @@
           </div>
           <div class="mb-1">
             <UnifiedSearchBar
-              active-tab="opportunities"
+              active-tab="requests"
               full-width
               placeholder="Search requests..."
               :pagination="pagination"
@@ -154,7 +154,7 @@ const tableScrollContainer = ref(null)
 
 const { rowSelection, selectedCount, hasSelection, getSelectedRows, clearSelection } = useTableRowSelection((row) => row.compositeId)
 
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
+const pagination = ref({ pageIndex: 0, pageSize: 50 })
 const sorting = ref([])
 const globalFilter = ref('')
 const columnFilters = ref([
@@ -237,7 +237,7 @@ const columns = computed(() => [
     meta: { title: 'Type' },
     cell: ({ row }) => {
       const r = row.original
-      const typeClass = r.type === 'lead' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-purple-50 text-purple-700 border-purple-200'
+      const typeClass = r.type === 'lead' ? 'bg-badge-green text-emerald-700 border-emerald-200' : 'bg-purple-50 text-purple-700 border-purple-200'
       return h('span', {
         class: `inline-flex items-center px-2 py-0.5 rounded text-fluid-xs font-semibold border ${typeClass} w-fit`
       }, r.type === 'lead' ? 'Lead' : 'Opportunity')

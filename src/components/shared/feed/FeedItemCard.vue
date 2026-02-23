@@ -243,16 +243,15 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-const handleEdit = () => {
+function handleEdit() {
   showMenu.value = false
   emit('edit', props.item)
 }
 
-const handleDelete = () => {
+function handleDelete() {
   showMenu.value = false
   if (confirm('Are you sure you want to delete this item?')) {
     emit('delete', props.item)
   }
 }
 </script>
-

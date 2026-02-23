@@ -36,7 +36,30 @@
           </Toggle>
         </div>
       </template>
-      <template v-if="customHeaderActions">
+      <template v-if="route.name === 'reports'">
+        <select
+          v-model="reportsTimeRange"
+          class="px-3 py-1.5 rounded-lg border border-border bg-white text-sm font-medium text-muted-foreground shadow-sm hover:bg-muted transition-all cursor-pointer"
+        >
+          <option>This month</option>
+          <option>Last month</option>
+          <option>This quarter</option>
+          <option>This year</option>
+        </select>
+      </template>
+      <template v-else-if="homeHeaderActions">
+        <Button
+          variant="outline"
+          size="sm"
+          class="flex items-center gap-2"
+          :disabled="homeHeaderActions.isLoading?.()"
+          @click="homeHeaderActions.onRefresh()"
+        >
+          <RefreshCw :class="{ 'animate-spin': homeHeaderActions.isLoading?.() }" class="size-4 shrink-0" />
+          <span class="hidden sm:inline">Refresh</span>
+        </Button>
+      </template>
+      <template v-else-if="customHeaderActions">
         <button
           type="button"
           class="group flex items-center gap-2 rounded-xl border border-border px-3 py-1.5 bg-surface text-sm font-medium text-muted-foreground hover:border-red-100 hover:bg-red-50 hover:text-brand-red transition-all"
@@ -46,6 +69,38 @@
           <span class="hidden sm:inline">{{ t('common.navigation.addNew') }}</span>
         </button>
       </template>
+      <template v-else-if="calendarHeaderActions">
+        <div class="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            class="flex items-center gap-2"
+            @click="calendarHeaderActions.onFilters()"
+          >
+            <Filter class="size-4 shrink-0" />
+            <span>Filters</span>
+            <span
+              v-if="calendarHeaderActions.activeFilterCount > 0"
+              class="rounded-full bg-primary text-primary-foreground text-xs px-2 min-w-5 h-5 flex items-center justify-center"
+            >
+              {{ calendarHeaderActions.activeFilterCount }}
+            </span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            class="flex items-center gap-2"
+            @click="calendarHeaderActions.onConnect()"
+          >
+            <Link class="size-4 shrink-0" />
+            <span>{{ calendarHeaderActions.connectedCount > 0 ? 'Connected' : 'Connect' }}</span>
+          </Button>
+          <Button variant="outline" size="sm" class="flex items-center gap-2" @click="calendarHeaderActions.onAddEvent()">
+            <Plus class="size-4 shrink-0" />
+            <span>Add event</span>
+          </Button>
+        </div>
+      </template>
     </div>
   </header>
 </template>
@@ -54,11 +109,12 @@
 import { computed, inject, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { LayoutGrid, Table, Plus } from 'lucide-vue-next'
-import { Toggle } from '@motork/component-library/future/primitives'
+import { LayoutGrid, Table, Plus, RefreshCw, Filter, Link } from 'lucide-vue-next'
+import { Toggle, Button } from '@motork/component-library/future/primitives'
 
 const route = useRoute()
 const { t } = useI18n()
+const reportsTimeRange = ref('This month')
 
 const headerActionsRef = inject('headerActionsRef', null)
 const customHeaderActions = computed(() => {
@@ -70,6 +126,18 @@ const customHeaderActions = computed(() => {
 const tasksHeaderActions = computed(() => {
   const ref = headerActionsRef?.value
   if (ref?.type === 'tasks') return ref
+  return null
+})
+
+const homeHeaderActions = computed(() => {
+  const ref = headerActionsRef?.value
+  if (ref?.type === 'home') return ref
+  return null
+})
+
+const calendarHeaderActions = computed(() => {
+  const ref = headerActionsRef?.value
+  if (ref?.type === 'calendar') return ref
   return null
 })
 

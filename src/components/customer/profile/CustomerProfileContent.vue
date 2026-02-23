@@ -25,24 +25,22 @@
              />
            </div>
            
-           <!-- Upcoming Appointments -->
+           <!-- Upcoming Appointments (next 1 only) -->
            <div class="space-y-4">
              <div class="flex items-center justify-between">
-               <h3 class="text-lg font-semibold text-foreground">Upcoming appointments</h3>
+               <h3 class="text-lg font-semibold text-foreground">Upcoming appointment</h3>
                <Button variant="outline" size="sm" @click="$emit('add-appointment')">Add</Button>
              </div>
              
-             <template v-if="appointments.length > 0">
-               <UpcomingAppointments 
-                 v-for="app in appointments"
-                 :key="app.id"
-                 :title="app.title"
-                 :date="formatDate(app.start)"
-                 :location="app.location"
-                 :customerName="app.customerName"
-                 :vehicle="app.vehicle"
-               />
-             </template>
+             <UpcomingAppointments
+               v-if="nextUpcomingAppointment"
+               :key="nextUpcomingAppointment.id"
+               :title="nextUpcomingAppointment.title"
+               :date="formatDate(nextUpcomingAppointment.start)"
+               :location="nextUpcomingAppointment.location"
+               :customerName="nextUpcomingAppointment.customerName"
+               :vehicle="nextUpcomingAppointment.vehicle"
+             />
              <div v-else class="text-sm text-muted-foreground italic">No upcoming appointments.</div>
            </div>
         </div>
@@ -50,11 +48,13 @@
       
       <div v-else-if="activeTab === 'activity'" class="w-full">
         <TaskActivityCard
-          :activities="activities"
+          :activities="mergedActivities"
           :expanded-summaries="expandedSummaries"
+          :show-add-appointment="true"
           class="w-full"
           @activity-click="() => {}"
           @add-activity="$emit('add-activity', $event)"
+          @add-appointment="$emit('add-appointment')"
         />
       </div>
 
@@ -63,66 +63,6 @@
           :leads="leads" 
           :opportunities="opportunities"
           @click="handleRequestClick"
-        />
-      </div>
-      
-      <div v-else-if="activeTab === 'notes'" class="space-y-4">
-        <div v-if="!showNoteWidget" class="flex justify-end">
-          <Button variant="outline" size="sm" @click="openAddNote">Add note</Button>
-        </div>
-        <NoteWidget
-          v-if="showNoteWidget"
-          :item="editingNoteItem"
-          :task-type="'contact'"
-          :task-id="customerId"
-          :hide-header="true"
-          @save="handleNoteSave"
-          @cancel="showNoteWidget = false; editingNoteItem = null"
-        />
-        <div v-if="notesItems.length > 0" class="space-y-4">
-          <FeedItemCard
-            v-for="item in notesItems"
-            :key="item.id"
-            :item="item"
-            task-type="contact"
-            :customer-initials="customerInitials"
-            @edit="(i) => { editingNoteItem = i; showNoteWidget = true }"
-            @delete="$emit('note-delete', $event)"
-          />
-        </div>
-        <div v-else-if="!showNoteWidget" class="text-center py-10 text-muted-foreground text-sm">No notes yet. Add a note to get started.</div>
-      </div>
-      
-      <div v-else-if="activeTab === 'attachments'" class="space-y-4">
-        <div v-if="!showAttachmentWidget" class="flex justify-end">
-          <Button variant="outline" size="sm" @click="openAddAttachment">Add attachment</Button>
-        </div>
-        <AttachmentWidget
-          v-if="showAttachmentWidget"
-          :item="editingAttachmentItem"
-          :task-type="'contact'"
-          :task-id="customerId"
-          @save="handleAttachmentSave"
-          @cancel="showAttachmentWidget = false; editingAttachmentItem = null"
-        />
-        <div v-if="attachmentItems.length > 0" class="space-y-4">
-          <FeedItemCard
-            v-for="item in attachmentItems"
-            :key="item.id"
-            :item="item"
-            task-type="contact"
-            :customer-initials="customerInitials"
-            @edit="(i) => { editingAttachmentItem = i; showAttachmentWidget = true }"
-            @delete="$emit('attachment-delete', $event)"
-          />
-        </div>
-        <div v-else-if="!showAttachmentWidget" class="text-center py-10 text-muted-foreground text-sm">No attachments yet. Add an attachment to get started.</div>
-      </div>
-      
-      <div v-else-if="activeTab === 'appointments'" class="space-y-4">
-        <AppointmentsTabContent
-          :appointments="appointments"
-          @add-appointment="$emit('add-appointment')"
         />
       </div>
     </div>
@@ -134,10 +74,6 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@motork/component-library/future/primitives'
 import Tabs from '@/components/customer/widgets/Tabs.vue'
-import AppointmentsTabContent from '@/components/shared/AppointmentsTabContent.vue'
-import NoteWidget from '@/components/customer/activities/NoteWidget.vue'
-import AttachmentWidget from '@/components/customer/activities/AttachmentWidget.vue'
-import FeedItemCard from '@/components/customer/feed/FeedItemCard.vue'
 import HighlightsBox from './HighlightsBox.vue'
 import ActivityFeed from './ActivityFeed.vue'
 import UpcomingAppointments from './UpcomingAppointments.vue'
@@ -158,49 +94,47 @@ const props = defineProps({
   activeTab: { type: String, default: 'overview' }
 })
 
-const emit = defineEmits(['add-activity', 'add-appointment', 'note-save', 'note-delete', 'attachment-save', 'attachment-delete', 'update:activeTab'])
+const emit = defineEmits(['add-activity', 'add-appointment', 'update:activeTab'])
 
 const router = useRouter()
-const showNoteWidget = ref(false)
-const editingNoteItem = ref(null)
-const showAttachmentWidget = ref(false)
-const editingAttachmentItem = ref(null)
 const expandedSummaries = ref({})
 
-const notesItems = computed(() =>
-  (props.activities || []).filter((a) => a && (a.type === 'note')).sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0))
-)
-const attachmentItems = computed(() =>
-  (props.activities || []).filter((a) => a && (a.type === 'attachment')).sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0))
-)
+const nextUpcomingAppointment = computed(() => {
+  const now = new Date()
+  const upcoming = (props.appointments || [])
+    .filter((app) => new Date(app.start || 0) >= now)
+    .sort((a, b) => new Date(a.start || 0).getTime() - new Date(b.start || 0).getTime())
+  return upcoming[0] || null
+})
+
+const mergedActivities = computed(() => {
+  const acts = [...(props.activities || [])]
+  const last3Appointments = (props.appointments || [])
+    .sort((a, b) => new Date(b.start || 0).getTime() - new Date(a.start || 0).getTime())
+    .slice(0, 3)
+  const apps = last3Appointments.map((app) => ({
+    id: `appointment-${app.id}`,
+    type: 'appointment',
+    user: 'Scheduled',
+    action: 'Appointment',
+    message: app.title || 'Appointment',
+    content: app.title || 'Appointment',
+    timestamp: app.start || app.createdAt || new Date().toISOString(),
+    title: app.title,
+    location: app.location || app.dealership,
+    customerName: app.customerName || app.customer,
+    vehicle: app.vehicle
+  }))
+  return [...acts, ...apps].sort(
+    (a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime()
+  )
+})
 
 const tabs = computed(() => [
   { key: 'overview', label: 'Overview', count: 1 },
-  { key: 'activity', label: 'Activity', count: (props.activities || []).length },
   { key: 'requests', label: 'Requests', count: props.leads.length + props.opportunities.length },
-  { key: 'notes', label: 'Notes', count: notesItems.value.length },
-  { key: 'attachments', label: 'Attachments', count: attachmentItems.value.length },
-  { key: 'appointments', label: 'Appointments', count: props.appointments.length }
+  { key: 'activity', label: 'Activity', count: (props.activities || []).length + props.appointments.length }
 ])
-
-function openAddNote() {
-  editingNoteItem.value = null
-  showNoteWidget.value = true
-}
-function openAddAttachment() {
-  editingAttachmentItem.value = null
-  showAttachmentWidget.value = true
-}
-function handleNoteSave(data) {
-  showNoteWidget.value = false
-  editingNoteItem.value = null
-  emit('note-save', data)
-}
-function handleAttachmentSave(data) {
-  showAttachmentWidget.value = false
-  editingAttachmentItem.value = null
-  emit('attachment-save', data)
-}
 
 const formatDate = (dateString) => {
   if (!dateString) return ''

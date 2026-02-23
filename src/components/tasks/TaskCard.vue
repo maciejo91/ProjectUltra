@@ -117,7 +117,9 @@ const cardClass = computed(() => {
 
 const selectedBorderClass = computed(() => {
   if (!isSelected.value) return ''
-  return props.item?.type === 'opportunity' ? 'task-card-selected task-card-selected-opportunity' : 'task-card-selected'
+  if (props.item?.type === 'opportunity') return 'task-card-selected task-card-selected-opportunity'
+  if (props.item?.type === 'lead') return 'task-card-selected task-card-selected-lead'
+  return 'task-card-selected'
 })
 
 
@@ -192,7 +194,11 @@ const urgencyDotClass = computed(() => getUrgencyDotClass(props.item?.urgencyLev
 }
 
 .task-card.task-card-selected {
-  border: 2px solid #0470e9 !important;
+  border: 2px solid var(--brand-primary) !important;
+}
+
+.task-card.task-card-selected.task-card-selected-lead {
+  border-color: #047857 !important;
 }
 
 .task-card.task-card-selected.task-card-selected-opportunity {

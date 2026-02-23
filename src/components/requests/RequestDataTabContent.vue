@@ -87,9 +87,9 @@
 import { ref, computed } from 'vue'
 import { Button } from '@motork/component-library/future/primitives'
 import { Database, ChevronDown, Paperclip, FolderOpen, StickyNote } from 'lucide-vue-next'
-import NoteWidget from '@/components/customer/activities/NoteWidget.vue'
-import AttachmentWidget from '@/components/customer/activities/AttachmentWidget.vue'
-import FeedItemCard from '@/components/customer/feed/FeedItemCard.vue'
+import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
+import AttachmentWidget from '@/components/shared/feed/AttachmentWidget.vue'
+import FeedItemCard from '@/components/shared/feed/FeedItemCard.vue'
 
 const props = defineProps({
   activities: { type: Array, default: () => [] },

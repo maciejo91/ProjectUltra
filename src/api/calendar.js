@@ -2,9 +2,28 @@ import { mockCalendarEvents } from './mockData'
 
 const delay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms))
 
-export const fetchCalendarEvents = async () => {
+export const fetchCalendarEvents = async (filters = {}) => {
   await delay()
-  return [...mockCalendarEvents]
+  let list = [...mockCalendarEvents]
+  if (filters.eventTypes?.length) {
+    list = list.filter((e) => filters.eventTypes.includes(e.type))
+  }
+  if (filters.dealership) {
+    list = list.filter((e) => e.dealership === filters.dealership)
+  }
+  if (filters.team) {
+    list = list.filter((e) => e.team === filters.team)
+  }
+  if (filters.includeCancelled === false) {
+    list = list.filter((e) => e.status !== 'cancelled')
+  }
+  if (filters.noShowsOnly) {
+    list = list.filter((e) => e.status === 'no-show')
+  }
+  if (filters.currentUserId) {
+    list = list.filter((e) => e.assigneeId === filters.currentUserId)
+  }
+  return list
 }
 
 export const createCalendarEvent = async (eventData) => {

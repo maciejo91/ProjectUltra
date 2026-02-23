@@ -17,7 +17,7 @@
   <div v-else>
     <div class="mb-1">
     <UnifiedSearchBar
-      active-tab="opportunities"
+      active-tab="reports"
       placeholder="Search team performance..."
       :pagination="pagination"
       @update:globalFilter="globalFilter = $event"
@@ -44,12 +44,6 @@
         <Trophy :size="16" class="text-foreground" />
         <h3 class="text-lg font-medium text-foreground leading-5">Best performers</h3>
       </div>
-      <div class="flex items-center gap-2">
-        <Button variant="ghost" size="sm">
-          This month
-          <ChevronDown :size="16" class="ml-1" />
-        </Button>
-      </div>
     </template>
   </DataTable>
     </div>
@@ -58,9 +52,9 @@
 
 <script setup>
 import { ref, computed, h } from 'vue'
-import { ChevronDown, Trophy } from 'lucide-vue-next'
+import { Trophy } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
-import { Button, Avatar, AvatarFallback } from '@motork/component-library/future/primitives'
+import { Avatar, AvatarFallback } from '@motork/component-library/future/primitives'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
 import { useDataTableData } from '@/composables/useDataTableData'
 
@@ -81,7 +75,7 @@ const pagination = ref({
   pageSize: 10
 })
 
-const sorting = ref([])
+const sorting = ref([{ id: 'leads', desc: true }])
 const globalFilter = ref('')
 const columnFilters = ref([])
 const filterDefsRef = ref([])
@@ -124,8 +118,8 @@ const columns = computed(() => [
   },
   {
     accessorKey: 'qualifiedLeads',
-    header: () => 'Qualified',
-    meta: { title: 'Qualified' },
+    header: () => 'Qualified leads (%)',
+    meta: { title: 'Qualified leads (%)' },
     cell: ({ row }) => {
       const member = row.original
       return h('div', { class: 'text-sm text-foreground' }, [
@@ -143,28 +137,16 @@ const columns = computed(() => [
     }
   },
   {
-    accessorKey: 'inNegotiation',
-    header: () => 'In Negotiation',
-    meta: { title: 'In Negotiation' },
-    cell: ({ row }) => {
-      const member = row.original
-      return h('div', { class: 'text-sm text-foreground' }, [
-        h('span', member.inNegotiation),
-        h('span', { class: 'text-muted-foreground text-xs ml-1' }, `(${member.inNegotiationPercentage}%)`)
-      ])
-    }
+    accessorKey: 'contracts',
+    header: () => 'Contracts',
+    meta: { title: 'Contracts' },
+    cell: ({ row }) => h('div', { class: 'text-sm text-foreground' }, row.original.contracts)
   },
   {
-    accessorKey: 'won',
-    header: () => 'Won',
-    meta: { title: 'Won' },
-    cell: ({ row }) => {
-      const member = row.original
-      return h('div', { class: 'text-sm text-foreground' }, [
-        h('span', member.won),
-        h('span', { class: 'text-muted-foreground text-xs ml-1' }, `(${member.wonPercentage}%)`)
-      ])
-    }
+    accessorKey: 'conversionRate',
+    header: () => 'Conversion rate',
+    meta: { title: 'Conversion rate' },
+    cell: ({ row }) => h('div', { class: 'text-sm text-foreground' }, `${row.original.conversionRate}%`)
   }
 ])
 
@@ -175,13 +157,18 @@ const searchableFields = (row) => [
   row.qualifiedLeads != null ? String(row.qualifiedLeads) : null,
   row.qualifiedPercentage != null ? String(row.qualifiedPercentage) : null,
   row.opportunities != null ? String(row.opportunities) : null,
-  row.inNegotiation != null ? String(row.inNegotiation) : null,
-  row.inNegotiationPercentage != null ? String(row.inNegotiationPercentage) : null,
-  row.won != null ? String(row.won) : null,
-  row.wonPercentage != null ? String(row.wonPercentage) : null
+  (row.contracts ?? row.won) != null ? String(row.contracts ?? row.won) : null,
 ]
+const enrichedTeamMembers = computed(() =>
+  (props.teamMembers || []).map((m) => {
+    const contracts = m.contracts ?? m.won ?? 0
+    const conversionRate = m.leads > 0 ? parseFloat(((contracts / m.leads) * 100).toFixed(1)) : 0
+    return { ...m, contracts, conversionRate }
+  })
+)
+
 const { paginatedData, totalFilteredCount } = useDataTableData({
-  rawData: computed(() => props.teamMembers),
+  rawData: enrichedTeamMembers,
   columns,
   globalFilter,
   columnFilters,

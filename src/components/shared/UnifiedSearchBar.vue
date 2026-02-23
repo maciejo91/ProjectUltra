@@ -67,6 +67,7 @@ const props = defineProps({
   placeholder: { type: String, default: '' },
   assigneeOptions: { type: Array, default: () => [] },
   volvoModelOptions: { type: Array, default: () => [] },
+  brandOptions: { type: Array, default: () => [] },
   requestTypeOptions: { type: Array, default: () => [] },
   statusOptions: { type: Array, default: () => [] },
   sourceOptions: { type: Array, default: () => [] },
@@ -88,10 +89,24 @@ const isAIMode = ref(false)
 const queryError = ref(null)
 const isProcessingQuery = ref(false)
 
+function getContext () {
+  const t = props.activeTab || ''
+  if (t === 'vehicles') return 'vehicles'
+  if (t === 'customers') return 'customers'
+  if (t === 'leads' || t === 'open-leads') return 'leads'
+  if (t === 'opportunities' || t === 'open-opportunities' || t === 'won' || t === 'lost' || t === 'in-negotiation') return 'opportunities'
+  if (t === 'tasks') return 'tasks'
+  if (t === 'requests') return 'requests'
+  if (t === 'reports') return 'reports'
+  return t || 'opportunities'
+}
+
 function getProcessQuery () {
   return useNaturalLanguageQuery({
+    context: getContext(),
     assigneeOptions: props.assigneeOptions,
     volvoModelOptions: props.volvoModelOptions,
+    brandOptions: props.brandOptions,
     requestTypeOptions: props.requestTypeOptions,
     statusOptions: props.statusOptions,
     sourceOptions: props.sourceOptions,
@@ -102,10 +117,21 @@ function getProcessQuery () {
   }).processQuery
 }
 
+const AI_PLACEHOLDERS = {
+  vehicles: 'Ask anything... (e.g., XC90 available, Volkswagen under €50k)',
+  leads: 'Ask anything... (e.g., All new cars assigned to Josh, leads created last 3 days)',
+  opportunities: 'Ask anything... (e.g., Test drives from marketing, qualified opportunities)',
+  tasks: 'Ask anything... (e.g., Tasks assigned to me, hot leads due this week)',
+  requests: 'Ask anything... (e.g., Assigned to Sarah, valid requests)',
+  customers: 'Ask anything... (e.g., Contacts from marketing, companies)',
+  reports: 'Search team performance...',
+}
+
 const computedPlaceholder = computed(() => {
   if (props.placeholder) return props.placeholder
   if (isAIMode.value) {
-    return 'Ask anything... (e.g., All new cars assigned to Josh)'
+    const ctx = getContext()
+    return AI_PLACEHOLDERS[ctx] ?? 'Ask anything... (e.g., All new cars assigned to Josh)'
   }
   return props.activeTab === 'opportunities' ? 'Search opportunities...' : 'Search leads...'
 })

@@ -1,8 +1,8 @@
 import { ref, computed } from 'vue'
 import { useActionableQuestions } from '@/composables/useActionableQuestions'
-import { fetchTodayAppointments, fetchUpcomingAppointments } from '@/api/calendar'
-import { fetchTasksDueToday as fetchLeadTasksDueToday, fetchTasksDueUpcoming as fetchLeadTasksDueUpcoming } from '@/api/leads'
-import { fetchTasksDueToday as fetchOppTasksDueToday, fetchTasksDueUpcoming as fetchOppTasksDueUpcoming } from '@/api/opportunities'
+import { fetchTodayAppointments } from '@/api/calendar'
+import { fetchTasksDueToday as fetchLeadTasksDueToday } from '@/api/leads'
+import { fetchTasksDueToday as fetchOppTasksDueToday } from '@/api/opportunities'
 import { useUserStore } from '@/stores/user'
 
 export function useDashboard() {
@@ -12,7 +12,6 @@ export function useDashboard() {
   const todayAppointments = ref([])
   const todayLeadTasks = ref([])
   const todayOppTasks = ref([])
-  const upcomingAppointments = ref([])
   const loadingAppointments = ref(true)
   const loadingTasks = ref(true)
 
@@ -37,102 +36,71 @@ export function useDashboard() {
     return [...leads, ...opps]
   })
 
-  // Computed: Prioritized todos combining appointments and tasks
-  const prioritizedTodos = computed(() => {
-    const todos = []
-    
-    // Add appointments (sorted by time)
-    const appointments = todayAppointments.value.map(apt => ({
-      ...apt,
-      todoType: 'appointment',
-      sortTime: new Date(apt.start).getTime(),
-      time: new Date(apt.start).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      date: new Date(apt.start)
-    }))
-    todos.push(...appointments)
-    
-    // Add tasks (sorted by priority and time)
-    const tasks = todayTasks.value.map(task => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+
+  const todayItems = computed(() => {
+    const items = []
+
+    todayAppointments.value.forEach((apt) => {
+      const start = new Date(apt.start)
+      const sortTime = start.getTime()
+      items.push({
+        kind: 'appointment',
+        id: `apt-${apt.id}`,
+        sortTime,
+        time: start.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        title: apt.customer || apt.title || 'Appointment',
+        subtitle: apt.vehicle ? `${apt.type} • ${apt.vehicle}` : apt.type || '',
+        typeLabel: apt.status || 'Scheduled',
+        typeTheme: getStatusTheme(apt.status),
+        extraLabel: null,
+        extraTheme: 'gray',
+        opportunityId: apt.opportunityId,
+        leadId: apt.leadId,
+        isOverdue: sortTime < Date.now()
+      })
+    })
+
+    todayTasks.value.forEach((task) => {
       const dueDate = task.dueDate || (task.nextActionDue ? new Date(task.nextActionDue) : null)
-      const now = new Date()
-      const isOverdue = dueDate && dueDate < now
-      
-      return {
-        ...task,
-        todoType: 'task',
-        sortTime: dueDate ? dueDate.getTime() : 0,
-        isOverdue,
-        priority: task.priority === 'Hot' ? 1 : 2
-      }
+      if (!dueDate) return
+      const taskDate = new Date(dueDate)
+      taskDate.setHours(0, 0, 0, 0)
+      if (taskDate < today || taskDate >= tomorrow) return
+
+      const sortTime = dueDate.getTime()
+      const isOverdue = sortTime < Date.now()
+      const vehicle = task.requestedCar || task.vehicle
+      const vehicleStr = vehicle ? `${vehicle.brand} ${vehicle.model}` : ''
+
+      items.push({
+        kind: 'task',
+        id: `${task.type}-${task.id}`,
+        type: task.type,
+        sortTime,
+        time: dueDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        title: task.customer?.name || 'Unknown Customer',
+        subtitle: vehicleStr ? `${task.taskType || task.type} • ${vehicleStr}` : (task.taskType || task.type),
+        typeLabel: task.type === 'lead' ? 'Lead' : 'Opportunity',
+        typeTheme: task.type === 'lead' ? 'green' : 'purple',
+        extraLabel: isOverdue ? 'OVERDUE' : task.priority === 'Hot' ? 'HOT' : null,
+        extraTheme: 'red',
+        isOverdue
+      })
     })
-    todos.push(...tasks)
-    
-    // Sort: Appointments first (by time), then overdue tasks, then tasks due today (by priority), then upcoming
-    return todos.sort((a, b) => {
-      // Appointments come first
-      if (a.todoType === 'appointment' && b.todoType !== 'appointment') return -1
-      if (a.todoType !== 'appointment' && b.todoType === 'appointment') return 1
-      
-      // Within appointments, sort by time
-      if (a.todoType === 'appointment' && b.todoType === 'appointment') {
-        return a.sortTime - b.sortTime
-      }
-      
-      // Within tasks, overdue first
-      if (a.isOverdue && !b.isOverdue) return -1
-      if (!a.isOverdue && b.isOverdue) return 1
-      
-      // Then by priority (Hot > Normal)
-      if (a.priority !== b.priority) {
-        return a.priority - b.priority
-      }
-      
-      // Then by time
-      return a.sortTime - b.sortTime
-    })
+
+    return items.sort((a, b) => a.sortTime - b.sortTime)
   })
 
-  // Computed: Separate appointments and tasks for display
-  const appointmentsToday = computed(() => {
-    return todayAppointments.value
-      .map(apt => ({
-        ...apt,
-        time: new Date(apt.start).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-        date: new Date(apt.start)
-      }))
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
-  })
+  function getStatusTheme(status) {
+    const map = { confirmed: 'green', scheduled: 'blue', pending: 'orange', cancelled: 'red', 'no-show': 'gray' }
+    return map[status] || 'gray'
+  }
 
-  const tasksDueToday = computed(() => {
-    return todayTasks.value
-      .filter(task => {
-        const dueDate = task.dueDate || (task.nextActionDue ? new Date(task.nextActionDue) : null)
-        if (!dueDate) return false
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        const tomorrow = new Date(today)
-        tomorrow.setDate(tomorrow.getDate() + 1)
-        const taskDate = new Date(dueDate)
-        taskDate.setHours(0, 0, 0, 0)
-        return taskDate >= today && taskDate < tomorrow
-      })
-      .sort((a, b) => {
-        // Overdue first
-        const now = new Date()
-        const aOverdue = a.dueDate < now
-        const bOverdue = b.dueDate < now
-        if (aOverdue && !bOverdue) return -1
-        if (!aOverdue && bOverdue) return 1
-        
-        // Then by priority
-        if (a.priority !== b.priority) {
-          return (a.priority === 'Hot' ? 1 : 2) - (b.priority === 'Hot' ? 1 : 2)
-        }
-        
-        // Then by time
-        return (a.dueDate?.getTime() || 0) - (b.dueDate?.getTime() || 0)
-      })
-  })
+  const loadingToday = computed(() => loadingAppointments.value || loadingTasks.value)
 
   // Notifications (from actionable questions)
   const notifications = computed(() => questions.value)
@@ -155,11 +123,6 @@ export function useDashboard() {
         userStore.canAccessOpportunities() ? fetchOppTasksDueToday().then(data => { todayOppTasks.value = data }) : Promise.resolve()
       ]).then(() => {
         loadingTasks.value = false
-      }),
-      
-      // Load upcoming appointments (next 24h)
-      fetchUpcomingAppointments(1).then(data => {
-        upcomingAppointments.value = data
       })
     ]).catch(error => {
       console.error('Error loading dashboard:', error)
@@ -171,12 +134,9 @@ export function useDashboard() {
   return {
     notifications,
     totalNotificationsCount: totalQuestionsCount,
-    appointmentsToday,
-    tasksDueToday,
-    prioritizedTodos,
+    todayItems,
     loadingNotifications: questionsLoading,
-    loadingAppointments: computed(() => loadingAppointments.value),
-    loadingTasks: computed(() => loadingTasks.value),
+    loadingToday,
     loadDashboard
   }
 }

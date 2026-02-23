@@ -10,7 +10,7 @@ const routes = [
       {
         path: '',
         name: 'home',
-        redirect: '/tasks'
+        redirect: '/home'
       },
       {
         path: 'home',

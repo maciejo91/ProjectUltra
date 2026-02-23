@@ -76,10 +76,6 @@
         :hide-tab-counts="showCloseButton"
         @add-activity="handleAddActivity"
         @add-appointment="showCreateAppointmentModal = true"
-        @note-save="handleNoteSave"
-        @note-delete="handleNoteDelete"
-        @attachment-save="handleAttachmentSave"
-        @attachment-delete="handleAttachmentDelete"
       />
     </div>
     </div>
@@ -318,12 +314,10 @@ const loadCustomerData = async () => {
 }
 
 const handleSidebarAction = (action) => {
-  if (action === 'note') {
-    activeTab.value = 'notes'
-  } else if (action === 'appointment') {
-    activeTab.value = 'appointments'
+  if (action === 'appointment') {
+    activeTab.value = 'activity'
   } else {
-    comingSoonTitle.value = action === 'call' || action === 'email' ? 'Communicate' : 'More Actions'
+    comingSoonTitle.value = action === 'call' || action === 'email' ? 'Communicate' : action === 'note' ? 'Add Note' : 'More Actions'
     showComingSoonModal.value = true
   }
 }
@@ -332,54 +326,6 @@ const handleAddActivity = () => {
   comingSoonTitle.value = 'Add Activity'
   showComingSoonModal.value = true
 }
-
-const handleNoteSave = (data) => {
-  const user = userStore.currentUser?.name || 'You'
-  const activity = {
-    id: data.id || `note-${Date.now()}`,
-    type: 'note',
-    user,
-    action: data.action || 'added a note',
-    content: data.content || data.message || '',
-    timestamp: data.timestamp || new Date().toISOString()
-  }
-  if (data.isEdit) {
-    customerActivities.value = customerActivities.value.map((a) =>
-      String(a.id) === String(activity.id) ? activity : a
-    )
-  } else {
-    customerActivities.value = [activity, ...customerActivities.value]
-  }
-}
-
-const handleNoteDelete = (item) => {
-  customerActivities.value = customerActivities.value.filter((a) => a.id !== item.id)
-}
-
-const handleAttachmentSave = (data) => {
-  const user = userStore.currentUser?.name || 'You'
-  const activity = {
-    id: data.id || `att-${Date.now()}`,
-    type: 'attachment',
-    user,
-    action: data.action || 'uploaded an attachment',
-    fileName: data.fileName || '',
-    content: data.fileName ? `Attachment: ${data.fileName}` : '',
-    timestamp: data.timestamp || new Date().toISOString()
-  }
-  if (data.isEdit) {
-    customerActivities.value = customerActivities.value.map((a) =>
-      String(a.id) === String(activity.id) ? activity : a
-    )
-  } else {
-    customerActivities.value = [activity, ...customerActivities.value]
-  }
-}
-
-const handleAttachmentDelete = (item) => {
-  customerActivities.value = customerActivities.value.filter((a) => a.id !== item.id)
-}
-
 
 const handleAppointmentCreated = async (eventData) => {
   // Create appointment logic

@@ -35,7 +35,7 @@
 
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2 mb-1">
-            <Badge variant="secondary" :class="item.type === 'lead' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-purple-50 text-purple-700 border-purple-200'">
+            <Badge variant="secondary" :class="item.type === 'lead' ? 'bg-badge-green text-emerald-700 border-emerald-200' : 'bg-purple-50 text-purple-700 border-purple-200'">
               {{ item.type === 'lead' ? 'Lead' : 'Opportunity' }}
             </Badge>
             <Badge variant="secondary" :class="getStatusClass(item.status)">{{ item.status }}</Badge>

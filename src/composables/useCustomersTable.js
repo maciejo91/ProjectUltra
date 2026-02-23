@@ -6,12 +6,15 @@ import { getLucideIcon } from '@/utils/lucideIcons'
 /**
  * Composable for Customers table configuration
  * Provides columns, filterDefinitions, and tableMeta for DataTable component
- * 
+ *
  * @param {Ref} activeTab - The active tab ('customers', 'open-leads', etc.)
  * @param {Function} handleRowClick - Handler function for row clicks
+ * @param {Object} [opts] - Optional: { rows } for dynamic filter options (assignee, requestType)
  * @returns {Object} Object containing columns, filterDefinitions, and tableMeta
  */
-export function useCustomersTable(activeTab, handleRowClick) {
+export function useCustomersTable(activeTab, handleRowClick, opts = {}) {
+  const rows = opts.rows
+
   // Filter definitions for AI-powered filtering
   const filterDefinitions = computed(() => {
     // Different filters based on active tab
@@ -46,8 +49,26 @@ export function useCustomersTable(activeTab, handleRowClick) {
         }
       ]
     } else {
-      // For leads and opportunities
+      // For leads and opportunities – include all fields supported by AI natural language queries
+      const rowList = rows?.value ?? []
+      const assigneeOptions = [...new Set(rowList.map((r) => r.assignee).filter(Boolean))].sort().map((name) => ({ value: name, label: name }))
+      const requestTypeOptions = [
+        { value: 'Test Drive', label: 'Test Drive' },
+        { value: 'Quotation', label: 'Quotation' },
+        { value: 'Generic sales', label: 'Generic sales' }
+      ]
+
       return [
+        {
+          key: 'assignee',
+          label: 'Assignee',
+          type: 'select',
+          operators: [
+            { value: 'eq', label: 'is' },
+            { value: 'ne', label: 'is not' }
+          ],
+          options: assigneeOptions
+        },
         {
           key: 'status',
           label: 'Status',
@@ -62,6 +83,30 @@ export function useCustomersTable(activeTab, handleRowClick) {
             { value: 'Qualified', label: 'Qualified' },
             { value: 'Not interested', label: 'Not interested' }
           ]
+        },
+        {
+          key: 'carStatus',
+          label: 'Car status',
+          type: 'select',
+          operators: [
+            { value: 'eq', label: 'is' },
+            { value: 'ne', label: 'is not' }
+          ],
+          options: [
+            { value: 'In Stock', label: 'In Stock' },
+            { value: 'Out of Stock', label: 'Out of Stock' }
+          ]
+        },
+        {
+          key: 'requestType',
+          label: 'Request type',
+          type: 'select',
+          operators: [
+            { value: 'eq', label: 'is' },
+            { value: 'ne', label: 'is not' },
+            { value: 'in', label: 'is any of' }
+          ],
+          options: requestTypeOptions
         },
         {
           key: 'priority',
@@ -89,6 +134,28 @@ export function useCustomersTable(activeTab, handleRowClick) {
             { value: 'Referral', label: 'Referral' },
             { value: 'Direct', label: 'Direct' }
           ]
+        },
+        {
+          key: 'car',
+          label: 'Requested car (model)',
+          type: 'select',
+          operators: [
+            { value: 'includes', label: 'contains' },
+            { value: 'eq', label: 'is' }
+          ],
+          options: []
+        },
+        {
+          key: 'createdAt',
+          label: 'Created',
+          type: 'inputrange',
+          inputType: 'date',
+          operators: [
+            { value: 'between', label: 'is between' },
+            { value: 'gte', label: 'is after' },
+            { value: 'lte', label: 'is before' }
+          ],
+          options: []
         }
       ]
     }

@@ -74,14 +74,15 @@ const DEFAULT_SETTINGS = {
   
   // Navigation Visibility (per-item control)
   navigationVisibility: {
-    home: false,
+    home: true,
     tasks: true,
+    requests: true,
     customers: true,
-    calendar: false,
-    reports: false,
+    calendar: true,
+    reports: true,
     lists: true,
-    search: false,
-    language: false
+    search: true,
+    language: true
     // Note: Settings is always visible
   },
   
@@ -99,14 +100,16 @@ function loadSettings() {
     if (stored) {
       const parsed = JSON.parse(stored)
       
-      // Migrate navigationVisibility: if home is true (old default), update to new defaults
-      // This ensures existing users get the new default visibility (only tasks and customers)
-      if (parsed.navigationVisibility && parsed.navigationVisibility.home === true) {
-        // User hasn't customized - apply new defaults
+      // Migrate navigationVisibility: apply all-visible defaults for users on old restrictive defaults
+      const nv = parsed.navigationVisibility
+      const hadRestrictiveDefaults = nv && (
+        nv.home === false || nv.calendar === false || nv.reports === false ||
+        nv.search === false || nv.language === false
+      )
+      if (hadRestrictiveDefaults) {
         parsed.navigationVisibility = { ...DEFAULT_SETTINGS.navigationVisibility }
-        // Save the migrated settings immediately
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...DEFAULT_SETTINGS, ...parsed }))
-      } else if (parsed.navigationVisibility) {
+      } else if (nv) {
         // User has customized - merge with defaults for any missing keys
         parsed.navigationVisibility = {
           ...DEFAULT_SETTINGS.navigationVisibility,

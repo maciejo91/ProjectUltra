@@ -80,24 +80,28 @@ export const getEventTypeTextClass = (type) => {
   return colorMap[type] || 'text-blue-900'
 }
 
-export const getEventCalendarClass = (type) => {
-  const colorMap = {
-    'test-drive': 'event-blue',
-    'appointment': 'event-green',
-    'offsite': 'event-emerald',
-    'workshop': 'event-indigo',
-    'call': 'event-orange',
-    'delivery': 'event-teal',
-    'meeting': 'event-purple',
-    'training': 'event-pink',
-    'marketing': 'event-yellow',
-    'leave': 'event-red',
-    'memo': 'event-gray',
-    'recall': 'event-cyan',
-    'absence': 'event-rose',
-    'other': 'event-slate'
+/** Returns theme CSS class for calendar event chip background (e.g. calendar-event-test-drive). */
+export const getEventTypeCssClass = (type) => {
+  const typeMap = {
+    'test-drive': 'calendar-event-test-drive',
+    'appointment': 'calendar-event-appointment',
+    'dealership-visit': 'calendar-event-appointment',
+    'offsite': 'calendar-event-offsite',
+    'workshop': 'calendar-event-workshop',
+    'call': 'calendar-event-call',
+    'delivery': 'calendar-event-delivery',
+    'meeting': 'calendar-event-meeting',
+    'meeting-at-customers': 'calendar-event-meeting',
+    'training': 'calendar-event-training',
+    'marketing': 'calendar-event-marketing',
+    'leave': 'calendar-event-leave',
+    'memo': 'calendar-event-memo',
+    'recall': 'calendar-event-recall',
+    'absence': 'calendar-event-absence',
+    'internal-meeting': 'calendar-event-internal',
+    'other': 'calendar-event-other',
   }
-  return colorMap[type] || 'event-blue'
+  return typeMap[type] || 'calendar-event-other'
 }
 
 export const formatEventDate = (dateStr) => {

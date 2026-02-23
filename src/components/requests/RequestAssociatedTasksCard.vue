@@ -7,7 +7,7 @@
         :key="task.compositeId"
         type="button"
         class="group w-full min-w-0 py-2 text-left transition-colors hover:bg-muted/50 cursor-pointer flex items-center gap-2 overflow-hidden border-l-2 border-transparent first:pt-0"
-        :class="task.type === 'lead' ? 'hover:border-l-blue-500' : 'hover:border-l-purple-500'"
+        :class="task.type === 'lead' ? 'hover:border-l-emerald-700' : 'hover:border-l-purple-500'"
         @click="handleTaskClick(task)"
       >
         <div class="w-10 h-7 shrink-0 rounded overflow-hidden bg-muted flex items-center justify-center">
@@ -17,7 +17,7 @@
         <div class="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
           <span
             class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
-            :class="task.type === 'lead' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'"
+            :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
           >
             {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
           </span>
@@ -54,7 +54,7 @@
           :key="task.compositeId"
           type="button"
           class="group w-full min-w-0 px-4 py-2 text-left transition-colors hover:bg-muted/50 cursor-pointer flex items-center gap-2 overflow-hidden border-l-2 border-transparent"
-          :class="task.type === 'lead' ? 'hover:border-l-blue-500' : 'hover:border-l-purple-500'"
+          :class="task.type === 'lead' ? 'hover:border-l-emerald-700' : 'hover:border-l-purple-500'"
           @click="handleTaskClick(task)"
         >
           <div class="w-10 h-7 shrink-0 rounded overflow-hidden bg-muted flex items-center justify-center">
@@ -64,7 +64,7 @@
           <div class="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
             <span
               class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
-              :class="task.type === 'lead' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'"
+              :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
             >
               {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
             </span>

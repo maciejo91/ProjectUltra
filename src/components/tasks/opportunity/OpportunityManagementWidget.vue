@@ -1,24 +1,22 @@
 <template>
   <TaskManagementWidget :task="opportunity" hide-title hide-border>
-    <template #deadline-banner>
-      <div class="px-4 pt-4">
-        <DeadlineBanner
-          v-if="!opportunityState.isClosed.value"
-          :next-action-due="opportunity.nextActionDue"
-          :show-deadline-banner="opportunityState.showDeadlineBanner.value"
-          :task-id="opportunity.id"
-        />
-      </div>
-    </template>
-    
     <template #primary-action>
-      <!-- One next action card (no extra container); assignee/due already in grey area above -->
+      <!-- One next action card with due badge inside (like LQTask) -->
       <PrimaryActionWidget
         v-if="nextActionCard"
         :actions="nextActionCard.actions"
         :color-scheme="nextActionCard.colorScheme"
         @action-clicked="() => {}"
-      />
+      >
+        <template #header>
+          <DeadlineBanner
+            v-if="!opportunityState.isClosed.value"
+            :next-action-due="opportunity.nextActionDue"
+            :show-deadline-banner="opportunityState.showDeadlineBanner.value"
+            :task-id="opportunity.id"
+          />
+        </template>
+      </PrimaryActionWidget>
 
       <ContractPendingManagementSection
         v-if="!opportunityActions.isClosed.value && opportunity.stage === 'In Negotiation' && getDisplayStage(opportunity, 'opportunity') === 'In Negotiation - Contract Pending'"

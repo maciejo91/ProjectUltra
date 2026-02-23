@@ -1,8 +1,10 @@
 <template>
   <div
-    class="rounded-lg p-4 relative transition-all duration-300 border"
+    class="rounded-lg relative transition-all duration-300 border overflow-hidden"
     :class="[colorScheme.background, colorScheme.border]"
   >
+    <slot name="header" />
+    <div class="p-4">
     <div class="flex justify-between items-start mb-3">
       <div>
         <h4 class="font-bold text-foreground text-sm">{{ cardTitle }}</h4>
@@ -21,6 +23,7 @@
         <component :is="getLucideIcon(item.icon)" class="w-4 h-4 shrink-0" />
         {{ item.label }}
       </button>
+    </div>
     </div>
   </div>
 </template>

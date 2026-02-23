@@ -3,6 +3,21 @@
     <div class="flex-1 flex flex-col overflow-hidden">
       <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide min-h-0">
         <div class="bg-white mb-8">
+          <div class="flex flex-wrap items-center gap-2 py-2 mb-4">
+            <div class="outcome-toggle-group flex flex-wrap gap-3">
+              <Toggle
+                v-for="chip in filterChips"
+                :key="chip.key"
+                variant="outline"
+                :model-value="selectedInventoryChip === chip.key"
+                :aria-pressed="selectedInventoryChip === chip.key"
+                class="outcome-toggle-item rounded-sm"
+                @update:model-value="(p) => p && (selectedInventoryChip = chip.key)"
+              >
+                {{ chip.label }} ({{ chip.count }})
+              </Toggle>
+            </div>
+          </div>
           <div class="mb-1">
             <UnifiedSearchBar
               active-tab="vehicles"
@@ -11,6 +26,7 @@
               :pagination="pagination"
               :status-options="vehicleStatusOptions"
               :volvo-model-options="volvoModelOptions"
+              :brand-options="vehicleBrandOptions"
               @update:global-filter="globalFilter = $event"
               @update:column-filters="columnFilters = $event"
               @update:pagination="pagination = $event"
@@ -216,10 +232,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, inject, h, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, inject, h } from 'vue'
 import { X } from 'lucide-vue-next'
 import { useVehiclesStore } from '@/stores/vehicles'
-import { Button, Badge, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea } from '@motork/component-library/future/primitives'
+import { Button, Badge, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea, Toggle } from '@motork/component-library/future/primitives'
 import DrawerContainer from '@/components/shared/DrawerContainer.vue'
 import VehicleGrid from '@/components/vehicles/VehicleGrid.vue'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
@@ -237,11 +253,21 @@ const pagination = ref({
 
 const globalFilter = ref('')
 const sorting = ref([])
-// Default filter: Type = In stock (filter by type applied on load)
-const defaultTypeFilter = () => [
-  { key: 'inventoryType', id: 'inventoryType', value: 'in-stock', operator: 'eq' }
-]
-const columnFilters = ref(defaultTypeFilter())
+const selectedInventoryChip = ref('all')
+
+function getInventoryTypeFilter(chip) {
+  if (chip === 'all') return []
+  return [{ key: 'inventoryType', id: 'inventoryType', value: chip, operator: 'eq' }]
+}
+
+function replaceInventoryFilter(filters, chip) {
+  const without = (Array.isArray(filters) ? filters : []).filter(
+    f => (f.key || f.field || f.id) !== 'inventoryType'
+  )
+  return [...getInventoryTypeFilter(chip), ...without]
+}
+
+const columnFilters = ref(replaceInventoryFilter([], selectedInventoryChip.value))
 
 // Column visibility: hide columns with mostly empty/N/A data (column selector lets users show them)
 const columnVisibility = ref({
@@ -260,6 +286,21 @@ const vehiclesWithType = computed(() =>
     inventoryType: v.stockDays !== null && v.stockDays !== undefined ? 'in-stock' : 'customer-vehicles'
   }))
 )
+
+const filterChips = computed(() => {
+  const list = vehiclesWithType.value
+  const inStock = list.filter((v) => v.inventoryType === 'in-stock').length
+  const customerVehicles = list.filter((v) => v.inventoryType === 'customer-vehicles').length
+  return [
+    { key: 'all', label: 'All', count: list.length },
+    { key: 'in-stock', label: 'In stock', count: inStock },
+    { key: 'customer-vehicles', label: "Customers' vehicles", count: customerVehicles }
+  ]
+})
+
+watch(selectedInventoryChip, (chip) => {
+  columnFilters.value = replaceInventoryFilter(columnFilters.value, chip)
+}, { immediate: true })
 
 // Use composable for vehicle detail modal logic
 const { showAddModal, newVehicle, handleCloseModal, handleSubmit } = useVehicleDetail()
@@ -289,11 +330,10 @@ const filterDefinitions = [
       { value: 'ne', label: 'is not' }
     ],
     options: [
-      { value: 'Available', label: 'Available' },
-      { value: 'In Stock', label: 'In Stock' },
-      { value: 'Sold', label: 'Sold' }
+      { value: 'New', label: 'New' },
+      { value: 'Used', label: 'Used' }
     ],
-    aiHint: 'Vehicle availability status'
+    aiHint: 'Vehicle status (New or Used)'
   },
   {
     key: 'brand',
@@ -310,6 +350,25 @@ const filterDefinitions = [
       { value: 'Porsche', label: 'Porsche' }
     ],
     aiHint: 'Car manufacturer brand'
+  },
+  {
+    key: 'model',
+    label: 'Model',
+    type: 'select',
+    operators: [
+      { value: 'eq', label: 'is' },
+      { value: 'ne', label: 'is not' }
+    ],
+    options: [
+      { value: 'XC90', label: 'XC90' },
+      { value: 'XC60', label: 'XC60' },
+      { value: 'XC40', label: 'XC40' },
+      { value: 'ID.4', label: 'ID.4' },
+      { value: 'ID.5', label: 'ID.5' },
+      { value: 'Golf', label: 'Golf' },
+      { value: 'Tiguan', label: 'Tiguan' }
+    ],
+    aiHint: 'Vehicle model'
   },
   {
     key: 'price',
@@ -352,6 +411,10 @@ const volvoModelOptions = computed(() => [
   { value: 'S90', label: 'S90' },
   { value: 'S60', label: 'S60' }
 ])
+const vehicleBrandOptions = computed(() => {
+  const def = filterDefinitions.find(d => d.key === 'brand')
+  return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
+})
 
 onMounted(() => {
   if (headerActionsRef) {
@@ -361,14 +424,6 @@ onMounted(() => {
     }
   }
   vehiclesStore.fetchVehicles()
-  // Ensure filter by type (In stock) is applied by default after table has mounted
-  nextTick(() => {
-    const current = columnFilters.value
-    const hasTypeFilter = Array.isArray(current) && current.some(f => (f.key || f.field || f.id) === 'inventoryType')
-    if (!hasTypeFilter) {
-      columnFilters.value = defaultTypeFilter()
-    }
-  })
 })
 
 onBeforeUnmount(() => {
@@ -526,7 +581,7 @@ const columns = [
     cell: ({ row }) => {
       const status = row.original.status
       if (status == null) return h('span', { class: 'text-meta' }, '—')
-      const theme = status === 'Available' ? 'green' : status === 'In Stock' ? 'blue' : 'gray'
+      const theme = status === 'New' ? 'green' : status === 'Used' ? 'gray' : 'blue'
       return h(Badge, { text: status, size: 'small', theme })
     }
   },

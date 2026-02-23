@@ -495,18 +495,6 @@
 
         </div>
       </div>
-
-      <!-- Right: Activity Timeline (collapsed by default) -->
-      <!-- COMMENTED OUT: Moved to Manage tab as a card -->
-      <!-- <ActivitySummarySidebar
-        :title="'Activity summary'"
-        :activities="allActivities"
-        :collapsed="activitySidebarCollapsed"
-        :show-collapse="true"
-        :show="true"
-        class="hidden lg:flex"
-        @toggle-collapse="activitySidebarCollapsed = !activitySidebarCollapsed"
-      /> -->
     </div>
 
     <!-- Purchase Method Modal -->
@@ -644,7 +632,7 @@
               :key="idx"
               class="flex gap-2 text-sm font-mono"
             >
-              <span :class="line.speaker === 'Lead' ? 'text-blue-600 font-semibold shrink-0' : 'text-green-600 font-semibold shrink-0'">{{ line.speaker }}:</span>
+              <span :class="line.speaker === 'Lead' ? 'text-emerald-700 font-semibold shrink-0' : 'text-green-600 font-semibold shrink-0'">{{ line.speaker }}:</span>
               <span class="text-foreground wrap-break-word">{{ line.text }}</span>
             </div>
           </div>
@@ -678,11 +666,11 @@ import CustomerRelatedTasksWidget from '@/components/tasks/CustomerRelatedTasksW
 import TradeInsCard from '@/components/shared/TradeInsCard.vue'
 import FinancingOptionsCard from '@/components/shared/FinancingOptionsCard.vue'
 import AddNewButton from '@/components/customer/widgets/AddNewButton.vue'
-import FeedItemCard from '@/components/customer/feed/FeedItemCard.vue'
+import FeedItemCard from '@/components/shared/feed/FeedItemCard.vue'
 import TaskActivityCard from '@/components/tasks/TaskActivityCard.vue'
 import CommunicationWidget from '@/components/shared/communication/CommunicationWidget.vue'
-import NoteWidget from '@/components/customer/activities/NoteWidget.vue'
-import AttachmentWidget from '@/components/customer/activities/AttachmentWidget.vue'
+import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
+import AttachmentWidget from '@/components/shared/feed/AttachmentWidget.vue'
 import TradeInWidget from '@/components/customer/activities/TradeInWidget.vue'
 import PurchaseMethodWidget from '@/components/customer/activities/PurchaseMethodWidget.vue'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'

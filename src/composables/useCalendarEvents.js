@@ -1,85 +1,169 @@
-import { ref } from 'vue'
-import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '@/api/calendar'
+import { ref, computed, watch } from 'vue'
+import { fetchCalendarEvents, createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '@/api/calendar'
+import { getEventTypeCssClass } from '@/utils/calendarHelpers'
 
 /**
- * Composable for calendar event handlers
- * Handles creating, updating, deleting, and viewing calendar events
- * 
- * @param {Object} params - Parameters object
- * @param {Ref} params.events - Reactive reference to events array
- * @param {Ref} params.calendarOptions - Reactive reference to calendar options
- * @param {Ref} params.showCreateEventModal - Reactive reference for create modal visibility
- * @param {Ref} params.showQuickViewModal - Reactive reference for quick view modal visibility
- * @param {Ref} params.showEditEventModal - Reactive reference for edit modal visibility
- * @param {Ref} params.selectedEvent - Reactive reference to selected event
- * @param {Ref} params.newEvent - Reactive reference to new event data
- * @returns {Object} Object containing event handlers
+ * Composable for calendar events: load, filter, CRUD, modal state.
+ * Maps API events (start/end ISO) to view model (startTime/endTime Date, type, cssClass).
  */
-export function useCalendarEvents({ events, calendarOptions, showCreateEventModal, showQuickViewModal, showEditEventModal, selectedEvent, newEvent }) {
-  
-  const handleDateSelect = (selectInfo) => {
-    newEvent.value.date = selectInfo.startStr
-    showCreateEventModal.value = true
+export function useCalendarEvents({ appliedFilters, currentDate, currentView }) {
+  const events = ref([])
+  const isEventModalOpen = ref(false)
+  const modalInitialRange = ref(null)
+  const modalEditingEvent = ref(null)
+  const filterOptions = ref({ eventTypes: [], dealerships: [], teams: [], users: [] })
+
+  const loadEvents = async () => {
+    const af = appliedFilters.value
+    const apiFilters = {
+      eventTypes: af.eventTypes,
+      dealership: af.dealership || undefined,
+      team: af.team || undefined,
+      includeCancelled: af.includeCancelled,
+      noShowsOnly: af.noShowsOnly,
+    }
+    const result = await fetchCalendarEvents(apiFilters)
+    events.value = result
   }
 
-  const handleEventClick = (clickInfo) => {
-    const eventId = parseInt(clickInfo.event.id)
-    const fullEvent = events.value.find(e => e.id === eventId)
-    if (fullEvent) {
-      selectedEvent.value = { ...fullEvent }
-      showQuickViewModal.value = true
+  const loadFilterOptions = async () => {
+    const { fetchCalendarFilterOptions } = await import('@/api/calendar')
+    const opts = await fetchCalendarFilterOptions()
+    filterOptions.value = opts
+    if (activeTypeIds.value.length === 0 && opts.eventTypes?.length) {
+      activeTypeIds.value = opts.eventTypes.map((t) => t.value)
     }
   }
 
-  const handleCreateEvent = async (eventData) => {
-    const fullEventData = {
-      ...eventData,
-      start: `${eventData.date}T${eventData.time || '10:00:00'}`,
-      end: `${eventData.date}T${eventData.time || '11:00:00'}`
-    }
-    const createdEvent = await createCalendarEvent(fullEventData)
-    events.value.push(createdEvent)
-    calendarOptions.value.events = [...events.value]
-    showCreateEventModal.value = false
-  }
-
-  const handleDeleteEvent = async (eventId) => {
-    if (confirm('Are you sure you want to delete this event?')) {
-      await deleteCalendarEvent(eventId)
-      events.value = events.value.filter(e => e.id !== eventId)
-      calendarOptions.value.events = [...events.value]
-      showQuickViewModal.value = false
-      selectedEvent.value = null
+  const mapEventToViewModel = (e) => {
+    const startTime = new Date(e.start)
+    const endTime = new Date(e.end)
+    const type = e.type || 'other'
+    return {
+      id: String(e.id),
+      title: e.title || '',
+      description: e.description,
+      startTime,
+      endTime,
+      type,
+      cssClass: getEventTypeCssClass(type),
+      location: e.dealership || e.location,
+      attendees: e.attendees,
+      customer: e.customer,
+      assignee: e.assignee,
+      assigneeId: e.assigneeId,
     }
   }
 
-  const openEditModal = () => {
-    showQuickViewModal.value = false
-    showEditEventModal.value = true
+  const activeTypeIds = ref([])
+
+  const filteredEvents = computed(() => {
+    let list = events.value.map(mapEventToViewModel)
+    const af = appliedFilters.value
+
+    if (activeTypeIds.value.length > 0) {
+      list = list.filter((e) => activeTypeIds.value.includes(e.type))
+    }
+    if (af.eventTypes?.length) {
+      list = list.filter((e) => af.eventTypes.includes(e.type))
+    }
+    if (af.dealership) {
+      list = list.filter((e) => e.location === af.dealership)
+    }
+    if (af.team) {
+      list = list.filter((e) => e.assignee && e.assignee.includes(af.team))
+    }
+    if (af.mostRelevant) {
+      list = list.filter((e) => e.customer)
+    }
+    if (!af.includeCancelled) {
+      list = list.filter((e) => {
+        const raw = events.value.find((ev) => String(ev.id) === e.id)
+        return raw?.status !== 'cancelled'
+      })
+    }
+    if (af.noShowsOnly) {
+      list = list.filter((e) => {
+        const raw = events.value.find((ev) => String(ev.id) === e.id)
+        return raw?.status === 'no-show'
+      })
+    }
+
+    return list
+  })
+
+  watch([currentDate, currentView], loadEvents, { immediate: false })
+  watch(appliedFilters, loadEvents, { deep: true, immediate: false })
+
+  const openCreateModal = (range = null) => {
+    modalInitialRange.value = range
+    modalEditingEvent.value = null
+    isEventModalOpen.value = true
   }
 
-  const handleSaveEditedEvent = async (eventData) => {
-    const updatedData = {
-      ...eventData,
-      start: `${eventData.date}T${eventData.time || '10:00'}:00`,
-      end: `${eventData.date}T${eventData.time || '11:00'}:00`
+  const openEditModal = (event) => {
+    modalEditingEvent.value = event
+    modalInitialRange.value = {
+      start: new Date(event.startTime),
+      end: new Date(event.endTime),
     }
-    await updateCalendarEvent(eventData.id, updatedData)
-    const index = events.value.findIndex(e => e.id === eventData.id)
-    if (index !== -1) {
-      events.value[index] = { ...events.value[index], ...updatedData }
-      calendarOptions.value.events = [...events.value]
+    isEventModalOpen.value = true
+  }
+
+  const closeModal = () => {
+    isEventModalOpen.value = false
+    modalInitialRange.value = null
+    modalEditingEvent.value = null
+  }
+
+  const apiEventFromForm = (payload) => {
+    const start = payload.startTime instanceof Date ? payload.startTime : new Date(payload.startTime)
+    const end = payload.endTime instanceof Date ? payload.endTime : new Date(payload.endTime)
+    return {
+      title: payload.title,
+      type: payload.typeId || payload.type,
+      start: start.toISOString().slice(0, 19),
+      end: end.toISOString().slice(0, 19),
+      customer: payload.customer,
+      assignee: payload.assignee,
+      assigneeId: payload.assigneeId,
+      dealership: payload.dealership,
+      vehicle: payload.vehicle,
     }
-    showEditEventModal.value = false
+  }
+
+  const upsertEvent = async (payload) => {
+    const apiData = apiEventFromForm(payload)
+    if (payload.id) {
+      await updateCalendarEvent(parseInt(payload.id, 10), apiData)
+    } else {
+      await createCalendarEvent(apiData)
+    }
+    await loadEvents()
+    closeModal()
+  }
+
+  const deleteEventAction = async (id) => {
+    if (!confirm('Are you sure you want to delete this event?')) return
+    await deleteCalendarEvent(parseInt(id, 10))
+    await loadEvents()
+    closeModal()
   }
 
   return {
-    handleDateSelect,
-    handleEventClick,
-    handleCreateEvent,
-    handleDeleteEvent,
+    events,
+    filteredEvents,
+    filterOptions,
+    activeTypeIds,
+    isEventModalOpen,
+    modalInitialRange,
+    modalEditingEvent,
+    loadEvents,
+    loadFilterOptions,
+    openCreateModal,
     openEditModal,
-    handleSaveEditedEvent
+    closeModal,
+    upsertEvent,
+    deleteEventAction,
   }
 }
-

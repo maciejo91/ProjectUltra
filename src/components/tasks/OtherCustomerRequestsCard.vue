@@ -19,7 +19,7 @@
         <!-- Single Line: Type + Stage + Vehicle + Price + Date -->
         <span 
           class="text-sm font-bold uppercase px-1 py-0.5 rounded leading-normal shrink-0"
-          :class="relatedTask.type === 'lead' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'"
+          :class="relatedTask.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-600'"
         >
           {{ relatedTask.type === 'lead' ? 'Lead' : 'Opp' }}
         </span>

@@ -7,7 +7,7 @@
           <DialogTitle>Connect Calendar</DialogTitle>
         </DialogHeader>
 
-        <div class="flex-1 overflow-y-auto px-6 py-4 w-full">
+        <div class="flex-1 overflow-y-auto px-4 py-2 w-full">
           <!-- Connecting State -->
           <div v-if="connectingTo" class="text-center py-8 w-full">
       <div

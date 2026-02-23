@@ -74,6 +74,14 @@
                 <component :is="item.icon" class="w-4 h-4 shrink-0" :class="item.iconClass" />
                 <span>{{ item.label }}</span>
               </DropdownMenuItem>
+              <DropdownMenuItem
+                v-if="showAddAppointment"
+                @select="(e) => { e.preventDefault(); handleAddAppointment(); }"
+                class="flex items-center gap-2 cursor-pointer"
+              >
+                <Calendar class="w-4 h-4 shrink-0 text-purple-600" />
+                <span>Schedule appointment</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -119,9 +127,11 @@
                           ? 'bg-purple-100'
                           : activity.type === 'email' || activity.type === 'customer-email'
                             ? 'bg-blue-100'
-                            : activity.type === 'whatsapp' || activity.type === 'customer-whatsapp'
+                            :                     activity.type === 'whatsapp' || activity.type === 'customer-whatsapp'
                               ? 'bg-green-100'
-                              : 'bg-muted',
+                              : activity.type === 'appointment'
+                                ? 'bg-purple-100'
+                                : 'bg-muted',
                   ]"
                 >
                   <StickyNote
@@ -148,6 +158,11 @@
                     v-else-if="activity.type === 'whatsapp' || activity.type === 'customer-whatsapp'"
                     :size="16"
                     class="text-green-600"
+                  />
+                  <Calendar
+                    v-else-if="activity.type === 'appointment'"
+                    :size="16"
+                    class="text-purple-600"
                   />
                   <FileText v-else :size="16" class="text-foreground" />
                 </div>
@@ -189,6 +204,9 @@
                       class="text-muted-foreground"
                     >
                       {{ ' sent a WhatsApp message' }}</span
+                    >
+                    <span v-else-if="activity.type === 'appointment'" class="text-muted-foreground">
+                      {{ ' ' + (activity.message || activity.title || 'Appointment') }}</span
                     >
                     <span v-else class="text-muted-foreground">
                       {{ ' ' + (activity.message || activity.action) }}</span
@@ -285,6 +303,15 @@
                     {{ t('common.call.showTranscript') }}
                   </Button>
                 </div>
+                <div
+                  v-if="activity.type === 'appointment'"
+                  class="mt-2 bg-purple-50 rounded-lg p-4"
+                >
+                  <p class="text-sm font-medium text-foreground">{{ activity.title || activity.message || 'Appointment' }}</p>
+                  <p v-if="activity.location" class="text-sm text-muted-foreground mt-1">{{ activity.location }}</p>
+                  <p v-if="activity.customerName" class="text-sm text-muted-foreground">{{ activity.customerName }}</p>
+                  <p v-if="activity.vehicle" class="text-sm text-muted-foreground">{{ activity.vehicle }}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -318,7 +345,7 @@
             :key="idx"
             class="flex gap-2 text-sm font-mono"
           >
-            <span :class="line.speaker === 'Lead' ? 'text-blue-600 font-semibold shrink-0' : 'text-green-600 font-semibold shrink-0'">{{ line.speaker }}:</span>
+            <span :class="line.speaker === 'Lead' ? 'text-emerald-700 font-semibold shrink-0' : 'text-green-600 font-semibold shrink-0'">{{ line.speaker }}:</span>
             <span class="text-foreground wrap-break-word">{{ line.text }}</span>
           </div>
         </div>
@@ -343,7 +370,8 @@ import {
   Plus,
   X,
   Reply,
-  Check
+  Check,
+  Calendar
 } from 'lucide-vue-next'
 import {
   DropdownMenu,
@@ -377,10 +405,14 @@ const props = defineProps({
   expandedSummaries: {
     type: Object,
     default: () => ({})
+  },
+  showAddAppointment: {
+    type: Boolean,
+    default: false
   }
 })
 
-const emit = defineEmits(['activity-click', 'toggle-summary-expanded', 'add-activity'])
+const emit = defineEmits(['activity-click', 'toggle-summary-expanded', 'add-activity', 'add-appointment'])
 
 const addActivityCommunicationItems = [
   { type: 'email', label: 'Email', icon: Mail, iconClass: 'text-primary' },
@@ -393,12 +425,18 @@ const addActivityOtherItems = [
   { type: 'attachment', label: 'Attachment', icon: Paperclip, iconClass: 'text-muted-foreground' }
 ]
 
-const activityFilters = computed(() => [
-  { label: t('entities.activity.filterAll'), value: 'all' },
-  { label: t('entities.activity.filterCommunication'), value: 'communication' },
-  { label: t('entities.activity.filterNotes'), value: 'notes' },
-  { label: t('entities.activity.filterSystemUpdates'), value: 'system-updates' }
-])
+const activityFilters = computed(() => {
+  const filters = [
+    { label: t('entities.activity.filterAll'), value: 'all' },
+    { label: t('entities.activity.filterCommunication'), value: 'communication' },
+    { label: t('entities.activity.filterNotes'), value: 'notes' },
+    { label: t('entities.activity.filterSystemUpdates'), value: 'system-updates' }
+  ]
+  if (props.showAddAppointment) {
+    filters.splice(3, 0, { label: 'Appointments', value: 'appointments' })
+  }
+  return filters
+})
 
 const selectedFilters = ref(['all'])
 const transcriptDialogActivity = ref(null)
@@ -452,6 +490,7 @@ const hasActiveFilters = computed(() =>
 function getActivityFilterCategory(activity) {
   if (['email', 'sms', 'whatsapp', 'call', 'customer-email', 'customer-whatsapp'].includes(activity.type)) return 'communication'
   if (activity.type === 'note') return 'notes'
+  if (activity.type === 'appointment') return 'appointments'
   if (activity.type === 'transcription' || activity.transcription) return 'system-updates'
   if (activity.type === 'system' || activity.type === 'created' || activity.type === 'status') return 'system-updates'
   if (activity.type === 'ai-summary') return 'notes'
@@ -511,6 +550,10 @@ const handleActivityClick = (activity) => {
 
 const handleAddActivity = (action) => {
   emit('add-activity', action)
+}
+
+function handleAddAppointment() {
+  emit('add-appointment')
 }
 </script>
 

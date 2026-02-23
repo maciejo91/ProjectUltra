@@ -3,8 +3,10 @@
  * Used by UnifiedSearchBar in AI mode.
  *
  * @param {Object} options - Optional filter options (arrays of { value, label })
+ * @param {string} [options.context] - 'vehicles' | 'leads' | 'opportunities' | 'tasks' | 'requests' | 'customers' | 'reports'
  * @param {Array} options.assigneeOptions
  * @param {Array} options.volvoModelOptions
+ * @param {Array} options.brandOptions - For vehicles (Volkswagen, Audi, etc.)
  * @param {Array} options.requestTypeOptions
  * @param {Array} options.statusOptions
  * @param {Array} options.sourceOptions
@@ -148,30 +150,38 @@ function parseDateRange (q) {
   return null
 }
 
-function matchCarStatus (q) {
+function matchCarStatus (q, context) {
   const lower = toLower(q)
   if (/\bnew\s+cars?\b/i.test(lower) || /\ball\s+new\s+cars?\b/i.test(lower)) {
-    return { id: 'carStatus', value: 'In Stock', operator: 'eq' }
+    // Vehicles mock data uses status 'New'/'Used'; leads use carStatus 'In Stock'/'Out of Stock'
+    return { id: context === 'vehicles' ? 'status' : 'carStatus', value: context === 'vehicles' ? 'New' : 'In Stock', operator: 'eq' }
   }
   if (/\bused\s+cars?\b/i.test(lower) || /\ball\s+used\s+cars?\b/i.test(lower)) {
-    return { id: 'carStatus', value: 'Out of Stock', operator: 'eq' }
+    return { id: context === 'vehicles' ? 'status' : 'carStatus', value: context === 'vehicles' ? 'Used' : 'Out of Stock', operator: 'eq' }
+  }
+  if (context === 'vehicles' && (/\bin\s+stock\b/i.test(lower) || /\bavailable\b/i.test(lower))) {
+    return { id: 'status', value: 'New', operator: 'eq' } // Mock uses New for available stock
+  }
+  if (context === 'vehicles' && /\bsold\b/i.test(lower)) {
+    return { id: 'status', value: 'Used', operator: 'eq' } // Mock uses Used for sold
   }
   return null
 }
 
-function matchVolvoModel (q, volvoModelOptions) {
+function matchVolvoModel (q, volvoModelOptions, context) {
   const list = (volvoModelOptions && volvoModelOptions.length)
     ? volvoModelOptions.map(o => (o.value || o.label || '').toString())
     : VOLVO_MODELS
   const lower = toLower(q)
+  const field = context === 'vehicles' ? 'model' : 'car'
   for (const model of list) {
     if (lower.includes(model.toLowerCase())) {
-      return { id: 'car', value: model, operator: 'includes' }
+      return { id: field, value: model, operator: context === 'vehicles' ? 'eq' : 'includes' }
     }
   }
   for (const model of VOLVO_MODELS) {
     if (lower.includes(model.toLowerCase())) {
-      return { id: 'car', value: model, operator: 'includes' }
+      return { id: field, value: model, operator: context === 'vehicles' ? 'eq' : 'includes' }
     }
   }
   return null
@@ -406,7 +416,7 @@ function matchRequestedCarBrand (q, requestedCarBrandOptions) {
       return { id: 'requestedCarBrand', value: v, operator: 'eq' }
     }
   }
-  const synonyms = { vw: 'Volkswagen', volkswagen: 'Volkswagen', bmw: 'BMW', audi: 'Audi', mercedes: 'Mercedes-Benz' }
+  const synonyms = { vw: 'Volkswagen', volkswagen: 'Volkswagen', bmw: 'BMW', audi: 'Audi', mercedes: 'Mercedes-Benz', porsche: 'Porsche' }
   for (const [key, brand] of Object.entries(synonyms)) {
     if (lower.includes(key)) {
       const v = requestedCarBrandOptions.find(o => toLower(String(o.value || o.label)).includes(brand.toLowerCase()))?.value
@@ -416,9 +426,53 @@ function matchRequestedCarBrand (q, requestedCarBrandOptions) {
   return null
 }
 
+function matchVehicleBrand (q, brandOptions) {
+  const options = brandOptions ?? [
+    { value: 'Volkswagen', label: 'Volkswagen' },
+    { value: 'Mercedes-Benz', label: 'Mercedes-Benz' },
+    { value: 'Audi', label: 'Audi' },
+    { value: 'Porsche', label: 'Porsche' }
+  ]
+  const lower = toLower(q)
+  const synonyms = { vw: 'Volkswagen', volkswagen: 'Volkswagen', bmw: 'BMW', audi: 'Audi', mercedes: 'Mercedes-Benz', porsche: 'Porsche' }
+  for (const [key, brand] of Object.entries(synonyms)) {
+    if (lower.includes(key)) {
+      const v = options.find(o => toLower(String(o.value || o.label)).includes(brand.toLowerCase()))?.value
+      if (v) return { id: 'brand', value: v, operator: 'eq' }
+    }
+  }
+  for (const opt of options) {
+    const v = (opt.value || opt.label || '').toString()
+    if (lower.includes(toLower(v))) {
+      return { id: 'brand', value: v, operator: 'eq' }
+    }
+  }
+  return null
+}
+
+function matchVehiclePrice (q) {
+  const lower = toLower(q)
+  const underMatch = lower.match(/(?:under|below|less than)\s*€?\s*(\d+(?:[.,]\d+)?)\s*k?/i) ||
+    lower.match(/€?\s*(\d+(?:[.,]\d+)?)\s*k?\s*(?:and\s+)?(?:under|below|less)/i)
+  if (underMatch) {
+    let max = parseFloat(String(underMatch[1]).replace(',', ''))
+    if (/\d+\s*k\b/i.test(q)) max *= 1000
+    return { id: 'price', value: max, operator: 'lte' }
+  }
+  const overMatch = lower.match(/(?:over|above|more than)\s*€?\s*(\d+(?:[.,]\d+)?)\s*k?/i)
+  if (overMatch) {
+    let min = parseFloat(String(overMatch[1]).replace(',', ''))
+    if (/\d+\s*k\b/i.test(q)) min *= 1000
+    return { id: 'price', value: min, operator: 'gte' }
+  }
+  return null
+}
+
 export function useNaturalLanguageQuery (options = {}) {
+  const context = options.context ?? ''
   const assigneeOptions = options.assigneeOptions ?? []
   const volvoModelOptions = options.volvoModelOptions ?? []
+  const brandOptions = options.brandOptions ?? []
   const requestTypeOptions = options.requestTypeOptions ?? []
   const statusOptions = options.statusOptions ?? []
   const sourceOptions = options.sourceOptions ?? []
@@ -432,56 +486,66 @@ export function useNaturalLanguageQuery (options = {}) {
       return { filters: [], error: null, globalFilterFallback: (query || '').trim() || undefined }
     }
     let q = query.trim()
-    // Ignore "and" / "&" between parts so "assigned to Josh and today" still works
     q = q.replace(/\s+and\s+/gi, ' ').replace(/\s*&\s*/g, ' ').replace(/\s+/g, ' ').trim()
     if (!q) return { filters: [], error: null, globalFilterFallback: undefined }
 
     const filters = []
-    let dateRange = parseDateRange(q)
-    if (dateRange) {
-      filters.push({
-        id: 'createdAt',
-        value: dateRange.operator === 'between' ? { from: dateRange.from, to: dateRange.to } : dateRange.from,
-        operator: dateRange.operator
-      })
+
+    if (context === 'vehicles') {
+      // Vehicles-specific parsing
+      const carStatus = matchCarStatus(q, context)
+      if (carStatus) filters.push(carStatus)
+      const volvo = matchVolvoModel(q, volvoModelOptions, context)
+      if (volvo) filters.push(volvo)
+      const brand = matchVehicleBrand(q, brandOptions)
+      if (brand) filters.push(brand)
+      const price = matchVehiclePrice(q)
+      if (price) filters.push(price)
+      // Only add status from matchStatus if carStatus didn't already add one (avoids duplicate for "new cars")
+      if (!carStatus) {
+        const status = matchStatus(q, statusOptions)
+        if (status) filters.push(status)
+      }
+    } else if (context === 'customers') {
+      const source = matchSource(q, sourceOptions)
+      if (source) filters.push(source)
+      const accountType = matchAccountType(q, accountTypeOptions)
+      if (accountType) filters.push(accountType)
+    } else {
+      // leads, opportunities, tasks, requests, reports – shared parsing
+      const dateRange = parseDateRange(q)
+      if (dateRange) {
+        filters.push({
+          id: dateRange.operator === 'between' ? 'createdAt' : 'createdAt',
+          value: dateRange.operator === 'between' ? { from: dateRange.from, to: dateRange.to } : dateRange.from,
+          operator: dateRange.operator
+        })
+      }
+      const assignee = matchAssignee(q, assigneeOptions)
+      if (assignee) filters.push(assignee)
+      const carStatus = matchCarStatus(q, context)
+      if (carStatus) filters.push(carStatus)
+      const volvo = matchVolvoModel(q, volvoModelOptions, context)
+      if (volvo) filters.push(volvo)
+      const requestType = matchRequestType(q, requestTypeOptions)
+      if (requestType) filters.push(requestType)
+      const status = matchStatus(q, statusOptions)
+      if (status) filters.push(status)
+      const source = matchSource(q, sourceOptions)
+      if (source) filters.push(source)
+      const priority = matchPriority(q, priorityOptions)
+      if (priority) filters.push(priority)
+      const type = matchType(q, typeOptions)
+      if (type) filters.push(type)
+      const accountType = matchAccountType(q, accountTypeOptions)
+      if (accountType) filters.push(accountType)
+      const requestedCarBrand = matchRequestedCarBrand(q, requestedCarBrandOptions)
+      if (requestedCarBrand) filters.push(requestedCarBrand)
     }
-
-    const assignee = matchAssignee(q, assigneeOptions)
-    if (assignee) filters.push(assignee)
-
-    const carStatus = matchCarStatus(q)
-    if (carStatus) filters.push(carStatus)
-
-    const volvo = matchVolvoModel(q, volvoModelOptions)
-    if (volvo) filters.push(volvo)
-
-    const requestType = matchRequestType(q, requestTypeOptions)
-    if (requestType) filters.push(requestType)
-
-    const status = matchStatus(q, statusOptions)
-    if (status) filters.push(status)
-
-    const source = matchSource(q, sourceOptions)
-    if (source) filters.push(source)
-
-    const priority = matchPriority(q, priorityOptions)
-    if (priority) filters.push(priority)
-
-    const type = matchType(q, typeOptions)
-    if (type) filters.push(type)
-
-    const accountType = matchAccountType(q, accountTypeOptions)
-    if (accountType) filters.push(accountType)
-
-    const requestedCarBrand = matchRequestedCarBrand(q, requestedCarBrandOptions)
-    if (requestedCarBrand) filters.push(requestedCarBrand)
 
     if (filters.length > 0) {
       return { filters, error: null }
     }
-    // When no structured filters matched, use a smarter fallback: if the query looks like
-    // "assigned to X" / "X's leads" / "managed by X", search by the name part only so
-    // "assigned to josh" searches "josh" and can match assignee "Josh Smith", etc.
     const assigneeFallbackMatch = q.match(/(?:assigned to|managed by|handled by)\s+([a-z'\s]+?)(?:\s*$|\s+and\s|\.|,)/i) ||
       q.match(/([a-z]+)'s\s+(?:leads?|cars?|opportunities?)/i)
     const fallbackSearch = assigneeFallbackMatch ? assigneeFallbackMatch[1].trim() : q

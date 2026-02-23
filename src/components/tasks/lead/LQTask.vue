@@ -1136,7 +1136,7 @@ import {
   PopoverContent
 } from '@motork/component-library/future/primitives'
 import { Check, PhoneOff, ThumbsUp, ThumbsDown, Clock, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, ChevronLeft, ChevronRight, ChevronDown, Plus, Users } from 'lucide-vue-next'
-import NoteWidget from '@/components/customer/activities/NoteWidget.vue'
+import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'

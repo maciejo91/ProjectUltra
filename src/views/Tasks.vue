@@ -1,12 +1,5 @@
 <template>
   <div class="h-full flex flex-col lg:flex-row overflow-hidden bg-surface">
-    <!-- Unified Mobile Header - Shows when task is selected (both views) -->
-    <MobileDetailHeader
-      :show="!!currentTask || (viewMode === 'table' && !!drawerTask)"
-      back-label="Back to task list"
-      @back="handleBackToTaskList"
-    />
-
     <!-- Card View: when header-over-list layout (desktop), teleport list and right panel to layout slots.
          Only mount Teleports after targets exist (avoids "Failed to locate Teleport target" on Tasks mount).
          Use disabled when route changes so content renders in place before unmount (avoids insertBefore null). -->
@@ -21,7 +14,7 @@
             :view-mode="viewMode"
             :initial-search-query="cardSearchQuery"
             @view-change="handleViewChange"
-            :selected-class="(task) => task.type === 'lead' ? 'bg-muted border-2 border-blue-500' : 'bg-muted border-2 border-purple-500'"
+            :selected-class="(task) => task.type === 'lead' ? 'bg-muted border-2 border-emerald-700' : 'bg-muted border-2 border-purple-500'"
             :unselected-class="getUnselectedClass"
             :getName="(task) => {
               const customer = task.customer
@@ -56,7 +49,7 @@
               if (vehicle.status) parts.push(vehicle.status)
               return parts.join(' • ')
             }"
-            :avatarClass="(task) => task.type === 'lead' ? 'bg-orange-100 text-orange-600' : 'bg-purple-100 text-purple-600'"
+            :avatarClass="(task) => task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-100 text-purple-600'"
             :show-mobile-close="false"
             @select="selectTask"
             @close="handleBackToTaskList"
@@ -67,7 +60,7 @@
             @toggle-closed="toggleShowClosed"
           >
             <template #badges="{ item: task }">
-              <Badge v-if="task && task.type" :text="task.type === 'lead' ? 'Lead' : 'Opportunity'" size="small" :theme="task.type === 'lead' ? 'blue' : 'gray'" />
+              <Badge v-if="task && task.type" :text="task.type === 'lead' ? 'Lead' : 'Opportunity'" size="small" :theme="task.type === 'lead' ? 'green' : 'gray'" />
               <Badge v-if="task && task.priority === 'Hot' && settingsStore.getSetting('urgencyEnabled') === false" text="HOT" size="small" theme="red" />
             </template>
             <template #location="{ item: task }">{{ getCustomerCity(task) || 'Unknown' }}</template>
@@ -99,6 +92,7 @@
           :add-new-config="addNewConfig"
           :filtered-tasks="filteredTasks"
           @task-navigate="handleTaskNavigate"
+          @close="handleBackToTaskList"
         />
         <div v-else class="flex-1 flex flex-col w-full min-h-0 overflow-hidden bg-surface">
           <div class="flex-1 flex items-center justify-center w-full p-8">
@@ -128,7 +122,7 @@
           :view-mode="viewMode"
           :initial-search-query="cardSearchQuery"
           @view-change="handleViewChange"
-          :selected-class="(task) => task.type === 'lead' ? 'bg-muted border-2 border-blue-500' : 'bg-muted border-2 border-purple-500'"
+          :selected-class="(task) => task.type === 'lead' ? 'bg-muted border-2 border-emerald-700' : 'bg-muted border-2 border-purple-500'"
           :unselected-class="getUnselectedClass"
           :getName="(task) => {
             const customer = task.customer
@@ -163,7 +157,7 @@
             if (vehicle.status) parts.push(vehicle.status)
             return parts.join(' • ')
           }"
-          :avatarClass="(task) => task.type === 'lead' ? 'bg-orange-100 text-orange-600' : 'bg-purple-100 text-purple-600'"
+          :avatarClass="(task) => task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-100 text-purple-600'"
           :show-mobile-close="false"
           @select="selectTask"
           @close="handleBackToTaskList"
@@ -174,7 +168,7 @@
           @toggle-closed="toggleShowClosed"
         >
           <template #badges="{ item: task }">
-            <Badge v-if="task && task.type" :text="task.type === 'lead' ? 'Lead' : 'Opportunity'" size="small" :theme="task.type === 'lead' ? 'blue' : 'gray'" />
+            <Badge v-if="task && task.type" :text="task.type === 'lead' ? 'Lead' : 'Opportunity'" size="small" :theme="task.type === 'lead' ? 'green' : 'gray'" />
             <Badge v-if="task && task.priority === 'Hot' && settingsStore.getSetting('urgencyEnabled') === false" text="HOT" size="small" theme="red" />
           </template>
           <template #location="{ item: task }">{{ getCustomerCity(task) || 'Unknown' }}</template>
@@ -205,6 +199,7 @@
           :add-new-config="addNewConfig"
           :filtered-tasks="filteredTasks"
           @task-navigate="handleTaskNavigate"
+          @close="handleBackToTaskList"
         />
         <div v-if="!currentTask" class="hidden lg:flex flex-1 flex-col w-full min-h-0 overflow-hidden bg-surface">
           <div class="flex-1 flex items-center justify-center w-full p-8">
@@ -294,7 +289,6 @@ import { Badge } from '@motork/component-library/future/primitives'
 import EntityListSidebar from '@/components/tasks/TasksList.vue'
 import TasksTableView from '@/components/tasks/TasksTableView.vue'
 import TaskDetailView from '@/components/tasks/TaskDetailView.vue'
-import MobileDetailHeader from '@/components/shared/layout/MobileDetailHeader.vue'
 import DrawerContainer from '@/components/shared/DrawerContainer.vue'
 import { useTaskShell } from '@/composables/useTaskShell'
 import { useTaskHelpers } from '@/composables/useTaskHelpers'
@@ -330,8 +324,13 @@ const {
   getUnselectedClass: getUnselectedClassHelper
 } = useTaskHelpers()
 
-// View mode state with localStorage persistence (default to table)
-const viewMode = ref(localStorage.getItem('tasksViewMode') || 'table')
+// View mode state with localStorage persistence (table is default; card persists when user switches)
+const viewMode = ref(
+  (() => {
+    const stored = localStorage.getItem('tasksViewMode')
+    return stored === 'card' || stored === 'table' ? stored : 'table'
+  })()
+)
 
 // True when list/detail should be teleported to layout slots (card view + task selected on desktop).
 // Require route.name === 'task-detail' so teleports are disabled before unmount when navigating away

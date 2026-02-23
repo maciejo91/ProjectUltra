@@ -1,7 +1,7 @@
 export const mockDashboardKPIs = [
   {
     id: 1,
-    title: 'Deals closed today',
+    title: 'Deals closed this month',
     value: 12,
     change: 20,
     changeType: 'increase',
@@ -9,7 +9,7 @@ export const mockDashboardKPIs = [
   },
   {
     id: 2,
-    title: 'Deals in negotiation',
+    title: 'Negotiations this month',
     value: 320,
     change: 11,
     changeType: 'increase',
@@ -35,40 +35,75 @@ export const mockDashboardKPIs = [
 
 export const mockSalesPipeline = {
   stages: [
-    { name: 'Lead generated', percentage: 100, count: 1000, avgTime: '12h' },
-    { name: 'Validated', percentage: 87.2, count: 872, avgTime: '12h' },
-    { name: 'Qualified', percentage: 63.4, count: 634, avgTime: '12h' },
-    { name: 'Offer created', percentage: 17.2, count: 172, avgTime: '7d 9h' },
-    { name: 'Won', percentage: 11.2, count: 112, avgTime: '12h' }
+    { name: 'New leads', percentage: 100 },
+    { name: 'Qualification', percentage: 84.5, avgTime: '11h on avg.' },
+    { name: 'Contacted', percentage: 61.8, avgTime: '13h on avg.' },
+    { name: 'In negotiation', percentage: 19.3, avgTime: '6d 14h on avg.' },
+    { name: 'Won', percentage: 12.7, avgTime: '14h on avg.' }
   ],
   leadSources: [
-    { name: 'Coches.net', color: 'red', data: [1000, 872, 634, 172, 112] },
-    { name: 'Autoscout24', color: 'orange', data: [800, 700, 500, 140, 90] },
-    { name: 'OLX', color: 'blue', data: [600, 520, 380, 100, 65] },
-    { name: 'Cars.com', color: 'gray', data: [400, 350, 250, 70, 45] }
+    { name: 'Volvocars.com', color: 'gray', data: [320, 276, 207, 62, 44] },
+    { name: 'Facebook', color: 'blue', data: [285, 235, 167, 48, 32] },
+    { name: 'Volvo Winter Campaign', color: 'orange', data: [245, 219, 168, 55, 35] }
   ]
 }
 
 export const mockTeamPerformance = [
-  { name: 'Jose Maria Gonzalez', leads: 171, qualifiedLeads: 85, qualifiedPercentage: 49, opportunities: 42, inNegotiation: 18, inNegotiationPercentage: 43, won: 12, wonPercentage: 67 },
-  { name: 'Sarah Johnson', leads: 145, qualifiedLeads: 62, qualifiedPercentage: 43, opportunities: 38, inNegotiation: 15, inNegotiationPercentage: 39, won: 9, wonPercentage: 60 },
-  { name: 'Michael Chen', leads: 198, qualifiedLeads: 94, qualifiedPercentage: 47, opportunities: 51, inNegotiation: 22, inNegotiationPercentage: 43, won: 15, wonPercentage: 68 },
-  { name: 'Emma Rodriguez', leads: 156, qualifiedLeads: 78, qualifiedPercentage: 50, opportunities: 45, inNegotiation: 19, inNegotiationPercentage: 42, won: 11, wonPercentage: 58 },
-  { name: 'David Kim', leads: 182, qualifiedLeads: 89, qualifiedPercentage: 49, opportunities: 48, inNegotiation: 21, inNegotiationPercentage: 44, won: 14, wonPercentage: 67 },
-  { name: 'Lisa Thompson', leads: 134, qualifiedLeads: 59, qualifiedPercentage: 44, opportunities: 35, inNegotiation: 14, inNegotiationPercentage: 40, won: 8, wonPercentage: 57 },
-  { name: 'Carlos Martinez', leads: 167, qualifiedLeads: 82, qualifiedPercentage: 49, opportunities: 44, inNegotiation: 20, inNegotiationPercentage: 45, won: 13, wonPercentage: 65 },
-  { name: 'Anna Kowalski', leads: 143, qualifiedLeads: 65, qualifiedPercentage: 45, opportunities: 37, inNegotiation: 16, inNegotiationPercentage: 43, won: 10, wonPercentage: 63 },
-  { name: 'Thomas Anderson', leads: 189, qualifiedLeads: 91, qualifiedPercentage: 48, opportunities: 49, inNegotiation: 23, inNegotiationPercentage: 47, won: 16, wonPercentage: 70 },
-  { name: 'Sophie Laurent', leads: 159, qualifiedLeads: 73, qualifiedPercentage: 46, opportunities: 41, inNegotiation: 17, inNegotiationPercentage: 41, won: 11, wonPercentage: 65 }
+  { name: 'David Martin', leads: 198, qualifiedLeads: 94, qualifiedPercentage: 47, opportunities: 51, contracts: 28 },
+  { name: 'Sophie Dubois', leads: 189, qualifiedLeads: 91, qualifiedPercentage: 48, opportunities: 49, contracts: 26 },
+  { name: 'Thomas Anderson', leads: 182, qualifiedLeads: 89, qualifiedPercentage: 49, opportunities: 48, contracts: 25 },
+  { name: 'Marie Leclerc', leads: 171, qualifiedLeads: 85, qualifiedPercentage: 49, opportunities: 42, contracts: 23 },
+  { name: 'James Wilson', leads: 167, qualifiedLeads: 82, qualifiedPercentage: 49, opportunities: 44, contracts: 22 },
+  { name: 'Camille Bernard', leads: 159, qualifiedLeads: 73, qualifiedPercentage: 46, opportunities: 41, contracts: 21 },
+  { name: 'Emily Brown', leads: 156, qualifiedLeads: 78, qualifiedPercentage: 50, opportunities: 45, contracts: 24 },
+  { name: 'Pierre Moreau', leads: 145, qualifiedLeads: 62, qualifiedPercentage: 43, opportunities: 38, contracts: 19 },
+  { name: 'Robert Taylor', leads: 143, qualifiedLeads: 65, qualifiedPercentage: 45, opportunities: 37, contracts: 18 },
+  { name: 'Julie Martin', leads: 134, qualifiedLeads: 59, qualifiedPercentage: 44, opportunities: 35, contracts: 17 }
+]
+
+export const mockActionableQuestions = [
+  {
+    id: 'mock-appt-followup-1',
+    type: 'appointment-followup',
+    priority: 4,
+    question: 'You had an appointment yesterday with Jean-Pierre Dubois but no offer is added so far. Did they show up to the appointment?',
+    customer: { name: 'Jean-Pierre Dubois' },
+    opportunityId: 1,
+    opportunity: { id: 1, assignee: 'Salsabeel Khaleel', customer: { name: 'Jean-Pierre Dubois' } },
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    appointmentDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'mock-stuck-opportunity-1',
+    type: 'stuck-opportunity',
+    priority: 1,
+    question: 'This opportunity with Sarah Johnson has been inactive for 16 days. Are they still interested in purchasing?',
+    customer: { name: 'Sarah Johnson' },
+    opportunityId: 1,
+    opportunity: { id: 1, assignee: 'Salsabeel Khaleel', customer: { name: 'Sarah Johnson' } },
+    createdAt: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(),
+    daysInactive: 16
+  },
+  {
+    id: 'mock-lead-qualification-urgency-1',
+    type: 'lead-qualification-urgency',
+    priority: 2,
+    question: 'Lead from Michael Brown is 10 days old and still unqualified. Should we prioritise qualification?',
+    customer: { name: 'Michael Brown' },
+    leadId: 1,
+    opportunityId: null,
+    opportunity: null,
+    lead: { id: 1, assignee: 'Salsabeel Khaleel', customer: { name: 'Michael Brown' } },
+    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
+  }
 ]
 
 export const mockTodaysEvents = [
-  { id: 1, time: '09:30-10:30', type: 'Dealership visit', customer: 'Jose Maria Gonzalez', location: 'Madrid Mercedes-Benz Central' },
-  { id: 2, time: '11:00-12:00', type: 'Test drive', customer: 'Sarah Johnson', location: 'Barcelona Mercedes-Benz' },
-  { id: 3, time: '13:15-13:45', type: 'Call', customer: 'Michael Chen', location: 'Virtual Meeting' },
-  { id: 4, time: '14:30-15:30', type: 'Delivery', customer: 'Emma Rodriguez', location: 'Valencia Mercedes-Benz' },
-  { id: 5, time: '15:45-16:45', type: 'Recall', customer: 'David Kim', location: 'Seville Service Center' },
-  { id: 6, time: '17:00-18:00', type: 'Offsite visit', customer: 'Lisa Thompson', location: 'Customer Location - Malaga' }
+  { id: 1, date: 'February 14th', time: '09:30-10:30', title: 'Dealership visit', type: 'Dealership visit', name: 'Jean-Pierre Dubois', location: 'Volvo Paris' },
+  { id: 2, date: 'February 14th', time: '11:00-12:00', title: 'Test drive', type: 'Test drive', name: 'Sarah Johnson', location: 'Volvo Lyon' },
+  { id: 3, date: 'February 14th', time: '13:15-13:45', title: 'Call', type: 'Call', name: 'Michael Brown', location: 'Virtual Meeting' },
+  { id: 4, date: 'February 14th', time: '14:30-15:30', title: 'Delivery', type: 'Delivery', name: 'Marie Lefebvre', location: 'Volvo Marseille' },
+  { id: 5, date: 'February 14th', time: '15:45-16:45', title: 'Recall', type: 'Recall', name: 'David Martin', location: 'Volvo Nice' }
 ]
 
 export const mockPageViewsByVehicle = [
@@ -121,11 +156,22 @@ export const mockBDCOperatorMetrics = {
     withinSLA: 142,
     trend: [85.2, 86.5, 87.1, 88.3, 88.9, 89.5, 89.9]
   },
-  tasksPerDay: {
-    current: 35,
+  managedLeadTasks: {
+    total: 210,
+    dailyAvg: 35,
     target: 40,
-    average: 33.5,
-    trend: [28, 30, 32, 33, 34, 34.5, 35]
+    trend: [28, 30, 32, 34, 35, 34, 35]
+  },
+  handledNoShowTasks: {
+    total: 12,
+    dailyAvg: 2,
+    trend: [1, 1, 2, 2, 2, 2, 2]
+  },
+  followUpTasks: {
+    total: 48,
+    dailyAvg: 8,
+    target: 10,
+    trend: [6, 6, 7, 7, 8, 8, 8]
   },
   appointmentsReserved: 28,
   appointmentsReservedTrend: [22, 24, 26, 25, 27, 28],
@@ -150,60 +196,42 @@ export const mockSalespersonMetrics = {
     year: 15000000
   },
   pipelineValue: 3200000,
+  pipelineValueTrend: [2800000, 2900000, 3000000, 3100000, 3150000, 3180000, 3200000],
   winRate: 68.5,
+  winRateTrend: [64, 65, 66, 67, 68, 68.2, 68.5],
   newOpportunities: {
     month: 23,
     quarter: 67,
     year: 245
   },
-  dormantOpportunities: 8
+  dormantOpportunities: 8,
+  dormantOpportunitiesTrend: [10, 9, 9, 8, 8, 8, 8],
+  opportunitiesInNegotiation: 4,
+  nudges: [
+    { id: 'dormant', text: '2 dormant opportunities – re-engage to unlock €480k', priority: 1 },
+    { id: 'target', text: '3 more contracts to hit monthly target', priority: 2 }
+  ]
 }
 
 export const mockManagerFunnelMetrics = {
   stages: [
-    {
-      name: 'Total leads',
-      count: 1332,
-      percentage: 100,
-      color: 'gray',
-      trend: [1200, 1250, 1280, 1300, 1315, 1325, 1332]
-    },
-    {
-      name: 'Assigned leads',
-      count: 1037,
-      percentage: 78,
-      color: 'gray',
-      trend: [950, 980, 1000, 1015, 1025, 1030, 1037]
-    },
-    {
-      name: 'Managed leads',
-      count: 982,
-      percentage: 74,
-      color: 'gray',
-      trend: [920, 940, 960, 970, 975, 980, 982]
-    },
-    {
-      name: 'Qualified leads',
-      count: 372,
-      percentage: 28,
-      color: 'orange',
-      trend: [340, 350, 360, 365, 368, 370, 372]
-    },
-    {
-      name: 'Managed opportunities',
-      count: 316,
-      percentage: 24,
-      color: 'blue',
-      trend: [290, 300, 308, 312, 314, 315, 316]
-    },
-    {
-      name: 'Won opportunities',
-      count: 211,
-      percentage: 16,
-      color: 'red',
-      trend: [195, 200, 205, 208, 210, 210, 211]
-    }
+    { name: 'Total leads', count: 1332, percentage: 100, colorCode: '#eab308', trend: [1200, 1250, 1280, 1300, 1315, 1325, 1332] },
+    { name: 'Assigned leads', count: 1037, percentage: 78, colorCode: '#b45309', trend: [950, 980, 1000, 1015, 1025, 1030, 1037] },
+    { name: 'Managed leads', count: 982, percentage: 74, colorCode: '#22c55e', trend: [920, 940, 960, 970, 975, 980, 982] },
+    { name: 'Qualified leads', count: 372, percentage: 28, colorCode: '#16a34a', trend: [340, 350, 360, 365, 368, 370, 372] },
+    { name: 'Managed opportunities', count: 316, percentage: 24, colorCode: '#7e22ce', trend: [290, 300, 308, 312, 314, 315, 316] },
+    { name: 'Won opportunities', count: 211, percentage: 16, colorCode: '#0470e9', trend: [195, 200, 205, 208, 210, 210, 211] }
   ],
   conversionRate: 16,
-  conversionRateTrend: [14.2, 14.8, 15.2, 15.5, 15.7, 15.9, 16]
+  conversionRateTrend: [14.2, 14.8, 15.2, 15.5, 15.7, 15.9, 16],
+  taskCompletion: {
+    completed: 892,
+    total: 1037,
+    overdueCount: 47
+  },
+  dealsReport: {
+    won: 211,
+    lost: 105,
+    wonRate: 66.8
+  }
 }

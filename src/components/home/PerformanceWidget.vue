@@ -1,76 +1,104 @@
 <template>
-  <div class="rounded-lg flex flex-col bg-muted">
-    <!-- Title Section -->
-    <div class="px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 shrink-0">
-      <div class="flex items-center gap-2">
-        <LineChart class="w-4 h-4 shrink-0 text-foreground" />
-        <h2 class="text-sm font-medium text-foreground leading-5">Performance</h2>
-      </div>
+  <Card class="border border-border flex flex-col overflow-hidden shadow-mk-dashboard-card">
+    <CardHeader class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+      <CardTitle class="text-sm font-medium leading-5">Performance</CardTitle>
       <select
         v-model="selectedPeriod"
         @change="loadMetrics"
-        class="input text-xs w-full sm:w-auto"
+        class="input text-xs w-full sm:w-auto bg-muted/50 border-border rounded-md px-2 py-1 outline-none focus:ring-1 focus:ring-primary/20"
       >
         <option value="month">Month</option>
         <option value="quarter">Quarter</option>
         <option value="year">Year</option>
       </select>
-    </div>
-    
-    <!-- Card Content -->
-    <div class="bg-white rounded-lg p-4 shadow-nsc-card flex flex-col">
+    </CardHeader>
+
+    <CardContent class="flex flex-col">
       <!-- Loading State -->
       <div v-if="loading" class="space-y-4">
-        <div v-for="n in 4" :key="`skeleton-${n}`" class="h-16 bg-gray-100 rounded animate-pulse"></div>
+        <div v-for="n in 4" :key="`skeleton-${n}`" class="h-16 bg-muted rounded animate-pulse"></div>
       </div>
 
       <!-- BDC Operator View -->
       <div v-else-if="userRole === 'operator'" class="space-y-4">
         <!-- SLA Compliance -->
-        <div class="bg-surface rounded-lg p-3 border border-border">
+        <div class="bg-muted rounded-lg p-4 border border-border">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-muted-foreground">SLA Compliance</span>
-            <span class="text-xs font-bold" :class="slaCompliancePercentage >= 90 ? 'text-green-600' : 'text-yellow-600'">
-              {{ slaCompliancePercentage }}%
-            </span>
+            <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">SLA Compliance</span>
+            <Badge
+              :text="`${slaCompliancePercentage}%`"
+              size="small"
+              :theme="slaCompliancePercentage >= 90 ? 'green' : 'orange'"
+            />
           </div>
-          <div class="text-xs text-gray-600">
+          <div class="text-xs text-foreground font-medium">
             {{ bdcMetrics?.slaCompliance?.withinSLA || 0 }} / {{ bdcMetrics?.slaCompliance?.total || 0 }} tasks completed within SLA
           </div>
         </div>
 
-        <!-- Tasks Per Day -->
-        <div class="bg-surface rounded-lg p-3 border border-border">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-muted-foreground">Tasks Per Day</span>
-            <span class="text-xs font-bold" :class="getTasksPerDayStatusClass()">
-              {{ bdcMetrics?.tasksPerDay?.current || 0 }} / {{ bdcMetrics?.tasksPerDay?.target || 0 }}
-            </span>
+        <!-- Managed Lead Tasks -->
+        <div class="bg-muted rounded-lg p-4 border border-border">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Managed Lead Tasks</span>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold" :class="getManagedTaskStatusClass(bdcMetrics?.managedLeadTasks?.dailyAvg, bdcMetrics?.managedLeadTasks?.target)">
+                {{ bdcMetrics?.managedLeadTasks?.dailyAvg || 0 }} / {{ bdcMetrics?.managedLeadTasks?.target || 0 }}
+              </span>
+            </div>
           </div>
-          <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <div class="w-full bg-border rounded-full h-2">
             <div
               class="h-2 rounded-full transition-all"
-              :class="getTasksPerDayStatusClass(true)"
-              :style="{ width: `${Math.min((bdcMetrics?.tasksPerDay?.current || 0) / 50 * 100, 100)}%` }"
+              :class="getManagedTaskStatusClass(bdcMetrics?.managedLeadTasks?.dailyAvg, bdcMetrics?.managedLeadTasks?.target, true)"
+              :style="{ width: `${Math.min((bdcMetrics?.managedLeadTasks?.dailyAvg || 0) / 50 * 100, 100)}%` }"
             ></div>
           </div>
-          <div class="text-xs text-gray-500 mt-1">Target: 20-50 tasks/day</div>
+          <div class="text-[10px] text-muted-foreground mt-2 font-medium">Target: 20-50/day (avg this period)</div>
+        </div>
+
+        <!-- Handled No-Show Tasks -->
+        <div class="bg-muted rounded-lg p-4 border border-border">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Handled No-Show Tasks</span>
+            <span class="text-lg font-bold text-foreground">{{ bdcMetrics?.handledNoShowTasks?.total || 0 }}</span>
+          </div>
+          <div class="text-[10px] text-muted-foreground font-medium">{{ bdcMetrics?.handledNoShowTasks?.dailyAvg || 0 }} avg/day (this period)</div>
+        </div>
+
+        <!-- Follow-Up Tasks -->
+        <div class="bg-muted rounded-lg p-4 border border-border">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Follow-Up Tasks</span>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold" :class="getManagedTaskStatusClass(bdcMetrics?.followUpTasks?.dailyAvg, bdcMetrics?.followUpTasks?.target)">
+                {{ bdcMetrics?.followUpTasks?.dailyAvg || 0 }} / {{ bdcMetrics?.followUpTasks?.target || 0 }}
+              </span>
+            </div>
+          </div>
+          <div class="w-full bg-border rounded-full h-2">
+            <div
+              class="h-2 rounded-full transition-all"
+              :class="getManagedTaskStatusClass(bdcMetrics?.followUpTasks?.dailyAvg, bdcMetrics?.followUpTasks?.target, true)"
+              :style="{ width: `${Math.min((bdcMetrics?.followUpTasks?.dailyAvg || 0) / 20 * 100, 100)}%` }"
+            ></div>
+          </div>
+          <div class="text-[10px] text-muted-foreground mt-2 font-medium">Target: {{ bdcMetrics?.followUpTasks?.target || 10 }}/day (avg this period)</div>
         </div>
 
         <!-- Appointments Reserved -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="bg-surface rounded-lg p-3 border border-border">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs text-gray-500 mb-1">Appointments Reserved</div>
-                <div class="text-sm font-bold text-gray-900 mb-1">{{ bdcMetrics?.appointmentsReserved || 0 }}</div>
+                <div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Appointments Reserved</div>
+                <div class="text-lg font-bold text-foreground leading-none">{{ bdcMetrics?.appointmentsReserved || 0 }}</div>
               </div>
-              <div class="h-12 w-16 flex-shrink-0" v-if="bdcMetrics?.appointmentsReservedTrend">
+              <div class="h-10 w-16 shrink-0" v-if="bdcMetrics?.appointmentsReservedTrend">
                 <svg class="w-full h-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="gradient-appointments" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" style="stop-color:var(--brand-blue);stop-opacity:0.2" />
-                      <stop offset="100%" style="stop-color:var(--brand-blue);stop-opacity:0" />
+                      <stop offset="0%" style="stop-color:#0470e9;stop-opacity:0.4" />
+                      <stop offset="100%" style="stop-color:#0470e9;stop-opacity:0.1" />
                     </linearGradient>
                   </defs>
                   <path
@@ -80,8 +108,8 @@
                   />
                   <path
                     :d="generateSmoothPath(bdcMetrics.appointmentsReservedTrend)"
-                    stroke="var(--brand-blue)"
-                    stroke-width="2.5"
+                    stroke="#0470e9"
+                    stroke-width="2"
                     fill="none"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -91,18 +119,18 @@
               </div>
             </div>
           </div>
-          <div class="bg-surface rounded-lg p-3 border border-border">
+          <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs text-gray-500 mb-1">Lead-to-Opportunity Rate</div>
-                <div class="text-sm font-bold text-gray-900 mb-1">{{ bdcMetrics?.leadToOpportunityConversion || 0 }}%</div>
+                <div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Lead-to-Opp Rate</div>
+                <div class="text-lg font-bold text-foreground leading-none">{{ bdcMetrics?.leadToOpportunityConversion || 0 }}%</div>
               </div>
-              <div class="h-12 w-16 flex-shrink-0" v-if="bdcMetrics?.leadToOpportunityConversionTrend">
+              <div class="h-10 w-16 shrink-0" v-if="bdcMetrics?.leadToOpportunityConversionTrend">
                 <svg class="w-full h-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="gradient-lead-opp" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" style="stop-color:var(--color-success);stop-opacity:0.2" />
-                      <stop offset="100%" style="stop-color:var(--color-success);stop-opacity:0" />
+                      <stop offset="0%" style="stop-color:#0470e9;stop-opacity:0.4" />
+                      <stop offset="100%" style="stop-color:#0470e9;stop-opacity:0.1" />
                     </linearGradient>
                   </defs>
                   <path
@@ -112,8 +140,8 @@
                   />
                   <path
                     :d="generateSmoothPath(bdcMetrics.leadToOpportunityConversionTrend)"
-                    stroke="var(--color-success)"
-                    stroke-width="2.5"
+                    stroke="#0470e9"
+                    stroke-width="2"
                     fill="none"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -128,20 +156,35 @@
 
       <!-- Salesperson View -->
       <div v-else-if="userRole === 'salesman'" class="space-y-4">
+        <!-- Nudges -->
+        <div v-if="salespersonNudges.length" class="bg-primary/15 border border-primary rounded-lg p-4 space-y-2">
+          <div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">What to do next</div>
+          <ul class="space-y-1.5">
+            <li
+              v-for="nudge in salespersonNudges"
+              :key="nudge.id"
+              class="text-xs text-foreground flex items-start gap-2"
+            >
+              <Lightbulb class="w-3.5 h-3.5 shrink-0 mt-0.5 text-primary" />
+              <span>{{ nudge.text }}</span>
+            </li>
+          </ul>
+        </div>
+
         <!-- Contracts & Revenue -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="bg-surface rounded-lg p-3 border border-border">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs text-gray-500 mb-1">Contracts Closed</div>
-                <div class="text-sm font-bold text-gray-900 mb-1">{{ salespersonMetrics?.contractsClosed?.[selectedPeriod] || 0 }}</div>
+                <div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Contracts Closed</div>
+                <div class="text-lg font-bold text-foreground leading-none">{{ salespersonMetrics?.contractsClosed?.[selectedPeriod] || 0 }}</div>
               </div>
-              <div class="h-12 w-16 flex-shrink-0" v-if="getTrendData('contractsClosed')">
+              <div class="h-10 w-16 shrink-0" v-if="getTrendData('contractsClosed')">
                 <svg class="w-full h-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="gradient-contracts" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" style="stop-color:var(--color-success);stop-opacity:0.2" />
-                      <stop offset="100%" style="stop-color:var(--color-success);stop-opacity:0" />
+                      <stop offset="0%" style="stop-color:#0470e9;stop-opacity:0.4" />
+                      <stop offset="100%" style="stop-color:#0470e9;stop-opacity:0.1" />
                     </linearGradient>
                   </defs>
                   <path
@@ -151,8 +194,8 @@
                   />
                   <path
                     :d="generateSmoothPath(getTrendData('contractsClosed'))"
-                    stroke="var(--color-success)"
-                    stroke-width="2.5"
+                    stroke="#0470e9"
+                    stroke-width="2"
                     fill="none"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -162,18 +205,18 @@
               </div>
             </div>
           </div>
-          <div class="bg-surface rounded-lg p-3 border border-border">
+          <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs text-gray-500 mb-1">Revenue</div>
-                <div class="text-sm font-bold text-gray-900 mb-1">€{{ formatCurrency(salespersonMetrics?.revenue?.[selectedPeriod] || 0) }}</div>
+                <div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Total Revenue</div>
+                <div class="text-lg font-bold text-foreground leading-none">€{{ formatCurrency(salespersonMetrics?.revenue?.[selectedPeriod] || 0) }}</div>
               </div>
-              <div class="h-12 w-16 flex-shrink-0" v-if="getTrendData('revenue')">
+              <div class="h-10 w-16 shrink-0" v-if="getTrendData('revenue')">
                 <svg class="w-full h-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="gradient-revenue" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" style="stop-color:var(--brand-blue);stop-opacity:0.2" />
-                      <stop offset="100%" style="stop-color:var(--brand-blue);stop-opacity:0" />
+                      <stop offset="0%" style="stop-color:#0470e9;stop-opacity:0.4" />
+                      <stop offset="100%" style="stop-color:#0470e9;stop-opacity:0.1" />
                     </linearGradient>
                   </defs>
                   <path
@@ -183,8 +226,8 @@
                   />
                   <path
                     :d="generateSmoothPath(getTrendData('revenue'))"
-                    stroke="var(--brand-blue)"
-                    stroke-width="2.5"
+                    stroke="#0470e9"
+                    stroke-width="2"
                     fill="none"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -197,43 +240,47 @@
         </div>
 
         <!-- Revenue Targets -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-between text-xs">
-            <span class="text-muted-foreground">Monthly Target</span>
-            <span class="font-bold">{{ getRevenueProgress('month') }}%</span>
+        <div class="space-y-3 bg-muted rounded-lg p-4 border border-border">
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Monthly Target</span>
+              <span class="font-bold text-foreground">{{ getRevenueProgress('month') }}%</span>
+            </div>
+            <div class="w-full bg-border rounded-full h-1.5 overflow-hidden">
+              <div
+                class="h-full bg-primary transition-all duration-700"
+                :style="{ width: `${Math.min(getRevenueProgress('month'), 100)}%` }"
+              ></div>
+            </div>
           </div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
-            <div
-              class="h-2 rounded-full bg-brand-blue transition-all"
-              :style="{ width: `${Math.min(getRevenueProgress('month'), 100)}%` }"
-            ></div>
-          </div>
-          <div class="flex items-center justify-between text-xs">
-            <span class="text-muted-foreground">Quarterly Target</span>
-            <span class="font-bold">{{ getRevenueProgress('quarter') }}%</span>
-          </div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
-            <div
-              class="h-2 rounded-full bg-brand-blue transition-all"
-              :style="{ width: `${Math.min(getRevenueProgress('quarter'), 100)}%` }"
-            ></div>
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Quarterly Target</span>
+              <span class="font-bold text-foreground">{{ getRevenueProgress('quarter') }}%</span>
+            </div>
+            <div class="w-full bg-border rounded-full h-1.5 overflow-hidden">
+              <div
+                class="h-full bg-primary transition-all duration-700"
+                :style="{ width: `${Math.min(getRevenueProgress('quarter'), 100)}%` }"
+              ></div>
+            </div>
           </div>
         </div>
 
         <!-- Pipeline & Win Rate -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="bg-surface rounded-lg p-3 border border-border">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs text-gray-500 mb-1">Pipeline Value</div>
-                <div class="text-sm font-bold text-gray-900 mb-1">€{{ formatCurrency(salespersonMetrics?.pipelineValue || 0) }}</div>
+                <div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Pipeline Value</div>
+                <div class="text-lg font-bold text-foreground leading-none">€{{ formatCurrency(salespersonMetrics?.pipelineValue || 0) }}</div>
               </div>
-              <div class="h-12 w-16 flex-shrink-0" v-if="salespersonMetrics?.pipelineValueTrend">
+              <div class="h-10 w-16 shrink-0" v-if="salespersonMetrics?.pipelineValueTrend">
                 <svg class="w-full h-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="gradient-pipeline" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" style="stop-color:var(--brand-blue);stop-opacity:0.2" />
-                      <stop offset="100%" style="stop-color:var(--brand-blue);stop-opacity:0" />
+                      <stop offset="0%" style="stop-color:#0470e9;stop-opacity:0.4" />
+                      <stop offset="100%" style="stop-color:#0470e9;stop-opacity:0.1" />
                     </linearGradient>
                   </defs>
                   <path
@@ -243,8 +290,8 @@
                   />
                   <path
                     :d="generateSmoothPath(salespersonMetrics.pipelineValueTrend)"
-                    stroke="var(--brand-blue)"
-                    stroke-width="2.5"
+                    stroke="#0470e9"
+                    stroke-width="2"
                     fill="none"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -254,18 +301,18 @@
               </div>
             </div>
           </div>
-          <div class="bg-surface rounded-lg p-3 border border-border">
+          <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs text-gray-500 mb-1">Win Rate</div>
-                <div class="text-sm font-bold text-gray-900 mb-1">{{ salespersonMetrics?.winRate || 0 }}%</div>
+                <div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Current Win Rate</div>
+                <div class="text-lg font-bold text-foreground leading-none">{{ salespersonMetrics?.winRate || 0 }}%</div>
               </div>
-              <div class="h-12 w-16 flex-shrink-0" v-if="salespersonMetrics?.winRateTrend">
+              <div class="h-10 w-16 shrink-0" v-if="salespersonMetrics?.winRateTrend">
                 <svg class="w-full h-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="gradient-winrate" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" style="stop-color:var(--color-success);stop-opacity:0.2" />
-                      <stop offset="100%" style="stop-color:var(--color-success);stop-opacity:0" />
+                      <stop offset="0%" style="stop-color:#0470e9;stop-opacity:0.4" />
+                      <stop offset="100%" style="stop-color:#0470e9;stop-opacity:0.1" />
                     </linearGradient>
                   </defs>
                   <path
@@ -275,8 +322,8 @@
                   />
                   <path
                     :d="generateSmoothPath(salespersonMetrics.winRateTrend)"
-                    stroke="var(--color-success)"
-                    stroke-width="2.5"
+                    stroke="#0470e9"
+                    stroke-width="2"
                     fill="none"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -289,19 +336,19 @@
         </div>
 
         <!-- New & Dormant Opportunities -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="bg-surface rounded-lg p-3 border border-border">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs text-gray-500 mb-1">New Opportunities</div>
-                <div class="text-sm font-bold text-gray-900 mb-1">{{ salespersonMetrics?.newOpportunities?.[selectedPeriod] || 0 }}</div>
+                <div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">New Opps</div>
+                <div class="text-lg font-bold text-foreground leading-none">{{ salespersonMetrics?.newOpportunities?.[selectedPeriod] || 0 }}</div>
               </div>
-              <div class="h-12 w-16 flex-shrink-0" v-if="getTrendData('newOpportunities')">
+              <div class="h-10 w-16 shrink-0" v-if="getTrendData('newOpportunities')">
                 <svg class="w-full h-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="gradient-new-opp" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" style="stop-color:var(--color-success);stop-opacity:0.2" />
-                      <stop offset="100%" style="stop-color:var(--color-success);stop-opacity:0" />
+                      <stop offset="0%" style="stop-color:#0470e9;stop-opacity:0.4" />
+                      <stop offset="100%" style="stop-color:#0470e9;stop-opacity:0.1" />
                     </linearGradient>
                   </defs>
                   <path
@@ -311,8 +358,8 @@
                   />
                   <path
                     :d="generateSmoothPath(getTrendData('newOpportunities'))"
-                    stroke="var(--color-success)"
-                    stroke-width="2.5"
+                    stroke="#0470e9"
+                    stroke-width="2"
                     fill="none"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -322,18 +369,18 @@
               </div>
             </div>
           </div>
-          <div class="bg-surface rounded-lg p-3 border border-border">
+          <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs text-gray-500 mb-1">Dormant Opportunities</div>
-                <div class="text-sm font-bold text-red-600 mb-1">{{ salespersonMetrics?.dormantOpportunities || 0 }}</div>
+                <div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Dormant Opps</div>
+                <div class="text-lg font-bold text-destructive leading-none">{{ salespersonMetrics?.dormantOpportunities || 0 }}</div>
               </div>
-              <div class="h-12 w-16 flex-shrink-0" v-if="salespersonMetrics?.dormantOpportunitiesTrend">
+              <div class="h-10 w-16 shrink-0" v-if="salespersonMetrics?.dormantOpportunitiesTrend">
                 <svg class="w-full h-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="gradient-dormant" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" style="stop-color:var(--brand-red);stop-opacity:0.2" />
-                      <stop offset="100%" style="stop-color:var(--brand-red);stop-opacity:0" />
+                      <stop offset="0%" style="stop-color:#EF4444;stop-opacity:0.4" />
+                      <stop offset="100%" style="stop-color:#EF4444;stop-opacity:0.1" />
                     </linearGradient>
                   </defs>
                   <path
@@ -343,8 +390,8 @@
                   />
                   <path
                     :d="generateSmoothPath(salespersonMetrics.dormantOpportunitiesTrend)"
-                    stroke="var(--brand-red)"
-                    stroke-width="2.5"
+                    stroke="#EF4444"
+                    stroke-width="2"
                     fill="none"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -357,95 +404,123 @@
         </div>
       </div>
 
-      <!-- Manager View -->
+      <!-- Manager View (stacked full-width for readability) -->
       <div v-else-if="userRole === 'manager'" class="space-y-4">
-        <!-- Funnel Visualization & Conversion Rate -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <!-- Conversion Rate Card -->
-          <div class="bg-surface border border-border rounded-lg p-6 flex flex-col items-center justify-center">
-            <div class="relative w-24 h-24 sm:w-28 sm:h-28 mb-3">
-              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                <!-- Background circle -->
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="42"
-                  fill="none"
-                  stroke="var(--color-success-light)"
-                  stroke-width="8"
-                />
-                <!-- Progress circle -->
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="42"
-                  fill="none"
-                  stroke="#10b981"
-                  stroke-width="8"
-                  :stroke-dasharray="`${(managerMetrics?.conversionRate || 0) * 2.64} 265`"
-                  stroke-linecap="round"
-                  class="transition-all duration-700"
-                />
-              </svg>
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div class="text-center">
-                  <div class="text-sm font-bold text-green-700">
-                    {{ managerMetrics?.conversionRate || 0 }}%
-                  </div>
-                </div>
+        <!-- Conversion Rate (full width) -->
+        <div class="w-full bg-muted border border-border rounded-lg p-6 flex flex-col items-center justify-center">
+          <div class="relative w-24 h-24 sm:w-28 sm:h-28 mb-3">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="42" fill="none" stroke-width="8" class="opacity-20" style="stroke:#0470e9" />
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                stroke-width="8"
+                class="transition-all duration-700"
+                style="stroke:#0470e9"
+                :stroke-dasharray="`${(managerMetrics?.conversionRate || 0) * 2.64} 265`"
+                stroke-linecap="round"
+              />
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-sm font-bold text-foreground">{{ managerMetrics?.conversionRate || 0 }}%</div>
               </div>
             </div>
-            <div class="text-sm font-bold text-green-800 mb-1">Conversion Rate</div>
-            <div class="text-xs text-green-600 text-center">
-              {{ getConversionDescription(managerMetrics?.conversionRate || 0) }}
-            </div>
           </div>
+          <div class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Conversion Rate</div>
+          <Badge
+            :text="getConversionDescription(managerMetrics?.conversionRate || 0)"
+            size="small"
+            :theme="getConversionBadgeTheme(managerMetrics?.conversionRate || 0)"
+          />
+        </div>
 
-          <!-- Bar Chart -->
-          <div class="lg:col-span-2 bg-surface rounded-lg p-6 md:p-8">
-            <h3 class="text-sm font-bold text-gray-900 mb-4">Sales Funnel</h3>
-            <div class="space-y-3">
-              <div
-                v-for="(stage, index) in managerMetrics?.stages || []"
-                :key="stage.name"
-                class="relative"
-              >
-                <div class="flex items-center gap-3 mb-1">
-                  <span class="text-xs font-medium text-muted-foreground w-32 sm:w-40 flex-shrink-0">{{ stage.name }}</span>
-                  <div class="flex-1 relative">
-                    <div class="w-full bg-gray-200 rounded-full h-6 overflow-hidden">
-                      <div
-                        class="h-full rounded-full transition-all duration-700 flex items-center justify-end pr-2"
-                        :class="getStageColorClass(stage.color)"
-                        :style="{ width: `${stage.percentage}%`, minWidth: '2px' }"
-                      >
-                        <span class="text-xs font-bold text-gray-900">{{ formatNumber(stage.count) }}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <span class="text-xs font-bold text-gray-900 w-12 text-right flex-shrink-0">{{ stage.percentage }}%</span>
+        <!-- Sales Funnel (full width) -->
+        <div class="w-full bg-muted border border-border rounded-lg p-4">
+          <h3 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Sales Funnel</h3>
+          <div class="space-y-3">
+            <div
+              v-for="stage in managerMetrics?.stages || []"
+              :key="stage.name"
+              class="flex items-center gap-3"
+            >
+              <span class="text-xs font-medium text-foreground w-28 sm:w-32 flex-shrink-0">{{ stage.name }}</span>
+              <div class="flex-1 min-w-0">
+                <div class="w-full bg-muted rounded-full h-2 overflow-hidden">
+                  <div
+                    class="h-full rounded-full transition-all duration-700"
+                    :style="{ width: `${stage.percentage}%`, minWidth: '2px', backgroundColor: stage.colorCode || '#6b7280' }"
+                  ></div>
                 </div>
               </div>
+              <span class="text-[10px] font-bold text-foreground w-16 text-right flex-shrink-0">{{ formatNumber(stage.count) }} ({{ stage.percentage }}%)</span>
             </div>
           </div>
+        </div>
+
+        <!-- Task Completion (full width) -->
+        <div class="w-full bg-muted rounded-lg p-4 border border-border">
+          <div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Task Completion</div>
+          <div class="flex items-baseline gap-2 mb-2">
+            <span class="text-lg font-bold text-foreground">{{ taskCompletionPercentage }}%</span>
+            <span class="text-xs text-muted-foreground">completed on time</span>
+          </div>
+          <div class="w-full bg-muted rounded-full h-2 overflow-hidden mb-2">
+            <div
+              class="h-full rounded-full transition-all"
+              :style="{ width: `${taskCompletionPercentage}%`, backgroundColor: '#0470e9' }"
+            ></div>
+          </div>
+          <div class="text-xs text-foreground">
+            {{ managerMetrics?.taskCompletion?.completed || 0 }} / {{ managerMetrics?.taskCompletion?.total || 0 }} tasks
+          </div>
+          <div v-if="(managerMetrics?.taskCompletion?.overdueCount || 0) > 0" class="mt-2">
+            <Badge :text="`${managerMetrics.taskCompletion.overdueCount} overdue`" size="small" theme="red" />
+          </div>
+        </div>
+
+        <!-- Deals Won vs Lost (full width) -->
+        <div class="w-full bg-muted rounded-lg p-4 border border-border">
+          <div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Deals Won vs Lost</div>
+          <div class="flex items-baseline gap-2 mb-2">
+            <span class="text-lg font-bold" style="color:#0470e9">{{ managerMetrics?.dealsReport?.won || 0 }}</span>
+            <span class="text-xs text-muted-foreground">won</span>
+            <span class="text-muted-foreground mx-1">|</span>
+            <span class="text-lg font-bold" style="color:#EF4444">{{ managerMetrics?.dealsReport?.lost || 0 }}</span>
+            <span class="text-xs text-muted-foreground">lost</span>
+          </div>
+          <div class="w-full bg-muted rounded-full h-2 overflow-hidden flex">
+            <div
+              class="h-full transition-all"
+              :style="{ width: `${dealsWonPercentage}%`, backgroundColor: '#0470e9' }"
+            ></div>
+            <div
+              class="h-full transition-all"
+              :style="{ width: `${100 - dealsWonPercentage}%`, backgroundColor: '#EF4444' }"
+            ></div>
+          </div>
+          <div class="text-xs text-muted-foreground mt-1">{{ managerMetrics?.dealsReport?.wonRate || 0 }}% win rate</div>
         </div>
       </div>
 
       <!-- Fallback for other roles -->
-      <div v-else class="text-center py-8 text-gray-500">
+      <div v-else class="text-center py-8 text-muted-foreground">
         <LineChart class="w-10 h-10 shrink-0 mb-2 text-muted-foreground/50" />
         <p class="text-sm">Performance metrics not available</p>
         <p class="text-xs text-muted-foreground mt-1">Contact your administrator</p>
       </div>
-    </div>
-  </div>
+    </CardContent>
+  </Card>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { LineChart } from 'lucide-vue-next'
+import { LineChart, Lightbulb } from 'lucide-vue-next'
 import { useUserStore } from '@/stores/user'
 import { fetchBDCOperatorMetrics, fetchSalespersonMetrics, fetchManagerFunnelMetrics } from '@/api/dashboard'
+import { Badge, Card, CardHeader, CardTitle, CardContent } from '@motork/component-library/future/primitives'
 
 const userStore = useUserStore()
 const userRole = computed(() => userStore.userRole())
@@ -460,15 +535,34 @@ const managerMetrics = ref(null)
 
 const slaCompliancePercentage = computed(() => {
   if (!bdcMetrics.value?.slaCompliance) return 0
-  const { completed, total } = bdcMetrics.value.slaCompliance
+  const { withinSLA, total } = bdcMetrics.value.slaCompliance
+  const completed = withinSLA ?? bdcMetrics.value.slaCompliance.completed
   return total > 0 ? Math.round((completed / total) * 100 * 10) / 10 : 0
 })
 
-const getTasksPerDayStatusClass = (isBg = false) => {
-  const current = bdcMetrics.value?.tasksPerDay?.current || 0
-  if (current >= 40) return isBg ? 'bg-green-600' : 'text-green-600'
-  if (current >= 20) return isBg ? 'bg-yellow-600' : 'text-yellow-600'
-  return isBg ? 'bg-red-600' : 'text-red-600'
+const salespersonNudges = computed(() => {
+  const nudges = salespersonMetrics.value?.nudges
+  return Array.isArray(nudges) ? nudges.slice(0, 2) : []
+})
+
+const taskCompletionPercentage = computed(() => {
+  const tc = managerMetrics.value?.taskCompletion
+  if (!tc?.total) return 0
+  return Math.round((tc.completed / tc.total) * 100)
+})
+
+const dealsWonPercentage = computed(() => {
+  const dr = managerMetrics.value?.dealsReport
+  const total = (dr?.won ?? 0) + (dr?.lost ?? 0)
+  return total > 0 ? Math.round(((dr.won ?? 0) / total) * 100) : 0
+})
+
+const getManagedTaskStatusClass = (current, target, isBg = false) => {
+  const val = current ?? 0
+  const tgt = target ?? 20
+  if (val >= tgt) return isBg ? 'perf-chart-primary' : 'perf-text-primary'
+  if (val >= tgt * 0.5) return isBg ? 'perf-chart-yellow' : 'perf-text-yellow'
+  return isBg ? 'perf-chart-red' : 'perf-text-red'
 }
 
 const getRevenueProgress = (period) => {
@@ -497,12 +591,33 @@ const formatNumber = (num) => {
 
 const getStageColorClass = (color) => {
   const colorMap = {
-    'red': 'bg-red-300',
-    'orange': 'bg-orange-300',
-    'blue': 'bg-blue-300',
-    'gray': 'bg-gray-300'
+    'red': 'perf-chart-red',
+    'orange': 'perf-chart-yellow',
+    'blue': 'perf-chart-primary',
+    'purple': 'perf-chart-grey',
+    'yellow': 'perf-chart-grey',
+    'gray': 'perf-chart-grey'
   }
-  return colorMap[color] || 'bg-gray-300'
+  return colorMap[color] || 'perf-chart-grey'
+}
+
+const getManagerStageColorClass = (color) => {
+  const colorMap = {
+    'red': 'perf-chart-red',
+    'blue': 'perf-chart-primary',
+    'orange': 'perf-chart-grey',
+    'purple': 'perf-chart-grey',
+    'yellow': 'perf-chart-grey',
+    'gray': 'perf-chart-grey'
+  }
+  return colorMap[color] || 'perf-chart-grey'
+}
+
+const getConversionBadgeTheme = (rate) => {
+  if (rate >= 20) return 'green'
+  if (rate >= 15) return 'green'
+  if (rate >= 10) return 'orange'
+  return 'red'
 }
 
 const getTrendData = (metric) => {

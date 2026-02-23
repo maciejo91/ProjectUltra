@@ -4,10 +4,11 @@
       <!-- Search bar with AI mode: above filter bar and table -->
       <div class="mb-1">
         <UnifiedSearchBar
-          active-tab="leads"
+          active-tab="open-leads"
           placeholder="Search leads..."
           :pagination="pagination"
           :assignee-options="assigneeOptions"
+          :volvo-model-options="volvoModelOptions"
           :request-type-options="requestTypeOptions"
           :status-options="leadsStatusOptions"
           :source-options="leadsSourceOptions"
@@ -161,7 +162,7 @@ const handleRowClick = (row) => {
 }
 
 const activeTab = ref('open-leads')
-const { columns, filterDefinitions, tableMeta } = useCustomersTable(activeTab, handleRowClick)
+const { columns, filterDefinitions, tableMeta } = useCustomersTable(activeTab, handleRowClick, { rows })
 
 const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
   rawData: rows,
@@ -196,6 +197,15 @@ const requestTypeOptions = [
   { value: 'Test Drive', label: 'Test Drive' },
   { value: 'Quotation', label: 'Quotation' },
   { value: 'Generic sales', label: 'Generic sales' }
+]
+const volvoModelOptions = [
+  { value: 'XC90', label: 'XC90' },
+  { value: 'XC60', label: 'XC60' },
+  { value: 'XC40', label: 'XC40' },
+  { value: 'ID.4', label: 'ID.4' },
+  { value: 'ID.5', label: 'ID.5' },
+  { value: 'Golf', label: 'Golf' },
+  { value: 'Tiguan', label: 'Tiguan' }
 ]
 const leadsStatusOptions = computed(() => {
   const def = filterDefinitions.value?.find(d => d.key === 'status')

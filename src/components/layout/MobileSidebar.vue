@@ -56,30 +56,16 @@
           <!-- Home -->
           <router-link
             v-if="navigationVisibility.home !== false"
-            to="/tasks"
+            to="/home"
             @click="$emit('close')"
             class="mobile-sidebar-link"
-            :class="{ 'mobile-sidebar-link-active': isActive('/tasks') }"
+            :class="{ 'mobile-sidebar-link-active': isActive('/home') }"
           >
             <Home :size="18" class="shrink-0 sm:hidden" />
             <Home :size="20" class="shrink-0 hidden sm:block" />
             <span>Home</span>
           </router-link>
 
-          <!-- Tasks -->
-          <router-link 
-            v-if="navigationVisibility.tasks !== false"
-            to="/tasks" 
-            @click="$emit('close')"
-            class="mobile-sidebar-link"
-            :class="{ 'mobile-sidebar-link-active': isActive('/tasks') }"
-          >
-            <ListChecks :size="18" class="shrink-0 sm:hidden" />
-            <ListChecks :size="20" class="shrink-0 hidden sm:block" />
-            <span>Tasks</span>
-            <div v-if="hotLeadsCount > 0" class="ml-auto w-2 h-2 rounded-full bg-brand-red"></div>
-          </router-link>
-          
           <!-- Customers -->
           <router-link 
             v-if="navigationVisibility.customers !== false"
@@ -91,6 +77,33 @@
             <Users :size="18" class="shrink-0 sm:hidden" />
             <Users :size="20" class="shrink-0 hidden sm:block" />
             <span>Customers</span>
+          </router-link>
+
+          <!-- Requests -->
+          <router-link
+            v-if="navigationVisibility.requests !== false"
+            to="/requests"
+            @click="$emit('close')"
+            class="mobile-sidebar-link"
+            :class="{ 'mobile-sidebar-link-active': isActive('/requests') }"
+          >
+            <FileBadge2 :size="18" class="shrink-0 sm:hidden" />
+            <FileBadge2 :size="20" class="shrink-0 hidden sm:block" />
+            <span>{{ $t('common.navigation.requests') }}</span>
+          </router-link>
+
+          <!-- Tasks -->
+          <router-link 
+            v-if="navigationVisibility.tasks !== false"
+            to="/tasks" 
+            @click="$emit('close')"
+            class="mobile-sidebar-link"
+            :class="{ 'mobile-sidebar-link-active': isActive('/tasks') }"
+          >
+            <ListTodo :size="18" class="shrink-0 sm:hidden" />
+            <ListTodo :size="20" class="shrink-0 hidden sm:block" />
+            <span>Tasks</span>
+            <div v-if="hotLeadsCount > 0" class="ml-auto w-2 h-2 rounded-full bg-brand-red"></div>
           </router-link>
           
           <!-- Calendar -->
@@ -105,6 +118,9 @@
             <Calendar :size="20" class="shrink-0 hidden sm:block" />
             <span>Calendar</span>
           </router-link>
+
+          <!-- Separator -->
+          <div class="h-px bg-white/10 mx-3 my-1" aria-hidden="true" />
           
           <!-- Reports -->
           <router-link 
@@ -117,19 +133,6 @@
             <LineChart :size="18" class="shrink-0 sm:hidden" />
             <LineChart :size="20" class="shrink-0 hidden sm:block" />
             <span>Reports</span>
-          </router-link>
-
-          <!-- Requests -->
-          <router-link
-            v-if="navigationVisibility.requests !== false"
-            to="/requests"
-            @click="$emit('close')"
-            class="mobile-sidebar-link"
-            :class="{ 'mobile-sidebar-link-active': isActive('/requests') }"
-          >
-            <LayoutList :size="18" class="shrink-0 sm:hidden" />
-            <LayoutList :size="20" class="shrink-0 hidden sm:block" />
-            <span>{{ $t('common.navigation.requests') }}</span>
           </router-link>
 
           <!-- Vehicles (Lists) Submenu -->
@@ -174,34 +177,6 @@
             <Search :size="20" class="shrink-0 hidden sm:block" />
             <span>Search</span>
           </button>
-
-          <!-- Language Selector -->
-          <button
-            v-if="navigationVisibility.language !== false"
-            @click="toggleLanguageMenu"
-            class="mobile-sidebar-link w-full"
-            :class="{ 'mobile-sidebar-link-active': showLanguageMenu }"
-          >
-            <Globe :size="18" class="shrink-0 sm:hidden" />
-            <Globe :size="20" class="shrink-0 hidden sm:block" />
-            <span>Language</span>
-            <ChevronDown :size="14" class="ml-auto transition-transform sm:hidden" :class="{ 'rotate-180': showLanguageMenu }" />
-            <ChevronDown :size="16" class="ml-auto transition-transform hidden sm:block" :class="{ 'rotate-180': showLanguageMenu }" />
-          </button>
-
-          <!-- Language Submenu -->
-          <div v-if="showLanguageMenu" class="pl-8 sm:pl-9 space-y-0.5 sm:space-y-1">
-            <button
-              v-for="lang in languages"
-              :key="lang.code"
-              @click="changeLanguage(lang.code)"
-              class="mobile-sidebar-link mobile-sidebar-submenu-link w-full"
-              :class="{ 'mobile-sidebar-link-active': currentLocale === lang.code }"
-            >
-              <span class="text-sm sm:text-base shrink-0">{{ lang.flag }}</span>
-              <span>{{ lang.name }}</span>
-            </button>
-          </div>
 
           <!-- Settings -->
           <router-link 
@@ -268,6 +243,32 @@
               <span>{{ $t('common.roles.operator') }}</span>
             </button>
 
+            <!-- Language submenu -->
+            <div v-if="navigationVisibility.language !== false" class="space-y-0.5 sm:space-y-1">
+              <div class="h-px bg-white/10 my-0.5 sm:my-1"></div>
+              <button
+                type="button"
+                @click="showLanguageSubmenu = !showLanguageSubmenu"
+                class="mobile-sidebar-link mobile-sidebar-submenu-link w-full flex items-center justify-between"
+              >
+                <span>{{ $t('common.labels.language') }}</span>
+                <ChevronDown :size="14" class="transition-transform" :class="{ 'rotate-180': showLanguageSubmenu }" />
+              </button>
+              <div v-if="showLanguageSubmenu" class="pl-8 sm:pl-10 space-y-0.5 sm:space-y-1">
+                <button
+                  v-for="lang in languages"
+                  :key="lang.code"
+                  type="button"
+                  @click="changeLanguage(lang.code)"
+                  class="mobile-sidebar-link mobile-sidebar-submenu-link w-full"
+                  :class="{ 'mobile-sidebar-link-active': currentLocale === lang.code }"
+                >
+                  <span class="text-sm sm:text-base shrink-0">{{ lang.flag }}</span>
+                  <span>{{ lang.name }}</span>
+                </button>
+              </div>
+            </div>
+
             <!-- Dark Mode Toggle -->
             <div class="h-px bg-white/10 my-0.5 sm:my-1"></div>
             <button 
@@ -306,7 +307,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useLeadsStore } from '@/stores/leads'
@@ -317,15 +318,14 @@ import {
   Plus, 
   Home, 
   List, 
-  ListChecks,
-  LayoutList,
+  ListTodo,
+  FileBadge2,
   Users, 
   Calendar, 
   LineChart, 
   Settings,
   CarFront,
   Search,
-  Globe,
   Shield,
   User,
   Headphones,
@@ -361,9 +361,11 @@ const firstVisibleRoute = computed(() => {
   const nav = navigationVisibility.value
   
   // Check routes in order of appearance
-  if (nav.home !== false) return '/tasks'
+  if (nav.home !== false) return '/home'
   if (nav.tasks !== false) return '/tasks'
   if (nav.customers !== false) return '/customers'
+  if (nav.requests !== false) return '/requests'
+  if (nav.tasks !== false) return '/tasks'
   if (nav.calendar !== false) return '/calendar'
   if (userStore.canAccessReports() && nav.reports !== false) return '/reports'
   if (nav.lists !== false) return '/vehicles'
@@ -373,9 +375,13 @@ const firstVisibleRoute = computed(() => {
 })
 
 const showListsMenu = ref(false)
-const showLanguageMenu = ref(false)
 const showUserMenu = ref(false)
+const showLanguageSubmenu = ref(false)
 const showSearchModal = ref(false)
+
+watch(showUserMenu, (open) => {
+  if (!open) showLanguageSubmenu.value = false
+})
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -408,14 +414,12 @@ const toggleListsMenu = () => {
   showListsMenu.value = !showListsMenu.value
 }
 
-const toggleLanguageMenu = () => {
-  showLanguageMenu.value = !showLanguageMenu.value
-}
-
 const changeLanguage = (langCode) => {
   locale.value = langCode
   localStorage.setItem('app-locale', langCode)
-  showLanguageMenu.value = false
+  showLanguageSubmenu.value = false
+  showUserMenu.value = false
+  emit('close')
 }
 
 const toggleUserMenu = () => {
@@ -426,7 +430,7 @@ const switchRole = (role) => {
   userStore.switchRole(role)
   showUserMenu.value = false
   emit('close')
-  router.push('/tasks')
+  router.push('/home')
 }
 
 const handleLogout = () => {

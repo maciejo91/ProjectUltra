@@ -1,4 +1,4 @@
-import { mockCalendarEvents, mockUsers } from './mockData'
+import { mockCalendarEvents, mockUsers, mockActionableQuestions } from './mockData'
 import { opportunityService } from '@/services/opportunityService'
 import { OpportunityRepository } from '@/repositories/OpportunityRepository'
 import { ActivityRepository } from '@/repositories/ActivityRepository'
@@ -704,7 +704,12 @@ export const fetchActionableQuestions = async (userId, userRole) => {
     const ageB = new Date(b.createdAt || b.appointmentDate)
     return ageA - ageB // Older first
   })
-  
+
+  // Fallback to mock data when dynamic logic yields no questions (for demo/development)
+  if (questions.length === 0 && mockActionableQuestions.length > 0) {
+    return [...mockActionableQuestions]
+  }
+
   return questions
 }
 

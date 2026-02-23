@@ -1,149 +1,162 @@
 <template>
   <div 
-    class="bg-surface border border-border rounded-lg p-4 hover:border-blue-300 hover:shadow-sm transition-all"
+    class="bg-background border border-border rounded-lg p-3 hover:border-primary/30 hover:shadow-sm transition-all group"
     :class="dismissing ? 'opacity-50' : ''"
   >
-    <div class="flex items-center gap-2 mb-2">
-      <!-- Priority Badge -->
-      <span
-        class="text-xs font-bold px-2 py-0.5 rounded border whitespace-nowrap"
-        :class="getPriorityBadgeClass(question.priority)"
-      >
-        {{ getPriorityLabel(question.priority) }}
-      </span>
-      
-      <!-- Time -->
-      <span class="text-xs">{{ getTimeAgo() }}</span>
-      
-      <!-- Owner -->
-      <span class="text-xs">• Owner: {{ getOwnerDisplay() }}</span>
-      
-      <!-- Dismiss Button -->
-      <div class="ml-auto flex items-center gap-2">
-        <button
-          v-if="!showDismissConfirm"
-          @click="showDismissConfirm = true"
-          class="w-7 h-7 flex items-center justify-center rounded text-muted-foreground hover:text-muted-foreground hover:bg-muted transition-colors"
-          title="Dismiss"
-        >
-          <X class="w-4 h-4 shrink-0" />
-        </button>
-        
-        <!-- Dismiss Confirmation -->
+    <div class="flex items-center justify-between gap-3">
+      <div class="min-w-0 flex-1" @click="handleQuestionClick">
+        <p class="text-foreground text-xs font-medium leading-snug" v-html="getHighlightedQuestion()"></p>
+      </div>
+      <!-- Action Buttons + Dismiss -->
+      <div class="flex gap-1.5 shrink-0 items-center">
+          <template v-if="question.type === 'appointment-followup'">
+            <Button
+              @click="handleYes"
+              size="sm"
+              variant="default"
+              class="h-7 text-xs"
+            >
+              Yes
+            </Button>
+            <Button
+              @click="handleNo"
+              size="sm"
+              variant="outline"
+              class="h-7 text-xs"
+            >
+              No
+            </Button>
+          </template>
+          
+          <template v-else-if="question.type === 'ns-followup'">
+            <Button
+              @click="handleYes"
+              size="sm"
+              variant="default"
+              class="h-7 text-xs"
+            >
+              Yes
+            </Button>
+            <Button
+              @click="handleNo"
+              size="sm"
+              variant="outline"
+              class="h-7 text-xs"
+            >
+              No
+            </Button>
+            <Button
+              @click="handleReassign"
+              size="sm"
+              variant="secondary"
+              class="h-7 text-xs"
+            >
+              Reassign
+            </Button>
+          </template>
+          
+          <template v-else-if="question.type === 'offer-followup'">
+            <Button
+              @click="handleViewTask"
+              size="sm"
+              variant="default"
+              class="h-7 text-xs"
+            >
+              View Opportunity
+            </Button>
+          </template>
+          
+          <template v-else-if="question.type === 'stuck-opportunity'">
+            <Button
+              @click="handleYes"
+              size="sm"
+              variant="default"
+              class="h-7 text-xs"
+            >
+              Yes
+            </Button>
+            <Button
+              @click="handleNo"
+              size="sm"
+              variant="outline"
+              class="h-7 text-xs"
+            >
+              No
+            </Button>
+            <Button
+              @click="handleReassign"
+              size="sm"
+              variant="secondary"
+              class="h-7 text-xs"
+            >
+              Reassign
+            </Button>
+          </template>
+          
+          <template v-else-if="question.type === 'lead-qualification-urgency'">
+            <Button
+              @click="handleYes"
+              size="sm"
+              variant="default"
+              class="h-7 text-xs"
+            >
+              Yes
+            </Button>
+            <Button
+              @click="handleNo"
+              size="sm"
+              variant="outline"
+              class="h-7 text-xs"
+            >
+              No
+            </Button>
+            <Button
+              @click="handleReassign"
+              size="sm"
+              variant="secondary"
+              class="h-7 text-xs"
+            >
+              Reassign
+            </Button>
+          </template>
+
+        <!-- Dismiss -->
+        <template v-if="!showDismissConfirm">
+          <Button
+            @click="showDismissConfirm = true"
+            variant="ghost"
+            size="icon-sm"
+            class="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+            title="Dismiss"
+          >
+            <X class="size-3.5" />
+          </Button>
+        </template>
         <div
           v-else
-          class="bg-surface border border-border rounded-lg shadow-lg p-1.5 flex items-center gap-1.5 z-10"
+          class="bg-background border border-border rounded-lg shadow-lg p-2 flex flex-col gap-2 z-10 min-w-24 shrink-0"
         >
-          <span class="text-xs whitespace-nowrap">Dismiss?</span>
-          <button
-            @click="handleDismiss"
-            class="px-2 py-0.5 text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded transition-colors"
-          >
-            Yes
-          </button>
-          <button
-            @click="showDismissConfirm = false"
-            class="px-2 py-0.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            No
-          </button>
+          <span class="text-[10px] font-bold text-center text-muted-foreground uppercase">Dismiss?</span>
+          <div class="flex gap-1">
+            <Button
+              @click="handleDismiss"
+              size="xs"
+              variant="default"
+              class="h-7 flex-1 bg-destructive hover:bg-destructive/90 text-[10px]"
+            >
+              Yes
+            </Button>
+            <Button
+              @click="showDismissConfirm = false"
+              size="xs"
+              variant="ghost"
+              class="h-7 flex-1 text-[10px]"
+            >
+              No
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Question Text with highlighted customer name -->
-    <div class="mb-2" @click="handleQuestionClick">
-      <p class="text-foreground text-sm mb-1" v-html="getHighlightedQuestion()"></p>
-    </div>
-    
-    <!-- Action Buttons -->
-    <div class="flex gap-2 flex-wrap justify-end mt-3">
-      <template v-if="question.type === 'appointment-followup'">
-        <button
-          @click="handleYes"
-          class="px-3 py-1.5 text-xs font-medium !bg-brand-dark !text-white border border-brand-dark rounded-xl hover:!bg-brand-darkDarker hover:border-brand-darkDarker transition-colors"
-        >
-          Yes
-        </button>
-        <button
-          @click="handleNo"
-          class="px-3 py-1.5 text-xs font-medium bg-surface text-brand-dark border border-D1D5DB rounded-xl hover:brightness-95 transition-colors"
-        >
-          No
-        </button>
-      </template>
-      
-      <template v-else-if="question.type === 'ns-followup'">
-        <button
-          @click="handleYes"
-          class="px-3 py-1.5 text-xs font-medium !bg-brand-dark !text-white border border-brand-dark rounded-xl hover:!bg-brand-darkDarker hover:border-brand-darkDarker transition-colors"
-        >
-          Yes
-        </button>
-        <button
-          @click="handleNo"
-          class="px-3 py-1.5 text-xs font-medium bg-surface text-brand-dark border border-D1D5DB rounded-xl hover:brightness-95 transition-colors"
-        >
-          No
-        </button>
-        <button
-          @click="handleReassign"
-          class="px-3 py-1.5 text-xs font-medium bg-surface text-brand-dark border border-D1D5DB rounded-xl hover:brightness-95 transition-colors"
-        >
-          Reassign
-        </button>
-      </template>
-      
-      <template v-else-if="question.type === 'offer-followup'">
-        <button
-          @click="handleViewTask"
-          class="px-3 py-1.5 text-xs font-medium !bg-brand-dark !text-white border border-brand-dark rounded-xl hover:!bg-brand-darkDarker hover:border-brand-darkDarker transition-colors"
-        >
-          View Opportunity
-        </button>
-      </template>
-      
-      <template v-else-if="question.type === 'stuck-opportunity'">
-        <button
-          @click="handleYes"
-          class="px-3 py-1.5 text-xs font-medium !bg-brand-dark !text-white border border-brand-dark rounded-xl hover:!bg-brand-darkDarker hover:border-brand-darkDarker transition-colors"
-        >
-          Yes
-        </button>
-        <button
-          @click="handleNo"
-          class="px-3 py-1.5 text-xs font-medium bg-surface text-brand-dark border border-D1D5DB rounded-xl hover:brightness-95 transition-colors"
-        >
-          No
-        </button>
-        <button
-          @click="handleReassign"
-          class="px-3 py-1.5 text-xs font-medium bg-surface text-brand-dark border border-D1D5DB rounded-xl hover:brightness-95 transition-colors"
-        >
-          Reassign
-        </button>
-      </template>
-      
-      <template v-else-if="question.type === 'lead-qualification-urgency'">
-        <button
-          @click="handleYes"
-          class="px-3 py-1.5 text-xs font-medium !bg-brand-dark !text-white border border-brand-dark rounded-xl hover:!bg-brand-darkDarker hover:border-brand-darkDarker transition-colors"
-        >
-          Yes
-        </button>
-        <button
-          @click="handleNo"
-          class="px-3 py-1.5 text-xs font-medium bg-surface text-brand-dark border border-D1D5DB rounded-xl hover:brightness-95 transition-colors"
-        >
-          No
-        </button>
-        <button
-          @click="handleReassign"
-          class="px-3 py-1.5 text-xs font-medium bg-surface text-brand-dark border border-D1D5DB rounded-xl hover:brightness-95 transition-colors"
-        >
-          Reassign
-        </button>
-      </template>
     </div>
   </div>
 </template>
@@ -151,6 +164,7 @@
 <script setup>
 import { X } from 'lucide-vue-next'
 import { ref } from 'vue'
+import { Button, Badge } from '@motork/component-library/future/primitives'
 
 const props = defineProps({
   question: {
@@ -196,16 +210,16 @@ const getHighlightedQuestion = () => {
   const questionText = props.question.question
   
   // Make the question clickable to view the task
-  const highlightedName = `<a href="#" class="font-bold text-brand-red hover:text-brand-red-dark hover:underline" onclick="event.preventDefault()">${customerName}</a>`
+  const highlightedName = `<span class="font-bold text-primary hover:underline cursor-pointer">${customerName}</span>`
   
   // Replace all instances of customer name with highlighted version
   return questionText.replace(new RegExp(customerName, 'g'), highlightedName)
 }
 
-const getPriorityBadgeClass = (priority) => {
-  if (priority === 1) return 'bg-red-50 text-red-600 border-red-100'
-  if (priority <= 3) return 'bg-amber-50 text-amber-600 border-amber-100'
-  return 'bg-emerald-50 text-emerald-600 border-emerald-100'
+const getPriorityTheme = (priority) => {
+  if (priority === 1) return 'red'
+  if (priority <= 3) return 'orange'
+  return 'blue'
 }
 
 const getPriorityLabel = (priority) => {

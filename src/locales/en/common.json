@@ -1,4 +1,7 @@
 {
+  "labels": {
+    "language": "Language"
+  },
   "navigation": {
     "home": "Home",
     "tasks": "Tasks",

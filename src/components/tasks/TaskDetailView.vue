@@ -15,10 +15,10 @@
       />
 
       <!-- Center + Right Panels Row -->
-      <div class="flex flex-1 min-h-0 overflow-hidden">
+      <div class="flex flex-col lg:flex-row flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
         <!-- Center Panel: Task Management Widget Only -->
-        <div class="flex-1 flex flex-col min-h-0 overflow-hidden bg-white min-w-0">
-          <div class="flex-1 min-h-0 overflow-y-auto">
+        <div class="shrink-0 lg:flex-1 flex flex-col min-h-0 overflow-visible lg:overflow-hidden bg-white min-w-0">
+          <div class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
             <div class="p-2">
               <div v-if="showAssignToMeBanner" class="px-2 mb-2">
                 <TaskAssignee
@@ -44,7 +44,7 @@
 
         <!-- Right Sidebar with Tabs -->
         <div
-          class="right-sidebar flex flex-col min-h-0 overflow-hidden shrink-0 border-l border-border bg-background"
+          class="right-sidebar flex flex-col min-h-0 overflow-hidden shrink-0 w-full lg:w-[320px] lg:min-w-[320px] border-t lg:border-t-0 lg:border-l border-border bg-background"
         >
           <Tabs v-model="sidebarTab" class="flex flex-col flex-1 min-h-0 overflow-hidden gap-0">
             <!-- Sidebar Tabs -->
@@ -87,7 +87,7 @@
             </TabsList>
             
             <!-- Sidebar Content -->
-            <div class="flex-1 min-h-0 flex flex-col overflow-y-auto bg-muted">
+            <div class="flex-1 min-h-0 flex flex-col lg:overflow-y-auto bg-muted">
               <!-- Request Tab -->
               <TabsContent value="request" class="space-y-2 p-2 mt-0 flex-1 min-h-full">
                 <TaskContactCard
@@ -253,8 +253,8 @@ import VehicleRequestCard from './VehicleRequestCard.vue'
 import TaskActivityCard from './TaskActivityCard.vue'
 import TradeInsCard from '@/components/shared/TradeInsCard.vue'
 import FinancingOptionsCard from '@/components/shared/FinancingOptionsCard.vue'
-import NoteWidget from '@/components/customer/activities/NoteWidget.vue'
-import AttachmentWidget from '@/components/customer/activities/AttachmentWidget.vue'
+import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
+import AttachmentWidget from '@/components/shared/feed/AttachmentWidget.vue'
 import AddWhatsAppModal from '@/components/modals/AddWhatsAppModal.vue'
 import AddSMSModal from '@/components/modals/AddSMSModal.vue'
 import AddEmailModal from '@/components/modals/AddEmailModal.vue'
@@ -783,10 +783,12 @@ const handleReassigned = async (assignee) => {
 </script>
 
 <style scoped>
-/* Right sidebar responsive widths */
-.right-sidebar {
-  width: 320px;
-  min-width: 320px;
+/* Right sidebar responsive widths - desktop only (lg and up) */
+@media (min-width: 1024px) {
+  .right-sidebar {
+    width: 320px;
+    min-width: 320px;
+  }
 }
 
 @media (min-width: 1440px) {

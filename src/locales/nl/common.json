@@ -1,4 +1,7 @@
 {
+  "labels": {
+    "language": "Taal"
+  },
   "navigation": {
     "home": "Home",
     "tasks": "Taken",

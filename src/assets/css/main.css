@@ -22,16 +22,34 @@
   --header-height: clamp(48px, 3.75vw, 60px);
   --topbar-height: clamp(40px, 3.125vw, 48px);
 
-  --chart-color-1: #3b82f6;
-  --chart-color-2: #14b8a6;
+  --chart-color-1: #0470e9;
+  --chart-color-2: #10B981;
   --chart-color-3: #0ea5e9;
   --chart-color-4: #8b5cf6;
   --chart-color-5: #ec4899;
   --chart-color-6: #f97316;
-  --chart-color-7: #ef4444;
-  --chart-color-8: #10b981;
+  --chart-color-7: #EF4444;
+  --chart-color-8: #10B981;
   --chart-color-9: #eab308;
   --chart-color-10: #84cc16;
+
+  /* Calendar event type backgrounds */
+  --calendar-event-test-drive: #DBEAFE;
+  --calendar-event-appointment: #DCFCE7;
+  --calendar-event-offsite: #E0F2FE;
+  --calendar-event-workshop: #F3E8FF;
+  --calendar-event-call: #FEE2E2;
+  --calendar-event-delivery: #F0FDFA;
+  --calendar-event-meeting: #E0F2FE;
+  --calendar-event-training: #FDF2F8;
+  --calendar-event-marketing: #FEF9C3;
+  --calendar-event-leave: #FEE2E2;
+  --calendar-event-memo: #F3F4F6;
+  --calendar-event-recall: #FEF9C3;
+  --calendar-event-absence: #FFF1F2;
+  --calendar-event-internal: #F3E8FF;
+  --calendar-event-other: #F3F4F6;
+  --calendar-current-time: #ef4444;
 
   --mk-dashboard-card-shadow:
     0 0 0 1px rgba(14, 63, 126, 0.04), 0 1px 1px -0.5px rgba(42, 51, 69, 0.04),
@@ -60,7 +78,7 @@
   --base-card: #fff;
   --base-surface: #fff;
   --base-sidebar-foreground: #0a0a0a;
-  --base-primary: #0470e9;
+  --base-primary: var(--brand-primary);
   --sidebar-bg: #0a0a0a;
   
   /* Border colors - Match reference subtle borders */
@@ -83,13 +101,13 @@
   --greys-400: #9ca3af;
   --greys-50: #f9fafb;
   
-  /* Brand colors */
+  /* Brand colors - single source of truth for primary blue */
   --brand-primary: #0470e9;
-  --brand-primary-600: #0470e9;
+  --brand-primary-600: var(--brand-primary);
   --brand-primary-700: #0359c0;
   
   /* Badge background colors (green / red / orange) */
-  --badge-green-bg: #eef9f5;
+  --badge-green-bg: #d1fae5;
   --badge-red-bg: #ffeff0;
   --badge-orange-bg: #fff6ea;
 
@@ -113,12 +131,56 @@
 }
 
 /* ========================================
+   Exception: Remove trailing dots from card titles (Motork default)
+   ======================================== */
+
+[data-slot="card-title"]::after {
+  content: none !important;
+}
+
+/* ========================================
    Exception: Custom Card Shadow
    ======================================== */
 
 .mk-dashboard-card {
   box-shadow: var(--mk-dashboard-card-shadow);
 }
+
+/* Vue Cal theme overrides - match ProjectUltra screenshot */
+.vuecal-theme-project.vuecal {
+  --vuecal-header-bg: var(--background);
+  --vuecal-cell-bg: var(--background);
+  --vuecal-cell-border: var(--border);
+  --vuecal-event-bg: var(--calendar-event-other);
+  --vuecal-event-border: transparent;
+  --vuecal-event-text-color: var(--foreground);
+}
+.vuecal-theme-project .vuecal__event { border-radius: 0.375rem; font-size: var(--text-xs); }
+.vuecal-theme-project .vuecal__heading { background: var(--muted); color: var(--muted-foreground); }
+.vuecal-theme-project .vuecal__cell { border-color: var(--border); }
+.vuecal-theme-project .vuecal__cell--out-of-scope { background: var(--muted); opacity: 0.6; }
+
+/* Calendar current time indicator */
+.bg-calendar-current-time {
+  background-color: var(--calendar-current-time);
+}
+
+/* Calendar event chip backgrounds */
+.calendar-event-test-drive { background-color: var(--calendar-event-test-drive); }
+.calendar-event-appointment { background-color: var(--calendar-event-appointment); }
+.calendar-event-offsite { background-color: var(--calendar-event-offsite); }
+.calendar-event-workshop { background-color: var(--calendar-event-workshop); }
+.calendar-event-call { background-color: var(--calendar-event-call); }
+.calendar-event-delivery { background-color: var(--calendar-event-delivery); }
+.calendar-event-meeting { background-color: var(--calendar-event-meeting); }
+.calendar-event-training { background-color: var(--calendar-event-training); }
+.calendar-event-marketing { background-color: var(--calendar-event-marketing); }
+.calendar-event-leave { background-color: var(--calendar-event-leave); }
+.calendar-event-memo { background-color: var(--calendar-event-memo); }
+.calendar-event-recall { background-color: var(--calendar-event-recall); }
+.calendar-event-absence { background-color: var(--calendar-event-absence); }
+.calendar-event-internal { background-color: var(--calendar-event-internal); }
+.calendar-event-other { background-color: var(--calendar-event-other); }
 
 .bg-ai-gradient {
   background: var(--ai-gradient);
@@ -435,7 +497,7 @@ button[class*="bg-primary"] {
   /* Exact Figma specs */
   border-radius: 8px !important;
   border: none !important;
-  background: #0470e9 !important;
+  background: var(--brand-primary) !important;
   color: #fff !important;
   font-weight: 500 !important;
   box-shadow:
@@ -1074,6 +1136,20 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 .bg-badge-green { background-color: var(--badge-green-bg); }
 .bg-badge-red { background-color: var(--badge-red-bg); }
 .bg-badge-orange { background-color: var(--badge-orange-bg); }
+
+/* Performance widget chart colors (blue + grey main, green secondary) */
+.perf-chart-primary { background-color: #0470e9; }
+.perf-chart-grey { background-color: #6b7280; }
+.perf-chart-green { background-color: #10B981; }
+.perf-chart-red { background-color: #EF4444; }
+.perf-chart-purple { background-color: #7e22ce; }
+.perf-chart-yellow { background-color: #b45309; }
+.perf-text-primary { color: #0470e9; }
+.perf-text-grey { color: #6b7280; }
+.perf-text-green { color: #10B981; }
+.perf-text-red { color: #EF4444; }
+.perf-text-purple { color: #7e22ce; }
+.perf-text-yellow { color: #b45309; }
 
 /* Table badges: consistent small semibold label (reinforce theme token size) */
 .data-table-inner span.inline-flex.rounded[class*="px-2"] {
