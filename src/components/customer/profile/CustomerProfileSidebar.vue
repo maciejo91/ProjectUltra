@@ -61,25 +61,6 @@
           </div>
         </div>
 
-        <!-- Action Bar -->
-        <div class="flex items-center justify-center gap-2 py-2">
-          <Button variant="outline" size="icon" class="rounded-full w-10 h-10" @click="$emit('action', 'call')" title="Call">
-            <Phone class="w-4 h-4 text-muted-foreground" />
-          </Button>
-          <Button variant="outline" size="icon" class="rounded-full w-10 h-10" @click="$emit('action', 'email')" title="Email">
-            <Mail class="w-4 h-4 text-muted-foreground" />
-          </Button>
-          <Button variant="outline" size="icon" class="rounded-full w-10 h-10" @click="$emit('action', 'note')" title="Add Note">
-            <FileText class="w-4 h-4 text-muted-foreground" />
-          </Button>
-          <Button variant="outline" size="icon" class="rounded-full w-10 h-10" @click="$emit('action', 'appointment')" title="Schedule Appointment">
-            <Calendar class="w-4 h-4 text-muted-foreground" />
-          </Button>
-          <Button variant="outline" size="icon" class="rounded-full w-10 h-10" @click="$emit('action', 'add')" title="More Actions">
-            <Plus class="w-4 h-4 text-muted-foreground" />
-          </Button>
-        </div>
-
         <!-- Details List -->
         <div class="space-y-4 pt-4 border-t border-border">
           <div class="grid grid-cols-[100px_1fr] gap-2 text-sm">
@@ -136,7 +117,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Card, CardContent, Button, Badge } from '@motork/component-library/future/primitives'
-import { MoreHorizontal, Plus, Phone, Mail, FileText, Calendar, ExternalLink, Copy } from 'lucide-vue-next'
+import { MoreHorizontal, Plus, ExternalLink, Copy } from 'lucide-vue-next'
 import { useToastStore } from '@/stores/toast'
 
 const props = defineProps({
@@ -149,7 +130,7 @@ const props = defineProps({
   customerType: { type: String, default: 'contact' }
 })
 
-const emit = defineEmits(['action', 'add-tag'])
+const emit = defineEmits(['add-tag'])
 const router = useRouter()
 const toastStore = useToastStore()
 

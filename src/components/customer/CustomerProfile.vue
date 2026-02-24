@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col overflow-hidden bg-surface">
+  <div class="h-full flex flex-col overflow-hidden bg-surface mb-6">
     <!-- Drawer header (matches TaskDetailHeader when in drawer) -->
     <header
       v-if="showCloseButton"
@@ -56,7 +56,6 @@
         :customer-id="customerId"
         :customer-type="customerType"
         @add-tag="showAddTagModal = true"
-        @action="handleSidebarAction"
       />
     </div>
 
@@ -310,15 +309,6 @@ const loadCustomerData = async () => {
     console.error('Error loading customer data:', err)
     error.value = err.message
     loadingCustomer.value = false
-  }
-}
-
-const handleSidebarAction = (action) => {
-  if (action === 'appointment') {
-    activeTab.value = 'activity'
-  } else {
-    comingSoonTitle.value = action === 'call' || action === 'email' ? 'Communicate' : action === 'note' ? 'Add Note' : 'More Actions'
-    showComingSoonModal.value = true
   }
 }
 

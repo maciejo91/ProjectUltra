@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-foreground">Activity</h3>
+      <h3 class="text-lg font-semibold text-foreground">Recent activity</h3>
       <Button variant="outline" size="sm" @click="$emit('add')">Add</Button>
     </div>
 

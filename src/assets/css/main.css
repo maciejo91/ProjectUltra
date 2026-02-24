@@ -68,6 +68,15 @@
 }
 
 /* ========================================
+   App-wide typography: Figtree (loaded in index.html)
+   ======================================== */
+html,
+body,
+#app {
+  font-family: 'Figtree', sans-serif;
+}
+
+/* ========================================
    Custom Navigation Sidebar (no Motork component)
    ======================================== */
 

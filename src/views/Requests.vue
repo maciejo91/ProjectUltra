@@ -428,7 +428,16 @@ function closeRequestDrawer() {
   }
 }
 
+function applySegmentFromQuery() {
+  const segment = route.query.segment
+  const validSegments = Object.values(SK)
+  if (segment && validSegments.includes(segment)) {
+    selectedSegment.value = segment
+  }
+}
+
 onMounted(() => {
+  applySegmentFromQuery()
   const openId = route.query.open
   if (openId && (openId.startsWith('lead-') || openId.startsWith('opportunity-'))) {
     drawerRequestCompositeId.value = openId
@@ -437,6 +446,12 @@ onMounted(() => {
     const id = parseInt(idStr, 10)
     if (type === 'lead' && id) leadsStore.fetchLeadById(id)
     else if (type === 'opportunity' && id) opportunitiesStore.fetchOpportunityById(id)
+  }
+})
+
+watch(() => route.query.segment, (segment) => {
+  if (segment && Object.values(SK).includes(segment)) {
+    selectedSegment.value = segment
   }
 })
 

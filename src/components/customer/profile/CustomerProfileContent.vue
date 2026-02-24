@@ -11,16 +11,26 @@
     </div>
 
     <!-- Tab Content -->
-    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+    <div class="flex-1 overflow-y-auto p-6 pb-8 space-y-6">
       <div v-if="activeTab === 'overview'" class="space-y-6 max-w-5xl mx-auto">
         <!-- Highlights -->
         <HighlightsBox :summary="summary" />
         
+        <!-- Active requests -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold text-foreground">Active requests</h3>
+          <RequestsList
+            :leads="leads"
+            :opportunities="opportunities"
+            @click="handleRequestClick"
+          />
+        </div>
+        
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-           <!-- Activity Feed -->
+           <!-- Recent activity (2 latest) -->
            <div class="space-y-4">
              <ActivityFeed 
-               :activities="activities" 
+               :activities="recentActivitiesForOverview" 
                @add="$emit('add-activity')"
              />
            </div>
@@ -107,6 +117,13 @@ const nextUpcomingAppointment = computed(() => {
   return upcoming[0] || null
 })
 
+const recentActivitiesForOverview = computed(() => {
+  const list = [...(props.activities || [])]
+  return list
+    .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())
+    .slice(0, 2)
+})
+
 const mergedActivities = computed(() => {
   const acts = [...(props.activities || [])]
   const last3Appointments = (props.appointments || [])
@@ -133,7 +150,7 @@ const mergedActivities = computed(() => {
 const tabs = computed(() => [
   { key: 'overview', label: 'Overview', count: 1 },
   { key: 'requests', label: 'Requests', count: props.leads.length + props.opportunities.length },
-  { key: 'activity', label: 'Activity', count: (props.activities || []).length + props.appointments.length }
+  { key: 'activity', label: 'Recent activity', count: (props.activities || []).length + props.appointments.length }
 ])
 
 const formatDate = (dateString) => {

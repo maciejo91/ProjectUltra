@@ -5,7 +5,7 @@
   >
     <div class="flex items-center justify-between gap-3">
       <div class="min-w-0 flex-1" @click="handleQuestionClick">
-        <p class="text-foreground text-xs font-medium leading-snug" v-html="getHighlightedQuestion()"></p>
+        <p class="text-foreground text-sm font-medium leading-snug" v-html="getHighlightedQuestion()"></p>
       </div>
       <!-- Action Buttons + Dismiss -->
       <div class="flex gap-1.5 shrink-0 items-center">
@@ -136,13 +136,13 @@
           v-else
           class="bg-background border border-border rounded-lg shadow-lg p-2 flex flex-col gap-2 z-10 min-w-24 shrink-0"
         >
-          <span class="text-[10px] font-bold text-center text-muted-foreground uppercase">Dismiss?</span>
+          <span class="text-xs font-semibold text-center text-muted-foreground uppercase">Dismiss?</span>
           <div class="flex gap-1">
             <Button
               @click="handleDismiss"
               size="xs"
               variant="default"
-              class="h-7 flex-1 bg-destructive hover:bg-destructive/90 text-[10px]"
+              class="h-7 flex-1 bg-destructive hover:bg-destructive/90 text-xs"
             >
               Yes
             </Button>
@@ -150,7 +150,7 @@
               @click="showDismissConfirm = false"
               size="xs"
               variant="ghost"
-              class="h-7 flex-1 text-[10px]"
+              class="h-7 flex-1 text-xs"
             >
               No
             </Button>
