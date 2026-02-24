@@ -293,9 +293,9 @@ const columns = computed(() => [
     meta: { title: 'Type' },
     cell: ({ row }) => {
       const task = row.original
-      const typeClass = task.type === 'lead' ? 'bg-badge-green text-emerald-700 border-emerald-200' : 'bg-purple-50 text-purple-700 border-purple-200'
+      const typeClass = task.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'
       return h('span', {
-        class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${typeClass} w-fit`
+        class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${typeClass} w-fit`
       }, task.type === 'lead' ? 'Lead' : 'Opportunity')
     }
   },
@@ -403,7 +403,7 @@ const columns = computed(() => [
       const stageClass = props.getStageBadgeClass(displayStage)
       return displayStage
         ? h('span', {
-            class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${stageClass} w-fit`
+            class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${stageClass} w-fit`
           }, displayStage)
         : h('span', { class: 'text-meta' }, '—')
     }
@@ -464,7 +464,7 @@ const columns = computed(() => [
       return h('div', { class: 'flex flex-col gap-1 min-w-0' }, [
         h('span', { class: 'text-meta' }, `${main}${details}`.trim()),
         ...(badge ? [h('span', {
-          class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200 w-fit'
+          class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700 w-fit'
         }, badge)] : [])
       ])
     }

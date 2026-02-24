@@ -2,7 +2,7 @@
   <div class="flex flex-wrap items-center gap-2">
     <!-- Type Badge (Lead/Opportunity) -->
     <span 
-      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase border leading-none"
+      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase leading-none"
       :class="typeBadgeClass"
     >
       {{ typeLabel }}
@@ -11,7 +11,7 @@
     <!-- Hot Priority Badge (when urgency disabled and not shown elsewhere e.g. next to name on card) -->
     <span 
       v-if="showHotPriorityBadge && !urgencyShownElsewhere"
-      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase bg-badge-red text-red-700 border border-red-200 leading-none"
+      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase bg-badge-red text-red-700 leading-none"
     >
       Hot
     </span>
@@ -19,7 +19,7 @@
     <!-- Base Status Badge (shown when there's a substatus) -->
     <span 
       v-if="baseStatus && hasSubstatus"
-      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase border leading-none"
+      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase leading-none"
       :class="getStageColorClass(baseStatus)"
     >
       {{ baseStatus }}
@@ -28,7 +28,7 @@
     <!-- Substatus Badge (or single status if no substatus) -->
     <span 
       v-if="displayStatus"
-      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase border leading-none"
+      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase leading-none"
       :class="getStageColorClass(displayStatus)"
     >
       {{ displayStatus }}
@@ -76,8 +76,8 @@ const typeLabel = computed(() => {
 
 const typeBadgeClass = computed(() => {
   return props.task.type === 'lead' 
-    ? 'bg-badge-green text-emerald-700 border-emerald-200' 
-    : 'bg-purple-50 text-purple-700 border-purple-200'
+    ? 'bg-badge-green text-emerald-700' 
+    : 'bg-purple-50 text-purple-700'
 })
 
 const getBaseStage = (task) => {
@@ -147,18 +147,7 @@ const getStageColorClass = (stage) => {
   if (props.task.type === 'opportunity') {
     try {
       const baseColor = getStageColorFromMapper(stage, 'opportunity')
-      // Add border color that matches the theme
-      if (baseColor.includes('blue')) return baseColor + ' border-blue-200'
-      if (baseColor.includes('purple')) return baseColor + ' border-purple-200'
-      if (baseColor.includes('yellow')) return baseColor + ' border-yellow-200'
-      if (baseColor.includes('pink')) return baseColor + ' border-pink-200'
-      if (baseColor.includes('indigo')) return baseColor + ' border-indigo-200'
-      if (baseColor.includes('emerald')) return baseColor + ' border-emerald-200'
-      if (baseColor.includes('badge-green') || baseColor.includes('green')) return baseColor + ' border-green-200'
-      if (baseColor.includes('badge-red') || baseColor.includes('red')) return baseColor + ' border-red-200'
-      if (baseColor.includes('badge-orange') || baseColor.includes('orange')) return baseColor + ' border-orange-200'
-      if (baseColor.includes('gray')) return baseColor + ' border-gray-200'
-      return baseColor + ' border-gray-200'
+      return baseColor
     } catch (e) {
       // Fallback to stage-based colors
     }
@@ -166,10 +155,10 @@ const getStageColorClass = (stage) => {
   
   // Fallback colors for leads or when stage mapper fails (New = green per screenshot)
   const stageLower = stage.toLowerCase()
-  if (stageLower.includes('new')) return 'bg-badge-green text-emerald-700 border-emerald-200'
-  if (stageLower.includes('qualif')) return 'bg-badge-green text-green-600 border-green-200'
-  if (stageLower.includes('negotiat')) return 'bg-purple-50 text-purple-600 border-purple-200'
-  if (stageLower.includes('close')) return 'bg-muted text-muted-foreground border-border'
-  return 'bg-gray-50 text-gray-700 border-gray-200'
+  if (stageLower.includes('new')) return 'bg-badge-green text-emerald-700'
+  if (stageLower.includes('qualif')) return 'bg-badge-green text-green-600'
+  if (stageLower.includes('negotiat')) return 'bg-purple-50 text-purple-600'
+  if (stageLower.includes('close')) return 'bg-muted text-muted-foreground'
+  return 'bg-gray-50 text-gray-700'
 }
 </script>

@@ -35,7 +35,7 @@
             <p v-if="car.price" class="text-xs text-muted-foreground mb-2">€ {{ formatCurrency(car.price) }}</p>
             <div 
               v-if="car.stockDays !== null && car.stockDays !== undefined"
-              class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-green-50 border border-green-100 text-green-700 text-xs font-semibold rounded-md mb-2"
+              class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-green-50 text-green-700 text-xs font-semibold rounded-md mb-2"
             >
               <div class="w-1 h-1 bg-green-500 rounded-full"></div> In stock ({{ car.stockDays }} days)
             </div>

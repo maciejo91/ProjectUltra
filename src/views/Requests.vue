@@ -237,9 +237,9 @@ const columns = computed(() => [
     meta: { title: 'Type' },
     cell: ({ row }) => {
       const r = row.original
-      const typeClass = r.type === 'lead' ? 'bg-badge-green text-emerald-700 border-emerald-200' : 'bg-purple-50 text-purple-700 border-purple-200'
+      const typeClass = r.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'
       return h('span', {
-        class: `inline-flex items-center px-2 py-0.5 rounded text-fluid-xs font-semibold border ${typeClass} w-fit`
+        class: `inline-flex items-center px-2 py-0.5 rounded text-fluid-xs font-semibold ${typeClass} w-fit`
       }, r.type === 'lead' ? 'Lead' : 'Opportunity')
     }
   },
@@ -260,7 +260,7 @@ const columns = computed(() => [
       if (!stage) return h('span', { class: 'text-muted-foreground' }, '—')
       const stageClass = getStageBadgeClass(stage)
       return h('span', {
-        class: `inline-flex items-center px-2 py-0.5 rounded text-fluid-xs font-semibold border ${stageClass} w-fit`
+        class: `inline-flex items-center px-2 py-0.5 rounded text-fluid-xs font-semibold ${stageClass} w-fit`
       }, stage)
     }
   },

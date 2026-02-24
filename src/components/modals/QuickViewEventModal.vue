@@ -15,13 +15,13 @@
               </span>
               <span
                 v-if="event?.status === 'cancelled'"
-                class="badge-ui bg-red-100 text-red-700 border-red-200"
+                class="badge-ui bg-red-100 text-red-700"
               >
                 Cancelled
               </span>
               <span
                 v-else-if="event?.status === 'no-show'"
-                class="badge-ui bg-orange-100 text-orange-700 border-orange-200"
+                class="badge-ui bg-orange-100 text-orange-700"
               >
                 No-show
               </span>

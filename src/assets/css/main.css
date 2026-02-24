@@ -106,8 +106,8 @@
   --brand-primary-600: var(--brand-primary);
   --brand-primary-700: #0359c0;
   
-  /* Badge background colors (green / red / orange) */
-  --badge-green-bg: #d1fae5;
+  /* Badge background colors (green / red / orange) - green used mainly on leads */
+  --badge-green-bg: color-mix(in oklab, var(--success) 8%, transparent);
   --badge-red-bg: #ffeff0;
   --badge-orange-bg: #fff6ea;
 
@@ -1132,10 +1132,17 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
   font-size: var(--text-xs, 0.75rem);
 }
 
-/* Badge background utilities (use with text-* and border-* for full badge styling) */
-.bg-badge-green { background-color: var(--badge-green-bg); }
-.bg-badge-red { background-color: var(--badge-red-bg); }
-.bg-badge-orange { background-color: var(--badge-orange-bg); }
+/* Badge background utilities (use with text-* for full badge styling; all badges borderless) */
+.bg-badge-green { background-color: var(--badge-green-bg); border: none; }
+.bg-badge-red { background-color: var(--badge-red-bg); border: none; }
+.bg-badge-orange { background-color: var(--badge-orange-bg); border: none; }
+
+/* All badge-like elements: borderless */
+[data-slot="badge"],
+.data-table-inner span.inline-flex.rounded[class*="px-2"],
+.badge-ui {
+  border: none !important;
+}
 
 /* Performance widget chart colors (blue + grey main, green secondary) */
 .perf-chart-primary { background-color: #0470e9; }

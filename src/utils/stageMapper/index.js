@@ -147,10 +147,10 @@ export function getStageColor(displayStage, entityType = 'opportunity') {
 // Get color classes for delivery substatus badges
 export function getDeliverySubstatusColor(substatus) {
   const substatusColors = {
-    [DELIVERY_SUBSTATUS.AWAITING_DELIVERY]: 'bg-teal-50 text-teal-700 border-teal-200',
-    [DELIVERY_SUBSTATUS.DELIVERED]: 'bg-badge-green text-green-700 border-green-200'
+    [DELIVERY_SUBSTATUS.AWAITING_DELIVERY]: 'bg-teal-50 text-teal-700',
+    [DELIVERY_SUBSTATUS.DELIVERED]: 'bg-badge-green text-green-700'
   }
   
-  return substatusColors[substatus] || 'bg-gray-50 text-gray-700 border-gray-200'
+  return substatusColors[substatus] || 'bg-gray-50 text-gray-700'
 }
 

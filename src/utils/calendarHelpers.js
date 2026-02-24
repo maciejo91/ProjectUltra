@@ -42,22 +42,22 @@ export const getEventTypeHeaderClass = (type) => {
 
 export const getEventTypeBadgeClass = (type) => {
   const colorMap = {
-    'test-drive': 'bg-blue-100 text-blue-700 border-blue-200',
-    'appointment': 'bg-green-100 text-green-700 border-green-200',
-    'offsite': 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    'workshop': 'bg-indigo-100 text-indigo-700 border-indigo-200',
-    'call': 'bg-orange-100 text-orange-700 border-orange-200',
-    'delivery': 'bg-teal-100 text-teal-700 border-teal-200',
-    'meeting': 'bg-purple-100 text-purple-700 border-purple-200',
-    'training': 'bg-pink-100 text-pink-700 border-pink-200',
-    'marketing': 'bg-yellow-100 text-yellow-700 border-yellow-200',
-    'leave': 'bg-red-100 text-red-700 border-red-200',
-    'memo': 'bg-gray-100 text-gray-700 border-gray-200',
-    'recall': 'bg-cyan-100 text-cyan-700 border-cyan-200',
-    'absence': 'bg-rose-100 text-rose-700 border-rose-200',
-    'other': 'bg-slate-100 text-slate-700 border-slate-200'
+    'test-drive': 'bg-blue-100 text-blue-700',
+    'appointment': 'bg-green-100 text-green-700',
+    'offsite': 'bg-emerald-100 text-emerald-700',
+    'workshop': 'bg-indigo-100 text-indigo-700',
+    'call': 'bg-orange-100 text-orange-700',
+    'delivery': 'bg-teal-100 text-teal-700',
+    'meeting': 'bg-purple-100 text-purple-700',
+    'training': 'bg-pink-100 text-pink-700',
+    'marketing': 'bg-yellow-100 text-yellow-700',
+    'leave': 'bg-red-100 text-red-700',
+    'memo': 'bg-gray-100 text-gray-700',
+    'recall': 'bg-cyan-100 text-cyan-700',
+    'absence': 'bg-rose-100 text-rose-700',
+    'other': 'bg-slate-100 text-slate-700'
   }
-  return colorMap[type] || 'bg-blue-100 text-blue-700 border-blue-200'
+  return colorMap[type] || 'bg-blue-100 text-blue-700'
 }
 
 export const getEventTypeTextClass = (type) => {

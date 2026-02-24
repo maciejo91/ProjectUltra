@@ -69,31 +69,31 @@
                 <div class="flex items-center gap-2 flex-wrap">
                   <div 
                     v-if="stockDays !== undefined && stockDays !== null"
-                    class="inline-flex items-center gap-1.5 px-2 py-1 bg-green-50 border border-green-100 text-green-700 text-xs font-semibold rounded-md"
+                    class="inline-flex items-center gap-1.5 px-2 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-md"
                   >
                     <div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div> In stock ({{ stockDays }} days)
                   </div>
                   <div 
                     v-else-if="hasCar"
-                    class="inline-flex items-center gap-1.5 px-2 py-1 bg-orange-50 border border-orange-100 text-orange-700 text-xs font-semibold rounded-md"
+                    class="inline-flex items-center gap-1.5 px-2 py-1 bg-orange-50 text-orange-700 text-xs font-semibold rounded-md"
                   >
                     <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> Out of stock
                   </div>
                   <div
                     v-if="vehicleCondition"
-                    class="inline-flex items-center px-2 py-1 bg-muted border border-border text-muted-foreground text-xs font-semibold rounded-md"
+                    class="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-semibold rounded-md"
                   >
                     {{ vehicleCondition }}
                   </div>
                   <div
                     v-if="vin"
-                    class="inline-flex items-center min-w-0 max-w-36 px-2 py-1 bg-muted border border-border text-muted-foreground text-xs font-mono rounded-md"
+                    class="inline-flex items-center min-w-0 max-w-36 px-2 py-1 bg-muted text-muted-foreground text-xs font-mono rounded-md"
                     :title="`VIN: ${vin}`"
                   >
                     <span class="truncate block min-w-0">VIN: {{ vin }}</span>
                   </div>
                   <!-- Source next to stock availability -->
-                  <div v-if="source" class="inline-flex items-center gap-1.5 px-2 py-1 bg-muted border border-border text-muted-foreground text-xs font-semibold rounded-md">
+                  <div v-if="source" class="inline-flex items-center gap-1.5 px-2 py-1 bg-muted text-muted-foreground text-xs font-semibold rounded-md">
                     <span class="text-xs text-muted-foreground font-medium">Source:</span>
                     <span class="text-xs font-bold text-foreground">{{ source }}</span>
                   </div>
