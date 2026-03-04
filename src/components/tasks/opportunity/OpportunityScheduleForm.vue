@@ -151,6 +151,7 @@
     <div class="flex flex-wrap justify-end items-center gap-2 pt-3">
       <slot name="extra-actions" />
       <Button
+        v-if="!hideCancelButton"
         variant="secondary"
         @click="onCancel"
       >
@@ -189,6 +190,10 @@ const props = defineProps({
   initialAppointment: {
     type: Object,
     default: null
+  },
+  hideCancelButton: {
+    type: Boolean,
+    default: false
   }
 })
 

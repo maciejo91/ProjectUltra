@@ -6,9 +6,12 @@
     <slot name="header" />
     <div class="p-4">
     <div class="flex justify-between items-start mb-3">
-      <div>
-        <h4 class="font-bold text-foreground text-sm">{{ cardTitle }}</h4>
-        <p class="text-xs text-muted-foreground mt-0.5">{{ cardDescription }}</p>
+      <div class="min-w-0 flex-1">
+        <p v-if="sentenceStyle" class="text-base leading-normal font-medium text-foreground">{{ cardDescription || cardTitle }}</p>
+        <template v-else>
+          <h4 class="font-bold text-foreground text-sm">{{ cardTitle }}</h4>
+          <p class="text-xs text-muted-foreground mt-0.5">{{ cardDescription }}</p>
+        </template>
       </div>
     </div>
     <div class="flex gap-3 flex-wrap">
@@ -36,7 +39,9 @@ const props = defineProps({
   action: { type: Object, default: null },
   colorScheme: { type: Object, default: () => ({ background: 'bg-muted', border: 'border-border' }) },
   /** When set, merges multiple CTAs in one card (same priority). Each item: { key, label, icon, buttonClass?, handler } */
-  actions: { type: Array, default: null }
+  actions: { type: Array, default: null },
+  /** When true, show action as a single sentence (like leads) instead of title + subtitle */
+  sentenceStyle: { type: Boolean, default: false }
 })
 
 defineEmits(['action-clicked'])

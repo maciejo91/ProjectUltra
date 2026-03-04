@@ -79,38 +79,36 @@
           :task-id="lead.id"
         />
         <div class="p-4">
-          <div class="flex justify-between items-start mb-3">
-            <div class="min-w-0">
-              <p class="text-base leading-normal font-medium text-foreground">{{ dynamicDescription }}</p>
-            </div>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <p class="text-base leading-normal font-medium text-foreground min-w-0 flex-1">{{ dynamicDescription }}</p>
+            <!-- Call Interface Component (inline so button sits on same line as action) -->
+            <CallInterface
+              :inline="true"
+              :is-call-active="isCallActive"
+              :call-ended="callEnded"
+              :call-duration="callDuration"
+              :call-notes="callNotes"
+              :formatted-call-duration="formattedCallDuration"
+              :mock-transcription="mockTranscription"
+              :contact-attempts="contactAttempts"
+              :max-contact-attempts="maxContactAttempts"
+              :lead-summary="leadSummary"
+              :caller-name="callerName"
+              :assigned-person-name="currentUser?.name ?? ''"
+              :is-muted="isMuted"
+              @start-call="startCall"
+              @end-call="onEndCall"
+              @close="onCallClose"
+              @toggle-mute="toggleMute"
+              @log-manual-call="logManualCall"
+              @extract-information="handleExtractInformation"
+              @update:call-notes="updateCallNotes"
+              @copy-number="copyNumber"
+            />
           </div>
-
-        <!-- Call Interface Component -->
-        <CallInterface
-          :is-call-active="isCallActive"
-          :call-ended="callEnded"
-          :call-duration="callDuration"
-          :call-notes="callNotes"
-          :formatted-call-duration="formattedCallDuration"
-          :mock-transcription="mockTranscription"
-          :contact-attempts="contactAttempts"
-          :max-contact-attempts="maxContactAttempts"
-          :lead-summary="leadSummary"
-          :caller-name="callerName"
-          :assigned-person-name="currentUser?.name ?? ''"
-          :is-muted="isMuted"
-          @start-call="startCall"
-          @end-call="onEndCall"
-          @close="onCallClose"
-          @toggle-mute="toggleMute"
-          @log-manual-call="logManualCall"
-          @extract-information="handleExtractInformation"
-          @update:call-notes="updateCallNotes"
-          @copy-number="copyNumber"
-        />
-        </div>
         </div>
       </div>
+    </div>
 
       <!-- Grey outcome area: outcome selection and expanded cards -->
       <div class="mk-expanded-cards-area space-y-3">

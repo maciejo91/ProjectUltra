@@ -43,6 +43,7 @@
             variant="outline"
             size="small"
             class="rounded-sm w-full sm:w-auto"
+            :disabled="saving"
             @click="handleCancel"
           >
             Cancel
@@ -50,11 +51,12 @@
           <Button
             variant="default"
             size="small"
-            class="rounded-sm w-full sm:w-auto"
-            :disabled="!canSubmit"
+            class="rounded-sm w-full sm:w-auto inline-flex items-center justify-center gap-2"
+            :disabled="!canSubmit || saving"
             @click="handleConfirm"
           >
-            Postpone Task
+            <Spinner v-if="saving" class="size-4 shrink-0" />
+            <span>{{ saving ? 'Saving…' : 'Postpone Task' }}</span>
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -64,7 +66,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { Button, Input, Label, Textarea } from '@motork/component-library/future/primitives'
+import { Button, Input, Label, Textarea, Spinner } from '@motork/component-library/future/primitives'
 import {
   Dialog,
   DialogContent,
@@ -83,6 +85,10 @@ const props = defineProps({
   taskType: {
     type: String,
     required: true
+  },
+  saving: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -124,12 +130,12 @@ const handleCancel = () => {
 }
 
 const handleConfirm = () => {
-  if (!canSubmit.value) return
-  
+  if (!canSubmit.value || props.saving) return
+
   const dateTime = postponeForm.value.time
     ? `${postponeForm.value.date}T${postponeForm.value.time}:00`
     : `${postponeForm.value.date}T12:00:00`
-  
+
   emit('confirm', {
     taskType: props.taskType,
     date: postponeForm.value.date,
@@ -137,7 +143,6 @@ const handleConfirm = () => {
     dateTime: dateTime,
     reason: postponeForm.value.reason
   })
-  
-  emit('close')
+  // Parent closes dialog after async save completes
 }
 </script>

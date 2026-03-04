@@ -1,12 +1,15 @@
 <template>
   <div class="flex flex-col">
-    <!-- Main card: header + toggles only (LQTask-style) -->
+    <!-- Main card: title, subtitle, carousels, then more actions -->
     <div class="bg-white rounded-lg shadow-nsc-card overflow-visible">
-      <div class="p-6">
-        <div class="mb-3">
+      <div class="p-6 space-y-4">
+        <div>
           <h4 class="font-bold text-foreground text-sm">Manage Offers & Follow Up</h4>
           <p class="text-sm text-muted-foreground mt-0.5">
-            <template v-if="opportunity.offers && opportunity.offers.length > 0">
+            <template v-if="showNfuContent">
+              Follow up with customer about offers
+            </template>
+            <template v-else-if="opportunity.offers && opportunity.offers.length > 0">
               <template v-if="meetsOFBCondition">
                 This opportunity has been in negotiation for {{ daysInNegotiation }} days without a contract. Follow up with customer to get feedback and move forward.
               </template>
@@ -19,59 +22,25 @@
             </template>
           </p>
         </div>
-        <div v-if="!opportunity.offers || opportunity.offers.length === 0" class="mb-4 p-4 bg-muted rounded-lg">
-          <p class="text-sm text-muted-foreground">No offers yet. Create your first offer to continue.</p>
-        </div>
-        <div class="flex flex-wrap gap-3 items-center justify-between">
-          <div class="flex flex-wrap gap-3 items-center">
-          <template v-if="opportunity.negotiationSubstatus === 'Offer Sent'">
-            <div class="outcome-toggle-group flex flex-wrap gap-3">
-              <Toggle
-                v-if="hasOffers"
-                variant="outline"
-                :model-value="showNegotiationSection"
-                @update:model-value="(p) => { $emit('update:show-negotiation-section', p); if (p) { $emit('update:show-add-offer-section', false); $emit('update:show-survey-section', false); } else { $emit('reset-negotiation-form') } }"
-                class="outcome-toggle-item"
-              >
-                <Phone class="w-4 h-4 shrink-0" />
-                <span>Follow Up</span>
-              </Toggle>
-              <Toggle
-                v-if="meetsOFBCondition"
-                variant="outline"
-                :model-value="showSurveySection"
-                @update:model-value="(p) => { $emit('update:show-survey-section', p); if (p) { $emit('update:show-negotiation-section', false); $emit('update:show-add-offer-section', false); } }"
-                class="outcome-toggle-item"
-              >
-                <ClipboardList class="w-4 h-4 shrink-0" />
-                <span>Complete Survey</span>
-              </Toggle>
-            </div>
-          </template>
-          <template v-else>
-            <div class="outcome-toggle-group flex flex-wrap gap-3">
-              <Toggle
-                v-if="hasOffers"
-                variant="outline"
-                :model-value="showNegotiationSection"
-                @update:model-value="(p) => { $emit('update:show-negotiation-section', p); if (p) { $emit('update:show-add-offer-section', false); $emit('update:show-survey-section', false); } else { $emit('reset-negotiation-form') } }"
-                class="outcome-toggle-item"
-              >
-                <Phone class="w-4 h-4 shrink-0" />
-                <span>{{ (opportunity.negotiationSubstatus === 'Offer Feedback') ? 'Request Feedback' : 'Follow Up' }}</span>
-              </Toggle>
-              <Toggle
-                v-if="meetsOFBCondition"
-                variant="outline"
-                :model-value="showSurveySection"
-                @update:model-value="(p) => { $emit('update:show-survey-section', p); if (p) { $emit('update:show-negotiation-section', false); $emit('update:show-add-offer-section', false); } }"
-                class="outcome-toggle-item"
-              >
-                <ClipboardList class="w-4 h-4 shrink-0" />
-                <span>Complete Survey</span>
-              </Toggle>
-            </div>
-          </template>
+        <slot name="carousels" />
+        <!-- When NFU is active: no buttons in card (they appear in grey area below, like lead). Else: Follow up + more actions -->
+        <div v-if="!showNfuContent" class="flex flex-wrap gap-3 items-center">
+          <div v-if="showPrimaryFollowUpButton" class="outcome-toggle-group flex flex-wrap gap-3">
+            <Toggle
+              variant="outline"
+              :model-value="showNegotiationSection"
+              @update:model-value="(p) => {
+                emit('update:show-negotiation-section', p);
+                if (p) {
+                  emit('update:show-add-offer-section', false);
+                  emit('update:show-survey-section', false);
+                }
+              }"
+              class="outcome-toggle-item"
+            >
+              <Phone class="w-4 h-4 shrink-0" />
+              <span>Follow up</span>
+            </Toggle>
           </div>
           <SecondaryActionsDropdown
             v-if="secondaryActions && secondaryActions.length > 0"
@@ -83,8 +52,11 @@
       </div>
     </div>
 
-    <!-- Expanded content as cards below the main card (LQTask-style) -->
-    <div class="mk-expanded-cards-area space-y-4">
+    <!-- Grey area below card (same UX as lead): NFU actions + expanded forms, or Contact Customer / OFB -->
+    <div v-if="showNfuContent" class="mk-expanded-cards-area space-y-4">
+      <slot name="nfu-content" />
+    </div>
+    <div v-else class="mk-expanded-cards-area space-y-4">
       <div v-if="showNegotiationSection" class="space-y-4">
         <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
           <h5 class="font-semibold text-foreground text-sm mb-4">Contact Customer</h5>
@@ -268,6 +240,16 @@ const props = defineProps({
   secondaryActions: {
     type: Array,
     default: () => []
+  },
+  /** When true (e.g. Offer Sent), show Follow up as primary button instead of only in dropdown */
+  showPrimaryFollowUpButton: {
+    type: Boolean,
+    default: false
+  },
+  /** When true, show slot #nfu-content under title/subtitle (NFU task embedded in this section) */
+  showNfuContent: {
+    type: Boolean,
+    default: false
   }
 })
 

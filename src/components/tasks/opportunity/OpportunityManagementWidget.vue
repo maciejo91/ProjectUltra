@@ -1,11 +1,12 @@
 <template>
   <TaskManagementWidget :task="opportunity" hide-title hide-border>
     <template #primary-action>
-      <!-- One next action card with due badge inside (like LQTask) -->
+      <!-- One next action card with due badge inside (like LQTask); sentence style to match leads -->
       <PrimaryActionWidget
         v-if="nextActionCard"
         :actions="nextActionCard.actions"
         :color-scheme="nextActionCard.colorScheme"
+        :sentence-style="true"
         @action-clicked="() => {}"
       >
         <template #header>
@@ -46,7 +47,7 @@
         @contract-pending-action="handleContractPendingAction"
       />
 
-      <!-- In Offer Sent: show only one — Manage appointment if scheduled, else Manage Offers & Follow Up -->
+      <!-- In Negotiation: Manage Offers & Follow Up (NFU when active shows under this title/subtitle) -->
       <NegotiationManagementSection
         v-if="isInNegotiation && !(scheduledAppointment && scheduledAppointment.start)"
         ref="negotiationManagementSectionRef"
@@ -54,6 +55,8 @@
         :show-negotiation-section="showNegotiationSection"
         :show-add-offer-section="showAddOfferSection"
         :show-survey-section="showSurveySection"
+        :show-primary-follow-up-button="isOfferSent"
+        :show-nfu-content="isNfuActive"
         :negotiation-channel="negotiationChannel"
         :negotiation-message="negotiationMessage"
         :negotiation-selected-offer-id="negotiationSelectedOfferId"
@@ -79,7 +82,21 @@
         @secondary-action="handleSecondaryAction"
         @survey-submitted="handleSurveySubmitted"
         @survey-cancelled="handleSurveyCancelled"
-      />
+      >
+        <template v-if="isNfuActive" #nfu-content>
+          <NFUTask
+            :opportunity="opportunity"
+            :secondary-actions="filteredSecondaryActions"
+            :postpone-saving="postponeTaskSaving"
+            embed-in-section
+            @postpone-confirm="handleNFUPostponeConfirm"
+            @secondary-action="handleSecondaryAction"
+            @schedule-submit="(p) => handleScheduleFormSubmit(p, 'schedule')"
+            @close-as-lost="handleNFUCloseAsLost"
+            @reassigned="handleOwnerReassigned"
+          />
+        </template>
+      </NegotiationManagementSection>
 
       <AppointmentManagementSection
         v-if="!opportunityState.isClosed.value && scheduledAppointment && scheduledAppointment.start"
@@ -92,7 +109,6 @@
         :ns-task-count="nsTaskCount"
         :can-submit-ns-task="canSubmitNsTask"
         :ns-task-button-label="nsTaskButtonLabel"
-        :can-create-offer="canCreateOffer"
         :secondary-actions="filteredSecondaryActions"
         :customer-name="customerName"
         :customer-profile-url="customerProfileUrl"
@@ -109,12 +125,48 @@
         @ns-cancel="handleCancelNsTask"
         @ns-confirm="handleConfirmNsTask"
         @ns-close-as-lost="handleNsCloseAsLost"
-        @offer-assignment-created="handleOfferAssignmentCreated"
-        @offer-assignment-cancel="handleCancelOfferAssignment"
-        @open-create-offer-modal="openCreateOfferModalFromAssignment"
         @secondary-action="handleSecondaryAction"
         @customer-click="handleCustomerClick"
       />
+
+      <!-- Offers and contracts: below all action cards (negative margin to tighten gap above) -->
+      <div
+        v-if="isInNegotiation || (opportunity.offers && opportunity.offers.length > 0) || (scheduledAppointment && scheduledAppointment.start && showOfferAssignmentSection)"
+        class="space-y-4 -mt-4"
+        :key="`offers-wrapper-${opportunity.id}`"
+      >
+        <OfferCarousel
+          ref="offerCarouselRef"
+          :key="`carousel-${opportunity.id}`"
+          :offers="opportunity.offers || []"
+          :opportunity-id="opportunity.id"
+          @offer-activated="handleOfferActivated"
+          @generate-pdf="handleOfferPDFGenerate"
+          @offer-accepted="handleOfferAccepted"
+          @add="showOfferAssignmentSection ? openCreateOfferModalFromAssignment() : openCreateOfferModal()"
+        />
+      </div>
+      <div v-if="isContractPending && !opportunityActions.isClosed.value" class="space-y-4">
+        <ContractCarousel
+          ref="contractCarouselRef"
+          :contracts="contracts"
+          :opportunity-id="opportunity.id"
+          :max-contract-date="maxContractDate"
+          @generate-pdf="handleContractPDFGenerate"
+          @collect-esignatures="handleCollectESignaturesFromContract"
+          @add="openCreateContractModal"
+        />
+      </div>
+      <div v-if="isClosedWon && contracts.length > 0" class="space-y-4">
+        <ContractCarousel
+          ref="contractCarouselRef"
+          :contracts="contracts"
+          :opportunity-id="opportunity.id"
+          :max-contract-date="maxContractDate"
+          @generate-pdf="handleContractPDFGenerate"
+          @collect-esignatures="handleCollectESignaturesFromContract"
+        />
+      </div>
     </template>
 
     <template #task-widgets>
@@ -135,34 +187,34 @@
         <div class="flex flex-col">
           <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden">
             <div class="p-6">
-              <div class="mb-3">
-                <h4 class="font-bold text-foreground text-sm">Call to Schedule Appointment</h4>
-                <p class="text-sm text-muted-foreground mt-0.5">
-                  Contact the customer to schedule an appointment
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <p class="text-base leading-normal font-medium text-foreground min-w-0 flex-1">
+                  Contact the customer to schedule an appointment.
                 </p>
+                <CallInterface
+                  :inline="true"
+                  :is-call-active="isCallActive"
+                  :call-ended="callEnded"
+                  :call-duration="callDuration"
+                  :call-notes="callNotes"
+                  :formatted-call-duration="formattedCallDuration"
+                  :mock-transcription="mockTranscription"
+                  :contact-attempts="0"
+                  :max-contact-attempts="3"
+                  :lead-summary="leadSummary"
+                  :caller-name="callerName"
+                  :assigned-person-name="userStore.currentUser?.name ?? ''"
+                  :is-muted="isMuted"
+                  @start-call="startCall"
+                  @end-call="endCall"
+                  @close="callState.resetCall()"
+                  @toggle-mute="toggleMute"
+                  @log-manual-call="logManualCall"
+                  @extract-information="showComingSoonModal = true"
+                  @update:call-notes="updateCallNotes"
+                  @copy-number="copyNumber"
+                />
               </div>
-              <CallInterface
-                :is-call-active="isCallActive"
-                :call-ended="callEnded"
-                :call-duration="callDuration"
-                :call-notes="callNotes"
-                :formatted-call-duration="formattedCallDuration"
-                :mock-transcription="mockTranscription"
-                :contact-attempts="0"
-                :max-contact-attempts="3"
-                :lead-summary="leadSummary"
-                :caller-name="callerName"
-                :assigned-person-name="userStore.currentUser?.name ?? ''"
-                :is-muted="isMuted"
-                @start-call="startCall"
-                @end-call="endCall"
-                @close="callState.resetCall()"
-                @toggle-mute="toggleMute"
-                @log-manual-call="logManualCall"
-                @extract-information="showComingSoonModal = true"
-                @update:call-notes="updateCallNotes"
-                @copy-number="copyNumber"
-              />
             </div>
           </div>
           <div class="mk-expanded-cards-area">
@@ -170,6 +222,7 @@
               ref="scheduleFormRef"
               :opportunity="opportunity"
               mode="schedule"
+              :hide-cancel-button="true"
               @submit="(p) => handleScheduleFormSubmit(p, 'schedule')"
               @cancel="cancelScheduleForm"
             >
@@ -665,16 +718,21 @@
         </div>
       </div>
 
-      <!-- Regular Task Widgets -->
-      <div v-else-if="opportunityState.activeTaskWidget.value && opportunityState.activeTaskWidget.value.component" class="space-y-3">
+      <!-- Regular Task Widgets (NFU is shown inside Manage Offers & Follow Up above, not here) -->
+      <div v-else-if="opportunityState.activeTaskWidget.value && opportunityState.activeTaskWidget.value.component && opportunityState.activeTaskWidget.value.type !== 'NFU'" class="space-y-3">
         <component
           :is="opportunityState.activeTaskWidget.value.component"
-          v-bind="opportunityState.activeTaskWidget.value.props"
+          v-bind="{ ...opportunityState.activeTaskWidget.value.props, secondaryActions: filteredSecondaryActions, postponeSaving: postponeTaskSaving }"
           @close="handleTaskWidgetClose"
           @auto-close-lost="handleAutoCloseLost"
           @survey-submitted="handleTaskWidgetSurveySubmitted"
           @survey-cancelled="handleTaskWidgetClose"
           @postpone="handleTaskPostpone"
+          @postpone-confirm="handleNFUPostponeConfirm"
+          @secondary-action="handleSecondaryAction"
+          @schedule-submit="(p) => handleScheduleFormSubmit(p, 'schedule')"
+          @close-as-lost="handleNFUCloseAsLost"
+          @reassigned="handleOwnerReassigned"
           @reschedule-delivery="handleRescheduleDeliveryFromTask"
         />
       </div>
@@ -685,41 +743,6 @@
       <!-- Secondary actions now shown inline with management buttons -->
     </template>
   </TaskManagementWidget>
-
-  <!-- Offers and contracts outside the grey container -->
-  <div v-if="isInNegotiation || (opportunity.offers && opportunity.offers.length > 0)" class="mt-4" :key="`offers-wrapper-${opportunity.id}`">
-    <OfferCarousel
-      ref="offerCarouselRef"
-      :key="`carousel-${opportunity.id}`"
-      :offers="opportunity.offers || []"
-      :opportunity-id="opportunity.id"
-      @offer-activated="handleOfferActivated"
-      @generate-pdf="handleOfferPDFGenerate"
-      @offer-accepted="handleOfferAccepted"
-      @add="openCreateOfferModal"
-    />
-  </div>
-  <div v-if="isContractPending && !opportunityActions.isClosed.value" class="mt-4">
-    <ContractCarousel
-      ref="contractCarouselRef"
-      :contracts="contracts"
-      :opportunity-id="opportunity.id"
-      :max-contract-date="maxContractDate"
-      @generate-pdf="handleContractPDFGenerate"
-      @collect-esignatures="handleCollectESignaturesFromContract"
-      @add="openCreateContractModal"
-    />
-  </div>
-  <div v-if="isClosedWon && contracts.length > 0" class="mt-4">
-    <ContractCarousel
-      ref="contractCarouselRef"
-      :contracts="contracts"
-      :opportunity-id="opportunity.id"
-      :max-contract-date="maxContractDate"
-      @generate-pdf="handleContractPDFGenerate"
-      @collect-esignatures="handleCollectESignaturesFromContract"
-    />
-  </div>
 
   <!-- Appointment Modals -->
   <CreateEventModal
@@ -864,16 +887,10 @@
     @open-edit-financing="(f) => { editingFinancingOption = f; showFinancingModal = true }"
   />
 
-  <PostponeTaskDialog
-    :show="showPostponeTaskDialog"
-    :task-type="postponeTaskType || ''"
-    @close="handlePostponeTaskCancel"
-    @confirm="handlePostponeTaskConfirm"
-  />
-
   <EditExpectedCloseDateModal
     :show="showEditExpectedCloseDateModal"
     :opportunity="opportunity"
+    :saving="extendExpectedCloseSaving"
     @close="handleCancelExtendExpectedCloseDate"
     @confirm="handleExtendExpectedCloseDate"
   />
@@ -956,17 +973,16 @@ import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
 import PDFPreviewModal from '@/components/modals/PDFPreviewModal.vue'
 import EmailPDFModal from '@/components/modals/EmailPDFModal.vue'
 import CallInterface from '@/components/tasks/lead/CallInterface.vue'
-import PostponeTaskDialog from '@/components/tasks/shared/PostponeTaskDialog.vue'
 import EditExpectedCloseDateModal from '@/components/tasks/opportunity/EditExpectedCloseDateModal.vue'
 import OpportunityScheduleForm from '@/components/tasks/opportunity/OpportunityScheduleForm.vue'
 import NS1Task from '@/components/tasks/opportunity/NS1Task.vue'
 import NS2Task from '@/components/tasks/opportunity/NS2Task.vue'
 import NS3Task from '@/components/tasks/opportunity/NS3Task.vue'
-import OfferAssignmentTask from '@/components/tasks/opportunity/OfferAssignmentTask.vue'
 import OfferCarousel from '@/components/shared/OfferCarousel.vue'
 import ContractCarousel from '@/components/shared/ContractCarousel.vue'
 import AppointmentManagementSection from '@/components/tasks/opportunity/AppointmentManagementSection.vue'
 import NegotiationManagementSection from '@/components/tasks/opportunity/NegotiationManagementSection.vue'
+import NFUTask from '@/components/tasks/opportunity/NFUTask.vue'
 import ContractPendingManagementSection from '@/components/tasks/opportunity/ContractPendingManagementSection.vue'
 import CreateContractModal from '@/components/modals/CreateContractModal.vue'
 import AddOfferModal from '@/components/modals/AddOfferModal.vue'
@@ -1339,7 +1355,6 @@ const contractPendingManagementSectionRef = ref(null)
 const ns1TaskRef = computed(() => appointmentManagementSectionRef.value?.ns1TaskRef)
 const ns2TaskRef = computed(() => appointmentManagementSectionRef.value?.ns2TaskRef)
 const ns3TaskRef = computed(() => appointmentManagementSectionRef.value?.ns3TaskRef)
-const offerAssignmentTaskRef = computed(() => appointmentManagementSectionRef.value?.offerAssignmentTaskRef)
 // In Negotiation section state
 const showNegotiationSection = ref(false)
 const showAddOfferSection = ref(false)
@@ -1411,6 +1426,7 @@ const contractPendingActions = computed(() => {
         showScheduleAppointmentContractPendingSection.value = false
         showSetDeliveryDateSection.value = false
         showCloseAsLostSection.value = true
+        showNegotiationSection.value = false
         resetCloseAsLost()
       }
     },
@@ -1454,11 +1470,6 @@ const nsTaskButtonLabel = computed(() => {
   return 'Assign and Save'
 })
 
-// Offer assignment validation
-const canCreateOffer = computed(() => {
-  return offerAssignmentTaskRef?.value?.canSubmit || false
-})
-
 // In Negotiation computed properties
 const offerSelectOptions = computed(() => {
   const opp = opportunity.value
@@ -1499,9 +1510,9 @@ const showCreateOfferModal = ref(false)
 const addOfferModalContext = ref('default') // 'default' | 'assignment'
 const showPDFPreviewModal = ref(false)
 const showEmailPDFModal = ref(false)
-const showPostponeTaskDialog = ref(false)
-const postponeTaskType = ref(null)
+const postponeTaskSaving = ref(false)
 const showEditExpectedCloseDateModal = ref(false)
+const extendExpectedCloseSaving = ref(false)
 // Expected close date menu moved to TaskDetailHeader
 const pdfGenerationDocumentType = ref(null) // 'contract' | 'offer' | null
 const pdfGenerationOfferId = ref(null)
@@ -1526,8 +1537,8 @@ defineExpose({
 const actionHandlers = {
   'schedule-appointment': () => { 
     showInlineScheduleSection.value = true
-    // Hide other sections when showing schedule form
     showRescheduleSection.value = false
+    showNegotiationSection.value = false
   },
   'manage-appointment': () => {
     // Show appointment management options (reschedule/cancel/mark no-show)
@@ -1542,6 +1553,7 @@ const actionHandlers = {
     } else {
       showInlineScheduleSection.value = true
       showRescheduleSection.value = false
+      showNegotiationSection.value = false
     }
   },
   'reschedule': () => {
@@ -1559,6 +1571,13 @@ const actionHandlers = {
   'create-offer': () => { openCreateOfferModal() },
   'call-prospect': () => { showComingSoonModal.value = true },
   'follow-up-offer': () => { showComingSoonModal.value = true },
+  'follow-up': () => {
+    showNegotiationSection.value = true
+    showAddOfferSection.value = false
+    showSurveySection.value = false
+    showInlineScheduleSection.value = false
+    showCloseAsLostSection.value = false
+  },
   'request-decision': () => { showComingSoonModal.value = true },
   'finalize-contract': () => { showContractDateModal.value = true },
   'schedule-delivery': () => { 
@@ -1589,6 +1608,7 @@ const actionHandlers = {
   'extend-deadline': () => { showComingSoonModal.value = true },
   'close-lost': () => { 
     showCloseAsLostSection.value = true
+    showNegotiationSection.value = false
     resetCloseAsLost()
   },
   'reopen': () => { handleReopen() },
@@ -1671,6 +1691,7 @@ const opportunityActions = useOpportunityActions(
             label: 'Close as Lost',
             handler: () => {
               showCloseAsLostSection.value = true
+              showNegotiationSection.value = false
               resetCloseAsLost()
             }
           }
@@ -1684,8 +1705,8 @@ const opportunityActions = useOpportunityActions(
     if (shouldShowScheduleForm.value) {
       return null
     }
-    // Don't show NS task widget in task-widgets section - we use inline NS1Task/NS2Task/NS3Task instead
     const widget = opportunityActions.activeTaskWidget.value
+    // NS tasks are shown inline in AppointmentManagementSection
     if (widget && widget.type === 'NS') {
       return null
     }
@@ -1729,6 +1750,15 @@ const hasOffers = computed(() => {
   return props.opportunity?.offers && Array.isArray(props.opportunity.offers) && props.opportunity.offers.length > 0
 })
 
+// In Negotiation - Offer Sent: show Follow up / Contact customer as primary and section by default
+const isOfferSent = computed(() => {
+  return isInNegotiation.value &&
+    opportunityState.displayStage.value === 'In Negotiation - Offer Sent' &&
+    hasOffers.value
+})
+
+const isNfuActive = computed(() => opportunityState.activeTaskWidget.value?.type === 'NFU')
+
 // More actions: hide "Create offer" / "Add offer" when at least one offer exists
 // Always ensure "schedule-appointment" is available for all statuses
 const filteredSecondaryActions = computed(() => {
@@ -1737,7 +1767,10 @@ const filteredSecondaryActions = computed(() => {
   if (hasOffers.value) {
     filtered = base.filter(a => a.key !== 'add-offer' && a.key !== 'create-offer')
   }
-  
+  // Offer Sent: Follow up is the primary action on the card — remove it from More actions dropdown
+  if (isOfferSent.value) {
+    filtered = filtered.filter(a => a.key !== 'follow-up')
+  }
   // Always include schedule-appointment if not already present
   const hasScheduleAppointment = filtered.some(a => a.key === 'schedule-appointment')
   if (!hasScheduleAppointment) {
@@ -1751,18 +1784,69 @@ const filteredSecondaryActions = computed(() => {
         handler: () => {
           showInlineScheduleSection.value = true
           showRescheduleSection.value = false
+          showNegotiationSection.value = false
         }
       }
     ]
   }
-  
+  // In Negotiation with offers (but not Offer Sent): add Follow Up to secondary dropdown
+  if (isInNegotiation.value && hasOffers.value && !isOfferSent.value) {
+    const hasFollowUp = filtered.some(a => a.key === 'follow-up')
+    if (!hasFollowUp) {
+      filtered = [
+        ...filtered,
+        {
+          key: 'follow-up',
+          label: 'Follow Up',
+          icon: 'fa-solid fa-phone',
+          description: 'Contact customer about offers',
+          handler: () => {
+            showNegotiationSection.value = true
+            showAddOfferSection.value = false
+            showSurveySection.value = false
+            showInlineScheduleSection.value = false
+            showCloseAsLostSection.value = false
+          }
+        }
+      ]
+    }
+  }
   return filtered
 })
 
 // Single next action card: always one card; merge primary + same-priority secondaries into one CTA block
 const DEFAULT_NEXT_ACTION_SCHEME = { background: 'bg-muted', border: 'border-border' }
 const nextActionCard = computed(() => {
-  if (opportunityState.isClosed.value || isContractPending || isInNegotiation) {
+  if (opportunityState.isClosed.value || isContractPending) {
+    return null
+  }
+  // In Negotiation - Offer Sent: primary card with Follow up (Contact customer) shown by default
+  if (isOfferSent.value) {
+    const followUpHandler = () => {
+      showNegotiationSection.value = true
+      showAddOfferSection.value = false
+      showSurveySection.value = false
+      showInlineScheduleSection.value = false
+      showCloseAsLostSection.value = false
+    }
+    return {
+      title: 'Follow up',
+      description: 'Contact customer about offers',
+      colorScheme: DEFAULT_NEXT_ACTION_SCHEME,
+      actions: [
+        {
+          key: 'follow-up',
+          label: 'Follow up',
+          title: 'Follow up',
+          description: 'Contact customer about offers',
+          icon: 'fa-solid fa-phone',
+          buttonClass: 'bg-primary text-white hover:opacity-90',
+          handler: followUpHandler
+        }
+      ]
+    }
+  }
+  if (isInNegotiation.value) {
     return null
   }
   const primary = opportunityState.primaryAction.value
@@ -1818,6 +1902,15 @@ const nextActionCard = computed(() => {
 
   if (mergedActions.length === 0) return null
   return { title, description, colorScheme, actions: mergedActions }
+})
+
+// In Negotiation - Offer Sent: show Contact Customer section by default
+watch(isOfferSent, (offerSent) => {
+  if (offerSent) {
+    showNegotiationSection.value = true
+    showAddOfferSection.value = false
+    showSurveySection.value = false
+  }
 })
 
 // Helper function (kept for backward compatibility)
@@ -1882,55 +1975,76 @@ function handleSurveyCancelled(data) {
   showSurveySection.value = false
 }
 
-async function handleTaskPostpone(taskType) {
-  postponeTaskType.value = taskType.toLowerCase()
-  showPostponeTaskDialog.value = true
+async function savePostponedTask(payload) {
+  const { taskType, dateTime, reason, assignee, noteToAssignee } = payload
+  const opp = getCurrentOpportunity()
+  const updates = { postponedTasks: { ...(opp.postponedTasks || {}), [taskType]: dateTime } }
+  if (assignee && assignee.label) {
+    updates.assignee = assignee.label
+  }
+  await opportunitiesStore.updateOpportunity(opp.id, updates)
+  let content = `Task ${taskType.toUpperCase()} postponed to ${new Date(dateTime).toLocaleString()}${reason ? `: ${reason}` : ''}`
+  if (assignee?.label) content += `. Assigned to ${assignee.label}.`
+  if (noteToAssignee) content += ` Note: ${noteToAssignee}`
+  await opportunitiesStore.addActivity(opp.id, {
+    type: 'task-postponed',
+    user: userStore.currentUser?.name || 'You',
+    action: 'postponed task',
+    content,
+    data: { taskType, dateTime, reason, assignee: assignee?.label, noteToAssignee },
+    timestamp: new Date().toISOString()
+  })
 }
 
-async function handlePostponeTaskConfirm(data) {
+async function handleTaskPostpone(taskType) {
+  const taskTypeKey = taskType?.toLowerCase() || 'nfu'
+  if (taskTypeKey === 'nfu') return
+  postponeTaskSaving.value = true
   try {
-    const opp = getCurrentOpportunity()
-    const postponedTasks = opp.postponedTasks || {}
-    postponedTasks[data.taskType] = data.dateTime
-    
-    await opportunitiesStore.updateOpportunity(opp.id, {
-      postponedTasks: postponedTasks
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    const dateTime = `${tomorrow.toISOString().split('T')[0]}T12:00:00`
+    await savePostponedTask({
+      taskType: taskTypeKey,
+      dateTime,
+      date: tomorrow.toISOString().split('T')[0],
+      time: '12:00',
+      reason: ''
     })
-    
-    // Create activity log
-    await opportunitiesStore.addActivity(opp.id, {
-      type: 'task-postponed',
-      user: userStore.currentUser?.name || 'You',
-      action: 'postponed task',
-      content: `Task ${data.taskType.toUpperCase()} postponed to ${new Date(data.dateTime).toLocaleString()}${data.reason ? `: ${data.reason}` : ''}`,
-      data: {
-        taskType: data.taskType,
-        dateTime: data.dateTime,
-        reason: data.reason
-      },
-      timestamp: new Date().toISOString()
-    })
-    
-    showPostponeTaskDialog.value = false
-    postponeTaskType.value = null
   } catch (error) {
     console.error('Failed to postpone task:', error)
+  } finally {
+    postponeTaskSaving.value = false
   }
 }
 
-function handlePostponeTaskCancel() {
-  showPostponeTaskDialog.value = false
-  postponeTaskType.value = null
+async function handleNFUPostponeConfirm(data) {
+  postponeTaskSaving.value = true
+  try {
+    await savePostponedTask({ ...data, taskType: 'nfu' })
+    if (data.assignee?.label) {
+      handleOwnerReassigned({ assignee: data.assignee.label })
+    }
+  } catch (error) {
+    console.error('Failed to postpone NFU task:', error)
+  } finally {
+    postponeTaskSaving.value = false
+  }
+}
+
+function handleNFUCloseAsLost({ opportunity: opp, reason }) {
+  handleClosedLost({ reason, notes: '' })
 }
 
 async function handleExtendExpectedCloseDate(data) {
+  extendExpectedCloseSaving.value = true
   try {
     const opp = getCurrentOpportunity()
-    
+
     await opportunitiesStore.updateOpportunity(opp.id, {
       expectedCloseDate: data.expectedCloseDate
     })
-    
+
     // Create activity log
     await opportunitiesStore.addActivity(opp.id, {
       type: 'expected-close-date-extension',
@@ -1943,10 +2057,12 @@ async function handleExtendExpectedCloseDate(data) {
       },
       timestamp: new Date().toISOString()
     })
-    
+
     showEditExpectedCloseDateModal.value = false
   } catch (error) {
     console.error('Failed to extend expected close date:', error)
+  } finally {
+    extendExpectedCloseSaving.value = false
   }
 }
 
@@ -2478,11 +2594,6 @@ async function handleOfferAssignmentCreated({ opportunity: _opportunity, offerDa
   }
 }
 
-// Handle cancel offer assignment
-function handleCancelOfferAssignment() {
-  showOfferAssignmentSection.value = false
-}
-
 // In Negotiation handlers
 function handleFollowUpOffer() {
   showRescheduleSection.value = false
@@ -2683,7 +2794,6 @@ async function handleSkipToCreateOffer() {
       negotiationSubstatus: 'Awaiting Offer'
     })
     await opportunitiesStore.fetchOpportunityById(opp.id)
-    openCreateOfferModal()
   } catch (err) {
     console.error('Failed to skip to create offer:', err)
   }
@@ -3065,6 +3175,7 @@ function handleNsNotResponding({ opportunity }) {
 
 function handleAutoCloseLost({ opportunity, reason }) {
   showCloseAsLostSection.value = true
+  showNegotiationSection.value = false
   resetCloseAsLost()
   if (reason) {
     closeAsLostReason.value = reason

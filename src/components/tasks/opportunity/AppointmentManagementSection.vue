@@ -149,19 +149,6 @@
           {{ nsTaskButtonLabel }}
         </Button>
       </div>
-
-      <transition name="expand">
-        <div v-if="showOfferAssignmentSection" class="space-y-4">
-          <OfferAssignmentTask
-            ref="offerAssignmentTaskRef"
-            :opportunity="opportunity"
-            :scheduled-appointment="scheduledAppointment"
-            @offer-created="$emit('offer-assignment-created', $event)"
-            @cancel="$emit('offer-assignment-cancel')"
-            @open-create-offer-modal="$emit('open-create-offer-modal')"
-          />
-        </div>
-      </transition>
     </div>
   </div>
 </template>
@@ -176,7 +163,6 @@ import OpportunityScheduleForm from '@/components/tasks/opportunity/OpportunityS
 import NS1Task from '@/components/tasks/opportunity/NS1Task.vue'
 import NS2Task from '@/components/tasks/opportunity/NS2Task.vue'
 import NS3Task from '@/components/tasks/opportunity/NS3Task.vue'
-import OfferAssignmentTask from '@/components/tasks/opportunity/OfferAssignmentTask.vue'
 
 const props = defineProps({
   opportunity: {
@@ -211,10 +197,6 @@ const props = defineProps({
     type: String,
     default: 'Assign'
   },
-  canCreateOffer: {
-    type: Boolean,
-    default: false
-  },
   secondaryActions: {
     type: Array,
     default: () => []
@@ -246,10 +228,6 @@ const emit = defineEmits([
   'ns-cancel',
   'ns-confirm',
   'ns-close-as-lost',
-  'offer-assignment-created',
-  'offer-assignment-cancel',
-  'offer-assignment-confirm',
-  'open-create-offer-modal',
   'secondary-action',
   'customer-click'
 ])
@@ -258,7 +236,6 @@ const scheduleFormRef = ref(null)
 const ns1TaskRef = ref(null)
 const ns2TaskRef = ref(null)
 const ns3TaskRef = ref(null)
-const offerAssignmentTaskRef = ref(null)
 
 // Track which secondary action form is currently active (for forms that stay inline)
 const activeSecondaryAction = ref(null)
@@ -300,8 +277,7 @@ defineExpose({
   scheduleFormRef,
   ns1TaskRef,
   ns2TaskRef,
-  ns3TaskRef,
-  offerAssignmentTaskRef
+  ns3TaskRef
 })
 </script>
 

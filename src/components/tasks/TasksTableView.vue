@@ -284,19 +284,54 @@ const getCarPrice = (task) => {
   return vehicle?.price
 }
 
-// DataTable columns order: Type, Urgency, Task title, Customer, Vehicle, VIN, Request message, Status, Created, Due date, Attempts, Source, Assigned
+// DataTable columns order: Task title, Due date, Customer, Urgency, Type, Status, Vehicle, VIN, Request message, Created, Attempts, Source, Assigned
 const columns = computed(() => [
   {
-    id: 'type',
-    accessorKey: 'type',
-    header: 'Type',
-    meta: { title: 'Type' },
+    id: 'taskTitle',
+    accessorKey: 'taskTitle',
+    header: 'Task title',
+    meta: {
+      title: 'Task title',
+      onOpen: (row) => handleRowClick(row.original)
+    },
     cell: ({ row }) => {
       const task = row.original
-      const typeClass = task.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'
+      const displayTitle = getTaskDisplayTitle(task)
+      return h('div', { class: 'text-content font-semibold text-foreground truncate min-w-0' }, displayTitle || '—')
+    }
+  },
+  {
+    id: 'dueDate',
+    accessorKey: 'nextActionDue',
+    header: 'Due date',
+    meta: { title: 'Due date' },
+    cell: ({ row }) => {
+      const task = row.original
+      const date = task.type === 'opportunity' && task.expectedCloseDate
+        ? task.expectedCloseDate
+        : (task.nextActionDue ?? task.dueDate)
+      if (!date) {
+        return h('span', { class: 'text-meta' }, 'Not set')
+      }
+      const status = getDeadlineStatus(date)
+      const text = formatDueDateRelative(date)
       return h('span', {
-        class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${typeClass} w-fit`
-      }, task.type === 'lead' ? 'Lead' : 'Opportunity')
+        class: `text-xs font-medium uppercase leading-none ${status.textClass}`
+      }, text)
+    }
+  },
+  {
+    id: 'customer',
+    accessorKey: 'customer',
+    header: 'Customer',
+    meta: { title: 'Customer' },
+    cell: ({ row }) => {
+      const task = row.original
+      const city = getCustomerCity(task)
+      return h('div', { class: 'flex flex-col min-w-0' }, [
+        h('div', { class: 'text-content font-semibold text-foreground truncate' }, task.customer?.name || '—'),
+        h('div', { class: 'text-meta truncate' }, city || '—')
+      ])
     }
   },
   {
@@ -320,31 +355,32 @@ const columns = computed(() => [
     }
   },
   {
-    id: 'taskTitle',
-    accessorKey: 'taskTitle',
-    header: 'Task title',
-    meta: {
-      title: 'Task title',
-      onOpen: (row) => handleRowClick(row.original)
-    },
+    id: 'type',
+    accessorKey: 'type',
+    header: 'Type',
+    meta: { title: 'Type' },
     cell: ({ row }) => {
       const task = row.original
-      const displayTitle = getTaskDisplayTitle(task)
-      return h('div', { class: 'text-content font-semibold text-foreground truncate min-w-0' }, displayTitle || '—')
+      const typeClass = task.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'
+      return h('span', {
+        class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${typeClass} w-fit`
+      }, task.type === 'lead' ? 'Lead' : 'Opportunity')
     }
   },
   {
-    id: 'customer',
-    accessorKey: 'customer',
-    header: 'Customer',
-    meta: { title: 'Customer' },
+    id: 'status',
+    accessorKey: 'status',
+    header: 'Status',
+    meta: { title: 'Status' },
     cell: ({ row }) => {
       const task = row.original
-      const city = getCustomerCity(task)
-      return h('div', { class: 'flex flex-col min-w-0' }, [
-        h('div', { class: 'text-content font-semibold text-foreground truncate' }, task.customer?.name || '—'),
-        h('div', { class: 'text-meta truncate' }, city || '—')
-      ])
+      const displayStage = getDisplayStage(task, task.type === 'lead' ? 'lead' : 'opportunity')
+      const stageClass = props.getStageBadgeClass(displayStage)
+      return displayStage
+        ? h('span', {
+            class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${stageClass} w-fit`
+          }, displayStage)
+        : h('span', { class: 'text-meta' }, '—')
     }
   },
   {
@@ -393,22 +429,6 @@ const columns = computed(() => [
     }
   },
   {
-    id: 'status',
-    accessorKey: 'status',
-    header: 'Status',
-    meta: { title: 'Status' },
-    cell: ({ row }) => {
-      const task = row.original
-      const displayStage = getDisplayStage(task, task.type === 'lead' ? 'lead' : 'opportunity')
-      const stageClass = props.getStageBadgeClass(displayStage)
-      return displayStage
-        ? h('span', {
-            class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${stageClass} w-fit`
-          }, displayStage)
-        : h('span', { class: 'text-meta' }, '—')
-    }
-  },
-  {
     id: 'createdAt',
     accessorKey: 'createdAt',
     header: 'Created',
@@ -417,26 +437,6 @@ const columns = computed(() => [
       const task = row.original
       if (!task.createdAt) return h('span', { class: 'text-meta' }, '—')
       return h('span', { class: 'text-meta' }, formatRelativeTime(task.createdAt))
-    }
-  },
-  {
-    id: 'dueDate',
-    accessorKey: 'nextActionDue',
-    header: 'Due date',
-    meta: { title: 'Due date' },
-    cell: ({ row }) => {
-      const task = row.original
-      const date = task.type === 'opportunity' && task.expectedCloseDate
-        ? task.expectedCloseDate
-        : (task.nextActionDue ?? task.dueDate)
-      if (!date) {
-        return h('span', { class: 'text-meta' }, 'Not set')
-      }
-      const status = getDeadlineStatus(date)
-      const text = formatDueDateRelative(date)
-      return h('span', {
-        class: `text-xs font-medium uppercase leading-none ${status.textClass}`
-      }, text)
     }
   },
   {

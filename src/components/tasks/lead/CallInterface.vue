@@ -1,7 +1,11 @@
 <template>
   <div>
     <!-- Call Action Buttons Row (hidden when hideButton is true or call is already active; stays visible after call ends for Call Again) -->
-    <div v-if="!hideButton && !isCallActive" class="flex items-center justify-between gap-3 mb-1 w-full">
+    <div
+      v-if="!hideButton && !isCallActive"
+      class="flex items-center justify-between gap-3"
+      :class="inline ? 'shrink-0' : 'mb-1 w-full'"
+    >
       <Button
         variant="default"
         :disabled="isCallActive"
@@ -291,6 +295,11 @@ const props = defineProps({
     required: true
   },
   hideButton: {
+    type: Boolean,
+    default: false
+  },
+  /** When true, wrapper does not take full width so it can sit on same line as task action text */
+  inline: {
     type: Boolean,
     default: false
   },

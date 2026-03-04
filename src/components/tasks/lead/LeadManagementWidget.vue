@@ -3,6 +3,7 @@
   <PostponeTaskDialog
     :show="showPostponeDueDateDialog"
     task-type="lead"
+    :saving="outcomeSaving"
     @close="showPostponeDueDateDialog = false"
     @confirm="handlePostponeDueDateConfirm"
   />

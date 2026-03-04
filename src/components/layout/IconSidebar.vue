@@ -16,22 +16,23 @@
           expanded ? 'h-9 gap-3 px-3' : 'h-9 justify-center'
         ]"
         @click="layoutStore.toggleSidebar()"
+        @mouseenter="(e) => showSidebarTooltip(e, expanded ? t('common.layout.closeSidebar') : t('common.layout.openSidebar'))"
+        @mouseleave="hideSidebarTooltip"
       >
         <PanelLeftClose v-if="expanded" :size="18" class="shrink-0" />
         <PanelLeft v-else :size="18" class="shrink-0" />
         <span v-if="expanded" class="truncate text-sm">{{ t('common.layout.closeSidebar') }}</span>
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          {{ t('common.layout.openSidebar') }}
-        </span>
       </button>
     </div>
 
     <!-- Logo -->
     <div class="w-full px-2 pt-2 pb-2 shrink-0">
-      <router-link :to="firstVisibleRoute" :class="['relative group flex items-center gap-2', expanded ? 'overflow-hidden' : 'justify-center overflow-visible']">
+      <router-link
+        :to="firstVisibleRoute"
+        :class="['relative group flex items-center gap-2', expanded ? 'overflow-hidden' : 'justify-center overflow-visible']"
+        @mouseenter="(e) => showSidebarTooltip(e, 'LeadSparK')"
+        @mouseleave="hideSidebarTooltip"
+      >
         <div
           :class="[
             'flex shrink-0 items-center justify-center rounded-md bg-transparent',
@@ -50,12 +51,6 @@
         >
           LeadSparK
         </span>
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          LeadSparK
-        </span>
       </router-link>
     </div>
 
@@ -69,15 +64,11 @@
         ]"
         aria-label="Add New Customer"
         title="Add New Customer"
+        @mouseenter="(e) => showSidebarTooltip(e, 'Add New Customer')"
+        @mouseleave="hideSidebarTooltip"
       >
         <Plus :size="16" class="shrink-0" />
         <span v-if="expanded" class="truncate text-sm font-medium">{{ $t('common.navigation.addNew') }}</span>
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          Add New Customer
-        </span>
       </router-link>
     </div>
 
@@ -93,15 +84,11 @@
         ]"
         aria-label="Home"
         title="Home"
+        @mouseenter="(e) => showSidebarTooltip(e, 'Home')"
+        @mouseleave="hideSidebarTooltip"
       >
         <Home :size="16" class="text-white shrink-0" />
         <span v-if="expanded" class="truncate text-sm text-white">Home</span>
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          Home
-        </span>
       </router-link>
 
       <router-link
@@ -114,15 +101,11 @@
         ]"
         aria-label="Customers"
         title="Customers"
+        @mouseenter="(e) => showSidebarTooltip(e, 'Customers')"
+        @mouseleave="hideSidebarTooltip"
       >
         <Users :size="16" class="text-white shrink-0" />
         <span v-if="expanded" class="truncate text-sm text-white">Customers</span>
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          Customers
-        </span>
       </router-link>
 
       <router-link
@@ -135,15 +118,11 @@
         ]"
         aria-label="Vehicles"
         title="Vehicles"
+        @mouseenter="(e) => showSidebarTooltip(e, 'Vehicles')"
+        @mouseleave="hideSidebarTooltip"
       >
         <CarFront :size="16" class="text-white shrink-0" />
         <span v-if="expanded" class="truncate text-sm text-white">Vehicles</span>
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          Vehicles
-        </span>
       </router-link>
 
       <!-- Separator -->
@@ -159,15 +138,11 @@
         ]"
         aria-label="Requests"
         :title="$t('common.navigation.requests')"
+        @mouseenter="(e) => showSidebarTooltip(e, t('common.navigation.requests'))"
+        @mouseleave="hideSidebarTooltip"
       >
         <FileBadge2 :size="16" class="text-white shrink-0" />
         <span v-if="expanded" class="truncate text-sm text-white">{{ $t('common.navigation.requests') }}</span>
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          {{ $t('common.navigation.requests') }}
-        </span>
       </router-link>
 
       <router-link
@@ -180,16 +155,12 @@
         ]"
         aria-label="Tasks"
         title="Tasks"
+        @mouseenter="(e) => showSidebarTooltip(e, 'Tasks')"
+        @mouseleave="hideSidebarTooltip"
       >
         <ListTodo :size="16" class="text-white shrink-0" />
         <span v-if="expanded" class="truncate text-sm text-white">Tasks</span>
         <div v-if="hotLeadsCount > 0" :class="expanded ? 'absolute right-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-brand-red rounded-full' : 'absolute -right-1 top-0 w-2 h-2 bg-brand-red rounded-full'" />
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          Tasks
-        </span>
       </router-link>
 
       <router-link
@@ -206,8 +177,7 @@
         <Calendar :size="16" class="text-white shrink-0" />
         <span v-if="expanded" class="truncate text-sm text-white">Calendar</span>
         <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+          class="sidebar-icon-tooltip pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Calendar
         </span>
@@ -230,8 +200,7 @@
         <LineChart :size="16" class="text-white shrink-0" />
         <span v-if="expanded" class="truncate text-sm text-white">Insights</span>
         <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+          class="sidebar-icon-tooltip pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Insights
         </span>
@@ -254,8 +223,7 @@
         <Search :size="16" class="text-white shrink-0" />
         <span v-if="expanded" class="truncate text-sm text-white">Search</span>
         <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+          class="sidebar-icon-tooltip pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Search
         </span>
@@ -275,8 +243,7 @@
         <Settings :size="16" class="text-white shrink-0" />
         <span v-if="expanded" class="truncate text-sm text-white">Settings</span>
         <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+          class="sidebar-icon-tooltip pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           Settings
         </span>
@@ -307,8 +274,7 @@
             {{ userStore.currentUser?.name }}
           </span>
           <span
-            v-else
-            class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+            class="sidebar-icon-tooltip pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
           >
             {{ userStore.currentUser?.name }}
           </span>
@@ -417,6 +383,23 @@
       @close="handleCloseSearchModal"
       @search="handleSearch"
     />
+
+    <!-- Sidebar tooltip (teleported so it is not clipped by overflow) -->
+    <Teleport to="body">
+      <Transition name="dropdown">
+        <div
+          v-if="sidebarTooltip"
+          class="fixed z-[9999] whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white shadow-sm"
+          :style="{
+            left: `${sidebarTooltip.left}px`,
+            top: `${sidebarTooltip.top}px`,
+            transform: 'translateY(-50%)'
+          }"
+        >
+          {{ sidebarTooltip.label }}
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -497,6 +480,23 @@ const firstVisibleRoute = computed(() => {
 const showUserMenu = ref(false)
 const showLanguageSubmenu = ref(false)
 const showSearchModal = ref(false)
+
+const sidebarTooltip = ref(null)
+
+function showSidebarTooltip(event, label) {
+  const el = event?.currentTarget
+  if (!el || !label) return
+  const rect = el.getBoundingClientRect()
+  sidebarTooltip.value = {
+    label,
+    left: rect.right + 8,
+    top: rect.top + rect.height / 2
+  }
+}
+
+function hideSidebarTooltip() {
+  sidebarTooltip.value = null
+}
 
 watch(showUserMenu, (open) => {
   if (!open) showLanguageSubmenu.value = false

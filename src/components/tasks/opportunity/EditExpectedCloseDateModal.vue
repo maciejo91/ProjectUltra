@@ -34,6 +34,7 @@
           <Button
             variant="outline"
             size="small"
+            :disabled="saving"
             @click="handleCancel"
           >
             Cancel
@@ -41,10 +42,12 @@
           <Button
             variant="default"
             size="small"
-            :disabled="!canSubmit"
+            class="inline-flex items-center justify-center gap-2"
+            :disabled="!canSubmit || saving"
             @click="handleConfirm"
           >
-            Save
+            <Spinner v-if="saving" class="size-4 shrink-0" />
+            <span>{{ saving ? 'Saving…' : 'Save' }}</span>
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -67,7 +70,8 @@ import {
   DialogHeader,
   DialogOverlay,
   DialogPortal,
-  DialogTitle
+  DialogTitle,
+  Spinner
 } from '@motork/component-library/future/primitives'
 
 const props = defineProps({
@@ -78,6 +82,10 @@ const props = defineProps({
   opportunity: {
     type: Object,
     required: true
+  },
+  saving: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -118,11 +126,11 @@ function handleCancel() {
 }
 
 function handleConfirm() {
-  if (!canSubmit.value) return
+  if (!canSubmit.value || props.saving) return
   emit('confirm', {
     expectedCloseDate: newDate.value,
     reason: reason.value
   })
-  emit('close')
+  // Parent closes modal after async save completes
 }
 </script>
