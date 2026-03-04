@@ -105,10 +105,13 @@ const { rowSelection, selectedCount, hasSelection, getSelectedRows, clearSelecti
 
 const emit = defineEmits(['row-click'])
 
-// DataTable state (local to this tab)
+// DataTable state (local to this tab) - default filters: Source, Account type
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
 const globalFilter = ref('')
-const columnFilters = ref([])
+const columnFilters = ref([
+  { id: 'source-1', field: 'source', value: '', operator: 'eq', pinned: true },
+  { id: 'accountType-1', field: 'accountType', value: '', operator: 'eq', pinned: true }
+])
 const sorting = ref([])
 
 // Helper to extract location from address
@@ -163,7 +166,7 @@ const handleRowClick = (row) => {
 }
 
 const activeTab = ref('customers')
-const { columns, filterDefinitions, tableMeta } = useCustomersTable(activeTab, handleRowClick)
+const { columns, filterDefinitions, tableMeta } = useCustomersTable(activeTab, handleRowClick, { rows })
 
 const getCustomerFilterValue = (row, key) => {
   if (key === 'accountType') return row.accountType

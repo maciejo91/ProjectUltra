@@ -1,4 +1,5 @@
 import { computed } from 'vue'
+import { getDisplayStage } from '@/utils/stageMapper'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 
 /**
@@ -48,7 +49,7 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
 
     // Status/Stage filter - matches Task details column (status badge), dynamic options from tasks
     const uniqueStatuses = [...new Set(
-      taskList.map(t => t.displayStage ?? t.status ?? t.stage).filter(Boolean)
+      taskList.map(t => getDisplayStage(t, t.type === 'lead' ? 'lead' : 'opportunity') ?? t.displayStage ?? t.status ?? t.stage).filter(Boolean)
     )].sort()
     const leadStageValues = Object.values(LEAD_STAGES).filter(s => s !== LEAD_STAGES.VALID)
     const statusOptions = uniqueStatuses.length > 0
@@ -83,25 +84,6 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
         { value: 'Normal', label: 'Normal' }
       ],
       aiHint: 'Task priority level'
-    })
-
-    // Urgency level filter - multiselect for leads and opportunities (opportunities use priority → urgencyLevel)
-    defs.push({
-      key: 'urgencyLevel',
-      label: 'Urgency',
-      type: 'multiselect',
-      operators: [
-        { value: 'in', label: 'is any of' },
-        { value: 'notIn', label: 'is none of' }
-      ],
-      options: [
-        { value: 'HOT', label: 'Hot' },
-        { value: 'WARM', label: 'Warm' },
-        { value: 'STANDARD', label: 'Standard' },
-        { value: 'COLD', label: 'Cold' }
-      ],
-      aiHint: 'Task urgency level (leads and opportunities)',
-      pinned: true
     })
 
     // Source filter - matches Source column, dynamic options

@@ -36,69 +36,10 @@
         
           <!-- Contact Search (if existing) -->
           <div v-if="contactMode === 'existing'" class="space-y-6">
-            <div class="relative space-y-3">
-              <Label class="block text-sm font-semibold text-foreground">Search Customer</Label>
-              <div class="relative w-full">
-                <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 shrink-0 text-muted-foreground z-10" />
-                <Input 
-                  v-model="searchQuery"
-                  @input="handleSearch"
-                  @focus="showResults = true"
-                  type="text" 
-                  placeholder="Search by name, email, phone, or company..."
-                  class="pl-9 w-full h-10"
-                />
-              </div>
-              
-              <!-- Autocomplete Dropdown -->
-              <Card 
-                v-if="showResults && filteredContacts.length > 0"
-                class="absolute z-50 w-full mt-1 max-h-64 overflow-y-auto shadow-lg"
-              >
-                <CardContent class="p-0">
-                  <div 
-                    v-for="contact in filteredContacts" 
-                    :key="contact.id"
-                    @click="selectContact(contact)"
-                    class="flex items-center gap-2 p-3 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
-                  >
-                    <div class="w-8 h-8 rounded-full bg-muted text-primary flex items-center justify-center text-xs font-bold shrink-0">
-                      {{ contact.initials }}
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-sm font-semibold text-foreground truncate">{{ contact.name }}</div>
-                      <div class="text-xs text-muted-foreground truncate">{{ contact.email }}</div>
-                    </div>
-                    <ChevronRight class="w-3 h-3 shrink-0 text-muted-foreground" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <!-- Selected Customer Display -->
-            <Card v-if="selectedContact" class="bg-muted border-border">
-              <CardContent class="p-4">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-white text-primary flex items-center justify-center text-xs font-bold border border-border">
-                      {{ selectedContact.initials }}
-                    </div>
-                    <div>
-                      <div class="text-sm font-semibold text-foreground">{{ selectedContact.name }}</div>
-                      <div class="text-xs text-muted-foreground">{{ selectedContact.email }}</div>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="small"
-                    class="h-8 w-8 p-0"
-                    @click="clearSelection"
-                  >
-                    <X class="w-4 h-4 shrink-0" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <CustomerSearchSelect
+              v-model="selectedContact"
+              label="Search Customer"
+            />
           </div>
         
           <!-- Customer Form Fields (if new) -->
@@ -396,8 +337,9 @@
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue'
-import { Search, ChevronRight, X, Info, AlertTriangle } from 'lucide-vue-next'
+import { Info, AlertTriangle } from 'lucide-vue-next'
 import { Button, Checkbox, Input, Toggle, Card, CardHeader, CardTitle, CardContent, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Label } from '@motork/component-library/future/primitives'
+import CustomerSearchSelect from '@/components/shared/CustomerSearchSelect.vue'
 import { useCustomersStore } from '@/stores/customers'
 import { useAddFormValidation } from '@/composables/useAddFormValidation'
 import { useAddFormSubmission } from '@/composables/useAddFormSubmission'
@@ -424,9 +366,6 @@ const customersStore = useCustomersStore()
 // Contact Mode
 const contactMode = ref(props.initialContact ? 'existing' : 'new') // 'existing' or 'new'
 
-// Contact Search (for existing)
-const searchQuery = ref('')
-const showResults = ref(false)
 const selectedContact = ref(props.initialContact || null)
 
 // Contact Form Data (for new)
@@ -469,16 +408,12 @@ watch(() => props.forceType, (newType) => {
   }
 })
 
-// Set initial contact if provided
 watch(() => props.initialContact, (newContact) => {
   if (newContact) {
     selectedContact.value = newContact
-    searchQuery.value = newContact.name
     contactMode.value = 'existing'
   }
 }, { immediate: true })
-
-let searchTimeout = null
 
 // Use validation composable
 const { errors, canSubmit, validateContactForm, clearErrors } = useAddFormValidation({
@@ -491,21 +426,6 @@ onMounted(() => {
   if (customersStore.customers.length === 0) {
     customersStore.fetchCustomers()
   }
-})
-
-// Computed
-const filteredContacts = computed(() => {
-  if (!searchQuery.value.trim()) {
-    return customersStore.customers.slice(0, 10)
-  }
-  
-  const query = searchQuery.value.toLowerCase()
-  return customersStore.customers.filter(contact => 
-    contact.name.toLowerCase().includes(query) ||
-    contact.email.toLowerCase().includes(query) ||
-    (contact.phone && contact.phone.toLowerCase().includes(query)) ||
-    (contact.company && contact.company.toLowerCase().includes(query))
-  ).slice(0, 10)
 })
 
 const hasVehicleData = computed(() => {
@@ -539,35 +459,12 @@ const { isSubmitting, handleSubmit: submitHandler, resetSubmitting } = useAddFor
   }
 })
 
-// Methods
-const handleSearch = () => {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    showResults.value = true
-  }, 300)
-}
-
-const selectContact = (contact) => {
-  selectedContact.value = contact
-  searchQuery.value = contact.name
-  showResults.value = false
-}
-
-const clearSelection = () => {
-  selectedContact.value = null
-  searchQuery.value = ''
-  showResults.value = false
-}
-
 const handleClear = () => {
   // Reset contact mode to new
   contactMode.value = 'new'
   
-  // Clear contact search
   selectedContact.value = null
-  searchQuery.value = ''
-  showResults.value = false
-  
+
   // Clear contact form
   contactFormData.name = ''
   contactFormData.email = ''

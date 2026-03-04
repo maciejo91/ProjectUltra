@@ -352,7 +352,7 @@ export const mockOpportunities = [
 
   // 9a. In Negotiation - Awaiting Offer (appointment done/skipped, no offer yet)
   {
-    id: 12,
+    id: 14,
     customerId: 14,
     source: 'Website',
     sourceDetails: 'Contact form',
@@ -531,6 +531,222 @@ export const mockOpportunities = [
     closedDate: createDateOffset(-14),
     contractDate: createDateOffset(-14),
     deliveryDate: createDateOffset(-5),
+    scheduledAppointment: null
+  },
+
+  // 15. Qualified – no appointment
+  {
+    id: 15,
+    customerId: 17,
+    source: 'Walk-in',
+    sourceDetails: 'Showroom visit',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('Genesis', 'GV60', 2024, 65000, { vin: 'WBADT43452G123456' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'Qualified',
+    negotiationSubstatus: null,
+    offers: [],
+    tags: ['EV'],
+    value: 65000,
+    expectedCloseDate: createDateOffset(14),
+    assignee: 'Sarah Jenkins',
+    createdAt: createHourOffset(-6),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createDateOffset(3),
+    scheduledAppointment: null
+  },
+
+  // 16. In Negotiation - Offer Sent (additional)
+  {
+    id: 16,
+    customerId: 20,
+    source: 'Google Ads',
+    sourceDetails: 'Summer Campaign',
+    fiscalEntity: 'MotorK',
+    requestType: 'Test Drive',
+    requestedCar: baseRequestedCar('Polestar', '2', 2024, 55000, { vin: 'YV1EZFA2XN5123456' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'In Negotiation',
+    negotiationSubstatus: 'Offer Sent',
+    offers: [
+      {
+        id: 'offer-16',
+        createdAt: createHourOffset(-4),
+        vehicleBrand: 'Polestar',
+        vehicleModel: '2',
+        vehicleYear: 2024,
+        price: 55000,
+        status: 'active',
+        data: { brand: 'Polestar', model: '2', year: 2024, price: 55000, financingType: 'cash', image: DEFAULT_CAR_IMAGE }
+      }
+    ],
+    tags: [],
+    value: 55000,
+    expectedCloseDate: createDateOffset(7),
+    assignee: 'David Miller',
+    createdAt: createHourOffset(-8),
+    lastActivity: createHourOffset(-1),
+    nextActionDue: createDateOffset(2),
+    scheduledAppointment: null
+  },
+
+  // 17. In Negotiation - Contract Pending (additional)
+  {
+    id: 17,
+    customerId: 21,
+    source: 'Website',
+    sourceDetails: 'Contact form',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('Audi', 'e-tron', 2024, 78000, { vin: 'WAUZZZ8V9LA123456' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'In Negotiation',
+    negotiationSubstatus: 'Offer Sent',
+    offers: [
+      {
+        id: 'offer-17',
+        createdAt: createDateOffset(-6),
+        vehicleBrand: 'Audi',
+        vehicleModel: 'e-tron',
+        vehicleYear: 2024,
+        price: 78000,
+        status: 'accepted',
+        data: { brand: 'Audi', model: 'e-tron', year: 2024, price: 78000, financingType: 'financing', image: DEFAULT_CAR_IMAGE }
+      }
+    ],
+    contracts: [
+      {
+        id: 'contract-17-1',
+        contractDate: createDateOffset(-2),
+        contractNotes: 'Pending customer signature',
+        contractSigned: false,
+        version: 1,
+        status: 'pending'
+      }
+    ],
+    tags: ['Premium'],
+    value: 78000,
+    expectedCloseDate: createDateOffset(5),
+    assignee: 'Sarah Jenkins',
+    createdAt: createDateOffset(-12),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createDateOffset(1),
+    contractDate: createDateOffset(-2),
+    scheduledAppointment: null
+  },
+
+  // 18. Closed Won – no delivery date (additional)
+  {
+    id: 18,
+    customerId: 22,
+    source: 'Facebook',
+    sourceDetails: 'Auto campaign',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('Cupra', 'Formentor', 2024, 42000, { vin: 'WVWZZZ3CZWE123457' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'Closed Won',
+    negotiationSubstatus: null,
+    deliverySubstatus: null,
+    offers: [
+      {
+        id: 'offer-18',
+        createdAt: createDateOffset(-20),
+        vehicleBrand: 'Cupra',
+        vehicleModel: 'Formentor',
+        vehicleYear: 2024,
+        price: 42000,
+        status: 'accepted',
+        data: { brand: 'Cupra', model: 'Formentor', year: 2024, price: 42000, financingType: 'cash', image: DEFAULT_CAR_IMAGE }
+      }
+    ],
+    contracts: [
+      {
+        id: 'contract-18-1',
+        contractDate: createDateOffset(-5),
+        contractNotes: 'Signed',
+        contractSigned: true,
+        esignatureCollectedDate: createDateOffset(-5),
+        version: 1,
+        status: 'signed'
+      }
+    ],
+    tags: [],
+    value: 42000,
+    expectedCloseDate: null,
+    assignee: 'David Miller',
+    createdAt: createDateOffset(-25),
+    lastActivity: createDateOffset(-4),
+    nextActionDue: createDateOffset(2),
+    closedDate: createDateOffset(-5),
+    contractDate: createDateOffset(-5),
+    deliveryDate: null,
+    scheduledAppointment: null
+  },
+
+  // 19. Closed Lost (additional)
+  {
+    id: 19,
+    customerId: 23,
+    source: '3rd Party',
+    sourceDetails: 'Aggregator',
+    fiscalEntity: '',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('Alfa Romeo', 'Giulia', 2024, 52000, { vin: 'ZARFAEEB0N7123456' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'Closed Lost',
+    negotiationSubstatus: 'Offer Sent',
+    offers: [
+      {
+        id: 'offer-19',
+        createdAt: createDateOffset(-10),
+        vehicleBrand: 'Alfa Romeo',
+        vehicleModel: 'Giulia',
+        vehicleYear: 2024,
+        price: 52000,
+        status: 'archived',
+        data: { brand: 'Alfa Romeo', model: 'Giulia', year: 2024, price: 52000, financingType: 'financing', image: DEFAULT_CAR_IMAGE }
+      }
+    ],
+    tags: [],
+    value: 52000,
+    lostReason: 'Financing fell through',
+    expectedCloseDate: null,
+    assignee: 'Sarah Jenkins',
+    createdAt: createDateOffset(-15),
+    lastActivity: createDateOffset(-8),
+    nextActionDue: createDateOffset(-5),
+    closedDate: createDateOffset(-8),
+    scheduledAppointment: null
+  },
+
+  // 20. Abandoned (additional)
+  {
+    id: 20,
+    customerId: 24,
+    source: 'Website',
+    sourceDetails: 'Contact form',
+    fiscalEntity: '',
+    requestType: 'Generic sales',
+    requestedCar: baseRequestedCar('DS', '4', 2024, 45000, { vin: 'VR3UHZKX1NM123456' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'Abandoned',
+    negotiationSubstatus: null,
+    offers: [],
+    tags: [],
+    value: 45000,
+    expectedCloseDate: createHourOffset(48),
+    assignee: 'David Miller',
+    createdAt: createHourOffset(-12),
+    lastActivity: createHourOffset(-8),
+    nextActionDue: createHourOffset(24),
     scheduledAppointment: null
   }
 ]

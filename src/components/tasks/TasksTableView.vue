@@ -177,8 +177,7 @@ const sorting = ref([])
 const columnFilters = ref([
   { id: 'showClosed-1', field: 'showClosed', value: props.showClosed ? 'yes' : '', operator: 'eq', pinned: true },
   { id: 'type-1', field: 'type', value: '', operator: 'eq', pinned: true },
-  { id: 'status-1', field: 'status', value: [], operator: 'in', pinned: true },
-  { id: 'urgencyLevel-1', field: 'urgencyLevel', value: [], operator: 'in', pinned: true }
+  { id: 'status-1', field: 'status', value: [], operator: 'in', pinned: true }
 ])
 // Default visible columns: show Task title, hide Urgency, Created, Attempts, VIN, Request message, Source
 const columnVisibility = ref({
@@ -225,6 +224,7 @@ watch(
   { deep: true }
 )
 
+// Show filter row when we have filters (including default Show Closed, Type, Status) or search
 const hasActiveFilters = computed(() => {
   const hasColumnFilters = Array.isArray(columnFilters.value) && columnFilters.value.length > 0
   const hasSearch = Boolean(globalFilter.value && String(globalFilter.value).trim())
@@ -503,17 +503,6 @@ const getTaskFilterValue = (row, key) => {
   }
   if (key === 'nextActionDue') {
     return row.nextActionDue ?? row.dueDate
-  }
-  if (key === 'urgencyLevel') {
-    if (row.urgencyLevel) return row.urgencyLevel
-    if (row.type === 'lead') {
-      try {
-        return calculateLeadUrgency(row).level
-      } catch {
-        return undefined
-      }
-    }
-    return undefined
   }
   return getNestedProperty(row, key)
 }

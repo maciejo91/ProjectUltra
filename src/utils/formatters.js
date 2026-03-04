@@ -269,6 +269,7 @@ export function getStageBadgeClass(stage) {
     // Legacy/alternate keys
     'Open': 'bg-blue-50 text-blue-700',
     'Open Opportunities': 'bg-blue-50 text-blue-700',
+    'Opportunities Qualified': 'bg-blue-50 text-blue-700',
     'Open opportunity': 'bg-blue-50 text-blue-700',
     'Opportunity in negotiation': 'bg-badge-orange text-amber-700',
     'Registration': 'bg-indigo-50 text-indigo-700',

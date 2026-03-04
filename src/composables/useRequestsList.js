@@ -88,7 +88,7 @@ export function useRequestsList() {
   const opportunitiesStore = useOpportunitiesStore()
   const userStore = useUserStore()
 
-  const selectedSegment = ref(SEGMENT_KEYS.ALL)
+  const selectedSegment = ref(SEGMENT_KEYS.NEW_LEADS)
 
   const combinedList = computed(() => {
     return buildCombinedList(

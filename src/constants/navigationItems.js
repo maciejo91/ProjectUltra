@@ -7,9 +7,9 @@ export const NAV_ITEMS = [
   { id: 'tasks', label: 'Tasks' },
   { id: 'requests', label: 'Requests' },
   { id: 'customers', label: 'Customers' },
+  { id: 'lists', label: 'Vehicles' },
   { id: 'calendar', label: 'Calendar' },
   { id: 'reports', label: 'Reports' },
-  { id: 'lists', label: 'Vehicles' },
   { id: 'search', label: 'Search' },
   { id: 'language', label: 'Language' }
 ]

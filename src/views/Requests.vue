@@ -147,6 +147,7 @@ import { useDataTableData, getNestedProperty } from '@/composables/useDataTableD
 import { useTasksTableFilters } from '@/composables/useTasksTableFilters'
 import { useTableRowSelection } from '@/composables/useTableRowSelection'
 import { getStageBadgeClass } from '@/utils/formatters'
+import { getDisplayStage } from '@/utils/stageMapper'
 import { useUsersStore } from '@/stores/users'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
@@ -160,11 +161,11 @@ const {
 } = useRequestsList()
 
 const REQUESTS_PINNED_SEGMENT_KEY = 'project-ultra-requests-pinned-segment'
-const validSegmentKeys = Object.values(SK)
+const selectableSegmentKeys = Object.values(SK).filter(k => k !== SK.ALL)
 const getStoredPinnedSegment = () => {
   try {
     const stored = localStorage.getItem(REQUESTS_PINNED_SEGMENT_KEY)
-    return stored && validSegmentKeys.includes(stored) ? stored : ''
+    return stored && selectableSegmentKeys.includes(stored) ? stored : ''
   } catch {
     return ''
   }
@@ -206,7 +207,7 @@ const columnVisibility = ref({
 })
 
 const { filterDefinitions } = useTasksTableFilters({
-  showTypeFilter: true,
+  showTypeFilter: computed(() => true),
   tasks: filteredList
 })
 
@@ -223,19 +224,16 @@ const sourceOptions = computed(() => {
   return def?.options ?? []
 })
 
+// Show filter row when we have filters (Type, Status, Assignee) or search
 const hasActiveFilters = computed(() => {
-  const hasColumnFilters = Array.isArray(columnFilters.value) && columnFilters.value.some(f => {
-    const v = f.value
-    return (Array.isArray(v) && v.length > 0) || (v !== '' && v != null)
-  })
+  const hasColumnFilters = Array.isArray(columnFilters.value) && columnFilters.value.length > 0
   const hasSearch = Boolean(globalFilter.value && String(globalFilter.value).trim())
   return hasColumnFilters || hasSearch
 })
 
 const filterChips = computed(() => [
-  { key: SK.ALL, label: 'All', count: counts.value[SK.ALL] },
   { key: SK.NEW_LEADS, label: 'New Leads', count: counts.value[SK.NEW_LEADS] },
-  { key: SK.OPEN_OPPORTUNITIES, label: 'Open opportunities', count: counts.value[SK.OPEN_OPPORTUNITIES] },
+  { key: SK.OPEN_OPPORTUNITIES, label: 'Opportunities Qualified', count: counts.value[SK.OPEN_OPPORTUNITIES] },
   { key: SK.IN_NEGOTIATION, label: 'Opportunities in negotiation', count: counts.value[SK.IN_NEGOTIATION] },
   { key: SK.WON, label: 'Opportunities won', count: counts.value[SK.WON] },
   { key: SK.LOST, label: 'Opportunities lost', count: counts.value[SK.LOST] }
@@ -254,9 +252,8 @@ function togglePin(key) {
 }
 
 const emptyStateText = computed(() => {
-  if (selectedSegment.value === SK.ALL) return 'No requests'
   if (selectedSegment.value === SK.NEW_LEADS) return 'No New Leads'
-  if (selectedSegment.value === SK.OPEN_OPPORTUNITIES) return 'No Open opportunities'
+  if (selectedSegment.value === SK.OPEN_OPPORTUNITIES) return 'No Opportunities Qualified'
   if (selectedSegment.value === SK.IN_NEGOTIATION) return 'No Opportunities in negotiation'
   if (selectedSegment.value === SK.WON) return 'No Opportunities won'
   if (selectedSegment.value === SK.LOST) return 'No Opportunities lost'
@@ -332,7 +329,7 @@ const columns = computed(() => [
 
 const getRequestFilterValue = (row, key) => {
   if (key === 'status') {
-    return row.displayStage ?? row.stage ?? row.status ?? ''
+    return getDisplayStage(row, row.type === 'lead' ? 'lead' : 'opportunity') ?? row.displayStage ?? row.stage ?? row.status ?? ''
   }
   if (key === 'assignee') {
     const val = row.assignee
@@ -480,8 +477,9 @@ function closeRequestDrawer() {
 
 function applySegmentFromQuery() {
   const segment = route.query.segment
-  const validSegments = Object.values(SK)
-  if (segment && validSegments.includes(segment)) {
+  if (segment === 'all') {
+    selectedSegment.value = SK.NEW_LEADS
+  } else if (segment && selectableSegmentKeys.includes(segment)) {
     selectedSegment.value = segment
   }
 }
@@ -500,7 +498,9 @@ onMounted(() => {
 })
 
 watch(() => route.query.segment, (segment) => {
-  if (segment && Object.values(SK).includes(segment)) {
+  if (segment === 'all') {
+    selectedSegment.value = SK.NEW_LEADS
+  } else if (segment && selectableSegmentKeys.includes(segment)) {
     selectedSegment.value = segment
   }
 })

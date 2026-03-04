@@ -79,6 +79,37 @@
             <span>Customers</span>
           </router-link>
 
+          <!-- Vehicles (Lists) Submenu -->
+          <button
+            v-if="navigationVisibility.lists !== false"
+            @click="toggleListsMenu"
+            class="mobile-sidebar-link w-full"
+            :class="{ 'mobile-sidebar-link-active': isActive('/vehicles') || showListsMenu }"
+          >
+            <List :size="18" class="shrink-0 sm:hidden" />
+            <List :size="20" class="shrink-0 hidden sm:block" />
+            <span>Vehicles</span>
+            <ChevronDown :size="14" class="ml-auto transition-transform sm:hidden" :class="{ 'rotate-180': showListsMenu }" />
+            <ChevronDown :size="16" class="ml-auto transition-transform hidden sm:block" :class="{ 'rotate-180': showListsMenu }" />
+          </button>
+          
+          <!-- Lists Submenu Items -->
+          <div v-if="showListsMenu && navigationVisibility.lists !== false" class="pl-8 sm:pl-9 space-y-0.5 sm:space-y-1">
+            <router-link 
+              to="/vehicles"
+              @click="$emit('close')"
+              class="mobile-sidebar-link mobile-sidebar-submenu-link"
+              :class="{ 'mobile-sidebar-link-active': isActive('/vehicles') }"
+            >
+              <CarFront :size="16" class="shrink-0 sm:hidden" />
+              <CarFront :size="18" class="shrink-0 hidden sm:block" />
+              <span>Vehicles</span>
+            </router-link>
+          </div>
+
+          <!-- Separator -->
+          <div class="h-px bg-white/70 my-2 mx-3 shrink-0" aria-hidden="true" />
+
           <!-- Requests -->
           <router-link
             v-if="navigationVisibility.requests !== false"
@@ -120,9 +151,9 @@
           </router-link>
 
           <!-- Separator -->
-          <div class="h-px bg-white/10 mx-3 my-1" aria-hidden="true" />
+          <div class="h-px bg-white/70 my-2 mx-3 shrink-0" aria-hidden="true" />
           
-          <!-- Reports -->
+          <!-- Insights -->
           <router-link 
             v-if="userStore.canAccessReports() && navigationVisibility.reports !== false"
             to="/reports" 
@@ -132,35 +163,8 @@
           >
             <LineChart :size="18" class="shrink-0 sm:hidden" />
             <LineChart :size="20" class="shrink-0 hidden sm:block" />
-            <span>Reports</span>
+            <span>Insights</span>
           </router-link>
-
-          <!-- Vehicles (Lists) Submenu -->
-          <button
-            @click="toggleListsMenu"
-            class="mobile-sidebar-link w-full"
-            :class="{ 'mobile-sidebar-link-active': isActive('/vehicles') || showListsMenu }"
-          >
-            <List :size="18" class="shrink-0 sm:hidden" />
-            <List :size="20" class="shrink-0 hidden sm:block" />
-            <span>Vehicles</span>
-            <ChevronDown :size="14" class="ml-auto transition-transform sm:hidden" :class="{ 'rotate-180': showListsMenu }" />
-            <ChevronDown :size="16" class="ml-auto transition-transform hidden sm:block" :class="{ 'rotate-180': showListsMenu }" />
-          </button>
-          
-          <!-- Lists Submenu Items -->
-          <div v-if="showListsMenu" class="pl-8 sm:pl-9 space-y-0.5 sm:space-y-1">
-            <router-link 
-              to="/vehicles"
-              @click="$emit('close')"
-              class="mobile-sidebar-link mobile-sidebar-submenu-link"
-              :class="{ 'mobile-sidebar-link-active': isActive('/vehicles') }"
-            >
-              <CarFront :size="16" class="shrink-0 sm:hidden" />
-              <CarFront :size="18" class="shrink-0 hidden sm:block" />
-              <span>Vehicles</span>
-            </router-link>
-          </div>
         </div>
 
         <!-- Divider -->

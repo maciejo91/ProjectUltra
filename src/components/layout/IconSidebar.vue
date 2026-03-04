@@ -12,7 +12,7 @@
         :aria-label="expanded ? t('common.layout.closeSidebar') : t('common.layout.openSidebar')"
         :aria-expanded="expanded"
         :class="[
-          'flex w-full items-center rounded-md text-white/80 hover:bg-white/10 transition-colors',
+          'relative group flex w-full items-center rounded-md text-white/80 hover:bg-white/10 transition-colors',
           expanded ? 'h-9 gap-3 px-3' : 'h-9 justify-center'
         ]"
         @click="layoutStore.toggleSidebar()"
@@ -20,12 +20,18 @@
         <PanelLeftClose v-if="expanded" :size="18" class="shrink-0" />
         <PanelLeft v-else :size="18" class="shrink-0" />
         <span v-if="expanded" class="truncate text-sm">{{ t('common.layout.closeSidebar') }}</span>
+        <span
+          v-else
+          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+        >
+          {{ t('common.layout.openSidebar') }}
+        </span>
       </button>
     </div>
 
     <!-- Logo -->
     <div class="w-full px-2 pt-2 pb-2 shrink-0">
-      <router-link :to="firstVisibleRoute" class="flex items-center gap-2 overflow-hidden">
+      <router-link :to="firstVisibleRoute" :class="['relative group flex items-center gap-2', expanded ? 'overflow-hidden' : 'justify-center overflow-visible']">
         <div
           :class="[
             'flex shrink-0 items-center justify-center rounded-md bg-transparent',
@@ -41,6 +47,12 @@
         <span
           v-if="expanded"
           class="truncate text-sm font-semibold text-white"
+        >
+          LeadSparK
+        </span>
+        <span
+          v-else
+          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
           LeadSparK
         </span>
@@ -114,6 +126,30 @@
       </router-link>
 
       <router-link
+        v-if="navigationVisibility.lists !== false"
+        to="/vehicles"
+        :class="[
+          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
+          expanded ? 'h-9 px-3' : 'h-8 justify-center',
+          isActive('/vehicles') ? 'bg-white/20' : 'hover:bg-white/10'
+        ]"
+        aria-label="Vehicles"
+        title="Vehicles"
+      >
+        <CarFront :size="16" class="text-white shrink-0" />
+        <span v-if="expanded" class="truncate text-sm text-white">Vehicles</span>
+        <span
+          v-else
+          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
+        >
+          Vehicles
+        </span>
+      </router-link>
+
+      <!-- Separator -->
+      <div class="h-px bg-white/70 my-2 mx-1 shrink-0" aria-hidden="true" />
+
+      <router-link
         v-if="navigationVisibility.requests !== false"
         to="/requests"
         :class="[
@@ -178,7 +214,7 @@
       </router-link>
 
       <!-- Separator -->
-      <div class="h-px bg-white/10 my-1 mx-1" aria-hidden="true" />
+      <div class="h-px bg-white/70 my-2 mx-1 shrink-0" aria-hidden="true" />
 
       <router-link
         v-if="userStore.canAccessReports() && navigationVisibility.reports !== false"
@@ -188,36 +224,16 @@
           expanded ? 'h-9 px-3' : 'h-8 justify-center',
           isActive('/reports') ? 'bg-white/20' : 'hover:bg-white/10'
         ]"
-        aria-label="Reports"
-        title="Reports"
+        aria-label="Insights"
+        title="Insights"
       >
         <LineChart :size="16" class="text-white shrink-0" />
-        <span v-if="expanded" class="truncate text-sm text-white">Reports</span>
+        <span v-if="expanded" class="truncate text-sm text-white">Insights</span>
         <span
           v-else
           class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
         >
-          Reports
-        </span>
-      </router-link>
-
-      <router-link
-        to="/vehicles"
-        :class="[
-          'relative group flex items-center gap-3 rounded-md transition-colors cursor-pointer',
-          expanded ? 'h-9 px-3' : 'h-8 justify-center',
-          isActive('/vehicles') ? 'bg-white/20' : 'hover:bg-white/10'
-        ]"
-        aria-label="Vehicles"
-        title="Vehicles"
-      >
-        <CarFront :size="16" class="text-white shrink-0" />
-        <span v-if="expanded" class="truncate text-sm text-white">Vehicles</span>
-        <span
-          v-else
-          class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-sm text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        >
-          Vehicles
+          Insights
         </span>
       </router-link>
     </div>

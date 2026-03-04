@@ -19,6 +19,22 @@ export function useCustomersTable(activeTab, handleRowClick, opts = {}) {
   const filterDefinitions = computed(() => {
     // Different filters based on active tab
     if (activeTab.value === 'customers') {
+      const rowList = rows?.value ?? []
+      const uniqueSources = [...new Set(rowList.map((r) => r.source).filter(Boolean))].sort()
+      const sourceOptions = uniqueSources.length > 0
+        ? uniqueSources.map(s => ({ value: s, label: s }))
+        : [
+            { value: 'Marketing', label: 'Marketing' },
+            { value: 'Referral', label: 'Referral' },
+            { value: 'Direct', label: 'Direct' }
+          ]
+      const uniqueAccountTypes = [...new Set(rowList.map((r) => r.accountType).filter(Boolean))].sort()
+      const accountTypeOptions = uniqueAccountTypes.length > 0
+        ? uniqueAccountTypes.map(a => ({ value: a, label: a }))
+        : [
+            { value: 'Contact', label: 'Contact' },
+            { value: 'Account', label: 'Account' }
+          ]
       return [
         {
           key: 'source',
@@ -28,11 +44,8 @@ export function useCustomersTable(activeTab, handleRowClick, opts = {}) {
             { value: 'eq', label: 'is' },
             { value: 'ne', label: 'is not' }
           ],
-          options: [
-            { value: 'Marketing', label: 'Marketing' },
-            { value: 'Referral', label: 'Referral' },
-            { value: 'Direct', label: 'Direct' }
-          ]
+          options: sourceOptions,
+          pinned: true
         },
         {
           key: 'accountType',
@@ -42,10 +55,8 @@ export function useCustomersTable(activeTab, handleRowClick, opts = {}) {
             { value: 'eq', label: 'is' },
             { value: 'ne', label: 'is not' }
           ],
-          options: [
-            { value: 'Contact', label: 'Contact' },
-            { value: 'Account', label: 'Account' }
-          ]
+          options: accountTypeOptions,
+          pinned: true
         }
       ]
     } else {

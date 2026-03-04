@@ -32,7 +32,20 @@
             </ol>
           </nav>
 
-          <!-- Step 1: Vehicle -->
+          <!-- Step: Customer (when showCustomerStep) -->
+          <div v-if="currentStepKey === 'customer'" class="space-y-4 max-w-2xl">
+            <p class="text-sm text-muted-foreground">Select the customer for this offer.</p>
+            <CustomerSearchSelect
+              :model-value="selectedCustomer"
+              label="Search Customer"
+              contacts-only
+              :show-clear="false"
+              change-label="Change"
+              @update:model-value="onCustomerSelected"
+            />
+          </div>
+
+          <!-- Step: Vehicle (when not preselected) -->
           <div v-if="currentStepKey === 'vehicle'" class="space-y-4">
             <div v-if="vehicleSubView === 'choice'" class="grid gap-3 sm:grid-cols-1">
               <Button
@@ -541,9 +554,10 @@ import {
 import VehicleSelectionInline from '@/components/shared/VehicleSelectionInline.vue'
 import TradeInsCard from '@/components/shared/TradeInsCard.vue'
 import FinancingOptionsCard from '@/components/shared/FinancingOptionsCard.vue'
+import CustomerSearchSelect from '@/components/shared/CustomerSearchSelect.vue'
 
-const STEP_KEYS = ['vehicle', 'personal', 'tradein_financing', 'pricing', 'payment', 'terms']
-const STEP_LABELS = [
+const BASE_STEP_KEYS = ['vehicle', 'personal', 'tradein_financing', 'pricing', 'payment', 'terms']
+const BASE_STEP_LABELS = [
   { key: 'vehicle', label: 'Vehicle' },
   { key: 'personal', label: 'Personal' },
   { key: 'tradein_financing', label: 'Trade-in & Financing' },
@@ -553,6 +567,10 @@ const STEP_LABELS = [
 ]
 
 const props = defineProps({
+  /** When set, vehicle step is skipped and this vehicle is used. */
+  preselectedVehicle: { type: Object, default: null },
+  /** When true, adds a customer selection step as the first step (e.g. from vehicles page). */
+  showCustomerStep: { type: Boolean, default: false },
   show: { type: Boolean, required: true },
   opportunity: { type: Object, default: null },
   /** When true, the Trade-ins card Add button shows loading (e.g. while saving a trade-in). */
@@ -568,13 +586,48 @@ const vehicleSelectionRef = ref(null)
 const hasStockSelection = ref(false)
 const promoPublicOemEnabled = ref(false)
 const promoOemCommercialEnabled = ref(false)
+const selectedCustomer = ref(null)
+
+function onCustomerSelected(c) {
+  selectedCustomer.value = c
+  if (c) populateCustomer()
+}
+
+const stepKeys = computed(() => {
+  const keys = [...BASE_STEP_KEYS]
+  if (props.showCustomerStep) keys.unshift('customer')
+  if (props.preselectedVehicle) keys.splice(keys.indexOf('vehicle'), 1)
+  return keys
+})
+const stepLabels = computed(() => {
+  const labels = [...BASE_STEP_LABELS]
+  if (props.showCustomerStep) labels.unshift({ key: 'customer', label: 'Customer' })
+  if (props.preselectedVehicle) labels.splice(labels.findIndex(l => l.key === 'vehicle'), 1)
+  return labels
+})
 
 const resolvedTaskId = computed(() => props.opportunity?.id ?? null)
-const customer = computed(() => props.opportunity?.customer ?? null)
+const customer = computed(() => {
+  if (props.showCustomerStep && selectedCustomer.value) {
+    const c = selectedCustomer.value
+    return {
+      id: c.id,
+      name: c.name || [c.firstName, c.lastName].filter(Boolean).join(' '),
+      email: c.email,
+      phone: c.phone,
+      address: c.address,
+      city: c.city,
+      zipCode: c.zipCode || c.postalCode,
+      initials: c.initials || (c.name || '').split(/\s+/).map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    }
+  }
+  return props.opportunity?.customer ?? null
+})
 const taskTradeIns = computed(() => props.opportunity?.tradeIns ?? [])
 const taskFinancingOptions = computed(() => props.opportunity?.financingOptions ?? [])
 const requestedVehicle = computed(
   () =>
+    props.preselectedVehicle ||
     props.opportunity?.selectedVehicle ||
     props.opportunity?.vehicle ||
     props.opportunity?.requestedCar ||
@@ -585,10 +638,10 @@ const opportunityId = computed(() => props.opportunity?.id ?? null)
 const { locale } = useI18n()
 const defaultVatForLocale = computed(() => (locale.value === 'it' ? '22' : '21'))
 
-const currentStepKey = computed(() => STEP_KEYS[stepIndex.value] ?? 'vehicle')
+const currentStepKey = computed(() => stepKeys.value[stepIndex.value] ?? 'vehicle')
 const currentStepIndex = computed(() => stepIndex.value)
-const stepLabels = STEP_LABELS
-const isLastStep = computed(() => stepIndex.value === STEP_KEYS.length - 1)
+const isLastStep = computed(() => stepIndex.value === stepKeys.value.length - 1)
+
 
 const offerData = ref({
   salutation: '',
@@ -793,6 +846,7 @@ const canSubmit = computed(() => {
 })
 
 const isNextDisabled = computed(() => {
+  if (currentStepKey.value === 'customer') return !selectedCustomer.value
   if (currentStepKey.value === 'vehicle') {
     if (vehicleSubView.value === 'stock') return !hasStockSelection.value
   }
@@ -815,7 +869,8 @@ function priceGrossStep1(price) {
 function populateCustomer() {
   const c = customer.value
   if (!c) return
-  const nameParts = (c.name || '').split(' ')
+  const fullName = c.name || [c.firstName, c.lastName].filter(Boolean).join(' ')
+  const nameParts = fullName.split(' ')
   offerData.value.firstName = nameParts[0] || ''
   offerData.value.lastName = nameParts.slice(1).join(' ') || ''
   offerData.value.email = c.email || ''
@@ -891,7 +946,7 @@ function handleNext() {
     if (vehicleSubView.value !== 'stock' && vehicleSubView.value !== 'configure') return
   }
   if (isLastStep.value) return
-  stepIndex.value = Math.min(stepIndex.value + 1, STEP_KEYS.length - 1)
+  stepIndex.value = Math.min(stepIndex.value + 1, stepKeys.value.length - 1)
 }
 
 function handleBackClick() {
@@ -960,13 +1015,19 @@ function submitForm() {
     timestamp: new Date().toISOString(),
     isEdit: false
   }
+  if (props.showCustomerStep && selectedCustomer.value) {
+    payload.selectedCustomerId = selectedCustomer.value.id
+    payload.selectedCustomerType = selectedCustomer.value.type || 'contact'
+  }
   emit('confirm', payload)
 }
 
 function reset() {
   stepIndex.value = 0
   vehicleSubView.value = 'choice'
-  resolvedVehicle.value = null
+  selectedCustomer.value = null
+  const preVehicle = props.preselectedVehicle
+  resolvedVehicle.value = preVehicle ? { ...preVehicle } : null
   hasStockSelection.value = false
   offerData.value = {
     salutation: '',

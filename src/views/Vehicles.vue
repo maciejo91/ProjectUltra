@@ -228,22 +228,85 @@
         </footer>
       </div>
     </DrawerContainer>
+
+    <AddOfferModal
+      v-if="showAddOfferModal"
+      :show="showAddOfferModal"
+      :preselected-vehicle="selectedVehicleForOffer"
+      :show-customer-step="true"
+      @confirm="handleAddOfferConfirm"
+      @cancel="showAddOfferModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount, inject, h } from 'vue'
-import { X } from 'lucide-vue-next'
+import { X, FilePlus } from 'lucide-vue-next'
 import { useVehiclesStore } from '@/stores/vehicles'
-import { Button, Badge, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea, Toggle } from '@motork/component-library/future/primitives'
+import { Badge, Button, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea, Toggle } from '@motork/component-library/future/primitives'
 import DrawerContainer from '@/components/shared/DrawerContainer.vue'
 import VehicleGrid from '@/components/vehicles/VehicleGrid.vue'
+import AddOfferModal from '@/components/modals/AddOfferModal.vue'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
 import { useVehicleDetail } from '@/composables/useVehicleDetail'
 import { useDataTableData } from '@/composables/useDataTableData'
 
 const headerActionsRef = inject('headerActionsRef', null)
 const vehiclesStore = useVehiclesStore()
+const showAddOfferModal = ref(false)
+const selectedVehicleForOffer = ref(null)
+
+function openAddOfferModal(vehicle) {
+  selectedVehicleForOffer.value = vehicle
+  showAddOfferModal.value = true
+}
+
+async function handleAddOfferConfirm(payload) {
+  const vehicle = selectedVehicleForOffer.value
+  const contactId = payload.selectedCustomerId
+  if (!vehicle || !contactId) return
+  try {
+    const { useOpportunitiesStore } = await import('@/stores/opportunities')
+    const { useUserStore } = await import('@/stores/user')
+    const opportunitiesStore = useOpportunitiesStore()
+    const userStore = useUserStore()
+    const carData = {
+      brand: vehicle.brand,
+      model: vehicle.model,
+      year: vehicle.year,
+      price: vehicle.price ?? 0,
+      image: vehicle.image,
+      vin: vehicle.vin,
+      plates: vehicle.plates,
+      fuelType: vehicle.fuelType,
+      gearType: vehicle.gearType,
+      kilometers: vehicle.kilometers,
+      source: 'Direct'
+    }
+    const { createOpportunityFromContact } = await import('@/api/opportunities')
+    const newOpp = await createOpportunityFromContact(contactId, carData)
+    await opportunitiesStore.addOffer(newOpp.id, {
+      vehicleBrand: payload.data?.brand || vehicle.brand,
+      vehicleModel: payload.data?.model || vehicle.model,
+      vehicleYear: payload.data?.year || vehicle.year,
+      price: payload.data?.price ?? vehicle.price ?? 0,
+      data: payload.data
+    })
+    await opportunitiesStore.addActivity(newOpp.id, {
+      type: 'offer',
+      user: userStore.currentUser?.name || 'You',
+      action: 'created an offer',
+      content: `Offer created: ${vehicle.brand} ${vehicle.model} (${vehicle.year}) - € ${(payload.data?.price ?? vehicle.price ?? 0).toLocaleString()}`,
+      data: payload.data,
+      timestamp: new Date().toISOString()
+    })
+    showAddOfferModal.value = false
+    selectedVehicleForOffer.value = null
+  } catch (err) {
+    console.error('Failed to create offer:', err)
+  }
+}
 
 // DataTable state management
 const pagination = ref({
@@ -253,11 +316,10 @@ const pagination = ref({
 
 const globalFilter = ref('')
 const sorting = ref([])
-const selectedInventoryChip = ref('all')
+const selectedInventoryChip = ref('in-stock')
 
 function getInventoryTypeFilter(chip) {
-  if (chip === 'all') return []
-  return [{ key: 'inventoryType', id: 'inventoryType', value: chip, operator: 'eq' }]
+  return [{ id: 'inventoryType-1', field: 'inventoryType', value: chip, operator: 'eq', pinned: true }]
 }
 
 function replaceInventoryFilter(filters, chip) {
@@ -267,7 +329,11 @@ function replaceInventoryFilter(filters, chip) {
   return [...getInventoryTypeFilter(chip), ...without]
 }
 
-const columnFilters = ref(replaceInventoryFilter([], selectedInventoryChip.value))
+const defaultColumnFilters = () => [
+  ...getInventoryTypeFilter(selectedInventoryChip.value),
+  { id: 'status-1', field: 'status', value: '', operator: 'eq', pinned: true }
+]
+const columnFilters = ref(defaultColumnFilters())
 
 // Column visibility: hide columns with mostly empty/N/A data (column selector lets users show them)
 const columnVisibility = ref({
@@ -292,7 +358,6 @@ const filterChips = computed(() => {
   const inStock = list.filter((v) => v.inventoryType === 'in-stock').length
   const customerVehicles = list.filter((v) => v.inventoryType === 'customer-vehicles').length
   return [
-    { key: 'all', label: 'All', count: list.length },
     { key: 'in-stock', label: 'In stock', count: inStock },
     { key: 'customer-vehicles', label: "Customers' vehicles", count: customerVehicles }
   ]
@@ -305,100 +370,117 @@ watch(selectedInventoryChip, (chip) => {
 // Use composable for vehicle detail modal logic
 const { showAddModal, newVehicle, handleCloseModal, handleSubmit } = useVehicleDetail()
 
-// Filter definitions (inventoryType first so filter is always visible with default)
-const filterDefinitions = [
-  {
-    key: 'inventoryType',
-    label: 'Type',
-    type: 'select',
-    operators: [
-      { value: 'eq', label: 'is' },
-      { value: 'ne', label: 'is not' }
-    ],
-    options: [
-      { value: 'in-stock', label: 'In stock' },
-      { value: 'customer-vehicles', label: "Customers' vehicles" }
-    ],
-    aiHint: 'Inventory type: in stock or customer vehicle'
-  },
-  {
-    key: 'status',
-    label: 'Status',
-    type: 'select',
-    operators: [
-      { value: 'eq', label: 'is' },
-      { value: 'ne', label: 'is not' }
-    ],
-    options: [
-      { value: 'New', label: 'New' },
-      { value: 'Used', label: 'Used' }
-    ],
-    aiHint: 'Vehicle status (New or Used)'
-  },
-  {
-    key: 'brand',
-    label: 'Brand',
-    type: 'multiselect',
-    operators: [
-      { value: 'in', label: 'is any of' },
-      { value: 'notIn', label: 'is none of' }
-    ],
-    options: [
-      { value: 'Volkswagen', label: 'Volkswagen' },
-      { value: 'Mercedes-Benz', label: 'Mercedes-Benz' },
-      { value: 'Audi', label: 'Audi' },
-      { value: 'Porsche', label: 'Porsche' }
-    ],
-    aiHint: 'Car manufacturer brand'
-  },
-  {
-    key: 'model',
-    label: 'Model',
-    type: 'select',
-    operators: [
-      { value: 'eq', label: 'is' },
-      { value: 'ne', label: 'is not' }
-    ],
-    options: [
-      { value: 'XC90', label: 'XC90' },
-      { value: 'XC60', label: 'XC60' },
-      { value: 'XC40', label: 'XC40' },
-      { value: 'ID.4', label: 'ID.4' },
-      { value: 'ID.5', label: 'ID.5' },
-      { value: 'Golf', label: 'Golf' },
-      { value: 'Tiguan', label: 'Tiguan' }
-    ],
-    aiHint: 'Vehicle model'
-  },
-  {
-    key: 'price',
-    label: 'Price',
-    type: 'inputrange',
-    inputType: 'number',
-    operators: [
-      { value: 'between', label: 'is between' },
-      { value: 'gte', label: 'is at least' },
-      { value: 'lte', label: 'is at most' }
-    ],
-    prefix: '€',
-    aiHint: 'Vehicle price in euros'
-  },
-  {
-    key: 'stockDays',
-    label: 'Stock Days',
-    type: 'inputrange',
-    inputType: 'number',
-    operators: [
-      { value: 'between', label: 'is between' },
-      { value: 'gte', label: 'is at least' },
-      { value: 'lte', label: 'is at most' }
-    ],
-    aiHint: 'Number of days in stock'
-  }
-]
+// Filter definitions - dynamic options from vehicles data
+const filterDefinitions = computed(() => {
+  const vehicles = vehiclesWithType.value ?? []
+  const uniqueBrands = [...new Set(vehicles.map(v => v.brand).filter(Boolean))].sort()
+  const uniqueModels = [...new Set(vehicles.map(v => v.model).filter(Boolean))].sort()
+  const uniqueStatuses = [...new Set(vehicles.map(v => v.status).filter(Boolean))].sort()
+  const statusOptions = uniqueStatuses.length > 0
+    ? uniqueStatuses.map(s => ({ value: s, label: s }))
+    : [
+        { value: 'New', label: 'New' },
+        { value: 'Used', label: 'Used' }
+      ]
+  const brandOptions = uniqueBrands.length > 0
+    ? uniqueBrands.map(b => ({ value: b, label: b }))
+    : [
+        { value: 'Volkswagen', label: 'Volkswagen' },
+        { value: 'Mercedes-Benz', label: 'Mercedes-Benz' },
+        { value: 'Audi', label: 'Audi' },
+        { value: 'Porsche', label: 'Porsche' }
+      ]
+  const modelOptions = uniqueModels.length > 0
+    ? uniqueModels.map(m => ({ value: m, label: m }))
+    : [
+        { value: 'XC90', label: 'XC90' },
+        { value: 'XC60', label: 'XC60' },
+        { value: 'XC40', label: 'XC40' },
+        { value: 'ID.4', label: 'ID.4' },
+        { value: 'ID.5', label: 'ID.5' },
+        { value: 'Golf', label: 'Golf' },
+        { value: 'Tiguan', label: 'Tiguan' }
+      ]
+  return [
+    {
+      key: 'inventoryType',
+      label: 'Type',
+      type: 'select',
+      operators: [
+        { value: 'eq', label: 'is' },
+        { value: 'ne', label: 'is not' }
+      ],
+      options: [
+        { value: 'in-stock', label: 'In stock' },
+        { value: 'customer-vehicles', label: "Customers' vehicles" }
+      ],
+      aiHint: 'Inventory type: in stock or customer vehicle',
+      pinned: true
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      type: 'select',
+      operators: [
+        { value: 'eq', label: 'is' },
+        { value: 'ne', label: 'is not' }
+      ],
+      options: statusOptions,
+      aiHint: 'Vehicle status (New or Used)',
+      pinned: true
+    },
+    {
+      key: 'brand',
+      label: 'Brand',
+      type: 'multiselect',
+      operators: [
+        { value: 'in', label: 'is any of' },
+        { value: 'notIn', label: 'is none of' }
+      ],
+      options: brandOptions,
+      aiHint: 'Car manufacturer brand'
+    },
+    {
+      key: 'model',
+      label: 'Model',
+      type: 'select',
+      operators: [
+        { value: 'eq', label: 'is' },
+        { value: 'ne', label: 'is not' }
+      ],
+      options: modelOptions,
+      aiHint: 'Vehicle model'
+    },
+    {
+      key: 'price',
+      label: 'Price',
+      type: 'inputrange',
+      inputType: 'number',
+      operators: [
+        { value: 'between', label: 'is between' },
+        { value: 'gte', label: 'is at least' },
+        { value: 'lte', label: 'is at most' }
+      ],
+      prefix: '€',
+      aiHint: 'Vehicle price in euros'
+    },
+    {
+      key: 'stockDays',
+      label: 'Stock Days',
+      type: 'inputrange',
+      inputType: 'number',
+      operators: [
+        { value: 'between', label: 'is between' },
+        { value: 'gte', label: 'is at least' },
+        { value: 'lte', label: 'is at most' }
+      ],
+      aiHint: 'Number of days in stock'
+    }
+  ]
+})
 
 const vehicleStatusOptions = computed(() => {
-  const def = filterDefinitions.find(d => d.key === 'status')
+  const def = filterDefinitions.value?.find(d => d.key === 'status')
   return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
 })
 const volvoModelOptions = computed(() => [
@@ -412,7 +494,7 @@ const volvoModelOptions = computed(() => [
   { value: 'S60', label: 'S60' }
 ])
 const vehicleBrandOptions = computed(() => {
-  const def = filterDefinitions.find(d => d.key === 'brand')
+  const def = filterDefinitions.value?.find(d => d.key === 'brand')
   return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
 })
 
@@ -622,11 +704,32 @@ const columns = [
     header: 'Warranty info',
     meta: { title: 'Warranty info' },
     cell: () => h('span', { class: 'text-meta' }, 'N/A')
+  },
+  {
+    accessorKey: 'actions',
+    header: 'Actions',
+    meta: { title: 'Actions' },
+    cell: ({ row }) => {
+      const vehicle = row.original
+      return h(
+        Button,
+        {
+          variant: 'outline',
+          size: 'sm',
+          class: 'rounded-sm shrink-0',
+          onClick: (e) => {
+            e.stopPropagation()
+            openAddOfferModal(vehicle)
+          }
+        },
+        () => [h(FilePlus, { class: 'w-4 h-4 shrink-0 mr-1.5' }), 'Add offer']
+      )
+    }
   }
 ]
 
 // Filter → sort → paginate for DataTable (guide pattern)
-const filterDefsRef = computed(() => filterDefinitions)
+const filterDefsRef = computed(() => filterDefinitions.value)
 const columnsRef = computed(() => columns)
 const { paginatedData, totalFilteredCount } = useDataTableData({
   rawData: vehiclesWithType,
