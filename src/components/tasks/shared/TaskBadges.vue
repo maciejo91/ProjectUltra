@@ -43,7 +43,7 @@ import { useSettingsStore } from '@/stores/settings'
 
 const settingsStore = useSettingsStore()
 
-/** For leads: use calculated display stage (New, Valid, etc.), not raw API status (Open, Validated). */
+/** For leads: use calculated display stage (New, To be called back, Valid - to be called back, etc.), not raw API status (Open, Validated). */
 const getLeadDisplayStage = (task) => {
   if (!task || task.type !== 'lead') return null
   try {
@@ -105,7 +105,7 @@ const displayStage = computed(() => {
   if (props.task.type === 'opportunity') {
     return getCalculatedDisplayStage(props.task) || getBaseStage(props.task) || 'New'
   }
-  // Leads: use calculated display stage (New, To be called back, Valid, etc.), not raw status (Open, Validated)
+  // Leads: use calculated display stage (New, To be called back, Valid - to be called back, etc.), not raw status (Open, Validated)
   return getLeadDisplayStage(props.task) || props.task.displayStage || props.task.stage || props.task.currentStage || 'New'
 })
 

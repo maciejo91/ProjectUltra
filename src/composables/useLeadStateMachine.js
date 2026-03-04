@@ -101,40 +101,6 @@ export const LEAD_STATE_CONFIG = {
     canReassign: true
   },
 
-  [LEAD_STAGES.VALID]: {
-    primaryAction: {
-      key: 'complete-conversion',
-      title: 'Lead Validated',
-      description: 'Lead is validated. Complete conversion details to create opportunity',
-      label: 'Complete Conversion',
-      icon: 'fa-solid fa-check-circle',
-      buttonClass: 'bg-emerald-600 hover:bg-emerald-700 text-white',
-      colorScheme: { background: 'bg-emerald-50/50', border: 'border-emerald-100' }
-    },
-    secondaryActions: [
-      {
-        key: 'schedule-follow-up',
-        label: 'Schedule Follow-up',
-        icon: 'fa-solid fa-calendar-plus',
-        conditional: 'no-appointment'
-      },
-      {
-        key: 'disqualify',
-        label: 'Disqualify Lead',
-        icon: 'fa-solid fa-xmark'
-      }
-    ],
-    taskWidgets: [
-      { type: 'LQ', condition: 'always' } // Show LQWidget for conversion
-    ],
-    showLQWidget: true,
-    showDeadlineBanner: true,
-    canPostpone: false,
-    canReassign: true,
-    // LQWidget should show "interested" outcome flow
-    lqWidgetMode: 'conversion'
-  },
-
   [LEAD_STAGES.CLOSED_INVALID]: {
     primaryAction: {
       key: 'reopen',

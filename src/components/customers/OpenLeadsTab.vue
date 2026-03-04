@@ -114,7 +114,8 @@ const formatDate = (dateString) => {
 
 const getStatusClass = (status) => {
   const statusMap = {
-    'Valid': 'bg-emerald-100 text-emerald-700',
+    'Valid - to be called back': 'bg-emerald-100 text-emerald-700',
+    'To be called back': 'bg-purple-100 text-purple-700',
     'Not valid': 'bg-rose-100 text-rose-600',
     'Qualified': 'bg-muted text-muted-foreground',
     'Not interested': 'bg-rose-100 text-rose-600',

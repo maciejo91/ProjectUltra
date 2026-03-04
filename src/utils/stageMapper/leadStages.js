@@ -30,11 +30,10 @@ export function calculateLeadDisplayStage(lead) {
       return LEAD_STAGES.NEW
     }
     
-    // If stage is already an active display stage, return it directly
+    // If stage is already an active display stage, return it directly (never VALID)
     if (stageValue === LEAD_STAGES.NEW ||
         stageValue === LEAD_STAGES.TO_BE_CALLED_BACK ||
-        stageValue === LEAD_STAGES.VALID_TO_BE_CALLED_BACK ||
-        stageValue === LEAD_STAGES.VALID) {
+        stageValue === LEAD_STAGES.VALID_TO_BE_CALLED_BACK) {
       return stageValue
     }
     
@@ -50,11 +49,9 @@ export function calculateLeadDisplayStage(lead) {
       return LEAD_STAGES.TO_BE_CALLED_BACK
     }
 
-    // Map validated/qualified: "Valid - to be called back" if there are data logged (spoke-to-customer), else "Valid"
+    // Map validated/qualified: always "Valid - to be called back" (never "Valid")
     if (apiStatus === API_STATUSES.VALIDATED || apiStatus === 'Qualified') {
-      const hasDataLogged = Array.isArray(lead.contactAttempts) &&
-        lead.contactAttempts.some((a) => a.outcome === 'spoke-to-customer')
-      return hasDataLogged ? LEAD_STAGES.VALID_TO_BE_CALLED_BACK : LEAD_STAGES.VALID
+      return LEAD_STAGES.VALID_TO_BE_CALLED_BACK
     }
     
     // Default: New lead (for 'Open' and any other active status)
@@ -146,24 +143,18 @@ export function getLeadTransitions() {
     [LEAD_STAGES.NEW]: [
       LEAD_STAGES.TO_BE_CALLED_BACK,
       LEAD_STAGES.VALID_TO_BE_CALLED_BACK,
-      LEAD_STAGES.VALID,
       LEAD_STAGES.CLOSED_INVALID,
       LEAD_STAGES.CLOSED_NOT_INTERESTED,
       LEAD_STAGES.CLOSED_DUPLICATE
     ],
     [LEAD_STAGES.TO_BE_CALLED_BACK]: [
       LEAD_STAGES.VALID_TO_BE_CALLED_BACK,
-      LEAD_STAGES.VALID,
       LEAD_STAGES.CLOSED_INVALID,
       LEAD_STAGES.CLOSED_NOT_INTERESTED
     ],
     [LEAD_STAGES.VALID_TO_BE_CALLED_BACK]: [
-      LEAD_STAGES.VALID,
       LEAD_STAGES.TO_BE_CALLED_BACK,
       LEAD_STAGES.CLOSED_INVALID,
-      LEAD_STAGES.CLOSED_NOT_INTERESTED
-    ],
-    [LEAD_STAGES.VALID]: [
       LEAD_STAGES.CLOSED_NOT_INTERESTED
     ],
     [LEAD_STAGES.CLOSED_INVALID]: [

@@ -89,6 +89,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { ChevronRight, Car } from 'lucide-vue-next'
 import { Card, CardContent } from '@motork/component-library/future/primitives'
 import { getDisplayStage } from '@/utils/stageMapper'
@@ -104,10 +105,21 @@ const props = defineProps({
   bare: {
     type: Boolean,
     default: false
+  },
+  /** Max number of tasks to show. Default 5 for compact views; pass higher or omit for main Tasks tab */
+  limit: {
+    type: Number,
+    default: 5
+  },
+  /** When true, clicking a task navigates to task detail page (/tasks/:id). When false, emits request-navigate (switch request in drawer) */
+  navigateToTaskDetail: {
+    type: Boolean,
+    default: false
   }
 })
 
 const emit = defineEmits(['request-navigate'])
+const router = useRouter()
 
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
@@ -136,7 +148,7 @@ const associatedTasks = computed(() => {
     }))
   ]
 
-  return allTasks
+  const filtered = allTasks
     .filter((task) => {
       if (task.compositeId === currentCompositeId) return false
       if (!task.customer) return false
@@ -146,7 +158,7 @@ const associatedTasks = computed(() => {
       )
     })
     .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
-    .slice(0, 5)
+  return props.limit > 0 ? filtered.slice(0, props.limit) : filtered
 })
 
 function getTaskStage(task) {
@@ -191,6 +203,13 @@ function formatCurrency(amount) {
 }
 
 function handleTaskClick(task) {
-  emit('request-navigate', task.compositeId)
+  if (props.navigateToTaskDetail && task.compositeId) {
+    const [type, id] = task.compositeId.split('-')
+    if (type && id) {
+      router.push({ path: `/tasks/${id}`, query: { type } })
+    }
+  } else {
+    emit('request-navigate', task.compositeId)
+  }
 }
 </script>

@@ -87,6 +87,7 @@
           :request="request"
           class="flex-1 min-h-0"
           @offer-saved="handleOfferSaved"
+          @request-navigate="$emit('request-navigate', $event)"
         />
       </div>
       <div :class="isClosedLead ? 'lg:col-span-3' : 'lg:col-span-1'" class="min-w-0 flex flex-col min-h-0 gap-4">

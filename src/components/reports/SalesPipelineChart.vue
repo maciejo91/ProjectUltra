@@ -1,35 +1,35 @@
 <template>
   <div class="bg-muted rounded-xl p-1 flex flex-col shrink-0">
-    <div class="bg-white rounded-lg shadow-nsc-card flex flex-col">
+    <div class="bg-card rounded-lg shadow-nsc-card flex flex-col">
       <!-- Loading Skeleton -->
       <template v-if="loading">
         <div class="px-4 py-4 flex items-center justify-between shrink-0">
-          <div class="h-5 bg-gray-200 rounded w-32 animate-pulse"></div>
-          <div class="h-8 bg-gray-200 rounded w-32 animate-pulse"></div>
+          <div class="h-5 bg-muted rounded w-32 animate-pulse"></div>
+          <div class="h-8 bg-muted rounded w-32 animate-pulse"></div>
         </div>
       <div class="px-4 pb-4 border-b border">
         <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
           <div v-for="n in 4" :key="`stage-${n}`" class="flex items-center gap-2">
-            <div class="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
-            <div class="h-4 bg-gray-200 rounded w-8 animate-pulse"></div>
-            <div class="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
+            <div class="h-4 bg-muted rounded w-20 animate-pulse"></div>
+            <div class="h-4 bg-muted rounded w-8 animate-pulse"></div>
+            <div class="h-4 bg-muted rounded w-12 animate-pulse"></div>
           </div>
         </div>
       </div>
       <div class="px-4 pb-4">
-        <div class="h-40 md:h-48 lg:h-56 bg-gray-100 rounded animate-pulse"></div>
+        <div class="h-40 md:h-48 lg:h-56 bg-muted rounded animate-pulse"></div>
       </div>
       <div class="px-4 pb-4 flex flex-wrap gap-4">
         <div v-for="n in 4" :key="`legend-${n}`" class="flex items-center gap-2">
-          <div class="w-3 h-3 bg-gray-200 rounded-full animate-pulse"></div>
-          <div class="h-3 bg-gray-200 rounded w-16 animate-pulse"></div>
+          <div class="w-3 h-3 bg-muted rounded-full animate-pulse"></div>
+          <div class="h-3 bg-muted rounded w-16 animate-pulse"></div>
         </div>
       </div>
       <div class="px-4 pb-4 flex flex-wrap items-center gap-6 pt-4 border-t border">
         <div v-for="n in 4" :key="`time-${n}`" class="flex items-center gap-2">
-          <div class="h-4 bg-gray-200 rounded w-4 animate-pulse"></div>
-          <div class="h-4 bg-gray-200 rounded w-8 animate-pulse"></div>
-          <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+          <div class="h-4 bg-muted rounded w-4 animate-pulse"></div>
+          <div class="h-4 bg-muted rounded w-8 animate-pulse"></div>
+          <div class="h-4 bg-muted rounded w-16 animate-pulse"></div>
         </div>
         </div>
       </template>
@@ -97,13 +97,8 @@
               class="flex items-center gap-2"
             >
               <div
-                class="w-3 h-3 rounded-full"
-                :class="{
-                  'bg-red-500': source.color === 'red',
-                  'bg-orange-500': source.color === 'orange',
-                  'bg-blue-500': source.color === 'blue',
-                  'bg-gray-500': source.color === 'gray'
-                }"
+                class="w-3 h-3 rounded-full shrink-0"
+                :style="{ backgroundColor: getSourceColor(source.color) }"
               ></div>
               <span class="text-xs text-muted-foreground">{{ source.name }}</span>
             </div>
@@ -145,14 +140,15 @@ const getGradientId = (name) => {
   return name.toLowerCase().replace('.', '').replace(' ', '-')
 }
 
+// Badge-aligned palette: green (success), red (destructive), orange (warning), blue (primary) — no greys
 const getSourceColor = (color) => {
   const colors = {
-    red: 'var(--brand-red)',
-    orange: '#f97316', // Orange-500 - no CSS variable available in theme
-    blue: 'var(--brand-blue)',
-    gray: 'var(--brand-slate)'
+    red: 'var(--destructive)',
+    orange: 'var(--warning)',
+    blue: 'var(--success)',
+    gray: 'var(--primary)'
   }
-  return colors[color] || 'var(--brand-slate)'
+  return colors[color] || 'var(--primary)'
 }
 
 const getSourceAvgTime = (sourceName) => {

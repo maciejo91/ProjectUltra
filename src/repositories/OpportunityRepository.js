@@ -112,7 +112,7 @@ export class OpportunityRepository extends BaseRepository {
       })
     }
     
-    // Ensure opportunity id: 1 always has today's appointment (for demo purposes)
+    // Ensure opportunity id: 2 has today's appointment (for demo purposes; opp 1 stays Awaiting Appointment)
     return this.ensureTodayAppointment(results)
   }
 
@@ -130,7 +130,7 @@ export class OpportunityRepository extends BaseRepository {
     }
     if (!opportunity) return null
     
-    // Ensure opportunity id: 1 always has today's appointment (for demo purposes)
+    // Ensure opportunity id: 2 has today's appointment (for demo purposes)
     return this.ensureTodayAppointment(opportunity)
   }
 
@@ -248,10 +248,11 @@ export class OpportunityRepository extends BaseRepository {
   }
 
   /**
-   * Ensure opportunity id: 1 has today's appointment
+   * Ensure opportunity id: 2 has today's appointment
    * (Helper method for demo purposes - ensures "Mark as Showed Up" and "Mark as No-Show" are visible)
+   * Uses opp 2 (Appointment Scheduled) so opp 1 stays Awaiting Appointment.
    * @param {Object|Array} opportunityOrArray - Single opportunity object or array of opportunities
-   * @returns {Object|Array} Opportunity or array with id: 1 updated to have today's appointment
+   * @returns {Object|Array} Opportunity or array with id: 2 updated to have today's appointment
    */
   ensureTodayAppointment(opportunityOrArray) {
     const isArray = Array.isArray(opportunityOrArray)
@@ -264,8 +265,8 @@ export class OpportunityRepository extends BaseRepository {
     endDate.setHours(15, 0, 0, 0)
     
     const updatedOpportunities = opportunities.map(opp => {
-      if (opp && opp.id === 1) {
-        // Ensure opportunity id: 1 has today's appointment
+      if (opp && opp.id === 2) {
+        // Ensure opportunity id: 2 has today's appointment
         const existingAppointment = opp.scheduledAppointment
         return {
           ...opp,
@@ -275,8 +276,8 @@ export class OpportunityRepository extends BaseRepository {
             end: endDate.toISOString(),
             type: existingAppointment?.type || 'Test Drive',
             assignee: existingAppointment?.assignee || opp.assignee || 'Sarah Jenkins',
-            customerId: existingAppointment?.customerId || opp.customerId || 2,
-            opportunityId: 1,
+            customerId: existingAppointment?.customerId || opp.customerId,
+            opportunityId: 2,
             duration: existingAppointment?.duration || 60,
             status: existingAppointment?.status || 'confirmed',
             noShowCount: existingAppointment?.noShowCount || 0,

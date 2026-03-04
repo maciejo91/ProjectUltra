@@ -78,7 +78,7 @@ export function useCustomersTable(activeTab, handleRowClick, opts = {}) {
             { value: 'notIn', label: 'is none of' }
           ],
           options: [
-            { value: 'Valid', label: 'Valid' },
+            { value: 'Valid - to be called back', label: 'Valid - to be called back' },
             { value: 'Not valid', label: 'Not valid' },
             { value: 'Qualified', label: 'Qualified' },
             { value: 'Not interested', label: 'Not interested' }

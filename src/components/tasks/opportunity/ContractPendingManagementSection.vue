@@ -12,7 +12,7 @@
               Create a new contract to track versions. Use the + button on the carousel above to add a contract.
             </p>
           </div>
-          <div class="flex flex-wrap gap-3 items-center">
+          <div class="flex flex-wrap gap-3 items-center justify-end">
             <SecondaryActionsDropdown
               :actions="contractPendingActions"
               @action-selected="$emit('contract-pending-action', $event)"
@@ -33,7 +33,7 @@
               Schedule vehicle delivery with the customer. Set the delivery date, time, and location.
             </p>
           </div>
-          <div class="flex flex-wrap gap-3 items-center">
+          <div class="flex flex-wrap gap-3 items-center justify-between">
             <div class="outcome-toggle-group flex flex-wrap gap-3">
               <Toggle
                 v-if="!hasDeliveryDate"
@@ -48,6 +48,7 @@
             </div>
             <SecondaryActionsDropdown
               :actions="contractPendingActions"
+              class="ml-auto shrink-0"
               @action-selected="$emit('contract-pending-action', $event)"
             />
           </div>

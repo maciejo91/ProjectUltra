@@ -92,6 +92,13 @@ export const OPPORTUNITY_STATE_CONFIG = {
         conditional: 'appointment-past-not-completed'
       },
       {
+        key: 'create-offer',
+        label: 'Create Offer',
+        icon: 'fa-solid fa-file-lines',
+        description: 'Skip appointment and create an offer directly',
+        conditional: 'no-appointment'
+      },
+      {
         key: 'select-vehicle',
         label: 'Select Vehicle',
         icon: 'fa-solid fa-car',
@@ -153,6 +160,22 @@ export const OPPORTUNITY_STATE_CONFIG = {
     ]
   },
 
+  'In Negotiation - Awaiting Offer': {
+    primaryAction: {
+      key: 'create-offer',
+      title: 'Create Offer',
+      description: 'Create initial offer to begin negotiation',
+      label: 'Create Offer',
+      icon: 'fa-solid fa-file-invoice-dollar',
+      buttonClass: 'bg-yellow-600 hover:bg-yellow-700 text-white',
+      colorScheme: { background: 'bg-yellow-50/50', border: 'border-yellow-100' }
+    },
+    secondaryActions: [
+      { key: 'schedule-appointment', label: 'Schedule Appointment', icon: 'fa-solid fa-calendar-plus', description: 'Schedule a new appointment' },
+      { key: 'close-lost', label: 'Close as Lost', icon: 'fa-solid fa-xmark' }
+    ]
+  },
+
   'In Negotiation': {
     primaryAction: (context) => {
       // Default: No offers yet - show create offer action
@@ -172,12 +195,6 @@ export const OPPORTUNITY_STATE_CONFIG = {
       return null
     },
     secondaryActions: [
-      {
-        key: 'add-offer',
-        label: 'Create Another Offer',
-        icon: 'fa-solid fa-file-invoice-dollar',
-        description: 'Create an additional offer if terms need adjustment'
-      },
       {
         key: 'reassign',
         label: 'Reassign',
@@ -230,12 +247,6 @@ export const OPPORTUNITY_STATE_CONFIG = {
     },
     secondaryActions: [
       {
-        key: 'add-offer',
-        label: 'Create Another Offer',
-        icon: 'fa-solid fa-file-invoice-dollar',
-        description: 'Create an additional offer if terms need adjustment'
-      },
-      {
         key: 'schedule-appointment',
         label: 'Schedule Appointment',
         icon: 'fa-solid fa-calendar-plus',
@@ -248,6 +259,50 @@ export const OPPORTUNITY_STATE_CONFIG = {
       }
     ],
     taskWidgets: []
+  },
+
+  'In Negotiation - Offer Feedback': {
+    primaryAction: (context) => {
+      if (context.scheduledAppointment && context.scheduledAppointment.start) {
+        return {
+          key: 'manage-appointment',
+          title: 'Manage Appointment',
+          description: (ctx) => {
+            const appointmentDate = new Date(ctx.scheduledAppointment.start)
+            return `Appointment scheduled for ${ctx.formatDateTime ? ctx.formatDateTime(ctx.scheduledAppointment.start) : appointmentDate.toLocaleString()}`
+          },
+          label: 'Manage Appointment',
+          icon: 'fa-solid fa-calendar-check',
+          buttonClass: 'bg-purple-600 hover:bg-purple-700 text-white',
+          colorScheme: { background: 'bg-purple-50/50', border: 'border-purple-100' }
+        }
+      }
+      return {
+        key: 'manage-offers-follow-up',
+        title: 'Manage Offers & Follow Up',
+        description: 'Request feedback from customer and follow up on offers',
+        label: 'Manage Offers & Follow Up',
+        icon: 'fa-solid fa-file-invoice-dollar',
+        buttonClass: 'bg-yellow-600 hover:bg-yellow-700 text-white',
+        colorScheme: { background: 'bg-yellow-50/50', border: 'border-yellow-100' }
+      }
+    },
+    secondaryActions: [
+      {
+        key: 'schedule-appointment',
+        label: 'Schedule Appointment',
+        icon: 'fa-solid fa-calendar-plus',
+        description: 'Schedule a new appointment'
+      },
+      {
+        key: 'close-lost',
+        label: 'Close as Lost',
+        icon: 'fa-solid fa-xmark'
+      }
+    ],
+    taskWidgets: [
+      { type: 'NFU', condition: 'negotiation-offer-feedback-5-plus-days-no-appointment' }
+    ]
   },
 
   'In Negotiation - Contract Pending': {
@@ -287,12 +342,6 @@ export const OPPORTUNITY_STATE_CONFIG = {
       return null
     },
     secondaryActions: [
-      {
-        key: 'add-offer',
-        label: 'Create Another Offer',
-        icon: 'fa-solid fa-file-invoice-dollar',
-        description: 'Create an additional offer if terms need adjustment'
-      },
       {
         key: 'schedule-appointment',
         label: 'Schedule Appointment',

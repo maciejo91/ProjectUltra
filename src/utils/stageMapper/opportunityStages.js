@@ -120,6 +120,16 @@ export function calculateOpportunityDisplayStage(opportunity) {
         return `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Sent`
       }
       
+      // Offer Under Review – migrated to Offer Feedback (backward compat)
+      if (opportunity.negotiationSubstatus === 'Offer Under Review') {
+        return `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Feedback`
+      }
+      
+      // Awaiting Offer - show as "In Negotiation - Awaiting Offer" (skipped appointment, ready to create offer)
+      if (opportunity.negotiationSubstatus === 'Awaiting Offer') {
+        return `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Awaiting Offer`
+      }
+      
       // Offer Feedback - show as "In Negotiation - Offer Feedback" (backward compatibility)
       if (opportunity.negotiationSubstatus === 'Offer Feedback') {
         return `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Feedback`
@@ -203,6 +213,8 @@ export function mapOpportunityStageToApiStatus(displayStage) {
     [OPPORTUNITY_STAGES.APPOINTMENT_SCHEDULED]: API_STATUSES.QUALIFIED,
     [OPPORTUNITY_STAGES.IN_NEGOTIATION]: API_STATUSES.IN_NEGOTIATION,
     [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Sent`]: API_STATUSES.IN_NEGOTIATION,
+    [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Feedback`]: API_STATUSES.IN_NEGOTIATION,
+    [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Awaiting Offer`]: API_STATUSES.IN_NEGOTIATION,
     [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Contract Pending`]: API_STATUSES.IN_NEGOTIATION,
     [OPPORTUNITY_STAGES.CLOSED_WON]: API_STATUSES.CLOSED_WON,
     [OPPORTUNITY_STAGES.CLOSED_LOST]: API_STATUSES.CLOSED_LOST,

@@ -86,6 +86,7 @@
           <SecondaryActionsDropdown
             v-if="secondaryActions && secondaryActions.length > 0"
             :actions="secondaryActions"
+            class="ml-auto shrink-0"
             @action-selected="handleSecondaryActionSelected"
           />
         </div>

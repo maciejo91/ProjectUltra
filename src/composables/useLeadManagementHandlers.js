@@ -98,6 +98,11 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
     const lead = getLead()
     if (!lead) return
 
+    const displayStage = leadState.displayStage.value
+    if (displayStage !== LEAD_STAGES.VALID_TO_BE_CALLED_BACK && displayStage !== LEAD_STAGES.TO_BE_CALLED_BACK) {
+      return
+    }
+
     isConvertingToOpportunity.value = true
     try {
       // Update lead with assignment before converting to opportunity

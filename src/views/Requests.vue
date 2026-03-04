@@ -4,9 +4,13 @@
       <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide min-h-0">
         <div class="bg-white mb-8">
           <div class="flex flex-wrap items-center gap-2 py-2 mb-4">
-            <div class="outcome-toggle-group flex flex-wrap gap-3">
+            <TransitionGroup
+              tag="div"
+              name="chip-move"
+              class="outcome-toggle-group flex flex-wrap gap-3"
+            >
               <Toggle
-                v-for="chip in filterChips"
+                v-for="chip in orderedFilterChips"
                 :key="chip.key"
                 variant="outline"
                 :model-value="selectedSegment === chip.key"
@@ -14,9 +18,20 @@
                 class="outcome-toggle-item rounded-sm"
                 @update:model-value="(p) => p && (selectedSegment = chip.key)"
               >
-                {{ chip.label }} ({{ chip.count }})
+                <span class="flex items-center gap-2">
+                  <span>{{ chip.label }} ({{ chip.count }})</span>
+                  <button
+                    type="button"
+                    class="shrink-0 rounded p-0.5 text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    :aria-label="pinnedSegmentKey === chip.key ? 'Unpin' : 'Pin to front'"
+                    @click.stop="togglePin(chip.key)"
+                  >
+                    <PinOff v-if="pinnedSegmentKey === chip.key" class="size-3.5" aria-hidden />
+                    <Pin v-else class="size-3.5" aria-hidden />
+                  </button>
+                </span>
               </Toggle>
-            </div>
+            </TransitionGroup>
           </div>
           <div class="mb-1">
             <UnifiedSearchBar
@@ -118,9 +133,9 @@
 </template>
 
 <script setup>
-import { ref, computed, h, watch, onUnmounted, onMounted } from 'vue'
+import { ref, computed, h, watch, onUnmounted, onMounted, TransitionGroup } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { FileText, Trash2, X } from 'lucide-vue-next'
+import { FileText, Pin, PinOff, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button, Toggle } from '@motork/component-library/future/primitives'
 import DrawerContainer from '@/components/shared/DrawerContainer.vue'
@@ -143,6 +158,29 @@ const {
   loading,
   SEGMENT_KEYS: SK
 } = useRequestsList()
+
+const REQUESTS_PINNED_SEGMENT_KEY = 'project-ultra-requests-pinned-segment'
+const validSegmentKeys = Object.values(SK)
+const getStoredPinnedSegment = () => {
+  try {
+    const stored = localStorage.getItem(REQUESTS_PINNED_SEGMENT_KEY)
+    return stored && validSegmentKeys.includes(stored) ? stored : ''
+  } catch {
+    return ''
+  }
+}
+const pinnedSegmentKey = ref(getStoredPinnedSegment())
+watch(pinnedSegmentKey, (key) => {
+  try {
+    if (key) {
+      localStorage.setItem(REQUESTS_PINNED_SEGMENT_KEY, key)
+    } else {
+      localStorage.removeItem(REQUESTS_PINNED_SEGMENT_KEY)
+    }
+  } catch {
+    // ignore
+  }
+})
 
 const route = useRoute()
 const router = useRouter()
@@ -202,6 +240,18 @@ const filterChips = computed(() => [
   { key: SK.WON, label: 'Opportunities won', count: counts.value[SK.WON] },
   { key: SK.LOST, label: 'Opportunities lost', count: counts.value[SK.LOST] }
 ])
+
+const orderedFilterChips = computed(() => {
+  const chips = filterChips.value
+  if (!pinnedSegmentKey.value) return chips
+  const pinned = chips.find((c) => c.key === pinnedSegmentKey.value)
+  if (!pinned) return chips
+  return [pinned, ...chips.filter((c) => c.key !== pinnedSegmentKey.value)]
+})
+
+function togglePin(key) {
+  pinnedSegmentKey.value = pinnedSegmentKey.value === key ? '' : key
+}
 
 const emptyStateText = computed(() => {
   if (selectedSegment.value === SK.ALL) return 'No requests'
@@ -468,6 +518,10 @@ function handleRequestNavigate(compositeId) {
 </script>
 
 <style scoped>
+.chip-move-move {
+  transition: transform 0.35s ease;
+}
+
 .data-table-inner.table-search-wrapper :deep([data-slot="table-search"]),
 .data-table-inner.table-search-wrapper :deep(div:has(> input[placeholder*="Search"])),
 .data-table-inner.table-search-wrapper :deep(div:has(> input[type="search"])) {

@@ -437,6 +437,10 @@
 
       <!-- Answer + Interested (Inline) -->
           <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'interested'" ref="expandedOutcomeRef" class="space-y-4">
+            <!-- Stage restriction: qualify only from To be called back or Valid - to be called back -->
+            <div v-if="!canQualifyFromStage" class="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+              Lead must be in "To be called back" or "Valid - to be called back" to qualify.
+            </div>
             <!-- Info note -->
             <div class="text-xs text-muted-foreground px-2">
               <span class="text-red-600">*</span> Required fields
@@ -2226,7 +2230,13 @@ watch(qualificationEventType, (newEventType) => {
   }
 })
 
+const canQualifyFromStage = computed(() => {
+  const stage = leadState.displayStage.value
+  return stage === LEAD_STAGES.VALID_TO_BE_CALLED_BACK || stage === LEAD_STAGES.TO_BE_CALLED_BACK
+})
+
 const canQualify = computed(() => {
+  if (!canQualifyFromStage.value) return false
   const hasAssignee = Boolean(qualificationSelectedTeam.value || qualificationSelectedSalesman.value)
   if (qualificationMethod.value === 'assign-only') {
     return true

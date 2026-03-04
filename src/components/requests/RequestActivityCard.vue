@@ -1,23 +1,46 @@
 <template>
-  <div class="rounded-lg border border-border bg-card flex flex-col min-h-0 overflow-hidden">
+  <div class="flex flex-col min-h-0 overflow-hidden border-t border-border bg-background">
     <!-- Lead: Communicate + Data tabs -->
-    <Tabs v-if="isLead" v-model="activeTab" class="flex flex-col flex-1 min-h-0">
-      <TabsList class="flex shrink-0 border-b border-border bg-background rounded-none w-full flex-wrap">
+    <Tabs v-if="isLead" v-model="activeTab" class="flex flex-col flex-1 min-h-0 overflow-hidden gap-0">
+      <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
         <TabsTrigger
           value="communicate"
-          class="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent shrink-0"
+          class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+          :class="activeTab === 'communicate' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
         >
-          Communicate
+          <span>Communicate</span>
+          <span
+            v-if="activeTab === 'communicate'"
+            class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+          />
         </TabsTrigger>
         <TabsTrigger
           value="data"
-          class="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent shrink-0"
+          class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+          :class="activeTab === 'data' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
         >
-          Data
+          <span>Data</span>
+          <span
+            v-if="activeTab === 'data'"
+            class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+          />
+        </TabsTrigger>
+        <TabsTrigger
+          v-if="showTasksTab"
+          value="tasks"
+          class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+          :class="activeTab === 'tasks' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+        >
+          <span>Tasks</span>
+          <span
+            v-if="activeTab === 'tasks'"
+            class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+          />
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="communicate" class="flex-1 overflow-y-auto p-4 mt-0 data-[state=inactive]:hidden">
-        <div class="rounded-lg flex flex-col bg-muted pt-1 px-1 pb-1">
+      <div class="flex-1 min-h-0 flex flex-col overflow-y-auto bg-muted">
+        <TabsContent value="communicate" class="flex-1 overflow-y-auto space-y-2 p-2 mt-0 data-[state=inactive]:hidden min-h-0">
+          <div class="rounded-lg flex flex-col bg-background pt-1 px-1 pb-1">
           <CommunicationWidget
             :task-type="request?.type || 'lead'"
             :task-id="request?.id"
@@ -28,9 +51,9 @@
             selection-card-description="Log a call outcome or send an email, SMS or WhatsApp to this customer."
             @save="handleCommunicationSave"
           />
-        </div>
-      </TabsContent>
-      <TabsContent value="data" class="flex-1 overflow-y-auto p-4 mt-0 data-[state=inactive]:hidden">
+          </div>
+        </TabsContent>
+        <TabsContent value="data" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <RequestDataTabContent
           :activities="requestActivities"
           :task-type="request?.type || 'lead'"
@@ -41,46 +64,97 @@
           @attachment-save="handleAttachmentSave"
           @attachment-delete="handleAttachmentDelete"
         />
-      </TabsContent>
+        </TabsContent>
+        <TabsContent
+          v-if="showTasksTab"
+          value="tasks"
+          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 p-2"
+        >
+          <RequestAssociatedTasksCard
+            :request="request"
+            bare
+            :limit="50"
+            navigate-to-task-detail
+          />
+        </TabsContent>
+      </div>
     </Tabs>
 
     <!-- Opportunity: full tabbed layout -->
-    <Tabs v-else v-model="activeTab" class="flex flex-col flex-1 min-h-0">
-      <TabsList class="flex shrink-0 border-b border-border bg-background rounded-none w-full flex-wrap">
+    <Tabs v-else v-model="activeTab" class="flex flex-col flex-1 min-h-0 overflow-hidden gap-0">
+      <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
         <TabsTrigger
           value="communicate"
-          class="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent shrink-0"
+          class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+          :class="activeTab === 'communicate' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
         >
-          Communicate
+          <span>Communicate</span>
+          <span
+            v-if="activeTab === 'communicate'"
+            class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+          />
         </TabsTrigger>
         <TabsTrigger
           value="data"
-          class="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent shrink-0"
+          class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+          :class="activeTab === 'data' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
         >
-          Data
+          <span>Data</span>
+          <span
+            v-if="activeTab === 'data'"
+            class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+          />
         </TabsTrigger>
         <TabsTrigger
           value="appointments"
-          class="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent shrink-0"
+          class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+          :class="activeTab === 'appointments' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
         >
-          Appointments
+          <span>Appointments</span>
+          <span
+            v-if="activeTab === 'appointments'"
+            class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+          />
         </TabsTrigger>
         <TabsTrigger
           value="offers"
-          class="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent shrink-0"
+          class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+          :class="activeTab === 'offers' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
         >
-          Offers
+          <span>Offers</span>
+          <span
+            v-if="activeTab === 'offers'"
+            class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+          />
         </TabsTrigger>
         <TabsTrigger
           value="contracts"
-          class="rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent shrink-0"
+          class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+          :class="activeTab === 'contracts' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
         >
-          Contracts
+          <span>Contracts</span>
+          <span
+            v-if="activeTab === 'contracts'"
+            class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+          />
+        </TabsTrigger>
+        <TabsTrigger
+          v-if="showTasksTab"
+          value="tasks"
+          class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+          :class="activeTab === 'tasks' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+        >
+          <span>Tasks</span>
+          <span
+            v-if="activeTab === 'tasks'"
+            class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+          />
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="communicate" class="flex-1 overflow-y-auto p-4 mt-0 data-[state=inactive]:hidden">
-        <div class="rounded-lg flex flex-col bg-muted pt-1 px-1 pb-1">
+      <div class="flex-1 min-h-0 flex flex-col overflow-y-auto bg-muted">
+        <TabsContent value="communicate" class="flex-1 overflow-y-auto space-y-2 p-2 mt-0 data-[state=inactive]:hidden min-h-0">
+          <div class="rounded-lg flex flex-col bg-background pt-1 px-1 pb-1">
           <CommunicationWidget
             :task-type="request?.type || 'lead'"
             :task-id="request?.id"
@@ -91,10 +165,10 @@
             selection-card-description="Log a call outcome or send an email, SMS or WhatsApp to this customer."
             @save="handleCommunicationSave"
           />
-        </div>
-      </TabsContent>
+          </div>
+        </TabsContent>
 
-      <TabsContent value="data" class="flex-1 overflow-y-auto p-4 mt-0 data-[state=inactive]:hidden">
+        <TabsContent value="data" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <RequestDataTabContent
           :activities="requestActivities"
           :task-type="request?.type || 'opportunity'"
@@ -105,9 +179,9 @@
           @attachment-save="handleAttachmentSave"
           @attachment-delete="handleAttachmentDelete"
         />
-      </TabsContent>
+        </TabsContent>
 
-      <TabsContent value="appointments" class="flex-1 overflow-y-auto p-4 mt-0 data-[state=inactive]:hidden">
+        <TabsContent value="appointments" class="flex-1 overflow-y-auto px-1 py-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <RequestAppointmentsTabContent
           :request="request"
           :appointments="appointments"
@@ -116,9 +190,9 @@
           @appointment-no-show="handleAppointmentNoShow"
           @appointment-created="handleAppointmentCreated"
         />
-      </TabsContent>
+        </TabsContent>
 
-      <TabsContent value="offers" class="flex-1 overflow-y-auto p-4 mt-0 data-[state=inactive]:hidden">
+        <TabsContent value="offers" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <OfferCarousel
           ref="offerCarouselRef"
           :offers="request?.offers || []"
@@ -128,9 +202,9 @@
           @generate-pdf="handleOfferPDFGenerate"
           @add="showAddOfferModal = true"
         />
-      </TabsContent>
+        </TabsContent>
 
-      <TabsContent value="contracts" class="flex-1 overflow-y-auto p-4 mt-0 data-[state=inactive]:hidden">
+        <TabsContent value="contracts" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <ContractCarousel
           ref="contractCarouselRef"
           :contracts="contracts"
@@ -140,7 +214,20 @@
           @collect-esignatures="handleCollectESignatures"
           @add="showCreateContractModal = true"
         />
-      </TabsContent>
+        </TabsContent>
+        <TabsContent
+          v-if="showTasksTab"
+          value="tasks"
+          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 p-2"
+        >
+          <RequestAssociatedTasksCard
+            :request="request"
+            bare
+            :limit="50"
+            navigate-to-task-detail
+          />
+        </TabsContent>
+      </div>
     </Tabs>
 
     <ComingSoonModal :show="showPDFComingSoon" @close="showPDFComingSoon = false" />
@@ -180,6 +267,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-libr
 import CommunicationWidget from '@/components/shared/communication/CommunicationWidget.vue'
 import RequestAppointmentsTabContent from './RequestAppointmentsTabContent.vue'
 import RequestDataTabContent from './RequestDataTabContent.vue'
+import RequestAssociatedTasksCard from './RequestAssociatedTasksCard.vue'
 import OfferCarousel from '@/components/shared/OfferCarousel.vue'
 import ContractCarousel from '@/components/shared/ContractCarousel.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
@@ -198,9 +286,16 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['offer-saved', 'appointment-created'])
+const emit = defineEmits(['offer-saved', 'appointment-created', 'request-navigate'])
 
+const showTasksTab = computed(() => !!(props.request?.customer || props.request?.customerId))
 const activeTab = ref('communicate')
+
+watch(showTasksTab, (show) => {
+  if (!show && activeTab.value === 'tasks') {
+    activeTab.value = 'communicate'
+  }
+})
 const showCreateAppointmentModal = ref(false)
 const appointments = ref([])
 const dealerships = ref([])
@@ -563,3 +658,51 @@ async function handleCollectESignatures(data) {
   }
 }
 </script>
+
+<style scoped>
+/* Tab styling to match task detail page */
+:deep([role="tablist"]) {
+  border: none !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  gap: 0 !important;
+  height: auto !important;
+  min-height: 48px !important;
+}
+
+:deep([role="tab"]) {
+  background: transparent !important;
+  border: none !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  position: relative !important;
+  box-shadow: none !important;
+  height: 100% !important;
+  min-height: 48px !important;
+}
+
+:deep([role="tab"]::before),
+:deep([role="tab"]::after) {
+  display: none !important;
+  box-shadow: none !important;
+}
+
+:deep([role="tab"] *) {
+  box-shadow: none !important;
+}
+
+:deep([role="tab"][data-state="active"]) {
+  color: var(--color-text-foreground) !important;
+  box-shadow: none !important;
+}
+
+:deep([role="tab"][data-state="inactive"]) {
+  color: var(--color-text-muted-foreground) !important;
+  box-shadow: none !important;
+}
+</style>

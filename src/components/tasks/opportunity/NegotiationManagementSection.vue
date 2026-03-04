@@ -22,10 +22,12 @@
         <div v-if="!opportunity.offers || opportunity.offers.length === 0" class="mb-4 p-4 bg-muted rounded-lg">
           <p class="text-sm text-muted-foreground">No offers yet. Create your first offer to continue.</p>
         </div>
-        <div class="flex flex-wrap gap-3 items-center">
+        <div class="flex flex-wrap gap-3 items-center justify-between">
+          <div class="flex flex-wrap gap-3 items-center">
           <template v-if="opportunity.negotiationSubstatus === 'Offer Sent'">
             <div class="outcome-toggle-group flex flex-wrap gap-3">
               <Toggle
+                v-if="hasOffers"
                 variant="outline"
                 :model-value="showNegotiationSection"
                 @update:model-value="(p) => { $emit('update:show-negotiation-section', p); if (p) { $emit('update:show-add-offer-section', false); $emit('update:show-survey-section', false); } else { $emit('reset-negotiation-form') } }"
@@ -49,6 +51,7 @@
           <template v-else>
             <div class="outcome-toggle-group flex flex-wrap gap-3">
               <Toggle
+                v-if="hasOffers"
                 variant="outline"
                 :model-value="showNegotiationSection"
                 @update:model-value="(p) => { $emit('update:show-negotiation-section', p); if (p) { $emit('update:show-add-offer-section', false); $emit('update:show-survey-section', false); } else { $emit('reset-negotiation-form') } }"
@@ -57,16 +60,6 @@
                 <Phone class="w-4 h-4 shrink-0" />
                 <span>{{ (opportunity.negotiationSubstatus === 'Offer Feedback') ? 'Request Feedback' : 'Follow Up' }}</span>
               </Toggle>
-              <Button
-                v-if="!hasOffers"
-                variant="outline"
-                size="small"
-                class="gap-2"
-                @click="$emit('open-add-offer-modal')"
-              >
-                <Plus class="w-4 h-4 shrink-0" />
-                <span>Add Offer</span>
-              </Button>
               <Toggle
                 v-if="meetsOFBCondition"
                 variant="outline"
@@ -79,9 +72,11 @@
               </Toggle>
             </div>
           </template>
+          </div>
           <SecondaryActionsDropdown
             v-if="secondaryActions && secondaryActions.length > 0"
             :actions="secondaryActions"
+            class="ml-auto shrink-0"
             @action-selected="handleSecondaryActionClick"
           />
         </div>
@@ -226,7 +221,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { Phone, ClipboardList, Plus, MessageCircle, MessageSquare, Mail, Clock } from 'lucide-vue-next'
+import { Phone, ClipboardList, MessageCircle, MessageSquare, Mail, Clock } from 'lucide-vue-next'
 import { Button, Toggle, Label, Textarea } from '@motork/component-library/future/primitives'
 import { SelectMenu } from '@motork/component-library/future/components'
 import SecondaryActionsDropdown from '@/components/shared/SecondaryActionsDropdown.vue'

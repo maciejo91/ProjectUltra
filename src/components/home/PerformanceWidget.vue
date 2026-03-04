@@ -24,7 +24,7 @@
         <!-- SLA Compliance -->
         <div class="bg-muted rounded-lg p-4 border border-border">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">SLA Compliance</span>
+            <span class="text-xs font-medium text-muted-foreground tracking-wider">SLA Compliance</span>
             <Badge
               :text="`${slaCompliancePercentage}%`"
               size="small"
@@ -39,7 +39,7 @@
         <!-- Managed Lead Tasks -->
         <div class="bg-muted rounded-lg p-4 border border-border">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Managed Lead Tasks</span>
+            <span class="text-xs font-medium text-muted-foreground tracking-wider">Managed Lead Tasks</span>
             <div class="flex items-center gap-2">
               <span class="text-xs font-bold" :class="getManagedTaskStatusClass(bdcMetrics?.managedLeadTasks?.dailyAvg, bdcMetrics?.managedLeadTasks?.target)">
                 {{ bdcMetrics?.managedLeadTasks?.dailyAvg || 0 }} / {{ bdcMetrics?.managedLeadTasks?.target || 0 }}
@@ -59,7 +59,7 @@
         <!-- Handled No-Show Tasks -->
         <div class="bg-muted rounded-lg p-4 border border-border">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Handled No-Show Tasks</span>
+            <span class="text-xs font-medium text-muted-foreground tracking-wider">Handled No-Show Tasks</span>
             <span class="text-sm font-bold text-foreground">{{ bdcMetrics?.handledNoShowTasks?.total || 0 }}</span>
           </div>
           <div class="text-xs text-muted-foreground font-medium">{{ bdcMetrics?.handledNoShowTasks?.dailyAvg || 0 }} avg/day (this period)</div>
@@ -68,7 +68,7 @@
         <!-- Follow-Up Tasks -->
         <div class="bg-muted rounded-lg p-4 border border-border">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Follow-Up Tasks</span>
+            <span class="text-xs font-medium text-muted-foreground tracking-wider">Follow-Up Tasks</span>
             <div class="flex items-center gap-2">
               <span class="text-xs font-bold" :class="getManagedTaskStatusClass(bdcMetrics?.followUpTasks?.dailyAvg, bdcMetrics?.followUpTasks?.target)">
                 {{ bdcMetrics?.followUpTasks?.dailyAvg || 0 }} / {{ bdcMetrics?.followUpTasks?.target || 0 }}
@@ -90,7 +90,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Appointments Reserved</div>
+                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Appointments Reserved</div>
                 <div class="text-sm font-bold text-foreground leading-none">{{ bdcMetrics?.appointmentsReserved || 0 }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="bdcMetrics?.appointmentsReservedTrend">
@@ -122,7 +122,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Lead-to-Opp Rate</div>
+                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Lead-to-Opp Rate</div>
                 <div class="text-sm font-bold text-foreground leading-none">{{ bdcMetrics?.leadToOpportunityConversion || 0 }}%</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="bdcMetrics?.leadToOpportunityConversionTrend">
@@ -158,7 +158,7 @@
       <div v-else-if="userRole === 'salesman'" class="space-y-4">
         <!-- Nudges -->
         <div v-if="salespersonNudges.length" class="bg-primary/15 border border-primary rounded-lg p-4 space-y-2">
-          <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider">What to do next</div>
+          <div class="text-xs font-medium text-muted-foreground tracking-wider">What to do next</div>
           <ul class="space-y-1.5">
             <li
               v-for="nudge in salespersonNudges"
@@ -176,7 +176,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Contracts Closed</div>
+                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Contracts Closed</div>
                 <div class="text-sm font-bold text-foreground leading-none">{{ salespersonMetrics?.contractsClosed?.[selectedPeriod] || 0 }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="getTrendData('contractsClosed')">
@@ -208,7 +208,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Total Revenue</div>
+                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Total Revenue</div>
                 <div class="text-sm font-bold text-foreground leading-none">€{{ formatCurrency(salespersonMetrics?.revenue?.[selectedPeriod] || 0) }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="getTrendData('revenue')">
@@ -242,7 +242,7 @@
         <!-- Revenue Targets -->
         <div class="space-y-3 bg-muted rounded-lg p-4 border border-border">
           <div class="space-y-1">
-            <div class="flex items-center justify-between text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <div class="flex items-center justify-between text-xs font-medium text-muted-foreground tracking-wider">
               <span>Monthly Target</span>
               <span class="font-bold text-foreground">{{ getRevenueProgress('month') }}%</span>
             </div>
@@ -254,7 +254,7 @@
             </div>
           </div>
           <div class="space-y-1">
-            <div class="flex items-center justify-between text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <div class="flex items-center justify-between text-xs font-medium text-muted-foreground tracking-wider">
               <span>Quarterly Target</span>
               <span class="font-bold text-foreground">{{ getRevenueProgress('quarter') }}%</span>
             </div>
@@ -272,7 +272,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Pipeline Value</div>
+                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Pipeline Value</div>
                 <div class="text-sm font-bold text-foreground leading-none">€{{ formatCurrency(salespersonMetrics?.pipelineValue || 0) }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="salespersonMetrics?.pipelineValueTrend">
@@ -304,7 +304,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Current Win Rate</div>
+                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Current Win Rate</div>
                 <div class="text-sm font-bold text-foreground leading-none">{{ salespersonMetrics?.winRate || 0 }}%</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="salespersonMetrics?.winRateTrend">
@@ -340,7 +340,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">New Opps</div>
+                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">New Opps</div>
                 <div class="text-sm font-bold text-foreground leading-none">{{ salespersonMetrics?.newOpportunities?.[selectedPeriod] || 0 }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="getTrendData('newOpportunities')">
@@ -372,7 +372,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Dormant Opps</div>
+                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Dormant Opps</div>
                 <div class="text-sm font-bold text-destructive leading-none">{{ salespersonMetrics?.dormantOpportunities || 0 }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="salespersonMetrics?.dormantOpportunitiesTrend">
@@ -429,7 +429,7 @@
               </div>
             </div>
           </div>
-          <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Conversion Rate</div>
+          <div class="text-xs font-medium text-muted-foreground tracking-wider mb-1">Conversion Rate</div>
           <Badge
             :text="getConversionDescription(managerMetrics?.conversionRate || 0)"
             size="small"
@@ -439,7 +439,7 @@
 
         <!-- Sales Funnel (full width) -->
         <div class="w-full bg-muted border border-border rounded-lg p-4">
-          <h3 class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-4">Sales Funnel</h3>
+          <h3 class="text-xs font-medium text-muted-foreground tracking-wider mb-4">Sales Funnel</h3>
           <div class="space-y-3">
             <div
               v-for="stage in managerMetrics?.stages || []"
@@ -471,7 +471,7 @@
 
         <!-- Task Completion (full width) -->
         <div class="w-full bg-muted rounded-lg p-4 border border-border">
-          <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Task Completion</div>
+          <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Task Completion</div>
           <div class="flex items-baseline gap-2 mb-2">
             <span class="text-sm font-bold text-foreground">{{ taskCompletionPercentage }}%</span>
             <span class="text-xs text-muted-foreground">completed on time</span>
@@ -492,7 +492,7 @@
 
         <!-- Deals Won vs Lost (full width) -->
         <div class="w-full bg-muted rounded-lg p-4 border border-border">
-          <div class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Deals Won vs Lost</div>
+          <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Deals Won vs Lost</div>
           <div class="flex items-baseline gap-2 mb-2">
             <span class="text-sm font-bold" style="color:#0470e9">{{ managerMetrics?.dealsReport?.won || 0 }}</span>
             <span class="text-xs text-muted-foreground">won</span>

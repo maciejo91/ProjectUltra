@@ -148,7 +148,8 @@
     />
 
     <!-- Action buttons below cards (same as LQTask outcome buttons) -->
-    <div class="flex justify-end gap-2 pt-3">
+    <div class="flex flex-wrap justify-end items-center gap-2 pt-3">
+      <slot name="extra-actions" />
       <Button
         variant="secondary"
         @click="onCancel"

@@ -1,13 +1,7 @@
 <template>
   <div class="space-y-6">
-    <!-- Redesigned Header: More visually clean -->
-    <div class="flex justify-between items-center bg-white p-3 border-b border-border rounded-t-lg">
-      <h3 class="text-sm font-semibold text-foreground flex items-center gap-2">
-        <Database class="w-4 h-4 text-muted-foreground" />
-        Data & Activity
-      </h3>
-      
-      <!-- Unified Add New Dropdown -->
+    <!-- Unified Add New Dropdown -->
+    <div class="flex justify-end items-center pt-3 pb-1 px-1 mb-4">
       <div class="relative">
         <Button 
           variant="outline" 
@@ -86,7 +80,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { Button } from '@motork/component-library/future/primitives'
-import { Database, ChevronDown, Paperclip, FolderOpen, StickyNote } from 'lucide-vue-next'
+import { ChevronDown, Paperclip, FolderOpen, StickyNote } from 'lucide-vue-next'
 import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
 import AttachmentWidget from '@/components/shared/feed/AttachmentWidget.vue'
 import FeedItemCard from '@/components/shared/feed/FeedItemCard.vue'

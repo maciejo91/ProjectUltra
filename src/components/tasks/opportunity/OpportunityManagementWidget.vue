@@ -172,7 +172,17 @@
               mode="schedule"
               @submit="(p) => handleScheduleFormSubmit(p, 'schedule')"
               @cancel="cancelScheduleForm"
-            />
+            >
+              <template #extra-actions>
+                <Button
+                  variant="outline"
+                  class="rounded-sm"
+                  @click="handleSkipToCreateOffer"
+                >
+                  Skip to Create Offer
+                </Button>
+              </template>
+            </OpportunityScheduleForm>
           </div>
         </div>
       </div>
@@ -245,6 +255,7 @@
               <SecondaryActionsDropdown
                 v-if="filteredSecondaryActions && filteredSecondaryActions.length > 0"
                 :actions="filteredSecondaryActions"
+                class="ml-auto shrink-0"
                 @action-selected="handleSecondaryAction"
               />
             </div>
@@ -596,6 +607,7 @@
               <SecondaryActionsDropdown
                 v-if="filteredSecondaryActions && filteredSecondaryActions.length > 0"
                 :actions="filteredSecondaryActions"
+                class="ml-auto shrink-0"
                 @action-selected="handleSecondaryAction"
               />
             </div>
@@ -1390,17 +1402,7 @@ const deliveryDateForm = ref({
 const scheduleAppointmentContractPendingFormRef = computed(() => contractPendingManagementSectionRef.value?.scheduleAppointmentContractPendingFormRef)
 
 const contractPendingActions = computed(() => {
-  const actions = []
-  if (!hasOffers.value) {
-    actions.push({
-      key: 'add-offer',
-      label: 'Add offer',
-      handler: () => {
-        openCreateOfferModal()
-      }
-    })
-  }
-  actions.push(
+  return [
     {
       key: 'close-as-lost',
       label: 'Close as Lost',
@@ -1417,8 +1419,7 @@ const contractPendingActions = computed(() => {
       label: 'Schedule appointment',
       handler: () => handleScheduleAppointmentContractPending()
     }
-  )
-  return actions
+  ]
 })
 
 function handleContractPendingAction() {
@@ -2671,6 +2672,21 @@ function openCreateContractModal() {
 
 function closeCreateContractModal() {
   showCreateContractModal.value = false
+}
+
+async function handleSkipToCreateOffer() {
+  const opp = opportunity.value
+  if (!opp?.id) return
+  try {
+    await opportunitiesStore.updateOpportunity(opp.id, {
+      stage: 'In Negotiation',
+      negotiationSubstatus: 'Awaiting Offer'
+    })
+    await opportunitiesStore.fetchOpportunityById(opp.id)
+    openCreateOfferModal()
+  } catch (err) {
+    console.error('Failed to skip to create offer:', err)
+  }
 }
 
 function openCreateOfferModal() {

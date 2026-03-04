@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-4">
-    <div v-if="showAddButton" class="flex justify-end">
+    <div v-if="showAddButton" class="flex justify-end mb-2">
       <Button variant="outline" size="sm" @click="$emit('add-appointment')">
         Add
       </Button>

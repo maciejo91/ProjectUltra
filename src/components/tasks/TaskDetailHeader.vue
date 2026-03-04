@@ -1,27 +1,64 @@
 <template>
   <header class="task-detail-header shrink-0 pt-4 lg:pt-2 px-4 sm:px-6 pb-1">
     <div class="task-detail-header-grid">
-      <!-- Row 1: Title + Prev/Next aligned on same line -->
+      <!-- Row 1: Title + Badges (same line on desktop, badges wrap to second line on mobile) + Prev/Next -->
       <div class="task-detail-header-title-row">
-        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-          <button
-            v-if="task"
-            type="button"
-            class="lg:hidden w-8 h-8 flex items-center justify-center -ml-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors shrink-0"
-            aria-label="Back to task list"
-            @click="$emit('close')"
-          >
-            <ArrowLeft class="w-5 h-5 shrink-0" />
-          </button>
-          <h3 v-if="task && taskTitle" class="task-detail-title text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
-            {{ taskTitle }}
-          </h3>
-          <h3 v-else-if="task" class="task-detail-title text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
-            {{ task.type === 'lead' ? 'Lead Qualification Task' : 'Opportunity Management Task' }}
-          </h3>
-          <h3 v-else class="task-detail-title text-sm sm:text-base font-semibold text-foreground leading-tight">
-            No task selected
-          </h3>
+        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap min-w-0 flex-1">
+            <button
+              v-if="task"
+              type="button"
+              class="lg:hidden w-8 h-8 flex items-center justify-center -ml-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors shrink-0"
+              aria-label="Back to task list"
+              @click="$emit('close')"
+            >
+              <ArrowLeft class="w-5 h-5 shrink-0" />
+            </button>
+            <h3 v-if="task && taskTitle" class="task-detail-title text-sm sm:text-base font-semibold text-foreground truncate leading-tight shrink min-w-0">
+              {{ taskTitle }}
+            </h3>
+            <h3 v-else-if="task" class="task-detail-title text-sm sm:text-base font-semibold text-foreground truncate leading-tight shrink min-w-0">
+              {{ task.type === 'lead' ? 'Lead Qualification Task' : 'Opportunity Management Task' }}
+            </h3>
+            <h3 v-else class="task-detail-title text-sm sm:text-base font-semibold text-foreground leading-tight shrink min-w-0">
+              No task selected
+            </h3>
+            <TaskBadges v-if="task" :task="task" class="shrink-0" />
+            <template v-if="task" v-for="tag in normalizedTags" :key="tag.name">
+              <span
+                v-if="tag.color"
+                class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-xs font-medium shrink-0"
+                :class="isLightColor(tag.color) ? 'text-foreground' : 'text-white'"
+                :style="{ backgroundColor: tag.color }"
+              >
+                <span class="min-w-0 truncate">{{ tag.name }}</span>
+                <button
+                  type="button"
+                  class="tag-remove rounded p-0.5 shrink-0 opacity-70 hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  :aria-label="`Remove tag ${tag.name}`"
+                  @click.stop="openRemoveTagConfirm(tag.name)"
+                >
+                  <X :size="12" />
+                </button>
+              </span>
+              <span v-else class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-xs font-medium shrink-0 bg-primary/15 text-foreground">
+                <span class="min-w-0 truncate">{{ tag.name }}</span>
+                <button
+                  type="button"
+                  class="tag-remove rounded p-0.5 shrink-0 opacity-70 hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  :aria-label="`Remove tag ${tag.name}`"
+                  @click.stop="openRemoveTagConfirm(tag.name)"
+                >
+                  <X :size="12" />
+                </button>
+              </span>
+            </template>
+            <button
+              v-if="task"
+              @click.stop="showAddTagModal = true"
+              class="text-xs text-muted-foreground hover:text-primary font-medium hover:underline transition-colors whitespace-nowrap shrink-0"
+            >
+              + tag
+            </button>
         </div>
         <div class="task-detail-header-actions shrink-0">
           <Button 
@@ -52,45 +89,6 @@
             <X :size="16" class="text-muted-foreground" />
           </Button>
         </div>
-      </div>
-      <!-- Row 2: Badges + Tags (wrap to next line if needed) -->
-      <div v-if="task" class="task-detail-header-badges flex items-center gap-1.5 sm:gap-2 flex-wrap">
-        <TaskBadges :task="task" />
-        <template v-for="tag in normalizedTags" :key="tag.name">
-          <span
-            v-if="tag.color"
-            class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-xs font-medium shrink-0"
-            :class="isLightColor(tag.color) ? 'text-foreground' : 'text-white'"
-            :style="{ backgroundColor: tag.color }"
-          >
-            <span class="min-w-0 truncate">{{ tag.name }}</span>
-            <button
-              type="button"
-              class="tag-remove rounded p-0.5 shrink-0 opacity-70 hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-              :aria-label="`Remove tag ${tag.name}`"
-              @click.stop="openRemoveTagConfirm(tag.name)"
-            >
-              <X :size="12" />
-            </button>
-          </span>
-          <span v-else class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-xs font-medium shrink-0 bg-primary/15 text-foreground">
-            <span class="min-w-0 truncate">{{ tag.name }}</span>
-            <button
-              type="button"
-              class="tag-remove rounded p-0.5 shrink-0 opacity-70 hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-              :aria-label="`Remove tag ${tag.name}`"
-              @click.stop="openRemoveTagConfirm(tag.name)"
-            >
-              <X :size="12" />
-            </button>
-          </span>
-        </template>
-        <button
-          @click.stop="showAddTagModal = true"
-          class="text-xs text-muted-foreground hover:text-primary font-medium hover:underline transition-colors whitespace-nowrap shrink-0"
-        >
-          + tag
-        </button>
       </div>
       <TaskAssigneeDateBar
       v-if="task && hasAssigneeOrDate"

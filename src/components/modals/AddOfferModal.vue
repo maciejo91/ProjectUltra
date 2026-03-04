@@ -116,7 +116,7 @@
           <div v-if="currentStepKey === 'personal'" class="space-y-4 max-w-2xl">
             <div class="space-y-4">
               <div>
-                <Label class="text-xs font-medium text-muted-foreground mb-1">Salutation <span class="text-red-500">*</span></Label>
+                <Label class="text-xs font-medium text-muted-foreground mb-1">Salutation</Label>
                 <Select v-model="offerData.salutation">
                   <SelectTrigger class="w-full">
                     <SelectValue placeholder="Select salutation" />
@@ -130,17 +130,17 @@
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">First Name <span class="text-red-500">*</span></Label>
+                  <Label class="text-xs font-medium text-muted-foreground mb-1">First Name</Label>
                   <Input v-model="offerData.firstName" placeholder="Enter first name" :disabled="!!customer" />
                 </div>
                 <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">Last Name <span class="text-red-500">*</span></Label>
+                  <Label class="text-xs font-medium text-muted-foreground mb-1">Last Name</Label>
                   <Input v-model="offerData.lastName" placeholder="Enter last name" :disabled="!!customer" />
                 </div>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">Email <span class="text-red-500">*</span></Label>
+                  <Label class="text-xs font-medium text-muted-foreground mb-1">Email</Label>
                   <Input type="email" v-model="offerData.email" placeholder="email@example.com" :disabled="!!customer" />
                 </div>
                 <div>
@@ -150,7 +150,7 @@
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">ZIP / Postal Code <span class="text-red-500">*</span></Label>
+                  <Label class="text-xs font-medium text-muted-foreground mb-1">ZIP / Postal Code</Label>
                   <Input v-model="offerData.zipCode" placeholder="Enter ZIP code" :disabled="!!customer" />
                 </div>
                 <div>
@@ -245,7 +245,7 @@
               </div>
             </div>
             <div>
-              <Label class="text-xs font-medium text-muted-foreground mb-1">Base Price (€) <span class="text-red-500">*</span></Label>
+              <Label class="text-xs font-medium text-muted-foreground mb-1">Base Price (€)</Label>
               <Input type="number" :value="offerData.price" readonly class="bg-muted" placeholder="0" />
             </div>
             <div class="flex items-center gap-2">
@@ -479,7 +479,7 @@
               <p class="text-xs font-semibold text-foreground">Privacy & consent</p>
               <div class="flex items-start gap-2">
                 <Checkbox :checked="offerData.privacyConsent" @update:checked="offerData.privacyConsent = $event" id="privacy-consent" />
-                <Label for="privacy-consent" class="text-xs text-muted-foreground cursor-pointer">I agree to the privacy policy <span class="text-red-500">*</span></Label>
+                <Label for="privacy-consent" class="text-xs text-muted-foreground cursor-pointer">I agree to the privacy policy</Label>
               </div>
               <div class="flex items-start gap-2">
                 <Checkbox :checked="offerData.marketingConsent" @update:checked="offerData.marketingConsent = $event" id="marketing-consent" />
@@ -789,15 +789,7 @@ const paymentMethodsValid = computed(() => {
 })
 
 const canSubmit = computed(() => {
-  const base =
-    offerData.value.salutation &&
-    offerData.value.firstName &&
-    offerData.value.lastName &&
-    offerData.value.email &&
-    offerData.value.zipCode &&
-    offerData.value.price > 0 &&
-    offerData.value.privacyConsent
-  return base && paymentMethodsValid.value
+  return offerData.value.price > 0 && paymentMethodsValid.value
 })
 
 const isNextDisabled = computed(() => {

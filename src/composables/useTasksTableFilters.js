@@ -50,10 +50,11 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
     const uniqueStatuses = [...new Set(
       taskList.map(t => t.displayStage ?? t.status ?? t.stage).filter(Boolean)
     )].sort()
+    const leadStageValues = Object.values(LEAD_STAGES).filter(s => s !== LEAD_STAGES.VALID)
     const statusOptions = uniqueStatuses.length > 0
       ? uniqueStatuses.map(s => ({ value: s, label: s }))
       : [
-          ...Object.values(LEAD_STAGES),
+          ...leadStageValues,
           ...Object.values(OPPORTUNITY_STAGES),
           'In Negotiation - Offer Sent',
           'In Negotiation - Contract Pending'
@@ -67,7 +68,7 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
         { value: 'notIn', label: 'is none of' }
       ],
       options: statusOptions,
-      aiHint: 'Lead status or opportunity stage (e.g. Valid, Qualified, In Negotiation)',
+      aiHint: 'Lead status or opportunity stage (e.g. New, To be called back, Qualified, In Negotiation)',
       pinned: true
     })
 

@@ -245,7 +245,7 @@ function matchStatus (q, statusOptions) {
   const lower = toLower(q)
   const trimmed = q.trim()
   const options = statusOptions || [
-    { value: 'Valid', label: 'Valid' },
+    { value: 'Valid - to be called back', label: 'Valid - to be called back' },
     { value: 'Not valid', label: 'Not valid' },
     { value: 'Qualified', label: 'Qualified' },
     { value: 'Not interested', label: 'Not interested' }
@@ -273,7 +273,7 @@ function matchStatus (q, statusOptions) {
     [/\blost\b/i, 'Lost'],
     [/\bin\s+negotiation\b/i, 'In Negotiation'],
     [/\bdisqualified\b/i, 'Disqualified'],
-    [/\bvalid\s+leads?\b/i, 'Valid'],
+    [/\bvalid\s+leads?\b/i, 'Valid - to be called back'],
     [/\bqualified\b/i, 'Qualified'],
     [/\bnot\s+valid\b/i, 'Not valid'],
     [/\bnot\s+interested\b/i, 'Not interested'],

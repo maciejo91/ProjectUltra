@@ -6,6 +6,7 @@
  */
 
 import { computed, toValue } from 'vue'
+import { getDisplayStage } from '@/utils/stageMapper'
 import { 
   getPrimaryAction, 
   getAvailableSecondaryActions, 
@@ -52,12 +53,14 @@ export function useOpportunityActions(opportunity, scheduledAppointment, activit
     const appt = toValue(scheduledAppointment)
     const acts = toValue(activities)
     
+    const enrichedOpp = { ...opp, activities: acts, scheduledAppointment: appt ?? opp.scheduledAppointment }
+    const stage = opp.displayStage || getDisplayStage(enrichedOpp, 'opportunity') || opp.stage
     return {
       opportunity: opp,
       scheduledAppointment: appt,
       activities: acts,
       hasOffers: (opp.offers && opp.offers.length > 0) || acts?.some(a => a.type === 'offer') || false,
-      stage: opp.displayStage || opp.stage,
+      stage,
       deliverySubstatus: opp.deliverySubstatus || null,
       formatDateTime: formatDateTime,
       hasActiveTaskWidget: false // Will be set after activeTaskWidget is computed
