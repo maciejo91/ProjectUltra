@@ -36,7 +36,10 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
       const updates = {
         nextActionDue: isoTimestamp
       }
-      
+      if (data.scheduledRecallAppointment) {
+        updates.scheduledRecallAppointment = data.scheduledRecallAppointment
+      }
+
       // Add reassignment if provided
       if (data.assigneeId || data.teamId) {
         updates.assignee = data.assignee || null

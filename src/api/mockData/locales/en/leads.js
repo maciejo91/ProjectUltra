@@ -1,4 +1,4 @@
-import { createHourOffset, DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
+import { createHourOffset, createDateString, DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
 
 const baseRequestedCar = (brand, model, year, price) => ({
   brand,
@@ -23,7 +23,7 @@ const baseRequestedCar = (brand, model, year, price) => ({
 })
 
 export const mockLeads = [
-  // 1. New – stage: Open, no callbackDate, minimal contactAttempts
+  // 1. New – stage: Open, no callback
   {
     id: 1,
     customerId: 1,
@@ -48,7 +48,7 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 5
   },
-  // 2. To be called back – stage: Open, callbackDate set
+  // 2. To be called back – callbackDate, scheduled recall
   {
     id: 2,
     customerId: 2,
@@ -66,6 +66,7 @@ export const mockLeads = [
     lastActivity: createHourOffset(-2),
     nextActionDue: createHourOffset(8),
     callbackDate: createHourOffset(8),
+    scheduledRecallAppointment: { date: createDateString(1), time: '10:00' },
     tags: ['Premium'],
     stage: 'Open',
     isDisqualified: false,
@@ -76,7 +77,7 @@ export const mockLeads = [
     ],
     distanceKm: 3
   },
-  // 3. Valid - to be called back – stage: Validated, callbackDate, spoke-to-customer
+  // 3. Valid - to be called back
   {
     id: 3,
     customerId: 3,
@@ -104,7 +105,7 @@ export const mockLeads = [
     ],
     distanceKm: 15
   },
-  // 4. Valid – stage: Validated, no callbackDate, spoke-to-customer
+  // 4. New – NO PHONE – shows contact-by-email form
   {
     id: 4,
     customerId: 4,
@@ -118,20 +119,18 @@ export const mockLeads = [
     sourceDetails: 'Contact form',
     assignee: 'David Miller',
     assigneeInitials: 'DM',
-    createdAt: createHourOffset(-5),
+    createdAt: createHourOffset(-1),
     lastActivity: createHourOffset(-1),
-    nextActionDue: createHourOffset(10),
+    nextActionDue: createHourOffset(6),
     tags: [],
-    stage: 'Validated',
+    stage: 'Open',
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: [
-      { timestamp: createHourOffset(-4), outcome: 'spoke-to-customer', channel: 'phone', notes: 'Customer validated. No callback needed.', transcription: null }
-    ],
+    contactAttempts: [],
     distanceKm: 20
   },
-  // 5. Closed - Invalid – stage: Not Valid, isDisqualified
+  // 5. Closed - Invalid
   {
     id: 5,
     customerId: 5,
@@ -156,7 +155,7 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 120
   },
-  // 6. Closed - Not Interested – stage: Not Interested, isDisqualified
+  // 6. Closed - Not Interested
   {
     id: 6,
     customerId: 6,
@@ -183,7 +182,7 @@ export const mockLeads = [
     ],
     distanceKm: 50
   },
-  // 7. Closed - Duplicate – stage: Closed Failed, isDisqualified, isDuplicate
+  // 7. Closed - Duplicate
   {
     id: 7,
     customerId: 7,
@@ -208,216 +207,5 @@ export const mockLeads = [
     scheduledAppointment: null,
     contactAttempts: [],
     distanceKm: 5
-  },
-  // 8. New – stage: New (explicit)
-  {
-    id: 8,
-    customerId: 17,
-    status: 'Open',
-    priority: 'Hot',
-    requestedCar: baseRequestedCar('Hyundai', 'Ioniq 6', 2024, 48000),
-    carStatus: 'In Stock',
-    requestType: 'Quotation',
-    source: 'Website',
-    fiscalEntity: 'MotorK',
-    sourceDetails: 'Contact form',
-    assignee: 'Sarah Jenkins',
-    assigneeInitials: 'SJ',
-    createdAt: createHourOffset(-1),
-    lastActivity: createHourOffset(0),
-    nextActionDue: createHourOffset(6),
-    tags: ['EV'],
-    stage: 'New',
-    isDisqualified: false,
-    disqualifyReason: null,
-    scheduledAppointment: null,
-    contactAttempts: [],
-    distanceKm: 12
-  },
-  // 9. New – stage: Open, no callback
-  {
-    id: 9,
-    customerId: 20,
-    status: 'Open',
-    priority: 'Warm',
-    requestedCar: baseRequestedCar('Skoda', 'Octavia', 2024, 32000),
-    carStatus: 'In Stock',
-    requestType: 'Test Drive',
-    source: 'Google Ads',
-    fiscalEntity: 'MotorK',
-    sourceDetails: 'Display',
-    assignee: 'David Miller',
-    assigneeInitials: 'DM',
-    createdAt: createHourOffset(-5),
-    lastActivity: createHourOffset(-2),
-    nextActionDue: createHourOffset(12),
-    tags: [],
-    stage: 'Open',
-    isDisqualified: false,
-    disqualifyReason: null,
-    scheduledAppointment: null,
-    contactAttempts: [],
-    distanceKm: 8
-  },
-  // 10. To be called back
-  {
-    id: 10,
-    customerId: 21,
-    status: 'Open',
-    priority: 'Warm',
-    requestedCar: baseRequestedCar('Kia', 'EV6', 2024, 52000),
-    carStatus: 'In Stock',
-    requestType: 'Quotation',
-    source: 'Facebook',
-    fiscalEntity: 'MotorK',
-    sourceDetails: 'Auto campaign',
-    assignee: 'Sarah Jenkins',
-    assigneeInitials: 'SJ',
-    createdAt: createHourOffset(-6),
-    lastActivity: createHourOffset(-3),
-    nextActionDue: createHourOffset(10),
-    callbackDate: createHourOffset(10),
-    tags: [],
-    stage: 'Open',
-    isDisqualified: false,
-    disqualifyReason: null,
-    scheduledAppointment: null,
-    contactAttempts: [
-      { timestamp: createHourOffset(-4), outcome: 'no-answer', channel: 'phone', notes: 'Left voicemail. Customer to call back.', transcription: null }
-    ],
-    distanceKm: 25
-  },
-  // 11. Valid - to be called back
-  {
-    id: 11,
-    customerId: 26,
-    status: 'Open',
-    priority: 'Hot',
-    requestedCar: baseRequestedCar('Ford', 'Mustang Mach-E', 2024, 58000),
-    carStatus: 'In Stock',
-    requestType: 'Test Drive',
-    source: 'Walk-in',
-    fiscalEntity: 'MotorK',
-    sourceDetails: 'Showroom',
-    assignee: 'Salsabeel Khaleel',
-    assigneeInitials: 'SK',
-    createdAt: createHourOffset(-4),
-    lastActivity: createHourOffset(-1),
-    nextActionDue: createHourOffset(8),
-    callbackDate: createHourOffset(8),
-    tags: ['Premium'],
-    stage: 'Validated',
-    isDisqualified: false,
-    disqualifyReason: null,
-    scheduledAppointment: null,
-    contactAttempts: [
-      { timestamp: createHourOffset(-2), outcome: 'spoke-to-customer', channel: 'phone', notes: 'Confirmed interest. Callback scheduled.', transcription: null }
-    ],
-    distanceKm: 4
-  },
-  // 12. Valid
-  {
-    id: 12,
-    customerId: 27,
-    status: 'Open',
-    priority: 'Warm',
-    requestedCar: baseRequestedCar('Nissan', 'Ariya', 2024, 46000),
-    carStatus: 'In Stock',
-    requestType: 'Quotation',
-    source: '3rd Party',
-    fiscalEntity: 'MotorK',
-    sourceDetails: 'Aggregator',
-    assignee: 'David Miller',
-    assigneeInitials: 'DM',
-    createdAt: createHourOffset(-7),
-    lastActivity: createHourOffset(-2),
-    nextActionDue: createHourOffset(14),
-    tags: [],
-    stage: 'Validated',
-    isDisqualified: false,
-    disqualifyReason: null,
-    scheduledAppointment: null,
-    contactAttempts: [
-      { timestamp: createHourOffset(-5), outcome: 'spoke-to-customer', channel: 'phone', notes: 'Validated. No callback needed.', transcription: null }
-    ],
-    distanceKm: 18
-  },
-  // 13. Closed - Invalid
-  {
-    id: 13,
-    customerId: 28,
-    status: 'Open',
-    priority: 'Normal',
-    requestedCar: baseRequestedCar('Renault', 'Megane E-Tech', 2024, 38000),
-    carStatus: 'Not In Stock',
-    requestType: 'Quotation',
-    source: 'Website',
-    fiscalEntity: '',
-    sourceDetails: 'Invalid email',
-    assignee: null,
-    assigneeInitials: '',
-    createdAt: createHourOffset(-72),
-    lastActivity: createHourOffset(-72),
-    nextActionDue: createHourOffset(-48),
-    tags: [],
-    stage: 'Not Valid',
-    isDisqualified: true,
-    disqualifyReason: 'Invalid contact details',
-    scheduledAppointment: null,
-    contactAttempts: [],
-    distanceKm: 95
-  },
-  // 14. Closed - Not Interested
-  {
-    id: 14,
-    customerId: 29,
-    status: 'Open',
-    priority: 'Normal',
-    requestedCar: baseRequestedCar('Mini', 'Cooper SE', 2024, 36000),
-    carStatus: 'In Stock',
-    requestType: 'Quotation',
-    source: 'Google Ads',
-    fiscalEntity: '',
-    sourceDetails: 'Display',
-    assignee: 'Sarah Jenkins',
-    assigneeInitials: 'SJ',
-    createdAt: createHourOffset(-36),
-    lastActivity: createHourOffset(-4),
-    nextActionDue: createHourOffset(-24),
-    tags: [],
-    stage: 'Not Interested',
-    isDisqualified: true,
-    disqualifyReason: 'Budget constraints',
-    scheduledAppointment: null,
-    contactAttempts: [
-      { timestamp: createHourOffset(-5), outcome: 'spoke-to-customer', channel: 'phone', notes: 'Decided to postpone purchase.', transcription: null }
-    ],
-    distanceKm: 42
-  },
-  // 15. Closed - Duplicate
-  {
-    id: 15,
-    customerId: 24,
-    status: 'Open',
-    priority: 'Normal',
-    requestedCar: baseRequestedCar('Peugeot', '308', 2024, 28000),
-    carStatus: 'In Stock',
-    requestType: 'Quotation',
-    source: 'Walk-in',
-    fiscalEntity: 'MotorK',
-    sourceDetails: 'Duplicate of Lead 8',
-    assignee: 'Salsabeel Khaleel',
-    assigneeInitials: 'SK',
-    createdAt: createHourOffset(-2),
-    lastActivity: createHourOffset(-2),
-    nextActionDue: createHourOffset(-1),
-    tags: [],
-    stage: 'Closed Failed',
-    isDisqualified: true,
-    disqualifyReason: 'Duplicate',
-    isDuplicate: true,
-    scheduledAppointment: null,
-    contactAttempts: [],
-    distanceKm: 7
   }
 ]

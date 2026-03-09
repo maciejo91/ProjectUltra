@@ -32,6 +32,7 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
     aiSuggestionData,
     customDate,
     customTime,
+    markAsScheduledRecall,
     qualificationMethod,
     qualificationEventType,
     qualificationDurationValue,
@@ -411,25 +412,34 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
       callLogDateTime: callLogDateTime.value ?? ''
     }
 
+    const leadUpdates = {
+      nextActionDue: nextCallDate,
+      stage: LEAD_STAGES.VALID_TO_BE_CALLED_BACK,
+      status: 'Pending',
+      postponedInterestedState: draft,
+      scheduledRecallAppointment: markAsScheduledRecall?.value
+        ? { date: appointmentDate, time: appointmentTime }
+        : null
+    }
+
     if (leadsStore && lead.value?.id) {
       try {
-        await leadsStore.updateLead(lead.value.id, {
-          nextActionDue: nextCallDate,
-          stage: LEAD_STAGES.VALID_TO_BE_CALLED_BACK,
-          status: 'Pending',
-          postponedInterestedState: draft
-        })
+        await leadsStore.updateLead(lead.value.id, leadUpdates)
       } catch (error) {
         console.error('Failed to update lead (postpone from interested):', error)
       }
     }
 
-    emit('postponed', {
+    const postponedPayload = {
       date: appointmentDate,
       time: appointmentTime,
       createAppointment: true,
       fromInterested: true
-    })
+    }
+    if (markAsScheduledRecall?.value) {
+      postponedPayload.scheduledRecallAppointment = { date: appointmentDate, time: appointmentTime }
+    }
+    emit('postponed', postponedPayload)
 
     // Keep form visible with filled data (status is Valid - to be called back, not closed)
     // Do not set successState or cancelOutcome so the user still sees the form

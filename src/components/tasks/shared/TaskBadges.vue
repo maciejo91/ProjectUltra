@@ -7,6 +7,15 @@
     >
       {{ typeLabel }}
     </span>
+
+    <!-- Attempts (call attempts indicator) -->
+    <span
+      v-if="callAttemptsCount > 0"
+      class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
+    >
+      <Phone class="shrink-0 size-2.5" aria-hidden />
+      {{ callAttemptsValue }}
+    </span>
     
     <!-- Hot Priority Badge (when urgency disabled and not shown elsewhere e.g. next to name on card) -->
     <span 
@@ -38,6 +47,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { Phone } from 'lucide-vue-next'
 import { getDisplayStage as getCalculatedDisplayStageFromMapper, getStageColor as getStageColorFromMapper } from '@/utils/stageMapper'
 import { useSettingsStore } from '@/stores/settings'
 
@@ -65,11 +75,14 @@ const props = defineProps({
   }
 })
 
+const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
+const callAttemptsCount = computed(() => props.task?.contactAttempts?.length ?? 0)
+const callAttemptsValue = computed(() => `${callAttemptsCount.value}/${maxContactAttempts.value}`)
+
 const urgencyEnabled = computed(() => settingsStore.getSetting('urgencyEnabled') !== false)
 const showHotPriorityBadge = computed(() =>
   props.task?.priority === 'Hot' && !urgencyEnabled.value
 )
-
 const typeLabel = computed(() => {
   return props.task.type === 'lead' ? 'Lead' : 'Opportunity'
 })

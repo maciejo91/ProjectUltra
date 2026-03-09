@@ -5,42 +5,22 @@
     :class="[cardClass, selectedBorderClass]"
     @click="$emit('select', itemId)"
   >
-    <!-- Top row: Urgency (left) + Due Date + Attempts (right, stacked) -->
-    <div class="flex items-center justify-between gap-2 w-full shrink-0 mb-1">
-      <div class="flex items-center gap-1.5 min-w-0">
-        <span
-          v-if="showUrgencyBadge"
-          class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
-        >
-          <span
-            :class="['shrink-0 rounded-full size-2', urgencyDotClass]"
-            aria-hidden
-          />
-          {{ item.urgencyLevel }}
-        </span>
-        <span
-          v-else-if="showHotFallbackBadge"
-          class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
-        >
-          <span class="shrink-0 rounded-full size-2 bg-red-500" aria-hidden />
-          Hot
-        </span>
-      </div>
-      <div class="flex flex-col items-end shrink-0 gap-0.5">
-        <span
-          v-if="displayDate"
-          class="text-xs font-medium uppercase leading-none"
-          :class="displayDate.status.textClass"
-        >
-          {{ displayDate.text }}
-        </span>
-        <span
-          v-if="callAttemptsCount > 0"
-          class="text-xs font-normal text-muted-foreground leading-none"
-        >
-          Attempts {{ callAttemptsValue }}
-        </span>
-      </div>
+    <!-- Top row: Due Date + Recall (right) -->
+    <div class="flex items-center justify-end gap-2 w-full shrink-0 mb-1">
+      <span
+        v-if="displayDate"
+        class="text-xs font-medium uppercase leading-none shrink-0"
+        :class="displayDate.status.textClass"
+      >
+        {{ displayDate.text }}
+      </span>
+      <span
+        v-if="showScheduledRecallBadge"
+        class="inline-flex items-center gap-1 text-xs font-medium uppercase leading-none shrink-0 bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded"
+      >
+        <span class="shrink-0 rounded-full size-1.5 bg-blue-500" aria-hidden />
+        Recall
+      </span>
     </div>
 
     <div class="flex flex-col min-w-0 flex-1 pr-2">
@@ -55,8 +35,25 @@
       </div>
     </div>
 
-    <!-- Badges: full-width row -->
-    <div class="mt-2 w-full shrink-0">
+    <!-- Badges + Urgency: full-width row -->
+    <div class="mt-2 w-full shrink-0 flex items-center gap-2 flex-wrap">
+      <span
+        v-if="showUrgencyBadge"
+        class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
+      >
+        <span
+          :class="['shrink-0 rounded-full size-2', urgencyDotClass]"
+          aria-hidden
+        />
+        {{ item.urgencyLevel }}
+      </span>
+      <span
+        v-else-if="showHotFallbackBadge"
+        class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
+      >
+        <span class="shrink-0 rounded-full size-2 bg-red-500" aria-hidden />
+        Hot
+      </span>
       <TaskBadges :task="item" :urgency-shown-elsewhere="true" />
     </div>
   </div>
@@ -178,9 +175,9 @@ const displayDate = computed(() => {
   return deadline.value
 })
 
-const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
-const callAttemptsCount = computed(() => props.item.contactAttempts?.length ?? 0)
-const callAttemptsValue = computed(() => `${callAttemptsCount.value}/${maxContactAttempts.value}`)
+const showScheduledRecallBadge = computed(() =>
+  props.item?.type === 'lead' && props.item?.scheduledRecallAppointment?.date
+)
 
 const urgencyEnabled = computed(() => settingsStore.getSetting('urgencyEnabled') !== false)
 const showUrgencyBadge = computed(() => urgencyEnabled.value && props.item?.urgencyLevel)

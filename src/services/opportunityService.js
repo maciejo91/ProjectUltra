@@ -166,9 +166,17 @@ export class OpportunityService {
       })
     }
     
-    // Enrich with display stages
-    const enrichedResults = await Promise.all(results.map(opp => this.enrichWithStage(opp)))
-    
+    // Enrich with display stages (use allSettled so one failing enrichment does not empty the list)
+    const settled = await Promise.allSettled(results.map(opp => this.enrichWithStage(opp)))
+    const enrichedResults = settled
+      .filter(p => p.status === 'fulfilled')
+      .map(p => p.value)
+      .filter(Boolean)
+    const rejectedCount = settled.filter(p => p.status === 'rejected').length
+    if (rejectedCount > 0 && import.meta.env.DEV) {
+      console.warn(`OpportunityService: ${rejectedCount} opportunity(ies) skipped due to enrichment error`)
+    }
+
     return { data: enrichedResults, total: enrichedResults.length }
   }
 

@@ -310,14 +310,24 @@ const columns = computed(() => [
       const date = task.type === 'opportunity' && task.expectedCloseDate
         ? task.expectedCloseDate
         : (task.nextActionDue ?? task.dueDate)
-      if (!date) {
+      const hasRecall = task.type === 'lead' && task.scheduledRecallAppointment?.date
+      if (!date && !hasRecall) {
         return h('span', { class: 'text-meta' }, 'Not set')
       }
-      const status = getDeadlineStatus(date)
-      const text = formatDueDateRelative(date)
-      return h('span', {
-        class: `text-xs font-medium uppercase leading-none ${status.textClass}`
-      }, text)
+      const parts = []
+      if (date) {
+        const status = getDeadlineStatus(date)
+        const text = formatDueDateRelative(date)
+        parts.push(h('span', {
+          class: `text-xs font-medium uppercase leading-none ${status.textClass}`
+        }, text))
+      }
+      if (hasRecall) {
+        parts.push(h('span', {
+          class: 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium uppercase leading-none bg-blue-50 text-blue-700 ml-1'
+        }, [h('span', { class: 'shrink-0 rounded-full size-1.5 bg-blue-500', 'aria-hidden': 'true' }), 'Recall']))
+      }
+      return h('div', { class: 'flex flex-wrap items-center gap-1' }, parts)
     }
   },
   {

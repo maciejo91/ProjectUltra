@@ -58,7 +58,15 @@
             <Car v-else class="w-6 h-6 shrink-0 text-muted-foreground" />
           </div>
           <div class="flex-1 min-w-0">
-            <div class="font-bold text-foreground text-sm mb-1">{{ carBrand }} {{ carModel }} ({{ carYear }})</div>
+            <div class="flex flex-wrap items-center gap-2 mb-1">
+              <span class="font-bold text-foreground text-sm">{{ carBrand }} {{ carModel }} ({{ carYear }})</span>
+              <span
+                v-if="carCondition"
+                class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground"
+              >
+                {{ carCondition }}
+              </span>
+            </div>
             <div class="flex items-center gap-2 flex-wrap">
               <div 
                 v-if="stockDays !== undefined && stockDays !== null"
@@ -72,6 +80,14 @@
               >
                 <div class="w-1 h-1 bg-orange-500 rounded-full"></div> Out of stock
               </div>
+            </div>
+            <div
+              v-if="carMileage !== null || carFuelType || carGearType"
+              class="flex gap-3 mt-0.5 text-xs text-muted-foreground"
+            >
+              <span v-if="carMileage !== null">{{ formatMileage(carMileage) }} km</span>
+              <span v-if="carFuelType">{{ carFuelType }}</span>
+              <span v-if="carGearType">{{ carGearType }}</span>
             </div>
           </div>
           <div v-if="carPrice" class="text-right">
@@ -155,6 +171,28 @@ const carPrice = computed(() => props.task.requestedCar?.price || null)
 const stockDays = computed(() => props.task.requestedCar?.stockDays !== undefined ? props.task.requestedCar.stockDays : null)
 const requestMessage = computed(() => props.task.requestedCar?.requestMessage || '')
 
+// Mileage - support both kilometers (mock) and mileage
+const carMileage = computed(() => {
+  const v = props.task.requestedCar
+  const val = v?.kilometers ?? v?.mileage
+  return val !== undefined && val !== null ? val : null
+})
+
+// Condition (New/Km0/Used) - aligned with tasks table
+const carCondition = computed(() => {
+  const v = props.task.requestedCar
+  if (!v) return null
+  const status = v.status || ''
+  const km = v.kilometers ?? v.mileage
+  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'New') {
+    return (status && status.toLowerCase() === 'new') || km === 0 ? 'Km0' : 'New'
+  }
+  return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Used'
+})
+
+const carFuelType = computed(() => props.task.requestedCar?.fuelType || '')
+const carGearType = computed(() => props.task.requestedCar?.gearType || '')
+
 // Stage color class
 const stageColorClass = computed(() => {
   return getStageColor(props.task.displayStage || props.task.stage, props.entityType)
@@ -212,8 +250,14 @@ const negotiationBadge = computed(() => {
   return null
 })
 
-// Formatting function
+// Formatting functions
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-US').format(value)
+}
+
+const formatMileage = (mileage) => {
+  if (mileage == null) return '0'
+  const num = typeof mileage === 'string' ? parseFloat(mileage) : mileage
+  return new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(num)
 }
 </script>

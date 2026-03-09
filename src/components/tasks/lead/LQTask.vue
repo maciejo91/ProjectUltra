@@ -80,10 +80,12 @@
         />
         <div class="p-4">
           <div class="flex flex-wrap items-center justify-between gap-3">
-            <p class="text-base leading-normal font-medium text-foreground min-w-0 flex-1">{{ dynamicDescription }}</p>
-            <!-- Call Interface Component (inline so button sits on same line as action) -->
+            <p class="text-base leading-normal font-medium text-foreground min-w-0 flex-1">{{ contactDescription }}</p>
+            <!-- Call Interface when lead has phone; otherwise email card -->
             <CallInterface
+              v-if="hasPhone"
               :inline="true"
+              class="shrink-0"
               :is-call-active="isCallActive"
               :call-ended="callEnded"
               :call-duration="callDuration"
@@ -112,8 +114,14 @@
 
       <!-- Grey outcome area: outcome selection and expanded cards -->
       <div class="mk-expanded-cards-area space-y-3">
-        <!-- Inline Outcome Selection -->
-        <div v-if="!successState" class="space-y-4">
+        <!-- No phone: email form in place of outcome card -->
+        <LQTaskSendEmailCard
+          v-if="!hasPhone && !successState"
+          :lead="lead"
+          :contact-name="lead.customer?.name ?? 'the customer'"
+        />
+        <!-- Inline Outcome Selection (when lead has phone) -->
+        <div v-else-if="!successState" class="space-y-4">
             <div>
             <p class="text-sm font-medium text-foreground leading-normal mb-3">What's the outcome?</p>
             <div class="outcome-toggle-group grid grid-cols-3 gap-3">
@@ -997,6 +1005,17 @@
                 <Input type="time" v-model="customTime" class="w-full" />
               </div>
             </div>
+            <!-- Mark as scheduled recall appointment -->
+            <div v-if="rescheduleTime" class="mt-3 flex items-center gap-2">
+              <Checkbox
+                :id="`mark-recall-answer-${lead.id}`"
+                v-model:checked="markAsScheduledRecall"
+                class="rounded border-border"
+              />
+              <Label :for="`mark-recall-answer-${lead.id}`" class="text-sm font-normal text-foreground cursor-pointer">
+                Mark as scheduled recall appointment
+              </Label>
+            </div>
             <!-- Assigned to (next attempt) -->
             <div class="mt-4">
               <Label class="form-label">Assigned to</Label>
@@ -1111,6 +1130,7 @@ import { ref, computed, toRef, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { 
   Button,
+  Checkbox,
   Select,
   SelectTrigger,
   SelectContent,
@@ -1150,13 +1170,18 @@ import { useSettingsStore } from '@/stores/settings'
 import { useLeadsStore } from '@/stores/leads'
 import { useToastStore } from '@/stores/toast'
 import { formatDate, formatTime } from '@/utils/formatters'
-import { mergeContactIntoDescription } from '@/utils/taskActionTitle'
+import { defineAsyncComponent } from 'vue'
+import { mergeContactIntoDescription, getNoPhoneContactDescription } from '@/utils/taskActionTitle'
 import { useLeadActions } from '@/composables/useLeadActions'
 import { LEAD_STAGES } from '@/utils/stageMapper'
 import { useLQWidgetCall } from '@/composables/useLQWidgetCall'
 import { useLQWidgetOutcomes } from '@/composables/useLQWidgetOutcomes'
 import { useLQWidgetHandlers } from '@/composables/useLQWidgetHandlers'
 import CallInterface from '@/components/tasks/lead/CallInterface.vue'
+
+const LQTaskSendEmailCard = defineAsyncComponent(() =>
+  import('@/components/tasks/lead/LQTaskSendEmailCard.vue')
+)
 import DeadlineBanner from '@/components/tasks/shared/DeadlineBanner.vue'
 import AppointmentCommunications from '@/components/shared/communication/AppointmentCommunications.vue'
 import CloseAsLostForm from '@/components/shared/CloseAsLostForm.vue'
@@ -1477,12 +1502,20 @@ const leadSummary = computed(() => {
   return `${name} is interested in ${vehicle}. Lead comes from ${source}${created ? `, created ${created}` : ''}.`
 })
 
+const hasPhone = computed(() => !!(props.lead.customer?.phone ?? '').trim())
+
 const dynamicDescription = computed(() => {
   const base = leadState.primaryAction.value?.description || 'Begin lead qualification by verifying customer contact information.'
   const name = props.lead.customer?.name ?? ''
   const phone = props.lead.customer?.phone ?? ''
   return mergeContactIntoDescription(base, name, phone)
 })
+
+const contactDescription = computed(() =>
+  hasPhone.value
+    ? dynamicDescription.value
+    : getNoPhoneContactDescription(props.lead.customer?.name ?? '')
+)
 
 const isOverdue = computed(() => {
   // Lead tasks use nextActionDue only (scheduled appointments are for opportunities)
@@ -1519,6 +1552,7 @@ const {
   rescheduleTime,
   customDate,
   customTime,
+  markAsScheduledRecall,
   disqualifyCategory,
   disqualifyReason,
   assignment,
@@ -1595,6 +1629,10 @@ function setRescheduleTime(v) {
     handleAISuggestionClick()
   } else {
     rescheduleTime.value = v
+    if (v === 'custom') {
+      const today = new Date()
+      customDate.value = today.toISOString().split('T')[0]
+    }
   }
 }
 

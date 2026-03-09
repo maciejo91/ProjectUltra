@@ -69,6 +69,8 @@ export function useTaskFilters(showClosed) {
       ? opportunitiesStore.opportunities
       : opportunitiesStore.opportunities.filter(opp => {
           const displayStage = getDisplayStage(opp, 'opportunity')
+          // Include when stage is unknown (null/undefined) so we never hide opportunities by mistake
+          if (displayStage == null) return true
           return !CLOSED_OPPORTUNITY_STAGES.includes(displayStage)
         })
 

@@ -44,6 +44,9 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
   const customTime = ref('09:00')
   const aiSuggestionData = ref(null)
 
+  // Mark selected postpone time as scheduled recall appointment (Answer + Postpone)
+  const markAsScheduledRecall = ref(false)
+
   // Not Valid state
   const disqualifyCategory = ref('Not Interested')
   const disqualifyReason = ref('')
@@ -415,6 +418,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     rescheduleTime.value = null
     customDate.value = ''
     customTime.value = '09:00'
+    markAsScheduledRecall.value = false
     disqualifyCategory.value = 'Not Interested'
     disqualifyReason.value = ''
     surveyCompleted.value = false
@@ -474,6 +478,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     customDate.value = ''
     customTime.value = '09:00'
     aiSuggestionData.value = null
+    markAsScheduledRecall.value = false
   }
   
   // Initialize call log form with current datetime and auto-assign to current user
@@ -526,6 +531,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     rescheduleTime,
     customDate,
     customTime,
+    markAsScheduledRecall,
     disqualifyCategory,
     disqualifyReason,
     assignment,

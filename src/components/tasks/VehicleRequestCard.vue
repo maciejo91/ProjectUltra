@@ -37,9 +37,17 @@
       </div>
 
       <div class="min-w-0 flex-1 flex flex-col justify-center">
-        <p class="text-sm font-semibold text-foreground truncate">
-          {{ vehicleNameWithYear }}
-        </p>
+        <div class="flex flex-wrap items-center gap-2">
+          <p class="text-sm font-semibold text-foreground truncate">
+            {{ vehicleNameWithYear }}
+          </p>
+          <span
+            v-if="vehicleCondition"
+            class="shrink-0 inline-flex px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground"
+          >
+            {{ vehicleCondition }}
+          </span>
+        </div>
         <div
           v-if="vehicle.price"
           class="flex items-center gap-2 mt-1 text-sm text-foreground flex-wrap"
@@ -49,11 +57,12 @@
           </span>
         </div>
         <div
-          v-if="vehicle.mileage || vehicle.fuelType"
-          class="flex gap-3 mt-0.5 text-xs text-muted-foreground"
+          v-if="displayMileage || vehicle.fuelType || vehicle.gearType"
+          class="flex gap-3 mt-0.5 text-xs text-muted-foreground flex-wrap"
         >
-          <span v-if="vehicle.mileage">{{ formatMileage(vehicle.mileage) }} km</span>
+          <span v-if="displayMileage">{{ formatMileage(displayMileage) }} km</span>
           <span v-if="vehicle.fuelType">{{ vehicle.fuelType }}</span>
+          <span v-if="vehicle.gearType">{{ vehicle.gearType }}</span>
         </div>
       </div>
     </div>
@@ -106,6 +115,24 @@ const vehicleName = computed(() => {
 const vehicleNameWithYear = computed(() => {
   const name = vehicleName.value
   return props.vehicle.year ? `${name} (${props.vehicle.year})` : name
+})
+
+// Condition (New/Km0/Used) - aligned with tasks table
+const vehicleCondition = computed(() => {
+  const v = props.vehicle
+  if (!v) return null
+  const status = v.status || ''
+  const km = v.kilometers ?? v.mileage
+  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'New') {
+    return (status && status.toLowerCase() === 'new') || km === 0 ? 'Km0' : 'New'
+  }
+  return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Used'
+})
+
+// Mileage - support both kilometers (mock) and mileage
+const displayMileage = computed(() => {
+  const v = props.vehicle
+  return v?.kilometers ?? v?.mileage
 })
 
 const formatPrice = (price) => {

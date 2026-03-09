@@ -3,6 +3,7 @@ import { getMockData } from '@/api/mockData/localeLoader.js'
 import { DEFAULT_CAR_IMAGE, ensureRequestedCarImage } from '@/utils/mockDataHelpers'
 
 const STORAGE_KEY = 'project-ultra-leads'
+const DATA_VERSION = 2
 
 /**
  * Lead Repository
@@ -66,24 +67,46 @@ export class LeadRepository extends BaseRepository {
   }
 
   /**
+   * Merge mock leads that don't exist in stored data (e.g. new demo leads).
+   * Ensures new mock leads appear even when user has existing localStorage.
+   */
+  _mergeNewMockLeads(storedLeads) {
+    const mock = getMockData().mockLeads
+    if (!Array.isArray(mock) || mock.length === 0) return storedLeads
+    const storedIds = new Set((storedLeads || []).map(l => l.id))
+    const toAdd = mock.filter(m => !storedIds.has(m.id))
+    if (toAdd.length === 0) return storedLeads
+    return [...(storedLeads || []), ...JSON.parse(JSON.stringify(toAdd))]
+  }
+
+  /**
    * Get current data source: from localStorage if previously saved, else deep-clone of mock leads.
    */
   get dataSource() {
     if (this._leadsCache === null) {
       try {
+        const versionKey = `${STORAGE_KEY}-version`
+        const storedVersion = parseInt(localStorage.getItem(versionKey) || '0', 10)
         const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored) {
+        if (stored && storedVersion >= DATA_VERSION) {
           const parsed = JSON.parse(stored)
           this._leadsCache = Array.isArray(parsed) ? parsed : []
           this._ensureNextActionDue(this._leadsCache)
           this._ensureCarImages(this._leadsCache)
+          const merged = this._mergeNewMockLeads(this._leadsCache)
+          if (merged.length > this._leadsCache.length) {
+            this._leadsCache = merged
+            this._persist()
+          }
         }
-      } catch (_) {
-        this._leadsCache = []
-      }
+      } catch (_) {}
       if (this._leadsCache === null) {
         const mock = getMockData().mockLeads
         this._leadsCache = JSON.parse(JSON.stringify(mock || []))
+        this._persist()
+        try {
+          localStorage.setItem(`${STORAGE_KEY}-version`, String(DATA_VERSION))
+        } catch (_) {}
       }
     }
     return this._leadsCache

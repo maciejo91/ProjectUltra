@@ -409,7 +409,7 @@ const handleViewChange = (newViewMode, searchQuery = '') => {
 
 const activeFilters = ref([]) // Array of active filter keys: ['lead', 'due-in-24h', etc.] - no filters by default
 const sortOption = ref('') // '', 'urgent-first', 'assigned-to-me', 'assigned-to-my-team', 'recent-first'
-const showClosed = ref(false) // Toggle to show/hide closed leads and closed opportunities
+const showClosed = ref(false) // Toggle to show/hide closed leads and closed opportunities; default false (hidden by default)
 
 function toggleShowClosed() {
   showClosed.value = !showClosed.value

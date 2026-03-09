@@ -61,7 +61,7 @@ export const mockCustomers = [
     name: 'Sophie Mueller', 
     initials: 'SM', 
     email: 'sophie.mueller@example.com', 
-    phone: '+4901678912345', 
+    phone: null, 
     address: 'Maximilianstraße 10, 80539 Munich', 
     company: null, 
     source: 'Google Ads', 
@@ -686,6 +686,29 @@ export const mockCustomers = [
       return date.toISOString()
     })(),
     interestScore: 66
+  },
+  // Lead with missing email (scheduled recall demo)
+  {
+    id: 45,
+    name: 'Oliver Hartmann',
+    initials: 'OH',
+    email: null,
+    phone: '+4901333444555',
+    address: 'Schillerstraße 22, 10117 Berlin',
+    company: null,
+    source: 'Walk-in',
+    tags: [],
+    createdAt: (() => {
+      const date = new Date()
+      date.setHours(date.getHours() - 5)
+      return date.toISOString()
+    })(),
+    lastContact: (() => {
+      const date = new Date()
+      date.setHours(date.getHours() - 2)
+      return date.toISOString()
+    })(),
+    interestScore: 55
   },
   // ============================================
   // NESTED CONTACT-ACCOUNT RELATIONSHIP DEMO DATA

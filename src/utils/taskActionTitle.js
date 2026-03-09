@@ -60,6 +60,16 @@ export function mergeContactIntoDescription(baseDescription, name, phone) {
 }
 
 /**
+ * Get CTA description when lead has no phone – use email instead of call.
+ * @param {string} name - Customer name
+ * @returns {string} Description for "send them an email" flow
+ */
+export function getNoPhoneContactDescription(name) {
+  const who = name?.trim() ? name : 'the customer'
+  return `Begin lead qualification by sending an email to ${who}.`
+}
+
+/**
  * Get the descriptive action title for a task card based on the next primary action.
  * Never returns null/empty for lead or opportunity; uses stage + customer name fallback.
  * @param {Object} item - Lead or Opportunity item
