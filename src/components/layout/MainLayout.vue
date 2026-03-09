@@ -11,8 +11,11 @@
       class="flex-1 flex flex-col min-w-0 overflow-hidden main-content-area"
       :class="{ 'sidebar-expanded': layoutStore.sidebarExpanded }"
     >
-      <!-- Mobile Header (Mobile Only) -->
-      <header class="mobile-header md:hidden h-16 border-b border-border bg-background flex items-center justify-between gap-3 px-4 shrink-0 z-50">
+      <!-- Mobile Header (Mobile Only); hidden on customer/request detail so page header with Back is visible -->
+      <header
+        v-if="route.name !== 'customer-view' && route.name !== 'request-detail'"
+        class="mobile-header md:hidden h-16 border-b border-border bg-background flex items-center justify-between gap-3 px-4 shrink-0 z-50"
+      >
         <Transition name="fade-button">
           <button
             v-if="!isMobileSidebarOpen"
@@ -117,7 +120,7 @@
             :class="layoutStore.hideHeaderForTaskDetail ? 'tasks-header-aside--narrow' : 'tasks-header-aside--full'"
           >
             <div class="tasks-header-inner w-full min-w-0 h-full flex flex-col shrink-0 border-r border-border">
-              <AppHeader v-if="route.name !== 'customer-view'" class="shrink-0 border-b border-border" />
+              <AppHeader v-if="route.name !== 'customer-view' && route.name !== 'request-detail'" class="shrink-0 border-b border-border" />
               <div class="flex-1 min-h-0 overflow-hidden">
               <div id="tasks-list-teleport" class="h-full w-full min-h-0" />
             </div>

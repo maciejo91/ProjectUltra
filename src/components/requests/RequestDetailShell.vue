@@ -3,6 +3,7 @@
     <RequestDetailHeader
       :request="request"
       :filtered-requests="filteredRequests"
+      :is-full-page="isFullPage"
       @close="$emit('close')"
       @previous="$emit('previous')"
       @next="$emit('next')"
@@ -50,6 +51,10 @@ defineProps({
   filteredRequests: {
     type: Array,
     default: () => []
+  },
+  isFullPage: {
+    type: Boolean,
+    default: false
   }
 })
 

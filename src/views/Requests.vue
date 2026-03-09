@@ -116,30 +116,15 @@
       </div>
     </div>
 
-    <!-- Request Detail Drawer -->
-    <DrawerContainer
-      :show="showRequestDrawer"
-      @close="closeRequestDrawer"
-    >
-      <RequestDetailView
-        v-if="drawerRequest"
-        :request="drawerRequest"
-        :filtered-requests="sortedData"
-        @close="closeRequestDrawer"
-        @request-navigate="handleRequestNavigate"
-      />
-    </DrawerContainer>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, h, watch, onUnmounted, onMounted, TransitionGroup } from 'vue'
+import { ref, computed, h, watch, onUnmounted, onMounted, nextTick, TransitionGroup } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { FileText, Pin, PinOff, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button, Toggle } from '@motork/component-library/future/primitives'
-import DrawerContainer from '@/components/shared/DrawerContainer.vue'
-import RequestDetailView from '@/components/requests/RequestDetailView.vue'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
 import { useTableRowClick } from '@/composables/useTableRowClick'
 import { useRequestsList, SEGMENT_KEYS } from '@/composables/useRequestsList'
@@ -190,6 +175,7 @@ const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 
 const tableScrollContainer = ref(null)
+const highlightId = computed(() => route.query.highlight || null)
 
 const { rowSelection, selectedCount, hasSelection, getSelectedRows, clearSelection } = useTableRowSelection((row) => row.compositeId)
 
@@ -414,52 +400,22 @@ const handleBulkDelete = () => {
   clearSelection()
 }
 
+const isHighlighted = (row) => {
+  return highlightId.value && row?.compositeId === highlightId.value
+}
 const tableMeta = computed(() => ({
   class: {
-    tr: 'hover:bg-muted transition-colors cursor-pointer'
+    tr: (row) => {
+      const base = 'hover:bg-muted transition-colors cursor-pointer'
+      return isHighlighted(row?.original) ? `${base} bg-blue-50 border-l-4 border-l-blue-500` : base
+    }
   }
 }))
 
-// Request drawer state
-const showRequestDrawer = ref(false)
-const drawerRequestCompositeId = ref(null)
-
-const drawerRequest = computed(() => {
-  if (!drawerRequestCompositeId.value) return null
-  const found = filteredList.value.find(r => r.compositeId === drawerRequestCompositeId.value)
-  if (found) return found
-  const [type, idStr] = drawerRequestCompositeId.value.split('-')
-  const id = parseInt(idStr, 10)
-  if (type === 'lead') {
-    const lead = leadsStore.leads.find(l => l.id === id)
-    if (lead) {
-      return {
-        ...lead,
-        type: 'lead',
-        compositeId: `lead-${lead.id}`,
-        displayStage: lead.stage || 'New',
-        customer: lead.customer || lead
-      }
-    }
-  } else {
-    const opp = opportunitiesStore.opportunities.find(o => o.id === id)
-    if (opp) {
-      return {
-        ...opp,
-        type: 'opportunity',
-        compositeId: `opportunity-${opp.id}`,
-        displayStage: opp.stage || 'Qualified',
-        customer: opp.customer || opp
-      }
-    }
-  }
-  return null
-})
-
 const { onTableContainerClick } = useTableRowClick(displayedData, (row) => {
   if (!row?.compositeId) return
-  drawerRequestCompositeId.value = row.compositeId
-  showRequestDrawer.value = true
+  const [type, id] = row.compositeId.split('-')
+  router.push({ path: `/requests/${id}`, query: { type, from: 'requests' } })
   if (row.type === 'lead') {
     leadsStore.fetchLeadById(row.id)
   } else {
@@ -467,13 +423,27 @@ const { onTableContainerClick } = useTableRowClick(displayedData, (row) => {
   }
 })
 
-function closeRequestDrawer() {
-  showRequestDrawer.value = false
-  drawerRequestCompositeId.value = null
-  if (route.query.open) {
-    router.replace({ path: '/requests', query: {} })
-  }
-}
+watch(
+  highlightId,
+  async (id) => {
+    if (!id || !tableScrollContainer.value) return
+    const idx = sortedData.value.findIndex(r => r.compositeId === id)
+    if (idx === -1) return
+    const pageSize = pagination.value.pageSize || 50
+    const pageIndex = Math.floor(idx / pageSize)
+    if (pagination.value.pageIndex !== pageIndex) {
+      pagination.value = { ...pagination.value, pageIndex }
+    }
+    await nextTick()
+    const rows = tableScrollContainer.value.querySelectorAll('tbody tr')
+    const rowIndexOnPage = idx % pageSize
+    const rowEl = rows[rowIndexOnPage]
+    if (rowEl) {
+      rowEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  },
+  { immediate: true }
+)
 
 function applySegmentFromQuery() {
   const segment = route.query.segment
@@ -488,12 +458,13 @@ onMounted(() => {
   applySegmentFromQuery()
   const openId = route.query.open
   if (openId && (openId.startsWith('lead-') || openId.startsWith('opportunity-'))) {
-    drawerRequestCompositeId.value = openId
-    showRequestDrawer.value = true
     const [type, idStr] = openId.split('-')
     const id = parseInt(idStr, 10)
-    if (type === 'lead' && id) leadsStore.fetchLeadById(id)
-    else if (type === 'opportunity' && id) opportunitiesStore.fetchOpportunityById(id)
+    if (id) {
+      router.replace({ path: `/requests/${id}`, query: { type, from: 'requests' } })
+      if (type === 'lead') leadsStore.fetchLeadById(id)
+      else opportunitiesStore.fetchOpportunityById(id)
+    }
   }
 })
 
@@ -505,16 +476,6 @@ watch(() => route.query.segment, (segment) => {
   }
 })
 
-function handleRequestNavigate(compositeId) {
-  drawerRequestCompositeId.value = compositeId
-  const [type, idStr] = (compositeId || '').split('-')
-  const id = parseInt(idStr, 10)
-  if (type === 'lead' && id) {
-    leadsStore.fetchLeadById(id)
-  } else if (type === 'opportunity' && id) {
-    opportunitiesStore.fetchOpportunityById(id)
-  }
-}
 </script>
 
 <style scoped>

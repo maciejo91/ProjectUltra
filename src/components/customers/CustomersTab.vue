@@ -15,6 +15,7 @@
       />
       </div>
       <div
+        ref="tableScrollContainer"
         class="data-table-inner table-search-wrapper"
         :class="{ 'hide-table-filter': !hasActiveFilters }"
         @click="onTableContainerClick"
@@ -81,7 +82,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { Inbox, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
@@ -165,8 +166,38 @@ const handleRowClick = (row) => {
   }
 }
 
+const props = defineProps({
+  highlightId: { type: String, default: '' }
+})
+
 const activeTab = ref('customers')
-const { columns, filterDefinitions, tableMeta } = useCustomersTable(activeTab, handleRowClick, { rows })
+const tableScrollContainer = ref(null)
+const { columns, filterDefinitions, tableMeta: baseTableMeta } = useCustomersTable(activeTab, handleRowClick, { rows })
+
+const isHighlighted = (row) => {
+  const id = props.highlightId
+  if (!id || !row?.id) return false
+  return row.id === id
+}
+const tableMeta = computed(() => {
+  const base = baseTableMeta.value
+  const baseTr = base?.class?.tr
+  return {
+    ...base,
+    class: {
+      ...base?.class,
+      tr: typeof baseTr === 'function'
+        ? (row) => {
+            const baseClasses = baseTr(row) || ''
+            return isHighlighted(row?.original) ? `${baseClasses} bg-blue-50 border-l-4 border-l-blue-500` : baseClasses
+          }
+        : (row) => {
+            const baseClasses = typeof baseTr === 'string' ? baseTr : 'cursor-pointer hover:bg-muted transition-colors border-black/5'
+            return isHighlighted(row?.original) ? `${baseClasses} bg-blue-50 border-l-4 border-l-blue-500` : baseClasses
+          }
+    }
+  }
+})
 
 const getCustomerFilterValue = (row, key) => {
   if (key === 'accountType') return row.accountType
@@ -196,6 +227,28 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
 })
 
 const { onTableContainerClick } = useTableRowClick(paginatedData, handleRowClick)
+
+watch(
+  () => props.highlightId,
+  async (id) => {
+    if (!id || !tableScrollContainer.value) return
+    const idx = sortedData.value.findIndex(r => r.id === id)
+    if (idx === -1) return
+    const pageSize = pagination.value.pageSize || 10
+    const pageIndex = Math.floor(idx / pageSize)
+    if (pagination.value.pageIndex !== pageIndex) {
+      pagination.value = { ...pagination.value, pageIndex }
+    }
+    await nextTick()
+    const rows = tableScrollContainer.value.querySelectorAll('tbody tr')
+    const rowIndexOnPage = idx % pageSize
+    const rowEl = rows[rowIndexOnPage]
+    if (rowEl) {
+      rowEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  },
+  { immediate: true }
+)
 
 defineExpose({ paginatedData })
 

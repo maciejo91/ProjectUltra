@@ -1,11 +1,21 @@
 <template>
   <div class="h-full flex flex-col overflow-hidden bg-surface mb-6">
-    <!-- Drawer header (matches TaskDetailHeader when in drawer) -->
+    <!-- Header with prev/next and Back (when from listing) or Close (when in drawer) -->
     <header
-      v-if="showCloseButton"
+      v-if="showCloseButton || from"
       class="customer-profile-drawer-header shrink-0 px-4 sm:px-6"
     >
       <div class="customer-profile-drawer-header-content">
+        <Button
+          v-if="from"
+          variant="secondary"
+          size="icon"
+          class="rounded-sm shrink-0 -ml-0.5"
+          aria-label="Back to customers"
+          @click="emit('close')"
+        >
+          <ArrowLeft :size="16" class="text-muted-foreground" />
+        </Button>
         <div class="min-w-0 flex-1 flex items-center min-h-0">
           <h3 class="text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
             {{ customerDisplayName || 'Customer' }}
@@ -33,6 +43,7 @@
             <ChevronRight :size="16" class="text-muted-foreground" />
           </Button>
           <Button
+            v-if="!from"
             variant="secondary"
             size="icon"
             class="rounded-sm ml-0.5 sm:ml-1"
@@ -52,7 +63,7 @@
         :account="accountData"
         :cars="customerCars"
         :loading="loadingCustomer"
-        :show-open-in-new-tab="showCloseButton"
+        :show-open-in-new-tab="!!(showCloseButton || from)"
         :customer-id="customerId"
         :customer-type="customerType"
         @add-tag="showAddTagModal = true"
@@ -72,7 +83,7 @@
         :phone-number="customer?.phone || ''"
         :customer-id="customerId"
         :customer-initials="customer?.initials || '?'"
-        :hide-tab-counts="showCloseButton"
+        :hide-tab-counts="!!(showCloseButton || from)"
         @add-activity="handleAddActivity"
         @add-appointment="showCreateAppointmentModal = true"
       />
@@ -119,7 +130,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@motork/component-library/future/primitives'
-import { X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { ArrowLeft, X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useCustomersStore } from '@/stores/customers'
@@ -157,6 +168,10 @@ const props = defineProps({
   filteredCustomerRows: {
     type: Array,
     default: () => []
+  },
+  from: {
+    type: String,
+    default: ''
   }
 })
 

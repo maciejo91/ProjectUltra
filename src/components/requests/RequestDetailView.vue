@@ -2,6 +2,7 @@
   <RequestDetailShell
     :request="request"
     :filtered-requests="filteredRequests"
+    :is-full-page="isFullPage"
     @close="$emit('close')"
     @previous="handlePrevious"
     @next="handleNext"
@@ -136,6 +137,10 @@ const props = defineProps({
   filteredRequests: {
     type: Array,
     default: () => []
+  },
+  isFullPage: {
+    type: Boolean,
+    default: false
   }
 })
 

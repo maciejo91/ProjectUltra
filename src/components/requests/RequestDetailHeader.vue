@@ -1,72 +1,84 @@
 <template>
   <header class="shrink-0 flex items-center justify-between gap-4 px-4 py-3 border-b border-border bg-background">
-    <div class="flex flex-col min-w-0 flex-1">
-      <div class="flex items-center gap-2 min-w-0">
-        <span class="text-fluid-sm font-medium text-foreground truncate">
-          {{ titleText }}
-        </span>
-        <span
-          v-if="request"
-          class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium shrink-0"
-          :class="request.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'"
-        >
-          {{ request.type === 'lead' ? 'Lead' : 'Opportunity' }}
-        </span>
-        <DropdownMenu v-if="request" :modal="false">
-          <DropdownMenuTrigger as-child>
-            <button
-              type="button"
-              class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              :class="stageClass"
-            >
-              {{ displayStage }}
-              <ChevronDown class="size-3 shrink-0" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent class="w-48" align="start">
-            <DropdownMenuItem
-              v-if="showCloseAction"
-              class="flex cursor-pointer items-center gap-2"
-              @select="emit('open-close')"
-            >
-              <XCircle class="size-4 shrink-0" />
-              Close
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              v-if="showConvertAction"
-              class="flex cursor-pointer items-center gap-2"
-              @select="emit('open-convert')"
-            >
-              <Sparkles class="size-4 shrink-0" />
-              Convert to Opportunity
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              v-if="showReopenLeadAction"
-              class="flex cursor-pointer items-center gap-2"
-              @select="emit('reopen-lead')"
-            >
-              <RotateCcw class="size-4 shrink-0" />
-              Reopen as Lead
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              v-if="showReopenOppAction"
-              class="flex cursor-pointer items-center gap-2"
-              @select="emit('reopen-opportunity')"
-            >
-              <RotateCcw class="size-4 shrink-0" />
-              Reopen as Opportunity
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <div class="flex items-start gap-2 min-w-0 flex-1">
+      <Button
+        v-if="isFullPage"
+        variant="outline"
+        size="icon"
+        class="rounded-sm shrink-0 -ml-0.5 mt-0.5"
+        aria-label="Back to requests"
+        @click="$emit('close')"
+      >
+        <ArrowLeft class="size-4 text-muted-foreground" />
+      </Button>
+      <div class="flex flex-col min-w-0 flex-1">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-fluid-sm font-medium text-foreground truncate">
+            {{ titleText }}
+          </span>
+          <span
+            v-if="request"
+            class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium shrink-0"
+            :class="request.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'"
+          >
+            {{ request.type === 'lead' ? 'Lead' : 'Opportunity' }}
+          </span>
+          <DropdownMenu v-if="request" :modal="false">
+            <DropdownMenuTrigger as-child>
+              <button
+                type="button"
+                class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                :class="stageClass"
+              >
+                {{ displayStage }}
+                <ChevronDown class="size-3 shrink-0" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent class="w-48" align="start">
+              <DropdownMenuItem
+                v-if="showCloseAction"
+                class="flex cursor-pointer items-center gap-2"
+                @select="emit('open-close')"
+              >
+                <XCircle class="size-4 shrink-0" />
+                Close
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                v-if="showConvertAction"
+                class="flex cursor-pointer items-center gap-2"
+                @select="emit('open-convert')"
+              >
+                <Sparkles class="size-4 shrink-0" />
+                Convert to Opportunity
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                v-if="showReopenLeadAction"
+                class="flex cursor-pointer items-center gap-2"
+                @select="emit('reopen-lead')"
+              >
+                <RotateCcw class="size-4 shrink-0" />
+                Reopen as Lead
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                v-if="showReopenOppAction"
+                class="flex cursor-pointer items-center gap-2"
+                @select="emit('reopen-opportunity')"
+              >
+                <RotateCcw class="size-4 shrink-0" />
+                Reopen as Opportunity
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <TaskAssigneeDateBar
+          v-if="request && hasAssignee"
+          :task="request"
+          variant="inline"
+          assignee-only
+          class="mt-0.5 pt-0 pb-1 shrink-0 min-w-0"
+          @reassigned="$emit('reassigned', $event)"
+        />
       </div>
-      <TaskAssigneeDateBar
-        v-if="request && hasAssignee"
-        :task="request"
-        variant="inline"
-        assignee-only
-        class="mt-0.5 pt-0 pb-1 shrink-0 min-w-0"
-        @reassigned="$emit('reassigned', $event)"
-      />
     </div>
     <div class="flex items-center gap-2 shrink-0">
       <Button
@@ -88,9 +100,11 @@
         <ChevronRight class="size-4 text-muted-foreground" />
       </Button>
       <Button
+        v-if="!isFullPage"
         variant="outline"
         size="icon"
         class="rounded-sm"
+        aria-label="Close"
         @click="$emit('close')"
       >
         <X class="size-4 text-muted-foreground" />
@@ -101,7 +115,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { ChevronLeft, ChevronRight, X, ChevronDown, XCircle, Sparkles, RotateCcw } from 'lucide-vue-next'
+import { ArrowLeft, ChevronLeft, ChevronRight, X, ChevronDown, XCircle, Sparkles, RotateCcw } from 'lucide-vue-next'
 import {
   Button,
   DropdownMenu,
@@ -122,6 +136,10 @@ const props = defineProps({
   filteredRequests: {
     type: Array,
     default: () => []
+  },
+  isFullPage: {
+    type: Boolean,
+    default: false
   }
 })
 
