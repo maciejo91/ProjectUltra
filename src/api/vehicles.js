@@ -17,13 +17,57 @@ export const fetchVehicles = async (filters = {}) => {
   }
   if (filters.search) {
     const search = filters.search.toLowerCase()
-    results = results.filter(vehicle => 
-      vehicle.brand.toLowerCase().includes(search) ||
-      vehicle.model.toLowerCase().includes(search) ||
-      vehicle.vin.toLowerCase().includes(search)
+    results = results.filter(vehicle => {
+      const matchBrand = vehicle.brand?.toLowerCase().includes(search)
+      const matchModel = vehicle.model?.toLowerCase().includes(search)
+      const matchVin = vehicle.vin?.toLowerCase().includes(search)
+      const matchPlate = vehicle.plateNumber?.toLowerCase().includes(search)
+      return matchBrand || matchModel || matchVin || matchPlate
+    })
+  }
+
+  return { data: results, total: results.length }
+}
+
+const PLACEHOLDER_VALUES = ['unknown', 'n/a', '']
+
+function isPlaceholderValue(val) {
+  if (!val || typeof val !== 'string') return true
+  const normalized = val.trim().toLowerCase()
+  return PLACEHOLDER_VALUES.some(p => p === normalized) || normalized === ''
+}
+
+/**
+ * Search vehicles by VIN and/or plate number.
+ * Ignores placeholder values (unknown, n/a, empty).
+ * @param {Object} params
+ * @param {string} [params.vin] - VIN to search
+ * @param {string} [params.plate] - Plate number to search
+ * @returns {Promise<{ data: Array }>} Matched vehicles with ownership info (soldTo, etc.)
+ */
+export const searchVehiclesByVinOrPlate = async ({ vin, plate } = {}) => {
+  await delay()
+
+  const hasVin = vin && !isPlaceholderValue(vin)
+  const hasPlate = plate && !isPlaceholderValue(plate)
+  if (!hasVin && !hasPlate) return { data: [] }
+
+  let results = [...mockVehicles]
+
+  if (hasVin && hasPlate) {
+    results = results.filter(
+      v =>
+        (v.vin && v.vin.toLowerCase() === vin.trim().toLowerCase()) ||
+        (v.plateNumber && v.plateNumber.toLowerCase() === plate.trim().toLowerCase())
+    )
+  } else if (hasVin) {
+    results = results.filter(v => v.vin && v.vin.toLowerCase() === vin.trim().toLowerCase())
+  } else {
+    results = results.filter(
+      v => v.plateNumber && v.plateNumber.toLowerCase() === plate.trim().toLowerCase()
     )
   }
-  
+
   return { data: results, total: results.length }
 }
 

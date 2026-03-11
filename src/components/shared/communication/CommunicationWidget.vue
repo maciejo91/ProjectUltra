@@ -14,6 +14,7 @@
         <span>{{ channel.label }}</span>
       </Toggle>
       <Toggle
+        v-if="hasPhone"
         variant="outline"
         :model-value="outboundCallActive"
         @update:model-value="(p) => p && onInitiateCallClick()"
@@ -85,6 +86,7 @@
           <span>{{ channel.label }}</span>
         </Toggle>
         <Toggle
+          v-if="hasPhone"
           variant="outline"
           :model-value="outboundCallActive"
           @update:model-value="(p) => p && onInitiateCallClick()"
@@ -138,7 +140,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed } from 'vue'
 import { Phone } from 'lucide-vue-next'
 import { Toggle } from '@motork/component-library/future/primitives'
 import { getLucideIcon } from '@/utils/lucideIcons'
@@ -196,27 +198,42 @@ const props = defineProps({
 
 const emit = defineEmits(['save', 'cancel', 'send'])
 
-const channels = [
+const hasPhone = computed(() => !!(props.phoneNumber && String(props.phoneNumber).trim()))
+
+const allChannels = [
   { id: 'call', label: 'Log call', icon: 'fa-solid fa-pen-to-square' },
   { id: 'whatsapp', label: 'WhatsApp', icon: 'fa-brands fa-whatsapp' },
   { id: 'email', label: 'Email', icon: 'fa-solid fa-envelope' },
   { id: 'sms', label: 'SMS', icon: 'fa-solid fa-message' }
 ]
 
-// Initialize selected channel from prop; default to 'call' when not specified (e.g. Communicate tab)
-const selectedChannel = ref(props.type ?? 'call')
+const channels = computed(() =>
+  hasPhone.value ? allChannels : allChannels.filter((c) => c.id === 'email')
+)
+
+const defaultChannel = computed(() => (hasPhone.value ? 'call' : 'email'))
+
+// Initialize selected channel from prop; default to 'call' when phone present, 'email' when missing
+const selectedChannel = ref(props.type ?? defaultChannel.value)
 const callFormRef = ref(null)
 const outboundCallActive = ref(false)
 
 // Watch for prop changes to update selected channel
 watch(() => props.type, (newType) => {
-  selectedChannel.value = newType ?? 'call'
+  selectedChannel.value = newType ?? defaultChannel.value
 })
 
 // Reset selection when task changes (e.g. navigate to different entity)
 watch(() => props.taskId, () => {
-  selectedChannel.value = props.type ?? 'call'
+  selectedChannel.value = props.type ?? defaultChannel.value
   outboundCallActive.value = false
+})
+
+// When phone becomes missing, switch to email
+watch(hasPhone, (has) => {
+  if (!has && selectedChannel.value !== 'email') {
+    selectedChannel.value = 'email'
+  }
 })
 
 function setSelectedChannel(id) {
@@ -273,7 +290,7 @@ const handleCall = (data) => {
 }
 
 const handleCancel = () => {
-  selectedChannel.value = 'call'
+  selectedChannel.value = defaultChannel.value
   outboundCallActive.value = false
   emit('cancel')
 }

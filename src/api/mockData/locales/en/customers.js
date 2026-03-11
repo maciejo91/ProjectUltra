@@ -18,6 +18,22 @@ export const mockCustomers = [
     preferredContactTime: 'Mornings (8-11 AM)',
     budgetRange: '€50K-€80K'
   },
+  // Duplicate candidate: same email as Josh Adams (id 1) – for duplicate merge testing
+  {
+    id: 1000,
+    name: 'Josh Adams (duplicate)',
+    initials: 'JA',
+    email: 'josh.adams@example.com',
+    phone: '+4901564879300',
+    address: 'Piazza Duomo 1, 20122 Milan',
+    company: null,
+    source: 'Website',
+    tags: [],
+    createdAt: '2025-03-22T09:00:00',
+    lastContact: '2025-03-24T10:00:00',
+    interestScore: 50,
+    summary: 'Potential duplicate of Josh Adams.'
+  },
   { 
     id: 2, 
     name: 'Emma Watson', 

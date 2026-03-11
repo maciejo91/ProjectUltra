@@ -1,6 +1,16 @@
 <template>
   <!-- Bare: content only for tabbed layout -->
-  <div v-if="bare" class="p-4 flex-1 min-h-0 overflow-y-auto flex flex-col">
+  <div v-if="bare" class="flex-1 min-h-0 overflow-y-auto flex flex-col rounded-lg border border-border bg-background shadow-sm overflow-hidden">
+    <div class="px-4 py-3 border-b border-border shrink-0">
+      <h4 class="text-sm font-semibold text-foreground">Other requests</h4>
+      <p class="text-xs text-muted-foreground mt-0.5">Same customer</p>
+    </div>
+    <div v-if="showAddButton && hasCustomer" class="flex justify-end px-4 py-2 border-b border-border shrink-0">
+      <Button variant="outline" size="sm" @click="$emit('add-task')">
+        Add Task
+      </Button>
+    </div>
+    <div class="p-4 flex-1 min-h-0 overflow-y-auto flex flex-col">
     <div v-if="associatedTasks.length > 0" class="divide-y divide-border">
       <button
         v-for="task in associatedTasks"
@@ -37,6 +47,7 @@
       </button>
     </div>
     <p v-else class="text-sm text-muted-foreground">No other requests for this customer.</p>
+    </div>
   </div>
   <!-- Full card: standalone -->
   <Card
@@ -91,7 +102,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ChevronRight, Car } from 'lucide-vue-next'
-import { Card, CardContent } from '@motork/component-library/future/primitives'
+import { Button, Card, CardContent } from '@motork/component-library/future/primitives'
 import { getDisplayStage } from '@/utils/stageMapper'
 import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
 import { useLeadsStore } from '@/stores/leads'
@@ -115,14 +126,21 @@ const props = defineProps({
   navigateToTaskDetail: {
     type: Boolean,
     default: false
+  },
+  /** When true, show Add Task button. Use in Tasks tab on request detail. */
+  showAddButton: {
+    type: Boolean,
+    default: false
   }
 })
 
-const emit = defineEmits(['request-navigate'])
+const emit = defineEmits(['request-navigate', 'add-task'])
 const router = useRouter()
 
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
+
+const hasCustomer = computed(() => !!(props.request?.customer || props.request?.customerId))
 
 const associatedTasks = computed(() => {
   if (!props.request?.customer) return []
@@ -159,6 +177,19 @@ const associatedTasks = computed(() => {
     })
     .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
   return props.limit > 0 ? filtered.slice(0, props.limit) : filtered
+})
+
+const customerRequestRows = computed(() => {
+  if (!props.request?.compositeId) return []
+  const current = {
+    ...props.request,
+    compositeId: props.request.compositeId || `${props.request.type}-${props.request.id}`,
+    displayStage: props.request.displayStage || getDisplayStage(props.request, props.request.type || 'lead'),
+    customer: props.request.customer || props.request
+  }
+  return [current, ...associatedTasks.value].sort(
+    (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+  )
 })
 
 function getTaskStage(task) {
@@ -209,7 +240,7 @@ function handleTaskClick(task) {
       router.push({ path: `/tasks/${id}`, query: { type } })
     }
   } else {
-    emit('request-navigate', task.compositeId)
+    emit('request-navigate', task.compositeId, customerRequestRows.value)
   }
 }
 </script>

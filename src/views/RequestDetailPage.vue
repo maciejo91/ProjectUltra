@@ -23,11 +23,14 @@ import { useRoute, useRouter } from 'vue-router'
 import RequestDetailView from '@/components/requests/RequestDetailView.vue'
 import { useRequestsList } from '@/composables/useRequestsList'
 import { useLeadsStore } from '@/stores/leads'
+import { getDisplayStage } from '@/utils/stageMapper'
+import { useRequestNavigationStore } from '@/stores/requestNavigation'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 
 const route = useRoute()
 const router = useRouter()
-const { filteredList } = useRequestsList()
+const { filteredList, combinedList } = useRequestsList()
+const requestNavigationStore = useRequestNavigationStore()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 
@@ -47,7 +50,7 @@ const request = computed(() => {
         ...lead,
         type: 'lead',
         compositeId: `lead-${lead.id}`,
-        displayStage: lead.stage || 'New',
+        displayStage: getDisplayStage(lead, 'lead'),
         customer: lead.customer || lead
       }
     }
@@ -58,7 +61,7 @@ const request = computed(() => {
         ...opp,
         type: 'opportunity',
         compositeId: `opportunity-${opp.id}`,
-        displayStage: opp.stage || 'Qualified',
+        displayStage: getDisplayStage(opp, 'opportunity'),
         customer: opp.customer || opp
       }
     }
@@ -66,7 +69,21 @@ const request = computed(() => {
   return null
 })
 
-const filteredRequests = computed(() => filteredList.value)
+const requestRowsFromState = computed(() => {
+  const state = window.history?.state
+  return state?.requestRows ?? []
+})
+
+const filteredRequests = computed(() => {
+  const fromStore = requestNavigationStore.requestRows
+  const fromState = requestRowsFromState.value
+  const primary = fromStore?.length ? fromStore : (fromState?.length ? fromState : filteredList.value)
+  const currentId = compositeId.value
+  if (primary?.length && currentId && !primary.some((r) => String(r.compositeId) === String(currentId))) {
+    return combinedList.value
+  }
+  return primary
+})
 
 const loading = computed(() => {
   const type = requestType.value
@@ -94,18 +111,27 @@ watch(
 )
 
 function handleBack() {
-  const query = route.query.from === 'requests' && request.value?.compositeId
+  const from = route.query.from
+  if (from === 'customer' && request.value?.customerId) {
+    router.push({ path: `/customer/${request.value.customerId}` })
+    return
+  }
+  const query = from === 'requests' && request.value?.compositeId
     ? { highlight: request.value.compositeId }
     : {}
   router.push({ path: '/requests', query })
 }
 
-function handleRequestNavigate(compositeId) {
+function handleRequestNavigate(compositeId, requestRowsOverride) {
   const [type, id] = (compositeId || '').split('-')
   if (!id) return
+  const rows = requestRowsOverride?.length ? requestRowsOverride : filteredRequests.value
+  requestNavigationStore.setRequestRows(rows)
+  const from = route.query.from || 'requests'
   router.push({
     path: `/requests/${id}`,
-    query: { type, from: 'requests' }
+    query: { type, from },
+    state: rows.length ? { requestRows: rows } : undefined
   })
 }
 </script>

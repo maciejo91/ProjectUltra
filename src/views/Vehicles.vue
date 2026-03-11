@@ -349,7 +349,7 @@ const columnVisibility = ref({
 const vehiclesWithType = computed(() =>
   vehiclesStore.vehicles.map((v) => ({
     ...v,
-    inventoryType: v.stockDays !== null && v.stockDays !== undefined ? 'in-stock' : 'customer-vehicles'
+    inventoryType: v.inventoryType ?? (v.stockDays !== null && v.stockDays !== undefined ? 'in-stock' : 'customer-vehicles')
   }))
 )
 
@@ -357,9 +357,11 @@ const filterChips = computed(() => {
   const list = vehiclesWithType.value
   const inStock = list.filter((v) => v.inventoryType === 'in-stock').length
   const customerVehicles = list.filter((v) => v.inventoryType === 'customer-vehicles').length
+  const sold = list.filter((v) => v.inventoryType === 'sold').length
   return [
     { key: 'in-stock', label: 'In stock', count: inStock },
-    { key: 'customer-vehicles', label: "Customers' vehicles", count: customerVehicles }
+    { key: 'customer-vehicles', label: "Customers' vehicles", count: customerVehicles },
+    { key: 'sold', label: 'Sold', count: sold }
   ]
 })
 
@@ -412,7 +414,8 @@ const filterDefinitions = computed(() => {
       ],
       options: [
         { value: 'in-stock', label: 'In stock' },
-        { value: 'customer-vehicles', label: "Customers' vehicles" }
+        { value: 'customer-vehicles', label: "Customers' vehicles" },
+        { value: 'sold', label: 'Sold' }
       ],
       aiHint: 'Inventory type: in stock or customer vehicle',
       pinned: true
@@ -605,7 +608,7 @@ const columns = [
     meta: { title: 'Inventory' },
     cell: ({ row }) => {
       const type = row.original.inventoryType
-      const label = type === 'in-stock' ? 'In stock' : "Customers' vehicles"
+      const label = type === 'in-stock' ? 'In stock' : type === 'sold' ? 'Sold' : "Customers' vehicles"
       return h('span', { class: 'text-meta' }, label)
     }
   },
@@ -683,7 +686,9 @@ const columns = [
     meta: { title: 'Owner' },
     cell: ({ row }) => {
       const vehicle = row.original
-      const owner = vehicle.owner || (vehicle.requestedBy && vehicle.requestedBy.length > 0 ? vehicle.requestedBy[0] : null) || 'N/A'
+      const owner = vehicle.inventoryType === 'sold'
+        ? (vehicle.soldTo || 'N/A')
+        : (vehicle.owner || (vehicle.requestedBy && vehicle.requestedBy.length > 0 ? vehicle.requestedBy[0] : null) || 'N/A')
       return h('span', { class: 'text-meta' }, owner)
     }
   },
@@ -711,6 +716,9 @@ const columns = [
     meta: { title: 'Actions' },
     cell: ({ row }) => {
       const vehicle = row.original
+      if (vehicle.inventoryType === 'sold') {
+        return h('span', { class: 'text-meta' }, '—')
+      }
       return h(
         Button,
         {
@@ -741,6 +749,7 @@ const { paginatedData, totalFilteredCount } = useDataTableData({
   filterDefs: filterDefsRef,
   searchableFields: (row) => [
     row.inventoryType,
+    row.soldTo,
     row.brand,
     row.model,
     row.vin,

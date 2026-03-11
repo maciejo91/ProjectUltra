@@ -141,7 +141,7 @@
         @mouseenter="(e) => showSidebarTooltip(e, t('common.navigation.requests'))"
         @mouseleave="hideSidebarTooltip"
       >
-        <FileBadge2 :size="16" class="text-white shrink-0" />
+        <ArrowDownToLine :size="16" class="text-white shrink-0" />
         <span v-if="expanded" class="truncate text-sm text-white">{{ $t('common.navigation.requests') }}</span>
       </router-link>
 
@@ -416,7 +416,7 @@ import {
   Plus,
   Home,
   ListTodo,
-  FileBadge2,
+  ArrowDownToLine,
   Users,
   Calendar,
   LineChart,

@@ -98,6 +98,7 @@ function getContext () {
   if (t === 'tasks') return 'tasks'
   if (t === 'requests') return 'requests'
   if (t === 'reports') return 'reports'
+  if (t === 'campaigns') return 'campaigns'
   return t || 'opportunities'
 }
 
@@ -125,6 +126,7 @@ const AI_PLACEHOLDERS = {
   requests: 'Ask anything... (e.g., Assigned to Sarah, valid requests)',
   customers: 'Ask anything... (e.g., Contacts from marketing, companies)',
   reports: 'Search team performance...',
+  campaigns: 'Ask anything... (e.g., Email from last week, WhatsApp inbound)',
 }
 
 const computedPlaceholder = computed(() => {

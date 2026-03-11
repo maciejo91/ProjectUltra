@@ -6,7 +6,7 @@
     "inNegotiation": "In Negotiation",
     "inNegotiationOfferSent": "In Negotiation - Offer Sent",
     "inNegotiationContractPending": "In Negotiation - Contract Pending",
-    "inNegotiationOfferFeedback": "In Negotiation - Offer Feedback",
+    "inNegotiationOfferFeedback": "In Negotiation - Offer Feedback Missing",
     "contractPending": "Contract Pending",
     "closedWon": "Closed Won",
     "closedLost": "Closed Lost",

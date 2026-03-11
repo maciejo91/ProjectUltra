@@ -7,10 +7,7 @@
       @close="$emit('close')"
       @previous="$emit('previous')"
       @next="$emit('next')"
-      @open-close="$emit('open-close')"
-      @open-convert="$emit('open-convert')"
-      @reopen-lead="$emit('reopen-lead')"
-      @reopen-opportunity="$emit('reopen-opportunity')"
+      @update-status="$emit('update-status', $event)"
       @postpone-expected-close="$emit('postpone-expected-close')"
       @reassigned="$emit('reassigned', $event)"
     />
@@ -62,10 +59,7 @@ defineEmits([
   'close',
   'previous',
   'next',
-  'open-close',
-  'open-convert',
-  'reopen-lead',
-  'reopen-opportunity',
+  'update-status',
   'postpone-expected-close',
   'reassigned',
   'add-tradein',

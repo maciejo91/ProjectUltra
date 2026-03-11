@@ -1,5 +1,31 @@
 <template>
-  <div class="rounded-lg flex flex-col bg-muted">
+  <div class="rounded-lg flex flex-col bg-muted space-y-4">
+    <ThresholdBanner
+      :show="true"
+      :message="thresholdBannerMessage"
+    />
+    <!-- Delivery date details (when delivery is scheduled) -->
+    <div v-if="opportunity.deliveryDate" class="pt-1 px-1">
+      <div class="bg-white rounded-lg shadow-nsc-card overflow-visible">
+        <div class="p-6">
+          <h5 class="font-semibold text-foreground text-sm mb-2">Delivery date details</h5>
+          <dl class="text-sm space-y-1 text-muted-foreground">
+            <div class="flex gap-2">
+              <dt class="font-medium text-foreground min-w-[6rem]">Date</dt>
+              <dd>{{ formattedDeliveryDate }}</dd>
+            </div>
+            <div v-if="opportunity.deliveryLocation" class="flex gap-2">
+              <dt class="font-medium text-foreground min-w-[6rem]">Location</dt>
+              <dd>{{ opportunity.deliveryLocation }}</dd>
+            </div>
+            <div v-if="opportunity.deliveryNotes" class="flex gap-2">
+              <dt class="font-medium text-foreground min-w-[6rem]">Notes</dt>
+              <dd>{{ opportunity.deliveryNotes }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
     <div class="pt-1 px-1">
       <div class="bg-white rounded-lg shadow-nsc-card overflow-visible">
         <div class="p-6">
@@ -44,6 +70,14 @@
               <CalendarDays class="w-4 h-4 shrink-0" />
               <span>Reschedule Delivery</span>
             </Toggle>
+            <Button
+              v-if="showCloseWon"
+              variant="default"
+              class="outcome-toggle-item ml-auto"
+              @click="$emit('close-as-won')"
+            >
+              Close as Won
+            </Button>
           </div>
         </div>
       </div>
@@ -118,9 +152,12 @@ import { ref, computed } from 'vue'
 import { Clock, ClipboardList, CalendarDays } from 'lucide-vue-next'
 import { Button, Toggle } from '@motork/component-library/future/primitives'
 import PostDeliverySurvey from '@/components/tasks/opportunity/PostDeliverySurvey.vue'
+import ThresholdBanner from '@/components/tasks/shared/ThresholdBanner.vue'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
+import { useSettingsStore } from '@/stores/settings'
 import { getDeliverySubstatus } from '@/utils/stageMapper'
+import { formatDateTime } from '@/utils/formatters'
 
 const props = defineProps({
   opportunity: {
@@ -130,17 +167,27 @@ const props = defineProps({
   activities: {
     type: Array,
     default: () => []
+  },
+  showCloseWon: {
+    type: Boolean,
+    default: false
   }
 })
 
-const emit = defineEmits(['close', 'survey-submitted', 'survey-cancelled', 'postpone', 'reschedule-delivery'])
+const emit = defineEmits(['close', 'survey-submitted', 'survey-cancelled', 'postpone', 'reschedule-delivery', 'close-as-won'])
 
 const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
+const settingsStore = useSettingsStore()
 
 const showSurvey = ref(false)
 const showReschedule = ref(false)
 const surveyRef = ref(null)
+
+const formattedDeliveryDate = computed(() => {
+  const d = props.opportunity?.deliveryDate
+  return d ? formatDateTime(d) : ''
+})
 
 const deliverySubstatus = computed(() => {
   return getDeliverySubstatus(props.opportunity, props.activities)
@@ -148,6 +195,29 @@ const deliverySubstatus = computed(() => {
 
 const isAwaitingDelivery = computed(() => {
   return deliverySubstatus.value === 'Awaiting Delivery'
+})
+
+const daysSinceReference = computed(() => {
+  const opp = props.opportunity
+  const activities = props.activities || []
+  let refDate
+  if (isAwaitingDelivery.value && opp?.deliveryDate) {
+    refDate = opp.deliveryDate
+  } else {
+    refDate = opp?.actualDeliveryDate || opp?.deliveredDate ||
+      activities.find(a => a.data?.actualDeliveryDate)?.data?.actualDeliveryDate ||
+      activities.find(a => a.data?.deliveredDate)?.data?.deliveredDate
+  }
+  if (!refDate) return 0
+  const ref = new Date(refDate)
+  const now = new Date()
+  return Math.ceil(Math.abs(now - ref) / (1000 * 60 * 60 * 24))
+})
+
+const thresholdBannerMessage = computed(() => {
+  const threshold = settingsStore.getSetting('dfbDays') ?? 3
+  const context = isAwaitingDelivery.value ? 'scheduled delivery date' : 'delivery'
+  return `This task appeared because ${daysSinceReference.value} days passed since ${context} (${threshold} days threshold as per Settings).`
 })
 
 const canSubmit = computed(() => {

@@ -131,6 +131,7 @@ import { useRequestsList, SEGMENT_KEYS } from '@/composables/useRequestsList'
 import { useDataTableData, getNestedProperty } from '@/composables/useDataTableData'
 import { useTasksTableFilters } from '@/composables/useTasksTableFilters'
 import { useTableRowSelection } from '@/composables/useTableRowSelection'
+import { useRequestNavigationStore } from '@/stores/requestNavigation'
 import { getStageBadgeClass } from '@/utils/formatters'
 import { getDisplayStage } from '@/utils/stageMapper'
 import { useUsersStore } from '@/stores/users'
@@ -139,6 +140,7 @@ import { useOpportunitiesStore } from '@/stores/opportunities'
 
 const {
   filteredList,
+  combinedList,
   counts,
   selectedSegment,
   loading,
@@ -176,6 +178,7 @@ const opportunitiesStore = useOpportunitiesStore()
 
 const tableScrollContainer = ref(null)
 const highlightId = computed(() => route.query.highlight || null)
+const requestNavigationStore = useRequestNavigationStore()
 
 const { rowSelection, selectedCount, hasSelection, getSelectedRows, clearSelection } = useTableRowSelection((row) => row.compositeId)
 
@@ -415,7 +418,13 @@ const tableMeta = computed(() => ({
 const { onTableContainerClick } = useTableRowClick(displayedData, (row) => {
   if (!row?.compositeId) return
   const [type, id] = row.compositeId.split('-')
-  router.push({ path: `/requests/${id}`, query: { type, from: 'requests' } })
+  const rows = sortedData.value
+  requestNavigationStore.setRequestRows(rows)
+  router.push({
+    path: `/requests/${id}`,
+    query: { type, from: 'requests' },
+    state: { requestRows: rows }
+  })
   if (row.type === 'lead') {
     leadsStore.fetchLeadById(row.id)
   } else {
@@ -461,7 +470,15 @@ onMounted(() => {
     const [type, idStr] = openId.split('-')
     const id = parseInt(idStr, 10)
     if (id) {
-      router.replace({ path: `/requests/${id}`, query: { type, from: 'requests' } })
+      const sorted = sortedData.value
+      const inSorted = sorted.some((r) => r.compositeId === openId)
+      const requestRows = inSorted ? sorted : combinedList.value
+      requestNavigationStore.setRequestRows(requestRows)
+      router.replace({
+        path: `/requests/${id}`,
+        query: { type, from: 'requests' },
+        state: { requestRows: requestRows.length ? requestRows : [] }
+      })
       if (type === 'lead') leadsStore.fetchLeadById(id)
       else opportunitiesStore.fetchOpportunityById(id)
     }

@@ -49,20 +49,20 @@
 
         <DialogFooter class="flex-shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
           <Button
-            label="Cancel"
             variant="outline"
-            size="small"
             class="rounded-sm w-full sm:w-auto"
             @click="handleCancel"
-          />
-          <Button 
-            label="Collect e-signatures"
-            variant="primary"
-            size="small"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="default"
             class="rounded-sm w-full sm:w-auto"
             :disabled="!canSubmit"
             @click="handleConfirm"
-          />
+          >
+            Confirm
+          </Button>
         </DialogFooter>
       </DialogContent>
     </DialogPortal>

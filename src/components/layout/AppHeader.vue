@@ -74,7 +74,7 @@
           <Button
             variant="outline"
             size="sm"
-            class="flex items-center gap-2"
+            class="hidden"
             @click="calendarHeaderActions.onFilters()"
           >
             <Filter class="size-4 shrink-0" />

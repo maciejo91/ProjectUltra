@@ -3,16 +3,17 @@
     <div class="task-detail-header-grid">
       <!-- Row 1: Title + Badges (same line on desktop, badges wrap to second line on mobile) + Prev/Next -->
       <div class="task-detail-header-title-row">
-        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap min-w-0 flex-1">
-            <button
+        <div class="flex items-center gap-1 sm:gap-2 flex-wrap min-w-0 flex-1">
+            <Button
               v-if="task"
-              type="button"
-              class="lg:hidden w-8 h-8 flex items-center justify-center -ml-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors shrink-0"
+              variant="ghost"
+              size="icon"
+              class="lg:hidden shrink-0 -ml-0.5"
               aria-label="Back to task list"
               @click="$emit('close')"
             >
-              <ArrowLeft class="w-5 h-5 shrink-0" />
-            </button>
+              <ChevronLeft class="size-4 text-muted-foreground" />
+            </Button>
             <h3 v-if="task && taskTitle" class="task-detail-title text-sm sm:text-base font-semibold text-foreground truncate leading-tight shrink min-w-0">
               {{ taskTitle }}
             </h3>
@@ -157,7 +158,7 @@ import {
   DialogPortal,
   DialogTitle
 } from '@motork/component-library/future/primitives'
-import { ArrowLeft, ChevronLeft, ChevronRight, X } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight, X } from 'lucide-vue-next'
 import TaskBadges from './shared/TaskBadges.vue'
 import TaskAssigneeDateBar from './TaskAssigneeDateBar.vue'
 import { getTaskDisplayTitle } from '@/utils/taskActionTitle'

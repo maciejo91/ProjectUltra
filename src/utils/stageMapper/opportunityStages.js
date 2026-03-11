@@ -5,25 +5,7 @@
  */
 
 import { API_STATUSES, OPPORTUNITY_STAGES, DELIVERY_SUBSTATUS } from './constants.js'
-
-// Helper functions
-function calculateDaysSince(dateString) {
-  if (!dateString) return 0
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = Math.abs(now - date)
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-}
-
-function getLastOffer(activities) {
-  if (!activities || activities.length === 0) return null
-  
-  const offers = activities
-    .filter(a => a.type === 'offer')
-    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-  
-  return offers[0] || null
-}
+import { calculateDaysSince } from '@/utils/formatters'
 
 function hasDelivery(opportunity, activities) {
   if (opportunity.deliveryDate) return true
@@ -120,9 +102,9 @@ export function calculateOpportunityDisplayStage(opportunity) {
         return `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Sent`
       }
       
-      // Offer Under Review – migrated to Offer Feedback (backward compat)
+      // Offer Under Review – migrated to Offer Feedback Missing (backward compat)
       if (opportunity.negotiationSubstatus === 'Offer Under Review') {
-        return `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Feedback`
+        return OPPORTUNITY_STAGES.OFFER_FEEDBACK_MISSING
       }
       
       // Awaiting Offer - show as "In Negotiation - Awaiting Offer" (skipped appointment, ready to create offer)
@@ -130,9 +112,9 @@ export function calculateOpportunityDisplayStage(opportunity) {
         return `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Awaiting Offer`
       }
       
-      // Offer Feedback - show as "In Negotiation - Offer Feedback" (backward compatibility)
+      // Offer Feedback – show as "In Negotiation - Offer Feedback Missing" (backward compatibility)
       if (opportunity.negotiationSubstatus === 'Offer Feedback') {
-        return `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Feedback`
+        return OPPORTUNITY_STAGES.OFFER_FEEDBACK_MISSING
       }
     }
     
@@ -213,7 +195,7 @@ export function mapOpportunityStageToApiStatus(displayStage) {
     [OPPORTUNITY_STAGES.APPOINTMENT_SCHEDULED]: API_STATUSES.QUALIFIED,
     [OPPORTUNITY_STAGES.IN_NEGOTIATION]: API_STATUSES.IN_NEGOTIATION,
     [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Sent`]: API_STATUSES.IN_NEGOTIATION,
-    [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Feedback`]: API_STATUSES.IN_NEGOTIATION,
+    [OPPORTUNITY_STAGES.OFFER_FEEDBACK_MISSING]: API_STATUSES.IN_NEGOTIATION,
     [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Awaiting Offer`]: API_STATUSES.IN_NEGOTIATION,
     [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Contract Pending`]: API_STATUSES.IN_NEGOTIATION,
     [OPPORTUNITY_STAGES.CLOSED_WON]: API_STATUSES.CLOSED_WON,
@@ -254,6 +236,10 @@ export function getOpportunityTransitions() {
       OPPORTUNITY_STAGES.ABANDONED
     ],
     [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Sent`]: [
+      `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Contract Pending`,
+      OPPORTUNITY_STAGES.CLOSED_LOST
+    ],
+    [OPPORTUNITY_STAGES.OFFER_FEEDBACK_MISSING]: [
       `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Contract Pending`,
       OPPORTUNITY_STAGES.CLOSED_LOST
     ],

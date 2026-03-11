@@ -6,55 +6,13 @@
     @close="$emit('close')"
     @previous="handlePrevious"
     @next="handleNext"
-    @open-close="handleOpenClose"
-    @open-convert="showConvertModal = true"
-    @reopen-lead="handleReopenLead"
-    @reopen-opportunity="handleReopenOpp"
+    @update-status="handleUpdateStatus"
     @postpone-expected-close="handlePostponeExpectedClose"
     @reassigned="handleReassigned"
     @add-tradein="editingTradeIn = null; showTradeInModal = true"
     @add-financing="editingFinancingOption = null; showFinancingModal = true"
   >
-    <!-- Modals for status actions (triggered from header dropdown) -->
     <ComingSoonModal :show="showPostponeModal" @close="showPostponeModal = false" />
-    <DisqualifyModal
-      :show="showDisqualifyModal"
-      @confirm="handleDisqualifyConfirm"
-      @cancel="showDisqualifyModal = false"
-    />
-
-    <CloseAsLostModal
-      :show="showCloseAsLostModal"
-      @confirm="handleCloseAsLostConfirm"
-      @cancel="showCloseAsLostModal = false"
-    />
-
-    <Dialog :open="showConvertModal" @update:open="(v) => !v && (showConvertModal = false)">
-      <DialogPortal>
-        <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-        <DialogContent class="w-full sm:max-w-md" :show-close-button="true">
-          <DialogHeader class="shrink-0">
-            <DialogTitle>Convert to Opportunity</DialogTitle>
-            <DialogDescription>
-              Convert this lead to an opportunity? The lead will be marked as converted.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-end gap-3">
-            <Button variant="outline" class="rounded-sm" @click="showConvertModal = false">
-              Cancel
-            </Button>
-            <Button
-              variant="default"
-              class="rounded-sm"
-              :disabled="converting"
-              @click="handleConvert"
-            >
-              {{ converting ? 'Converting...' : 'Convert' }}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
 
     <PurchaseMethodModal
       :show="showFinancingModal"
@@ -65,6 +23,14 @@
       @save="handleFinancingSave"
       @delete="handleFinancingDelete"
       @close="showFinancingModal = false; editingFinancingOption = null"
+    />
+
+    <MergeConfirmModal
+      :show="showMergeModal"
+      :duplicate-summary="mergeDuplicateSummary"
+      :loading="mergeLoading"
+      @close="showMergeModal = false; duplicateToMerge = null"
+      @confirm="handleMergeConfirm"
     />
 
     <AddVehicleModal
@@ -82,20 +48,28 @@
     <!-- Associated Tasks + Timeline – main content left (Suggested action + Communicate), Activity/Other requests right -->
     <div v-if="showAssociatedTasksOrTimeline" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
       <div v-if="!isClosedLead" :class="showAssociatedTasks ? 'lg:col-span-2' : 'lg:col-span-3'" class="min-w-0 flex flex-col min-h-0 gap-4">
+        <DuplicateDetectedCard
+          v-if="request && potentialDuplicates.length"
+          :potential-duplicates="potentialDuplicates"
+          :merge-loading="mergeLoading"
+          class="shrink-0"
+          @merge="handleMergeClick"
+          @request-navigate="(...args) => $emit('request-navigate', ...args)"
+        />
         <SuggestedNextActionCard v-if="request" :request="request" class="shrink-0" />
         <RequestActivityCard
           v-if="showTimeline"
           :request="request"
           class="flex-1 min-h-0"
           @offer-saved="handleOfferSaved"
-          @request-navigate="$emit('request-navigate', $event)"
+          @request-navigate="(...args) => $emit('request-navigate', ...args)"
         />
       </div>
       <div :class="isClosedLead ? 'lg:col-span-3' : 'lg:col-span-1'" class="min-w-0 flex flex-col min-h-0 gap-4">
         <RequestRightColumnCard
           :request="request"
           :show-associated-tasks="showAssociatedTasks"
-          @request-navigate="$emit('request-navigate', $event)"
+          @request-navigate="(...args) => $emit('request-navigate', ...args)"
         />
       </div>
     </div>
@@ -104,30 +78,26 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useDuplicateDetection } from '@/composables/useDuplicateDetection'
+import { mergeRequestIntoPrimary, getVehicleSummary } from '@/api/mergeRequest'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
 import { useToastStore } from '@/stores/toast'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle
-} from '@motork/component-library/future/primitives'
 import RequestDetailShell from './RequestDetailShell.vue'
 import SuggestedNextActionCard from './SuggestedNextActionCard.vue'
 import RequestRightColumnCard from './RequestRightColumnCard.vue'
 import RequestActivityCard from './RequestActivityCard.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
-import DisqualifyModal from '@/components/modals/DisqualifyModal.vue'
-import CloseAsLostModal from '@/components/modals/CloseAsLostModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
+import MergeConfirmModal from '@/components/modals/MergeConfirmModal.vue'
+import DuplicateDetectedCard from './DuplicateDetectedCard.vue'
+import {
+  getApiStatus,
+  getOpportunityUpdateFromDisplayStage
+} from '@/utils/stageMapper'
+import { LEAD_STAGES } from '@/utils/stageMapper/constants'
 
 const props = defineProps({
   request: {
@@ -151,16 +121,23 @@ const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
 const toastStore = useToastStore()
 
-const showDisqualifyModal = ref(false)
-const showCloseAsLostModal = ref(false)
-const showConvertModal = ref(false)
 const showPostponeModal = ref(false)
-const converting = ref(false)
 const showTradeInModal = ref(false)
 const showFinancingModal = ref(false)
 const editingTradeIn = ref(null)
 const editingFinancingOption = ref(null)
 const tradeInActionLoading = ref(false)
+const showMergeModal = ref(false)
+const duplicateToMerge = ref(null)
+const mergeLoading = ref(false)
+
+const { potentialDuplicates } = useDuplicateDetection(computed(() => props.request))
+
+const mergeDuplicateSummary = computed(() => {
+  const d = duplicateToMerge.value
+  if (!d) return ''
+  return getVehicleSummary(d)
+})
 
 const activityAuthor = computed(() => userStore.currentUser?.name || 'You')
 
@@ -214,19 +191,30 @@ function handleEventCreated() {
   }
 }
 
-function handleDisqualified() {
-  useLeadsStore().fetchLeadById(props.request.id)
+function handleMergeClick(duplicate) {
+  duplicateToMerge.value = duplicate
+  showMergeModal.value = true
 }
 
-function handleCloseAsLost() {
-  useOpportunitiesStore().fetchOpportunityById(props.request.id)
-}
-
-function handleReopened() {
-  if (props.request?.type === 'lead') {
-    useLeadsStore().fetchLeadById(props.request.id)
-  } else {
-    useOpportunitiesStore().fetchOpportunityById(props.request.id)
+async function handleMergeConfirm() {
+  if (!props.request?.id || !duplicateToMerge.value) return
+  mergeLoading.value = true
+  try {
+    await mergeRequestIntoPrimary(props.request, duplicateToMerge.value)
+    toastStore.pushToast('success', 'Duplicate merged successfully')
+    showMergeModal.value = false
+    duplicateToMerge.value = null
+    if (props.request.type === 'lead') {
+      await leadsStore.fetchLeadById(props.request.id)
+      leadsStore.fetchLeads()
+    } else {
+      await opportunitiesStore.fetchOpportunityById(props.request.id)
+      opportunitiesStore.fetchOpportunities()
+    }
+  } catch (err) {
+    toastStore.pushToast('error', 'Failed to merge duplicate')
+  } finally {
+    mergeLoading.value = false
   }
 }
 
@@ -242,110 +230,42 @@ function handlePostponeExpectedClose() {
   showPostponeModal.value = true
 }
 
-function handleConverted(opportunity) {
-  leadsStore.fetchLeads()
-  opportunitiesStore.fetchOpportunities()
-  if (opportunity?.id) {
-    emit('request-navigate', `opportunity-${opportunity.id}`)
-  }
-}
-
-function handleOpenClose() {
-  if (!props.request) return
+function handleUpdateStatus(displayStage) {
+  if (!props.request?.id) return
+  const closedLeadStages = [
+    LEAD_STAGES.CLOSED_INVALID,
+    LEAD_STAGES.CLOSED_NOT_INTERESTED,
+    LEAD_STAGES.CLOSED_DUPLICATE
+  ]
   if (props.request.type === 'lead') {
-    showDisqualifyModal.value = true
+    const apiStatus = getApiStatus(displayStage, 'lead')
+    const isClosed = closedLeadStages.includes(displayStage)
+    leadsStore
+      .updateLead(props.request.id, {
+        isDisqualified: isClosed,
+        disqualifyReason: null,
+        disqualifyCategory: null,
+        stage: apiStatus,
+        status: apiStatus
+      })
+      .then(() => {
+        toastStore.pushToast('success', 'Status updated')
+        leadsStore.fetchLeadById(props.request.id)
+      })
+      .catch(() => {
+        toastStore.pushToast('error', 'Failed to update status')
+      })
   } else if (props.request.type === 'opportunity') {
-    showCloseAsLostModal.value = true
-  }
-}
-
-function handleDisqualifyConfirm({ category, reason }) {
-  if (!props.request?.id || props.request.type !== 'lead') return
-  leadsStore
-    .updateLead(props.request.id, {
-      isDisqualified: true,
-      disqualifyReason: reason,
-      disqualifyCategory: category
-    })
-    .then(() => {
-      showDisqualifyModal.value = false
-      toastStore.pushToast('success', 'Lead disqualified')
-      leadsStore.fetchLeadById(props.request.id)
-    })
-    .catch(() => {
-      toastStore.pushToast('error', 'Failed to disqualify')
-    })
-}
-
-function handleCloseAsLostConfirm({ reason, notes }) {
-  if (!props.request?.id || props.request.type !== 'opportunity') return
-  opportunitiesStore
-    .updateOpportunity(props.request.id, {
-      stage: 'Closed Lost',
-      lostReason: reason,
-      lostNotes: notes
-    })
-    .then(() => {
-      showCloseAsLostModal.value = false
-      toastStore.pushToast('success', 'Opportunity closed')
-      opportunitiesStore.fetchOpportunityById(props.request.id)
-    })
-    .catch(() => {
-      toastStore.pushToast('error', 'Failed to close')
-    })
-}
-
-function handleReopenLead() {
-  if (!props.request?.id || props.request.type !== 'lead') return
-  leadsStore
-    .updateLead(props.request.id, {
-      isDisqualified: false,
-      disqualifyReason: null,
-      disqualifyCategory: null,
-      stage: 'Open',
-      status: 'Open'
-    })
-    .then(() => {
-      toastStore.pushToast('success', 'Lead reopened')
-      leadsStore.fetchLeadById(props.request.id)
-    })
-    .catch(() => {
-      toastStore.pushToast('error', 'Failed to reopen')
-    })
-}
-
-function handleReopenOpp() {
-  if (!props.request?.id || props.request.type !== 'opportunity') return
-  const hasOffers = props.request?.offers?.length > 0
-  const targetStage = hasOffers ? 'In Negotiation' : 'Qualified'
-  const negotiationSubstatus = hasOffers ? 'Offer Sent' : null
-  opportunitiesStore
-    .updateOpportunity(props.request.id, {
-      stage: targetStage,
-      negotiationSubstatus
-    })
-    .then(() => {
-      toastStore.pushToast('success', 'Opportunity reopened')
-      opportunitiesStore.fetchOpportunityById(props.request.id)
-    })
-    .catch(() => {
-      toastStore.pushToast('error', 'Failed to reopen')
-    })
-}
-
-async function handleConvert() {
-  if (!props.request?.id || props.request.type !== 'lead') return
-  converting.value = true
-  try {
-    const opportunity = await leadsStore.convertLeadToOpportunity(props.request.id, null)
-    opportunitiesStore.addOpportunityToList(opportunity)
-    showConvertModal.value = false
-    toastStore.pushToast('success', 'Lead converted to opportunity')
-    handleConverted(opportunity)
-  } catch {
-    toastStore.pushToast('error', 'Failed to convert')
-  } finally {
-    converting.value = false
+    const payload = getOpportunityUpdateFromDisplayStage(displayStage)
+    opportunitiesStore
+      .updateOpportunity(props.request.id, payload)
+      .then(() => {
+        toastStore.pushToast('success', 'Status updated')
+        opportunitiesStore.fetchOpportunityById(props.request.id)
+      })
+      .catch(() => {
+        toastStore.pushToast('error', 'Failed to update status')
+      })
   }
 }
 

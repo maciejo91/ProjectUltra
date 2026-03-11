@@ -82,6 +82,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useRequestNavigationStore } from '@/stores/requestNavigation'
 import { Button } from '@motork/component-library/future/primitives'
 import Tabs from '@/components/customer/widgets/Tabs.vue'
 import HighlightsBox from './HighlightsBox.vue'
@@ -107,6 +108,7 @@ const props = defineProps({
 const emit = defineEmits(['add-activity', 'add-appointment', 'update:activeTab'])
 
 const router = useRouter()
+const requestNavigationStore = useRequestNavigationStore()
 const expandedSummaries = ref({})
 
 const nextUpcomingAppointment = computed(() => {
@@ -158,8 +160,44 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
 
-const handleRequestClick = (item) => {
-  const compositeId = item.type === 'lead' ? `lead-${item.id}` : `opportunity-${item.id}`
-  router.push({ path: '/requests', query: { open: compositeId } })
+const customerRequestRows = computed(() => {
+  const rows = []
+  ;(props.leads || []).forEach((l) => {
+    rows.push({
+      id: l.id,
+      type: 'lead',
+      compositeId: `lead-${l.id}`,
+      displayStage: l.stage || 'New',
+      customer: l.customer || l
+    })
+  })
+  ;(props.opportunities || []).forEach((o) => {
+    rows.push({
+      id: o.id,
+      type: 'opportunity',
+      compositeId: `opportunity-${o.id}`,
+      displayStage: o.stage || 'Qualified',
+      customer: o.customer || o
+    })
+  })
+  return rows
+})
+
+const handleRequestClick = (item, filteredItemsFromList) => {
+  const id = item.id
+  const type = item.type
+  const rows = (filteredItemsFromList?.length ? filteredItemsFromList : customerRequestRows.value).map((r) => ({
+    id: r.id,
+    type: r.type,
+    compositeId: r.compositeId,
+    displayStage: r.displayStage ?? r.original?.stage,
+    customer: r.customer ?? r.original?.customer
+  }))
+  requestNavigationStore.setRequestRows(rows)
+  router.push({
+    path: `/requests/${id}`,
+    query: { type, from: 'customer' },
+    state: { requestRows: rows }
+  })
 }
 </script>

@@ -8,9 +8,9 @@
       {{ typeLabel }}
     </span>
 
-    <!-- Attempts (call attempts indicator) -->
+    <!-- Attempts (call attempts indicator; hidden when shown under card title) -->
     <span
-      v-if="callAttemptsCount > 0"
+      v-if="!attemptsShownElsewhere && callAttemptsCount > 0"
       class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
     >
       <Phone class="shrink-0 size-2.5" aria-hidden />
@@ -70,6 +70,11 @@ const props = defineProps({
   },
   /** When true (e.g. on TaskCard), urgency/hot is shown next to customer name so we hide it here to avoid duplicate. */
   urgencyShownElsewhere: {
+    type: Boolean,
+    default: false
+  },
+  /** When true (e.g. on TaskCard), call attempts are shown under the title so we hide them here. */
+  attemptsShownElsewhere: {
     type: Boolean,
     default: false
   }

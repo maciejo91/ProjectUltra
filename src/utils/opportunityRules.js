@@ -7,16 +7,7 @@
 
 import { OPPORTUNITY_STATE_CONFIG, CLOSED_OPPORTUNITY_ACTIONS } from '@/composables/useOpportunityStateMachine'
 import { useSettingsStore } from '@/stores/settings'
-
-// Helper function to calculate days since a date
-function calculateDaysSince(dateString) {
-  if (!dateString) return 0
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = Math.abs(now - date)
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays
-}
+import { calculateDaysSince } from '@/utils/formatters'
 
 /**
  * Condition Evaluators
@@ -99,10 +90,6 @@ export const OpportunityConditions = {
            context.opportunity?.contractDate !== undefined
   },
   
-  'negotiation-offer-feedback-substatus': (context) => {
-    return context.opportunity?.negotiationSubstatus === 'Offer Feedback'
-  },
-
   // Negotiation stage conditions
   // NOTE: OFB task should NOT appear during negotiation phase - only in Closed Won - Awaiting Feedback
   // TEMPORARILY ENABLED FOR EVALUATION - opportunity 33
@@ -123,6 +110,28 @@ export const OpportunityConditions = {
     return false
   },
   
+  'contract-pending-delivery-feedback-required': (context) => {
+    // Delivery Feedback in Contract Pending: delivery date set and passed (dfbDays threshold)
+    if (context.stage !== 'In Negotiation - Contract Pending') return false
+    const opp = context.opportunity
+    if (!opp?.deliveryDate) return false
+    const actualDeliveryDate = opp.actualDeliveryDate ||
+      context.activities?.find(a => a.data?.actualDeliveryDate)?.data?.actualDeliveryDate
+    if (actualDeliveryDate) return false
+    const settingsStore = useSettingsStore()
+    const threshold = settingsStore.getSetting('dfbDays') || 3
+    const postponedDate = opp.postponedTasks?.dfb
+    if (postponedDate) {
+      const daysSincePostpone = calculateDaysSince(postponedDate)
+      const postponePeriod = settingsStore.getSetting('postponeTaskDays') || 7
+      if (daysSincePostpone < postponePeriod) return false
+      const daysFromPostpone = calculateDaysSince(postponedDate)
+      return daysFromPostpone >= threshold
+    }
+    const days = calculateDaysSince(opp.deliveryDate)
+    return days >= threshold
+  },
+
   'contract-pending-5-plus-days': (context) => {
     // Contract Feedback Task (CFB) - shows in Contract Pending substatus
     // Only show if at least one contract exists AND at least one is accepted (signed).
@@ -577,7 +586,3 @@ export const OpportunityValidations = {
     return { valid: true, error: null }
   }
 }
-
-// Export helper for external use
-export { calculateDaysSince }
-

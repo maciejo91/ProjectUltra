@@ -1,5 +1,10 @@
 <template>
-  <BaseTaskWidget
+  <div class="space-y-4">
+    <ThresholdBanner
+      :show="true"
+      :message="thresholdBannerMessage"
+    />
+    <BaseTaskWidget
     :title="'Open Opportunity Feedback'"
     :description="`This opportunity has been open for ${daysOpen} days without any offer. Consider creating an offer to move forward.`"
     :color-scheme="{ background: 'bg-orange-50/50', border: 'border-orange-100' }"
@@ -29,12 +34,15 @@
       />
     </template>
   </BaseTaskWidget>
+  </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import BaseTaskWidget from '@/components/tasks/shared/BaseTaskWidget.vue'
 import SurveyWidget from '@/components/customer/SurveyWidget.vue'
+import ThresholdBanner from '@/components/tasks/shared/ThresholdBanner.vue'
+import { useSettingsStore } from '@/stores/settings'
 
 const props = defineProps({
   opportunity: {
@@ -66,6 +74,8 @@ const surveyQuestions = [
   }
 ]
 
+const settingsStore = useSettingsStore()
+
 const daysOpen = computed(() => {
   if (!props.opportunity.createdAt) return 0
   const created = new Date(props.opportunity.createdAt)
@@ -73,6 +83,12 @@ const daysOpen = computed(() => {
   const diffTime = Math.abs(now - created)
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   return diffDays
+})
+
+const thresholdBannerMessage = computed(() => {
+  const min = settingsStore.getSetting('oofbMinDays') ?? 7
+  const max = settingsStore.getSetting('oofbMaxDays') ?? 13
+  return `This task appeared because the opportunity has been open for ${daysOpen.value} days without any offer (${min}-${max} days threshold as per Settings).`
 })
 
 const handleCreateOffer = () => {

@@ -1,5 +1,9 @@
 <template>
   <div class="flex flex-col">
+    <ThresholdBanner
+      :show="!!(showOfferFeedbackMissingBanner && offerFeedbackMissingDaysThreshold) || meetsOFBCondition"
+      :message="bannerMessage"
+    />
     <!-- Main card: title, subtitle, carousels, then more actions -->
     <div class="bg-white rounded-lg shadow-nsc-card overflow-visible">
       <div class="p-6 space-y-4">
@@ -10,12 +14,7 @@
               Follow up with customer about offers
             </template>
             <template v-else-if="opportunity.offers && opportunity.offers.length > 0">
-              <template v-if="meetsOFBCondition">
-                This opportunity has been in negotiation for {{ daysInNegotiation }} days without a contract. Follow up with customer to get feedback and move forward.
-              </template>
-              <template v-else>
-                Follow up with customer about offers
-              </template>
+              Follow up with customer about offers
             </template>
             <template v-else>
               Create an offer to continue negotiation
@@ -153,8 +152,15 @@
         </Button>
       </div>
       
+      <!-- Slot for dropdown action cards (Schedule Appointment, Close as Lost) - rendered right below management card -->
+      <slot name="dropdown-action-cards" />
+
       <!-- OFB Survey Section (only when toggle is active and OFB condition is met) -->
       <div v-if="showSurveySection && meetsOFBCondition" class="space-y-4">
+        <ThresholdBanner
+          :show="true"
+          :message="ofbBannerMessage"
+        />
         <OFBTask
           ref="ofbTaskRef"
           :opportunity="opportunity"
@@ -193,12 +199,14 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { Phone, ClipboardList, MessageCircle, MessageSquare, Mail, Clock } from 'lucide-vue-next'
+import { Phone, MessageCircle, MessageSquare, Mail, Clock } from 'lucide-vue-next'
 import { Button, Toggle, Label, Textarea } from '@motork/component-library/future/primitives'
 import { SelectMenu } from '@motork/component-library/future/components'
 import SecondaryActionsDropdown from '@/components/shared/SecondaryActionsDropdown.vue'
 import OFBTask from '@/components/tasks/opportunity/OFBTask.vue'
+import ThresholdBanner from '@/components/tasks/shared/ThresholdBanner.vue'
 import { OpportunityConditions } from '@/utils/opportunityRules'
+import { useSettingsStore } from '@/stores/settings'
 
 const props = defineProps({
   opportunity: {
@@ -250,6 +258,21 @@ const props = defineProps({
   showNfuContent: {
     type: Boolean,
     default: false
+  },
+  /** When true, show banner explaining why opportunity moved to Offer Feedback Missing */
+  showOfferFeedbackMissingBanner: {
+    type: Boolean,
+    default: false
+  },
+  /** Days threshold from Settings that triggered the transition */
+  offerFeedbackMissingDaysThreshold: {
+    type: Number,
+    default: null
+  },
+  /** Actual days passed without action (for banner) */
+  offerFeedbackMissingDaysPassed: {
+    type: Number,
+    default: null
   }
 })
 
@@ -277,6 +300,33 @@ const emit = defineEmits([
 ])
 
 const ofbTaskRef = ref(null)
+const settingsStore = useSettingsStore()
+
+const offerFeedbackMissingBannerMessage = computed(() => {
+  if (!props.showOfferFeedbackMissingBanner || !props.offerFeedbackMissingDaysThreshold) return ''
+  const days = props.offerFeedbackMissingDaysPassed ?? props.offerFeedbackMissingDaysThreshold
+  return `This opportunity moved to Offer Feedback Missing because ${days} days passed without action (${props.offerFeedbackMissingDaysThreshold} days threshold as per Settings).`
+})
+
+const ofbManagementBannerMessage = computed(() => {
+  const threshold = settingsStore.getSetting('ofbDays') ?? 5
+  return `This opportunity has been in negotiation for ${daysInNegotiation.value} days without a contract (${threshold} days threshold as per Settings). Follow up with customer to get feedback and move forward.`
+})
+
+const bannerMessage = computed(() => {
+  if (props.showOfferFeedbackMissingBanner && props.offerFeedbackMissingDaysThreshold) {
+    return offerFeedbackMissingBannerMessage.value
+  }
+  if (meetsOFBCondition.value) {
+    return ofbManagementBannerMessage.value
+  }
+  return ''
+})
+
+const ofbBannerMessage = computed(() => {
+  const threshold = settingsStore.getSetting('ofbDays') ?? 5
+  return `This task appeared because the opportunity has been in negotiation for ${daysInNegotiation.value} days without a contract (${threshold} days threshold as per Settings).`
+})
 
 const hasOffers = computed(() => {
   return props.opportunity?.offers && props.opportunity.offers.length > 0
@@ -319,34 +369,29 @@ const handleSurveyPostpone = (event) => {
 
 // Handle secondary action clicks - toggle appropriate form sections
 const handleSecondaryActionClick = (action) => {
-  // Map action keys to form sections
-  // Actions that should toggle Add Offer form
+  // Actions that open modal or have their own handlers (show cards below management card)
   const addOfferActions = ['add-offer', 'create-offer']
-  // Actions that should toggle Follow Up form
-  const followUpActions = ['follow-up', 'request-feedback', 'collect-feedback', 'reassign', 'schedule-appointment', 'close-lost']
-  
+  const actionHandledByParent = ['schedule-appointment', 'close-lost']
+
   if (addOfferActions.includes(action.key)) {
     emit('open-add-offer-modal')
+    emit('secondary-action', action)
     return
   }
-  if (followUpActions.includes(action.key)) {
-    const newValue = !props.showNegotiationSection
-    emit('update:show-negotiation-section', newValue)
-    if (newValue) {
-      emit('update:show-add-offer-section', false)
-      emit('update:show-survey-section', false)
-    } else {
-      emit('reset-negotiation-form')
-    }
+  // schedule-appointment and close-lost have handlers that toggle their cards below
+  if (actionHandledByParent.includes(action.key)) {
+    emit('secondary-action', action)
+    return
+  }
+  // Follow up / other actions: toggle Contact Customer section
+  const followUpActions = ['follow-up', 'request-feedback', 'collect-feedback', 'reassign']
+  const newValue = !props.showNegotiationSection
+  emit('update:show-negotiation-section', newValue)
+  if (newValue) {
+    emit('update:show-add-offer-section', false)
+    emit('update:show-survey-section', false)
   } else {
-    const newValue = !props.showNegotiationSection
-    emit('update:show-negotiation-section', newValue)
-    if (newValue) {
-      emit('update:show-add-offer-section', false)
-      emit('update:show-survey-section', false)
-    } else {
-      emit('reset-negotiation-form')
-    }
+    emit('reset-negotiation-form')
   }
   emit('secondary-action', action)
 }
@@ -354,32 +399,6 @@ const handleSecondaryActionClick = (action) => {
 // Check if OFB condition is met (for subtitle display)
 const meetsOFBCondition = computed(() => {
   // Only check for "Offer Sent" status
-  const substatus = props.opportunity?.negotiationSubstatus
-  if (substatus !== 'Offer Sent') {
-    return false
-  }
-  
-  // Check OFB condition
-  const context = {
-    opportunity: props.opportunity,
-    hasOffers: props.opportunity?.offers && props.opportunity.offers.length > 0,
-    stage: 'In Negotiation',
-    activities: []
-  }
-  
-  return OpportunityConditions['negotiation-5-plus-days-no-contract-has-offers'](context)
-})
-
-// Check if OFB task should be shown (only in expanded view, only for Offer Sent)
-const shouldShowOFBTask = computed(() => {
-  // TEMPORARY: For opportunity 33 evaluation, show even when not expanded
-  const isEvaluationMode = props.opportunity?.id === 3
-  
-  if (!isEvaluationMode && !props.showNegotiationSection) {
-    return false
-  }
-  
-  // Only show for "Offer Sent" status
   const substatus = props.opportunity?.negotiationSubstatus
   if (substatus !== 'Offer Sent') {
     return false

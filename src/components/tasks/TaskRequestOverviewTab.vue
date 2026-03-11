@@ -140,6 +140,8 @@ import { computed } from 'vue'
 import { Car } from 'lucide-vue-next'
 import { Badge, Button } from '@motork/component-library/future/primitives'
 import { getStageColor } from '@/utils/stageMapper'
+import { calculateDaysSince } from '@/utils/formatters'
+import { getLatestOffer } from '@/utils/activityHelpers'
 
 const props = defineProps({
   task: {
@@ -205,26 +207,6 @@ const substatusTheme = computed(() => {
   if (props.task.deliverySubstatus === 'Awaiting Delivery') return 'blue'
   return 'gray'
 })
-
-// Helper function to get latest offer from activities
-function getLatestOffer(activities) {
-  if (!activities || activities.length === 0) return null
-  
-  const offers = activities
-    .filter(a => a.type === 'offer')
-    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-  
-  return offers[0] || null
-}
-
-// Helper function to calculate days since a date
-function calculateDaysSince(dateString) {
-  if (!dateString) return 0
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = Math.abs(now - date)
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-}
 
 // Compute negotiation badge for "In Negotiation" stage
 const negotiationBadge = computed(() => {

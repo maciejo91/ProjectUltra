@@ -551,8 +551,22 @@ watch(currentTask, (task) => {
 const isDesktop = ref(typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches)
 if (typeof window !== 'undefined') {
   const mq = window.matchMedia('(min-width: 768px)')
-  mq.addEventListener('change', (e) => { isDesktop.value = e.matches })
+  mq.addEventListener('change', (e) => { 
+    isDesktop.value = e.matches 
+    // If switching to mobile and in table view, force card view
+    if (!e.matches && viewMode.value === 'table') {
+      viewMode.value = 'card'
+    }
+  })
 }
+
+// Ensure mobile starts in card view
+onMounted(() => {
+  if (!isDesktop.value && viewMode.value === 'table') {
+    viewMode.value = 'card'
+  }
+})
+
 watch(
   () => isDesktop.value && viewMode.value === 'card',
   (hide) => { layoutStore.setHideHeaderForTaskDetail(hide) },

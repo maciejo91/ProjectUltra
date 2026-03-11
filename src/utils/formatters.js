@@ -6,6 +6,19 @@
 import { useSettingsStore } from '@/stores/settings'
 
 /**
+ * Calculate days since a date (for threshold checks)
+ * @param {string} dateString - ISO date string or date
+ * @returns {number} Whole days elapsed
+ */
+export function calculateDaysSince(dateString) {
+  if (!dateString) return 0
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffTime = Math.abs(now - date)
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+}
+
+/**
  * Calculate conversion rate from leads to opportunities
  * Optionally excludes "NOT VALID" leads based on settings
  * @param {Array} leads - Array of lead objects
@@ -261,7 +274,7 @@ export function getStageBadgeClass(stage) {
     'In Negotiation': 'bg-badge-orange text-amber-700',
     'In Negotiation - Offer Sent': 'bg-badge-orange text-amber-700',
     'In Negotiation - Awaiting Offer': 'bg-badge-orange text-amber-700',
-    'In Negotiation - Offer Feedback': 'bg-badge-orange text-amber-700',
+    'In Negotiation - Offer Feedback Missing': 'bg-badge-orange text-amber-700',
     'In Negotiation - Contract Pending': 'bg-badge-green text-emerald-700',
     'Closed Won': 'bg-badge-green text-emerald-700',
     'Closed Lost': 'bg-badge-red text-rose-600',

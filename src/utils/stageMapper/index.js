@@ -101,6 +101,26 @@ export function canTransitionTo(currentStage, targetStage, entityType = 'opportu
 }
 
 /**
+ * Build opportunity update payload from display stage
+ * Handles negotiation substatus for granular In Negotiation stages
+ * @param {string} displayStage - Display stage to set
+ * @returns {Object} Update payload { stage, negotiationSubstatus? }
+ */
+export function getOpportunityUpdateFromDisplayStage(displayStage) {
+  if (displayStage === OPPORTUNITY_STAGES.ABANDONED) {
+    return { stage: 'Abandoned', negotiationSubstatus: null }
+  }
+  const apiStatus = mapOpportunityStageToApiStatus(displayStage)
+  const payload = { stage: apiStatus }
+  if (displayStage?.startsWith(`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - `)) {
+    payload.negotiationSubstatus = displayStage.replace(`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - `, '')
+  } else {
+    payload.negotiationSubstatus = null
+  }
+  return payload
+}
+
+/**
  * Get delivery substatus for Closed Won opportunities
  */
 export function getDeliverySubstatus(opportunity, activities = []) {
@@ -126,7 +146,7 @@ export function getStageColor(displayStage, entityType = 'opportunity') {
     [OPPORTUNITY_STAGES.IN_NEGOTIATION]: 'bg-yellow-100 text-yellow-700',
     [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Sent`]: 'bg-yellow-100 text-yellow-700',
     [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Awaiting Offer`]: 'bg-yellow-100 text-yellow-700',
-    [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Feedback`]: 'bg-yellow-100 text-yellow-700',
+    [OPPORTUNITY_STAGES.OFFER_FEEDBACK_MISSING]: 'bg-yellow-100 text-yellow-700',
     [OPPORTUNITY_STAGES.CONTRACT_PENDING]: 'bg-badge-green text-emerald-700',
     [OPPORTUNITY_STAGES.CLOSED_WON]: 'bg-badge-green text-green-700',
     [OPPORTUNITY_STAGES.CLOSED_LOST]: 'bg-badge-red text-red-700',

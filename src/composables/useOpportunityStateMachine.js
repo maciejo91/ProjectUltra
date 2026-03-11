@@ -261,7 +261,7 @@ export const OPPORTUNITY_STATE_CONFIG = {
     taskWidgets: []
   },
 
-  'In Negotiation - Offer Feedback': {
+  'In Negotiation - Offer Feedback Missing': {
     primaryAction: (context) => {
       if (context.scheduledAppointment && context.scheduledAppointment.start) {
         return {
@@ -354,9 +354,10 @@ export const OPPORTUNITY_STATE_CONFIG = {
         icon: 'fa-solid fa-xmark'
       }
     ],
-    // NOTE: CFB (Contract Feedback Task) is ONLY in Contract Pending stage
-    // DFB (Delivery Feedback Task) is NOT in Contract Pending - it only appears in Closed Won stage
+    // NOTE: CFB (Contract Feedback Task) and DFB (Delivery Feedback) in Contract Pending
+    // DFB takes priority when delivery date is set and passed (user fills feedback + can Close Won manually)
     taskWidgets: [
+      { type: 'DFB', condition: 'contract-pending-delivery-feedback-required' },
       { type: 'CFB', condition: 'contract-pending-5-plus-days' }
     ]
   },

@@ -5,38 +5,8 @@
     :class="[cardClass, selectedBorderClass]"
     @click="$emit('select', itemId)"
   >
-    <!-- Top row: Due Date + Recall (right) -->
-    <div class="flex items-center justify-end gap-2 w-full shrink-0 mb-1">
-      <span
-        v-if="displayDate"
-        class="text-xs font-medium uppercase leading-none shrink-0"
-        :class="displayDate.status.textClass"
-      >
-        {{ displayDate.text }}
-      </span>
-      <span
-        v-if="showScheduledRecallBadge"
-        class="inline-flex items-center gap-1 text-xs font-medium uppercase leading-none shrink-0 bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded"
-      >
-        <span class="shrink-0 rounded-full size-1.5 bg-blue-500" aria-hidden />
-        Recall
-      </span>
-    </div>
-
-    <div class="flex flex-col min-w-0 flex-1 pr-2">
-      <div class="flex items-center gap-x-2 gap-y-0 overflow-hidden flex-wrap mb-0.5 leading-none">
-        <h3 class="font-medium text-foreground text-sm break-words shrink-0 m-0">{{ cardTitle }}</h3>
-        <span
-          v-if="showCustomerSubtitle"
-          class="text-muted-foreground text-sm truncate shrink-0"
-        >
-          {{ getName(item) }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Badges + Urgency: full-width row -->
-    <div class="mt-2 w-full shrink-0 flex items-center gap-2 flex-wrap">
+    <!-- Top row: Urgency (left) | Due Date + Recall (right) -->
+    <div class="flex items-center justify-between gap-2 w-full shrink-0 mb-1">
       <span
         v-if="showUrgencyBadge"
         class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
@@ -54,13 +24,53 @@
         <span class="shrink-0 rounded-full size-2 bg-red-500" aria-hidden />
         Hot
       </span>
-      <TaskBadges :task="item" :urgency-shown-elsewhere="true" />
+      <div class="flex items-center gap-2 shrink-0 ml-auto">
+        <span
+          v-if="displayDate"
+          class="text-xs font-medium uppercase leading-none"
+          :class="displayDate.status.textClass"
+        >
+          {{ displayDate.text }}
+        </span>
+        <span
+          v-if="showScheduledRecallBadge"
+          class="inline-flex items-center gap-1 text-xs font-medium uppercase leading-none bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded"
+        >
+          <span class="shrink-0 rounded-full size-1.5 bg-blue-500" aria-hidden />
+          Recall
+        </span>
+      </div>
+    </div>
+
+    <div class="flex flex-col min-w-0 flex-1 pr-2">
+      <div class="flex items-center gap-x-2 gap-y-0 overflow-hidden flex-wrap mb-0.5 leading-none pt-2 pb-1">
+        <h3 class="font-medium text-foreground text-sm break-words shrink-0 m-0">{{ cardTitle }}</h3>
+        <span
+          v-if="showCustomerSubtitle"
+          class="text-muted-foreground text-sm truncate shrink-0"
+        >
+          {{ getName(item) }}
+        </span>
+        <span
+          v-if="callAttemptsCount > 0"
+          class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
+        >
+          <Phone class="shrink-0 size-2.5" aria-hidden />
+          {{ callAttemptsValue }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Badges on new line below title -->
+    <div class="mt-2 w-full shrink-0 flex items-center gap-2 flex-wrap">
+      <TaskBadges :task="item" :urgency-shown-elsewhere="true" :attempts-shown-elsewhere="true" />
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import { Phone } from 'lucide-vue-next'
 import { formatDueDateRelative, getDeadlineStatus } from '@/utils/formatters'
 import { getTaskDisplayTitle } from '@/utils/taskActionTitle'
 import { useSettingsStore } from '@/stores/settings'
@@ -183,6 +193,10 @@ const urgencyEnabled = computed(() => settingsStore.getSetting('urgencyEnabled')
 const showUrgencyBadge = computed(() => urgencyEnabled.value && props.item?.urgencyLevel)
 const showHotFallbackBadge = computed(() => !urgencyEnabled.value && props.item?.priority === 'Hot')
 const urgencyDotClass = computed(() => getUrgencyDotClass(props.item?.urgencyLevel))
+
+const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
+const callAttemptsCount = computed(() => props.item?.contactAttempts?.length ?? 0)
+const callAttemptsValue = computed(() => `${callAttemptsCount.value}/${maxContactAttempts.value}`)
 </script>
 
 <style scoped>

@@ -202,6 +202,11 @@ export const useCustomersStore = defineStore('customers', () => {
     throw new Error('Only contacts can be converted to leads')
   }
   
+  const mergeCustomer = async (primary, duplicate) => {
+    const { mergeCustomerIntoPrimary } = await import('@/api/mergeCustomer')
+    await mergeCustomerIntoPrimary(primary, duplicate)
+  }
+
   const convertToOpportunity = async (customerId) => {
     const customer = customers.value.find(c => c.id === customerId)
     if (!customer) throw new Error('Customer not found')
@@ -247,7 +252,8 @@ export const useCustomersStore = defineStore('customers', () => {
     removeContact,
     addRequestedCar,
     convertToLead,
-    convertToOpportunity
+    convertToOpportunity,
+    mergeCustomer
   }
 })
 

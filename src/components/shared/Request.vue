@@ -239,6 +239,8 @@ import { ref, computed } from 'vue'
 import { Badge, Button, Card, CardHeader, CardContent } from '@motork/component-library/future/primitives'
 import { getDeliverySubstatusColor, getStageColor } from '@/utils/stageMapper'
 import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
+import { calculateDaysSince } from '@/utils/formatters'
+import { getLatestOffer } from '@/utils/activityHelpers'
 
 const props = defineProps({
   // Stage/Owner/Source props
@@ -305,26 +307,6 @@ const substatusTheme = computed(() => {
 const stageColorClass = computed(() => {
   return getStageColor(props.stage, props.entityType)
 })
-
-// Helper function to get latest offer from activities
-function getLatestOffer(activities) {
-  if (!activities || activities.length === 0) return null
-  
-  const offers = activities
-    .filter(a => a.type === 'offer')
-    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-  
-  return offers[0] || null
-}
-
-// Helper function to calculate days since a date
-function calculateDaysSince(dateString) {
-  if (!dateString) return 0
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffTime = Math.abs(now - date)
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-}
 
 // Compute negotiation badge for "In Negotiation" stage
 const negotiationBadge = computed(() => {

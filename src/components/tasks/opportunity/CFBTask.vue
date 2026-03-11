@@ -1,5 +1,9 @@
 <template>
-  <div class="rounded-lg flex flex-col bg-muted">
+  <div class="rounded-lg flex flex-col bg-muted space-y-4">
+    <ThresholdBanner
+      :show="true"
+      :message="thresholdBannerMessage"
+    />
     <div class="pt-1 px-1">
       <div class="bg-white rounded-lg shadow-nsc-card overflow-visible">
         <div class="p-6">
@@ -23,8 +27,34 @@
               <ClipboardList class="w-4 h-4 shrink-0" />
               <span>Complete Survey</span>
             </Toggle>
+            <Toggle
+              v-if="showSetDeliveryDateOption"
+              variant="outline"
+              :model-value="showSetDeliveryDateSection"
+              :aria-pressed="showSetDeliveryDateSection"
+              @update:model-value="handleToggleChange('setDeliveryDate', $event)"
+              @click="handleSetDeliveryDateClick"
+              class="outcome-toggle-item"
+            >
+              <Truck class="w-4 h-4 shrink-0" />
+              <span>Set Delivery Date</span>
+            </Toggle>
           </div>
         </div>
+      </div>
+    </div>
+    
+    <div v-if="showSetDeliveryDateSection" class="mk-expanded-cards-area space-y-4">
+      <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+        <SetDeliveryDateForm
+          :form="deliveryDateForm"
+          :opportunity="opportunity"
+          :min-delivery-date="minDeliveryDate"
+          :can-submit="canSubmitSetDeliveryDate"
+          @update:form="$emit('update:delivery-date-form', $event)"
+          @confirm="$emit('confirm-set-delivery-date')"
+          @cancel="$emit('cancel-set-delivery-date')"
+        />
       </div>
     </div>
     
@@ -67,11 +97,14 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { ClipboardList, Clock } from 'lucide-vue-next'
+import { ClipboardList, Clock, Truck } from 'lucide-vue-next'
 import { Button, Toggle } from '@motork/component-library/future/primitives'
 import ContractFeedbackSurvey from '@/components/tasks/opportunity/ContractFeedbackSurvey.vue'
+import SetDeliveryDateForm from '@/components/tasks/opportunity/SetDeliveryDateForm.vue'
+import ThresholdBanner from '@/components/tasks/shared/ThresholdBanner.vue'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
+import { useSettingsStore } from '@/stores/settings'
 
 const props = defineProps({
   opportunity: {
@@ -81,13 +114,19 @@ const props = defineProps({
   activities: {
     type: Array,
     default: () => []
-  }
+  },
+  showSetDeliveryDateOption: { type: Boolean, default: false },
+  showSetDeliveryDateSection: { type: Boolean, default: false },
+  deliveryDateForm: { type: Object, default: () => ({}) },
+  minDeliveryDate: { type: String, default: '' },
+  canSubmitSetDeliveryDate: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['close', 'survey-submitted', 'survey-cancelled', 'postpone'])
+const emit = defineEmits(['close', 'survey-submitted', 'survey-cancelled', 'postpone', 'update:show-set-delivery-date-section', 'update:delivery-date-form', 'confirm-set-delivery-date', 'cancel-set-delivery-date'])
 
 const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
+const settingsStore = useSettingsStore()
 
 const showSurvey = ref(false)
 const surveyRef = ref(null)
@@ -102,6 +141,11 @@ const daysSinceContract = computed(() => {
   const now = new Date()
   const diffTime = Math.abs(now - contract)
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+})
+
+const thresholdBannerMessage = computed(() => {
+  const threshold = settingsStore.getSetting('cfbDays') ?? 7
+  return `This task appeared because the contract was signed ${daysSinceContract.value} days ago without delivery (${threshold} days threshold as per Settings).`
 })
 
 const handleSubmit = async (surveyData) => {
@@ -202,14 +246,19 @@ const handleCancel = () => {
 }
 
 const handleToggleChange = (type, value) => {
-  // Reset all toggles first
-  showSurvey.value = false
-  
-  // If the toggle is being turned on, set only that one
-  if (value) {
-    if (type === 'survey') {
-      showSurvey.value = true
-    }
+  if (type === 'survey') {
+    showSurvey.value = value
+    if (value) emit('update:show-set-delivery-date-section', false)
+  } else if (type === 'setDeliveryDate') {
+    emit('update:show-set-delivery-date-section', value)
+    if (value) showSurvey.value = false
+  }
+}
+
+const handleSetDeliveryDateClick = () => {
+  if (!props.showSetDeliveryDateSection) {
+    emit('update:show-set-delivery-date-section', true)
+    showSurvey.value = false
   }
 }
 </script>

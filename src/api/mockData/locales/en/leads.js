@@ -23,7 +23,7 @@ const baseRequestedCar = (brand, model, year, price) => ({
 })
 
 export const mockLeads = [
-  // 1. New – stage: Open, no callback
+  // 1. LQF: New lead – stage: Open, no callback (Lead Qualification task)
   {
     id: 1,
     customerId: 1,
@@ -182,7 +182,82 @@ export const mockLeads = [
     ],
     distanceKm: 50
   },
-  // 7. Closed - Duplicate
+  // 7. Duplicate candidate – same customer + same vehicle as Lead 1 (for Duplicate Detected card)
+  {
+    id: 8,
+    customerId: 1,
+    status: 'Open',
+    priority: 'Normal',
+    requestedCar: baseRequestedCar('Audi', 'A6 Allroad', 2023, 19000),
+    carStatus: 'In Stock',
+    requestType: 'Quotation',
+    source: 'Website',
+    fiscalEntity: 'MotorK',
+    sourceDetails: 'Web form',
+    assignee: 'Salsabeel Khaleel',
+    assigneeInitials: 'SK',
+    createdAt: createHourOffset(-1),
+    lastActivity: createHourOffset(-1),
+    nextActionDue: createHourOffset(12),
+    tags: [],
+    stage: 'Open',
+    isDisqualified: false,
+    disqualifyReason: null,
+    scheduledAppointment: null,
+    contactAttempts: [],
+    distanceKm: 5
+  },
+  // 8. Duplicate candidate – same customer + same vehicle as Lead 2 (VW ID.4)
+  {
+    id: 9,
+    customerId: 2,
+    status: 'Open',
+    priority: 'Normal',
+    requestedCar: baseRequestedCar('Volkswagen', 'ID.4', 2024, 45000),
+    carStatus: 'In Stock',
+    requestType: 'Quotation',
+    source: 'Website',
+    fiscalEntity: 'MotorK',
+    sourceDetails: 'Contact form',
+    assignee: 'Salsabeel Khaleel',
+    assigneeInitials: 'SK',
+    createdAt: createHourOffset(-1),
+    lastActivity: createHourOffset(-1),
+    nextActionDue: createHourOffset(16),
+    tags: [],
+    stage: 'Open',
+    isDisqualified: false,
+    disqualifyReason: null,
+    scheduledAppointment: null,
+    contactAttempts: [],
+    distanceKm: 3
+  },
+  // 9. Duplicate candidate – same customer + same vehicle as Lead 3 (BMW iX)
+  {
+    id: 10,
+    customerId: 3,
+    status: 'Open',
+    priority: 'Warm',
+    requestedCar: baseRequestedCar('BMW', 'iX xDrive50', 2024, 105000),
+    carStatus: 'In Stock',
+    requestType: 'Test Drive',
+    source: 'Website',
+    fiscalEntity: 'MotorK',
+    sourceDetails: 'Landing page',
+    assignee: 'Sarah Jenkins',
+    assigneeInitials: 'SJ',
+    createdAt: createHourOffset(-2),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createHourOffset(10),
+    tags: [],
+    stage: 'Open',
+    isDisqualified: false,
+    disqualifyReason: null,
+    scheduledAppointment: null,
+    contactAttempts: [],
+    distanceKm: 15
+  },
+  // 10. Closed - Duplicate
   {
     id: 7,
     customerId: 7,

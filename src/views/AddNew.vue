@@ -23,13 +23,20 @@
         </template>
       </PageHeader>
 
-      <div class="pt-2 px-4 pb-8 md:pt-3 md:px-6 md:pb-10 lg:pt-4 lg:px-8 lg:pb-12 text-sm w-full">
+      <div
+        class="pt-2 px-4 pb-8 md:pt-3 md:px-6 md:pb-10 lg:pt-4 lg:px-8 lg:pb-12 text-sm w-full"
+        :class="{ 'bg-white': activeTab === 'campaigns' }"
+      >
         <TabsContent value="manual" class="add-new-manual data-[state=inactive]:hidden w-full">
           <ManualTab ref="manualTabRef" @submit="handleSubmit" />
         </TabsContent>
 
         <TabsContent value="upload" class="data-[state=inactive]:hidden w-full">
           <UploadTab />
+        </TabsContent>
+
+        <TabsContent value="campaigns" class="data-[state=inactive]:hidden w-full">
+          <CampaignsTab />
         </TabsContent>
       </div>
     </Tabs>
@@ -46,6 +53,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-libr
 import PageHeader from '@/components/layout/PageHeader.vue'
 import ManualTab from '@/components/addnew/ManualTab.vue'
 import UploadTab from '@/components/addnew/UploadTab.vue'
+import CampaignsTab from '@/components/addnew/CampaignsTab.vue'
 import { useTabPersistence } from '@/composables/useTabPersistence'
 
 const router = useRouter()
@@ -58,14 +66,15 @@ const { activeTab } = useTabPersistence('add-new-active-tab', 'manual')
 
 // Ensure manual is automatically selected on mount
 onMounted(() => {
-  if (!activeTab.value || !['manual', 'upload'].includes(activeTab.value)) {
+  if (!activeTab.value || !['manual', 'upload', 'campaigns'].includes(activeTab.value)) {
     activeTab.value = 'manual'
   }
 })
 
 const tabs = [
   { key: 'manual', label: 'Manual' },
-  { key: 'upload', label: 'Upload' }
+  { key: 'upload', label: 'Upload' },
+  { key: 'campaigns', label: 'Campaigns' }
 ]
 
 const handleSubmit = async (formData) => {

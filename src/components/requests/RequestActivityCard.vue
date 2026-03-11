@@ -15,6 +15,17 @@
           />
         </TabsTrigger>
         <TabsTrigger
+          value="conversations"
+          class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+          :class="activeTab === 'conversations' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+        >
+          <span>Conversations</span>
+          <span
+            v-if="activeTab === 'conversations'"
+            class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+          />
+        </TabsTrigger>
+        <TabsTrigger
           value="data"
           class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
           :class="activeTab === 'data' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
@@ -53,6 +64,9 @@
           />
           </div>
         </TabsContent>
+        <TabsContent value="conversations" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
+          <RequestConversationsTabContent :activities="conversationActivities" />
+        </TabsContent>
         <TabsContent value="data" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <RequestDataTabContent
           :activities="requestActivities"
@@ -68,13 +82,15 @@
         <TabsContent
           v-if="showTasksTab"
           value="tasks"
-          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 p-2"
+          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 p-2 gap-4"
         >
           <RequestAssociatedTasksCard
             :request="request"
             bare
             :limit="50"
             navigate-to-task-detail
+            show-add-button
+            @add-task="showCreateTaskModal = true"
           />
         </TabsContent>
       </div>
@@ -91,6 +107,17 @@
           <span>Communicate</span>
           <span
             v-if="activeTab === 'communicate'"
+            class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
+          />
+        </TabsTrigger>
+        <TabsTrigger
+          value="conversations"
+          class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
+          :class="activeTab === 'conversations' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+        >
+          <span>Conversations</span>
+          <span
+            v-if="activeTab === 'conversations'"
             class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
           />
         </TabsTrigger>
@@ -168,6 +195,10 @@
           </div>
         </TabsContent>
 
+        <TabsContent value="conversations" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
+          <RequestConversationsTabContent :activities="conversationActivities" />
+        </TabsContent>
+
         <TabsContent value="data" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <RequestDataTabContent
           :activities="requestActivities"
@@ -218,13 +249,15 @@
         <TabsContent
           v-if="showTasksTab"
           value="tasks"
-          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 p-2"
+          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 p-2 gap-4"
         >
           <RequestAssociatedTasksCard
             :request="request"
             bare
             :limit="50"
             navigate-to-task-detail
+            show-add-button
+            @add-task="showCreateTaskModal = true"
           />
         </TabsContent>
       </div>
@@ -244,6 +277,7 @@
       v-if="showCreateContractModal"
       :show="showCreateContractModal"
       :max-contract-date="maxContractDate"
+      :context="request"
       @confirm="handleContractCreatedFromModal"
       @cancel="showCreateContractModal = false"
     />
@@ -258,6 +292,13 @@
       @create="handleAppointmentCreated"
       @cancel="showCreateAppointmentModal = false"
     />
+
+    <CreateTaskModal
+      :show="showCreateTaskModal"
+      :request="request"
+      @save="handleCreateTaskSave"
+      @close="showCreateTaskModal = false"
+    />
   </div>
 </template>
 
@@ -266,6 +307,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-library/future/primitives'
 import CommunicationWidget from '@/components/shared/communication/CommunicationWidget.vue'
 import RequestAppointmentsTabContent from './RequestAppointmentsTabContent.vue'
+import RequestConversationsTabContent from './RequestConversationsTabContent.vue'
 import RequestDataTabContent from './RequestDataTabContent.vue'
 import RequestAssociatedTasksCard from './RequestAssociatedTasksCard.vue'
 import OfferCarousel from '@/components/shared/OfferCarousel.vue'
@@ -274,10 +316,12 @@ import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
 import AddOfferModal from '@/components/modals/AddOfferModal.vue'
 import CreateContractModal from '@/components/modals/CreateContractModal.vue'
 import CreateEventModal from '@/components/modals/CreateEventModal.vue'
+import CreateTaskModal from '@/components/modals/CreateTaskModal.vue'
 import { fetchAppointmentsByCustomerId, createCalendarEvent, fetchCalendarFilterOptions } from '@/api/calendar'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
+import { useToastStore } from '@/stores/toast'
 
 const props = defineProps({
   request: {
@@ -296,17 +340,32 @@ watch(showTasksTab, (show) => {
     activeTab.value = 'communicate'
   }
 })
+
+const conversationActivities = computed(() => {
+  const list = requestActivities.value.filter(
+    (a) =>
+      a.type === 'customer-email' ||
+      a.type === 'customer-whatsapp' ||
+      a.type === 'email' ||
+      a.type === 'whatsapp'
+  )
+  return [...list].sort(
+    (a, b) => new Date(a.timestamp || 0).getTime() - new Date(b.timestamp || 0).getTime()
+  )
+})
 const showCreateAppointmentModal = ref(false)
 const appointments = ref([])
 const dealerships = ref([])
 const showPDFComingSoon = ref(false)
 const showAddOfferModal = ref(false)
 const showCreateContractModal = ref(false)
+const showCreateTaskModal = ref(false)
 const offerCarouselRef = ref(null)
 const contractCarouselRef = ref(null)
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
+const toastStore = useToastStore()
 
 const requestActivities = computed(() => {
   if (!props.request) return []
@@ -425,6 +484,49 @@ const maxContractDate = computed(() => {
   const d = new Date()
   return d.toISOString().slice(0, 10)
 })
+
+async function handleCreateTaskSave(data) {
+  const r = props.request
+  if (!r?.id) return
+  const newTask = {
+    id: `task-${Date.now()}`,
+    taskCode: data.taskCode,
+    taskName: data.taskName,
+    assignee: data.assignee,
+    assigneeInitials: data.assigneeInitials || '',
+    dueDate: data.dueDate,
+    status: 'pending',
+    createdAt: new Date().toISOString()
+  }
+  const existing = r.manualTasks || []
+  const manualTasks = [...existing, newTask]
+  try {
+    if (r.type === 'lead') {
+      await leadsStore.updateLead(r.id, { manualTasks })
+    } else if (r.type === 'opportunity') {
+      await opportunitiesStore.updateOpportunity(r.id, { manualTasks })
+    }
+    const activity = {
+      type: 'note',
+      user: userStore.currentUser?.name || 'You',
+      action: 'added task',
+      content: `${data.taskName} (${data.taskCode}) – due ${data.dueDate}`,
+      timestamp: new Date().toISOString()
+    }
+    if (r.type === 'lead') {
+      await leadsStore.addActivity(r.id, activity)
+    } else if (r.type === 'opportunity') {
+      await opportunitiesStore.addActivity(r.id, activity)
+    }
+    toastStore.pushToast('success', 'Task added')
+    showCreateTaskModal.value = false
+    if (r.type === 'lead') await leadsStore.fetchLeadById(r.id)
+    else if (r.type === 'opportunity') await opportunitiesStore.fetchOpportunityById(r.id)
+  } catch (err) {
+    toastStore.pushToast('error', 'Failed to add task')
+    throw err
+  }
+}
 
 async function handleNoteSave(data) {
   if (!props.request?.id) return
@@ -593,15 +695,14 @@ async function handleContractCreatedFromModal(payload) {
   try {
     const opp = props.request
     const acceptedOffer = opp.offers?.find(o => o.status === 'accepted' || o.acceptance_status === 'accepted')
-    await opportunitiesStore.addContract(opp.id, {
-      contractDate: payload.contractDate,
-      contractTime: payload.contractTime,
-      notes: payload.notes,
+    const contractPayload = {
+      ...payload,
       lockedOfferId: acceptedOffer?.id,
       lockedTradeInLabel: acceptedOffer?.data?.selectedTradeInLabel,
       lockedFinancingLabel: acceptedOffer?.data?.selectedFinancingLabel,
       lockedPrice: acceptedOffer?.price
-    })
+    }
+    await opportunitiesStore.addContract(opp.id, contractPayload)
     const datetime = payload.contractTime
       ? `${payload.contractDate}T${payload.contractTime}:00`
       : `${payload.contractDate}T12:00:00`

@@ -192,5 +192,61 @@ export const mockActivities = [
     content: 'Thanks for the C-Class info. I would like to see it this week.',
     timestamp: createHourOffset(-4),
     leadId: 4
+  },
+  // Opportunity customer replies (for Conversations tab)
+  {
+    id: 22,
+    type: 'customer-email',
+    user: 'John Smith',
+    action: 'sent an email',
+    content: 'I received the quote. Can we confirm the black exterior is still available?',
+    timestamp: createHourOffset(-5),
+    opportunityId: 1
+  },
+  {
+    id: 23,
+    type: 'customer-whatsapp',
+    user: 'David Miller',
+    action: 'sent a WhatsApp message',
+    content: 'Happy to proceed with the counter-offer. When can we sign?',
+    timestamp: createHourOffset(-2),
+    opportunityId: 3
+  },
+  // Outbound communications for Conversations tab
+  {
+    id: 24,
+    type: 'email',
+    user: 'Sarah Jenkins',
+    action: 'sent an email',
+    content: 'Here is the quote for the Audi A6 you requested. Let me know if you have questions.',
+    timestamp: createHourOffset(-6),
+    opportunityId: 1
+  },
+  {
+    id: 25,
+    type: 'whatsapp',
+    user: 'David Miller',
+    action: 'sent a WhatsApp message',
+    content: 'I have prepared a counter-offer with a 5% discount. Sending it now.',
+    timestamp: createHourOffset(-3),
+    opportunityId: 3
+  },
+  {
+    id: 26,
+    type: 'email',
+    user: 'Josh Adams',
+    action: 'sent an email',
+    content: 'Thanks for your interest! We have a test drive slot available tomorrow at 10 AM.',
+    timestamp: createHourOffset(-1),
+    leadId: 1
+  },
+  {
+    id: 27,
+    type: 'whatsapp',
+    user: 'Emma Watson',
+    action: 'sent a WhatsApp message',
+    content: 'Hi Emma, I tried calling you. I will call again after 2 PM as requested.',
+    timestamp: createHourOffset(-0.5),
+    leadId: 2
   }
 ]

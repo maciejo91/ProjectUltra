@@ -37,7 +37,7 @@
           value="other"
           class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 p-2"
         >
-          <RequestAssociatedTasksCard :request="request" bare @request-navigate="$emit('request-navigate', $event)" />
+          <RequestAssociatedTasksCard :request="request" bare @request-navigate="(id, rows) => $emit('request-navigate', id, rows)" />
         </TabsContent>
       </div>
     </Tabs>

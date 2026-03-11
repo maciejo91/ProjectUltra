@@ -103,7 +103,7 @@ export class ActivityRepository extends BaseRepository {
       type: data.type,
       user: data.user,
       action: data.action,
-      content: data.content,
+      content: data.content ?? data.message ?? data.notes,
       data: data.data
     }
     

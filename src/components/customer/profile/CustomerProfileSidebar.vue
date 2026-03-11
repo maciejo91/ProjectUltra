@@ -31,14 +31,6 @@
             <button class="absolute bottom-0 right-0 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center border border-gray-100 hover:bg-gray-50">
               <MoreHorizontal class="w-3 h-3 text-muted-foreground" />
             </button>
-            <button
-              v-if="showOpenInNewTab"
-              class="absolute top-0 right-[-10px] w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center border border-gray-100 hover:bg-gray-50"
-              @click="openFullPage"
-              title="Open in full page"
-            >
-              <ExternalLink class="w-3 h-3 text-muted-foreground" />
-            </button>
           </div>
           
           <div class="space-y-1">
@@ -62,7 +54,7 @@
         </div>
 
         <!-- Details List -->
-        <div class="space-y-4 pt-4 border-t border-border">
+        <div class="mt-4 space-y-4 pt-4 border-t border-border">
           <div class="grid grid-cols-[100px_1fr] gap-2 text-sm">
             <div class="text-muted-foreground">Customer name</div>
             <div class="font-medium text-foreground text-right truncate">{{ displayName }}</div>
@@ -115,9 +107,8 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { Card, CardContent, Button, Badge } from '@motork/component-library/future/primitives'
-import { MoreHorizontal, Plus, ExternalLink, Copy } from 'lucide-vue-next'
+import { MoreHorizontal, Plus, Copy } from 'lucide-vue-next'
 import { useToastStore } from '@/stores/toast'
 
 const props = defineProps({
@@ -125,13 +116,11 @@ const props = defineProps({
   account: { type: Object, default: null },
   cars: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
-  showOpenInNewTab: { type: Boolean, default: false },
   customerId: { type: [Number, String], default: null },
   customerType: { type: String, default: 'contact' }
 })
 
 const emit = defineEmits(['add-tag'])
-const router = useRouter()
 const toastStore = useToastStore()
 
 const copyPhone = async () => {
@@ -141,16 +130,6 @@ const copyPhone = async () => {
     toastStore.pushToast('success', 'Phone number copied to clipboard')
   } catch {
     toastStore.pushToast('error', 'Failed to copy phone number')
-  }
-}
-
-const openFullPage = () => {
-  if (props.customerId) {
-    const route = router.resolve({
-      path: `/customer/${props.customerId}`,
-      query: { type: props.customerType }
-    })
-    window.open(route.href, '_blank')
   }
 }
 

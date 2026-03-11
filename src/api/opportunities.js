@@ -236,12 +236,24 @@ export const addContract = async (opportunityId, contractData) => {
     version: opportunity.contracts.length + 1,
     contractSigned: false,
     esignatureCollectedDate: null,
-    status: 'active',
-    // Locked terms from accepted offer
+    status: contractData.contractStatus || contractData.status || 'active',
     lockedOfferId: contractData.lockedOfferId || null,
     lockedTradeInLabel: contractData.lockedTradeInLabel || '',
     lockedFinancingLabel: contractData.lockedFinancingLabel || '',
-    lockedPrice: contractData.lockedPrice || 0
+    lockedPrice: contractData.lockedPrice || 0,
+    // Extended contract fields
+    deliveryDate: contractData.deliveryDate || null,
+    expectedDeliveryDate: contractData.expectedDeliveryDate || null,
+    contractExternalId: contractData.contractExternalId || '',
+    contact: contractData.contact || null,
+    vehicle: contractData.vehicle || null,
+    tradeIn: contractData.tradeIn || null,
+    financial: contractData.financial || null,
+    paymentMethods: contractData.paymentMethods || [],
+    legal: contractData.legal || null,
+    contractOwner: contractData.contractOwner || null,
+    source: contractData.source || null,
+    dealLocation: contractData.dealLocation || null
   }
 
   opportunity.contracts.push(newContract)
@@ -253,6 +265,44 @@ export const addContract = async (opportunityId, contractData) => {
 
   await opportunityRepository.update(opportunityId, opportunity)
   return newContract
+}
+
+/**
+ * Update an existing contract on an opportunity
+ * @param {number|string} opportunityId - Opportunity ID
+ * @param {number|string} contractId - Contract ID
+ * @param {Object} updates - Fields to update (e.g. deliveryDate, expectedDeliveryDate)
+ * @returns {Promise<Object>} Updated contract
+ */
+export const updateContract = async (opportunityId, contractId, updates) => {
+  await delay()
+
+  const opportunity = await opportunityService.findById(opportunityId)
+  if (!opportunity) throw new Error('Opportunity not found')
+  if (!opportunity.contracts?.length) throw new Error('No contracts found')
+
+  const contractIndex = opportunity.contracts.findIndex(
+    c => String(c.id) === String(contractId)
+  )
+  if (contractIndex === -1) throw new Error('Contract not found')
+
+  const contract = opportunity.contracts[contractIndex]
+  const allowedKeys = [
+    'deliveryDate',
+    'expectedDeliveryDate',
+    'contractNotes',
+    'status',
+    'contractExternalId'
+  ]
+  const filtered = {}
+  for (const key of allowedKeys) {
+    if (updates[key] !== undefined) filtered[key] = updates[key]
+  }
+  opportunity.contracts[contractIndex] = { ...contract, ...filtered }
+  opportunity.lastActivity = new Date().toISOString()
+
+  await opportunityRepository.update(opportunityId, opportunity)
+  return opportunity.contracts[contractIndex]
 }
 
 // Delete contract (clear contractDate and revert offer status if auto-accepted)

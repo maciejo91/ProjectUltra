@@ -25,7 +25,7 @@
         v-for="item in filteredItems"
         :key="item.compositeId"
         class="border rounded-lg p-4 bg-white shadow-sm flex items-start gap-4 cursor-pointer hover:shadow-md transition-shadow"
-        @click="$emit('click', item)"
+        @click="$emit('click', item, filteredItems)"
       >
         <!-- Car Image or Icon -->
         <div class="w-24 h-16 bg-muted rounded overflow-hidden flex items-center justify-center shrink-0">

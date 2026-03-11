@@ -9,6 +9,7 @@
       :filtered-customer-rows="customerRowsFromState"
       @close="handleBack"
       @customer-navigate="handleCustomerNavigate"
+      @navigate-to-customer="handleNavigateToCustomer"
     />
   </div>
 </template>
@@ -34,6 +35,11 @@ function handleBack() {
     ? { highlight: `customer-${customerId.value}` }
     : {}
   router.push({ path: '/customers', query })
+}
+
+function handleNavigateToCustomer(id, type) {
+  const query = type === 'account' ? { type: 'account' } : {}
+  router.push({ path: `/customer/${id}`, query: { from: 'customers', ...query }, state: { customerRows: [] } })
 }
 
 function handleCustomerNavigate(direction) {

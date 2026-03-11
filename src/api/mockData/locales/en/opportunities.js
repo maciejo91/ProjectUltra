@@ -123,7 +123,7 @@ export const mockOpportunities = [
     }
   },
 
-  // 3. In Negotiation - Offer Sent
+  // 3. OFB: In Negotiation - Offer Sent, 6+ days, no contract (banner showcase – expand Follow up → Complete Survey)
   {
     id: 3,
     customerId: 3,
@@ -139,7 +139,7 @@ export const mockOpportunities = [
     offers: [
       {
         id: 'offer-3',
-        createdAt: createHourOffset(-3),
+        createdAt: createDateOffset(-8),
         vehicleBrand: 'Mercedes-Benz',
         vehicleModel: 'C-Class',
         vehicleYear: 2024,
@@ -150,15 +150,15 @@ export const mockOpportunities = [
     ],
     tags: [],
     value: 48000,
-    expectedCloseDate: createHourOffset(14),
+    expectedCloseDate: createDateOffset(7),
     assignee: 'David Miller',
-    createdAt: createHourOffset(-5),
-    lastActivity: createHourOffset(-2),
-    nextActionDue: createHourOffset(8),
+    createdAt: createDateOffset(-10),
+    lastActivity: createDateOffset(-6),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
 
-  // 4. In Negotiation - Contract Pending (Set Delivery Date step)
+  // 4. CFB (Contract Pending): In Negotiation - contract signed 8 days ago, no delivery (banner showcase)
   {
     id: 4,
     customerId: 4,
@@ -174,7 +174,7 @@ export const mockOpportunities = [
     offers: [
       {
         id: 'offer-4',
-        createdAt: createDateOffset(-8),
+        createdAt: createDateOffset(-12),
         vehicleBrand: 'Porsche',
         vehicleModel: '911',
         vehicleYear: 2024,
@@ -186,25 +186,27 @@ export const mockOpportunities = [
     contracts: [
       {
         id: 'contract-4-1',
-        contractDate: createDateOffset(-5),
-        contractNotes: 'Pending signature',
-        contractSigned: false,
+        contractDate: createDateOffset(-8),
+        contractNotes: 'Signed',
+        contractSigned: true,
+        esignatureCollectedDate: createDateOffset(-8),
         version: 1,
-        status: 'pending'
+        status: 'signed'
       }
     ],
     tags: ['Premium'],
     value: 125000,
-    expectedCloseDate: createHourOffset(12),
+    expectedCloseDate: createDateOffset(7),
     assignee: 'David Miller',
-    createdAt: createHourOffset(-6),
-    lastActivity: createHourOffset(-2),
-    nextActionDue: createHourOffset(20),
-    contractDate: createDateOffset(-5),
+    createdAt: createDateOffset(-15),
+    lastActivity: createDateOffset(-7),
+    nextActionDue: createDateOffset(2),
+    contractDate: createDateOffset(-8),
+    deliveryDate: null,
     scheduledAppointment: null
   },
 
-  // 5. Closed Won – no delivery date (Schedule Delivery)
+  // 5. CFB: Closed Won – contract signed 8 days ago, no delivery date (banner showcase)
   {
     id: 5,
     customerId: 5,
@@ -221,7 +223,7 @@ export const mockOpportunities = [
     offers: [
       {
         id: 'offer-5',
-        createdAt: createDateOffset(-15),
+        createdAt: createDateOffset(-20),
         vehicleBrand: 'Volkswagen',
         vehicleModel: 'Golf',
         vehicleYear: 2024,
@@ -233,10 +235,10 @@ export const mockOpportunities = [
     contracts: [
       {
         id: 'contract-5-1',
-        contractDate: createDateOffset(-3),
+        contractDate: createDateOffset(-8),
         contractNotes: 'Signed',
         contractSigned: true,
-        esignatureCollectedDate: createDateOffset(-3),
+        esignatureCollectedDate: createDateOffset(-8),
         version: 1,
         status: 'signed'
       }
@@ -245,11 +247,11 @@ export const mockOpportunities = [
     value: 32000,
     expectedCloseDate: null,
     assignee: 'Sarah Jenkins',
-    createdAt: createHourOffset(-8),
-    lastActivity: createHourOffset(-1),
-    nextActionDue: createHourOffset(12),
-    closedDate: createDateOffset(-3),
-    contractDate: createDateOffset(-3),
+    createdAt: createDateOffset(-25),
+    lastActivity: createDateOffset(-7),
+    nextActionDue: createDateOffset(1),
+    closedDate: createDateOffset(-8),
+    contractDate: createDateOffset(-8),
     deliveryDate: null,
     scheduledAppointment: null
   },
@@ -315,7 +317,7 @@ export const mockOpportunities = [
     scheduledAppointment: null
   },
 
-  // 8. In Negotiation - Offer Feedback
+  // 8. NFU / Offer Feedback Missing: In Negotiation - Offer Feedback, 6+ days, no appointment (banner showcase)
   {
     id: 8,
     customerId: 10,
@@ -331,7 +333,7 @@ export const mockOpportunities = [
     offers: [
       {
         id: 'offer-8',
-        createdAt: createHourOffset(-5),
+        createdAt: createDateOffset(-10),
         vehicleBrand: 'BMW',
         vehicleModel: 'iX xDrive50',
         vehicleYear: 2024,
@@ -342,11 +344,11 @@ export const mockOpportunities = [
     ],
     tags: [],
     value: 105000,
-    expectedCloseDate: createHourOffset(16),
+    expectedCloseDate: createDateOffset(7),
     assignee: 'Sarah Jenkins',
-    createdAt: createHourOffset(-6),
-    lastActivity: createHourOffset(-1),
-    nextActionDue: createHourOffset(10),
+    createdAt: createDateOffset(-10),
+    lastActivity: createDateOffset(-6),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
 
@@ -434,7 +436,7 @@ export const mockOpportunities = [
     scheduledAppointment: null
   },
 
-  // 10. Closed Won - Awaiting Delivery (delivery date scheduled, not yet delivered)
+  // 10. DFB (Awaiting Delivery): Closed Won - delivery date 5 days ago, not yet delivered (banner showcase)
   {
     id: 10,
     customerId: 12,
@@ -451,7 +453,7 @@ export const mockOpportunities = [
     offers: [
       {
         id: 'offer-10',
-        createdAt: createDateOffset(-10),
+        createdAt: createDateOffset(-15),
         vehicleBrand: 'Toyota',
         vehicleModel: 'Camry',
         vehicleYear: 2024,
@@ -463,10 +465,10 @@ export const mockOpportunities = [
     contracts: [
       {
         id: 'contract-10-1',
-        contractDate: createDateOffset(-5),
+        contractDate: createDateOffset(-10),
         contractNotes: 'Signed',
         contractSigned: true,
-        esignatureCollectedDate: createDateOffset(-5),
+        esignatureCollectedDate: createDateOffset(-10),
         version: 1,
         status: 'signed'
       }
@@ -475,16 +477,17 @@ export const mockOpportunities = [
     value: 38000,
     expectedCloseDate: null,
     assignee: 'Sarah Jenkins',
-    createdAt: createDateOffset(-12),
-    lastActivity: createDateOffset(-2),
-    nextActionDue: createDateOffset(3),
-    closedDate: createDateOffset(-5),
-    contractDate: createDateOffset(-5),
-    deliveryDate: createDateOffset(3),
+    createdAt: createDateOffset(-20),
+    lastActivity: createDateOffset(-4),
+    nextActionDue: createDateOffset(1),
+    closedDate: createDateOffset(-10),
+    contractDate: createDateOffset(-10),
+    deliveryDate: createDateOffset(-5),
+    actualDeliveryDate: null,
     scheduledAppointment: null
   },
 
-  // 11. Closed Won - Delivered
+  // 11. DFB (Delivered): Closed Won - actual delivery 5 days ago (post-delivery survey, banner showcase)
   {
     id: 11,
     customerId: 13,
@@ -501,7 +504,7 @@ export const mockOpportunities = [
     offers: [
       {
         id: 'offer-11',
-        createdAt: createDateOffset(-20),
+        createdAt: createDateOffset(-25),
         vehicleBrand: 'Honda',
         vehicleModel: 'Accord',
         vehicleYear: 2024,
@@ -513,10 +516,10 @@ export const mockOpportunities = [
     contracts: [
       {
         id: 'contract-11-1',
-        contractDate: createDateOffset(-14),
+        contractDate: createDateOffset(-20),
         contractNotes: 'Signed',
         contractSigned: true,
-        esignatureCollectedDate: createDateOffset(-14),
+        esignatureCollectedDate: createDateOffset(-20),
         version: 1,
         status: 'signed'
       }
@@ -525,12 +528,13 @@ export const mockOpportunities = [
     value: 36000,
     expectedCloseDate: null,
     assignee: 'David Miller',
-    createdAt: createDateOffset(-25),
-    lastActivity: createDateOffset(-5),
+    createdAt: createDateOffset(-30),
+    lastActivity: createDateOffset(-4),
     nextActionDue: null,
-    closedDate: createDateOffset(-14),
-    contractDate: createDateOffset(-14),
-    deliveryDate: createDateOffset(-5),
+    closedDate: createDateOffset(-20),
+    contractDate: createDateOffset(-20),
+    deliveryDate: createDateOffset(-8),
+    actualDeliveryDate: createDateOffset(-5),
     scheduledAppointment: null
   },
 
@@ -555,6 +559,54 @@ export const mockOpportunities = [
     createdAt: createHourOffset(-6),
     lastActivity: createHourOffset(-2),
     nextActionDue: createDateOffset(3),
+    scheduledAppointment: null
+  },
+
+  // OOFB: Qualified, no offers, 10 days old (7–13 day threshold, banner showcase)
+  {
+    id: 23,
+    customerId: 1,
+    source: 'Website',
+    sourceDetails: 'Contact form',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('BMW', '4 Series', 2024, 52000, { vin: 'WBA4B1C50FK123456' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'Qualified',
+    negotiationSubstatus: null,
+    offers: [],
+    tags: [],
+    value: 52000,
+    expectedCloseDate: createDateOffset(14),
+    assignee: 'David Miller',
+    createdAt: createDateOffset(-10),
+    lastActivity: createDateOffset(-9),
+    nextActionDue: createDateOffset(1),
+    scheduledAppointment: null
+  },
+
+  // UFB: Qualified, no offers, 16 days old (14+ day threshold, banner showcase)
+  {
+    id: 24,
+    customerId: 2,
+    source: 'Google Ads',
+    sourceDetails: 'Summer Campaign',
+    fiscalEntity: 'MotorK',
+    requestType: 'Test Drive',
+    requestedCar: baseRequestedCar('Mercedes-Benz', 'E-Class', 2024, 62000, { vin: 'WDD2130411A123456' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'Qualified',
+    negotiationSubstatus: null,
+    offers: [],
+    tags: [],
+    value: 62000,
+    expectedCloseDate: createDateOffset(7),
+    assignee: 'Sarah Jenkins',
+    createdAt: createDateOffset(-16),
+    lastActivity: createDateOffset(-15),
+    nextActionDue: createDateOffset(1),
     scheduledAppointment: null
   },
 
@@ -723,6 +775,141 @@ export const mockOpportunities = [
     lastActivity: createDateOffset(-8),
     nextActionDue: createDateOffset(-5),
     closedDate: createDateOffset(-8),
+    scheduledAppointment: null
+  },
+
+  // 20a. Duplicate candidate – same customer + same vehicle as Opp 1 (BMW 3 Series)
+  {
+    id: 21,
+    customerId: 1,
+    source: 'Website',
+    sourceDetails: 'Contact form',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('BMW', '3 Series', 2024, 45000),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'Qualified',
+    negotiationSubstatus: null,
+    offers: [],
+    tags: [],
+    value: 45000,
+    expectedCloseDate: createDateOffset(14),
+    assignee: 'Salsabeel Khaleel',
+    createdAt: createHourOffset(-1),
+    lastActivity: createHourOffset(-1),
+    nextActionDue: createHourOffset(8),
+    scheduledAppointment: null
+  },
+
+  // 20b. Duplicate candidate – same customer + same vehicle as Opp 2 (Audi A4)
+  {
+    id: 22,
+    customerId: 2,
+    source: 'Website',
+    sourceDetails: 'Lead form',
+    fiscalEntity: 'MotorK',
+    requestType: 'Test Drive',
+    requestedCar: baseRequestedCar('Audi', 'A4', 2024, 42000, { vin: 'WAUZZZ8V9KA123457' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'Qualified',
+    negotiationSubstatus: null,
+    offers: [],
+    tags: [],
+    value: 42000,
+    expectedCloseDate: createDateOffset(10),
+    assignee: 'Sarah Jenkins',
+    createdAt: createHourOffset(-2),
+    lastActivity: createHourOffset(-2),
+    nextActionDue: createHourOffset(12),
+    scheduledAppointment: null
+  },
+
+  // 25. NS (No-Show): Appointment Scheduled – appointment in the past, not completed (Mark No-Show task)
+  {
+    id: 25,
+    customerId: 25,
+    source: 'Website',
+    sourceDetails: 'Contact form',
+    fiscalEntity: 'MotorK',
+    requestType: 'Test Drive',
+    requestedCar: baseRequestedCar('Hyundai', 'Ioniq 6', 2024, 48000, { vin: 'KM8J3CA46NU123456' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'Qualified',
+    negotiationSubstatus: null,
+    offers: [],
+    tags: ['EV'],
+    value: 48000,
+    expectedCloseDate: createDateOffset(7),
+    assignee: 'Sarah Jenkins',
+    createdAt: createDateOffset(-5),
+    lastActivity: createDateOffset(-2),
+    nextActionDue: createDateOffset(1),
+    scheduledAppointment: {
+      id: 25,
+      start: createDateTimeOffset(-1, 10, 0),
+      end: createDateTimeOffset(-1, 11, 0),
+      type: 'Test Drive',
+      assignee: 'Sarah Jenkins',
+      customerId: 25,
+      opportunityId: 25,
+      duration: 60,
+      status: 'confirmed',
+      noShowCount: 0,
+      lastNoShowDate: null
+    }
+  },
+
+  // 26. DFB (Contract Pending): delivery date set and passed – DFB task + Close Won action
+  {
+    id: 26,
+    customerId: 26,
+    source: 'Phone',
+    sourceDetails: '',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
+    requestedCar: baseRequestedCar('Skoda', 'Octavia', 2024, 35000, { vin: 'TMBJJ9NE3N0123456' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'In Negotiation',
+    negotiationSubstatus: 'Offer Sent',
+    offers: [
+      {
+        id: 'offer-26',
+        createdAt: createDateOffset(-12),
+        vehicleBrand: 'Skoda',
+        vehicleModel: 'Octavia',
+        vehicleYear: 2024,
+        price: 35000,
+        status: 'accepted',
+        data: { brand: 'Skoda', model: 'Octavia', year: 2024, price: 35000, financingType: 'cash', image: DEFAULT_CAR_IMAGE }
+      }
+    ],
+    contracts: [
+      {
+        id: 'contract-26-1',
+        contractDate: createDateOffset(-8),
+        contractNotes: 'Signed',
+        contractSigned: true,
+        esignatureCollectedDate: createDateOffset(-8),
+        version: 1,
+        status: 'signed'
+      }
+    ],
+    tags: [],
+    value: 35000,
+    expectedCloseDate: createDateOffset(3),
+    assignee: 'David Miller',
+    createdAt: createDateOffset(-20),
+    lastActivity: createDateOffset(-4),
+    nextActionDue: createDateOffset(1),
+    contractDate: createDateOffset(-8),
+    deliveryDate: createDateTimeOffset(-5, 14, 0),
+    deliveryLocation: 'At Dealership',
+    deliveryNotes: 'Customer to collect',
+    actualDeliveryDate: null,
     scheduledAppointment: null
   },
 

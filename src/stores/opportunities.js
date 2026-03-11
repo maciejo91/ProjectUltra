@@ -129,34 +129,8 @@ export const useOpportunitiesStore = defineStore('opportunities', () => {
       const numericId = parseInt(id, 10)
       const currentOpp = currentOpportunity.value?.id === numericId ? currentOpportunity.value : opportunities.value.find(o => o.id === numericId)
       
-      // Auto-transition from "In Negotiation - Contract Pending" to "Closed Won - Awaiting Delivery"
-      // when both delivery date and e-signatures are completed
-      if (!updates.stage && currentOpp?.stage === 'In Negotiation' && currentOpp?.contractDate) {
-        const { getDisplayStage } = await import('@/utils/stageMapper')
-        const displayStage = getDisplayStage(currentOpp, 'opportunity')
-        
-        if (displayStage === 'In Negotiation - Contract Pending') {
-          // Check current state after applying updates
-          const hasDeliveryDate = updates.deliveryDate !== undefined ? updates.deliveryDate : currentOpp.deliveryDate
-          const hasESignature = updates.contractSigned !== undefined ? updates.contractSigned : 
-                               updates.esignatureCollectedDate !== undefined ? !!updates.esignatureCollectedDate :
-                               currentOpp.contractSigned || currentOpp.esignatureCollectedDate
-          
-          // Both steps completed - auto-transition to Closed Won
-          if (hasDeliveryDate && hasESignature) {
-            updates.stage = 'Closed Won'
-            updates.deliverySubstatus = 'Awaiting Delivery'
-            
-            // Track completion dates if not already set
-            if (updates.deliveryDate && !currentOpp.deliveryDateSetDate && !updates.deliveryDateSetDate) {
-              updates.deliveryDateSetDate = new Date().toISOString()
-            }
-            if ((updates.contractSigned || updates.esignatureCollectedDate) && !currentOpp.esignatureCollectedDate && !updates.esignatureCollectedDate) {
-              updates.esignatureCollectedDate = new Date().toISOString()
-            }
-          }
-        }
-      }
+      // Closed Won is manual: user must use "Close as Won" action from Contract Pending.
+      // No auto-transition when delivery date and e-signatures are completed.
       
       // Check if contract is being deleted (contractDate cleared)
       if (updates.contractDate === null && currentOpp?.contractDate) {
@@ -226,30 +200,6 @@ export const useOpportunitiesStore = defineStore('opportunities', () => {
       }
       if (currentOpportunity.value?.id === numericId) {
         currentOpportunity.value = updated
-      }
-      
-      // Check for auto-transition after update (if it happened)
-      if (updated.stage === 'Closed Won' && currentOpp?.stage === 'In Negotiation' && 
-          currentOpp?.contractDate && !updates.stage) {
-        // Auto-transition occurred - add activity
-        const { getDisplayStage } = await import('@/utils/stageMapper')
-        const previousDisplayStage = getDisplayStage(currentOpp, 'opportunity')
-        
-        if (previousDisplayStage === 'In Negotiation - Contract Pending') {
-          await addActivity(id, {
-            type: 'stage-transition',
-            user: 'System',
-            action: 'auto-transitioned to Closed Won - Awaiting Delivery',
-            content: 'Both delivery date and e-signatures completed. Opportunity moved to Closed Won - Awaiting Delivery',
-            data: {
-              fromStage: 'In Negotiation - Contract Pending',
-              toStage: 'Closed Won - Awaiting Delivery',
-              deliveryDateSetDate: updated.deliveryDateSetDate,
-              esignatureCollectedDate: updated.esignatureCollectedDate
-            },
-            timestamp: new Date().toISOString()
-          })
-        }
       }
       
       // Add audit log for contract deletion if needed

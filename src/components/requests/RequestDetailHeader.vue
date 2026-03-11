@@ -1,15 +1,15 @@
 <template>
   <header class="shrink-0 flex items-center justify-between gap-4 px-4 py-3 border-b border-border bg-background">
-    <div class="flex items-start gap-2 min-w-0 flex-1">
+    <div class="flex items-start gap-1.5 min-w-0 flex-1">
       <Button
         v-if="isFullPage"
-        variant="outline"
+        variant="ghost"
         size="icon"
-        class="rounded-sm shrink-0 -ml-0.5 mt-0.5"
+        class="rounded-sm shrink-0 -ml-0.5"
         aria-label="Back to requests"
         @click="$emit('close')"
       >
-        <ArrowLeft class="size-4 text-muted-foreground" />
+        <ChevronLeft class="size-4 text-muted-foreground" />
       </Button>
       <div class="flex flex-col min-w-0 flex-1">
         <div class="flex items-center gap-2 min-w-0">
@@ -34,48 +34,32 @@
                 <ChevronDown class="size-3 shrink-0" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent class="w-48" align="start">
+            <DropdownMenuContent class="min-w-48 max-h-64 overflow-y-auto p-1.5" align="start">
               <DropdownMenuItem
-                v-if="showCloseAction"
-                class="flex cursor-pointer items-center gap-2"
-                @select="emit('open-close')"
+                v-for="stage in statusOptions"
+                :key="stage"
+                class="flex cursor-pointer items-center rounded-sm px-2 py-1.5"
+                @select="emit('update-status', stage)"
               >
-                <XCircle class="size-4 shrink-0" />
-                Close
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                v-if="showConvertAction"
-                class="flex cursor-pointer items-center gap-2"
-                @select="emit('open-convert')"
-              >
-                <Sparkles class="size-4 shrink-0" />
-                Convert to Opportunity
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                v-if="showReopenLeadAction"
-                class="flex cursor-pointer items-center gap-2"
-                @select="emit('reopen-lead')"
-              >
-                <RotateCcw class="size-4 shrink-0" />
-                Reopen as Lead
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                v-if="showReopenOppAction"
-                class="flex cursor-pointer items-center gap-2"
-                @select="emit('reopen-opportunity')"
-              >
-                <RotateCcw class="size-4 shrink-0" />
-                Reopen as Opportunity
+                <span
+                  class="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium leading-none"
+                  :class="[
+                    getStageColorClass(stage),
+                    stage === displayStage && 'ring-1 ring-ring ring-inset'
+                  ]"
+                >
+                  {{ stage }}
+                </span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
         <TaskAssigneeDateBar
-          v-if="request && hasAssignee"
+          v-if="request"
           :task="request"
           variant="inline"
-          assignee-only
           class="mt-0.5 pt-0 pb-1 shrink-0 min-w-0"
+          @postpone-expected-close="$emit('postpone-expected-close')"
           @reassigned="$emit('reassigned', $event)"
         />
       </div>
@@ -115,7 +99,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { ArrowLeft, ChevronLeft, ChevronRight, X, ChevronDown, XCircle, Sparkles, RotateCcw } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight, X, ChevronDown } from 'lucide-vue-next'
 import {
   Button,
   DropdownMenu,
@@ -124,9 +108,9 @@ import {
   DropdownMenuItem
 } from '@motork/component-library/future/primitives'
 import TaskAssigneeDateBar from '@/components/tasks/TaskAssigneeDateBar.vue'
-import { getDisplayStage } from '@/utils/stageMapper'
+import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
 import { getStageBadgeClass } from '@/utils/formatters'
-import { OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
+import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 
 const props = defineProps({
   request: {
@@ -147,10 +131,7 @@ const emit = defineEmits([
   'close',
   'previous',
   'next',
-  'open-close',
-  'open-convert',
-  'reopen-lead',
-  'reopen-opportunity',
+  'update-status',
   'postpone-expected-close',
   'reassigned'
 ])
@@ -164,43 +145,38 @@ const stageClass = computed(() => {
   return getStageBadgeClass(displayStage.value)
 })
 
-const isLeadClosed = computed(() => {
-  if (props.request?.type !== 'lead') return false
-  return props.request.isDisqualified === true
-})
+function getStageColorClass(stage) {
+  if (!props.request) return 'bg-muted text-muted-foreground'
+  return getStageColor(stage, props.request.type || 'lead')
+}
 
-const isOppClosed = computed(() => {
-  if (props.request?.type !== 'opportunity') return false
-  const stage = props.request.displayStage || props.request.stage
+const statusOptions = computed(() => {
+  if (!props.request) return []
+  if (props.request.type === 'lead') {
+    return Object.values(LEAD_STAGES)
+  }
   return [
+    OPPORTUNITY_STAGES.QUALIFIED,
+    OPPORTUNITY_STAGES.AWAITING_APPOINTMENT,
+    OPPORTUNITY_STAGES.APPOINTMENT_SCHEDULED,
+    OPPORTUNITY_STAGES.IN_NEGOTIATION,
+    `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Sent`,
+    `${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Awaiting Offer`,
+    OPPORTUNITY_STAGES.OFFER_FEEDBACK_MISSING,
+    OPPORTUNITY_STAGES.CONTRACT_PENDING,
     OPPORTUNITY_STAGES.CLOSED_WON,
     OPPORTUNITY_STAGES.CLOSED_LOST,
     OPPORTUNITY_STAGES.ABANDONED
-  ].includes(stage)
+  ]
 })
-
-const showCloseAction = computed(() => {
-  if (!props.request) return false
-  if (props.request.type === 'lead') return !isLeadClosed.value
-  if (props.request.type === 'opportunity') return !isOppClosed.value
-  return false
-})
-
-const showConvertAction = computed(
-  () => props.request?.type === 'lead' && !isLeadClosed.value
-)
-
-const showReopenLeadAction = computed(
-  () => props.request?.type === 'lead' && isLeadClosed.value
-)
-
-const showReopenOppAction = computed(
-  () => props.request?.type === 'opportunity' && isOppClosed.value
-)
 
 const currentIndex = computed(() => {
-  if (!props.request?.compositeId || !props.filteredRequests?.length) return -1
-  return props.filteredRequests.findIndex(r => r.compositeId === props.request.compositeId)
+  const requestId = props.request?.compositeId
+  if (!requestId || !props.filteredRequests?.length) return -1
+  const idStr = String(requestId)
+  return props.filteredRequests.findIndex(
+    (r) => String(r.compositeId) === idStr || (r.type === props.request?.type && String(r.id) === String(props.request?.id))
+  )
 })
 
 const hasPrevious = computed(() => currentIndex.value > 0)
@@ -228,7 +204,4 @@ const titleText = computed(() => {
   return `${customerName.value} requests ${vehicleDisplayName.value}`
 })
 
-const hasAssignee = computed(() => {
-  return !!(props.request?.assignee || props.request?.owner || props.request?.assignedTo)
-})
 </script>

@@ -8,13 +8,13 @@
       <div class="customer-profile-drawer-header-content">
         <Button
           v-if="from"
-          variant="secondary"
+          variant="ghost"
           size="icon"
           class="rounded-sm shrink-0 -ml-0.5"
           aria-label="Back to customers"
           @click="emit('close')"
         >
-          <ArrowLeft :size="16" class="text-muted-foreground" />
+          <ChevronLeft :size="16" class="text-muted-foreground" />
         </Button>
         <div class="min-w-0 flex-1 flex items-center min-h-0">
           <h3 class="text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
@@ -63,7 +63,6 @@
         :account="accountData"
         :cars="customerCars"
         :loading="loadingCustomer"
-        :show-open-in-new-tab="!!(showCloseButton || from)"
         :customer-id="customerId"
         :customer-type="customerType"
         @add-tag="showAddTagModal = true"
@@ -72,6 +71,14 @@
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-muted/30">
+      <CustomerDuplicateDetectedCard
+        v-if="customer && potentialDuplicates.length"
+        :potential-duplicates="potentialDuplicates"
+        :merge-loading="mergeLoading"
+        class="shrink-0 mx-4 mt-4 mb-4"
+        @merge="handleMergeClick"
+        @customer-navigate="handleDuplicateCustomerNavigate"
+      />
       <CustomerProfileContent
         v-model:active-tab="activeTab"
         :summary="customerSummary"
@@ -123,6 +130,14 @@
       :title="comingSoonTitle"
       @close="showComingSoonModal = false"
     />
+
+    <MergeCustomerConfirmModal
+      :show="showMergeModal"
+      :duplicate-summary="mergeDuplicateSummary"
+      :loading="mergeLoading"
+      @close="showMergeModal = false; duplicateToMerge = null"
+      @confirm="handleMergeConfirm"
+    />
   </div>
 </template>
 
@@ -130,18 +145,23 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@motork/component-library/future/primitives'
-import { ArrowLeft, X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useCustomersStore } from '@/stores/customers'
 import { useUserStore } from '@/stores/user'
+import { useToastStore } from '@/stores/toast'
 import CustomerProfileSidebar from '@/components/customer/profile/CustomerProfileSidebar.vue'
 import CustomerProfileContent from '@/components/customer/profile/CustomerProfileContent.vue'
 import AddLeadOpportunityModal from '@/components/modals/AddLeadOpportunityModal.vue'
 import CreateEventModal from '@/components/modals/CreateEventModal.vue'
 import AddTagModal from '@/components/modals/AddTagModal.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
-import { fetchLeadsByCustomerId, fetchOpportunitiesByCustomerId, fetchCustomerCars, fetchTasksByCustomerId, fetchContactsByAccountId } from '@/api/contacts'
+import CustomerDuplicateDetectedCard from '@/components/customer/CustomerDuplicateDetectedCard.vue'
+import MergeCustomerConfirmModal from '@/components/modals/MergeCustomerConfirmModal.vue'
+import { useCustomerDuplicateDetection } from '@/composables/useCustomerDuplicateDetection'
+import { getCustomerSummary } from '@/api/mergeCustomer'
+import { fetchLeadsByCustomerId, fetchOpportunitiesByCustomerId, fetchCustomerCars, fetchTasksByCustomerId } from '@/api/contacts'
 import { fetchAccountById } from '@/api/accounts'
 import { fetchLeadActivities } from '@/api/leads'
 import { fetchOpportunityActivities } from '@/api/opportunities'
@@ -175,11 +195,12 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close', 'customer-navigate'])
+const emit = defineEmits(['close', 'customer-navigate', 'navigate-to-customer'])
 
 const router = useRouter()
 const customersStore = useCustomersStore()
 const userStore = useUserStore()
+const toastStore = useToastStore()
 
 // Loading states
 const loadingCustomer = ref(false)
@@ -200,6 +221,11 @@ const customerAppointments = ref([])
 const customerTasks = ref([])
 const customerCars = ref([])
 
+// Duplicate merge
+const showMergeModal = ref(false)
+const duplicateToMerge = ref(null)
+const mergeLoading = ref(false)
+
 // Modals
 const showAddModal = ref(false)
 const addModalType = ref('lead')
@@ -213,6 +239,20 @@ const activeTab = ref('overview')
 const currentUser = computed(() => userStore.currentUser)
 
 const customer = computed(() => customerData.value || customersStore.currentCustomer)
+
+const customerForDuplicateDetection = computed(() => {
+  const c = customer.value
+  if (!c) return null
+  return { ...c, type: c.type || (c.company && c.company !== '' ? 'account' : 'contact') }
+})
+
+const { potentialDuplicates } = useCustomerDuplicateDetection(customerForDuplicateDetection)
+
+const mergeDuplicateSummary = computed(() => {
+  const d = duplicateToMerge.value
+  if (!d) return ''
+  return getCustomerSummary(d)
+})
 
 const customerSummary = computed(() => {
    return customerData.value?.summary || ''
@@ -375,7 +415,34 @@ const handleAddModalSave = async () => {
   await loadCustomerData()
 }
 
+function handleMergeClick(duplicate) {
+  duplicateToMerge.value = duplicate
+  showMergeModal.value = true
+}
+
+async function handleMergeConfirm() {
+  if (!customer.value?.id || !duplicateToMerge.value) return
+  mergeLoading.value = true
+  try {
+    await customersStore.mergeCustomer(customer.value, duplicateToMerge.value)
+    toastStore.pushToast('success', 'Customer merged successfully')
+    showMergeModal.value = false
+    duplicateToMerge.value = null
+    await customersStore.fetchCustomers()
+    await loadCustomerData()
+  } catch (err) {
+    toastStore.pushToast('error', err?.message || 'Failed to merge customer')
+  } finally {
+    mergeLoading.value = false
+  }
+}
+
+function handleDuplicateCustomerNavigate(dupId, dupType) {
+  emit('navigate-to-customer', dupId, dupType)
+}
+
 onMounted(() => {
+  customersStore.fetchCustomers()
   loadCustomerData()
 })
 
@@ -398,7 +465,7 @@ watch(() => props.customerId, () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.5rem;
   width: 100%;
 }
 

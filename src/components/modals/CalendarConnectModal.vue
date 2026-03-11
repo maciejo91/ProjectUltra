@@ -7,7 +7,7 @@
           <DialogTitle>Connect Calendar</DialogTitle>
         </DialogHeader>
 
-        <div class="flex-1 overflow-y-auto px-4 py-2 w-full">
+        <div class="flex-1 overflow-y-auto px-2 py-2 w-full">
           <!-- Connecting State -->
           <div v-if="connectingTo" class="text-center py-8 w-full">
       <div
@@ -58,18 +58,13 @@
         </div>
       </div>
 
-      <!-- Available Connections -->
-      <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-        {{ connectedCalendars.length > 0 ? 'Add another calendar' : 'Choose a calendar provider' }}
-      </p>
-
       <!-- Google Calendar -->
       <button
         @click="$emit('connect', 'google')"
-        class="w-full flex items-center gap-4 p-4 bg-surface border border-border rounded-xl hover:border-gray-300 hover:shadow-sm transition-all group"
+        class="w-full flex items-center gap-3 p-3 bg-surface border border-border rounded-xl hover:border-gray-300 hover:shadow-sm transition-all group"
       >
-        <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
-          <Calendar class="w-6 h-6 shrink-0 text-red-500" />
+        <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors shrink-0">
+          <Calendar class="w-5 h-5 shrink-0 text-red-500" />
         </div>
         <div class="flex-1 text-left">
           <p class="font-semibold text-foreground">Google Calendar</p>
@@ -81,10 +76,10 @@
       <!-- Microsoft Outlook -->
       <button
         @click="$emit('connect', 'microsoft')"
-        class="w-full flex items-center gap-4 p-4 bg-surface border border-border rounded-xl hover:border-gray-300 hover:shadow-sm transition-all group"
+        class="w-full flex items-center gap-3 p-3 bg-surface border border-border rounded-xl hover:border-gray-300 hover:shadow-sm transition-all group"
       >
-        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-          <Calendar class="w-6 h-6 shrink-0 text-blue-500" />
+        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors shrink-0">
+          <Calendar class="w-5 h-5 shrink-0 text-blue-500" />
         </div>
         <div class="flex-1 text-left">
           <p class="font-semibold text-foreground">Microsoft Outlook</p>

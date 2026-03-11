@@ -79,33 +79,18 @@
             <span>Customers</span>
           </router-link>
 
-          <!-- Vehicles (Lists) Submenu -->
-          <button
+          <!-- Vehicles (single link, same as desktop) -->
+          <router-link
             v-if="navigationVisibility.lists !== false"
-            @click="toggleListsMenu"
-            class="mobile-sidebar-link w-full"
-            :class="{ 'mobile-sidebar-link-active': isActive('/vehicles') || showListsMenu }"
+            to="/vehicles"
+            @click="$emit('close')"
+            class="mobile-sidebar-link"
+            :class="{ 'mobile-sidebar-link-active': isActive('/vehicles') }"
           >
-            <List :size="18" class="shrink-0 sm:hidden" />
-            <List :size="20" class="shrink-0 hidden sm:block" />
+            <CarFront :size="18" class="shrink-0 sm:hidden" />
+            <CarFront :size="20" class="shrink-0 hidden sm:block" />
             <span>Vehicles</span>
-            <ChevronDown :size="14" class="ml-auto transition-transform sm:hidden" :class="{ 'rotate-180': showListsMenu }" />
-            <ChevronDown :size="16" class="ml-auto transition-transform hidden sm:block" :class="{ 'rotate-180': showListsMenu }" />
-          </button>
-          
-          <!-- Lists Submenu Items -->
-          <div v-if="showListsMenu && navigationVisibility.lists !== false" class="pl-8 sm:pl-9 space-y-0.5 sm:space-y-1">
-            <router-link 
-              to="/vehicles"
-              @click="$emit('close')"
-              class="mobile-sidebar-link mobile-sidebar-submenu-link"
-              :class="{ 'mobile-sidebar-link-active': isActive('/vehicles') }"
-            >
-              <CarFront :size="16" class="shrink-0 sm:hidden" />
-              <CarFront :size="18" class="shrink-0 hidden sm:block" />
-              <span>Vehicles</span>
-            </router-link>
-          </div>
+          </router-link>
 
           <!-- Separator -->
           <div class="h-px bg-white/70 my-2 mx-3 shrink-0" aria-hidden="true" />
@@ -118,8 +103,8 @@
             class="mobile-sidebar-link"
             :class="{ 'mobile-sidebar-link-active': isActive('/requests') }"
           >
-            <FileBadge2 :size="18" class="shrink-0 sm:hidden" />
-            <FileBadge2 :size="20" class="shrink-0 hidden sm:block" />
+            <ArrowDownToLine :size="18" class="shrink-0 sm:hidden" />
+            <ArrowDownToLine :size="20" class="shrink-0 hidden sm:block" />
             <span>{{ $t('common.navigation.requests') }}</span>
           </router-link>
 
@@ -321,9 +306,8 @@ import { useTheme } from '@/composables/useTheme'
 import { 
   Plus, 
   Home, 
-  List, 
   ListTodo,
-  FileBadge2,
+  ArrowDownToLine,
   Users, 
   Calendar, 
   LineChart, 
@@ -378,7 +362,6 @@ const firstVisibleRoute = computed(() => {
   return '/tasks'
 })
 
-const showListsMenu = ref(false)
 const showUserMenu = ref(false)
 const showLanguageSubmenu = ref(false)
 const showSearchModal = ref(false)
@@ -412,10 +395,6 @@ const userInitials = computed(() => {
 
 const isActive = (path) => {
   return route.path.startsWith(path)
-}
-
-const toggleListsMenu = () => {
-  showListsMenu.value = !showListsMenu.value
 }
 
 const changeLanguage = (langCode) => {

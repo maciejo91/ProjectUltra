@@ -2,115 +2,128 @@
   <Dialog :open="show" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="flex w-full min-w-[50vw] max-w-[96rem] flex-col min-h-[50vh] max-h-[90vh] p-0">
-        <DialogHeader class="flex-shrink-0 border-b border-border px-6 py-4">
-          <DialogTitle class="text-foreground">Create offer</DialogTitle>
+      <DialogContent class="w-full sm:max-w-5xl max-h-[calc(100vh-4rem)] md:max-h-[calc(100vh-2rem)] flex flex-col p-0" :show-close-button="true">
+        <DialogHeader class="shrink-0 border-b border-border px-6 py-4">
+          <DialogTitle class="text-foreground text-xl font-bold">Create offer</DialogTitle>
         </DialogHeader>
 
-        <div class="flex-1 overflow-y-auto px-8 py-4">
-          <nav class="flex items-center justify-center gap-1 sm:gap-2 mb-4 flex-wrap" aria-label="Steps">
-            <ol class="flex items-center gap-1 sm:gap-2 flex-wrap">
+        <div class="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-8">
+          <nav class="flex items-center justify-center mb-6" aria-label="Steps">
+            <ol class="flex items-start w-full justify-between">
               <template v-for="(s, i) in stepLabels" :key="s.key">
-                <li
-                  v-if="i > 0"
-                  class="h-px w-3 sm:w-4 shrink-0 bg-border"
-                  aria-hidden="true"
-                />
-                <li
-                  class="flex flex-col items-center gap-1.5"
-                  :class="currentStepIndex === i ? 'text-foreground font-medium' : 'text-muted-foreground'"
-                >
+                <li class="flex flex-col items-center gap-2 shrink-0 w-16 sm:w-24">
                   <span
-                    class="flex size-6 shrink-0 items-center justify-center rounded-full text-xs"
-                    :class="currentStepIndex === i ? 'bg-primary text-primary-foreground' : 'bg-muted'"
+                    class="flex size-6 sm:size-7 shrink-0 items-center justify-center rounded-full text-[10px] sm:text-xs font-bold transition-colors"
+                    :class="currentStepIndex === i ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground'"
                   >
                     {{ i + 1 }}
                   </span>
-                  <span class="text-xs sm:text-sm text-center">{{ s.label }}</span>
+                  <span
+                    class="text-[9px] sm:text-[10px] font-bold uppercase tracking-tight text-center leading-tight transition-colors"
+                    :class="currentStepIndex === i ? 'text-foreground' : 'text-muted-foreground'"
+                  >
+                    {{ s.label }}
+                  </span>
                 </li>
+                <li v-if="i < stepLabels.length - 1" class="h-px flex-1 bg-border mt-3 sm:mt-3.5" aria-hidden="true" />
               </template>
             </ol>
           </nav>
 
-          <!-- Step: Customer (when showCustomerStep) -->
-          <div v-if="currentStepKey === 'customer'" class="space-y-4 max-w-2xl">
-            <p class="text-sm text-muted-foreground">Select the customer for this offer.</p>
-            <CustomerSearchSelect
-              :model-value="selectedCustomer"
-              label="Search Customer"
-              contacts-only
-              :show-clear="false"
-              change-label="Change"
-              @update:model-value="onCustomerSelected"
-            />
+          <!-- Step: Customer -->
+          <div v-if="currentStepKey === 'customer'" class="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div class="space-y-4">
+              <div class="flex items-center gap-2 pb-2 border-b border-border">
+                <User class="size-4 text-primary" />
+                <h3 class="text-sm font-bold text-foreground uppercase tracking-tight">Select Customer</h3>
+              </div>
+              <CustomerSearchSelect
+                :model-value="selectedCustomer"
+                label="Search Customer"
+                contacts-only
+                :show-clear="false"
+                change-label="Change"
+                @update:model-value="onCustomerSelected"
+              />
+            </div>
           </div>
 
-          <!-- Step: Vehicle (when not preselected) -->
-          <div v-if="currentStepKey === 'vehicle'" class="space-y-4">
-            <div v-if="vehicleSubView === 'choice'" class="grid gap-3 sm:grid-cols-1">
+          <!-- Step: Vehicle -->
+          <div v-if="currentStepKey === 'vehicle'" class="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div class="flex items-center gap-2 pb-2 border-b border-border">
+              <Car class="size-4 text-primary" />
+              <h3 class="text-sm font-bold text-foreground uppercase tracking-tight">Vehicle Selection</h3>
+            </div>
+            
+            <div v-if="vehicleSubView === 'choice'" class="grid gap-4 sm:grid-cols-2">
               <Button
                 v-if="requestedVehicle"
                 variant="outline"
-                class="h-auto w-full justify-start gap-3 px-4 py-3 text-left"
+                class="h-auto justify-start gap-4 p-4 text-left hover:bg-muted/50 transition-all border-2"
+                :class="resolvedVehicle ? 'border-primary bg-primary/5' : 'border-transparent'"
                 @click="useRequestedVehicle"
               >
-                <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted overflow-hidden">
+                <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted overflow-hidden border border-border">
                   <img
                     v-if="requestedVehicle.image"
                     :src="requestedVehicle.image"
                     :alt="`${requestedVehicle.brand} ${requestedVehicle.model}`"
                     class="size-full object-cover"
                   />
-                  <Car v-else class="size-5 text-foreground" />
+                  <Car v-else class="size-6 text-muted-foreground" />
                 </div>
                 <div class="min-w-0">
-                  <span class="font-medium text-foreground">Use requested vehicle</span>
-                  <p class="text-xs text-muted-foreground mt-0.5">
-                    {{ requestedVehicle.brand }} {{ requestedVehicle.model }} ({{ requestedVehicle.year }}) — € {{ formatCurrency(priceGrossStep1(requestedVehicle.price)) }} (incl. VAT)
+                  <span class="block text-sm font-bold text-foreground">Requested Vehicle</span>
+                  <p class="text-[11px] text-muted-foreground mt-1 truncate">
+                    {{ requestedVehicle.brand }} {{ requestedVehicle.model }}
                   </p>
                 </div>
               </Button>
+
               <Button
                 variant="outline"
-                class="h-auto w-full justify-start gap-3 px-4 py-3 text-left"
+                class="h-auto justify-start gap-4 p-4 text-left hover:bg-muted/50 transition-all border-2 border-transparent"
                 @click="vehicleSubView = 'stock'"
               >
-                <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                  <Package class="size-5 text-foreground" />
+                <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+                  <Package class="size-6 text-primary" />
                 </div>
                 <div class="min-w-0">
-                  <span class="font-medium text-foreground">Add from Stock</span>
-                  <p class="text-xs text-muted-foreground mt-0.5">Search and select an existing vehicle from inventory</p>
+                  <span class="block text-sm font-bold text-foreground">From Stock</span>
+                  <p class="text-[11px] text-muted-foreground mt-1">Browse inventory</p>
                 </div>
               </Button>
+
               <Button
                 variant="outline"
-                class="h-auto w-full justify-start gap-3 px-4 py-3 text-left"
+                class="h-auto justify-start gap-4 p-4 text-left hover:bg-muted/50 transition-all border-2 border-transparent"
                 @click="vehicleSubView = 'configure'"
               >
-                <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                  <Settings class="size-5 text-foreground" />
+                <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+                  <Settings class="size-6 text-primary" />
                 </div>
                 <div class="min-w-0">
-                  <span class="font-medium text-foreground">Configure Vehicle</span>
-                  <p class="text-xs text-muted-foreground mt-0.5">Build or customize a new vehicle</p>
+                  <span class="block text-sm font-bold text-foreground">Configure New</span>
+                  <p class="text-[11px] text-muted-foreground mt-1">Custom build</p>
                 </div>
               </Button>
+
               <Button
                 variant="outline"
-                class="h-auto w-full justify-start gap-3 px-4 py-3 text-left"
+                class="h-auto justify-start gap-4 p-4 text-left hover:bg-muted/50 transition-all border-2 border-transparent"
                 @click="skipToManual"
               >
-                <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                  <PenLine class="size-5 text-foreground" />
+                <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted border border-border">
+                  <PenLine class="size-6 text-muted-foreground" />
                 </div>
                 <div class="min-w-0">
-                  <span class="font-medium text-foreground">Skip & Enter Manually</span>
-                  <p class="text-xs text-muted-foreground mt-0.5">Create vehicle data from scratch</p>
+                  <span class="block text-sm font-bold text-foreground">Manual Entry</span>
+                  <p class="text-[11px] text-muted-foreground mt-1">Enter data from scratch</p>
                 </div>
               </Button>
             </div>
-            <div v-if="vehicleSubView === 'stock' || vehicleSubView === 'configure'">
+
+            <div v-if="vehicleSubView === 'stock' || vehicleSubView === 'configure'" class="animate-in slide-in-from-right-4 duration-300">
               <VehicleSelectionInline
                 ref="vehicleSelectionRef"
                 :requested-vehicle="requestedVehicle"
@@ -126,409 +139,468 @@
           </div>
 
           <!-- Step 2: Personal information -->
-          <div v-if="currentStepKey === 'personal'" class="space-y-4 max-w-2xl">
+          <div v-if="currentStepKey === 'personal'" class="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div class="space-y-4">
-              <div>
-                <Label class="text-xs font-medium text-muted-foreground mb-1">Salutation</Label>
-                <Select v-model="offerData.salutation">
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select salutation" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Mr.">Mr.</SelectItem>
-                    <SelectItem value="Mrs.">Mrs.</SelectItem>
-                    <SelectItem value="Ms.">Ms.</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div class="flex items-center gap-2 pb-2 border-b border-border">
+                <User2 class="size-4 text-primary" />
+                <h3 class="text-sm font-bold text-foreground uppercase tracking-tight">Personal Details</h3>
               </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">First Name</Label>
-                  <Input v-model="offerData.firstName" placeholder="Enter first name" :disabled="!!customer" />
-                </div>
-                <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">Last Name</Label>
-                  <Input v-model="offerData.lastName" placeholder="Enter last name" :disabled="!!customer" />
+              
+              <div class="space-y-2">
+                <Label class="text-xs font-semibold uppercase text-muted-foreground">Salutation</Label>
+                <div class="outcome-toggle-group flex gap-3">
+                  <Toggle
+                    v-for="s in ['Mr.', 'Mrs.', 'Ms.']"
+                    :key="s"
+                    variant="outline"
+                    class="outcome-toggle-item flex-1 font-medium"
+                    :model-value="offerData.salutation === s"
+                    @update:model-value="(v) => offerData.salutation = v ? s : ''"
+                  >
+                    {{ s }}
+                  </Toggle>
                 </div>
               </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">Email</Label>
-                  <Input type="email" v-model="offerData.email" placeholder="email@example.com" :disabled="!!customer" />
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                <div class="space-y-1.5">
+                  <Label class="text-xs font-semibold uppercase text-muted-foreground">First Name</Label>
+                  <Input v-model="offerData.firstName" placeholder="Enter first name" :disabled="!!customer" class="bg-background" />
                 </div>
-                <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">Phone Number</Label>
-                  <Input type="tel" v-model="offerData.phone" placeholder="+1 (555) 000-0000" :disabled="!!customer" />
+                <div class="space-y-1.5">
+                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Last Name</Label>
+                  <Input v-model="offerData.lastName" placeholder="Enter last name" :disabled="!!customer" class="bg-background" />
+                </div>
+                <div class="space-y-1.5">
+                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Email</Label>
+                  <Input type="email" v-model="offerData.email" placeholder="email@example.com" :disabled="!!customer" class="bg-background" />
+                </div>
+                <div class="space-y-1.5">
+                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Phone Number</Label>
+                  <Input type="tel" v-model="offerData.phone" placeholder="+1 (555) 000-0000" :disabled="!!customer" class="bg-background" />
                 </div>
               </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">ZIP / Postal Code</Label>
-                  <Input v-model="offerData.zipCode" placeholder="Enter ZIP code" :disabled="!!customer" />
+
+              <div class="space-y-4 pt-4 border-t border-border">
+                <div class="flex items-center gap-2">
+                  <MapPin class="size-4 text-primary" />
+                  <h3 class="text-sm font-bold text-foreground uppercase tracking-tight">Address Information</h3>
                 </div>
-                <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">City</Label>
-                  <Input v-model="offerData.city" placeholder="Enter city" :disabled="!!customer" />
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                  <div class="space-y-1.5">
+                    <Label class="text-xs font-semibold uppercase text-muted-foreground">ZIP / Postal Code</Label>
+                    <Input v-model="offerData.zipCode" placeholder="Enter ZIP" :disabled="!!customer" class="bg-background" />
+                  </div>
+                  <div class="space-y-1.5">
+                    <Label class="text-xs font-semibold uppercase text-muted-foreground">City</Label>
+                    <Input v-model="offerData.city" placeholder="Enter city" :disabled="!!customer" class="bg-background" />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <Label class="text-xs font-medium text-muted-foreground mb-1">Address / Street</Label>
-                <Input v-model="offerData.address" placeholder="Enter street address" :disabled="!!customer" />
+                <div class="space-y-1.5">
+                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Address / Street</Label>
+                  <Input v-model="offerData.address" placeholder="Enter street address" :disabled="!!customer" class="bg-background" />
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Step 3: Trade-in & Financing -->
-          <div v-if="currentStepKey === 'tradein_financing'" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div v-if="currentStepKey === 'tradein_financing'" class="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <TradeInsCard
                 :items="taskTradeIns"
                 :add-loading="tradeInAddLoading"
                 @open-add="$emit('open-add-tradein')"
                 @open-edit="(t) => $emit('open-edit-tradein', t)"
+                class="shadow-sm border-border"
               />
               <FinancingOptionsCard
                 :items="taskFinancingOptions"
                 @open-add="$emit('open-add-financing')"
                 @open-edit="(f) => $emit('open-edit-financing', f)"
+                class="shadow-sm border-border"
               />
             </div>
-            <div class="border border-border rounded-lg bg-muted/50 p-4 space-y-3 max-w-xl">
-              <p class="text-sm font-medium text-foreground">Use in this offer (Trade-in — select one or more)</p>
-              <div class="space-y-2">
-                <Label class="text-xs font-medium text-muted-foreground">Trade-ins</Label>
-                <div class="flex flex-col gap-2">
-                  <div
-                    v-for="ti in taskTradeIns"
-                    :key="ti.id"
-                    class="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer transition-colors"
-                    :class="isTradeInSelected(ti.id) ? 'bg-primary/10 border-primary' : 'bg-background'"
-                    @click="toggleTradeInSelection(ti.id)"
-                  >
-                    <Checkbox :checked="isTradeInSelected(ti.id)" @click.prevent="toggleTradeInSelection(ti.id)" />
-                    <div class="flex-1 min-w-0">
-                      <span class="font-medium text-foreground">{{ ti.label }}</span>
-                      <span v-if="ti.valuation != null" class="text-muted-foreground text-xs ml-2">€ {{ formatCurrency(ti.valuation) }}</span>
-                      <p v-if="ti.brand || ti.model || ti.year" class="text-xs text-muted-foreground mt-0.5">
-                        {{ [ti.brand, ti.model, ti.year].filter(Boolean).join(' ') }}
-                      </p>
+
+            <div class="p-5 rounded-xl border border-primary/20 bg-primary/5 space-y-6">
+              <div class="space-y-4">
+                <div class="flex items-center gap-2">
+                  <RefreshCw class="size-4 text-primary" />
+                  <h3 class="text-sm font-bold text-foreground uppercase tracking-tight">Apply to Offer</h3>
+                </div>
+                
+                <div class="space-y-3">
+                  <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">Selected Trade-ins</Label>
+                  <div class="grid grid-cols-1 gap-2">
+                    <div
+                      v-for="ti in taskTradeIns"
+                      :key="ti.id"
+                      class="flex items-center gap-3 p-3 rounded-lg border border-border bg-background cursor-pointer hover:border-primary/50 transition-all shadow-sm"
+                      :class="isTradeInSelected(ti.id) ? 'border-primary ring-1 ring-primary' : ''"
+                      @click="toggleTradeInSelection(ti.id)"
+                    >
+                      <Checkbox :checked="isTradeInSelected(ti.id)" @click.prevent="toggleTradeInSelection(ti.id)" />
+                      <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                          <span class="text-sm font-bold text-foreground">{{ ti.label }}</span>
+                          <span v-if="ti.valuation != null" class="text-sm font-bold text-primary">€ {{ formatCurrency(ti.valuation) }}</span>
+                        </div>
+                        <p class="text-[10px] text-muted-foreground font-medium uppercase mt-0.5">
+                          {{ [ti.brand, ti.model, ti.year].filter(Boolean).join(' ') }}
+                        </p>
+                      </div>
+                    </div>
+                    <div v-if="!taskTradeIns.length" class="text-center py-4 rounded-lg border border-dashed border-border bg-background/50">
+                      <p class="text-[10px] font-bold uppercase text-muted-foreground">No trade-ins available</p>
                     </div>
                   </div>
                 </div>
-                <p v-if="!taskTradeIns.length" class="text-xs text-muted-foreground">No trade-ins added yet. Use the card above to add.</p>
-              </div>
-              <div>
-                <Label class="text-xs font-medium text-muted-foreground mb-1">Financing</Label>
-                <Select :model-value="financingSelectValue" @update:model-value="onFinancingSelect">
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Pick financing or Cash..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="rent">Rent</SelectItem>
-                    <SelectItem value="lease">Lease</SelectItem>
-                    <SelectItem v-for="fo in taskFinancingOptions" :key="fo.id" :value="String(fo.id)">
-                      {{ fo.label }}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+
+                <div class="space-y-2">
+                  <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">Financing Plan</Label>
+                  <Select :model-value="financingSelectValue" @update:model-value="onFinancingSelect">
+                    <SelectTrigger class="bg-background font-medium">
+                      <SelectValue placeholder="Pick financing or Cash..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash Payment</SelectItem>
+                      <SelectItem value="rent">Rent</SelectItem>
+                      <SelectItem value="lease">Lease</SelectItem>
+                      <SelectItem v-for="fo in taskFinancingOptions" :key="fo.id" :value="String(fo.id)">
+                        {{ fo.label }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Step 4: Pricing -->
-          <div v-if="currentStepKey === 'pricing'" class="space-y-4 max-w-2xl">
-            <div v-if="!resolvedVehicle" class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted rounded-lg space-y-4">
-              <p class="text-sm font-medium text-foreground md:col-span-2">Vehicle details (manual entry)</p>
-              <div>
-                <Label class="text-xs font-medium text-muted-foreground mb-1">Brand</Label>
-                <Input v-model="offerData.brand" placeholder="e.g., Audi" />
+          <div v-if="currentStepKey === 'pricing'" class="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div v-if="!resolvedVehicle" class="p-5 rounded-xl border border-border bg-muted/20 space-y-4">
+              <div class="flex items-center gap-2 border-b border-border pb-2">
+                <FileText class="size-4 text-primary" />
+                <h3 class="text-xs font-bold text-foreground uppercase tracking-wider">Manual Vehicle Entry</h3>
               </div>
-              <div>
-                <Label class="text-xs font-medium text-muted-foreground mb-1">Model</Label>
-                <Input v-model="offerData.model" placeholder="e.g., e-tron GT" />
-              </div>
-              <div>
-                <Label class="text-xs font-medium text-muted-foreground mb-1">Year</Label>
-                <Input type="number" v-model="offerData.year" placeholder="2024" />
-              </div>
-              <div>
-                <Label class="text-xs font-medium text-muted-foreground mb-1">Image URL</Label>
-                <Input v-model="offerData.image" placeholder="https://..." />
-              </div>
-            </div>
-            <div>
-              <Label class="text-xs font-medium text-muted-foreground mb-1">Base Price (€)</Label>
-              <Input type="number" :value="offerData.price" readonly class="bg-muted" placeholder="0" />
-            </div>
-            <div class="flex items-center gap-2">
-              <Checkbox :checked="offerData.showVat" @update:checked="offerData.showVat = $event" id="show-vat" />
-              <Label for="show-vat" class="text-xs font-medium text-muted-foreground cursor-pointer">Show VAT breakdown</Label>
-            </div>
-            <div v-if="offerData.showVat" class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
-              <div>
-                <Label class="text-xs font-medium text-muted-foreground mb-1">VAT (e.g. % or legal text)</Label>
-                <Input type="text" v-model="offerData.vatRate" :placeholder="defaultVatForLocale" />
-              </div>
-              <div>
-                <Label class="text-xs font-medium text-muted-foreground mb-1">VAT €</Label>
-                <Input type="text" :value="displayVatAmount" readonly class="bg-muted" />
-              </div>
-              <div>
-                <Label class="text-xs font-medium text-muted-foreground mb-1">Subtotal €</Label>
-                <Input type="number" :value="subtotal" readonly class="bg-muted" />
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                <div class="space-y-1.5">
+                  <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">Brand</Label>
+                  <Input v-model="offerData.brand" placeholder="e.g., Audi" class="bg-background h-9" />
+                </div>
+                <div class="space-y-1.5">
+                  <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">Model</Label>
+                  <Input v-model="offerData.model" placeholder="e.g., e-tron GT" class="bg-background h-9" />
+                </div>
+                <div class="space-y-1.5">
+                  <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">Year</Label>
+                  <Input type="number" v-model="offerData.year" placeholder="2024" class="bg-background h-9" />
+                </div>
+                <div class="space-y-1.5">
+                  <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">Image URL</Label>
+                  <Input v-model="offerData.image" placeholder="https://..." class="bg-background h-9" />
+                </div>
               </div>
             </div>
-            <div class="space-y-3">
-              <div class="flex justify-between items-center">
-                <Label class="text-sm font-medium text-foreground">Quotation items</Label>
-                <Button variant="outline" size="sm" @click="addQuotationItem">
-                  <Plus class="size-4 mr-1" />
-                  Add item
-                </Button>
-              </div>
-              <div v-for="(item, index) in offerData.quotationItems" :key="index" class="border border-border rounded-lg p-3 space-y-3">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div class="md:col-span-2">
-                    <Label class="text-xs font-medium text-muted-foreground mb-1">Item name</Label>
-                    <Input v-model="item.name" placeholder="Item name" />
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <div class="space-y-6">
+                <div class="space-y-4">
+                  <div class="flex items-center gap-2 border-b border-border pb-2">
+                    <Tags class="size-4 text-primary" />
+                    <h3 class="text-xs font-bold text-foreground uppercase tracking-wider">Base Configuration</h3>
                   </div>
-                  <div class="flex justify-end items-end">
-                    <Button variant="ghost" size="icon" class="text-destructive hover:text-destructive" @click="removeQuotationItem(index)">
-                      <Trash2 class="size-4" />
+                  <div class="space-y-4">
+                    <div class="space-y-1.5 bg-primary/5 p-4 rounded-lg border border-primary/10">
+                      <Label class="text-[10px] font-bold uppercase text-primary px-1">Base Price (€)</Label>
+                      <Input type="number" :value="offerData.price" readonly class="bg-background text-xl font-black border-none shadow-none" />
+                    </div>
+                    <div class="flex items-center gap-3 px-1">
+                      <Checkbox :checked="offerData.showVat" @update:checked="offerData.showVat = $event" id="show-vat" />
+                      <Label for="show-vat" class="text-xs font-bold text-muted-foreground cursor-pointer uppercase tracking-tight">Show VAT breakdown</Label>
+                    </div>
+                    <div v-if="offerData.showVat" class="p-4 rounded-lg bg-muted/30 border border-border space-y-3 animate-in fade-in slide-in-from-top-2">
+                      <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                          <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">VAT Rate (%)</Label>
+                          <Input type="text" v-model="offerData.vatRate" :placeholder="defaultVatForLocale" class="bg-background h-8" />
+                        </div>
+                        <div class="space-y-1">
+                          <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">VAT Amount</Label>
+                          <div class="h-8 flex items-center px-3 rounded-md bg-background border border-border text-sm font-bold">
+                            € {{ displayVatAmount }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between border-b border-border pb-2">
+                    <div class="flex items-center gap-2">
+                      <PlusCircle class="size-4 text-primary" />
+                      <h3 class="text-xs font-bold text-foreground uppercase tracking-wider">Options & Extras</h3>
+                    </div>
+                    <Button variant="ghost" size="sm" @click="addQuotationItem" class="h-7 text-[10px] font-black uppercase text-primary">
+                      <Plus class="size-3 mr-1" /> Add
                     </Button>
                   </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label class="text-xs font-medium text-muted-foreground mb-1">Price (€)</Label>
-                    <Input type="number" :value="(item.price || 0)" readonly class="bg-muted" placeholder="0" />
-                  </div>
-                  <div>
-                    <Label class="text-xs font-medium text-muted-foreground mb-1">Quantity</Label>
-                    <Input type="number" v-model="item.quantity" placeholder="1" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="space-y-3">
-              <div class="flex justify-between items-center">
-                <Label class="text-sm font-medium text-foreground">Discounts (applied to taxable amount, not subject to VAT)</Label>
-                <Button variant="outline" size="sm" @click="addDiscount">
-                  <Plus class="size-4 mr-1" />
-                  Add discount
-                </Button>
-              </div>
-              <div v-for="(discount, index) in offerData.discounts" :key="index" class="border border-border rounded-lg p-3 space-y-3">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <Label class="text-xs font-medium text-muted-foreground mb-1">Discount title</Label>
-                    <Input v-model="discount.title" placeholder="Discount title" />
-                  </div>
-                  <div class="flex gap-2 items-end">
-                    <div class="flex-1">
-                      <Label class="text-xs font-medium text-muted-foreground mb-1">Type</Label>
-                      <Select v-model="discount.type">
-                        <SelectTrigger class="w-full">
-                          <SelectValue placeholder="€ or %" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="absolute">Amount (€)</SelectItem>
-                          <SelectItem value="percent">Percentage (%)</SelectItem>
-                        </SelectContent>
-                      </Select>
+                  <div class="space-y-3">
+                    <div v-for="(item, index) in offerData.quotationItems" :key="index" class="relative group p-4 rounded-xl border border-border bg-background hover:bg-muted/5 transition-all shadow-sm">
+                      <Button variant="ghost" size="icon" class="absolute top-2 right-2 text-muted-foreground hover:text-destructive h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" @click="removeQuotationItem(index)">
+                        <Trash2 class="size-3" />
+                      </Button>
+                      <div class="space-y-3">
+                        <div class="space-y-1">
+                          <Label class="text-[9px] font-bold uppercase text-muted-foreground px-1">Description</Label>
+                          <Input v-model="item.name" placeholder="Optional feature name" class="h-8 bg-muted/20" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                          <div class="space-y-1">
+                            <Label class="text-[9px] font-bold uppercase text-muted-foreground px-1">Price (€)</Label>
+                            <Input type="number" v-model="item.price" class="h-8 bg-muted/20" />
+                          </div>
+                          <div class="space-y-1">
+                            <Label class="text-[9px] font-bold uppercase text-muted-foreground px-1">Qty</Label>
+                            <Input type="number" v-model="item.quantity" class="h-8 bg-muted/20" />
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div class="flex-1" v-if="discount.type === 'absolute'">
-                      <Label class="text-xs font-medium text-muted-foreground mb-1">Amount (€)</Label>
-                      <Input type="number" v-model="discount.price" placeholder="0" />
-                    </div>
-                    <div class="flex-1" v-if="discount.type === 'percent'">
-                      <Label class="text-xs font-medium text-muted-foreground mb-1">Percent (%)</Label>
-                      <Input type="number" v-model="discount.percent" placeholder="0" />
+                    <div v-if="!offerData.quotationItems.length" class="text-center py-6 border-2 border-dashed border-border rounded-xl">
+                      <p class="text-[10px] font-bold uppercase text-muted-foreground">No extras added</p>
                     </div>
                   </div>
                 </div>
-                <div class="flex justify-end">
-                  <Button variant="ghost" size="icon" class="text-destructive hover:text-destructive" @click="removeDiscount(index)">
-                    <Trash2 class="size-4" />
-                  </Button>
-                </div>
               </div>
-            </div>
-            <div class="space-y-3">
-              <Label class="text-sm font-medium text-foreground">Promotions</Label>
-              <div class="rounded-lg border border-border bg-muted/50 p-4 space-y-3">
-                <div class="flex items-center justify-between gap-4">
-                  <span class="text-sm text-foreground">Public OEM</span>
-                  <Toggle
-                    variant="outline"
-                    :model-value="promoPublicOemEnabled"
-                    @update:model-value="promoPublicOemEnabled = $event"
-                  >
-                    {{ promoPublicOemEnabled ? 'On' : 'Off' }}
-                  </Toggle>
-                </div>
-                <div v-if="promoPublicOemEnabled" class="text-xs text-muted-foreground">
-                  Placeholder — € / % (read-only, from API)
-                </div>
-                <div class="flex items-center justify-between gap-4">
-                  <span class="text-sm text-foreground">OEM Commercial</span>
-                  <Toggle
-                    variant="outline"
-                    :model-value="promoOemCommercialEnabled"
-                    @update:model-value="promoOemCommercialEnabled = $event"
-                  >
-                    {{ promoOemCommercialEnabled ? 'On' : 'Off' }}
-                  </Toggle>
-                </div>
-                <div v-if="promoOemCommercialEnabled" class="text-xs text-muted-foreground">
-                  Placeholder — € / % (read-only, from API)
-                </div>
-                <div class="space-y-2">
-                  <Label class="text-sm font-medium text-foreground">Dealer Promos (editable)</Label>
-                  <Button variant="outline" size="sm" @click="addDealerPromo">
-                    <Plus class="size-4 mr-1" />
-                    Add dealer promo
-                  </Button>
-                  <div v-for="(promo, index) in offerData.promotions" :key="index" class="border border-border rounded-lg p-3 space-y-2 flex gap-2">
-                    <Input v-model="promo.label" placeholder="Label / free text" class="flex-1" />
-                    <Select v-model="promo.valueType">
-                      <SelectTrigger class="w-24">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="amount">€</SelectItem>
-                        <SelectItem value="percent">%</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Input v-if="promo.valueType === 'amount'" type="number" v-model="promo.amount" placeholder="0" class="w-24" />
-                    <Input v-else type="number" v-model="promo.percent" placeholder="0" class="w-24" />
-                    <Button variant="ghost" size="icon" class="text-destructive shrink-0" @click="removeDealerPromo(index)">
-                      <Trash2 class="size-4" />
+
+              <div class="space-y-6">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between border-b border-border pb-2">
+                    <div class="flex items-center gap-2">
+                      <Percent class="size-4 text-primary" />
+                      <h3 class="text-xs font-bold text-foreground uppercase tracking-wider">Discounts</h3>
+                    </div>
+                    <Button variant="ghost" size="sm" @click="addDiscount" class="h-7 text-[10px] font-black uppercase text-primary">
+                      <Plus class="size-3 mr-1" /> Add
                     </Button>
                   </div>
+                  <div class="space-y-3">
+                    <div v-for="(discount, index) in offerData.discounts" :key="index" class="relative group p-4 rounded-xl border border-border bg-background hover:bg-muted/5 transition-all shadow-sm">
+                      <Button variant="ghost" size="icon" class="absolute top-2 right-2 text-muted-foreground hover:text-destructive h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" @click="removeDiscount(index)">
+                        <Trash2 class="size-3" />
+                      </Button>
+                      <div class="space-y-3">
+                        <div class="space-y-1">
+                          <Label class="text-[9px] font-bold uppercase text-muted-foreground px-1">Title</Label>
+                          <Input v-model="discount.title" placeholder="e.g. Dealer Discount" class="h-8 bg-muted/20" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                          <div class="space-y-1">
+                            <Label class="text-[9px] font-bold uppercase text-muted-foreground px-1">Type</Label>
+                            <Select v-model="discount.type">
+                              <SelectTrigger class="h-8 bg-muted/20">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="absolute">Amount (€)</SelectItem>
+                                <SelectItem value="percent">Percent (%)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div class="space-y-1">
+                            <Label class="text-[9px] font-bold uppercase text-muted-foreground px-1">Value</Label>
+                            <Input v-if="discount.type === 'absolute'" type="number" v-model="discount.price" class="h-8 bg-muted/20" />
+                            <Input v-else type="number" v-model="discount.percent" class="h-8 bg-muted/20" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  <div class="flex items-center gap-2 border-b border-border pb-2">
+                    <Sparkles class="size-4 text-primary" />
+                    <h3 class="text-xs font-bold text-foreground uppercase tracking-wider">Promotions</h3>
+                  </div>
+                  <div class="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-background border border-border shadow-sm">
+                      <div class="flex items-center gap-2">
+                        <div class="size-2 rounded-full bg-primary" />
+                        <span class="text-[11px] font-bold uppercase tracking-tight">Public OEM Offer</span>
+                      </div>
+                      <Toggle variant="outline" size="sm" :model-value="promoPublicOemEnabled" @update:model-value="promoPublicOemEnabled = $event" class="h-6 text-[9px] font-black">
+                        {{ promoPublicOemEnabled ? 'ON' : 'OFF' }}
+                      </Toggle>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-background border border-border shadow-sm">
+                      <div class="flex items-center gap-2">
+                        <div class="size-2 rounded-full bg-primary" />
+                        <span class="text-[11px] font-bold uppercase tracking-tight">OEM Commercial</span>
+                      </div>
+                      <Toggle variant="outline" size="sm" :model-value="promoOemCommercialEnabled" @update:model-value="promoOemCommercialEnabled = $event" class="h-6 text-[9px] font-black">
+                        {{ promoOemCommercialEnabled ? 'ON' : 'OFF' }}
+                      </Toggle>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="space-y-2">
-              <Label class="text-xs font-medium text-muted-foreground">Rounding</Label>
-              <Select v-model="offerData.rounding">
-                <SelectTrigger class="w-full max-w-xs">
-                  <SelectValue placeholder="None" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  <SelectItem value="100">Nearest 100</SelectItem>
-                  <SelectItem value="1000">Nearest 1000</SelectItem>
-                </SelectContent>
-              </Select>
-              <p v-if="offerData.rounding && offerData.rounding !== 'none'" class="text-xs text-muted-foreground">
-                Final total: € {{ formatCurrency(finalTotal) }}
-              </p>
             </div>
           </div>
 
           <!-- Step 5: Payment methods -->
-          <div v-if="currentStepKey === 'payment'" class="space-y-4 max-w-2xl">
-            <div class="flex justify-between items-center">
-              <Label class="text-sm font-medium text-foreground">Payment methods</Label>
-              <Button variant="outline" size="sm" @click="addPaymentMethod">
-                <Plus class="size-4 mr-1" />
-                Add payment method
-              </Button>
-            </div>
-            <div v-for="(payment, index) in offerData.paymentMethods" :key="index" class="border border-border rounded-lg p-3 space-y-3">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">Description</Label>
-                  <Input v-model="payment.description" placeholder="Description (max 80 chars)" :maxlength="80" />
+          <div v-if="currentStepKey === 'payment'" class="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div class="flex flex-col md:flex-row gap-6">
+              <div class="flex-1 space-y-6">
+                <div class="flex items-center justify-between border-b border-border pb-2">
+                  <div class="flex items-center gap-2">
+                    <Wallet class="size-4 text-primary" />
+                    <h3 class="text-sm font-bold text-foreground uppercase tracking-tight">Payment Plan</h3>
+                  </div>
+                  <Button variant="outline" size="sm" @click="addPaymentMethod" class="h-8 rounded-full font-bold uppercase text-[10px]">
+                    <Plus class="size-3.5 mr-1.5" /> Add Step
+                  </Button>
                 </div>
-                <div>
-                  <Label class="text-xs font-medium text-muted-foreground mb-1">Amount (€)</Label>
-                  <Input type="number" v-model="payment.amount" placeholder="0" />
+
+                <div class="space-y-3">
+                  <div v-for="(payment, index) in offerData.paymentMethods" :key="index" class="relative group p-5 rounded-xl border border-border bg-background hover:bg-muted/5 transition-all shadow-sm space-y-4">
+                    <Button variant="ghost" size="icon" class="absolute top-2 right-2 text-muted-foreground hover:text-destructive h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" @click="removePaymentMethod(index)">
+                      <Trash2 class="size-3.5" />
+                    </Button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div class="space-y-1.5">
+                        <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">Description</Label>
+                        <Input v-model="payment.description" placeholder="e.g. Booking Fee" :maxlength="80" class="h-9 bg-muted/20" />
+                      </div>
+                      <div class="space-y-1.5">
+                        <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">Amount (€)</Label>
+                        <Input type="number" v-model="payment.amount" class="h-9 bg-muted/20" />
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-3 pt-1">
+                      <Checkbox :checked="payment.paid" @update:checked="payment.paid = $event" :id="'pm-paid-'+index" />
+                      <Label :for="'pm-paid-'+index" class="text-xs font-bold text-muted-foreground cursor-pointer uppercase select-none">Mark as paid</Label>
+                    </div>
+                  </div>
+                  <div v-if="!offerData.paymentMethods.length" class="text-center py-12 border-2 border-dashed border-border rounded-xl bg-muted/5">
+                    <CreditCard class="size-8 text-muted-foreground/30 mx-auto mb-3" />
+                    <p class="text-[11px] font-bold uppercase text-muted-foreground tracking-widest">No individual payments scheduled</p>
+                  </div>
                 </div>
               </div>
-              <div class="flex justify-between items-center">
-                <Label class="flex items-center gap-2 cursor-pointer">
-                  <Checkbox :checked="payment.paid" @update:checked="payment.paid = $event" />
-                  <span class="text-xs text-muted-foreground">PAID</span>
-                </Label>
-                <Button variant="ghost" size="icon" class="text-destructive hover:text-destructive" @click="removePaymentMethod(index)">
-                  <Trash2 class="size-4" />
-                </Button>
+
+              <div class="w-full md:w-80 space-y-6">
+                <div class="p-6 rounded-2xl bg-primary text-primary-foreground shadow-xl shadow-primary/20 space-y-6">
+                  <div class="space-y-1">
+                    <p class="text-[10px] font-black uppercase tracking-widest opacity-80">Final Offer Total</p>
+                    <p class="text-3xl font-black">€ {{ formatCurrency(finalTotal) }}</p>
+                  </div>
+                  <div class="space-y-3 pt-4 border-t border-primary-foreground/20">
+                    <div class="flex justify-between items-center opacity-90">
+                      <span class="text-xs font-bold uppercase tracking-tight">Down Payment</span>
+                      <span class="text-sm font-bold">€ {{ formatCurrency(offerData.downPayment || 0) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-white/10 p-3 rounded-lg">
+                      <span class="text-xs font-bold uppercase tracking-tight">Remaining (Cash)</span>
+                      <span class="text-sm font-black">€ {{ formatCurrency(remainingBalanceCash) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="offerData.paymentMethods.length > 0" class="p-5 rounded-xl border border-border bg-muted/20 space-y-3">
+                  <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Scheduled Total:</span>
+                    <span class="text-sm font-black text-foreground">€ {{ formatCurrency(paymentMethodsTotal) }}</span>
+                  </div>
+                  <div v-if="!paymentMethodsValid" class="flex items-center gap-2 p-2 rounded-md bg-destructive/10 text-destructive border border-destructive/20 animate-pulse">
+                    <AlertCircle class="size-3.5 shrink-0" />
+                    <span class="text-[9px] font-black uppercase leading-tight">Payments must match grand total!</span>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="bg-muted rounded-lg p-4 space-y-2">
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-medium text-muted-foreground">Grand total:</span>
-                <span class="text-sm font-bold text-foreground">€ {{ formatCurrency(finalTotal) }}</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-medium text-muted-foreground">Remaining balance (Cash):</span>
-                <span class="text-sm font-bold text-foreground">€ {{ formatCurrency(remainingBalanceCash) }}</span>
-              </div>
-              <p class="text-xs text-muted-foreground">Total minus down payment. Add payment methods below to match grand total.</p>
-            </div>
-            <div v-if="offerData.paymentMethods.length > 0" class="space-y-2">
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-medium text-muted-foreground">Payment methods total:</span>
-                <span class="text-sm font-bold text-foreground">€ {{ formatCurrency(paymentMethodsTotal) }}</span>
-              </div>
-              <p v-if="!paymentMethodsValid" class="text-xs text-destructive">Payment methods must equal grand total</p>
             </div>
           </div>
 
           <!-- Step 6: Terms & conditions -->
-          <div v-if="currentStepKey === 'terms'" class="space-y-4 max-w-2xl">
-            <div>
-              <Label class="text-xs font-medium text-muted-foreground mb-1">Notes / Comments</Label>
-              <Textarea v-model="offerData.notes" rows="3" placeholder="Any special terms, conditions, or notes..." />
-            </div>
-            <div>
-              <Label class="text-xs font-medium text-muted-foreground mb-1">Offer expiration date</Label>
-              <Input type="date" v-model="offerData.expirationDate" />
-            </div>
-            <div class="space-y-3 pt-3 border-t border-border">
-              <p class="text-xs font-semibold text-foreground">Privacy & consent</p>
-              <div class="flex items-start gap-2">
-                <Checkbox :checked="offerData.privacyConsent" @update:checked="offerData.privacyConsent = $event" id="privacy-consent" />
-                <Label for="privacy-consent" class="text-xs text-muted-foreground cursor-pointer">I agree to the privacy policy</Label>
+          <div v-if="currentStepKey === 'terms'" class="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-6">
+                <div class="space-y-4">
+                  <div class="flex items-center gap-2 border-b border-border pb-2">
+                    <MessageSquare class="size-4 text-primary" />
+                    <h3 class="text-sm font-bold text-foreground uppercase tracking-tight">Notes & Comments</h3>
+                  </div>
+                  <Textarea v-model="offerData.notes" rows="6" placeholder="Any special terms, conditions, or internal notes for this customer..." class="bg-background resize-none text-sm" />
+                </div>
               </div>
-              <div class="flex items-start gap-2">
-                <Checkbox :checked="offerData.marketingConsent" @update:checked="offerData.marketingConsent = $event" id="marketing-consent" />
-                <Label for="marketing-consent" class="text-xs text-muted-foreground cursor-pointer">I want to receive marketing communications</Label>
+
+              <div class="space-y-6">
+                <div class="space-y-4">
+                  <div class="flex items-center gap-2 border-b border-border pb-2">
+                    <Calendar class="size-4 text-primary" />
+                    <h3 class="text-sm font-bold text-foreground uppercase tracking-tight">Validity</h3>
+                  </div>
+                  <div class="space-y-1.5">
+                    <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">Offer Expiration Date</Label>
+                    <Input type="date" v-model="offerData.expirationDate" class="bg-background h-10" />
+                  </div>
+                </div>
+
+                <div class="space-y-4 pt-4">
+                  <div class="flex items-center gap-2 border-b border-border pb-2">
+                    <ShieldCheck class="size-4 text-primary" />
+                    <h3 class="text-sm font-bold text-foreground uppercase tracking-tight">Consent & Privacy</h3>
+                  </div>
+                  <div class="space-y-4">
+                    <div class="flex items-start gap-3 p-4 rounded-xl border border-border bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer" @click="offerData.privacyConsent = !offerData.privacyConsent">
+                      <Checkbox :checked="offerData.privacyConsent" class="mt-0.5" />
+                      <div class="space-y-1">
+                        <p class="text-xs font-bold text-foreground uppercase tracking-tight">Privacy Policy</p>
+                        <p class="text-[10px] text-muted-foreground leading-relaxed font-medium">The customer has read and agreed to the dealership's privacy policy and data processing terms.</p>
+                      </div>
+                    </div>
+                    <div class="flex items-start gap-3 p-4 rounded-xl border border-border bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer" @click="offerData.marketingConsent = !offerData.marketingConsent">
+                      <Checkbox :checked="offerData.marketingConsent" class="mt-0.5" />
+                      <div class="space-y-1">
+                        <p class="text-xs font-bold text-foreground uppercase tracking-tight">Marketing Communications</p>
+                        <p class="text-[10px] text-muted-foreground leading-relaxed font-medium">The customer wishes to receive updates, news, and promotional offers from our dealership.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <DialogFooter class="flex-shrink-0 flex flex-col-reverse sm:flex-row gap-2 border-t border-border px-6 py-4 sm:justify-between sm:items-center">
-          <div class="flex justify-end sm:justify-start order-1 min-w-0">
-            <Button variant="ghost" size="sm" class="gap-2" @click="handleBackClick">
-              <ChevronLeft class="size-4" />
-              Back
-            </Button>
-          </div>
-          <div class="flex flex-col-reverse sm:flex-row gap-2 order-2">
+        <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 border-t border-border px-6 py-4 bg-muted/10">
+          <Button variant="outline" size="sm" @click="handleBackClick" class="rounded-sm w-full sm:w-auto font-bold uppercase tracking-wider text-[10px]">
+            <ChevronLeft v-if="currentStepIndex > 0" class="size-3.5 mr-2" />
+            {{ currentStepIndex === 0 ? 'Cancel' : 'Back' }}
+          </Button>
+
+          <div class="flex flex-col sm:flex-row gap-3">
             <Button
               v-if="!isLastStep"
-              variant="outline"
+              variant="default"
               size="sm"
-              class="w-full sm:w-auto"
+              class="rounded-sm w-full sm:w-auto font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20"
               :disabled="isNextDisabled"
               @click="handleNext"
             >
-              Next
+              Continue
             </Button>
             <Button
               v-if="isLastStep"
               variant="default"
               size="sm"
-              class="w-full sm:w-auto"
+              class="rounded-sm w-full sm:w-auto font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20"
               :disabled="!canSubmit"
               @click="submitForm"
             >
-              Create offer
+              Finalize & Create Offer
             </Button>
           </div>
         </DialogFooter>
@@ -540,7 +612,30 @@
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Car, ChevronLeft, Package, PenLine, Plus, Settings, Trash2 } from 'lucide-vue-next'
+import {
+  AlertCircle,
+  Calendar,
+  Car,
+  ChevronLeft,
+  CreditCard,
+  FileText,
+  MapPin,
+  MessageSquare,
+  Package,
+  PenLine,
+  Percent,
+  Plus,
+  PlusCircle,
+  RefreshCw,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+  Tags,
+  Trash2,
+  User,
+  User2,
+  Wallet
+} from 'lucide-vue-next'
 import { Button, Checkbox, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, Toggle } from '@motork/component-library/future/primitives'
 import {
   Dialog,
