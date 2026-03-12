@@ -4,80 +4,69 @@
       :show="true"
       :message="thresholdBannerMessage"
     />
-    <!-- Delivery date details (when delivery is scheduled) -->
-    <div v-if="opportunity.deliveryDate" class="pt-1 px-1">
-      <div class="bg-white rounded-lg shadow-nsc-card overflow-visible">
-        <div class="p-6">
-          <h5 class="font-semibold text-foreground text-sm mb-2">Delivery date details</h5>
-          <dl class="text-sm space-y-1 text-muted-foreground">
-            <div class="flex gap-2">
-              <dt class="font-medium text-foreground min-w-[6rem]">Date</dt>
-              <dd>{{ formattedDeliveryDate }}</dd>
-            </div>
-            <div v-if="opportunity.deliveryLocation" class="flex gap-2">
-              <dt class="font-medium text-foreground min-w-[6rem]">Location</dt>
-              <dd>{{ opportunity.deliveryLocation }}</dd>
-            </div>
-            <div v-if="opportunity.deliveryNotes" class="flex gap-2">
-              <dt class="font-medium text-foreground min-w-[6rem]">Notes</dt>
-              <dd>{{ opportunity.deliveryNotes }}</dd>
-            </div>
-          </dl>
-        </div>
-      </div>
-    </div>
+    <!-- Single card: Delivery date details + Post-Delivery Customer Satisfaction Survey -->
     <div class="pt-1 px-1">
       <div class="bg-white rounded-lg shadow-nsc-card overflow-visible">
-        <div class="p-6">
-          <div class="mb-3">
-            <div class="flex justify-between items-start">
-              <div class="flex-1">
-                <h4 class="font-bold text-foreground text-sm">
-                  {{ isAwaitingDelivery ? 'Delivery Delay Feedback' : 'Post-Delivery Customer Satisfaction Survey' }}
-                </h4>
-                <p class="text-sm text-muted-foreground mt-0.5">
-                  {{ isAwaitingDelivery 
-                    ? 'Get feedback on delivery delay and check progress' 
-                    : 'Collect feedback from the customer about their delivery experience' }}
-                </p>
+        <div class="p-6 space-y-6">
+          <!-- Delivery date details (when delivery is scheduled) -->
+          <div v-if="opportunity.deliveryDate">
+            <h5 class="font-semibold text-foreground text-sm mb-2">Delivery date details</h5>
+            <dl class="text-sm space-y-1 text-muted-foreground">
+              <div class="flex gap-2">
+                <dt class="font-medium text-foreground min-w-[6rem]">Date</dt>
+                <dd>{{ formattedDeliveryDate }}</dd>
               </div>
-              <button
-                @click="$emit('postpone', 'dfb')"
-                class="bg-white border border-D1D5DB text-brand-dark font-medium px-4 py-2 rounded-btn text-xs flex items-center gap-2 transition-colors hover:bg-muted ml-4"
-              >
-                <Clock class="w-4 h-4 shrink-0" />
-                <span>Postpone</span>
-              </button>
-            </div>
+              <div v-if="opportunity.deliveryLocation" class="flex gap-2">
+                <dt class="font-medium text-foreground min-w-[6rem]">Location</dt>
+                <dd>{{ opportunity.deliveryLocation }}</dd>
+              </div>
+              <div v-if="opportunity.deliveryNotes" class="flex gap-2">
+                <dt class="font-medium text-foreground min-w-[6rem]">Notes</dt>
+                <dd>{{ opportunity.deliveryNotes }}</dd>
+              </div>
+            </dl>
           </div>
-          <div class="flex flex-wrap gap-3 items-center">
-            <Toggle
-              variant="outline"
-              :model-value="showSurvey"
-              @update:model-value="showSurvey = $event"
-              class="outcome-toggle-item"
-            >
-              <ClipboardList class="w-4 h-4 shrink-0" />
-              <span>Complete Survey</span>
-            </Toggle>
-            <Toggle
-              v-if="isAwaitingDelivery"
-              variant="outline"
-              :model-value="showReschedule"
-              @update:model-value="showReschedule = $event"
-              class="outcome-toggle-item"
-            >
-              <CalendarDays class="w-4 h-4 shrink-0" />
-              <span>Reschedule Delivery</span>
-            </Toggle>
-            <Button
-              v-if="showCloseWon"
-              variant="default"
-              class="outcome-toggle-item ml-auto"
-              @click="$emit('close-as-won')"
-            >
-              Close as Won
-            </Button>
+          <!-- Post-Delivery Customer Satisfaction Survey -->
+          <div>
+            <div class="mb-3">
+              <h4 class="font-bold text-foreground text-sm">
+                {{ isAwaitingDelivery ? 'Delivery Delay Feedback' : 'Post-Delivery Customer Satisfaction Survey' }}
+              </h4>
+              <p class="text-sm text-muted-foreground mt-0.5">
+                {{ isAwaitingDelivery 
+                  ? 'Get feedback on delivery delay and check progress' 
+                  : 'Collect feedback from the customer about their delivery experience' }}
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-3 items-center">
+              <Toggle
+                variant="outline"
+                :model-value="showSurvey"
+                @update:model-value="showSurvey = $event"
+                class="outcome-toggle-item"
+              >
+                <ClipboardList class="w-4 h-4 shrink-0" />
+                <span>Complete Survey</span>
+              </Toggle>
+              <Button
+                v-if="showCloseWon"
+                variant="default"
+                class="outcome-toggle-item"
+                @click="$emit('close-as-won')"
+              >
+                Close as Won
+              </Button>
+              <Toggle
+                v-if="isAwaitingDelivery"
+                variant="outline"
+                :model-value="showReschedule"
+                @update:model-value="showReschedule = $event"
+                class="outcome-toggle-item"
+              >
+                <CalendarDays class="w-4 h-4 shrink-0" />
+                <span>Reschedule Delivery</span>
+              </Toggle>
+            </div>
           </div>
         </div>
       </div>
@@ -149,7 +138,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Clock, ClipboardList, CalendarDays } from 'lucide-vue-next'
+import { ClipboardList, CalendarDays } from 'lucide-vue-next'
 import { Button, Toggle } from '@motork/component-library/future/primitives'
 import PostDeliverySurvey from '@/components/tasks/opportunity/PostDeliverySurvey.vue'
 import ThresholdBanner from '@/components/tasks/shared/ThresholdBanner.vue'

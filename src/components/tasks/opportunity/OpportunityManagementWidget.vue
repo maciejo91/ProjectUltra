@@ -104,7 +104,7 @@
               <div class="p-6">
                 <h4 class="font-bold text-foreground text-sm mb-1">Ready to Close</h4>
                 <p class="text-sm text-muted-foreground mb-4">
-                  Delivery date is set. Close as Won when e-signatures are collected (or use More actions).
+                  {{ hasESignature ? 'E-signatures collected. Close as Won below or use More actions.' : 'Delivery date is set. Close as Won when e-signatures are collected (or use More actions).' }}
                 </p>
                 <div class="flex items-center justify-between gap-3">
                   <Button
@@ -1664,12 +1664,23 @@ function closeAllExpandedSections() {
   showAddOfferContractPendingSection.value = false
 }
 
+// E-signature is at opportunity level or on any contract when contracts is an array
+const hasESignature = computed(() => {
+  const opp = props.opportunity
+  if (opp?.contractSigned || opp?.esignatureCollectedDate) return true
+  if (Array.isArray(opp?.contracts) && opp.contracts.length > 0) {
+    return opp.contracts.some(
+      (c) => !!(c?.contractSigned || c?.esignatureCollectedDate || c?.status === 'signed')
+    )
+  }
+  return false
+})
+
 const canCloseAsWon = computed(() => {
   if (!isContractPending.value) return false
   const opp = props.opportunity
   const hasDeliveryDateVal = !!opp?.deliveryDate
-  const hasESignature = !!(opp?.contractSigned || opp?.esignatureCollectedDate)
-  return hasDeliveryDateVal && hasESignature
+  return hasDeliveryDateVal && hasESignature.value
 })
 
 const contractPendingActions = computed(() => {
@@ -1968,9 +1979,9 @@ const opportunityActions = useOpportunityActions(
     if (widget && widget.type === 'NS') {
       return null
     }
-    // CFB in Contract Pending is shown in primary-action (with Set Delivery Date), not here
-    if (widget && widget.type === 'CFB' && opportunityState.displayStage.value === 'In Negotiation - Contract Pending') {
-      return null
+    // CFB and DFB in Contract Pending are shown in primary-action only (at the very top), not here
+    if (widget && opportunityState.displayStage.value === 'In Negotiation - Contract Pending') {
+      if (widget.type === 'CFB' || widget.type === 'DFB') return null
     }
     return widget
   }),
