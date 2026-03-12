@@ -133,6 +133,8 @@
 
     <MergeCustomerConfirmModal
       :show="showMergeModal"
+      :primary="customer"
+      :duplicate="duplicateToMerge"
       :duplicate-summary="mergeDuplicateSummary"
       :loading="mergeLoading"
       @close="showMergeModal = false; duplicateToMerge = null"
@@ -420,11 +422,13 @@ function handleMergeClick(duplicate) {
   showMergeModal.value = true
 }
 
-async function handleMergeConfirm() {
-  if (!customer.value?.id || !duplicateToMerge.value) return
+async function handleMergeConfirm(payload) {
+  const master = payload?.master ?? customer.value
+  const toMerge = payload?.toMerge ?? duplicateToMerge.value
+  if (!master?.id || !toMerge) return
   mergeLoading.value = true
   try {
-    await customersStore.mergeCustomer(customer.value, duplicateToMerge.value)
+    await customersStore.mergeCustomer(master, toMerge)
     toastStore.pushToast('success', 'Customer merged successfully')
     showMergeModal.value = false
     duplicateToMerge.value = null

@@ -3,33 +3,162 @@
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
       <DialogContent
-        class="w-full sm:max-w-md flex flex-col"
+        class="w-full sm:max-w-5xl max-h-[calc(100vh-4rem)] flex flex-col"
         :show-close-button="true"
       >
         <DialogHeader class="shrink-0">
-          <DialogTitle>Merge duplicate customer?</DialogTitle>
-          <DialogDescription v-if="duplicateSummary">
-            Merge {{ duplicateSummary }} into this customer? The duplicate will be closed and its leads and opportunities will be reassigned.
-          </DialogDescription>
+          <DialogTitle>Merge contacts</DialogTitle>
         </DialogHeader>
 
+        <div class="flex-1 overflow-y-auto py-4 w-full space-y-4">
+          <div
+            class="rounded-md border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/50 px-4 py-3 flex items-start gap-3"
+          >
+            <AlertTriangle class="size-5 shrink-0 text-amber-600 dark:text-amber-500 mt-0.5" />
+            <p class="text-sm text-foreground">
+              Important: be careful, once the manual merging is done the process is not reversible!
+            </p>
+          </div>
+          <p class="text-sm text-muted-foreground">
+            We will keep the contact selected as the master record and merge all leads, opportunities, owned vehicles and activities from the other contact into the master one.
+          </p>
+
+          <div
+            v-if="primary && duplicate"
+            class="border border-border rounded-lg overflow-hidden"
+          >
+            <div class="grid grid-cols-[1fr_1fr_1fr] gap-0 bg-muted/50">
+              <div class="px-4 py-2 text-sm font-medium text-muted-foreground">
+                Field
+              </div>
+              <div
+                :class="[
+                  'px-4 py-2 text-sm font-medium',
+                  isMasterPrimary ? 'bg-primary/10 text-foreground' : 'text-muted-foreground'
+                ]"
+              >
+                Master record
+              </div>
+              <div
+                :class="[
+                  'px-4 py-2 text-sm font-medium',
+                  !isMasterPrimary ? 'bg-primary/10 text-foreground' : 'text-muted-foreground'
+                ]"
+              >
+                Other record
+              </div>
+            </div>
+            <div class="grid grid-cols-[1fr_1fr_1fr] gap-0 divide-y divide-border">
+              <div class="px-4 py-2 text-xs text-muted-foreground">
+                —
+              </div>
+              <div
+                :class="[
+                  'px-4 py-3 flex flex-col gap-2',
+                  isMasterPrimary ? 'bg-primary/5' : ''
+                ]"
+              >
+                <span class="text-xs text-muted-foreground">Contact ID: {{ masterRecord?.id ?? '—' }}</span>
+                <span class="text-sm font-medium text-foreground">Master record</span>
+              </div>
+              <div
+                :class="[
+                  'px-4 py-3 flex flex-col gap-2',
+                  !isMasterPrimary ? 'bg-primary/5' : ''
+                ]"
+              >
+                <span class="text-xs text-muted-foreground">Contact ID: {{ otherRecord?.id ?? '—' }}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  class="rounded-sm w-fit"
+                  @click="swapMaster"
+                >
+                  Set as master
+                </Button>
+              </div>
+            </div>
+            <template v-for="(group, gIdx) in displayedRowsBySection" :key="gIdx">
+              <div
+                v-for="row in group.rows"
+                :key="row.key"
+                class="grid grid-cols-[1fr_1fr_1fr] gap-0 divide-x divide-border"
+              >
+                <div class="px-4 py-2 text-sm font-medium text-foreground">
+                  {{ row.label }}
+                </div>
+                <div
+                  :class="[
+                    'px-4 py-2 flex items-center gap-2',
+                    isMasterPrimary ? 'bg-primary/5' : ''
+                  ]"
+                >
+                  <input
+                    type="radio"
+                    :name="`merge-${row.key}`"
+                    :checked="fieldChoice[row.key] === 'master'"
+                    class="rounded-full border-input"
+                    @change="fieldChoice[row.key] = 'master'"
+                  >
+                  <span class="text-sm text-foreground">{{ masterVal(row) }}</span>
+                  <AlertCircle
+                    v-if="row.differs && fieldChoice[row.key] === 'other'"
+                    class="size-4 shrink-0 text-destructive"
+                  />
+                </div>
+                <div
+                  :class="[
+                    'px-4 py-2 flex items-center gap-2',
+                    !isMasterPrimary ? 'bg-primary/5' : ''
+                  ]"
+                >
+                  <input
+                    type="radio"
+                    :name="`merge-${row.key}`"
+                    :checked="fieldChoice[row.key] === 'other'"
+                    class="rounded-full border-input"
+                    @change="fieldChoice[row.key] = 'other'"
+                  >
+                  <span class="text-sm text-foreground">{{ otherVal(row) }}</span>
+                  <AlertCircle
+                    v-if="row.differs && fieldChoice[row.key] === 'master'"
+                    class="size-4 shrink-0 text-destructive"
+                  />
+                </div>
+              </div>
+            </template>
+            <div class="border-t border-border px-4 py-2">
+              <button
+                type="button"
+                class="text-sm text-primary hover:underline"
+                @click="showAllFields = !showAllFields"
+              >
+                {{ showAllFields ? 'Show only differing values' : 'Show all fields' }}
+              </button>
+            </div>
+          </div>
+          <div v-else class="text-sm text-muted-foreground">
+            Merge {{ duplicateSummary }} into this customer? The duplicate will be closed and its leads and opportunities will be reassigned.
+          </div>
+        </div>
+
         <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
-          <button
-            type="button"
-            class="inline-flex items-center justify-center rounded-sm border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-muted hover:text-foreground disabled:opacity-50 disabled:pointer-events-none w-full sm:w-auto"
+          <Button
+            variant="outline"
+            class="rounded-sm w-full sm:w-auto"
             :disabled="loading"
             @click="handleClose"
           >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none w-full sm:w-auto"
+            {{ primary && duplicate ? 'Remove suggestions' : 'Cancel' }}
+          </Button>
+          <Button
+            variant="default"
+            class="rounded-sm w-full sm:w-auto"
             :disabled="loading"
             @click="handleConfirm"
           >
-            Confirm
-          </button>
+            {{ loading ? 'Merging…' : 'Merge' }}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </DialogPortal>
@@ -37,21 +166,32 @@
 </template>
 
 <script setup>
+import { ref, computed, watch } from 'vue'
+import { AlertTriangle, AlertCircle } from 'lucide-vue-next'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogOverlay,
   DialogPortal,
   DialogTitle
 } from '@motork/component-library/future/primitives'
+import { Button } from '@motork/component-library/future/primitives'
+import { useMergeFields, CUSTOMER_FIELD_SECTIONS } from '@/composables/useMergeFields'
 
-defineProps({
+const props = defineProps({
   show: {
     type: Boolean,
     default: false
+  },
+  primary: {
+    type: Object,
+    default: null
+  },
+  duplicate: {
+    type: Object,
+    default: null
   },
   duplicateSummary: {
     type: String,
@@ -65,6 +205,61 @@ defineProps({
 
 const emit = defineEmits(['close', 'confirm'])
 
+const isMasterPrimary = ref(true)
+const showAllFields = ref(false)
+const fieldChoice = ref({})
+
+const primaryRef = computed(() => props.primary)
+const otherRef = computed(() => props.duplicate)
+
+const masterRecord = computed(() =>
+  isMasterPrimary.value ? props.primary : props.duplicate
+)
+const otherRecord = computed(() =>
+  isMasterPrimary.value ? props.duplicate : props.primary
+)
+
+const { rows, rowsWithDiff } = useMergeFields(
+  primaryRef,
+  otherRef,
+  CUSTOMER_FIELD_SECTIONS
+)
+
+const displayedRowsBySection = computed(() => {
+  const list = showAllFields.value ? rows.value : rowsWithDiff.value
+  const bySection = {}
+  for (const r of list) {
+    if (!bySection[r.section]) bySection[r.section] = { section: r.section, rows: [] }
+    bySection[r.section].rows.push(r)
+  }
+  return Object.values(bySection)
+})
+
+function masterVal(row) {
+  return isMasterPrimary.value ? row.primaryVal : row.otherVal
+}
+function otherVal(row) {
+  return isMasterPrimary.value ? row.otherVal : row.primaryVal
+}
+
+watch(
+  () => [props.primary, props.duplicate, props.show],
+  () => {
+    if (!props.show) return
+    isMasterPrimary.value = true
+    const choices = {}
+    for (const r of rows.value) {
+      choices[r.key] = 'master'
+    }
+    fieldChoice.value = choices
+  },
+  { deep: true, immediate: true }
+)
+
+function swapMaster() {
+  isMasterPrimary.value = !isMasterPrimary.value
+}
+
 function handleOpenChange(isOpen) {
   if (!isOpen) emit('close')
 }
@@ -74,6 +269,12 @@ function handleClose() {
 }
 
 function handleConfirm() {
-  emit('confirm')
+  if (props.primary && props.duplicate) {
+    const master = isMasterPrimary.value ? props.primary : props.duplicate
+    const toMerge = isMasterPrimary.value ? props.duplicate : props.primary
+    emit('confirm', { master, toMerge })
+  } else {
+    emit('confirm')
+  }
 }
 </script>

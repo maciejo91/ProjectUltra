@@ -27,6 +27,8 @@
 
     <MergeConfirmModal
       :show="showMergeModal"
+      :primary="request"
+      :duplicate="duplicateToMerge"
       :duplicate-summary="mergeDuplicateSummary"
       :loading="mergeLoading"
       @close="showMergeModal = false; duplicateToMerge = null"
@@ -196,11 +198,13 @@ function handleMergeClick(duplicate) {
   showMergeModal.value = true
 }
 
-async function handleMergeConfirm() {
-  if (!props.request?.id || !duplicateToMerge.value) return
+async function handleMergeConfirm(payload) {
+  const master = payload?.master ?? props.request
+  const toMerge = payload?.toMerge ?? duplicateToMerge.value
+  if (!master?.id || !toMerge) return
   mergeLoading.value = true
   try {
-    await mergeRequestIntoPrimary(props.request, duplicateToMerge.value)
+    await mergeRequestIntoPrimary(master, toMerge)
     toastStore.pushToast('success', 'Duplicate merged successfully')
     showMergeModal.value = false
     duplicateToMerge.value = null
