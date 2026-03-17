@@ -41,7 +41,7 @@ const DEFAULT_SETTINGS = {
   },
 
   // Lead Urgency (level thresholds; score now from Lead Scoring)
-  urgencyEnabled: true,
+  urgencyEnabled: false,
   urgencyThresholds: {
     hot: 80,
     warm: 50,

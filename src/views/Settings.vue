@@ -40,14 +40,13 @@
                 />
               </TabsTrigger>
               <TabsTrigger
-                v-if="isDev"
-                value="development"
+                value="data"
                 class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
-                :class="activeTab === 'development' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
+                :class="activeTab === 'data' ? 'text-foreground' : 'text-muted-foreground hover:text-muted-foreground'"
               >
-                <span>Development</span>
+                <span>Data</span>
                 <span
-                  v-if="activeTab === 'development'"
+                  v-if="activeTab === 'data'"
                   class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
                 />
               </TabsTrigger>
@@ -512,19 +511,19 @@
             </div>
           </TabsContent>
 
-          <!-- Development Tab (dev only) -->
-          <TabsContent v-if="isDev" value="development" class="data-[state=inactive]:hidden">
+          <!-- Data tab: reset demo/mock data (available in prod for demos) -->
+          <TabsContent value="data" class="data-[state=inactive]:hidden">
             <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card max-w-2xl">
-              <h3 class="text-title mb-4">Reset mock data</h3>
+              <h3 class="text-title mb-4">Refresh demo data</h3>
               <p class="text-meta mb-6">
-                Clear localStorage for leads and opportunities so the app reloads from the current mock data.
-                Use this when mock data has been updated (e.g. due date fixes) and you want changes to take effect.
+                Clear stored leads and opportunities so the app reloads from the current demo data.
+                Use this to reset the demo to a fresh state (e.g. after a demo or when data has been updated).
               </p>
               <Button
                 variant="outline"
                 @click="handleResetMockData"
               >
-                Reset mock data and reload
+                Refresh demo data and reload
               </Button>
             </div>
           </TabsContent>
@@ -546,9 +545,6 @@ import { ChevronUp, ChevronDown } from 'lucide-vue-next'
 
 const settingsStore = useSettingsStore()
 
-// Show Development tab only in dev mode
-const isDev = import.meta.env.DEV
-
 // Tab state
 const activeTab = ref('tasks')
 
@@ -569,7 +565,7 @@ const availableStages = [
 // Local copy of settings for editing
 const localSettings = ref({
   abandonedEligibleStages: [],
-  urgencyEnabled: true,
+  urgencyEnabled: false,
   urgencyThresholds: {
     hot: 80,
     warm: 50,
@@ -640,7 +636,7 @@ function loadSettings() {
     // Deep copy array to avoid reference issues
     abandonedEligibleStages: [...(settingsStore.settings.abandonedEligibleStages || [])],
     // Ensure urgency settings exist with defaults
-    urgencyEnabled: settingsStore.settings.urgencyEnabled !== undefined ? settingsStore.settings.urgencyEnabled : true,
+    urgencyEnabled: settingsStore.settings.urgencyEnabled !== undefined ? settingsStore.settings.urgencyEnabled : false,
     urgencyThresholds: {
       hot: settingsStore.settings.urgencyThresholds?.hot || 80,
       warm: settingsStore.settings.urgencyThresholds?.warm || 50,
