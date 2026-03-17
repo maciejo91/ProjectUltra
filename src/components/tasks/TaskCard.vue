@@ -203,7 +203,8 @@ const taskStatusClass = computed(() => {
 })
 
 // Use store.settings so reactivity to saved settings is guaranteed when user returns from Settings
-const urgencyEnabled = computed(() => settingsStore.settings?.urgencyEnabled !== false)
+// Only show urgency when explicitly enabled (default is off)
+const urgencyEnabled = computed(() => settingsStore.settings?.urgencyEnabled === true)
 const showUrgencyBadge = computed(() => Boolean(urgencyEnabled.value && props.item?.urgencyLevel))
 const urgencyDotClass = computed(() => getUrgencyDotClass(props.item?.urgencyLevel))
 

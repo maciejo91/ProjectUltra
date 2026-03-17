@@ -34,7 +34,7 @@ export function useTaskFilters(showClosed) {
   // Combine leads and opportunities with type property and composite key
   // Filter based on user role. Depends on urgency/leadScoring settings so urgency is recomputed when they change.
   const allTasks = computed(() => {
-    const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') !== false
+    const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') === true
     const _urgencyThresholds = settingsStore.getSetting('urgencyThresholds')
     const _leadScoring = settingsStore.getSetting('leadScoring')
 
@@ -110,7 +110,7 @@ export function useTaskFilters(showClosed) {
 
   // Same as allTasks but always includes closed leads/opportunities (for keeping task detail open when task was just closed)
   const allTasksIncludingClosed = computed(() => {
-    const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') !== false
+    const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') === true
 
     const leads = leadsStore.leads.map(lead => {
       const displayStage = getDisplayStage(lead, 'lead')

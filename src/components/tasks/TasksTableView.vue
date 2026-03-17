@@ -294,7 +294,7 @@ const getCarPrice = (task) => {
 
 // DataTable columns order: Task title, Due date, Customer, Urgency (when enabled), Type, Status, Vehicle, VIN, Request message, Created, Attempts, Source, Assigned
 const columns = computed(() => {
-  const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') !== false
+  const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') === true
   const urgencyColumn = {
     id: 'urgencyLevel',
     accessorKey: 'urgencyLevel',
@@ -596,7 +596,7 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
   pagination,
   filterDefs: filterDefinitions,
   searchableFields: (row) => {
-    const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') !== false
+    const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') === true
     const urgencyField =
       urgencyEnabled
         ? (row.type === 'lead' ? (row.urgencyLevel ?? calculateLeadUrgency(row).level ?? null) : (row.urgencyLevel ?? null))
