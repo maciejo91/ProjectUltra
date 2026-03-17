@@ -1,7 +1,12 @@
 <template>
   <div class="overflow-hidden p-4 rounded-lg border border-border bg-background shadow-nsc-card">
-    <div class="flex items-center justify-between gap-2 mb-2">
-      <h3 class="text-base font-medium text-foreground leading-6 truncate min-w-0">
+    <div class="flex items-center gap-3 min-w-0 mb-2">
+      <div
+        class="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white text-sm font-semibold shrink-0"
+      >
+        {{ customerInitials }}
+      </div>
+      <h3 class="flex-1 text-base font-medium text-foreground leading-6 truncate min-w-0">
         {{ task.customer?.name || 'Unknown' }}
       </h3>
       <Button
@@ -68,6 +73,17 @@ const props = defineProps({
 
 const toastStore = useToastStore()
 const router = useRouter()
+
+const customerInitials = computed(() => {
+  const name = props.task.customer?.name || ''
+  if (!name) return '?'
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase()
+})
 
 const phoneDisplay = computed(() => props.task.customer?.phone || null)
 const emailDisplay = computed(() => props.task.customer?.email || null)

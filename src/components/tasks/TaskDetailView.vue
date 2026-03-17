@@ -90,12 +90,6 @@
             <div class="flex-1 min-h-0 flex flex-col lg:overflow-y-auto bg-muted">
               <!-- Request Tab -->
               <TabsContent value="request" class="space-y-2 p-2 mt-0 flex-1 min-h-full">
-                <TaskContactCard
-                  :task="displayTask"
-                  :task-type="displayTask.type"
-                  :customer-id="displayTask.customerId || displayTask.customer?.id"
-                  @action="handleContactAction"
-                />
                 <VehicleRequestCard
                   v-if="displayTask.requestedCar || displayTask.vehicle"
                   :vehicle="displayTask.requestedCar || displayTask.vehicle"
@@ -104,6 +98,12 @@
                   :image-url="getCarImageUrl(displayTask.requestedCar || displayTask.vehicle)"
                   @open-ad="handleOpenAd"
                   @more-actions="handleMoreActions"
+                />
+                <TaskContactCard
+                  :task="displayTask"
+                  :task-type="displayTask.type"
+                  :customer-id="displayTask.customerId || displayTask.customer?.id"
+                  @action="handleContactAction"
                 />
                 <OtherCustomerRequestsCard
                   :task="displayTask"

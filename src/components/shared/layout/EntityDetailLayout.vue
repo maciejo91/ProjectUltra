@@ -280,8 +280,17 @@
 
         <!-- Tab 2: Request -->
         <div v-if="gridMainTab === 'request'" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-          <!-- Request Card + Contact Info Card -->
+          <!-- Contact Info Card + Request Card -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:col-span-2">
+            <!-- Contact Info Card -->
+            <TaskContactCard
+              :task="task"
+              :task-type="type"
+              :customer-id="task.customer?.id || task.customerId || task.id"
+              @action="handleContactInfoAction"
+              @add-tag="showAddTagModal = true"
+            />
+
             <!-- Request Card -->
             <TaskRequestOverviewTab
               v-if="type !== 'contact'"
@@ -290,15 +299,6 @@
               :activities="task.activities || []"
               @reassign="handleReassign"
               @add-requested-car="handleAddRequestedCar"
-            />
-
-            <!-- Contact Info Card -->
-            <TaskContactCard
-              :task="task"
-              :task-type="type"
-              :customer-id="task.customer?.id || task.customerId || task.id"
-              @action="handleContactInfoAction"
-              @add-tag="showAddTagModal = true"
             />
           </div>
 

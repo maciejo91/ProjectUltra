@@ -276,7 +276,7 @@
               
               <!-- Template and editable message (only show if channel selected and not 'dont-send') -->
               <div v-if="followupChannel && followupChannel !== 'dont-send'" class="space-y-3">
-                <!-- Template -->
+                <!-- Template (for WhatsApp, template content is not editable) -->
                 <div>
                   <Label class="form-label">Template</Label>
                   <Select v-model="selectedTemplate">
@@ -290,7 +290,7 @@
                   </Select>
                 </div>
                 
-                <!-- Editable message -->
+                <!-- Message (read-only for WhatsApp templates) -->
                 <div>
                   <Label class="form-label">Message</Label>
                   <Textarea
@@ -298,6 +298,7 @@
                     rows="4"
                     class="w-full resize-none border-border bg-background text-foreground"
                     placeholder="Select a template or type your message..."
+                    :readonly="followupChannel === 'whatsapp'"
                   />
                 </div>
               </div>
@@ -458,7 +459,7 @@
               />
             </div>
             <!-- Enrich Lead Card (collapsible, collapsed by default) -->
-            <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden">
+            <div ref="enrichLeadSectionRef" class="bg-white rounded-lg shadow-nsc-card overflow-hidden">
               <CollapsibleSection
                 title="Enrich lead"
                 :is-expanded="enrichLeadExpanded"
@@ -646,7 +647,7 @@
               class="space-y-4"
             >
               <!-- Assign to (collapsible, collapsed by default like Enrich lead) -->
-              <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden">
+              <div ref="assignToSectionRef" class="bg-white rounded-lg shadow-nsc-card overflow-hidden">
                 <CollapsibleSection
                   title="Assign to"
                   :is-expanded="assignToExpanded"
@@ -1243,6 +1244,8 @@ const showAssignmentModal = ref(false)
 const showFinancingModal = ref(false)
 const showVehicleModal = ref(false)
 const showPostponeRescheduleBlock = ref(false)
+const enrichLeadSectionRef = ref(null)
+const assignToSectionRef = ref(null)
 const enrichLeadExpanded = ref(false)
 const assignToExpanded = ref(false)
 const editingTradeIn = ref(null)
@@ -2025,11 +2028,16 @@ async function onConfirmPostpone() {
   showPostponeRescheduleBlock.value = false
 }
 
-function scrollToExpandedContent(getEl) {
-  nextTick(() => {
+function scrollToExpandedContent(getEl, delayMs = 0) {
+  const run = () => {
     const el = typeof getEl === 'function' ? getEl() : getEl
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  })
+  }
+  if (delayMs > 0) {
+    setTimeout(() => nextTick(run), delayMs)
+  } else {
+    nextTick(run)
+  }
 }
 
 watch(selectedOutcome, (newOutcome) => {
@@ -2041,6 +2049,18 @@ watch(selectedOutcome, (newOutcome) => {
 watch(qualificationEventType, (eventType) => {
   if (eventType) {
     scrollToExpandedContent(() => eventTypeExpandedRef.value)
+  }
+})
+
+// Scroll into view when user expands collapsible sections so next inputs are visible
+watch(enrichLeadExpanded, (expanded) => {
+  if (expanded) {
+    scrollToExpandedContent(() => enrichLeadSectionRef.value, 320)
+  }
+})
+watch(assignToExpanded, (expanded) => {
+  if (expanded) {
+    scrollToExpandedContent(() => assignToSectionRef.value, 320)
   }
 })
 
