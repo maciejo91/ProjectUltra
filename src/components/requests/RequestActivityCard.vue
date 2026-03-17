@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col min-h-0 overflow-hidden border-t border-border bg-background">
+  <div class="flex flex-col min-h-0 overflow-hidden bg-transparent">
     <!-- Lead: Communicate + Data tabs -->
     <Tabs v-if="isLead" v-model="activeTab" class="flex flex-col flex-1 min-h-0 overflow-hidden gap-0">
-      <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
+      <TabsList class="flex shrink-0 border-0 bg-transparent rounded-none w-full relative h-full">
         <TabsTrigger
           value="communicate"
           class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
@@ -49,25 +49,28 @@
           />
         </TabsTrigger>
       </TabsList>
-      <div class="flex-1 min-h-0 flex flex-col overflow-y-auto bg-muted">
-        <TabsContent value="communicate" class="flex-1 overflow-y-auto space-y-2 p-2 mt-0 data-[state=inactive]:hidden min-h-0">
-          <div class="rounded-lg flex flex-col bg-background pt-1 px-1 pb-1">
-          <CommunicationWidget
-            :task-type="request?.type || 'lead'"
-            :task-id="request?.id"
-            :phone-number="customerPhone"
-            :contact-name="customerName"
-            :inline="true"
-            selection-card-title="Call or send message"
-            selection-card-description="Log a call outcome or send an email, SMS or WhatsApp to this customer."
-            @save="handleCommunicationSave"
-          />
+      <div class="flex-1 min-h-0 flex flex-col overflow-y-auto">
+        <TabsContent value="communicate" class="flex-1 overflow-y-auto space-y-2 pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+          <div class="pt-3 px-1 pb-2">
+            <CommunicationWidget
+              :task-type="request?.type || 'lead'"
+              :task-id="request?.id"
+              :phone-number="customerPhone"
+              :contact-name="customerName"
+              :recent-attachments="recentAttachmentsForEmail"
+              :inline="true"
+              selection-card-title="Call or send message"
+              selection-card-description="Log a call outcome or send an email, SMS or WhatsApp to this customer."
+              @save="handleCommunicationSave"
+            />
           </div>
         </TabsContent>
-        <TabsContent value="conversations" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
-          <RequestConversationsTabContent :activities="conversationActivities" />
+        <TabsContent value="conversations" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+          <div class="pt-3 px-1 pb-2">
+            <RequestConversationsTabContent :activities="conversationActivities" />
+          </div>
         </TabsContent>
-        <TabsContent value="data" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="data" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <RequestDataTabContent
           :activities="requestActivities"
           :task-type="request?.type || 'lead'"
@@ -82,7 +85,7 @@
         <TabsContent
           v-if="showTasksTab"
           value="tasks"
-          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 p-2 gap-4"
+          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 pt-1 px-2 pb-2 gap-4"
         >
           <RequestAssociatedTasksCard
             :request="request"
@@ -90,6 +93,7 @@
             :limit="50"
             navigate-to-task-detail
             show-add-button
+            tab-layout
             @add-task="showCreateTaskModal = true"
           />
         </TabsContent>
@@ -98,7 +102,7 @@
 
     <!-- Opportunity: full tabbed layout -->
     <Tabs v-else v-model="activeTab" class="flex flex-col flex-1 min-h-0 overflow-hidden gap-0">
-      <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
+      <TabsList class="flex shrink-0 border-0 bg-transparent rounded-none w-full relative h-full">
         <TabsTrigger
           value="communicate"
           class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
@@ -179,27 +183,30 @@
         </TabsTrigger>
       </TabsList>
 
-      <div class="flex-1 min-h-0 flex flex-col overflow-y-auto bg-muted">
-        <TabsContent value="communicate" class="flex-1 overflow-y-auto space-y-2 p-2 mt-0 data-[state=inactive]:hidden min-h-0">
-          <div class="rounded-lg flex flex-col bg-background pt-1 px-1 pb-1">
-          <CommunicationWidget
-            :task-type="request?.type || 'lead'"
-            :task-id="request?.id"
-            :phone-number="customerPhone"
-            :contact-name="customerName"
-            :inline="true"
-            selection-card-title="Call or send message"
-            selection-card-description="Log a call outcome or send an email, SMS or WhatsApp to this customer."
-            @save="handleCommunicationSave"
-          />
+      <div class="flex-1 min-h-0 flex flex-col overflow-y-auto">
+        <TabsContent value="communicate" class="flex-1 overflow-y-auto space-y-2 pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+          <div class="pt-3 px-1 pb-2">
+            <CommunicationWidget
+              :task-type="request?.type || 'lead'"
+              :task-id="request?.id"
+              :phone-number="customerPhone"
+              :contact-name="customerName"
+              :recent-attachments="recentAttachmentsForEmail"
+              :inline="true"
+              selection-card-title="Call or send message"
+              selection-card-description="Log a call outcome or send an email, SMS or WhatsApp to this customer."
+              @save="handleCommunicationSave"
+            />
           </div>
         </TabsContent>
 
-        <TabsContent value="conversations" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
-          <RequestConversationsTabContent :activities="conversationActivities" />
+        <TabsContent value="conversations" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+          <div class="pt-3 px-1 pb-2">
+            <RequestConversationsTabContent :activities="conversationActivities" />
+          </div>
         </TabsContent>
 
-        <TabsContent value="data" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="data" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <RequestDataTabContent
           :activities="requestActivities"
           :task-type="request?.type || 'opportunity'"
@@ -212,7 +219,7 @@
         />
         </TabsContent>
 
-        <TabsContent value="appointments" class="flex-1 overflow-y-auto px-1 py-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="appointments" class="flex-1 overflow-y-auto px-1 pt-1 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <RequestAppointmentsTabContent
           :request="request"
           :appointments="appointments"
@@ -223,7 +230,7 @@
         />
         </TabsContent>
 
-        <TabsContent value="offers" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="offers" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <OfferCarousel
           ref="offerCarouselRef"
           :offers="request?.offers || []"
@@ -235,7 +242,7 @@
         />
         </TabsContent>
 
-        <TabsContent value="contracts" class="flex-1 overflow-y-auto p-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="contracts" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <ContractCarousel
           ref="contractCarouselRef"
           :contracts="contracts"
@@ -249,7 +256,7 @@
         <TabsContent
           v-if="showTasksTab"
           value="tasks"
-          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 p-2 gap-4"
+          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 pt-1 px-2 pb-2 gap-4"
         >
           <RequestAssociatedTasksCard
             :request="request"
@@ -257,6 +264,7 @@
             :limit="50"
             navigate-to-task-detail
             show-add-button
+            tab-layout
             @add-task="showCreateTaskModal = true"
           />
         </TabsContent>
@@ -381,6 +389,10 @@ const requestActivities = computed(() => {
   }
   return [...list]
 })
+
+const recentAttachmentsForEmail = computed(() =>
+  requestActivities.value.filter((a) => a.type === 'attachment')
+)
 
 const customerName = computed(() => {
   const c = props.request?.customer
@@ -615,6 +627,7 @@ async function handleCommunicationSave(data) {
     content: data.content || data.message || data.notes || 'Communication logged',
     subject: data.subject,
     template: data.template,
+    ...(data.attachments && { attachments: data.attachments }),
     ...(data.timestamp && { timestamp: data.timestamp })
   }
   if (!activity.timestamp) activity.timestamp = new Date().toISOString()
@@ -769,7 +782,7 @@ async function handleCollectESignatures(data) {
   margin: 0 !important;
   gap: 0 !important;
   height: auto !important;
-  min-height: 48px !important;
+  min-height: 40px !important;
 }
 
 :deep([role="tab"]) {
@@ -780,11 +793,11 @@ async function handleCollectESignatures(data) {
   border-right: none !important;
   border-bottom: none !important;
   margin: 0 !important;
-  padding: 12px 16px !important;
+  padding: 8px 16px !important;
   position: relative !important;
   box-shadow: none !important;
   height: 100% !important;
-  min-height: 48px !important;
+  min-height: 40px !important;
 }
 
 :deep([role="tab"]::before),

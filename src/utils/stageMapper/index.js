@@ -24,6 +24,7 @@ export {
 // Import stage calculation functions
 import { calculateOpportunityDisplayStage, mapOpportunityStageToApiStatus, getOpportunityTransitions, calculateDeliverySubstatusForOpportunity } from './opportunityStages.js'
 import { calculateLeadDisplayStage, mapLeadStageToApiStatus, getLeadTransitions } from './leadStages.js'
+import { getStageBadgeClass } from '@/utils/formatters'
 
 // ========================================
 // MAIN FUNCTIONS
@@ -134,37 +135,11 @@ export function getDeliverySubstatus(opportunity, activities = []) {
 }
 
 // ========================================
-// STAGE COLOR MAPPING
+// STAGE COLOR MAPPING (delegate to formatters for consistency with tasks table)
 // ========================================
 
-export function getStageColor(displayStage, entityType = 'opportunity') {
-  // Match styling from task status chip: bg-{color}-100 text-{color}-700 (no border in color class, border is added separately)
-  const opportunityColors = {
-    [OPPORTUNITY_STAGES.QUALIFIED]: 'bg-blue-100 text-blue-700',
-    [OPPORTUNITY_STAGES.AWAITING_APPOINTMENT]: 'bg-blue-100 text-blue-700',
-    [OPPORTUNITY_STAGES.APPOINTMENT_SCHEDULED]: 'bg-purple-100 text-purple-700',
-    [OPPORTUNITY_STAGES.IN_NEGOTIATION]: 'bg-yellow-100 text-yellow-700',
-    [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Offer Sent`]: 'bg-yellow-100 text-yellow-700',
-    [`${OPPORTUNITY_STAGES.IN_NEGOTIATION} - Awaiting Offer`]: 'bg-yellow-100 text-yellow-700',
-    [OPPORTUNITY_STAGES.OFFER_FEEDBACK_MISSING]: 'bg-yellow-100 text-yellow-700',
-    [OPPORTUNITY_STAGES.CONTRACT_PENDING]: 'bg-badge-green text-emerald-700',
-    [OPPORTUNITY_STAGES.CLOSED_WON]: 'bg-badge-green text-green-700',
-    [OPPORTUNITY_STAGES.CLOSED_LOST]: 'bg-badge-red text-red-700',
-    [OPPORTUNITY_STAGES.ABANDONED]: 'bg-gray-100 text-gray-700'
-  }
-  
-  const leadColors = {
-    [LEAD_STAGES.NEW]: 'bg-badge-green text-emerald-700',
-    [LEAD_STAGES.TO_BE_CALLED_BACK]: 'bg-purple-100 text-purple-700',
-    [LEAD_STAGES.VALID_TO_BE_CALLED_BACK]: 'bg-badge-green text-emerald-700',
-    [LEAD_STAGES.VALID]: 'bg-badge-green text-emerald-700',
-    [LEAD_STAGES.CLOSED_INVALID]: 'bg-gray-100 text-gray-600',
-    [LEAD_STAGES.CLOSED_NOT_INTERESTED]: 'bg-badge-red text-red-700',
-    [LEAD_STAGES.CLOSED_DUPLICATE]: 'bg-badge-orange text-orange-700'
-  }
-  
-  const colors = entityType === 'opportunity' ? opportunityColors : leadColors
-  return colors[displayStage] || 'bg-gray-100 text-gray-700'
+export function getStageColor(displayStage, _entityType = 'opportunity') {
+  return getStageBadgeClass(displayStage)
 }
 
 // Get color classes for delivery substatus badges

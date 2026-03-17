@@ -1,9 +1,9 @@
 <template>
   <div
     v-if="potentialDuplicates.length > 0"
-    class="rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 shadow-mk-dashboard-card"
+    class="rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 shadow-mk-dashboard-card flex items-start gap-2"
   >
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 flex-1 min-w-0">
       <div class="flex-1 min-w-0">
         <h3 class="text-sm font-semibold text-foreground">Duplicate detected</h3>
         <p class="mt-0.5 text-xs text-muted-foreground">
@@ -34,10 +34,22 @@
         </button>
       </div>
     </div>
+    <Button
+      variant="ghost"
+      size="icon"
+      class="shrink-0 h-8 w-8 text-muted-foreground hover:text-foreground"
+      aria-label="Dismiss banner"
+      @click="emit('dismiss')"
+    >
+      <X class="size-4" />
+    </Button>
   </div>
 </template>
 
 <script setup>
+import { Button } from '@motork/component-library/future/primitives'
+import { X } from 'lucide-vue-next'
+
 defineProps({
   potentialDuplicates: {
     type: Array,
@@ -49,7 +61,7 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['merge', 'request-navigate'])
+const emit = defineEmits(['merge', 'request-navigate', 'dismiss'])
 
 function getVehicleDisplay(task) {
   const vehicle = task.requestedCar || task.vehicle

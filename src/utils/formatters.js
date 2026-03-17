@@ -88,13 +88,15 @@ export function formatDueDate(isoTimestamp) {
 
 /**
  * Format a due date as human-readable relative time (for tasks)
- * Past: "34 minutes overdue", "2 hours overdue", "1 day overdue"
+ * Past: "34 minutes overdue", "2 hours overdue", "1 day overdue" (or "ago" when options.pastSuffix === 'ago')
  * Future: "in 34 minutes", "in 10 hours", "in 2 days"
  * @param {string} isoTimestamp - ISO timestamp string
+ * @param {{ pastSuffix?: 'overdue'|'ago' }} [options] - For "last updated" use pastSuffix: 'ago' to show "X ago" instead of "X overdue"
  * @returns {string} Relative time string
  */
-export function formatDueDateRelative(isoTimestamp) {
+export function formatDueDateRelative(isoTimestamp, options = {}) {
   if (!isoTimestamp) return ''
+  const pastSuffix = options.pastSuffix === 'ago' ? 'ago' : 'overdue'
   const dueDate = new Date(isoTimestamp)
   const now = new Date()
   const diffMs = dueDate - now
@@ -103,12 +105,12 @@ export function formatDueDateRelative(isoTimestamp) {
   const diffDay = Math.floor(diffHour / 24)
 
   if (diffMs < 0) {
-    // Past (overdue) – show time passed and that it's overdue
-    if (diffMin < 1) return 'Overdue just now'
-    if (diffMin < 60) return `${diffMin} minute${diffMin !== 1 ? 's' : ''} overdue`
-    if (diffHour < 24) return `${diffHour} hour${diffHour !== 1 ? 's' : ''} overdue`
-    if (diffDay < 7) return `${diffDay} day${diffDay !== 1 ? 's' : ''} overdue`
-    return `${diffDay} days overdue`
+    // Past – show time passed with "overdue" or "ago"
+    if (diffMin < 1) return pastSuffix === 'ago' ? 'Just now' : 'Overdue just now'
+    if (diffMin < 60) return `${diffMin} minute${diffMin !== 1 ? 's' : ''} ${pastSuffix}`
+    if (diffHour < 24) return `${diffHour} hour${diffHour !== 1 ? 's' : ''} ${pastSuffix}`
+    if (diffDay < 7) return `${diffDay} day${diffDay !== 1 ? 's' : ''} ${pastSuffix}`
+    return `${diffDay} days ${pastSuffix}`
   }
 
   // Future

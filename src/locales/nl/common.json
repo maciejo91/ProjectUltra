@@ -117,14 +117,15 @@
       "lead": "Leads",
       "opportunity": "Opportunities",
       "dueIn24h": "Vervalt binnen 24 uur",
-      "toBeCalled": "Opnieuw bellen",
+      "recallAppointment": "Recall afspraak",
+      "finalAttempt": "Laatste poging",
       "leads1h": "Leads 1 uur geleden aangemaakt",
       "assignedToMe": "Aan mij toegewezen",
       "assignedToMyTeam": "Aan mijn team toegewezen"
     },
     "sort": {
+      "none": "Geen sortering",
       "mostRecentFirst": "Meest recent eerst",
-      "mostUrgentFirst": "Meest urgent eerst",
       "oldestFirst": "Oudste eerst"
     }
   },

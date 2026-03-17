@@ -9,8 +9,6 @@
     @update-status="handleUpdateStatus"
     @postpone-expected-close="handlePostponeExpectedClose"
     @reassigned="handleReassigned"
-    @add-tradein="editingTradeIn = null; showTradeInModal = true"
-    @add-financing="editingFinancingOption = null; showFinancingModal = true"
   >
     <ComingSoonModal :show="showPostponeModal" @close="showPostponeModal = false" />
 
@@ -47,39 +45,91 @@
       @close="showTradeInModal = false; editingTradeIn = null"
     />
 
-    <!-- Associated Tasks + Timeline – main content left (Suggested action + Communicate), Activity/Other requests right -->
-    <div v-if="showAssociatedTasksOrTimeline" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-      <div v-if="!isClosedLead" :class="showAssociatedTasks ? 'lg:col-span-2' : 'lg:col-span-3'" class="min-w-0 flex flex-col min-h-0 gap-4">
-        <DuplicateDetectedCard
-          v-if="request && potentialDuplicates.length"
-          :potential-duplicates="potentialDuplicates"
-          :merge-loading="mergeLoading"
-          class="shrink-0"
-          @merge="handleMergeClick"
-          @request-navigate="(...args) => $emit('request-navigate', ...args)"
-        />
-        <SuggestedNextActionCard v-if="request" :request="request" class="shrink-0" />
-        <RequestActivityCard
-          v-if="showTimeline"
-          :request="request"
-          class="flex-1 min-h-0"
-          @offer-saved="handleOfferSaved"
-          @request-navigate="(...args) => $emit('request-navigate', ...args)"
-        />
-      </div>
-      <div :class="isClosedLead ? 'lg:col-span-3' : 'lg:col-span-1'" class="min-w-0 flex flex-col min-h-0 gap-4">
-        <RequestRightColumnCard
-          :request="request"
-          :show-associated-tasks="showAssociatedTasks"
-          @request-navigate="(...args) => $emit('request-navigate', ...args)"
-        />
+    <!-- Left: Car, Customer, etc. (2/3). Right: Activity/Other requests (1/3). Page scrolls as one. -->
+    <div v-if="showAssociatedTasksOrTimeline" class="p-4">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+        <!-- Left column: two wrappers (cards on top, Communicate/Data/Tasks below) -->
+        <div class="order-1 lg:col-span-2 flex flex-col gap-4">
+          <div class="flex flex-col gap-4 bg-muted rounded-lg p-4">
+            <DuplicateDetectedCard
+              v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
+              :potential-duplicates="potentialDuplicates"
+              :merge-loading="mergeLoading"
+              @merge="handleMergeClick"
+              @request-navigate="(...args) => $emit('request-navigate', ...args)"
+              @dismiss="duplicateBannerDismissed = true"
+            />
+            <LeadOpportunityDetailsCard v-if="request" :request="request" />
+            <!-- Requested car (wider) + Customer (narrower) on same row -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <VehicleRequestCard
+                v-if="request && (request.requestedCar || request.vehicle)"
+                class="md:col-span-2"
+                :vehicle="request.requestedCar || request.vehicle"
+                :request-message="request.requestMessage || request.requestedCar?.requestMessage"
+                :source="request.source"
+                :image-url="getCarImageUrl(request.requestedCar || request.vehicle)"
+                :save-requested-car="handleRequestedCarSave"
+                @open-ad="handleOpenAd"
+                @more-actions="handleMoreActions"
+              />
+              <TaskContactCard
+                v-if="request"
+                class="md:col-span-1"
+                :task="request"
+                :task-type="request.type"
+                :customer-id="request.customerId || request.customer?.id"
+                @action="handleContactAction"
+              />
+            </div>
+          </div>
+          <div class="flex flex-col bg-muted rounded-lg pt-2 px-4 pb-4">
+            <RequestActivityCard
+              v-if="showTimeline && !isClosedLead"
+              :request="request"
+              @offer-saved="handleOfferSaved"
+              @request-navigate="(...args) => $emit('request-navigate', ...args)"
+            />
+          </div>
+        </div>
+        <!-- Activity + Other requests (1/3 width, right column) -->
+        <div class="order-2 lg:col-span-1 flex flex-col gap-4">
+          <div class="flex flex-col gap-4 bg-muted rounded-lg p-4">
+            <TradeInsCard
+              v-if="request"
+              :items="request.tradeIns || []"
+              :add-loading="tradeInActionLoading"
+              @open-add="editingTradeIn = null; showTradeInModal = true"
+              @open-edit="openTradeInEdit"
+            />
+            <FinancingOptionsCard
+              v-if="request"
+              :items="request.financingOptions || []"
+              @open-add="editingFinancingOption = null; showFinancingModal = true"
+              @open-edit="openFinancingEdit"
+            />
+          </div>
+          <div class="flex flex-col bg-muted rounded-lg pt-2 px-4 pb-4">
+            <RequestRightColumnCard
+              :request="request"
+              :show-associated-tasks="showAssociatedTasks"
+              :show-suggested-action="request && !isClosedLead"
+              :activities="requestActivities"
+              :expanded-summaries="activityExpandedSummaries"
+              @request-navigate="(...args) => $emit('request-navigate', ...args)"
+              @activity-click="handleActivityClick"
+              @toggle-summary-expanded="toggleActivitySummaryExpanded"
+              @add-activity="handleAddActivity"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </RequestDetailShell>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick, watch } from 'vue'
 import { useDuplicateDetection } from '@/composables/useDuplicateDetection'
 import { mergeRequestIntoPrimary, getVehicleSummary } from '@/api/mergeRequest'
 import { useLeadsStore } from '@/stores/leads'
@@ -87,7 +137,11 @@ import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
 import { useToastStore } from '@/stores/toast'
 import RequestDetailShell from './RequestDetailShell.vue'
-import SuggestedNextActionCard from './SuggestedNextActionCard.vue'
+import LeadOpportunityDetailsCard from '@/components/shared/LeadOpportunityDetailsCard.vue'
+import VehicleRequestCard from '@/components/shared/VehicleRequestCard.vue'
+import TaskContactCard from '@/components/tasks/TaskContactCard.vue'
+import TradeInsCard from '@/components/shared/TradeInsCard.vue'
+import FinancingOptionsCard from '@/components/shared/FinancingOptionsCard.vue'
 import RequestRightColumnCard from './RequestRightColumnCard.vue'
 import RequestActivityCard from './RequestActivityCard.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
@@ -100,6 +154,7 @@ import {
   getOpportunityUpdateFromDisplayStage
 } from '@/utils/stageMapper'
 import { LEAD_STAGES } from '@/utils/stageMapper/constants'
+import { getCarImageUrl } from '@/utils/vehicleHelpers'
 
 const props = defineProps({
   request: {
@@ -132,8 +187,45 @@ const tradeInActionLoading = ref(false)
 const showMergeModal = ref(false)
 const duplicateToMerge = ref(null)
 const mergeLoading = ref(false)
+/** Dismiss duplicate banner for current request only (resets when request changes). */
+const duplicateBannerDismissed = ref(false)
+
+/** Activity tab: expanded state for AI summaries (same as task detail). */
+const activityExpandedSummaries = ref({})
 
 const { potentialDuplicates } = useDuplicateDetection(computed(() => props.request))
+
+/** Activities for current request (same source logic as task detail). */
+const requestActivities = computed(() => {
+  const r = props.request
+  if (!r) return []
+  let list = []
+  if (r.type === 'lead') {
+    if (leadsStore.currentLead?.id === r.id) {
+      list = leadsStore.currentLeadActivities || []
+    } else {
+      list = r.activities || []
+    }
+  } else if (r.type === 'opportunity') {
+    if (opportunitiesStore.currentOpportunity?.id === r.id) {
+      list = opportunitiesStore.currentOpportunityActivities || []
+    } else {
+      list = r.activities || []
+    }
+  }
+  return [...list].sort((a, b) => {
+    const ta = (a.timestamp ? new Date(a.timestamp).getTime() : 0)
+    const tb = (b.timestamp ? new Date(b.timestamp).getTime() : 0)
+    return tb - ta
+  })
+})
+
+watch(
+  () => props.request?.compositeId,
+  () => {
+    duplicateBannerDismissed.value = false
+  }
+)
 
 const mergeDuplicateSummary = computed(() => {
   const d = duplicateToMerge.value
@@ -160,6 +252,63 @@ const isClosedLead = computed(
 const showAssociatedTasksOrTimeline = computed(
   () => showAssociatedTasks.value || showTimeline.value
 )
+
+async function handleRequestedCarSave(carData) {
+  const r = props.request
+  if (!r?.id) return
+  try {
+    if (r.type === 'lead') {
+      await leadsStore.updateLead(r.id, { requestedCar: carData })
+      await leadsStore.fetchLeadById(r.id)
+    } else {
+      await opportunitiesStore.updateOpportunity(r.id, { requestedCar: carData })
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    toastStore.pushToast('success', 'Requested car updated')
+  } catch {
+    toastStore.pushToast('error', 'Failed to update requested car')
+    throw new Error('Save failed')
+  }
+}
+
+function handleOpenAd() {
+  // TODO: open ad
+}
+
+function handleMoreActions() {
+  // TODO: more actions menu
+}
+
+function handleContactAction() {
+  // TODO: contact action
+}
+
+function openTradeInEdit(item) {
+  editingTradeIn.value = item
+  nextTick(() => {
+    showTradeInModal.value = true
+  })
+}
+
+function openFinancingEdit(item) {
+  editingFinancingOption.value = item
+  nextTick(() => {
+    showFinancingModal.value = true
+  })
+}
+
+function handleActivityClick() {
+  // TODO: open activity detail modal when needed
+}
+
+function toggleActivitySummaryExpanded(activityId) {
+  activityExpandedSummaries.value[activityId] = !activityExpandedSummaries.value[activityId]
+}
+
+function handleAddActivity() {
+  // Add-activity opens modals on task detail; request detail can wire Note/Attachment etc. later
+  toastStore.pushToast('info', 'Add activity – coming soon')
+}
 
 function handlePrevious() {
   if (!props.request?.compositeId || !props.filteredRequests?.length) return

@@ -56,7 +56,12 @@
                 class="flex items-center gap-2 min-w-0 text-left cursor-pointer"
                 @click.stop="detailsVisible = !detailsVisible"
               >
-                <template v-if="detailsVisible">
+                <template v-if="callEnded">
+                  <span class="text-greys-400 text-sm shrink-0">
+                    Call ended
+                  </span>
+                </template>
+                <template v-else-if="detailsVisible">
                   <span class="text-greys-400 text-sm hover:text-white transition-colors shrink-0">
                     {{ 'Hide details' }}
                   </span>
@@ -81,23 +86,12 @@
                   </span>
                 </template>
               </button>
-              <button
-                type="button"
-                class="text-greys-400 hover:text-white transition-colors cursor-pointer p-1 shrink-0"
-                :aria-label="detailsVisible ? 'Collapse details' : 'Expand details'"
-                @click.stop="detailsVisible = !detailsVisible"
-              >
-                <ChevronDown
-                  :size="headerIconSize"
-                  class="transition-transform shrink-0"
-                  :class="{ 'rotate-180': !detailsVisible }"
-                  aria-hidden="true"
-                />
-              </button>
             </div>
+            <!-- Summary (hidden for call simulation)
             <p v-if="detailsVisible && leadSummary" class="text-sm text-white leading-relaxed mt-2 mb-2">
               {{ leadSummary }}
             </p>
+            -->
 
             <!-- Details: scrollable transcript block + fixed Extract button row -->
             <div
@@ -113,15 +107,16 @@
                   {{ t('common.call.madeACall', { name: assignedPersonName || t('common.call.user') }) }}
                 </div>
 
-                <!-- Summary when call has ended -->
+                <!-- Summary when call has ended (hidden for call simulation)
                 <div v-if="callEnded && !isCallActive" class="space-y-1">
                   <h4 class="text-xs font-bold uppercase tracking-wider text-greys-400">Summary</h4>
                   <p class="text-sm text-white">
                     Lead confirmed their details and the call covered the main inquiry discussed in the transcript below.
                   </p>
                 </div>
+                -->
 
-                <!-- Transcript (grey card, 3 lines with expand/collapse) -->
+                <!-- Transcript (grey card, 3 lines with expand/collapse) - hidden for call simulation
                 <div class="bg-greys-800 rounded-lg p-3 space-y-2 border border-greys-700">
                   <div class="flex items-center justify-between gap-2">
                     <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ t('common.call.transcript') }}</span>
@@ -145,6 +140,7 @@
                     </div>
                   </div>
                 </div>
+                -->
               </div>
 
             </div>
@@ -245,8 +241,8 @@
 </template>
 
 <script setup>
-import { Phone, ChevronDown, Sparkles, Mic, MicOff, PhoneOff, AlertTriangle } from 'lucide-vue-next'
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { Phone, Sparkles, Mic, MicOff, PhoneOff, AlertTriangle } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   Button,
@@ -324,8 +320,7 @@ const props = defineProps({
 const emit = defineEmits(['start-call', 'end-call', 'close', 'toggle-mute', 'log-manual-call', 'extract-information', 'update:call-notes', 'copy-number'])
 
 const { t } = useI18n()
-const headerIconSize = 20
-const detailsVisible = ref(true)
+const detailsVisible = ref(false)
 const transcriptExpanded = ref(true)
 const transcriptPreviewCount = 3
 
@@ -379,13 +374,7 @@ const floatingPanelStyle = computed(() => {
   }
 })
 
-// When call ends, expand popup to show transcription
-watch(() => props.callEnded, (ended) => {
-  if (ended) {
-    detailsVisible.value = true
-    transcriptExpanded.value = true
-  }
-})
+// Keep call ended state collapsed (no expansion), same as transcribing
 
 function onCloseClick() {
   if (props.isCallActive) {

@@ -90,6 +90,42 @@
             <div class="flex-1 min-h-0 flex flex-col lg:overflow-y-auto bg-muted">
               <!-- Request Tab -->
               <TabsContent value="request" class="space-y-2 p-2 mt-0 flex-1 min-h-full">
+                <div class="p-4 rounded-lg border border-border bg-background shadow-nsc-card">
+                  <div class="flex items-start justify-between gap-2">
+                    <div class="flex-1 min-w-0">
+                      <TaskBadgesAndTags
+                        :task="displayTask"
+                        stacked
+                        @tag-updated="handleTagUpdated"
+                      >
+                        <template #after-badges>
+                          <span
+                            v-if="showScheduledRecallBadge"
+                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-blue-100 text-blue-700"
+                          >
+                            Recall
+                          </span>
+                          <span
+                            v-if="requestTabAttemptsCount > 0"
+                            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-muted text-muted-foreground"
+                          >
+                            <Phone class="shrink-0 size-2.5" aria-hidden />
+                            {{ requestTabAttemptsValue }}
+                          </span>
+                        </template>
+                      </TaskBadgesAndTags>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      class="shrink-0 text-muted-foreground hover:text-foreground"
+                      aria-label="Open request in new tab"
+                      @click="openRequestInNewTab"
+                    >
+                      <ExternalLink class="size-4" />
+                    </Button>
+                  </div>
+                </div>
                 <VehicleRequestCard
                   v-if="displayTask.requestedCar || displayTask.vehicle"
                   :vehicle="displayTask.requestedCar || displayTask.vehicle"
@@ -105,21 +141,19 @@
                   :customer-id="displayTask.customerId || displayTask.customer?.id"
                   @action="handleContactAction"
                 />
-                <OtherCustomerRequestsCard
-                  :task="displayTask"
-                />
                 <TradeInsCard
-                  v-if="displayTask.type !== 'lead' || (displayTask.tradeIns || []).length > 0"
-                  :items="displayTask.tradeIns || []"
+                  :items="displayTask?.tradeIns ?? []"
                   :add-loading="tradeInActionLoading"
                   @open-add="editingTradeIn = null; showTradeInModal = true"
                   @open-edit="openTradeInEdit"
                 />
                 <FinancingOptionsCard
-                  v-if="displayTask.type !== 'lead' || (displayTask.financingOptions || []).length > 0"
-                  :items="displayTask.financingOptions || []"
+                  :items="displayTask?.financingOptions ?? []"
                   @open-add="editingFinancingOption = null; showFinancingModal = true"
                   @open-edit="openFinancingEdit"
+                />
+                <OtherCustomerRequestsCard
+                  :task="displayTask"
                 />
               </TabsContent>
               
@@ -236,21 +270,24 @@
 </template>
 
 <script setup>
-import { ListTodo } from 'lucide-vue-next'
+import { ListTodo, Phone, ExternalLink } from 'lucide-vue-next'
 import { ref, computed, nextTick } from 'vue'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-library/future/primitives'
+import { useRouter } from 'vue-router'
+import { Button, Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-library/future/primitives'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
 import { useToastStore } from '@/stores/toast'
+import { useSettingsStore } from '@/stores/settings'
 import { getDisplayStage } from '@/utils/stageMapper'
 import TaskDetailHeader from './TaskDetailHeader.vue'
 import TaskAssignee from './TaskAssignee.vue'
 import TaskManagementCard from './TaskManagementCard.vue'
 import TaskContactCard from './TaskContactCard.vue'
 import OtherCustomerRequestsCard from './OtherCustomerRequestsCard.vue'
-import VehicleRequestCard from './VehicleRequestCard.vue'
+import VehicleRequestCard from '@/components/shared/VehicleRequestCard.vue'
 import TaskActivityCard from './TaskActivityCard.vue'
+import TaskBadgesAndTags from './TaskBadgesAndTags.vue'
 import TradeInsCard from '@/components/shared/TradeInsCard.vue'
 import FinancingOptionsCard from '@/components/shared/FinancingOptionsCard.vue'
 import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
@@ -297,6 +334,8 @@ const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
 const toastStore = useToastStore()
+const settingsStore = useSettingsStore()
+const router = useRouter()
 
 // Use store's current lead/opportunity when id matches so drawer and card view show the same loaded data and stay in sync after LQ actions (no-answer, not interested)
 const displayTask = computed(() => {
@@ -379,6 +418,21 @@ const allActivities = computed(() => {
 const activityCount = computed(() => {
   return allActivities.value.length
 })
+
+const showScheduledRecallBadge = computed(
+  () => displayTask.value?.type === 'lead' && displayTask.value?.scheduledRecallAppointment?.date
+)
+const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
+const requestTabAttemptsCount = computed(() => displayTask.value?.contactAttempts?.length ?? 0)
+const requestTabAttemptsValue = computed(
+  () => `${requestTabAttemptsCount.value}/${maxContactAttempts.value}`
+)
+function openRequestInNewTab() {
+  const compositeId = displayTask.value?.compositeId
+  if (!compositeId) return
+  const href = router.resolve({ name: 'request-detail', params: { id: compositeId } }).href
+  window.open(href, '_blank')
+}
 
 // Navigation handlers
 const handlePrevious = () => {

@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-0">
+  <div class="mb-0 unified-search-bar">
     <div
       class="relative flex items-center rounded-lg transition-all duration-300 ease-in-out"
       :class="[

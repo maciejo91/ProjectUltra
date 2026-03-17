@@ -10,7 +10,7 @@
 
     <div
       v-else
-      class="text-center py-16 bg-muted/20 rounded-xl border border-dashed border-border mx-2"
+      class="text-center py-16 bg-background rounded-xl border border-dashed border-border mx-2"
     >
       <div class="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
         <MessageCircle class="w-6 h-6 text-muted-foreground" />

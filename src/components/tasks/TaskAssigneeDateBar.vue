@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="task && (isAssigned || (showDueDate && !assigneeOnly) || (showExpectedCloseDate && !assigneeOnly))"
+    v-if="task && (isAssigned || (showDueDate && !assigneeOnly) || (showExpectedCloseDate && !assigneeOnly) || (showLastUpdated && !assigneeOnly))"
     class="flex items-center flex-wrap shrink-0"
     :class="variant === 'inline' ? 'gap-2' : 'justify-between gap-2 pt-1.5 pb-1.5 px-4'"
   >
@@ -35,6 +35,13 @@
           <AssigneeDropdownContent show-remove-assignee @select="handleAssigneeFromDropdown" />
         </PopoverContent>
       </Popover>
+    </div>
+    <div
+      v-if="showLastUpdated && !assigneeOnly"
+      class="shrink-0 flex items-center gap-1 text-xs text-muted-foreground"
+    >
+      <History class="w-3.5 h-3.5 shrink-0" />
+      <span>Last updated: {{ formattedLastUpdated }}</span>
     </div>
     <div
       v-if="showDueDate && !assigneeOnly"
@@ -122,7 +129,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { Popover, PopoverTrigger, PopoverContent } from '@motork/component-library/future/primitives'
-import { ChevronDown, Clock } from 'lucide-vue-next'
+import { ChevronDown, Clock, History } from 'lucide-vue-next'
 import AssigneeDropdownContent from '@/components/tasks/AssigneeDropdownContent.vue'
 import { formatDueDateRelative } from '@/utils/formatters'
 import { useUsersStore } from '@/stores/users'
@@ -142,6 +149,12 @@ const props = defineProps({
   assigneeOnly: {
     type: Boolean,
     default: false
+  },
+  /** When 'lastUpdated', show last updated date with History icon instead of due/expected close */
+  dateDisplay: {
+    type: String,
+    default: 'due',
+    validator: (v) => ['due', 'lastUpdated'].includes(v)
   }
 })
 
@@ -237,8 +250,18 @@ function handleAssigneeFromDropdown(assignee) {
   assigneeDropdownOpen.value = false
 }
 
+const showLastUpdated = computed(() => {
+  return props.dateDisplay === 'lastUpdated' && !!(props.task?.lastActivity || props.task?.createdAt)
+})
+
+const formattedLastUpdated = computed(() => {
+  if (!props.task) return ''
+  const date = props.task.lastActivity || props.task.createdAt
+  return date ? formatDueDateRelative(date, { pastSuffix: 'ago' }) : ''
+})
+
 const showDueDate = computed(() => {
-  return props.task?.type === 'lead' && props.task?.nextActionDue && !isTaskClosed.value
+  return props.dateDisplay === 'due' && props.task?.type === 'lead' && props.task?.nextActionDue && !isTaskClosed.value
 })
 
 const dueDateLabel = computed(() => 'Due Date')
@@ -249,7 +272,7 @@ const formattedDueDate = computed(() => {
 })
 
 const showExpectedCloseDate = computed(() => {
-  return props.task?.type === 'opportunity' && props.task?.expectedCloseDate
+  return props.dateDisplay === 'due' && props.task?.type === 'opportunity' && props.task?.expectedCloseDate
 })
 
 const formattedExpectedCloseDate = computed(() => {

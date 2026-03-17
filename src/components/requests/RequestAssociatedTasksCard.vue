@@ -1,6 +1,64 @@
 <template>
-  <!-- Bare: content only for tabbed layout -->
-  <div v-if="bare" class="flex-1 min-h-0 overflow-y-auto flex flex-col rounded-lg border border-border bg-background shadow-sm overflow-hidden">
+  <!-- Tasks tab layout: Add task top-right, task cards without container (like Data / Conversations tabs) -->
+  <div v-if="bare && tabLayout" class="space-y-6">
+    <div class="flex justify-end items-center pt-3 pb-1 px-1 mb-4">
+      <Button
+        v-if="showAddButton && hasCustomer"
+        variant="outline"
+        size="sm"
+        class="flex items-center gap-2 rounded-md hover:bg-muted"
+        @click="$emit('add-task')"
+      >
+        Add task
+      </Button>
+    </div>
+    <div v-if="associatedTasks.length > 0" class="space-y-3 pb-6">
+      <button
+        v-for="task in associatedTasks"
+        :key="task.compositeId"
+        type="button"
+        class="group w-full min-w-0 text-left rounded-lg border border-border bg-card shadow-sm p-4 flex items-center gap-3 hover:bg-muted/50 cursor-pointer transition-colors"
+        @click="handleTaskClick(task)"
+      >
+        <div class="w-10 h-7 shrink-0 rounded overflow-hidden bg-muted flex items-center justify-center">
+          <img v-if="getTaskImage(task)" :src="getTaskImage(task)" alt="" class="w-full h-full object-cover" />
+          <Car v-else class="size-3.5 text-muted-foreground" />
+        </div>
+        <div class="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
+          <span
+            class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
+            :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
+          >
+            {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
+          </span>
+          <p class="text-sm font-medium text-foreground truncate">{{ getVehicleDisplay(task) }}</p>
+          <span class="text-xs text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
+          <span
+            v-if="task.type === 'opportunity' && (task.value || task.estimatedValue)"
+            class="text-xs font-semibold text-foreground shrink-0"
+          >
+            {{ formatCurrency(task.value ?? task.estimatedValue) }}
+          </span>
+        </div>
+        <div class="flex items-center gap-1 shrink-0">
+          <span class="text-xs text-muted-foreground whitespace-nowrap">{{ formatTaskDate(task) }}</span>
+          <ChevronRight class="size-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+        </div>
+      </button>
+    </div>
+    <div
+      v-else
+      class="text-center py-16 bg-background rounded-xl border border-dashed border-border mx-2"
+    >
+      <div class="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+        <ListTodo class="w-6 h-6 text-muted-foreground" />
+      </div>
+      <h4 class="text-foreground font-medium mb-1">No tasks yet</h4>
+      <p class="text-muted-foreground text-sm">Other requests for this customer will appear here.</p>
+    </div>
+  </div>
+  <!-- Bare: content only for tabbed layout (with container) -->
+  <div v-else-if="bare" class="flex-1 min-h-0 overflow-y-auto flex flex-col rounded-lg border border-border bg-background shadow-sm overflow-hidden">
     <div class="px-4 py-3 border-b border-border shrink-0">
       <h4 class="text-sm font-semibold text-foreground">Other requests</h4>
       <p class="text-xs text-muted-foreground mt-0.5">Same customer</p>
@@ -101,7 +159,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ChevronRight, Car } from 'lucide-vue-next'
+import { ChevronRight, Car, ListTodo } from 'lucide-vue-next'
 import { Button, Card, CardContent } from '@motork/component-library/future/primitives'
 import { getDisplayStage } from '@/utils/stageMapper'
 import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
@@ -129,6 +187,11 @@ const props = defineProps({
   },
   /** When true, show Add Task button. Use in Tasks tab on request detail. */
   showAddButton: {
+    type: Boolean,
+    default: false
+  },
+  /** When true, use tab layout: Add task top-right, task cards without container (like Data / Conversations tabs). */
+  tabLayout: {
     type: Boolean,
     default: false
   }

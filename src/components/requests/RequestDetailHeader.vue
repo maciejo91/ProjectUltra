@@ -58,6 +58,7 @@
           v-if="request"
           :task="request"
           variant="inline"
+          date-display="lastUpdated"
           class="mt-0.5 pt-0 pb-1 shrink-0 min-w-0"
           @postpone-expected-close="$emit('postpone-expected-close')"
           @reassigned="$emit('reassigned', $event)"

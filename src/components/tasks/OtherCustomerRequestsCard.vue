@@ -50,6 +50,12 @@ const props = defineProps({
   task: {
     type: Object,
     required: true
+  },
+  /** When 'request', links go to request detail page; when 'task', to task detail. */
+  linkTo: {
+    type: String,
+    default: 'task',
+    validator: (v) => v === 'task' || v === 'request'
   }
 })
 
@@ -85,10 +91,17 @@ const relatedTasks = computed(() => {
 
 const goToTask = (task) => {
   const [type, id] = task.compositeId.split('-')
-  router.push({ 
-    path: `/tasks/${id}`, 
-    query: { type } 
-  })
+  if (props.linkTo === 'request') {
+    router.push({
+      path: `/requests/${id}`,
+      query: { type }
+    })
+  } else {
+    router.push({
+      path: `/tasks/${id}`,
+      query: { type }
+    })
+  }
 }
 
 const getTaskStage = (task) => {

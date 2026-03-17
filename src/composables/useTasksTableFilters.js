@@ -34,7 +34,7 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
     if (showTypeFilter.value) {
       defs.push({
         key: 'type',
-        label: 'Type',
+        label: 'Task type',
         type: 'select',
         operators: [{ value: 'eq', label: 'is' }],
         options: [

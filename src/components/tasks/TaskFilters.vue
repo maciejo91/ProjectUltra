@@ -156,7 +156,8 @@ const filterOptions = computed(() => [
   { key: 'lead', label: t('common.tasks.filters.lead'), type: 'type' },
   { key: 'opportunity', label: t('common.tasks.filters.opportunity'), type: 'type' },
   { key: 'due-in-24h', label: t('common.tasks.filters.dueIn24h'), type: 'date' },
-  { key: 'to-be-called', label: t('common.tasks.filters.toBeCalled'), type: 'status' },
+  { key: 'recall-appointment', label: t('common.tasks.filters.recallAppointment'), type: 'status' },
+  { key: 'final-attempt', label: t('common.tasks.filters.finalAttempt'), type: 'status' },
   { key: 'leads-1h', label: t('common.tasks.filters.leads1h'), type: 'date' },
   { key: 'assigned-to-me', label: t('common.tasks.filters.assignedToMe'), type: 'assignee' },
   { key: 'assigned-to-my-team', label: t('common.tasks.filters.assignedToMyTeam'), type: 'assignee' },
@@ -187,8 +188,8 @@ const selectSort = (option) => {
 }
 
 const sortMenuItems = computed(() => [
+  { key: 'none', label: t('common.tasks.sort.none') },
   { key: 'recent-first', label: t('common.tasks.sort.mostRecentFirst') },
-  { key: 'urgent-first', label: t('common.tasks.sort.mostUrgentFirst') },
   { key: 'oldest-first', label: t('common.tasks.sort.oldestFirst') }
 ])
 </script>

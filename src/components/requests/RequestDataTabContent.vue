@@ -67,7 +67,7 @@
     </div>
     
     <!-- Empty State -->
-    <div v-else-if="!showNoteWidget && !showAttachmentWidget" class="text-center py-16 bg-muted/20 rounded-xl border border-dashed border-border mx-2">
+    <div v-else-if="!showNoteWidget && !showAttachmentWidget" class="text-center py-16 bg-background rounded-xl border border-dashed border-border mx-2">
       <div class="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
         <FolderOpen class="w-6 h-6 text-muted-foreground" />
       </div>

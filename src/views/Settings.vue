@@ -343,13 +343,14 @@
               <div class="bg-card border border-border rounded-lg p-6 shadow-mk-dashboard-card flex flex-col">
                 <h3 class="text-title mb-4">Urgency labels (HOT / WARM / STANDARD / COLD)</h3>
                 <p class="text-meta mb-6">The same score used for sorting drives the HOT/WARM/STANDARD/COLD level on leads and opportunities. Set the minimum score for each level.</p>
-                <div class="flex items-center gap-3 mb-6">
+                <div :class="['flex items-center gap-3', localSettings.urgencyEnabled ? 'mb-6' : 'mb-2']">
                   <Checkbox
                     id="scores-urgencyEnabled"
                     v-model="localSettings.urgencyEnabled"
                   />
                   <Label for="scores-urgencyEnabled" class="text-content font-medium text-foreground cursor-pointer">Show urgency level on leads and opportunities (HOT/WARM/STANDARD/COLD)</Label>
                 </div>
+                <p v-if="!localSettings.urgencyEnabled" class="text-meta text-muted-foreground mb-6 ml-7">When off, urgency level is not shown and urgency is not used for sorting or search.</p>
                 <div v-if="localSettings.urgencyEnabled" class="space-y-6">
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
                     <div class="space-y-3">

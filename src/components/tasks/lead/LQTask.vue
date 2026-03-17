@@ -68,6 +68,18 @@
     </template>
 
     <template v-else>
+      <!-- Loading: until lead data (and hasPhone) is known -->
+      <template v-if="isLeadDataLoading">
+        <div class="pt-1 px-1">
+          <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden">
+            <div class="p-8 flex items-center justify-center gap-3 min-h-[120px]" aria-busy="true" aria-label="Loading">
+              <Spinner class="size-6 text-foreground shrink-0" />
+              <span class="text-sm text-muted-foreground">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </template>
+      <template v-else>
       <!-- Contact block: white card (padding matches opportunity management cards) -->
       <div class="pt-1 px-1">
         <div
@@ -114,12 +126,18 @@
 
       <!-- Grey outcome area: outcome selection and expanded cards -->
       <div class="mk-expanded-cards-area space-y-3">
-        <!-- No phone: email form in place of outcome card -->
-        <LQTaskSendEmailCard
-          v-if="!hasPhone && !successState"
-          :lead="lead"
-          :contact-name="lead.customer?.name ?? 'the customer'"
-        />
+        <!-- No phone: email form + inline conversations -->
+        <div v-if="!hasPhone && !successState" class="space-y-3">
+          <LQTaskSendEmailCard
+            :lead="lead"
+            :contact-name="lead.customer?.name ?? 'the customer'"
+            :recent-attachments="recentAttachmentsForEmail"
+          />
+          <div id="lqtask-conversations" class="space-y-3">
+            <h4 class="text-sm font-medium text-foreground">Conversations</h4>
+            <RequestConversationsTabContent :activities="conversationActivities" />
+          </div>
+        </div>
         <!-- Inline Outcome Selection (when lead has phone) -->
         <div v-else-if="!successState" class="space-y-4">
             <div>
@@ -1066,6 +1084,7 @@
           </Button>
         </div>
       </div>
+      </template>
     </template>
 
     <!-- Note Modal -->
@@ -1183,6 +1202,7 @@ import DeadlineBanner from '@/components/tasks/shared/DeadlineBanner.vue'
 import AppointmentCommunications from '@/components/shared/communication/AppointmentCommunications.vue'
 import CloseAsLostForm from '@/components/shared/CloseAsLostForm.vue'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
+import RequestConversationsTabContent from '@/components/requests/RequestConversationsTabContent.vue'
 import { getAvailabilityForAssignee } from '@/services/availabilityService'
 import { simulateCallExtraction } from '@/simulation/callExtractionSimulation'
 
@@ -1524,6 +1544,25 @@ const isOverdue = computed(() => {
   return due < now
 })
 
+// Show loading only until this lead's full data is in the store (avoids stuck loading from global leadsStore.loading)
+const isLeadDataLoading = computed(() => {
+  const leadId = props.lead?.id
+  if (leadId == null) return false
+  return leadsStore.currentLead?.id !== leadId
+})
+
+// Conversation activities (email/WhatsApp) for inline thread when no phone
+const CONVERSATION_TYPES = ['email', 'customer-email', 'whatsapp', 'customer-whatsapp']
+const conversationActivities = computed(() => {
+  const list = (props.activities || []).filter((a) => CONVERSATION_TYPES.includes(a.type))
+  return [...list].sort(
+    (a, b) => new Date(a.timestamp || 0).getTime() - new Date(b.timestamp || 0).getTime()
+  )
+})
+
+const recentAttachmentsForEmail = computed(() =>
+  (props.activities || []).filter((a) => a.type === 'attachment')
+)
 
 // Use contactAttempts and maxContactAttempts from state machine
 const contactAttempts = leadState.contactAttempts

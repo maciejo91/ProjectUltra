@@ -16,7 +16,7 @@ export const mockTasks = [
   },
   {
     id: 2,
-    title: 'Send quotation for Mercedes EQS',
+    title: 'Manage Appointment',
     description: 'Prepare and send detailed quotation for EQS model.',
     status: 'active',
     priority: 'normal',

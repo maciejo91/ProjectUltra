@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-wrap items-center gap-2">
-    <!-- Type Badge (Lead/Opportunity) -->
+    <!-- Type Badge (Lead/Opportunity) – same style as tasks table -->
     <span 
-      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase leading-none"
+      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui"
       :class="typeBadgeClass"
     >
       {{ typeLabel }}
@@ -17,19 +17,11 @@
       {{ callAttemptsValue }}
     </span>
     
-    <!-- Hot Priority Badge (when urgency disabled and not shown elsewhere e.g. next to name on card) -->
-    <span 
-      v-if="showHotPriorityBadge && !urgencyShownElsewhere"
-      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase bg-badge-red text-red-700 leading-none"
-    >
-      Hot
-    </span>
-    
-    <!-- Base Status Badge (shown when there's a substatus) -->
+    <!-- Base Status Badge (shown when there's a substatus) – same colors as tasks table -->
     <span 
       v-if="baseStatus && hasSubstatus"
-      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase leading-none"
-      :class="getStageColorClass(baseStatus)"
+      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui"
+      :class="getStageBadgeClass(baseStatus)"
     >
       {{ baseStatus }}
     </span>
@@ -37,8 +29,8 @@
     <!-- Substatus Badge (or single status if no substatus) -->
     <span 
       v-if="displayStatus"
-      class="px-1.5 py-0.5 rounded text-xs font-medium uppercase leading-none"
-      :class="getStageColorClass(displayStatus)"
+      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui"
+      :class="getStageBadgeClass(displayStatus)"
     >
       {{ displayStatus }}
     </span>
@@ -48,7 +40,8 @@
 <script setup>
 import { computed } from 'vue'
 import { Phone } from 'lucide-vue-next'
-import { getDisplayStage as getCalculatedDisplayStageFromMapper, getStageColor as getStageColorFromMapper } from '@/utils/stageMapper'
+import { getDisplayStage as getCalculatedDisplayStageFromMapper } from '@/utils/stageMapper'
+import { getStageBadgeClass } from '@/utils/formatters'
 import { useSettingsStore } from '@/stores/settings'
 
 const settingsStore = useSettingsStore()
@@ -68,11 +61,6 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  /** When true (e.g. on TaskCard), urgency/hot is shown next to customer name so we hide it here to avoid duplicate. */
-  urgencyShownElsewhere: {
-    type: Boolean,
-    default: false
-  },
   /** When true (e.g. on TaskCard), call attempts are shown under the title so we hide them here. */
   attemptsShownElsewhere: {
     type: Boolean,
@@ -84,10 +72,6 @@ const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAt
 const callAttemptsCount = computed(() => props.task?.contactAttempts?.length ?? 0)
 const callAttemptsValue = computed(() => `${callAttemptsCount.value}/${maxContactAttempts.value}`)
 
-const urgencyEnabled = computed(() => settingsStore.getSetting('urgencyEnabled') !== false)
-const showHotPriorityBadge = computed(() =>
-  props.task?.priority === 'Hot' && !urgencyEnabled.value
-)
 const typeLabel = computed(() => {
   return props.task.type === 'lead' ? 'Lead' : 'Opportunity'
 })
@@ -157,26 +141,4 @@ const displayStatus = computed(() => {
   // If there's a substatus, show it; otherwise show the full display stage
   return substatus.value || displayStage.value
 })
-
-const getStageColorClass = (stage) => {
-  if (!stage) return 'bg-gray-50 text-gray-700 border-gray-200'
-  
-  // For opportunities, use the stage mapper color
-  if (props.task.type === 'opportunity') {
-    try {
-      const baseColor = getStageColorFromMapper(stage, 'opportunity')
-      return baseColor
-    } catch (e) {
-      // Fallback to stage-based colors
-    }
-  }
-  
-  // Fallback colors for leads or when stage mapper fails (New = green per screenshot)
-  const stageLower = stage.toLowerCase()
-  if (stageLower.includes('new')) return 'bg-badge-green text-emerald-700'
-  if (stageLower.includes('qualif')) return 'bg-badge-green text-green-600'
-  if (stageLower.includes('negotiat')) return 'bg-purple-50 text-purple-600'
-  if (stageLower.includes('close')) return 'bg-muted text-muted-foreground'
-  return 'bg-gray-50 text-gray-700'
-}
 </script>

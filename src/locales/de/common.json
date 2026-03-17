@@ -117,14 +117,15 @@
       "lead": "Leads",
       "opportunity": "Opportunities",
       "dueIn24h": "Fällig in 24 Stunden",
-      "toBeCalled": "Erneut anzurufen",
+      "recallAppointment": "Rückruftermin",
+      "finalAttempt": "Letzter Versuch",
       "leads1h": "Leads vor 1 Stunde erstellt",
       "assignedToMe": "Mir zugewiesen",
       "assignedToMyTeam": "Meinem Team zugewiesen"
     },
     "sort": {
+      "none": "Keine Sortierung",
       "mostRecentFirst": "Neueste zuerst",
-      "mostUrgentFirst": "Dringendste zuerst",
       "oldestFirst": "Älteste zuerst"
     }
   },

@@ -61,7 +61,6 @@
           >
             <template #badges="{ item: task }">
               <Badge v-if="task && task.type" :text="task.type === 'lead' ? 'Lead' : 'Opportunity'" size="small" :theme="task.type === 'lead' ? 'green' : 'gray'" />
-              <Badge v-if="task && task.priority === 'Hot' && settingsStore.getSetting('urgencyEnabled') === false" text="HOT" size="small" theme="red" />
             </template>
             <template #location="{ item: task }">{{ getCustomerCity(task) || 'Unknown' }}</template>
             <template #source="{ item: task }">{{ task.source || task.customer?.source || 'Unknown' }}</template>
@@ -169,7 +168,6 @@
         >
           <template #badges="{ item: task }">
             <Badge v-if="task && task.type" :text="task.type === 'lead' ? 'Lead' : 'Opportunity'" size="small" :theme="task.type === 'lead' ? 'green' : 'gray'" />
-            <Badge v-if="task && task.priority === 'Hot' && settingsStore.getSetting('urgencyEnabled') === false" text="HOT" size="small" theme="red" />
           </template>
           <template #location="{ item: task }">{{ getCustomerCity(task) || 'Unknown' }}</template>
           <template #source="{ item: task }">{{ task.source || task.customer?.source || 'Unknown' }}</template>
@@ -408,7 +406,7 @@ const handleViewChange = (newViewMode, searchQuery = '') => {
 
 
 const activeFilters = ref([]) // Array of active filter keys: ['lead', 'due-in-24h', etc.] - no filters by default
-const sortOption = ref('') // '', 'urgent-first', 'assigned-to-me', 'assigned-to-my-team', 'recent-first'
+const sortOption = ref('none') // 'none' = no sort, 'recent-first', 'oldest-first'
 const showClosed = ref(false) // Toggle to show/hide closed leads and closed opportunities; default false (hidden by default)
 
 function toggleShowClosed() {

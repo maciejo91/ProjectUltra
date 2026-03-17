@@ -3,6 +3,7 @@
     <EmailForm
       :initial-template="initialTemplate"
       :initial-message="initialMessage"
+      :recent-attachments="recentAttachments"
       @send="handleSend"
     />
   </div>
@@ -30,6 +31,10 @@ const props = defineProps({
   initialMessage: {
     type: String,
     default: ''
+  },
+  recentAttachments: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -50,6 +55,7 @@ async function handleSend(data) {
       content: data.message || 'Email sent',
       subject: data.subject,
       template: data.template,
+      attachments: data.attachments,
       timestamp: new Date().toISOString()
     }
     await leadsStore.addActivity(props.lead.id, activity)

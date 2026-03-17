@@ -585,6 +585,7 @@
     
     <AddEmailModal
       :show="showEmailModal"
+      :recent-attachments="gridAttachments"
       @save="handleEmailSave"
       @close="showEmailModal = false"
     />
@@ -1516,6 +1517,7 @@ const handleEmailSave = async (data) => {
       message: data.message,
       content: data.message,
       template: data.template,
+      attachments: data.attachments,
       timestamp: new Date().toISOString()
     })
     showEmailModal.value = false

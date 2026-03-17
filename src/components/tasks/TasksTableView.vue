@@ -93,7 +93,7 @@
 
 <script setup>
 import { ref, computed, h, watch, nextTick, onUnmounted } from 'vue'
-import { ListTodo, Trash2, X } from 'lucide-vue-next'
+import { ListTodo, Trash2, X, Triangle, Circle } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
@@ -110,6 +110,7 @@ import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useTaskHelpers } from '@/composables/useTaskHelpers'
 import { getTaskActionTitle, getTaskDisplayTitle } from '@/utils/taskActionTitle'
 import { getDisplayStage } from '@/utils/stageMapper'
+import { getTaskStatus } from '@/utils/taskStatus'
 
 const props = defineProps({
   tasks: { type: Array, required: true },
@@ -179,12 +180,19 @@ const columnFilters = ref([
   { id: 'type-1', field: 'type', value: '', operator: 'eq', pinned: true },
   { id: 'status-1', field: 'status', value: [], operator: 'in', pinned: true }
 ])
-// Default visible columns: show Task title, hide Urgency, Created, Attempts, VIN, Request message, Source
+// Default visible: Task, Due time, Customer, Vehicle, Attempts, Assignee, Created at, Status (task-level). Hidden: Request status, Type, Urgency, VIN, Request message, Source
 const columnVisibility = ref({
-  urgencyLevel: false,
   taskTitle: true,
-  createdAt: false,
-  contactAttempts: false,
+  dueDate: true,
+  customer: true,
+  vehicle: true,
+  contactAttempts: true,
+  assignee: true,
+  createdAt: true,
+  taskStatus: true,
+  requestStatus: false,
+  type: false,
+  urgencyLevel: false,
   vin: false,
   requestMessage: false,
   source: false
@@ -284,27 +292,52 @@ const getCarPrice = (task) => {
   return vehicle?.price
 }
 
-// DataTable columns order: Task title, Due date, Customer, Urgency, Type, Status, Vehicle, VIN, Request message, Created, Attempts, Source, Assigned
-const columns = computed(() => [
+// DataTable columns order: Task title, Due date, Customer, Urgency (when enabled), Type, Status, Vehicle, VIN, Request message, Created, Attempts, Source, Assigned
+const columns = computed(() => {
+  const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') !== false
+  const urgencyColumn = {
+    id: 'urgencyLevel',
+    accessorKey: 'urgencyLevel',
+    header: 'Urgency',
+    meta: { title: 'Urgency' },
+    cell: ({ row }) => {
+      const task = row.original
+      if (!task.urgencyLevel) {
+        return h('span', { class: 'text-meta' }, '—')
+      }
+      const dotClass = getUrgencyDotClass(task.urgencyLevel)
+      return h('span', {
+        class: 'inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none'
+      }, [
+        h('span', { class: ['shrink-0 rounded-full size-2', dotClass].join(' '), 'aria-hidden': 'true' }),
+        task.urgencyLevel
+      ])
+    }
+  }
+  return [
   {
     id: 'taskTitle',
     accessorKey: 'taskTitle',
-    header: 'Task title',
+    header: 'Task',
     meta: {
-      title: 'Task title',
+      title: 'Task',
       onOpen: (row) => handleRowClick(row.original)
     },
     cell: ({ row }) => {
       const task = row.original
       const displayTitle = getTaskDisplayTitle(task)
-      return h('div', { class: 'text-content font-semibold text-foreground truncate min-w-0' }, displayTitle || '—')
+      const subtitle = task.type === 'lead' ? 'Lead' : 'Opportunity'
+      return h('div', { class: 'flex flex-col min-w-0' }, [
+        h('div', { class: 'text-content font-semibold text-foreground truncate' }, displayTitle || '—'),
+        h('div', { class: 'text-meta truncate' }, subtitle)
+      ])
     }
   },
   {
     id: 'dueDate',
     accessorKey: 'nextActionDue',
-    header: 'Due date',
-    meta: { title: 'Due date' },
+    header: 'Due time',
+    meta: { title: 'Due time' },
     cell: ({ row }) => {
       const task = row.original
       const date = task.type === 'opportunity' && task.expectedCloseDate
@@ -317,9 +350,10 @@ const columns = computed(() => [
       const parts = []
       if (date) {
         const status = getDeadlineStatus(date)
+        const pillClass = status.type === 'overdue' ? 'mk-due-pill-overdue' : (status.type === 'urgent' || status.type === 'today' ? 'mk-due-pill-urgent' : 'mk-due-pill-normal')
         const text = formatDueDateRelative(date)
         parts.push(h('span', {
-          class: `text-xs font-medium uppercase leading-none ${status.textClass}`
+          class: `inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium uppercase leading-none ${pillClass}`
         }, text))
       }
       if (hasRecall) {
@@ -344,26 +378,7 @@ const columns = computed(() => [
       ])
     }
   },
-  {
-    id: 'urgencyLevel',
-    accessorKey: 'urgencyLevel',
-    header: 'Urgency',
-    meta: { title: 'Urgency' },
-    cell: ({ row }) => {
-      const task = row.original
-      const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') !== false
-      if (!urgencyEnabled || !task.urgencyLevel) {
-        return h('span', { class: 'text-meta' }, '—')
-      }
-      const dotClass = getUrgencyDotClass(task.urgencyLevel)
-      return h('span', {
-        class: 'inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none'
-      }, [
-        h('span', { class: ['shrink-0 rounded-full size-2', dotClass].join(' '), 'aria-hidden': 'true' }),
-        task.urgencyLevel
-      ])
-    }
-  },
+  ...(urgencyEnabled ? [urgencyColumn] : []),
   {
     id: 'type',
     accessorKey: 'type',
@@ -378,10 +393,10 @@ const columns = computed(() => [
     }
   },
   {
-    id: 'status',
+    id: 'requestStatus',
     accessorKey: 'status',
-    header: 'Status',
-    meta: { title: 'Status' },
+    header: 'Request status',
+    meta: { title: 'Request status' },
     cell: ({ row }) => {
       const task = row.original
       const displayStage = getDisplayStage(task, task.type === 'lead' ? 'lead' : 'opportunity')
@@ -441,8 +456,8 @@ const columns = computed(() => [
   {
     id: 'createdAt',
     accessorKey: 'createdAt',
-    header: 'Created',
-    meta: { title: 'Created' },
+    header: 'Created at',
+    meta: { title: 'Created at' },
     cell: ({ row }) => {
       const task = row.original
       if (!task.createdAt) return h('span', { class: 'text-meta' }, '—')
@@ -458,7 +473,35 @@ const columns = computed(() => [
       const task = row.original
       const attempts = task.contactAttempts?.length || 0
       const max = maxContactAttempts.value
-      return h('span', { class: 'text-content font-medium text-foreground' }, `${attempts}/${max}`)
+      const circumference = 2 * Math.PI * 12
+      const offset = max > 0 ? circumference * (1 - attempts / max) : circumference
+      return h('div', { class: 'mk-attempts-progress' }, [
+        h('svg', {
+          class: 'mk-attempts-progress-ring size-8 -rotate-90',
+          viewBox: '0 0 32 32',
+          'aria-hidden': 'true'
+        }, [
+          h('circle', {
+            class: 'mk-attempts-progress-track',
+            cx: 16,
+            cy: 16,
+            r: 12,
+            fill: 'none',
+            'stroke-width': 3
+          }),
+          h('circle', {
+            class: 'mk-attempts-progress-fill',
+            cx: 16,
+            cy: 16,
+            r: 12,
+            fill: 'none',
+            'stroke-width': 3,
+            'stroke-dasharray': circumference,
+            'stroke-dashoffset': offset
+          })
+        ]),
+        h('span', { class: 'mk-attempts-progress-text text-xs font-medium text-foreground' }, `${attempts}/${max}`)
+      ])
     }
   },
   {
@@ -482,8 +525,8 @@ const columns = computed(() => [
   {
     id: 'assignee',
     accessorKey: 'assignee',
-    header: 'Assigned',
-    meta: { title: 'Assigned' },
+    header: 'Assignee',
+    meta: { title: 'Assignee' },
     cell: ({ row }) => {
       const task = row.original
       const { name, line2 } = getAssigneeDepartmentLocation(task)
@@ -492,8 +535,25 @@ const columns = computed(() => [
         ...(line2 ? [h('div', { class: 'text-meta truncate' }, line2)] : [])
       ])
     }
+  },
+  {
+    id: 'taskStatus',
+    accessorKey: 'taskStatus',
+    header: 'Status',
+    meta: { title: 'Status' },
+    cell: ({ row }) => {
+      const task = row.original
+      const status = getTaskStatus(task, maxContactAttempts.value)
+      const labels = { overdue: 'Overdue', in_progress: 'In progress', open: 'Open' }
+      const statusClass = status === 'overdue' ? 'mk-task-status-overdue' : (status === 'in_progress' ? 'mk-task-status-in-progress' : 'mk-task-status-open')
+      const icon = status === 'overdue' ? h(Triangle, { class: 'shrink-0 size-3.5', 'aria-hidden': 'true' }) : h(Circle, { class: 'shrink-0 size-3.5', 'aria-hidden': 'true' })
+      return h('span', {
+        class: `inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold ${statusClass} w-fit`
+      }, [icon, labels[status]])
+    }
   }
-])
+  ]
+  })
 
 // Filter → sort → paginate for DataTable - maps filter keys to row values (aligned with columns)
 const getTaskFilterValue = (row, key) => {
@@ -535,30 +595,37 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
   sorting,
   pagination,
   filterDefs: filterDefinitions,
-  searchableFields: (row) => [
-    row.customer?.name,
-    row.customer?.email,
-    row.customer?.phone,
-    getCustomerCity(row),
-    getVehicleInfo(row),
-    (row.vehicle || row.requestedCar)?.vin,
-    row.type === 'lead' ? (row.displayStage ?? row.status) : (row.displayStage ?? row.stage),
-    row.type,
-    row.source,
-    row.sourceDetails,
-    row.assignee,
-    getDueDateSearchLabel(row),
-    getCarPrice(row) != null ? String(getCarPrice(row)) : null,
-    row.contactAttempts?.length,
-    row.createdAt,
-    row.type === 'lead' ? (calculateLeadUrgency(row).level ?? null) : null,
-    row.compositeId,
-    row.id,
-    getTaskActionTitle(row),
-    row.requestedCar?.requestMessage,
-    row.requestMessage,
-    row.taskStatusBadge
-  ],
+  searchableFields: (row) => {
+    const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') !== false
+    const urgencyField =
+      urgencyEnabled
+        ? (row.type === 'lead' ? (row.urgencyLevel ?? calculateLeadUrgency(row).level ?? null) : (row.urgencyLevel ?? null))
+        : null
+    return [
+      row.customer?.name,
+      row.customer?.email,
+      row.customer?.phone,
+      getCustomerCity(row),
+      getVehicleInfo(row),
+      (row.vehicle || row.requestedCar)?.vin,
+      row.type === 'lead' ? (row.displayStage ?? row.status) : (row.displayStage ?? row.stage),
+      row.type,
+      row.source,
+      row.sourceDetails,
+      row.assignee,
+      getDueDateSearchLabel(row),
+      getCarPrice(row) != null ? String(getCarPrice(row)) : null,
+      row.contactAttempts?.length,
+      row.createdAt,
+      ...(urgencyEnabled ? [urgencyField] : []),
+      row.compositeId,
+      row.id,
+      getTaskActionTitle(row),
+      row.requestedCar?.requestMessage,
+      row.requestMessage,
+      row.taskStatusBadge
+    ]
+  },
   getFilterValue: getTaskFilterValue
 })
 
@@ -706,13 +773,19 @@ const tableMeta = computed(() => ({
   border: none !important;
 }
 
-/* Filter row is always shown so filters (e.g. default Type: Lead) are explicit */
+/* Filter row: flex so pills sit in one row */
+.data-table-inner.table-search-wrapper :deep([data-slot="table-filter"]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
 
-/* Filter button - white background like reference */
+/* Filter button - same styling (light bg, subtle border) */
 :deep(button[aria-label*="filter"]),
 :deep(button[aria-label*="Filter"]),
 :deep([data-slot="table-filter"] button) {
-  background-color: white !important;
+  background-color: var(--background) !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 

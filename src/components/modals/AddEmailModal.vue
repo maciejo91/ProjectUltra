@@ -14,6 +14,7 @@
           <EmailForm
             ref="formRef"
             :show-actions="false"
+            :recent-attachments="recentAttachments"
             @send="handleSend"
             @update:valid="(v) => (formValid = v)"
           />
@@ -59,6 +60,10 @@ defineProps({
   show: {
     type: Boolean,
     required: true
+  },
+  recentAttachments: {
+    type: Array,
+    default: () => []
   }
 })
 

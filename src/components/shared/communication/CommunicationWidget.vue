@@ -43,6 +43,7 @@
         v-if="selectedChannel === 'email'"
         :initial-template="initialTemplate"
         :initial-message="initialMessage"
+        :recent-attachments="recentAttachments"
         @send="handleSend"
         @cancel="handleCancel"
       />
@@ -116,6 +117,7 @@
         v-if="selectedChannel === 'email'"
         :initial-template="initialTemplate"
         :initial-message="initialMessage"
+        :recent-attachments="recentAttachments"
         @send="handleSend"
         @cancel="handleCancel"
       />
@@ -193,6 +195,10 @@ const props = defineProps({
   initialMessage: {
     type: String,
     default: ''
+  },
+  recentAttachments: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -255,7 +261,8 @@ const handleSend = (data) => {
     content: data.message,
     communicationType: data.type,
     template: data.template,
-    subject: data.subject // For emails
+    subject: data.subject,
+    attachments: data.attachments
   })
   
   // Also emit 'send' for compatibility with CommunicationSelector usage

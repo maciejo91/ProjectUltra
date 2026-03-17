@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col flex-1 min-h-0 overflow-hidden border-t lg:border-t-0 lg:border-l border-border bg-background">
-    <Tabs v-model="activeTab" class="flex flex-col flex-1 min-h-0 overflow-hidden gap-0">
-      <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
+  <div class="flex flex-col">
+    <Tabs v-model="activeTab" class="flex flex-col gap-0">
+      <TabsList class="flex shrink-0 border-0 bg-muted rounded-none w-full relative h-full">
         <TabsTrigger
           value="activity"
           class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
@@ -27,17 +27,26 @@
         </TabsTrigger>
       </TabsList>
 
-      <div class="flex-1 min-h-0 flex flex-col overflow-y-auto bg-muted">
-        <TabsContent value="activity" class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 p-2">
-          <RequestActivityListCard :request="request" bare />
+      <SuggestedNextActionCard v-if="showSuggestedAction && request && activeTab === 'activity'" :request="request" class="shrink-0 mt-2 mx-2" />
+
+      <div class="flex flex-col">
+        <TabsContent value="activity" class="mt-0 data-[state=inactive]:hidden pt-1 px-2 pb-2">
+          <TaskActivityCard
+            :activities="activities"
+            :expanded-summaries="expandedSummaries"
+            :show-add-appointment="false"
+            @activity-click="$emit('activity-click', $event)"
+            @toggle-summary-expanded="$emit('toggle-summary-expanded', $event)"
+            @add-activity="$emit('add-activity', $event)"
+          />
         </TabsContent>
 
         <TabsContent
           v-if="showAssociatedTasks"
           value="other"
-          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 p-2"
+          class="mt-0 data-[state=inactive]:hidden pt-1 px-2 pb-2"
         >
-          <RequestAssociatedTasksCard :request="request" bare @request-navigate="(id, rows) => $emit('request-navigate', id, rows)" />
+          <OtherCustomerRequestsCard :task="request" link-to="request" />
         </TabsContent>
       </div>
     </Tabs>
@@ -47,8 +56,9 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-library/future/primitives'
-import RequestActivityListCard from './RequestActivityListCard.vue'
-import RequestAssociatedTasksCard from './RequestAssociatedTasksCard.vue'
+import TaskActivityCard from '@/components/tasks/TaskActivityCard.vue'
+import OtherCustomerRequestsCard from '@/components/tasks/OtherCustomerRequestsCard.vue'
+import SuggestedNextActionCard from './SuggestedNextActionCard.vue'
 
 const props = defineProps({
   request: {
@@ -58,10 +68,22 @@ const props = defineProps({
   showAssociatedTasks: {
     type: Boolean,
     default: false
+  },
+  showSuggestedAction: {
+    type: Boolean,
+    default: false
+  },
+  activities: {
+    type: Array,
+    default: () => []
+  },
+  expandedSummaries: {
+    type: Object,
+    default: () => ({})
   }
 })
 
-defineEmits(['request-navigate'])
+defineEmits(['request-navigate', 'activity-click', 'toggle-summary-expanded', 'add-activity'])
 
 const activeTab = ref('activity')
 
@@ -84,7 +106,7 @@ watch(
   margin: 0 !important;
   gap: 0 !important;
   height: auto !important;
-  min-height: 48px !important;
+  min-height: 40px !important;
 }
 
 :deep([role="tab"]) {
@@ -95,11 +117,11 @@ watch(
   border-right: none !important;
   border-bottom: none !important;
   margin: 0 !important;
-  padding: 12px 16px !important;
+  padding: 8px 16px !important;
   position: relative !important;
   box-shadow: none !important;
   height: 100% !important;
-  min-height: 48px !important;
+  min-height: 40px !important;
 }
 
 :deep([role="tab"]::before),

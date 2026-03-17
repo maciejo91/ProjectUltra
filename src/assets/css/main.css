@@ -1010,6 +1010,16 @@ button.mk-ai-mode-active:hover:not(:disabled),
   transform: translateY(-2px) !important;
 }
 
+/* Global search bar: no animation on AI mode button */
+.unified-search-bar button.mk-ai-mode-active,
+.unified-search-bar .mk-ai-mode-active {
+  transition: none !important;
+}
+.unified-search-bar button.mk-ai-mode-active:hover:not(:disabled),
+.unified-search-bar .mk-ai-mode-active:hover:not(:disabled) {
+  transform: none !important;
+}
+
 /* Toggle in LQTask "Suggest AI time" (Next call attempt) when selected – same style as AI Mode button */
 .reschedule-toggle-group button.mk-ai-mode-active-toggle[data-state="on"],
 .reschedule-toggle-group button.mk-ai-mode-active-toggle[aria-pressed="true"],
@@ -1171,6 +1181,68 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 .data-table-inner span.inline-flex.rounded[class*="px-2"] {
   font-size: var(--text-xs, 0.75rem);
   font-weight: 600;
+}
+
+/* Task status column badges (Overdue / In progress / Open) – use theme tokens */
+.mk-task-status-overdue {
+  background-color: var(--badge-red-bg, var(--destructive));
+  color: var(--rose-600, var(--destructive-foreground));
+}
+.mk-task-status-in-progress {
+  background-color: var(--badge-orange-bg);
+  color: var(--amber-700);
+}
+.mk-task-status-open {
+  background-color: var(--badge-green-bg);
+  color: var(--emerald-700);
+}
+
+/* Due time pills in tasks table – align with getDeadlineStatus */
+.mk-due-pill-overdue {
+  background-color: var(--badge-red-bg);
+  color: var(--rose-600);
+}
+.mk-due-pill-urgent {
+  background-color: var(--badge-orange-bg);
+  color: var(--amber-700);
+}
+.mk-due-pill-normal {
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+}
+
+/* Attempts column: circular progress (grey ring + green segment, X/Y in center) */
+.mk-attempts-progress {
+  position: relative;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.mk-attempts-progress-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.mk-attempts-progress-track {
+  stroke: var(--muted);
+}
+.mk-attempts-progress-fill {
+  stroke: var(--success);
+  transition: stroke-dashoffset 0.2s ease;
+}
+.mk-attempts-progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 500;
+  line-height: 1;
 }
 
 /* Note: DataTable styling uses Motork component library's default styles */

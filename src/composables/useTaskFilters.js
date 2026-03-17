@@ -172,9 +172,18 @@ export function useTaskFilters(showClosed) {
     })
   }
 
-  // Filter tasks that need to be called again (have nextActionDue set)
-  const filterByToBeCalled = (tasks) => {
-    return tasks.filter(task => task.nextActionDue != null)
+  // Filter tasks with recall badge (leads with scheduled recall appointment)
+  const filterByRecallAppointment = (tasks) => {
+    return tasks.filter(task => task.type === 'lead' && task.scheduledRecallAppointment?.date)
+  }
+
+  // Filter tasks at final attempt (e.g. 4/5 when max is 5)
+  const filterByFinalAttempt = (tasks) => {
+    const maxAttempts = settingsStore.getSetting('maxContactAttempts') ?? 5
+    return tasks.filter(task => {
+      const attempts = task.contactAttempts?.length ?? 0
+      return attempts === maxAttempts - 1 && attempts > 0
+    })
   }
 
   // Filter leads created within the last hour
@@ -228,8 +237,11 @@ export function useTaskFilters(showClosed) {
         case 'due-in-24h':
           filtered = filterByDueIn24Hours(filtered)
           break
-        case 'to-be-called':
-          filtered = filterByToBeCalled(filtered)
+        case 'recall-appointment':
+          filtered = filterByRecallAppointment(filtered)
+          break
+        case 'final-attempt':
+          filtered = filterByFinalAttempt(filtered)
           break
         case 'leads-1h':
           filtered = filterByLeadsCreated1Hour(filtered)
@@ -258,7 +270,8 @@ export function useTaskFilters(showClosed) {
     allTasksIncludingClosed,
     filterByType,
     filterByDueIn24Hours,
-    filterByToBeCalled,
+    filterByRecallAppointment,
+    filterByFinalAttempt,
     filterByLeadsCreated1Hour,
     filterByAssignedToMe,
     filterByAssignedToMyTeam,

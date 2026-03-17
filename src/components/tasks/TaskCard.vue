@@ -5,41 +5,34 @@
     :class="[cardClass, selectedBorderClass]"
     @click="$emit('select', itemId)"
   >
-    <!-- Top row: Urgency (left) | Due Date + Recall (right) -->
+    <!-- Top row: Status (left) | Urgency | Due Date (right) -->
     <div class="flex items-center justify-between gap-2 w-full shrink-0 mb-1">
-      <span
-        v-if="showUrgencyBadge"
-        class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
-      >
+      <div class="flex items-center gap-2 shrink-0 min-w-0">
         <span
-          :class="['shrink-0 rounded-full size-2', urgencyDotClass]"
-          aria-hidden
-        />
-        {{ item.urgencyLevel }}
-      </span>
-      <span
-        v-else-if="showHotFallbackBadge"
-        class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
-      >
-        <span class="shrink-0 rounded-full size-2 bg-red-500" aria-hidden />
-        Hot
-      </span>
-      <div class="flex items-center gap-2 shrink-0 ml-auto">
-        <span
-          v-if="displayDate"
-          class="text-xs font-medium uppercase leading-none"
-          :class="displayDate.status.textClass"
+          v-if="taskStatusLabel"
+          class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold shrink-0 w-fit"
+          :class="taskStatusClass"
         >
-          {{ displayDate.text }}
+          {{ taskStatusLabel }}
         </span>
         <span
-          v-if="showScheduledRecallBadge"
-          class="inline-flex items-center gap-1 text-xs font-medium uppercase leading-none bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded"
+          v-if="showUrgencyBadge"
+          class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
         >
-          <span class="shrink-0 rounded-full size-1.5 bg-blue-500" aria-hidden />
-          Recall
+          <span
+            :class="['shrink-0 rounded-full size-2', urgencyDotClass]"
+            aria-hidden
+          />
+          {{ item.urgencyLevel }}
         </span>
       </div>
+      <span
+        v-if="displayDate"
+        class="text-xs font-medium uppercase leading-none shrink-0"
+        :class="displayDate.status.textClass"
+      >
+        {{ displayDate.text }}
+      </span>
     </div>
 
     <div class="flex flex-col min-w-0 flex-1 pr-2">
@@ -51,28 +44,35 @@
         >
           {{ getName(item) }}
         </span>
-        <span
-          v-if="callAttemptsCount > 0"
-          class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
-        >
-          <Phone class="shrink-0 size-2.5" aria-hidden />
-          {{ callAttemptsValue }}
-        </span>
       </div>
     </div>
 
-    <!-- Badges on new line below title -->
+    <!-- Badges on new line below title (stage/status + recall + attempts) – commented out -->
+    <!--
     <div class="mt-2 w-full shrink-0 flex items-center gap-2 flex-wrap">
-      <TaskBadges :task="item" :urgency-shown-elsewhere="true" :attempts-shown-elsewhere="true" />
+      <TaskBadges :task="item" :attempts-shown-elsewhere="true" />
+      <span
+        v-if="showScheduledRecallBadge"
+        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-blue-100 text-blue-700"
+      >
+        Recall
+      </span>
+      <span
+        v-if="callAttemptsCount > 0"
+        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-muted text-muted-foreground"
+      >
+        {{ callAttemptsValue }}
+      </span>
     </div>
+    -->
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { Phone } from 'lucide-vue-next'
 import { formatDueDateRelative, getDeadlineStatus } from '@/utils/formatters'
 import { getTaskDisplayTitle } from '@/utils/taskActionTitle'
+import { getTaskStatus } from '@/utils/taskStatus'
 import { useSettingsStore } from '@/stores/settings'
 import { getUrgencyDotClass } from '@/composables/useLeadUrgency'
 import TaskBadges from './shared/TaskBadges.vue'
@@ -189,12 +189,24 @@ const showScheduledRecallBadge = computed(() =>
   props.item?.type === 'lead' && props.item?.scheduledRecallAppointment?.date
 )
 
-const urgencyEnabled = computed(() => settingsStore.getSetting('urgencyEnabled') !== false)
-const showUrgencyBadge = computed(() => urgencyEnabled.value && props.item?.urgencyLevel)
-const showHotFallbackBadge = computed(() => !urgencyEnabled.value && props.item?.priority === 'Hot')
+const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
+
+// Status column value (Overdue / In progress / Open) – same as tasks table Status column
+const taskStatus = computed(() => getTaskStatus(props.item, maxContactAttempts.value))
+const taskStatusLabel = computed(() => {
+  const labels = { overdue: 'Overdue', in_progress: 'In progress', open: 'Open' }
+  return labels[taskStatus.value] || ''
+})
+const taskStatusClass = computed(() => {
+  const status = taskStatus.value
+  return status === 'overdue' ? 'mk-task-status-overdue' : (status === 'in_progress' ? 'mk-task-status-in-progress' : 'mk-task-status-open')
+})
+
+// Use store.settings so reactivity to saved settings is guaranteed when user returns from Settings
+const urgencyEnabled = computed(() => settingsStore.settings?.urgencyEnabled !== false)
+const showUrgencyBadge = computed(() => Boolean(urgencyEnabled.value && props.item?.urgencyLevel))
 const urgencyDotClass = computed(() => getUrgencyDotClass(props.item?.urgencyLevel))
 
-const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
 const callAttemptsCount = computed(() => props.item?.contactAttempts?.length ?? 0)
 const callAttemptsValue = computed(() => `${callAttemptsCount.value}/${maxContactAttempts.value}`)
 </script>
