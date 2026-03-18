@@ -13,7 +13,7 @@
             aria-label="Change assignee"
           >
             <div
-              class="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
+              class="w-5 h-5 rounded-full flex items-center justify-center shrink-0 p-0.5"
               :class="getRoleAvatarClass(ownerInfo.role)"
             >
               <span class="text-[9px] font-medium leading-none">{{ getInitials(ownerInfo.name) }}</span>

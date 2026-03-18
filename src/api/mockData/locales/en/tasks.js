@@ -49,7 +49,7 @@ export const mockTasks = [
     dueDate: createDateOffset(5),
     customerId: 4,
     leadId: null,
-    opportunityId: 3,
+    opportunityId: 4,
     assignee: 'Salsabeel Khaleel',
     createdAt: createHourOffset(-2)
   },

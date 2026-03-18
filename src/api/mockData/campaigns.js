@@ -55,17 +55,17 @@ export const mockCampaignInteractions = [
   {
     id: 4,
     customerId: 4,
-    customer: { id: 4, name: 'Vincenzo', initials: 'V' },
+    customer: { id: 4, name: 'Sophie Mueller', initials: 'SM' },
     status: 'Active',
-    channel: 'WhatsApp Business',
+    channel: 'Email',
     direction: 'Outbound',
     lastMessageDate: createDateTimeOffset(-2, 13, 45),
-    lastMessage: 'Vincenzo: Quella di Caserta e quella di Napoli sono vicine?',
+    lastMessage: 'Are your showrooms in Munich and Stuttgart easy to reach by public transport?',
     leadId: 1,
     opportunityId: 2,
     messages: [
-      { id: 1, type: 'whatsapp', user: 'Sales Team', timestamp: createDateTimeOffset(-2, 9, 30), content: 'We have showrooms in both Caserta and Naples. Which would you prefer to visit?' },
-      { id: 2, type: 'customer-whatsapp', user: 'Vincenzo', timestamp: createDateTimeOffset(-2, 13, 45), content: 'Vincenzo: Quella di Caserta e quella di Napoli sono vicine?' }
+      { id: 1, type: 'email', user: 'Sales Team', timestamp: createDateTimeOffset(-2, 9, 30), content: 'We have showrooms in Munich and Stuttgart. Which would you prefer to visit?' },
+      { id: 2, type: 'customer-email', user: 'Sophie Mueller', timestamp: createDateTimeOffset(-2, 13, 45), content: 'Are your showrooms in Munich and Stuttgart easy to reach by public transport?' }
     ]
   },
   {

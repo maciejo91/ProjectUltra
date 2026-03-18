@@ -238,11 +238,18 @@ const columns = computed(() => [
     meta: { title: 'Direction' },
     cell: ({ row }) => {
       const dir = row.original.direction
+      const ch = row.original.channel
+      const isWhatsapp = ch === 'WhatsApp Business' || ch === 'WhatsApp'
       const Icon = dir === 'Inbound' ? ArrowUpRight : ArrowDownLeft
       const label = dir || '—'
-      return h('span', { class: 'flex items-center gap-2 text-muted-foreground' }, [
-        h(Icon, { class: 'w-4 h-4 shrink-0' }),
-        label
+      const iconAreaClass = isWhatsapp
+        ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+      return h('span', { class: 'flex items-center gap-2' }, [
+        h('span', {
+          class: `shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${iconAreaClass}`
+        }, [h(Icon, { class: 'w-4 h-4' })]),
+        h('span', { class: 'text-muted-foreground' }, label)
       ])
     }
   },

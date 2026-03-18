@@ -62,17 +62,14 @@ const icon = computed(() => (isInbound.value ? Download : Upload))
 // Channel icon for badge (Email or WhatsApp)
 const channelIcon = computed(() => (isEmail.value ? Mail : MessageCircle))
 
-// Icon background: blue for inbound, channel-based for outbound
+// Icon area: green for WhatsApp, blue for Email (channel-based)
 const iconBgClass = computed(() => {
-  if (isInbound.value) return 'bg-blue-100 dark:bg-blue-900/30'
   if (isEmail.value) return 'bg-blue-100 dark:bg-blue-900/30'
   if (isWhatsapp.value) return 'bg-green-100 dark:bg-green-900/30'
   return 'bg-muted'
 })
 
-// Icon color: blue for inbound, channel-based for outbound
 const iconColorClass = computed(() => {
-  if (isInbound.value) return 'text-blue-600 dark:text-blue-400'
   if (isEmail.value) return 'text-blue-600 dark:text-blue-400'
   if (isWhatsapp.value) return 'text-green-600 dark:text-green-400'
   return 'text-muted-foreground'

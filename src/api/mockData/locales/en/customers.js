@@ -85,9 +85,9 @@ export const mockCustomers = [
     createdAt: '2025-03-16T10:00:00', 
     lastContact: '2025-03-24T14:00:00',
     interestScore: 91,
-    summary: 'Premium segment buyer with strong preference for BMW and Mercedes. Best reached by phone during lunch hours (12-2 PM). Appreciates personalized service and exclusive offers. Family of 4, looking for spacious SUVs with luxury features. Previous customer with excellent payment history. Budget: €80,000+. Low price sensitivity, high service expectations.',
+    summary: 'Premium segment buyer with strong preference for BMW and Mercedes. Prefers email during lunch hours (12-2 PM). Appreciates personalized service and exclusive offers. Family of 4, looking for spacious SUVs with luxury features. Previous customer with excellent payment history. Budget: €80,000+. Low price sensitivity, high service expectations.',
     preferredVehicleType: 'SUV',
-    preferredChannel: 'Phone',
+    preferredChannel: 'Email',
     preferredContactTime: 'Lunch hours (12-2 PM)',
     budgetRange: '€80K+'
   },

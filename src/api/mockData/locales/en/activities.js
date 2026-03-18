@@ -186,9 +186,9 @@ export const mockActivities = [
   },
   {
     id: 21,
-    type: 'customer-whatsapp',
+    type: 'customer-email',
     user: 'Sophie Mueller',
-    action: 'sent a WhatsApp message',
+    action: 'sent an email',
     content: 'Thanks for the C-Class info. I would like to see it this week.',
     timestamp: createHourOffset(-4),
     leadId: 4
