@@ -1,10 +1,10 @@
 <template>
   <div v-if="task" :class="stacked ? 'flex flex-col gap-2' : 'flex items-center gap-2 flex-wrap'">
-    <div class="flex items-center gap-2 flex-wrap min-w-0">
+    <div v-if="!tagsOnly" class="flex items-center gap-2 flex-wrap min-w-0">
       <TaskBadges :task="task" :attempts-shown-elsewhere="stacked" class="shrink-0" />
       <slot name="after-badges" />
     </div>
-    <div v-if="stacked" class="flex items-center gap-2 flex-wrap">
+    <div v-if="(stacked || tagsOnly) && !badgesOnly" class="flex items-center gap-2 flex-wrap">
       <template v-for="tag in normalizedTags" :key="tag.name">
         <span
           v-if="tag.color"
@@ -45,7 +45,7 @@
         + tag
       </button>
     </div>
-    <template v-else>
+    <template v-else-if="!badgesOnly">
       <template v-for="tag in normalizedTags" :key="tag.name">
         <span
           v-if="tag.color"
@@ -153,6 +153,16 @@ const props = defineProps({
   },
   /** When true, status/type badges and after-badges slot are on first line, tags on second line */
   stacked: {
+    type: Boolean,
+    default: false
+  },
+  /** When true, only render badges (and after-badges slot); no tags */
+  badgesOnly: {
+    type: Boolean,
+    default: false
+  },
+  /** When true, only render tags row (add/remove); no badges */
+  tagsOnly: {
     type: Boolean,
     default: false
   }

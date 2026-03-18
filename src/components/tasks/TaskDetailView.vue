@@ -90,12 +90,14 @@
             <div class="flex-1 min-h-0 flex flex-col lg:overflow-y-auto bg-muted">
               <!-- Request Tab -->
               <TabsContent value="request" class="space-y-2 p-2 mt-0 flex-1 min-h-full">
-                <div class="p-4 rounded-lg border border-border bg-background shadow-nsc-card">
-                  <div class="flex items-start justify-between gap-2">
-                    <div class="flex-1 min-w-0">
+                <!-- Request badges card: compact height, grows with content -->
+                <div class="px-4 py-3 rounded-lg border border-border bg-background shadow-nsc-card shrink-0 w-full">
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="min-w-0">
                       <TaskBadgesAndTags
                         :task="displayTask"
                         stacked
+                        badges-only
                         @tag-updated="handleTagUpdated"
                       >
                         <template #after-badges>
@@ -125,6 +127,14 @@
                       <ExternalLink class="size-4" />
                     </Button>
                   </div>
+                </div>
+                <!-- Tags card -->
+                <div class="px-4 py-3 rounded-lg border border-border bg-background shadow-nsc-card shrink-0 w-full">
+                  <TaskBadgesAndTags
+                    :task="displayTask"
+                    tags-only
+                    @tag-updated="handleTagUpdated"
+                  />
                 </div>
                 <VehicleRequestCard
                   v-if="displayTask.requestedCar || displayTask.vehicle"

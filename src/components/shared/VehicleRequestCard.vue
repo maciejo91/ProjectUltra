@@ -61,8 +61,16 @@
             <span v-if="vehicle.gearType">{{ vehicle.gearType }}</span>
             <span v-if="displayMileage">{{ formatMileage(displayMileage) }} km</span>
           </div>
-          <!-- Source (e.g. website) inside card -->
-          <div v-if="source" class="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
+        </div>
+      </div>
+
+      <!-- Request message with source and open-ad icon next to it -->
+      <div v-if="requestMessage || source" class="mt-4 pt-4 border-t border-border">
+        <div class="flex items-start gap-2 flex-wrap">
+          <p v-if="requestMessage" class="text-sm text-foreground leading-5 flex-1 min-w-0">
+            "{{ requestMessage }}"
+          </p>
+          <div v-if="source" class="flex items-center gap-1.5 shrink-0 text-xs text-muted-foreground">
             <span>{{ source }}</span>
             <Button
               variant="ghost"
@@ -75,13 +83,6 @@
             </Button>
           </div>
         </div>
-      </div>
-
-      <!-- Request Message -->
-      <div v-if="requestMessage" class="mt-4 pt-4 border-t border-border">
-        <p class="text-sm text-foreground leading-5">
-          "{{ requestMessage }}"
-        </p>
       </div>
     </template>
 
