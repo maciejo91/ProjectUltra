@@ -18,7 +18,7 @@
           v-click-outside="() => showAddMenu = false" 
           class="absolute right-0 top-full mt-1 z-50 min-w-[160px] shadow-lg animate-in fade-in slide-in-from-top-1"
         >
-          <div class="bg-white border border-border rounded-lg p-1.5 space-y-0.5">
+          <div class="bg-background border border-border rounded-lg p-1.5 space-y-0.5">
             <button 
               v-for="item in addMenuItems" 
               :key="item.key"
@@ -80,7 +80,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { Button } from '@motork/component-library/future/primitives'
-import { ChevronDown, Paperclip, FolderOpen, StickyNote } from 'lucide-vue-next'
+import { ChevronDown, Paperclip, FolderOpen, StickyNote, Car, CreditCard } from 'lucide-vue-next'
 import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
 import AttachmentWidget from '@/components/shared/feed/AttachmentWidget.vue'
 import FeedItemCard from '@/components/shared/feed/FeedItemCard.vue'
@@ -92,7 +92,7 @@ const props = defineProps({
   customerInitials: { type: String, default: '?' }
 })
 
-const emit = defineEmits(['note-save', 'note-delete', 'attachment-save', 'attachment-delete'])
+const emit = defineEmits(['note-save', 'note-delete', 'attachment-save', 'attachment-delete', 'open-trade-in', 'open-financing'])
 
 const showAddMenu = ref(false)
 const showNoteWidget = ref(false)
@@ -106,9 +106,21 @@ const allDataItems = computed(() =>
     .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0))
 )
 
+function openAddTradeIn() {
+  closeWidgets()
+  emit('open-trade-in')
+}
+
+function openAddFinancing() {
+  closeWidgets()
+  emit('open-financing')
+}
+
 const addMenuItems = [
   { key: 'note', label: 'Add note', icon: StickyNote, onClick: openAddNote },
-  { key: 'attachment', label: 'Add attachment', icon: Paperclip, onClick: openAddAttachment }
+  { key: 'attachment', label: 'Add attachment', icon: Paperclip, onClick: openAddAttachment },
+  { key: 'tradein', label: 'Add trade-in', icon: Car, onClick: openAddTradeIn },
+  { key: 'financing', label: 'Add financing', icon: CreditCard, onClick: openAddFinancing }
 ]
 
 function openAddNote() {

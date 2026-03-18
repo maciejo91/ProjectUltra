@@ -8,8 +8,6 @@
       @previous="$emit('previous')"
       @next="$emit('next')"
       @update-status="$emit('update-status', $event)"
-      @postpone-expected-close="$emit('postpone-expected-close')"
-      @reassigned="$emit('reassigned', $event)"
     />
 
     <div v-if="request" class="flex-1 min-h-0 overflow-y-auto">

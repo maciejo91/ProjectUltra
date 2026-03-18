@@ -1,6 +1,6 @@
 <template>
   <header class="shrink-0 flex items-center justify-between gap-4 px-4 py-3 border-b border-border bg-background">
-    <div class="flex items-start gap-1.5 min-w-0 flex-1">
+    <div class="flex items-center gap-1.5 min-w-0 flex-1">
       <Button
         v-if="isFullPage"
         variant="ghost"
@@ -54,15 +54,6 @@
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <TaskAssigneeDateBar
-          v-if="request"
-          :task="request"
-          variant="inline"
-          date-display="lastUpdated"
-          class="mt-0.5 pt-0 pb-1 shrink-0 min-w-0"
-          @postpone-expected-close="$emit('postpone-expected-close')"
-          @reassigned="$emit('reassigned', $event)"
-        />
       </div>
     </div>
     <div class="flex items-center gap-2 shrink-0">
@@ -108,7 +99,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem
 } from '@motork/component-library/future/primitives'
-import TaskAssigneeDateBar from '@/components/tasks/TaskAssigneeDateBar.vue'
 import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
 import { getStageBadgeClass } from '@/utils/formatters'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
@@ -132,9 +122,7 @@ const emit = defineEmits([
   'close',
   'previous',
   'next',
-  'update-status',
-  'postpone-expected-close',
-  'reassigned'
+  'update-status'
 ])
 
 const displayStage = computed(() => {

@@ -80,6 +80,8 @@
           @note-delete="handleNoteDelete"
           @attachment-save="handleAttachmentSave"
           @attachment-delete="handleAttachmentDelete"
+          @open-trade-in="$emit('open-trade-in')"
+          @open-financing="$emit('open-financing')"
         />
         </TabsContent>
         <TabsContent
@@ -216,6 +218,8 @@
           @note-delete="handleNoteDelete"
           @attachment-save="handleAttachmentSave"
           @attachment-delete="handleAttachmentDelete"
+          @open-trade-in="$emit('open-trade-in')"
+          @open-financing="$emit('open-financing')"
         />
         </TabsContent>
 
@@ -231,27 +235,31 @@
         </TabsContent>
 
         <TabsContent value="offers" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
-        <OfferCarousel
-          ref="offerCarouselRef"
-          :offers="request?.offers || []"
-          :opportunity-id="request?.id"
-          @offer-activated="handleOfferActivated"
-          @offer-accepted="handleOfferAccepted"
-          @generate-pdf="handleOfferPDFGenerate"
-          @add="showAddOfferModal = true"
-        />
+          <div class="rounded-lg bg-background border border-border shadow-nsc-card p-4">
+            <OfferCarousel
+              ref="offerCarouselRef"
+              :offers="request?.offers || []"
+              :opportunity-id="request?.id"
+              @offer-activated="handleOfferActivated"
+              @offer-accepted="handleOfferAccepted"
+              @generate-pdf="handleOfferPDFGenerate"
+              @add="showAddOfferModal = true"
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="contracts" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
-        <ContractCarousel
-          ref="contractCarouselRef"
-          :contracts="contracts"
-          :opportunity-id="request?.id"
-          :max-contract-date="maxContractDate"
-          @generate-pdf="handleContractPDFGenerate"
-          @collect-esignatures="handleCollectESignatures"
-          @add="showCreateContractModal = true"
-        />
+          <div class="rounded-lg bg-background border border-border shadow-nsc-card p-4">
+            <ContractCarousel
+              ref="contractCarouselRef"
+              :contracts="contracts"
+              :opportunity-id="request?.id"
+              :max-contract-date="maxContractDate"
+              @generate-pdf="handleContractPDFGenerate"
+              @collect-esignatures="handleCollectESignatures"
+              @add="showCreateContractModal = true"
+            />
+          </div>
         </TabsContent>
         <TabsContent
           v-if="showTasksTab"
@@ -338,7 +346,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['offer-saved', 'appointment-created', 'request-navigate'])
+const emit = defineEmits(['offer-saved', 'appointment-created', 'request-navigate', 'open-trade-in', 'open-financing'])
 
 const showTasksTab = computed(() => !!(props.request?.customer || props.request?.customerId))
 const activeTab = ref('communicate')

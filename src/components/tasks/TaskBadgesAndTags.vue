@@ -1,6 +1,6 @@
 <template>
-  <div v-if="task" :class="stacked ? 'flex flex-col gap-2' : 'flex items-center gap-2 flex-wrap'">
-    <div v-if="!tagsOnly" class="flex items-center gap-2 flex-wrap min-w-0">
+  <div v-if="task" :class="stacked && !badgesOnly && !tagsOnly ? 'flex flex-col gap-2' : 'flex items-center gap-2 flex-wrap'">
+    <div v-if="!tagsOnly" class="flex items-center gap-2 flex-wrap min-w-0 w-full">
       <TaskBadges :task="task" :attempts-shown-elsewhere="stacked" class="shrink-0" />
       <slot name="after-badges" />
     </div>

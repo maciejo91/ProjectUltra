@@ -90,46 +90,47 @@
             <div class="flex-1 min-h-0 flex flex-col lg:overflow-y-auto bg-muted">
               <!-- Request Tab -->
               <TabsContent value="request" class="space-y-2 p-2 mt-0 flex-1 min-h-full">
-                <!-- Request badges card: compact height, grows with content -->
-                <div class="px-4 py-3 rounded-lg border border-border bg-background shadow-nsc-card shrink-0 w-full">
-                  <div class="flex items-center justify-between gap-2">
-                    <div class="min-w-0">
+                <!-- Request badges card: compact vertical padding like tags card -->
+                <div class="px-4 py-2 rounded-lg border border-border bg-background shadow-nsc-card shrink-0 w-full min-w-0">
+                  <div class="flex items-center gap-2 min-h-0 min-w-0">
+                    <div class="min-w-0 flex-1 flex items-center gap-2 flex-wrap">
                       <TaskBadgesAndTags
                         :task="displayTask"
                         stacked
                         badges-only
                         @tag-updated="handleTagUpdated"
+                        class="min-w-0 w-full max-w-full"
                       >
-                        <template #after-badges>
-                          <span
-                            v-if="showScheduledRecallBadge"
-                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-blue-100 text-blue-700"
-                          >
-                            Recall
-                          </span>
-                          <span
-                            v-if="requestTabAttemptsCount > 0"
-                            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-muted text-muted-foreground"
-                          >
-                            <Phone class="shrink-0 size-2.5" aria-hidden />
-                            {{ requestTabAttemptsValue }}
-                          </span>
-                        </template>
-                      </TaskBadgesAndTags>
+                      <template #after-badges>
+                        <span
+                          v-if="showScheduledRecallBadge"
+                          class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-blue-100 text-blue-700"
+                        >
+                          Recall
+                        </span>
+                        <span
+                          v-if="requestTabAttemptsCount > 0"
+                          class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-muted text-muted-foreground"
+                        >
+                          <Phone class="shrink-0 size-2.5" aria-hidden />
+                          {{ requestTabAttemptsValue }}
+                        </span>
+                      </template>
+                    </TaskBadgesAndTags>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
-                      class="shrink-0 text-muted-foreground hover:text-foreground"
+                      class="shrink-0 h-6 w-6 min-h-0 p-0 text-muted-foreground hover:text-foreground"
                       aria-label="Open request in new tab"
                       @click="openRequestInNewTab"
                     >
-                      <ExternalLink class="size-4" />
+                      <ExternalLink class="size-3" />
                     </Button>
                   </div>
                 </div>
                 <!-- Tags card -->
-                <div class="px-4 py-3 rounded-lg border border-border bg-background shadow-nsc-card shrink-0 w-full">
+                <div class="px-4 py-2 rounded-lg border border-border bg-background shadow-nsc-card shrink-0 w-full">
                   <TaskBadgesAndTags
                     :task="displayTask"
                     tags-only

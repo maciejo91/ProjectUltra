@@ -1,5 +1,14 @@
 <template>
   <div class="overflow-hidden px-3 py-2 rounded-lg bg-background border border-border shadow-nsc-card">
+    <TaskAssigneeDateBar
+      v-if="request"
+      :task="request"
+      variant="inline"
+      date-display="lastUpdated"
+      class="pb-2 mb-2 border-b border-border shrink-0 min-w-0"
+      @postpone-expected-close="$emit('postpone-expected-close')"
+      @reassigned="$emit('reassigned', $event)"
+    />
     <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-xs">
       <span><span class="text-muted-foreground">Generic sales:</span> <span class="text-foreground">{{ genericSales || '—' }}</span></span>
       <span class="text-muted-foreground">·</span>
@@ -19,6 +28,9 @@
 <script setup>
 import { computed } from 'vue'
 import { formatDate } from '@/utils/formatters'
+import TaskAssigneeDateBar from '@/components/tasks/TaskAssigneeDateBar.vue'
+
+defineEmits(['postpone-expected-close', 'reassigned'])
 
 const props = defineProps({
   /** Request or task (lead/opportunity) */

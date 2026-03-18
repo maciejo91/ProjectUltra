@@ -59,7 +59,12 @@
               @request-navigate="(...args) => $emit('request-navigate', ...args)"
               @dismiss="duplicateBannerDismissed = true"
             />
-            <LeadOpportunityDetailsCard v-if="request" :request="request" />
+            <LeadOpportunityDetailsCard
+              v-if="request"
+              :request="request"
+              @postpone-expected-close="handlePostponeExpectedClose"
+              @reassigned="handleReassigned"
+            />
             <!-- Requested car (wider) + Customer (narrower) on same row -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <VehicleRequestCard
@@ -89,26 +94,13 @@
               :request="request"
               @offer-saved="handleOfferSaved"
               @request-navigate="(...args) => $emit('request-navigate', ...args)"
+              @open-trade-in="editingTradeIn = null; showTradeInModal = true"
+              @open-financing="editingFinancingOption = null; showFinancingModal = true"
             />
           </div>
         </div>
         <!-- Activity + Other requests (1/3 width, right column) -->
         <div class="order-2 lg:col-span-1 flex flex-col gap-4">
-          <div class="flex flex-col gap-4 bg-muted rounded-lg p-4">
-            <TradeInsCard
-              v-if="request"
-              :items="request.tradeIns || []"
-              :add-loading="tradeInActionLoading"
-              @open-add="editingTradeIn = null; showTradeInModal = true"
-              @open-edit="openTradeInEdit"
-            />
-            <FinancingOptionsCard
-              v-if="request"
-              :items="request.financingOptions || []"
-              @open-add="editingFinancingOption = null; showFinancingModal = true"
-              @open-edit="openFinancingEdit"
-            />
-          </div>
           <div class="flex flex-col bg-muted rounded-lg pt-2 px-4 pb-4">
             <RequestRightColumnCard
               :request="request"
@@ -129,7 +121,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useDuplicateDetection } from '@/composables/useDuplicateDetection'
 import { mergeRequestIntoPrimary, getVehicleSummary } from '@/api/mergeRequest'
 import { useLeadsStore } from '@/stores/leads'
@@ -140,8 +132,6 @@ import RequestDetailShell from './RequestDetailShell.vue'
 import LeadOpportunityDetailsCard from '@/components/shared/LeadOpportunityDetailsCard.vue'
 import VehicleRequestCard from '@/components/shared/VehicleRequestCard.vue'
 import TaskContactCard from '@/components/tasks/TaskContactCard.vue'
-import TradeInsCard from '@/components/shared/TradeInsCard.vue'
-import FinancingOptionsCard from '@/components/shared/FinancingOptionsCard.vue'
 import RequestRightColumnCard from './RequestRightColumnCard.vue'
 import RequestActivityCard from './RequestActivityCard.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
@@ -281,20 +271,6 @@ function handleMoreActions() {
 
 function handleContactAction() {
   // TODO: contact action
-}
-
-function openTradeInEdit(item) {
-  editingTradeIn.value = item
-  nextTick(() => {
-    showTradeInModal.value = true
-  })
-}
-
-function openFinancingEdit(item) {
-  editingFinancingOption.value = item
-  nextTick(() => {
-    showFinancingModal.value = true
-  })
 }
 
 function handleActivityClick() {
