@@ -245,10 +245,10 @@
         @customer-click="handleCustomerClick"
       />
 
-      <!-- Offers and contracts: below all action cards (negative margin to tighten gap above) -->
+      <!-- Offers and contracts: below all action cards (negative margin to tighten gap above); px-4 matches mk-expanded-cards-area -->
       <div
         v-if="isInNegotiation || (opportunity.offers && opportunity.offers.length > 0) || (scheduledAppointment && scheduledAppointment.start && showOfferAssignmentSection)"
-        class="space-y-4 -mt-4 pb-6"
+        class="space-y-4 -mt-4 pb-6 px-4"
         :key="`offers-wrapper-${opportunity.id}`"
       >
         <OfferCarousel
@@ -262,7 +262,7 @@
           @add="showOfferAssignmentSection ? openCreateOfferModalFromAssignment() : openCreateOfferModal()"
         />
       </div>
-      <div v-if="isContractPending && !opportunityActions.isClosed.value" class="space-y-4 pb-6">
+      <div v-if="isContractPending && !opportunityActions.isClosed.value" class="space-y-4 pb-6 px-4">
         <ContractCarousel
           ref="contractCarouselRef"
           :contracts="contracts"
@@ -273,7 +273,7 @@
           @add="openCreateContractModal"
         />
       </div>
-      <div v-if="isClosedWon && contracts.length > 0" class="space-y-4 pb-6">
+      <div v-if="isClosedWon && contracts.length > 0" class="space-y-4 pb-6 px-4">
         <ContractCarousel
           ref="contractCarouselRef"
           :contracts="contracts"
