@@ -437,11 +437,37 @@ const requestTabAttemptsValue = computed(
   () => `${requestTabAttemptsCount.value}/${maxContactAttempts.value}`
 )
 function openRequestInNewTab() {
+  let id = null
+  let type = null
   const task = displayTask.value
-  if (!task?.id || !task?.type) return
+  if (task?.compositeId) {
+    const [t, num] = task.compositeId.split('-')
+    if (num && (t === 'lead' || t === 'opportunity')) {
+      id = num
+      type = t
+    }
+  }
+  if (id == null && task?.id != null && task?.type) {
+    id = String(task.id)
+    type = task.type
+  }
+  if (id == null && type == null && props.filteredTasks?.length) {
+    const first = props.filteredTasks[0]
+    if (first?.compositeId) {
+      const [t, num] = first.compositeId.split('-')
+      if (num && (t === 'lead' || t === 'opportunity')) {
+        id = num
+        type = t
+      }
+    } else if (first?.id != null && first?.type) {
+      id = String(first.id)
+      type = first.type
+    }
+  }
+  if (id == null || !type) return
   const href = router.resolve({
-    path: `/requests/${task.id}`,
-    query: { type: task.type }
+    path: `/requests/${id}`,
+    query: { type }
   }).href
   window.open(href, '_blank')
 }
