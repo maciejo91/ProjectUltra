@@ -27,10 +27,8 @@
         </TabsTrigger>
       </TabsList>
 
-      <SuggestedNextActionCard v-if="showSuggestedAction && request && activeTab === 'activity'" :request="request" class="shrink-0 mt-2 mx-2" />
-
       <div class="flex flex-col">
-        <TabsContent value="activity" class="mt-0 data-[state=inactive]:hidden pt-1 px-2 pb-2">
+        <TabsContent value="activity" class="mt-0 data-[state=inactive]:hidden py-2 px-1">
           <TaskActivityCard
             :activities="activities"
             :expanded-summaries="expandedSummaries"
@@ -44,7 +42,7 @@
         <TabsContent
           v-if="showAssociatedTasks"
           value="other"
-          class="mt-0 data-[state=inactive]:hidden pt-1 px-2 pb-2"
+          class="mt-0 data-[state=inactive]:hidden py-2 px-1"
         >
           <OtherCustomerRequestsCard :task="request" link-to="request" />
         </TabsContent>
@@ -58,7 +56,6 @@ import { ref, watch } from 'vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-library/future/primitives'
 import TaskActivityCard from '@/components/tasks/TaskActivityCard.vue'
 import OtherCustomerRequestsCard from '@/components/tasks/OtherCustomerRequestsCard.vue'
-import SuggestedNextActionCard from './SuggestedNextActionCard.vue'
 
 const props = defineProps({
   request: {
@@ -66,10 +63,6 @@ const props = defineProps({
     default: null
   },
   showAssociatedTasks: {
-    type: Boolean,
-    default: false
-  },
-  showSuggestedAction: {
     type: Boolean,
     default: false
   },

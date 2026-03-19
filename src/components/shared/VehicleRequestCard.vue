@@ -64,22 +64,30 @@
         </div>
       </div>
 
-      <!-- Request message with source and open-ad icon next to it -->
+      <!-- Request message with source link -->
       <div v-if="requestMessage || source" class="mt-4 pt-4 border-t border-border">
         <div class="flex items-start gap-2 flex-wrap">
           <p v-if="requestMessage" class="text-sm text-foreground leading-5 flex-1 min-w-0">
             "{{ requestMessage }}"
           </p>
-          <div v-if="source" class="flex items-center gap-1.5 shrink-0 text-xs text-muted-foreground">
-            <span>{{ source }}</span>
+          <div v-if="source" class="flex items-center shrink-0 text-xs">
+            <a
+              v-if="sourceUrl"
+              :href="sourceUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-primary underline underline-offset-2 hover:opacity-90 font-medium"
+            >
+              {{ source }}
+            </a>
             <Button
-              variant="ghost"
-              size="icon"
-              class="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
-              aria-label="Open ad"
+              v-else
+              variant="link"
+              size="small"
+              class="text-primary underline underline-offset-2 hover:opacity-90 p-0 h-auto font-medium text-xs"
               @click="$emit('open-ad')"
             >
-              <ExternalLink class="size-3.5" />
+              {{ source }}
             </Button>
           </div>
         </div>
@@ -192,7 +200,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@motork/component-library/future/primitives'
-import { Car, ExternalLink, Pencil } from 'lucide-vue-next'
+import { Car, Pencil } from 'lucide-vue-next'
 
 const props = defineProps({
   vehicle: {
@@ -204,6 +212,11 @@ const props = defineProps({
     default: ''
   },
   source: {
+    type: String,
+    default: ''
+  },
+  /** Optional URL for the source; when set, source is rendered as a real link opening in new tab */
+  sourceUrl: {
     type: String,
     default: ''
   },

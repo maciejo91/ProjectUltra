@@ -118,17 +118,16 @@
         />
       </div>
 
-      <!-- Request Details (condensed) -->
-      <div class="mt-3 pt-3 space-y-2">
-        <div v-if="task.source" class="flex items-center justify-between text-xs">
-          <span class="text-muted-foreground">Source</span>
-          <span class="text-foreground font-medium">{{ task.source }}</span>
-        </div>
-        <div v-if="requestMessage" class="pt-2">
-          <div class="text-xs text-muted-foreground mb-1">Message</div>
-          <div class="bg-muted rounded-lg p-2">
-            <p class="text-xs text-muted-foreground leading-relaxed line-clamp-3">{{ requestMessage }}</p>
-          </div>
+      <!-- Same card as request details page: Generic sales, Source, Channel, Fiscal entity, Dealership, Created date -->
+      <LeadOpportunityDetailsCard
+        :request="task"
+        :show-assignee-bar="false"
+        class="mt-3"
+      />
+      <div v-if="requestMessage" class="mt-3 pt-2">
+        <div class="text-xs text-muted-foreground mb-1">Message</div>
+        <div class="bg-muted rounded-lg p-2">
+          <p class="text-xs text-muted-foreground leading-relaxed line-clamp-3">{{ requestMessage }}</p>
         </div>
       </div>
     </div>
@@ -139,6 +138,7 @@
 import { computed } from 'vue'
 import { Car } from 'lucide-vue-next'
 import { Badge, Button } from '@motork/component-library/future/primitives'
+import LeadOpportunityDetailsCard from '@/components/shared/LeadOpportunityDetailsCard.vue'
 import { getStageColor } from '@/utils/stageMapper'
 import { calculateDaysSince } from '@/utils/formatters'
 import { getLatestOffer } from '@/utils/activityHelpers'

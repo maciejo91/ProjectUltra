@@ -1,7 +1,7 @@
 <template>
-  <div class="overflow-hidden px-3 py-2 rounded-lg bg-background border border-border shadow-nsc-card">
+  <div class="@container overflow-hidden px-3 py-2 rounded-lg bg-background border border-border shadow-nsc-card">
     <TaskAssigneeDateBar
-      v-if="request"
+      v-if="request && showAssigneeBar"
       :task="request"
       variant="inline"
       date-display="lastUpdated"
@@ -9,18 +9,13 @@
       @postpone-expected-close="$emit('postpone-expected-close')"
       @reassigned="$emit('reassigned', $event)"
     />
-    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-xs">
-      <span><span class="text-muted-foreground">Generic sales:</span> <span class="text-foreground">{{ genericSales || '—' }}</span></span>
-      <span class="text-muted-foreground">·</span>
-      <span><span class="text-muted-foreground">Source:</span> <span class="text-foreground">{{ source || '—' }}</span></span>
-      <span class="text-muted-foreground">·</span>
-      <span><span class="text-muted-foreground">Channel:</span> <span class="text-foreground">{{ channel || '—' }}</span></span>
-      <span class="text-muted-foreground">·</span>
-      <span><span class="text-muted-foreground">Fiscal entity:</span> <span class="text-foreground">{{ fiscalEntity || '—' }}</span></span>
-      <span class="text-muted-foreground">·</span>
-      <span><span class="text-muted-foreground">Dealership:</span> <span class="text-foreground">{{ dealership || '—' }}</span></span>
-      <span class="text-muted-foreground">·</span>
-      <span><span class="text-muted-foreground">{{ createdOrImportedLabel }}:</span> <span class="text-foreground">{{ createdOrImportedValue || '—' }}</span></span>
+    <div class="grid grid-cols-2 @[20rem]:grid-cols-3 @[28rem]:grid-cols-4 @[36rem]:grid-cols-5 @[44rem]:grid-cols-6 gap-x-4 @[20rem]:gap-x-2 gap-y-1.5 text-xs">
+      <div><span class="font-semibold text-muted-foreground">Generic sales:</span> <span class="text-foreground">{{ genericSales || '—' }}</span></div>
+      <div><span class="font-semibold text-muted-foreground">Source:</span> <span class="text-foreground">{{ source || '—' }}</span></div>
+      <div><span class="font-semibold text-muted-foreground">Channel:</span> <span class="text-foreground">{{ channel || '—' }}</span></div>
+      <div><span class="font-semibold text-muted-foreground">Fiscal entity:</span> <span class="text-foreground">{{ fiscalEntity || '—' }}</span></div>
+      <div><span class="font-semibold text-muted-foreground">Dealership:</span> <span class="text-foreground">{{ dealership || '—' }}</span></div>
+      <div><span class="font-semibold text-muted-foreground">{{ createdOrImportedLabel }}:</span> <span class="text-foreground">{{ createdOrImportedValue || '—' }}</span></div>
     </div>
   </div>
 </template>
@@ -37,6 +32,11 @@ const props = defineProps({
   request: {
     type: Object,
     default: null
+  },
+  /** When false, only the details line is shown (e.g. in task detail Request tab) */
+  showAssigneeBar: {
+    type: Boolean,
+    default: true
   }
 })
 

@@ -6,20 +6,37 @@
       >
         {{ customerInitials }}
       </div>
-      <div class="flex-1 flex items-center gap-1.5 min-w-0">
-        <h3 class="text-base font-medium text-foreground leading-6 truncate min-w-0">
-          {{ task.customer?.name || 'Unknown' }}
-        </h3>
-        <Button
-          v-if="task.customer?.id"
-          variant="ghost"
-          size="icon"
-          class="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
-          aria-label="Open customer profile"
-          @click="openCustomerProfileInNewTab"
-        >
-          <ExternalLink class="size-4" />
-        </Button>
+      <div class="flex-1 flex flex-col gap-1 min-w-0">
+        <div class="flex items-center gap-1.5 min-w-0">
+          <h3 class="text-base font-medium text-foreground leading-6 truncate min-w-0">
+            {{ task.customer?.name || 'Unknown' }}
+          </h3>
+          <Button
+            v-if="task.customer?.id"
+            variant="ghost"
+            size="icon"
+            class="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+            aria-label="Open customer profile"
+            @click="openCustomerProfileInNewTab"
+          >
+            <ExternalLink class="size-4" />
+          </Button>
+        </div>
+        <div v-if="task.customer?.isBusiness || (task.customer?.tags?.length > 0)" class="flex flex-wrap gap-1.5 items-center min-w-0">
+          <span
+            v-if="task.customer?.isBusiness"
+            class="inline-flex items-center w-fit px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-muted text-muted-foreground"
+          >
+            Business
+          </span>
+          <span
+            v-for="tag in (task.customer?.tags || [])"
+            :key="tag"
+            class="inline-flex items-center w-fit px-2 py-0.5 rounded text-xs font-semibold leading-none badge-ui bg-muted text-muted-foreground"
+          >
+            {{ tag }}
+          </span>
+        </div>
       </div>
       <Button
         v-if="task.customer?.id && !isEditing"

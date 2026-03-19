@@ -1,7 +1,7 @@
 <template>
   <header class="task-detail-header shrink-0 pt-4 lg:pt-2 px-4 sm:px-6 pb-1">
     <div class="task-detail-header-grid">
-      <!-- Single row: Back | Title | Status | Assignee + Due date | Prev/Next/Close -->
+      <!-- Single row: Title (left) | Assignee + date (center) | Prev/Next/Close (right) -->
       <div class="task-detail-header-title-row">
         <div class="flex items-center gap-2 min-w-0 flex-1">
           <Button
@@ -30,16 +30,18 @@
           >
             {{ taskStatusLabel }}
           </span>
+        </div>
+        <div class="flex flex-1 min-w-0 justify-center items-center shrink-0">
           <TaskAssigneeDateBar
             v-if="task && hasAssigneeOrDate"
             :task="task"
             variant="inline"
-            class="shrink-0 min-w-0"
+            class="shrink-0"
             @postpone-expected-close="$emit('postpone-expected-close')"
             @reassigned="$emit('reassigned', $event)"
           />
         </div>
-        <div class="task-detail-header-actions shrink-0">
+        <div class="task-detail-header-actions shrink-0 flex-1 flex justify-end">
           <Button 
             variant="secondary" 
             size="icon" 

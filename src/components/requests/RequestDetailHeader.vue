@@ -12,8 +12,8 @@
         <ChevronLeft class="size-4 text-muted-foreground" />
       </Button>
       <div class="flex flex-col min-w-0 flex-1">
-        <div class="flex items-center gap-2 min-w-0">
-          <span class="text-fluid-sm font-medium text-foreground truncate">
+        <div class="flex items-center gap-2 min-w-0 flex-wrap">
+          <span class="text-fluid-sm font-medium text-foreground truncate min-w-0">
             {{ titleText }}
           </span>
           <span
@@ -53,6 +53,15 @@
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <TaskAssigneeDateBar
+            v-if="request"
+            :task="request"
+            variant="inline"
+            date-display="lastUpdated"
+            class="shrink-0"
+            @postpone-expected-close="$emit('postpone-expected-close')"
+            @reassigned="$emit('reassigned', $event)"
+          />
         </div>
       </div>
     </div>
@@ -99,6 +108,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem
 } from '@motork/component-library/future/primitives'
+import TaskAssigneeDateBar from '@/components/tasks/TaskAssigneeDateBar.vue'
 import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
 import { getStageBadgeClass } from '@/utils/formatters'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
@@ -122,7 +132,9 @@ const emit = defineEmits([
   'close',
   'previous',
   'next',
-  'update-status'
+  'update-status',
+  'postpone-expected-close',
+  'reassigned'
 ])
 
 const displayStage = computed(() => {

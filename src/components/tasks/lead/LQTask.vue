@@ -553,60 +553,6 @@
                   </Select>
                 </div>
 
-                <!-- Trade-in -->
-                <div class="space-y-2">
-                  <Label class="form-label">Trade-in</Label>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    class="gap-1.5 inline-flex items-center"
-                    :disabled="tradeInActionLoading"
-                    @click="handleAddTradeInClick"
-                  >
-                    <Spinner v-if="tradeInActionLoading" class="size-3.5 shrink-0" aria-hidden />
-                    <Plus v-else class="size-3.5" />
-                    Add trade-in
-                  </Button>
-                  <ul v-if="(lead.tradeIns || []).length" class="space-y-1.5">
-                    <li
-                      v-for="t in (lead.tradeIns || [])"
-                      :key="t.id"
-                      class="flex items-center justify-between gap-2 py-1.5 px-2.5 rounded-lg border border-border bg-muted/50 text-sm cursor-pointer hover:bg-muted transition-colors"
-                      @click="openTradeInEdit(t)"
-                    >
-                      <span class="font-medium text-foreground">{{ t.label }}</span>
-                      <span v-if="t.valuation != null" class="text-muted-foreground shrink-0 text-xs">€ {{ formatTradeInCurrency(t.valuation) }}</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <!-- Financing -->
-                <div class="space-y-2">
-                  <Label class="form-label">Financing</Label>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    class="gap-1.5 inline-flex items-center"
-                    :disabled="financingActionLoading"
-                    @click="handleAddFinancingClick"
-                  >
-                    <Spinner v-if="financingActionLoading" class="size-3.5 shrink-0" aria-hidden />
-                    <Plus v-else class="size-3.5" />
-                    Add financing
-                  </Button>
-                  <ul v-if="(lead.financingOptions || []).length" class="space-y-1.5">
-                    <li
-                      v-for="f in (lead.financingOptions || [])"
-                      :key="f.id"
-                      class="flex items-center justify-between gap-2 py-1.5 px-2.5 rounded-lg border border-border bg-muted/50 text-sm cursor-pointer hover:bg-muted transition-colors"
-                      @click="openFinancingEdit(f)"
-                    >
-                      <span class="font-medium text-foreground">{{ f.label }}</span>
-                      <span v-if="f.termMonths" class="text-muted-foreground shrink-0 text-xs">{{ f.termMonths }} months</span>
-                    </li>
-                  </ul>
-                </div>
-
                 <!-- Additional notes -->
                 <div>
                   <Label class="form-label">Additional notes</Label>
@@ -1285,12 +1231,6 @@ const enrichLeadData = ref({
   budgetRange: '',
   additionalNotes: ''
 })
-
-function formatTradeInCurrency(val) {
-  if (val == null) return '0'
-  const n = typeof val === 'string' ? parseFloat(val) : val
-  return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-}
 
 // Assignment state
 const selectedDealership = ref('')

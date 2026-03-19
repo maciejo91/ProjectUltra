@@ -50,7 +50,7 @@
         </TabsTrigger>
       </TabsList>
       <div class="flex-1 min-h-0 flex flex-col overflow-y-auto">
-        <TabsContent value="communicate" class="flex-1 overflow-y-auto space-y-2 pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="communicate" class="flex-1 overflow-y-auto space-y-2 pt-1 px-1 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
           <div class="pt-3 px-1 pb-2">
             <CommunicationWidget
               :task-type="request?.type || 'lead'"
@@ -65,12 +65,12 @@
             />
           </div>
         </TabsContent>
-        <TabsContent value="conversations" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="conversations" class="flex-1 overflow-y-auto pt-1 px-1 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
           <div class="pt-3 px-1 pb-2">
             <RequestConversationsTabContent :activities="conversationActivities" />
           </div>
         </TabsContent>
-        <TabsContent value="data" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="data" class="flex-1 overflow-y-auto pt-1 px-1 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <RequestDataTabContent
           :activities="requestActivities"
           :task-type="request?.type || 'lead'"
@@ -87,16 +87,17 @@
         <TabsContent
           v-if="showTasksTab"
           value="tasks"
-          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 pt-1 px-2 pb-2 gap-4"
+          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 pt-1 px-1 pb-2 gap-4"
         >
           <RequestAssociatedTasksCard
             :request="request"
             bare
             :limit="50"
-            navigate-to-task-detail
+            open-task-in-drawer
             show-add-button
             tab-layout
             @add-task="showCreateTaskModal = true"
+            @open-task-drawer="$emit('open-task-drawer', $event)"
           />
         </TabsContent>
       </div>
@@ -186,7 +187,7 @@
       </TabsList>
 
       <div class="flex-1 min-h-0 flex flex-col overflow-y-auto">
-        <TabsContent value="communicate" class="flex-1 overflow-y-auto space-y-2 pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="communicate" class="flex-1 overflow-y-auto space-y-2 pt-1 px-1 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
           <div class="pt-3 px-1 pb-2">
             <CommunicationWidget
               :task-type="request?.type || 'lead'"
@@ -202,13 +203,13 @@
           </div>
         </TabsContent>
 
-        <TabsContent value="conversations" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="conversations" class="flex-1 overflow-y-auto pt-1 px-1 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
           <div class="pt-3 px-1 pb-2">
             <RequestConversationsTabContent :activities="conversationActivities" />
           </div>
         </TabsContent>
 
-        <TabsContent value="data" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="data" class="flex-1 overflow-y-auto pt-1 px-1 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
         <RequestDataTabContent
           :activities="requestActivities"
           :task-type="request?.type || 'opportunity'"
@@ -234,7 +235,7 @@
         />
         </TabsContent>
 
-        <TabsContent value="offers" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="offers" class="flex-1 overflow-y-auto pt-1 px-1 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
           <div class="rounded-lg bg-background border border-border shadow-nsc-card p-4">
             <OfferCarousel
               ref="offerCarouselRef"
@@ -248,7 +249,7 @@
           </div>
         </TabsContent>
 
-        <TabsContent value="contracts" class="flex-1 overflow-y-auto pt-1 px-2 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
+        <TabsContent value="contracts" class="flex-1 overflow-y-auto pt-1 px-1 pb-2 mt-0 data-[state=inactive]:hidden min-h-0">
           <div class="rounded-lg bg-background border border-border shadow-nsc-card p-4">
             <ContractCarousel
               ref="contractCarouselRef"
@@ -264,16 +265,17 @@
         <TabsContent
           v-if="showTasksTab"
           value="tasks"
-          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 pt-1 px-2 pb-2 gap-4"
+          class="flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden flex flex-col min-h-0 pt-1 px-1 pb-2 gap-4"
         >
           <RequestAssociatedTasksCard
             :request="request"
             bare
             :limit="50"
-            navigate-to-task-detail
+            open-task-in-drawer
             show-add-button
             tab-layout
             @add-task="showCreateTaskModal = true"
+            @open-task-drawer="$emit('open-task-drawer', $event)"
           />
         </TabsContent>
       </div>
@@ -346,7 +348,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['offer-saved', 'appointment-created', 'request-navigate', 'open-trade-in', 'open-financing'])
+const emit = defineEmits(['offer-saved', 'appointment-created', 'request-navigate', 'open-trade-in', 'open-financing', 'open-task-drawer'])
 
 const showTasksTab = computed(() => !!(props.request?.customer || props.request?.customerId))
 const activeTab = ref('communicate')

@@ -8,24 +8,55 @@
       :is-full-page="true"
       @close="handleBack"
       @request-navigate="handleRequestNavigate"
+      @open-task-drawer="handleOpenTaskDrawer"
     />
     <div v-else class="flex-1 flex items-center justify-center p-8">
       <div class="text-center">
         <p class="text-muted-foreground">{{ loading ? 'Loading...' : 'Request not found' }}</p>
       </div>
     </div>
+
+    <!-- Task drawer (on top of request details) -->
+    <DrawerContainer
+      :show="showTaskDrawer"
+      @close="closeTaskDrawer"
+    >
+      <div v-if="!drawerTask && drawerTaskCompositeId" class="flex items-center justify-center h-full p-8">
+        <div class="flex flex-col items-center gap-4">
+          <Loader2 class="size-8 animate-spin text-primary" />
+          <p class="text-sm text-muted-foreground">Loading task...</p>
+        </div>
+      </div>
+      <TaskDetailView
+        v-if="drawerTask && drawerManagementWidget && drawerStoreAdapter && drawerAddNewConfig"
+        :key="drawerTask?.compositeId || 'drawer-empty'"
+        :task="drawerTask"
+        :management-widget="drawerManagementWidget"
+        :store-adapter="drawerStoreAdapter"
+        :add-new-config="drawerAddNewConfig"
+        :filtered-tasks="drawerFilteredTasks"
+        :is-drawer-view="true"
+        @task-navigate="handleDrawerTaskNavigate"
+        @close="closeTaskDrawer"
+      />
+    </DrawerContainer>
   </div>
 </template>
 
 <script setup>
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Loader2 } from 'lucide-vue-next'
 import RequestDetailView from '@/components/requests/RequestDetailView.vue'
+import DrawerContainer from '@/components/shared/DrawerContainer.vue'
+import TaskDetailView from '@/components/tasks/TaskDetailView.vue'
 import { useRequestsList } from '@/composables/useRequestsList'
 import { useLeadsStore } from '@/stores/leads'
 import { getDisplayStage } from '@/utils/stageMapper'
 import { useRequestNavigationStore } from '@/stores/requestNavigation'
 import { useOpportunitiesStore } from '@/stores/opportunities'
+import { useTaskShell } from '@/composables/useTaskShell'
+import { useTaskFilters } from '@/composables/useTaskFilters'
 
 const route = useRoute()
 const router = useRouter()
@@ -33,6 +64,36 @@ const { filteredList, combinedList } = useRequestsList()
 const requestNavigationStore = useRequestNavigationStore()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
+
+const showClosed = ref(true)
+const { allTasks } = useTaskFilters(showClosed)
+
+const showTaskDrawer = ref(false)
+const drawerTaskCompositeId = ref(null)
+
+const drawerTask = computed(() => {
+  if (!drawerTaskCompositeId.value) return null
+  return allTasks.value.find(t => t.compositeId === drawerTaskCompositeId.value) || null
+})
+
+const drawerTaskRef = computed(() => drawerTask.value)
+const drawerTaskShellPropsRaw = useTaskShell(drawerTaskRef)
+const drawerManagementWidget = computed(() => drawerTaskShellPropsRaw.managementWidget.value)
+const drawerStoreAdapter = computed(() => drawerTaskShellPropsRaw.storeAdapter.value)
+const drawerAddNewConfig = computed(() => drawerTaskShellPropsRaw.addNewConfig.value)
+
+const drawerFilteredTasks = computed(() => allTasks.value)
+
+watch(drawerTaskCompositeId, (id) => {
+  if (!id) return
+  const [type, taskId] = id.split('-')
+  const numId = parseInt(taskId, 10)
+  if (type === 'lead' && numId) {
+    leadsStore.fetchLeadById(numId)
+  } else if (type === 'opportunity' && numId) {
+    opportunitiesStore.fetchOpportunityById(numId)
+  }
+})
 
 const requestId = computed(() => parseInt(route.params.id, 10))
 const requestType = computed(() => route.query.type || 'lead')
@@ -133,5 +194,29 @@ function handleRequestNavigate(compositeId, requestRowsOverride) {
     query: { type, from },
     state: rows.length ? { requestRows: rows } : undefined
   })
+}
+
+function handleOpenTaskDrawer(task) {
+  if (!task?.compositeId) return
+  drawerTaskCompositeId.value = task.compositeId
+  showTaskDrawer.value = true
+}
+
+function closeTaskDrawer() {
+  showTaskDrawer.value = false
+  drawerTaskCompositeId.value = null
+}
+
+function handleDrawerTaskNavigate(direction) {
+  if (!drawerTask.value) return
+  const tasks = drawerFilteredTasks.value
+  const currentId = drawerTask.value.compositeId || `${drawerTask.value.type}-${drawerTask.value.id}`
+  const index = tasks.findIndex(t => (t.compositeId || `${t.type}-${t.id}`) === currentId)
+  if (index === -1) return
+  if (direction === 'previous' && index > 0) {
+    drawerTaskCompositeId.value = tasks[index - 1].compositeId
+  } else if (direction === 'next' && index < tasks.length - 1) {
+    drawerTaskCompositeId.value = tasks[index + 1].compositeId
+  }
 }
 </script>

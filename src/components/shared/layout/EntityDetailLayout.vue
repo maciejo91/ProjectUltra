@@ -54,7 +54,6 @@
               <Request
                 :stage="task.displayStage || task.stage"
                 :owner="task.assignee"
-                :source="task.source || ''"
                 :delivery-substatus="task.deliverySubstatus"
                 :activities="task.activities || []"
                 :entity-type="type"

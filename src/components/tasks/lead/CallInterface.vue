@@ -162,7 +162,7 @@
             </div>
             <div class="flex items-center gap-3">
               <Button
-                v-if="isCallActive"
+                v-if="isCallActive && showMuteButton"
                 type="button"
                 variant="outline"
                 size="icon"
@@ -310,6 +310,11 @@ const props = defineProps({
   isMuted: {
     type: Boolean,
     default: false
+  },
+  /** When false, mute button is hidden (e.g. call simulation) */
+  showMuteButton: {
+    type: Boolean,
+    default: true
   },
   assignedPersonName: {
     type: String,

@@ -47,7 +47,8 @@ export class OpportunityService {
           initials: customer.initials,
           email: customer.email,
           phone: customer.phone,
-          address: customer.address
+          address: customer.address,
+          isBusiness: !!customer.isBusiness
         }
       }
     }

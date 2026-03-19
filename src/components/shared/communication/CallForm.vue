@@ -4,6 +4,7 @@
     <CallInterface
       v-if="showCallPanel"
       :hide-button="true"
+      :show-mute-button="false"
       :is-call-active="isCallActive"
       :call-ended="callEnded"
       :call-duration="callDuration"

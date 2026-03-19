@@ -46,11 +46,11 @@
     />
 
     <!-- Left: Car, Customer, etc. (2/3). Right: Activity/Other requests (1/3). Page scrolls as one. -->
-    <div v-if="showAssociatedTasksOrTimeline" class="p-4">
+    <div v-if="showAssociatedTasksOrTimeline" class="p-2">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
         <!-- Left column: two wrappers (cards on top, Communicate/Data/Tasks below) -->
         <div class="order-1 lg:col-span-2 flex flex-col gap-4">
-          <div class="flex flex-col gap-4 bg-muted rounded-lg p-4">
+          <div class="flex flex-col gap-4 bg-muted rounded-lg p-2">
             <DuplicateDetectedCard
               v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
               :potential-duplicates="potentialDuplicates"
@@ -62,6 +62,7 @@
             <LeadOpportunityDetailsCard
               v-if="request"
               :request="request"
+              :show-assignee-bar="false"
               @postpone-expected-close="handlePostponeExpectedClose"
               @reassigned="handleReassigned"
             />
@@ -87,25 +88,30 @@
                 @action="handleContactAction"
               />
             </div>
+            <SuggestedNextActionCard
+              v-if="request && !isClosedLead"
+              :request="request"
+              class="shrink-0"
+            />
           </div>
-          <div class="flex flex-col bg-muted rounded-lg pt-2 px-4 pb-4">
+          <div class="flex flex-col bg-muted rounded-lg p-2">
             <RequestActivityCard
               v-if="showTimeline && !isClosedLead"
               :request="request"
               @offer-saved="handleOfferSaved"
               @request-navigate="(...args) => $emit('request-navigate', ...args)"
               @open-trade-in="editingTradeIn = null; showTradeInModal = true"
+              @open-task-drawer="$emit('open-task-drawer', $event)"
               @open-financing="editingFinancingOption = null; showFinancingModal = true"
             />
           </div>
         </div>
         <!-- Activity + Other requests (1/3 width, right column) -->
         <div class="order-2 lg:col-span-1 flex flex-col gap-4">
-          <div class="flex flex-col bg-muted rounded-lg pt-2 px-4 pb-4">
+          <div class="flex flex-col bg-muted rounded-lg p-2">
             <RequestRightColumnCard
               :request="request"
               :show-associated-tasks="showAssociatedTasks"
-              :show-suggested-action="request && !isClosedLead"
               :activities="requestActivities"
               :expanded-summaries="activityExpandedSummaries"
               @request-navigate="(...args) => $emit('request-navigate', ...args)"
@@ -134,6 +140,7 @@ import VehicleRequestCard from '@/components/shared/VehicleRequestCard.vue'
 import TaskContactCard from '@/components/tasks/TaskContactCard.vue'
 import RequestRightColumnCard from './RequestRightColumnCard.vue'
 import RequestActivityCard from './RequestActivityCard.vue'
+import SuggestedNextActionCard from './SuggestedNextActionCard.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
@@ -161,7 +168,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close', 'request-navigate'])
+const emit = defineEmits(['close', 'request-navigate', 'open-task-drawer'])
 
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()

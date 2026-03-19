@@ -17,28 +17,34 @@
         v-for="task in associatedTasks"
         :key="task.compositeId"
         type="button"
-        class="group w-full min-w-0 text-left rounded-lg border border-border bg-card shadow-sm p-4 flex items-center gap-3 hover:bg-muted/50 cursor-pointer transition-colors"
+        class="group w-full min-w-0 text-left rounded-lg border border-border bg-card shadow-sm p-4 flex items-start gap-3 hover:bg-muted/50 cursor-pointer transition-colors"
         @click="handleTaskClick(task)"
       >
         <div class="w-10 h-7 shrink-0 rounded overflow-hidden bg-muted flex items-center justify-center">
           <img v-if="getTaskImage(task)" :src="getTaskImage(task)" alt="" class="w-full h-full object-cover" />
           <Car v-else class="size-3.5 text-muted-foreground" />
         </div>
-        <div class="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-          <span
-            class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
-            :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
-          >
-            {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
-          </span>
-          <p class="text-sm font-medium text-foreground truncate">{{ getVehicleDisplay(task) }}</p>
-          <span class="text-xs text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
-          <span
-            v-if="task.type === 'opportunity' && (task.value || task.estimatedValue)"
-            class="text-xs font-semibold text-foreground shrink-0"
-          >
-            {{ formatCurrency(task.value ?? task.estimatedValue) }}
-          </span>
+        <div class="flex-1 min-w-0 flex flex-col gap-1">
+          <div v-if="task.assignee" class="flex items-center gap-1 text-xs text-muted-foreground">
+            <User class="size-3 shrink-0" aria-hidden />
+            <span class="truncate">{{ task.assignee }}</span>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span
+              class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
+              :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
+            >
+              {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
+            </span>
+            <p class="text-sm font-medium text-foreground truncate">{{ getVehicleDisplay(task) }}</p>
+            <span class="text-xs text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
+            <span
+              v-if="task.type === 'opportunity' && (task.value || task.estimatedValue)"
+              class="text-xs font-semibold text-foreground shrink-0"
+            >
+              {{ formatCurrency(task.value ?? task.estimatedValue) }}
+            </span>
+          </div>
         </div>
         <div class="flex items-center gap-1 shrink-0">
           <span class="text-xs text-muted-foreground whitespace-nowrap">{{ formatTaskDate(task) }}</span>
@@ -74,7 +80,7 @@
         v-for="task in associatedTasks"
         :key="task.compositeId"
         type="button"
-        class="group w-full min-w-0 py-2 text-left transition-colors hover:bg-muted/50 cursor-pointer flex items-center gap-2 overflow-hidden border-l-2 border-transparent first:pt-0"
+        class="group w-full min-w-0 py-2 text-left transition-colors hover:bg-muted/50 cursor-pointer flex items-start gap-2 overflow-hidden border-l-2 border-transparent first:pt-0"
         :class="task.type === 'lead' ? 'hover:border-l-emerald-700' : 'hover:border-l-purple-500'"
         @click="handleTaskClick(task)"
       >
@@ -82,21 +88,27 @@
           <img v-if="getTaskImage(task)" :src="getTaskImage(task)" alt="" class="w-full h-full object-cover" />
           <Car v-else class="size-3.5 text-muted-foreground" />
         </div>
-        <div class="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-          <span
-            class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
-            :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
-          >
-            {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
-          </span>
-          <p class="text-sm font-medium text-foreground truncate">{{ getVehicleDisplay(task) }}</p>
-          <span class="text-xs text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
-          <span
-            v-if="task.type === 'opportunity' && (task.value || task.estimatedValue)"
-            class="text-xs font-semibold text-foreground shrink-0"
-          >
-            {{ formatCurrency(task.value ?? task.estimatedValue) }}
-          </span>
+        <div class="flex-1 min-w-0 flex flex-col gap-1">
+          <div v-if="task.assignee" class="flex items-center gap-1 text-xs text-muted-foreground">
+            <User class="size-3 shrink-0" aria-hidden />
+            <span class="truncate">{{ task.assignee }}</span>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span
+              class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
+              :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
+            >
+              {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
+            </span>
+            <p class="text-sm font-medium text-foreground truncate">{{ getVehicleDisplay(task) }}</p>
+            <span class="text-xs text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
+            <span
+              v-if="task.type === 'opportunity' && (task.value || task.estimatedValue)"
+              class="text-xs font-semibold text-foreground shrink-0"
+            >
+              {{ formatCurrency(task.value ?? task.estimatedValue) }}
+            </span>
+          </div>
         </div>
         <div class="flex items-center gap-1 shrink-0">
           <span class="text-xs text-muted-foreground whitespace-nowrap">{{ formatTaskDate(task) }}</span>
@@ -122,7 +134,7 @@
           v-for="task in associatedTasks"
           :key="task.compositeId"
           type="button"
-          class="group w-full min-w-0 px-4 py-2 text-left transition-colors hover:bg-muted/50 cursor-pointer flex items-center gap-2 overflow-hidden border-l-2 border-transparent"
+          class="group w-full min-w-0 px-4 py-2 text-left transition-colors hover:bg-muted/50 cursor-pointer flex items-start gap-2 overflow-hidden border-l-2 border-transparent"
           :class="task.type === 'lead' ? 'hover:border-l-emerald-700' : 'hover:border-l-purple-500'"
           @click="handleTaskClick(task)"
         >
@@ -130,21 +142,27 @@
             <img v-if="getTaskImage(task)" :src="getTaskImage(task)" alt="" class="w-full h-full object-cover" />
             <Car v-else class="size-3.5 text-muted-foreground" />
           </div>
-          <div class="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-            <span
-              class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
-              :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
-            >
-              {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
-            </span>
-            <p class="text-sm font-medium text-foreground truncate">{{ getVehicleDisplay(task) }}</p>
-            <span class="text-xs text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
-            <span
-              v-if="task.type === 'opportunity' && (task.value || task.estimatedValue)"
-              class="text-xs font-semibold text-foreground shrink-0"
-            >
-              {{ formatCurrency(task.value ?? task.estimatedValue) }}
-            </span>
+          <div class="flex-1 min-w-0 flex flex-col gap-1">
+            <div v-if="task.assignee" class="flex items-center gap-1 text-xs text-muted-foreground">
+              <User class="size-3 shrink-0" aria-hidden />
+              <span class="truncate">{{ task.assignee }}</span>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
+                :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
+              >
+                {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
+              </span>
+              <p class="text-sm font-medium text-foreground truncate">{{ getVehicleDisplay(task) }}</p>
+              <span class="text-xs text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
+              <span
+                v-if="task.type === 'opportunity' && (task.value || task.estimatedValue)"
+                class="text-xs font-semibold text-foreground shrink-0"
+              >
+                {{ formatCurrency(task.value ?? task.estimatedValue) }}
+              </span>
+            </div>
           </div>
           <div class="flex items-center gap-1 shrink-0">
             <span class="text-xs text-muted-foreground whitespace-nowrap">{{ formatTaskDate(task) }}</span>
@@ -159,7 +177,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ChevronRight, Car, ListTodo } from 'lucide-vue-next'
+import { ChevronRight, Car, ListTodo, User } from 'lucide-vue-next'
 import { Button, Card, CardContent } from '@motork/component-library/future/primitives'
 import { getDisplayStage } from '@/utils/stageMapper'
 import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
@@ -185,6 +203,11 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  /** When true, clicking a task opens task detail in a drawer instead of navigating. Takes precedence over navigateToTaskDetail. */
+  openTaskInDrawer: {
+    type: Boolean,
+    default: false
+  },
   /** When true, show Add Task button. Use in Tasks tab on request detail. */
   showAddButton: {
     type: Boolean,
@@ -197,7 +220,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['request-navigate', 'add-task'])
+const emit = defineEmits(['request-navigate', 'add-task', 'open-task-drawer'])
 const router = useRouter()
 
 const leadsStore = useLeadsStore()
@@ -297,6 +320,10 @@ function formatCurrency(amount) {
 }
 
 function handleTaskClick(task) {
+  if (props.openTaskInDrawer && task.compositeId) {
+    emit('open-task-drawer', task)
+    return
+  }
   if (props.navigateToTaskDetail && task.compositeId) {
     const [type, id] = task.compositeId.split('-')
     if (type && id) {

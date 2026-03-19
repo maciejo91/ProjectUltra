@@ -92,11 +92,6 @@
                   >
                     <span class="truncate block min-w-0">VIN: {{ vin }}</span>
                   </div>
-                  <!-- Source next to stock availability -->
-                  <div v-if="source" class="inline-flex items-center gap-1.5 px-2 py-1 bg-muted text-muted-foreground text-xs font-semibold rounded-md">
-                    <span class="text-xs text-muted-foreground font-medium">Source:</span>
-                    <span class="text-xs font-bold text-foreground">{{ source }}</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -122,8 +117,16 @@
             <p class="text-sm text-muted-foreground leading-relaxed">{{ requestMessage }}</p>
           </div>
         </div>
+
+        <!-- Same card as Request tab on task detail: Generic sales, Source, Channel, Fiscal entity, Dealership, Created date -->
+        <LeadOpportunityDetailsCard
+          v-if="task"
+          :request="task"
+          :show-assignee-bar="false"
+          class="mt-4"
+        />
       
-      <!-- Separator and toggle button (only show if there are expandable details) -->
+      <!-- Separator and toggle button (only show if there are vehicle details to expand) -->
       <div v-if="hasExpandableDetails" class="border-t border-border">
         <button
           @click="isExpanded = !isExpanded"
@@ -137,54 +140,9 @@
         </button>
       </div>
       
-      <!-- Expandable details -->
+      <!-- Expandable details: vehicle details only -->
       <div v-if="isExpanded && hasExpandableDetails" class="border-t border-border p-6 bg-muted/30 text-sm animate-fade-in">
-        <!-- REQUEST DETAILS -->
-        <div class="mb-6">
-          <h4 class="text-xs font-bold uppercase text-muted-foreground tracking-wider mb-4">REQUEST DETAILS</h4>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-6">
-            <div v-if="source">
-              <div class="text-xs text-muted-foreground mb-1">Source</div>
-              <div class="font-medium text-muted-foreground">{{ source }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-muted-foreground mb-1">Source details</div>
-              <div class="font-medium" :class="sourceDetails ? 'text-muted-foreground' : 'text-muted-foreground'">{{ sourceDetails || '--' }}</div>
-            </div>
-            <div v-if="dealership">
-              <div class="text-xs text-muted-foreground mb-1">Dealership</div>
-              <div class="font-medium text-muted-foreground">{{ dealership }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-muted-foreground mb-1">Channel</div>
-              <div class="font-medium text-muted-foreground">{{ channel || 'Email' }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-muted-foreground mb-1">AdCampaign</div>
-              <div class="font-medium" :class="adCampaign ? 'text-muted-foreground' : 'text-muted-foreground'">{{ adCampaign || '--' }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-muted-foreground mb-1">AdMedium</div>
-              <div class="font-medium" :class="adMedium ? 'text-muted-foreground' : 'text-muted-foreground'">{{ adMedium || '--' }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-muted-foreground mb-1">AdSource</div>
-              <div class="font-medium" :class="adSource ? 'text-muted-foreground' : 'text-muted-foreground'">{{ adSource || '--' }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-muted-foreground mb-1">Expected purchase date</div>
-              <div class="font-medium" :class="expectedPurchaseDate ? 'text-muted-foreground' : 'text-muted-foreground'">{{ expectedPurchaseDate || '--' }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-muted-foreground mb-1">Fiscal entity</div>
-              <div class="font-medium" :class="fiscalEntity ? 'text-muted-foreground' : 'text-muted-foreground'">{{ fiscalEntity || '--' }}</div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- VEHICLE DETAILS (only if car exists) -->
         <div v-if="hasCar">
-          <div class="border-t border my-4"></div>
           <div>
             <div class="flex justify-between items-center mb-4">
               <h4 class="text-xs font-bold uppercase text-muted-foreground tracking-wider">VEHICLE DETAILS</h4>
@@ -237,13 +195,14 @@
 import { Pin, Car, ListChecks, ChevronDown } from 'lucide-vue-next'
 import { ref, computed } from 'vue'
 import { Badge, Button, Card, CardHeader, CardContent } from '@motork/component-library/future/primitives'
+import LeadOpportunityDetailsCard from '@/components/shared/LeadOpportunityDetailsCard.vue'
 import { getDeliverySubstatusColor, getStageColor } from '@/utils/stageMapper'
 import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
 import { calculateDaysSince } from '@/utils/formatters'
 import { getLatestOffer } from '@/utils/activityHelpers'
 
 const props = defineProps({
-  // Stage/Owner/Source props
+  // Stage/Owner props
   stage: {
     type: String,
     required: true
@@ -251,10 +210,6 @@ const props = defineProps({
   owner: {
     type: String,
     required: true
-  },
-  source: {
-    type: String,
-    default: ''
   },
   deliverySubstatus: {
     type: String,
@@ -402,34 +357,6 @@ const vehicleCondition = computed(() => {
   return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Used'
 })
 
-const channel = computed(() => {
-  return 'Email' // Default, could be enhanced if task has channel field
-})
-
-const adCampaign = computed(() => {
-  return props.task?.sourceDetails || props.requestedCar?.adCampaign || ''
-})
-
-const expectedPurchaseDate = computed(() => {
-  return props.requestedCar?.expectedPurchaseDate || ''
-})
-
-const fiscalEntity = computed(() => {
-  return props.task?.fiscalEntity || ''
-})
-
-const sourceDetails = computed(() => {
-  return props.task?.sourceDetails || ''
-})
-
-const adMedium = computed(() => {
-  return props.requestedCar?.adMedium || ''
-})
-
-const adSource = computed(() => {
-  return props.requestedCar?.adSource || ''
-})
-
 const showOpenAd = computed(() => {
   return true
 })
@@ -439,10 +366,7 @@ const showTechnicalSpecs = computed(() => {
 })
 
 const hasExpandableDetails = computed(() => {
-  // Show expandable section if there are request details or vehicle details to show
-  return hasCar.value || props.requestType || props.source || sourceDetails.value || 
-         adCampaign.value || expectedPurchaseDate.value || fiscalEntity.value ||
-         adMedium.value || adSource.value
+  return hasCar.value
 })
 
 // Formatting functions
