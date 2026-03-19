@@ -1,5 +1,8 @@
 <template>
-  <div class="@container overflow-hidden px-3 py-2 rounded-lg bg-background border border-border shadow-nsc-card">
+  <div
+    class="@container overflow-hidden"
+    :class="bare ? 'min-w-0 pt-2' : 'px-3 py-2 rounded-lg bg-background border border-border shadow-nsc-card'"
+  >
     <TaskAssigneeDateBar
       v-if="request && showAssigneeBar"
       :task="request"
@@ -37,6 +40,11 @@ const props = defineProps({
   showAssigneeBar: {
     type: Boolean,
     default: true
+  },
+  /** When true, render without card border/shadow (for embedding inside another card) */
+  bare: {
+    type: Boolean,
+    default: false
   }
 })
 

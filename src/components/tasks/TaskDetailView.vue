@@ -57,14 +57,6 @@
                   : 'text-muted-foreground hover:text-muted-foreground'"
               >
                 <span>Request</span>
-                <button
-                  type="button"
-                  class="shrink-0 p-0.5 rounded text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  aria-label="Open request in new tab"
-                  @click.stop="openRequestInNewTab"
-                >
-                  <ExternalLink class="size-3" />
-                </button>
                 <span 
                   v-if="sidebarTab === 'request'"
                   class="absolute bottom-0 left-0 right-0 h-[2px] bg-primary z-10"
@@ -98,37 +90,50 @@
             <div class="flex-1 min-h-0 flex flex-col lg:overflow-y-auto bg-muted">
               <!-- Request Tab -->
               <TabsContent value="request" class="space-y-2 p-2 mt-0 flex-1 min-h-full">
-                <!-- Request badges and tags card -->
-                <div class="px-4 pt-4 pb-2 rounded-lg border border-border bg-background shadow-nsc-card shrink-0 w-full min-w-0">
-                  <TaskBadgesAndTags
-                    :task="displayTask"
-                    stacked
-                    @tag-updated="handleTagUpdated"
-                    class="min-w-0 w-full max-w-full"
-                  >
-                    <template #after-badges>
-                      <span
-                        v-if="showScheduledRecallBadge"
-                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-blue-100 text-blue-700"
-                      >
-                        Recall
-                      </span>
-                      <span
-                        v-if="requestTabAttemptsCount > 0"
-                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-muted text-muted-foreground"
-                      >
-                        <Phone class="shrink-0 size-2.5" aria-hidden />
-                        {{ requestTabAttemptsValue }}
-                      </span>
-                    </template>
-                  </TaskBadgesAndTags>
+                <!-- Details card: badges/tags + request details, with open-in-new-tab in header -->
+                <div class="rounded-lg border border-border bg-background shadow-nsc-card shrink-0 w-full min-w-0 overflow-hidden">
+                  <div class="shrink-0 flex items-center justify-between gap-2 px-4 pt-4 pb-2 border-b border-border">
+                    <h4 class="text-sm font-semibold text-foreground">Request Details</h4>
+                    <button
+                      type="button"
+                      class="shrink-0 p-0.5 rounded text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      aria-label="Open request in new tab"
+                      @click="openRequestInNewTab"
+                    >
+                      <ExternalLink class="size-3" />
+                    </button>
+                  </div>
+                  <div class="px-4 pt-4 pb-4 space-y-4">
+                    <TaskBadgesAndTags
+                      :task="displayTask"
+                      stacked
+                      @tag-updated="handleTagUpdated"
+                      class="min-w-0 w-full max-w-full"
+                    >
+                      <template #after-badges>
+                        <span
+                          v-if="showScheduledRecallBadge"
+                          class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-blue-100 text-blue-700"
+                        >
+                          Recall
+                        </span>
+                        <span
+                          v-if="requestTabAttemptsCount > 0"
+                          class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-muted text-muted-foreground"
+                        >
+                          <Phone class="shrink-0 size-2.5" aria-hidden />
+                          {{ requestTabAttemptsValue }}
+                        </span>
+                      </template>
+                    </TaskBadgesAndTags>
+                    <LeadOpportunityDetailsCard
+                      :request="displayTask"
+                      :show-assignee-bar="false"
+                      bare
+                      class="shrink-0 w-full min-w-0"
+                    />
+                  </div>
                 </div>
-                <!-- Request details: generic sales, source, channel, fiscal entity, dealership, created date -->
-                <LeadOpportunityDetailsCard
-                  :request="displayTask"
-                  :show-assignee-bar="false"
-                  class="shrink-0 w-full"
-                />
                 <VehicleRequestCard
                   v-if="displayTask.requestedCar || displayTask.vehicle"
                   :vehicle="displayTask.requestedCar || displayTask.vehicle"
