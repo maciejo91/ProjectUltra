@@ -8,7 +8,7 @@ export const mockCustomers = [
     address: 'Via Torino 56, 20123 Milan', 
     company: null, 
     source: 'Google Ads', 
-    tags: ['Premium', 'Automation'], 
+    tags: ['Green Vehicles', 'VIP'],
     createdAt: '2025-03-21T08:17:00', 
     lastContact: '2025-03-25T14:30:00',
     interestScore: 87,

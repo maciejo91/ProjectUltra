@@ -1,10 +1,17 @@
-import { createHourOffset, createDateString, DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
+import {
+  createHourOffset,
+  createDateString,
+  DEFAULT_CAR_IMAGE,
+  DEMO_CUSTOMER_REQUEST_MESSAGE,
+  demoPlateNumber
+} from '@/utils/mockDataHelpers'
 
 const baseRequestedCar = (brand, model, year, price) => ({
   brand,
   model,
   year,
   price,
+  plateNumber: demoPlateNumber(brand, model, year),
   image: DEFAULT_CAR_IMAGE,
   vin: 'WBA3B1C50EK123456',
   kilometers: 0,
@@ -19,7 +26,7 @@ const baseRequestedCar = (brand, model, year, price) => ({
   adMedium: 'Display',
   adSource: 'Google',
   expectedPurchaseDate: '2025-04',
-  requestMessage: `Interested in ${brand} ${model}. Ready to discuss.`
+  requestMessage: DEMO_CUSTOMER_REQUEST_MESSAGE
 })
 
 export const mockLeads = [
@@ -29,11 +36,25 @@ export const mockLeads = [
     customerId: 1,
     status: 'Open',
     priority: 'Hot',
-    requestedCar: { ...baseRequestedCar('Audi', 'A6 Allroad', 2023, 19000), dealership: 'Milano' },
+    requestedCar: {
+      ...baseRequestedCar('Audi', 'A6 Allroad', 2023, 19000),
+      plateNumber: 'FZ131FG',
+      variant: '40 TDI 2.0 quattro S tronic Business Advanced',
+      kilometers: 10237,
+      status: 'Used',
+      fuelType: 'Petrol',
+      vin: '1FADP34A59K123456',
+      dealership: 'Madrid',
+      registration: '22/12/2015',
+      listingUrl: 'https://www.autoscout24.es',
+      stockDistanceKm: 10,
+      stockDays: 200
+    },
+    requestMessage: DEMO_CUSTOMER_REQUEST_MESSAGE,
     carStatus: 'In Stock',
-    requestType: 'Quotation',
-    source: 'Walk-in',
-    channel: 'Showroom',
+    requestType: 'Generic sales',
+    source: 'Autoscout24.es',
+    channel: 'Paid',
     fiscalEntity: 'MotorK',
     sourceDetails: 'Showroom',
     assignee: 'Salsabeel Khaleel',

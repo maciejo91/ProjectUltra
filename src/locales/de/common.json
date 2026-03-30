@@ -16,7 +16,9 @@
   },
   "layout": {
     "openSidebar": "Seitenleiste öffnen",
-    "closeSidebar": "Seitenleiste schließen"
+    "closeSidebar": "Seitenleiste schließen",
+    "toggleSidebar": "Seitenleiste ein- oder ausklappen",
+    "userMenu": "Benutzermenü"
   },
   "buttons": {
     "save": "Speichern",

@@ -16,7 +16,9 @@
   },
   "layout": {
     "openSidebar": "Open sidebar",
-    "closeSidebar": "Close sidebar"
+    "closeSidebar": "Close sidebar",
+    "toggleSidebar": "Expand or collapse sidebar",
+    "userMenu": "User menu"
   },
   "buttons": {
     "save": "Save",

@@ -1,125 +1,136 @@
 <template>
-  <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6 w-full">
-    <h5 class="font-semibold text-foreground text-sm mb-4">{{ title }}</h5>
-    <!-- Quick time options (lead: Tomorrow 9am, Suggest AI, Select time) -->
-    <div v-if="showQuickTimeOptions" class="reschedule-toggle-group flex flex-wrap gap-2">
-      <Toggle
-        variant="outline"
-        :model-value="rescheduleTime === 'tomorrow-9am'"
-        @update:model-value="(p) => p && setRescheduleTime('tomorrow-9am')"
-        class="followup-toggle-item"
-      >
-        Tomorrow 9:00 AM
-      </Toggle>
-      <Toggle
-        v-if="showSuggestAi"
-        variant="outline"
-        :model-value="rescheduleTime === 'monday'"
-        @update:model-value="(p) => p && setRescheduleTime('monday')"
-        class="followup-toggle-item mk-ai-mode-active-toggle"
-      >
-        <Sparkles
-          :size="14"
-          class="mk-sparkles-icon shrink-0"
-          :fill="rescheduleTime === 'monday' ? 'url(#sparkles-gradient)' : 'currentColor'"
-          :stroke="rescheduleTime === 'monday' ? 'none' : 'currentColor'"
-          :stroke-width="rescheduleTime === 'monday' ? 0 : 1.5"
-        />
-        Suggest AI time
-      </Toggle>
-      <Toggle
-        variant="outline"
-        :model-value="rescheduleTime === 'custom'"
-        @update:model-value="(p) => p && setRescheduleTime('custom')"
-        class="followup-toggle-item"
-      >
-        Select time
-      </Toggle>
-    </div>
-    <!-- AI suggestion (lead only) -->
-    <div v-if="showQuickTimeOptions && showSuggestAi && rescheduleTime === 'monday' && aiSuggestionData" class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-      <div class="flex items-start gap-2">
-        <Lightbulb class="w-4 h-4 shrink-0 text-blue-600 mt-0.5" />
-        <div class="flex-1">
-          <p class="text-sm font-semibold text-foreground mb-1">
-            {{ aiSuggestionData.formattedDate }} at {{ aiSuggestionData.time }}
-          </p>
-          <p class="text-xs text-muted-foreground">
-            {{ aiSuggestionData.reason }}
-          </p>
+  <div class="w-full">
+    <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4 w-full">
+      <h5 class="font-semibold text-foreground text-sm mb-4">{{ title }}</h5>
+      <template v-if="showQuickTimeOptions">
+        <div class="reschedule-toggle-group flex flex-wrap gap-2">
+          <Toggle
+            variant="outline"
+            :model-value="rescheduleTime === 'tomorrow-9am'"
+            @update:model-value="(p) => p && setRescheduleTime('tomorrow-9am')"
+            class="followup-toggle-item"
+          >
+            Tomorrow 9:00 AM
+          </Toggle>
+          <Toggle
+            variant="outline"
+            :model-value="rescheduleTime === 'monday'"
+            @update:model-value="(p) => p && setRescheduleTime('monday')"
+            class="followup-toggle-item mk-ai-mode-active-toggle"
+          >
+            <Sparkles
+              :size="14"
+              class="mk-sparkles-icon shrink-0"
+              :fill="rescheduleTime === 'monday' ? 'url(#sparkles-gradient)' : 'currentColor'"
+              :stroke="rescheduleTime === 'monday' ? 'none' : 'currentColor'"
+              :stroke-width="rescheduleTime === 'monday' ? 0 : 1.5"
+            />
+            Suggest AI time
+          </Toggle>
+          <Toggle
+            variant="outline"
+            :model-value="rescheduleTime === 'custom'"
+            @update:model-value="(p) => p && setRescheduleTime('custom')"
+            class="followup-toggle-item"
+          >
+            Select time
+          </Toggle>
+        </div>
+        <div
+          v-if="rescheduleTime === 'monday' && aiSuggestionData"
+          class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg"
+        >
+          <div class="flex items-start gap-2">
+            <Lightbulb class="w-4 h-4 shrink-0 text-blue-600 mt-0.5" />
+            <div class="flex-1">
+              <p class="text-sm font-semibold text-foreground mb-1">
+                {{ aiSuggestionData.formattedDate }} at {{ aiSuggestionData.time }}
+              </p>
+              <p class="text-xs text-muted-foreground">
+                {{ aiSuggestionData.reason }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div v-if="rescheduleTime === 'custom'" class="mt-3 grid grid-cols-2 gap-3">
+          <div>
+            <Label class="form-label">Date <span class="text-destructive">*</span></Label>
+            <Input type="date" v-model="customDate" :min="minDate" class="w-full" />
+          </div>
+          <div>
+            <Label class="form-label">Time</Label>
+            <Input type="time" v-model="customTime" class="w-full" />
+          </div>
+        </div>
+      </template>
+      <div v-if="!showQuickTimeOptions" class="grid grid-cols-2 gap-3">
+        <div>
+          <Label class="form-label">Date <span class="text-destructive">*</span></Label>
+          <Input type="date" v-model="customDate" :min="minDate" class="w-full" />
+        </div>
+        <div>
+          <Label class="form-label">Time (optional)</Label>
+          <Input type="time" v-model="customTime" class="w-full" />
         </div>
       </div>
-    </div>
-    <!-- Date + time (custom for lead, or only option for opportunity) -->
-    <div v-if="!showQuickTimeOptions || rescheduleTime === 'custom'" class="mt-3 grid grid-cols-2 gap-3">
-      <div>
-        <Label class="form-label">Date <span class="text-destructive">*</span></Label>
-        <Input type="date" v-model="customDate" :min="minDate" class="w-full" />
+      <div v-if="showReasonField" class="mt-4">
+        <Label class="form-label">Reason (optional)</Label>
+        <Textarea
+          v-model="reason"
+          rows="2"
+          placeholder="Why are you postponing this task?"
+          class="w-full resize-none border-border bg-background text-foreground"
+        />
       </div>
-      <div>
-        <Label class="form-label">Time {{ showQuickTimeOptions ? '' : '(optional)' }}</Label>
-        <Input type="time" v-model="customTime" class="w-full" />
-      </div>
-    </div>
-    <!-- Reason (optional, used by opportunity) -->
-    <div v-if="showReasonField" class="mt-4">
-      <Label class="form-label">Reason (optional)</Label>
-      <Textarea
-        v-model="reason"
-        rows="2"
-        placeholder="Why are you postponing this task?"
-        class="w-full resize-none border-border bg-background text-foreground"
-      />
-    </div>
-    <!-- Assigned to -->
-    <div class="mt-4">
-      <Label class="form-label">Assigned to</Label>
-      <SelectMenu
-        v-model="selectedAssigneeKey"
-        :items="assigneeOptions"
-        value-key="_key"
-        :placeholder="assigneePlaceholder"
-        class="w-full"
-      >
-        <template #item="{ item }">
-          <div class="flex items-center gap-2">
-            <div
-              v-if="item.type === 'user'"
-              class="w-6 h-6 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
-              :class="getRoleAvatarClass(item.role)"
-            >
-              {{ getInitials(item.name || item.label) }}
+      <div class="mt-4">
+        <Label class="form-label">Assigned to</Label>
+        <SelectMenu
+          v-model="selectedAssigneeKey"
+          :items="assigneeOptions"
+          value-key="_key"
+          :placeholder="assigneePlaceholder"
+          class="w-full"
+        >
+          <template #item="{ item }">
+            <div class="flex items-center gap-2">
+              <div
+                v-if="item.type === 'user'"
+                class="w-6 h-6 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
+                :class="getRoleAvatarClass(item.role)"
+              >
+                {{ getInitials(item.name || item.label) }}
+              </div>
+              <Users v-else-if="item.type === 'team'" class="w-4 h-4 shrink-0 text-muted-foreground" />
+              <span class="font-medium text-foreground">{{ item.label }}</span>
             </div>
-            <Users v-else-if="item.type === 'team'" class="w-4 h-4 shrink-0 text-muted-foreground" />
-            <span class="font-medium text-foreground">{{ item.label }}</span>
-          </div>
-        </template>
-      </SelectMenu>
+          </template>
+        </SelectMenu>
+      </div>
+      <div class="mt-4">
+        <Label class="form-label">Note to assignee</Label>
+        <Textarea
+          v-model="noteToAssignee"
+          rows="3"
+          class="w-full resize-none border-border bg-background text-foreground"
+          placeholder="Add any notes or instructions for the assignee..."
+        />
+      </div>
     </div>
-    <!-- Note to assignee -->
-    <div class="mt-4">
-      <Label class="form-label">Note to assignee</Label>
-      <Textarea
-        v-model="noteToAssignee"
-        rows="3"
-        class="w-full resize-none border-border bg-background text-foreground"
-        placeholder="Add any notes or instructions for the assignee..."
-      />
-    </div>
-    <!-- Actions (when used as standalone e.g. NFU or Answer + Postpone) -->
-    <div v-if="showConfirmButtons" class="flex flex-wrap justify-end gap-2 mt-4 pt-4">
-      <Button variant="outline" size="small" class="rounded-sm" :disabled="saving" @click="emit('cancel')">
-        Cancel
+    <div
+      v-if="showConfirmButtons"
+      class="flex w-full justify-end gap-2 pt-3 flex-wrap"
+    >
+      <Button variant="secondary" :disabled="saving" @click="emit('cancel')">
+        {{ cancelLabel }}
       </Button>
       <Button
-        variant="default"
-        size="small"
-        class="rounded-sm"
+        variant="primary"
+        class="bg-primary text-white"
         :disabled="!canSubmit || saving"
         @click="handleConfirm"
       >
         <Spinner v-if="saving" class="size-4 shrink-0 mr-2" />
-        Postpone
+        {{ confirmLabel }}
       </Button>
     </div>
   </div>
@@ -132,19 +143,17 @@ import { SelectMenu } from '@motork/component-library/future/components'
 import { Sparkles, Lightbulb, Users } from 'lucide-vue-next'
 
 const props = defineProps({
-  title: { type: String, default: 'Next call attempt' },
+  title: { type: String, default: 'Postpone task to' },
   assigneeOptions: { type: Array, default: () => [] },
   defaultAssigneeKey: { type: String, default: '' },
   assigneePlaceholder: { type: String, default: 'Assign next attempt to...' },
-  /** When true, show Tomorrow 9am / Suggest AI / Select time. When false, only date + time (e.g. opportunity). */
+  confirmLabel: { type: String, default: 'Postpone' },
+  cancelLabel: { type: String, default: 'Cancel' },
   showQuickTimeOptions: { type: Boolean, default: false },
-  /** Only relevant when showQuickTimeOptions is true (lead). */
   showSuggestAi: { type: Boolean, default: false },
   aiSuggestionData: { type: Object, default: null },
   saving: { type: Boolean, default: false },
-  /** Show Cancel + Postpone buttons (e.g. NFU, Answer+Postpone). When false, parent uses getPayload(). */
   showConfirmButtons: { type: Boolean, default: true },
-  /** Show reason textarea (opportunity postpone). */
   showReasonField: { type: Boolean, default: false }
 })
 

@@ -1,0 +1,112 @@
+{
+  "copyTitle": "Copier le titre",
+  "titleCopied": "Titre copié",
+  "titleCopyFailed": "Impossible de copier",
+  "moreMenuShare": "Partager",
+  "headerTitle": "{entity} depuis {source} ({requestType})",
+  "headerPrimary": "{entity} depuis {source}",
+  "headerTypeLabel": "({requestType})",
+  "headerBack": "Retour aux demandes",
+  "statusInProgress": "En cours",
+  "created": "Créé",
+  "lastUpdated": "Dernière mise à jour",
+  "moreMenu": "Autres actions",
+  "addSegment": "Ajouter un segment",
+  "tabs": {
+    "overview": "Vue d’ensemble",
+    "conversations": "Conversations",
+    "tradeIns": "Reprises",
+    "purchaseMethod": "Mode d’achat",
+    "attachments": "Pièces jointes",
+    "tasks": "Tâches",
+    "activity": "Activité"
+  },
+  "insight": {
+    "highPaidStock": "Ce lead provient d’une source payante importante et concerne un véhicule en stock depuis {days} jours."
+  },
+  "lqfTask": {
+    "title": "Lead Qualification Task",
+    "manageTask": "Gérer la tâche",
+    "notNow": "Pas maintenant",
+    "nextAttemptTitle": "Reporter la tâche au",
+    "nextAttemptAssigneePlaceholder": "Attribuer à…",
+    "nextAttemptSaved": "Tâche reportée",
+    "nextAttemptSaveFailed": "Impossible de reporter la tâche",
+    "openFullTaskView": "Ouvrir la vue tâche complète",
+    "taskOptionsAria": "Options de la tâche"
+  },
+  "quickActions": {
+    "phone": "Téléphone",
+    "email": "E-mail",
+    "whatsapp": "WhatsApp",
+    "document": "Document",
+    "more": "Plus"
+  },
+  "contactCard": {
+    "otherInteractions": "Autres interactions ({count})",
+    "openProfile": "Ouvrir le profil client",
+    "cardMenu": "Menu carte client",
+    "editCustomer": "Modifier le client",
+    "addTag": "Ajouter un tag",
+    "privateCustomerTooltip": "Client particulier",
+    "businessTag": "Entreprise",
+    "saving": "Enregistrement…",
+    "customerUpdated": "Client mis à jour",
+    "saveFailed": "Échec de l’enregistrement",
+    "fields": {
+      "name": "Nom",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "address": "Adresse"
+    },
+    "placeholders": {
+      "name": "Nom du client",
+      "email": "email@example.com",
+      "phone": "+33…",
+      "address": "Adresse"
+    }
+  },
+  "vehicleCard": {
+    "title": "Véhicule demandé",
+    "registrationDate": "Date d’immatriculation",
+    "carLocation": "Localisation du véhicule",
+    "mileage": "Kilométrage",
+    "landingPage": "Page d’atterrissage",
+    "visit": "Visiter",
+    "editAria": "Modifier le véhicule demandé"
+  },
+  "messageCard": {
+    "title": "Message de la demande",
+    "expandAria": "Afficher le message de la demande",
+    "collapseAria": "Masquer le message de la demande",
+    "empty": "—"
+  },
+  "placeholders": {
+    "conversations": "Les conversations apparaîtront ici.",
+    "attachments": "Les pièces jointes apparaîtront ici.",
+    "tasksTab": "Related tasks and requests for this customer will appear here."
+  },
+  "emptyStates": {
+    "conversations": {
+      "title": "Pas encore de conversations",
+      "description": "Les e-mails et messages WhatsApp de cette demande apparaîtront ici.",
+      "action": "Envoyer un message"
+    },
+    "tradeIns": {
+      "title": "Pas encore de reprises",
+      "description": "Les véhicules de reprise ajoutés pour cette demande apparaîtront ici.",
+      "action": "Ajouter une reprise"
+    },
+    "purchaseMethod": {
+      "title": "Pas encore de mode d’achat",
+      "description": "Les options de financement ou de leasing ajoutées apparaîtront ici.",
+      "action": "Ajouter un financement"
+    },
+    "attachments": {
+      "title": "Aucune donnée enregistrée",
+      "description": "Les notes et pièces jointes de cette demande apparaîtront ici.",
+      "action": "Ajouter une pièce jointe",
+      "hasItems": "{count} pièce(s) jointe(s) sur cette demande."
+    }
+  }
+}

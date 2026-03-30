@@ -14,8 +14,8 @@
    ======================================== */
 
 :root {
-  --sidebar-width: clamp(40px, 3.75vw, 48px);
-  --sidebar-width-collapsed: clamp(40px, 3.75vw, 48px);
+  --sidebar-width: 4.5rem;
+  --sidebar-width-collapsed: 4.5rem;
   --sidebar-width-expanded: 256px;
   --lead-list-width: clamp(240px, 23.125vw, 296px);
   --activity-width: clamp(260px, 25vw, 320px);
@@ -491,18 +491,19 @@ label[for] {
 
 /* Target primary buttons (variant="default" and variant="black") */
 /* Using multiple selectors to ensure we catch all button variants */
-button[data-variant="default"],
-button[data-variant="black"],
-button[data-variant="primary"],
-button[class*="variant-default"],
-button[class*="variant-black"],
-button[class*="variant-primary"],
-button[class*="data-variant-default"],
-button[class*="data-variant-black"],
-button[class*="data-variant-primary"],
+/* Exclude [data-sidebar="menu-button"]: class names like cn-sidebar-menu-button-variant-default match class*="variant-default" */
+button[data-variant="default"]:not([data-sidebar="menu-button"]),
+button[data-variant="black"]:not([data-sidebar="menu-button"]),
+button[data-variant="primary"]:not([data-sidebar="menu-button"]),
+button[class*="variant-default"]:not([data-sidebar="menu-button"]),
+button[class*="variant-black"]:not([data-sidebar="menu-button"]),
+button[class*="variant-primary"]:not([data-sidebar="menu-button"]),
+button[class*="data-variant-default"]:not([data-sidebar="menu-button"]),
+button[class*="data-variant-black"]:not([data-sidebar="menu-button"]),
+button[class*="data-variant-primary"]:not([data-sidebar="menu-button"]),
 /* Fallback: target buttons that have primary-like styling */
-button[class*="bg-brand-primary"],
-button[class*="bg-primary"] {
+button[class*="bg-brand-primary"]:not([data-sidebar="menu-button"]),
+button[class*="bg-primary"]:not([data-sidebar="menu-button"]) {
   /* Exact Figma specs */
   border-radius: 8px !important;
   border: none !important;
@@ -519,17 +520,17 @@ button[class*="bg-primary"] {
 }
 
 /* Hover state - Enhanced shadows for elevation */
-button[data-variant='default']:hover:not(:disabled),
-button[data-variant='black']:hover:not(:disabled),
-button[data-variant='primary']:hover:not(:disabled),
-button[class*='variant-default']:hover:not(:disabled),
-button[class*='variant-black']:hover:not(:disabled),
-button[class*='variant-primary']:hover:not(:disabled),
-button[class*='data-variant-default']:hover:not(:disabled),
-button[class*='data-variant-black']:hover:not(:disabled),
-button[class*='data-variant-primary']:hover:not(:disabled),
-button[class*='bg-brand-primary']:hover:not(:disabled),
-button[class*='bg-primary']:hover:not(:disabled) {
+button[data-variant='default']:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[data-variant='black']:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[data-variant='primary']:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[class*='variant-default']:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[class*='variant-black']:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[class*='variant-primary']:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[class*='data-variant-default']:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[class*='data-variant-black']:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[class*='data-variant-primary']:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[class*='bg-brand-primary']:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[class*='bg-primary']:not([data-sidebar="menu-button"]):hover:not(:disabled) {
   box-shadow:
     0 2px 4px 0 rgba(11, 19, 36, 0.12),
     0 -1px 0 0 rgba(0, 0, 0, 0.12) inset !important;
@@ -537,17 +538,17 @@ button[class*='bg-primary']:hover:not(:disabled) {
 }
 
 /* Active/pressed state - Reduced shadows for pressed effect */
-button[data-variant='default']:active:not(:disabled),
-button[data-variant='black']:active:not(:disabled),
-button[data-variant='primary']:active:not(:disabled),
-button[class*='variant-default']:active:not(:disabled),
-button[class*='variant-black']:active:not(:disabled),
-button[class*='variant-primary']:active:not(:disabled),
-button[class*='data-variant-default']:active:not(:disabled),
-button[class*='data-variant-black']:active:not(:disabled),
-button[class*='data-variant-primary']:active:not(:disabled),
-button[class*='bg-brand-primary']:active:not(:disabled),
-button[class*='bg-primary']:active:not(:disabled) {
+button[data-variant='default']:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[data-variant='black']:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[data-variant='primary']:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[class*='variant-default']:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[class*='variant-black']:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[class*='variant-primary']:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[class*='data-variant-default']:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[class*='data-variant-black']:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[class*='data-variant-primary']:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[class*='bg-brand-primary']:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[class*='bg-primary']:not([data-sidebar="menu-button"]):active:not(:disabled) {
   box-shadow:
     0 1px 2px 0 rgba(11, 19, 36, 0.1),
     0 -1px 0 0 rgba(0, 0, 0, 0.12) inset !important;
@@ -561,17 +562,17 @@ button[class*='bg-primary']:active:not(:disabled) {
 }
 
 /* Disabled state - same blue as enabled, 50% opacity (matches library) */
-button[data-variant='default']:disabled,
-button[data-variant='black']:disabled,
-button[data-variant='primary']:disabled,
-button[class*='variant-default']:disabled,
-button[class*='variant-black']:disabled,
-button[class*='variant-primary']:disabled,
-button[class*='data-variant-default']:disabled,
-button[class*='data-variant-black']:disabled,
-button[class*='data-variant-primary']:disabled,
-button[class*='bg-brand-primary']:disabled,
-button[class*='bg-primary']:disabled {
+button[data-variant='default']:not([data-sidebar="menu-button"]):disabled,
+button[data-variant='black']:not([data-sidebar="menu-button"]):disabled,
+button[data-variant='primary']:not([data-sidebar="menu-button"]):disabled,
+button[class*='variant-default']:not([data-sidebar="menu-button"]):disabled,
+button[class*='variant-black']:not([data-sidebar="menu-button"]):disabled,
+button[class*='variant-primary']:not([data-sidebar="menu-button"]):disabled,
+button[class*='data-variant-default']:not([data-sidebar="menu-button"]):disabled,
+button[class*='data-variant-black']:not([data-sidebar="menu-button"]):disabled,
+button[class*='data-variant-primary']:not([data-sidebar="menu-button"]):disabled,
+button[class*='bg-brand-primary']:not([data-sidebar="menu-button"]):disabled,
+button[class*='bg-primary']:not([data-sidebar="menu-button"]):disabled {
   opacity: 0.5 !important;
 }
 
@@ -580,10 +581,10 @@ button[class*='bg-primary']:disabled {
    ======================================== */
 
 /* Secondary buttons - white background with border */
-button[data-variant="secondary"],
-button[data-variant="outline"],
-button[class*="variant-secondary"],
-button[class*="variant-outline"] {
+button[data-variant="secondary"]:not([data-sidebar="menu-button"]),
+button[data-variant="outline"]:not([data-sidebar="menu-button"]),
+button[class*="variant-secondary"]:not([data-sidebar="menu-button"]),
+button[class*="variant-outline"]:not([data-sidebar="menu-button"]) {
   border-radius: 8px !important;
   border: 1px solid rgba(0, 0, 0, 0.1) !important;
   background: var(--base-background, #fff) !important;
@@ -596,10 +597,10 @@ button[class*="variant-outline"] {
 }
 
 /* Secondary button hover state */
-button[data-variant="secondary"]:hover:not(:disabled),
-button[data-variant="outline"]:hover:not(:disabled),
-button[class*="variant-secondary"]:hover:not(:disabled),
-button[class*="variant-outline"]:hover:not(:disabled) {
+button[data-variant="secondary"]:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[data-variant="outline"]:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[class*="variant-secondary"]:not([data-sidebar="menu-button"]):hover:not(:disabled),
+button[class*="variant-outline"]:not([data-sidebar="menu-button"]):hover:not(:disabled) {
   background: var(--base-muted, #f5f5f5) !important;
   border-color: rgba(0, 0, 0, 0.15) !important;
   box-shadow:
@@ -607,10 +608,10 @@ button[class*="variant-outline"]:hover:not(:disabled) {
 }
 
 /* Secondary button active state */
-button[data-variant="secondary"]:active:not(:disabled),
-button[data-variant="outline"]:active:not(:disabled),
-button[class*="variant-secondary"]:active:not(:disabled),
-button[class*="variant-outline"]:active:not(:disabled) {
+button[data-variant="secondary"]:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[data-variant="outline"]:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[class*="variant-secondary"]:not([data-sidebar="menu-button"]):active:not(:disabled),
+button[class*="variant-outline"]:not([data-sidebar="menu-button"]):active:not(:disabled) {
   background: var(--base-muted, #f5f5f5) !important;
   border-color: rgba(0, 0, 0, 0.2) !important;
   box-shadow:
@@ -619,10 +620,10 @@ button[class*="variant-outline"]:active:not(:disabled) {
 }
 
 /* Secondary button disabled state */
-button[data-variant="secondary"]:disabled,
-button[data-variant="outline"]:disabled,
-button[class*="variant-secondary"]:disabled,
-button[class*="variant-outline"]:disabled {
+button[data-variant="secondary"]:not([data-sidebar="menu-button"]):disabled,
+button[data-variant="outline"]:not([data-sidebar="menu-button"]):disabled,
+button[class*="variant-secondary"]:not([data-sidebar="menu-button"]):disabled,
+button[class*="variant-outline"]:not([data-sidebar="menu-button"]):disabled {
   background: var(--base-muted, #f5f5f5) !important;
   border-color: rgba(0, 0, 0, 0.05) !important;
   color: rgba(0, 0, 0, 0.3) !important;

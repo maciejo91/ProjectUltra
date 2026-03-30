@@ -1,0 +1,112 @@
+{
+  "copyTitle": "Titel kopiëren",
+  "titleCopied": "Titel gekopieerd",
+  "titleCopyFailed": "Kopiëren mislukt",
+  "moreMenuShare": "Delen",
+  "headerTitle": "{entity} van {source} ({requestType})",
+  "headerPrimary": "{entity} van {source}",
+  "headerTypeLabel": "({requestType})",
+  "headerBack": "Terug naar aanvragen",
+  "statusInProgress": "Bezig",
+  "created": "Aangemaakt",
+  "lastUpdated": "Laatst bijgewerkt",
+  "moreMenu": "Meer acties",
+  "addSegment": "Segment toevoegen",
+  "tabs": {
+    "overview": "Overzicht",
+    "conversations": "Gesprekken",
+    "tradeIns": "Inruil",
+    "purchaseMethod": "Aankoopmethode",
+    "attachments": "Bijlagen",
+    "tasks": "Taken",
+    "activity": "Activiteit"
+  },
+  "insight": {
+    "highPaidStock": "Deze lead komt uit een betalende bron met hoge kosten en gaat over een auto die al {days} dagen op voorraad is."
+  },
+  "lqfTask": {
+    "title": "Lead Qualification Task",
+    "manageTask": "Taak beheren",
+    "notNow": "Niet nu",
+    "nextAttemptTitle": "Taak uitstellen naar",
+    "nextAttemptAssigneePlaceholder": "Toewijzen aan…",
+    "nextAttemptSaved": "Taak uitgesteld",
+    "nextAttemptSaveFailed": "Taak kon niet worden uitgesteld",
+    "openFullTaskView": "Volledige taakweergave openen",
+    "taskOptionsAria": "Taakopties"
+  },
+  "quickActions": {
+    "phone": "Telefoon",
+    "email": "E-mail",
+    "whatsapp": "WhatsApp",
+    "document": "Document",
+    "more": "Meer"
+  },
+  "contactCard": {
+    "otherInteractions": "Overige interacties ({count})",
+    "openProfile": "Klantprofiel openen",
+    "cardMenu": "Klantkaartmenu",
+    "editCustomer": "Klant bewerken",
+    "addTag": "Tag toevoegen",
+    "privateCustomerTooltip": "Particuliere klant",
+    "businessTag": "Zakelijk",
+    "saving": "Opslaan…",
+    "customerUpdated": "Klant bijgewerkt",
+    "saveFailed": "Opslaan mislukt",
+    "fields": {
+      "name": "Naam",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "address": "Adres"
+    },
+    "placeholders": {
+      "name": "Klantnaam",
+      "email": "email@example.com",
+      "phone": "+31…",
+      "address": "Adres"
+    }
+  },
+  "vehicleCard": {
+    "title": "Gevraagde voertuig",
+    "registrationDate": "Registratiedatum",
+    "carLocation": "Locatie voertuig",
+    "mileage": "Kilometerstand",
+    "landingPage": "Landingspagina",
+    "visit": "Bezoeken",
+    "editAria": "Gevraagde voertuig bewerken"
+  },
+  "messageCard": {
+    "title": "Bericht bij aanvraag",
+    "expandAria": "Aanvraagbericht uitklappen",
+    "collapseAria": "Aanvraagbericht inklappen",
+    "empty": "—"
+  },
+  "placeholders": {
+    "conversations": "Gesprekken verschijnen hier.",
+    "attachments": "Bijlagen verschijnen hier.",
+    "tasksTab": "Related tasks and requests for this customer will appear here."
+  },
+  "emptyStates": {
+    "conversations": {
+      "title": "Nog geen gesprekken",
+      "description": "E-mail en WhatsApp voor deze aanvraag verschijnen hier.",
+      "action": "Bericht versturen"
+    },
+    "tradeIns": {
+      "title": "Nog geen inruil",
+      "description": "Inruilauto’s die u toevoegt, verschijnen hier.",
+      "action": "Inruil toevoegen"
+    },
+    "purchaseMethod": {
+      "title": "Nog geen aankoopmethode",
+      "description": "Financierings- of leaseopties die u toevoegt, verschijnen hier.",
+      "action": "Financiering toevoegen"
+    },
+    "attachments": {
+      "title": "Geen gegevens opgeslagen",
+      "description": "Notities en bijlagen voor deze aanvraag verschijnen hier.",
+      "action": "Bijlage toevoegen",
+      "hasItems": "{count} bijlage(n) bij deze aanvraag."
+    }
+  }
+}

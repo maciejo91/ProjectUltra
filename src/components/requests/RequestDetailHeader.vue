@@ -1,116 +1,240 @@
 <template>
-  <header class="shrink-0 flex items-center justify-between gap-4 px-4 py-3 border-b border-border bg-background">
-    <div class="flex items-center gap-1.5 min-w-0 flex-1">
-      <Button
-        v-if="isFullPage"
-        variant="ghost"
-        size="icon"
-        class="rounded-sm shrink-0 -ml-0.5"
-        aria-label="Back to requests"
-        @click="$emit('close')"
-      >
-        <ChevronLeft class="size-4 text-muted-foreground" />
-      </Button>
-      <div class="flex flex-col min-w-0 flex-1">
-        <div class="flex items-center gap-2 min-w-0 flex-wrap">
-          <span class="text-fluid-sm font-medium text-foreground truncate min-w-0">
-            {{ titleText }}
-          </span>
-          <span
-            v-if="request"
-            class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium shrink-0"
-            :class="request.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'"
-          >
-            {{ request.type === 'lead' ? 'Lead' : 'Opportunity' }}
-          </span>
-          <DropdownMenu v-if="request" :modal="false">
-            <DropdownMenuTrigger as-child>
-              <button
-                type="button"
-                class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                :class="stageClass"
-              >
-                {{ displayStage }}
-                <ChevronDown class="size-3 shrink-0" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="min-w-48 max-h-64 overflow-y-auto p-1.5" align="start">
-              <DropdownMenuItem
-                v-for="stage in statusOptions"
-                :key="stage"
-                class="flex cursor-pointer items-center rounded-sm px-2 py-1.5"
-                @select="emit('update-status', stage)"
-              >
-                <span
-                  class="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium leading-none"
-                  :class="[
-                    getStageColorClass(stage),
-                    stage === displayStage && 'ring-1 ring-ring ring-inset'
-                  ]"
+  <header
+    class="shrink-0 flex flex-col border-b border-border bg-background"
+  >
+    <div
+      class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 w-full min-w-0 px-4 py-2"
+    >
+      <div class="flex items-start gap-2 min-w-0 flex-1">
+        <Button
+          v-if="isFullPage"
+          variant="ghost"
+          size="icon"
+          class="rounded-md shrink-0 size-6 mt-0.5"
+          :aria-label="t('requestDetail.headerBack')"
+          @click="$emit('close')"
+        >
+          <ChevronLeft class="size-4 text-muted-foreground" />
+        </Button>
+        <div class="flex flex-col gap-1 min-w-0 flex-1">
+          <div class="flex flex-wrap items-baseline gap-2 min-w-0">
+            <DropdownMenu v-if="request" :modal="false">
+              <DropdownMenuTrigger as-child>
+                <button
+                  type="button"
+                  class="inline-flex items-baseline gap-2 min-w-0 max-w-full text-left rounded-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
-                  {{ stage }}
-                </span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <TaskAssigneeDateBar
+                  <span class="text-base font-medium text-foreground truncate">{{
+                    primaryTitleText
+                  }}</span>
+                  <span class="text-xs text-muted-foreground shrink-0">{{
+                    typeLabelText
+                  }}</span>
+                  <ChevronDown class="size-3 shrink-0 text-muted-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent class="min-w-56 p-1.5" align="start">
+                <DropdownMenuItem
+                  class="flex cursor-pointer rounded-sm px-2 py-1.5 text-sm"
+                  @select="copyTitleToClipboard"
+                >
+                  {{ t('requestDetail.copyTitle') }}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <span
+              v-else
+              class="text-base font-medium text-foreground truncate min-w-0"
+            >
+              {{ primaryTitleText }}
+            </span>
+          </div>
+
+          <div
             v-if="request"
-            :task="request"
-            variant="inline"
-            date-display="lastUpdated"
-            class="shrink-0"
-            @postpone-expected-close="$emit('postpone-expected-close')"
-            @reassigned="$emit('reassigned', $event)"
-          />
+            class="flex flex-wrap items-center gap-x-4 gap-y-2"
+          >
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="flex flex-wrap items-center gap-1">
+                <span
+                  v-if="priorityBadge"
+                  class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium leading-none"
+                  :class="priorityBadge.class"
+                >
+                  {{ priorityBadge.label }}
+                </span>
+                <span
+                  v-for="tag in displayTags"
+                  :key="tag"
+                  class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium leading-none bg-muted text-muted-foreground"
+                >
+                  {{ tag }}
+                </span>
+                <span
+                  v-for="seg in extraSegments"
+                  :key="seg"
+                  class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium leading-none bg-muted text-muted-foreground"
+                >
+                  {{ seg }}
+                </span>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                class="rounded-md size-6 text-muted-foreground"
+                :aria-label="t('requestDetail.addSegment')"
+                @click="$emit('add-segment')"
+              >
+                <Plus class="size-3" />
+              </Button>
+            </div>
+
+            <span
+              class="inline-flex items-center gap-2 text-xs text-muted-foreground tabular-nums"
+              :aria-label="`${t('requestDetail.created')}: ${createdLabel}`"
+            >
+              <Info class="size-4 shrink-0" aria-hidden />
+              <span>{{ createdLabel }}</span>
+            </span>
+            <span
+              class="inline-flex items-center gap-2 text-xs text-muted-foreground tabular-nums"
+              :aria-label="`${t('requestDetail.lastUpdated')}: ${updatedLabel}`"
+            >
+              <RefreshCw class="size-4 shrink-0" aria-hidden />
+              <span>{{ updatedLabel }}</span>
+            </span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="flex items-center gap-2 shrink-0">
-      <Button
-        variant="outline"
-        size="icon"
-        class="rounded-sm"
-        :disabled="!hasPrevious"
-        @click="$emit('previous')"
-      >
-        <ChevronLeft class="size-4 text-muted-foreground" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        class="rounded-sm"
-        :disabled="!hasNext"
-        @click="$emit('next')"
-      >
-        <ChevronRight class="size-4 text-muted-foreground" />
-      </Button>
-      <Button
-        v-if="!isFullPage"
-        variant="outline"
-        size="icon"
-        class="rounded-sm"
-        aria-label="Close"
-        @click="$emit('close')"
-      >
-        <X class="size-4 text-muted-foreground" />
-      </Button>
+
+      <div class="flex flex-wrap items-center justify-end gap-2 shrink-0">
+        <DropdownMenu v-if="request" :modal="false">
+          <DropdownMenuTrigger as-child>
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              :class="stageClass"
+            >
+              {{ displayStage }}
+              <ChevronDown class="size-3 shrink-0" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent class="min-w-48 max-h-64 overflow-y-auto p-1.5" align="end">
+            <DropdownMenuItem
+              v-for="stage in statusOptions"
+              :key="stage"
+              class="flex cursor-pointer items-center rounded-sm px-2 py-1.5"
+              @select="emit('update-status', stage)"
+            >
+              <span
+                class="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium leading-none"
+                :class="[
+                  getStageColorClass(stage),
+                  stage === displayStage && 'ring-1 ring-ring ring-inset'
+                ]"
+              >
+                {{ stage }}
+              </span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <span
+          v-if="request && showWorkflowPill"
+          class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary"
+        >
+          <Loader2 class="size-3 shrink-0 animate-spin" aria-hidden />
+          {{ t('requestDetail.statusInProgress') }}
+        </span>
+
+        <Avatar v-if="request" class="size-6 shrink-0 rounded-full">
+          <AvatarFallback
+            class="bg-secondary text-secondary-foreground text-xs font-normal leading-none"
+          >
+            {{ assigneeInitials }}
+          </AvatarFallback>
+        </Avatar>
+
+        <DropdownMenu v-if="request" :modal="false">
+          <DropdownMenuTrigger as-child>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              class="rounded-md shrink-0 size-6"
+              :aria-label="t('requestDetail.moreMenu')"
+            >
+              <MoreVertical class="size-3 text-muted-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" class="min-w-40 p-1.5">
+            <DropdownMenuItem class="rounded-sm" @select="$emit('more-action', 'share')">
+              {{ t('requestDetail.moreMenuShare') }}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Button
+          variant="outline"
+          size="icon"
+          class="rounded-md size-8"
+          :disabled="!hasPrevious"
+          @click="$emit('previous')"
+        >
+          <ChevronLeft class="size-4 text-muted-foreground" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          class="rounded-md size-8"
+          :disabled="!hasNext"
+          @click="$emit('next')"
+        >
+          <ChevronRight class="size-4 text-muted-foreground" />
+        </Button>
+        <Button
+          v-if="!isFullPage"
+          variant="outline"
+          size="icon"
+          class="rounded-md size-8"
+          :aria-label="t('common.buttons.close')"
+          @click="$emit('close')"
+        >
+          <X class="size-4 text-muted-foreground" />
+        </Button>
+      </div>
     </div>
   </header>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { ChevronLeft, ChevronRight, X, ChevronDown } from 'lucide-vue-next'
+import { useToastStore } from '@/stores/toast'
+import { useI18n } from 'vue-i18n'
+import {
+  ChevronLeft,
+  ChevronRight,
+  X,
+  ChevronDown,
+  Info,
+  RefreshCw,
+  Plus,
+  MoreVertical,
+  Loader2
+} from 'lucide-vue-next'
 import {
   Button,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem
+  DropdownMenuItem,
+  Avatar,
+  AvatarFallback
 } from '@motork/component-library/future/primitives'
-import TaskAssigneeDateBar from '@/components/tasks/TaskAssigneeDateBar.vue'
 import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
 import { getStageBadgeClass } from '@/utils/formatters'
+import { formatDateTime } from '@/utils/formatters'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 
 const props = defineProps({
@@ -134,8 +258,24 @@ const emit = defineEmits([
   'next',
   'update-status',
   'postpone-expected-close',
-  'reassigned'
+  'reassigned',
+  'add-segment',
+  'more-action'
 ])
+
+const { t } = useI18n()
+const toastStore = useToastStore()
+
+async function copyTitleToClipboard() {
+  const text = titleText.value
+  if (!text) return
+  try {
+    await navigator.clipboard.writeText(text)
+    toastStore.pushToast('success', t('requestDetail.titleCopied'))
+  } catch {
+    toastStore.pushToast('error', t('requestDetail.titleCopyFailed'))
+  }
+}
 
 const displayStage = computed(() => {
   if (!props.request) return ''
@@ -176,33 +316,112 @@ const currentIndex = computed(() => {
   if (!requestId || !props.filteredRequests?.length) return -1
   const idStr = String(requestId)
   return props.filteredRequests.findIndex(
-    (r) => String(r.compositeId) === idStr || (r.type === props.request?.type && String(r.id) === String(props.request?.id))
+    (r) =>
+      String(r.compositeId) === idStr ||
+      (r.type === props.request?.type && String(r.id) === String(props.request?.id))
   )
 })
 
 const hasPrevious = computed(() => currentIndex.value > 0)
-const hasNext = computed(() =>
-  currentIndex.value >= 0 && currentIndex.value < props.filteredRequests.length - 1
+const hasNext = computed(
+  () => currentIndex.value >= 0 && currentIndex.value < props.filteredRequests.length - 1
 )
 
-const customerName = computed(() => {
-  const c = props.request?.customer
-  if (!c) return 'Customer'
-  if (c.name) return c.name
-  if (c.firstName || c.lastName) return [c.firstName, c.lastName].filter(Boolean).join(' ').trim()
-  if (c.email) return c.email.split('@')[0] || 'Customer'
-  return 'Customer'
+const sourceLabel = computed(() => props.request?.source || '—')
+const requestTypeLabel = computed(
+  () => props.request?.requestType || props.request?.genericSales || '—'
+)
+
+const entityLabel = computed(() => {
+  if (!props.request) return ''
+  return props.request.type === 'lead'
+    ? t('entities.lead.title')
+    : t('entities.opportunity.title')
 })
 
-const vehicleDisplayName = computed(() => {
-  const v = props.request?.requestedCar || props.request?.vehicle || {}
-  if (!v.brand && !v.model) return 'a vehicle'
-  const parts = [v.brand, v.model, v.variant].filter(Boolean)
-  return parts.join(' ') || 'a vehicle'
+const primaryTitleText = computed(() => {
+  if (!props.request) return ''
+  return t('requestDetail.headerPrimary', {
+    entity: entityLabel.value,
+    source: sourceLabel.value
+  })
+})
+
+const typeLabelText = computed(() => {
+  if (!props.request) return ''
+  return t('requestDetail.headerTypeLabel', {
+    requestType: requestTypeLabel.value
+  })
 })
 
 const titleText = computed(() => {
-  return `${customerName.value} requests ${vehicleDisplayName.value}`
+  if (!props.request) return ''
+  return t('requestDetail.headerTitle', {
+    entity: entityLabel.value,
+    source: sourceLabel.value,
+    requestType: requestTypeLabel.value
+  })
 })
 
+const createdLabel = computed(() => {
+  const d = props.request?.createdAt || props.request?.importedAt
+  return d ? formatDateTime(d) : '—'
+})
+
+const updatedLabel = computed(() => {
+  const d = props.request?.lastActivity || props.request?.updatedAt
+  return d ? formatDateTime(d) : '—'
+})
+
+const priorityBadge = computed(() => {
+  const p = props.request?.priority
+  if (!p || typeof p !== 'string') return null
+  const key = p.toLowerCase()
+  if (key === 'hot') {
+    return { label: p, class: 'bg-destructive/15 text-destructive' }
+  }
+  if (key === 'warm') {
+    return { label: p, class: 'bg-amber-100 text-amber-900' }
+  }
+  return { label: p, class: 'bg-muted text-muted-foreground' }
+})
+
+const displayTags = computed(() => {
+  const tags = props.request?.tags
+  if (!Array.isArray(tags)) return []
+  return tags.filter(Boolean).slice(0, 6)
+})
+
+const extraSegments = computed(() => {
+  const r = props.request
+  if (!r) return []
+  const out = []
+  if (r.channel === 'Paid' || r.channel === 'paid') out.push('ADV')
+  const st = (r.carStatus || '').toLowerCase()
+  if (st.includes('oem') || (Array.isArray(r.tags) && r.tags.some((x) => String(x).toUpperCase() === 'OEM'))) {
+    out.push('OEM')
+  }
+  return out
+})
+
+const assigneeInitials = computed(() => {
+  const r = props.request
+  if (!r) return '?'
+  if (r.assigneeInitials) return String(r.assigneeInitials).slice(0, 3)
+  const name = r.assignee
+  if (!name || typeof name !== 'string') return '?'
+  return name
+    .split(/\s+/)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+})
+
+const showWorkflowPill = computed(() => {
+  const r = props.request
+  if (!r) return false
+  if (r.type === 'lead' && r.isDisqualified) return false
+  return true
+})
 </script>

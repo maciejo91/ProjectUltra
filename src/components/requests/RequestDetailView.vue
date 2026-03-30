@@ -9,8 +9,11 @@
     @update-status="handleUpdateStatus"
     @postpone-expected-close="handlePostponeExpectedClose"
     @reassigned="handleReassigned"
+    @add-segment="handleAddSegment"
+    @more-action="handleHeaderMoreAction"
   >
     <ComingSoonModal :show="showPostponeModal" @close="showPostponeModal = false" />
+    <ComingSoonModal :show="showGenericComingSoon" @close="showGenericComingSoon = false" />
 
     <PurchaseMethodModal
       :show="showFinancingModal"
@@ -45,81 +48,251 @@
       @close="showTradeInModal = false; editingTradeIn = null"
     />
 
-    <!-- Left: Car, Customer, etc. (2/3). Right: Activity/Other requests (1/3). Page scrolls as one. -->
-    <div v-if="showAssociatedTasksOrTimeline" class="p-2">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
-        <!-- Left column: two wrappers (cards on top, Communicate/Data/Tasks below) -->
-        <div class="order-1 lg:col-span-2 flex flex-col gap-4">
-          <div class="flex flex-col gap-4 bg-muted rounded-lg p-2">
-            <DuplicateDetectedCard
-              v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
-              :potential-duplicates="potentialDuplicates"
-              :merge-loading="mergeLoading"
-              @merge="handleMergeClick"
-              @request-navigate="(...args) => $emit('request-navigate', ...args)"
-              @dismiss="duplicateBannerDismissed = true"
-            />
-            <LeadOpportunityDetailsCard
-              v-if="request"
-              :request="request"
-              :show-assignee-bar="false"
-              @postpone-expected-close="handlePostponeExpectedClose"
-              @reassigned="handleReassigned"
-            />
-            <!-- Requested car (wider) + Customer (narrower) on same row -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <VehicleRequestCard
-                v-if="request && (request.requestedCar || request.vehicle)"
-                class="md:col-span-2"
-                :vehicle="request.requestedCar || request.vehicle"
-                :request-message="request.requestMessage || request.requestedCar?.requestMessage"
-                :source="request.source"
-                :image-url="getCarImageUrl(request.requestedCar || request.vehicle)"
-                :save-requested-car="handleRequestedCarSave"
-                @open-ad="handleOpenAd"
-                @more-actions="handleMoreActions"
-              />
-              <TaskContactCard
-                v-if="request"
-                class="md:col-span-1"
-                :task="request"
-                :task-type="request.type"
-                :customer-id="request.customerId || request.customer?.id"
-                @action="handleContactAction"
-              />
+    <NoteWidget
+      modal
+      :show="showNoteModal"
+      :task-type="request?.type || 'lead'"
+      :task-id="request?.id"
+      @save="handleActivityNoteSave"
+      @close="showNoteModal = false"
+    />
+
+    <AttachmentWidget
+      modal
+      :show="showAttachmentModal"
+      :task-type="request?.type || 'lead'"
+      :task-id="request?.id"
+      @save="handleActivityAttachmentSave"
+      @close="showAttachmentModal = false"
+    />
+
+    <AddWhatsAppModal
+      :show="showWhatsAppModal"
+      @save="handleActivityWhatsAppSave"
+      @close="showWhatsAppModal = false"
+    />
+
+    <AddSMSModal
+      :show="showSMSModal"
+      @save="handleActivitySMSSave"
+      @close="showSMSModal = false"
+    />
+
+    <AddEmailModal
+      :show="showEmailModal"
+      @save="handleActivityEmailSave"
+      @close="showEmailModal = false"
+    />
+
+    <ComingSoonModal
+      :show="showCallComingSoonModal"
+      title="Call Feature"
+      @close="showCallComingSoonModal = false"
+    />
+
+    <OfferModal
+      :show="showOfferModal"
+      :task-type="request?.type || 'lead'"
+      :task-id="request?.id"
+      :customer="request?.customer"
+      @save="handleActivityOfferSave"
+      @close="showOfferModal = false"
+    />
+
+    <CreateEventModal
+      :show="showAppointmentModal"
+      :customer="request?.customer"
+      :assignee="request?.assignee"
+      @create="handleActivityAppointmentSave"
+      @cancel="showAppointmentModal = false"
+    />
+
+    <div
+      v-if="showAssociatedTasksOrTimeline"
+      class="flex w-full min-h-full flex-col p-4"
+    >
+      <div
+        class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-stretch"
+      >
+        <div class="order-1 flex flex-col gap-4 lg:col-span-2">
+          <DuplicateDetectedCard
+            v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
+            :potential-duplicates="potentialDuplicates"
+            :merge-loading="mergeLoading"
+            @merge="handleMergeClick"
+            @request-navigate="(...args) => $emit('request-navigate', ...args)"
+            @dismiss="duplicateBannerDismissed = true"
+          />
+          <RequestLeadProfileSection
+            v-if="request"
+            :request="request"
+            @quick-action="handleQuickAction"
+          />
+
+          <div
+            class="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-background shadow-mk-dashboard-card"
+          >
+            <RequestMainTabs class="shrink-0" v-model="mainTab" :tabs="mainTabs" />
+
+            <div class="flex min-h-0 flex-1 flex-col gap-4 p-4">
+              <template v-if="mainTab === 'overview' || mainTab === 'tasks'">
+                <div class="flex flex-col gap-4">
+                <RequestInsightBanner
+                  v-if="mainTab === 'overview' && insightMessage"
+                  class="shrink-0"
+                  :message="insightMessage"
+                />
+                <RequestLeadQualificationTeaser
+                  v-if="request?.type === 'lead'"
+                  class="w-full min-w-0 shrink-0"
+                  :show-teaser="lqfShowTeaser"
+                  :dismissed="lqfTeaserDismissed"
+                  :teaser-line="lqfTeaserLine"
+                  :assignee-initials="lqfAssigneeInitials"
+                  @manage-task="handleLqfManageTask"
+                  @open-full-task="handleOpenTaskDrawer()"
+                  @not-now="handleLqfNotNow"
+                >
+                  <template v-if="lqfInlineManageOpen" #outcome>
+                    <LeadManagementWidget
+                      :lead="request"
+                      :activities="requestActivities"
+                      embed-outcome-only
+                      @postpone-expected-close="handlePostponeExpectedClose"
+                      @reassigned="handleReassigned"
+                      @open-purchase-method="handleLqfOpenPurchaseMethod"
+                      @open-trade-in="handleLqfOpenTradeIn"
+                    />
+                  </template>
+                  <template v-if="lqfNotNowNextAttemptOpen" #next-attempt>
+                    <PostponeWithAssigneeCard
+                      :title="t('requestDetail.lqfTask.nextAttemptTitle')"
+                      :assignee-options="lqfNextAttemptAssigneeOptions"
+                      :default-assignee-key="lqfDefaultNextAttemptAssigneeKey"
+                      :assignee-placeholder="t('requestDetail.lqfTask.nextAttemptAssigneePlaceholder')"
+                      :cancel-label="t('common.buttons.cancel')"
+                      :show-quick-time-options="true"
+                      :saving="lqfNextAttemptSaving"
+                      @confirm="handleLqfNextAttemptConfirm"
+                      @cancel="lqfNotNowNextAttemptOpen = false"
+                    />
+                  </template>
+                </RequestLeadQualificationTeaser>
+                <SuggestedNextActionCard
+                  v-if="request && !isClosedLead && request.type === 'opportunity' && (mainTab === 'overview' || mainTab === 'tasks')"
+                  :request="request"
+                  class="shrink-0"
+                />
+                </div>
+              </template>
+
+              <template v-else-if="mainTab === 'activity'">
+                <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+                  <TaskActivityCard
+                    v-if="showTimeline && request"
+                    :activities="requestActivities"
+                    :expanded-summaries="activityExpandedSummaries"
+                    @toggle-summary-expanded="handleActivitySummaryToggle"
+                    @add-activity="handleTaskAddActivity"
+                  />
+                </div>
+              </template>
+
+              <template v-else-if="mainTab === 'conversations'">
+                <RequestConversationsTabContent
+                  :activities="conversationActivitiesForRequest"
+                  @send-message="showEmailModal = true"
+                />
+              </template>
+
+              <template v-else-if="mainTab === 'tradeIns'">
+                <RequestTabEmptyState
+                  v-if="tradeInsCount === 0"
+                  :icon="Car"
+                  :title="t('requestDetail.emptyStates.tradeIns.title')"
+                  :description="t('requestDetail.emptyStates.tradeIns.description')"
+                  :action-label="t('requestDetail.emptyStates.tradeIns.action')"
+                  @action="editingTradeIn = null; showTradeInModal = true"
+                />
+                <div v-else class="flex flex-col gap-4">
+                  <p class="text-sm text-muted-foreground">{{ tradeInsSummary }}</p>
+                  <Button
+                    variant="default"
+                    class="rounded-sm w-full sm:w-auto"
+                    @click="editingTradeIn = null; showTradeInModal = true"
+                  >
+                    {{ t('forms.modals.addTradeIn') }}
+                  </Button>
+                </div>
+              </template>
+
+              <template v-else-if="mainTab === 'purchaseMethod'">
+                <RequestTabEmptyState
+                  v-if="financingOptionsCount === 0"
+                  :icon="CreditCard"
+                  :title="t('requestDetail.emptyStates.purchaseMethod.title')"
+                  :description="t('requestDetail.emptyStates.purchaseMethod.description')"
+                  :action-label="t('requestDetail.emptyStates.purchaseMethod.action')"
+                  @action="editingFinancingOption = null; showFinancingModal = true"
+                />
+                <div v-else class="flex flex-col gap-4">
+                  <p class="text-sm text-muted-foreground">{{ financingSummary }}</p>
+                  <Button
+                    variant="default"
+                    class="rounded-sm w-full sm:w-auto"
+                    @click="editingFinancingOption = null; showFinancingModal = true"
+                  >
+                    {{ t('forms.modals.addFinancing') }}
+                  </Button>
+                </div>
+              </template>
+
+              <template v-else-if="mainTab === 'attachments'">
+                <RequestTabEmptyState
+                  v-if="attachmentsCount === 0"
+                  :icon="Folder"
+                  :title="t('requestDetail.emptyStates.attachments.title')"
+                  :description="t('requestDetail.emptyStates.attachments.description')"
+                  :action-label="t('requestDetail.emptyStates.attachments.action')"
+                  @action="showAttachmentModal = true"
+                />
+                <div v-else class="flex flex-col gap-4">
+                  <p class="text-sm text-muted-foreground">
+                    {{ t('requestDetail.emptyStates.attachments.hasItems', { count: attachmentsCount }) }}
+                  </p>
+                  <Button
+                    variant="outline"
+                    class="rounded-sm w-full sm:w-auto"
+                    @click="showAttachmentModal = true"
+                  >
+                    {{ t('forms.modals.addAttachment') }}
+                  </Button>
+                </div>
+              </template>
+
             </div>
-            <SuggestedNextActionCard
-              v-if="request && !isClosedLead"
-              :request="request"
-              class="shrink-0"
-            />
-          </div>
-          <div class="flex flex-col bg-muted rounded-lg p-2">
-            <RequestActivityCard
-              v-if="showTimeline && !isClosedLead"
-              :request="request"
-              @offer-saved="handleOfferSaved"
-              @request-navigate="(...args) => $emit('request-navigate', ...args)"
-              @open-trade-in="editingTradeIn = null; showTradeInModal = true"
-              @open-task-drawer="$emit('open-task-drawer', $event)"
-              @open-financing="editingFinancingOption = null; showFinancingModal = true"
-            />
           </div>
         </div>
-        <!-- Activity + Other requests (1/3 width, right column) -->
-        <div class="order-2 lg:col-span-1 flex flex-col gap-4">
-          <div class="flex flex-col bg-muted rounded-lg p-2">
-            <RequestRightColumnCard
-              :request="request"
-              :show-associated-tasks="showAssociatedTasks"
-              :activities="requestActivities"
-              :expanded-summaries="activityExpandedSummaries"
-              @request-navigate="(...args) => $emit('request-navigate', ...args)"
-              @activity-click="handleActivityClick"
-              @toggle-summary-expanded="toggleActivitySummaryExpanded"
-              @add-activity="handleAddActivity"
-            />
-          </div>
+
+        <div class="order-2 lg:col-span-1 flex flex-col gap-4 min-w-0">
+          <VehicleRequestCard
+            v-if="request && (request.requestedCar || request.vehicle)"
+            :heading="t('requestDetail.vehicleCard.title')"
+            :vehicle="request.requestedCar || request.vehicle"
+            :request-message="request.requestMessage || request.requestedCar?.requestMessage"
+            :source="request.source"
+            :source-url="request.requestedCar?.listingUrl || request.sourceUrl || ''"
+            :image-url="getCarImageUrl(request.requestedCar || request.vehicle)"
+            :save-requested-car="handleRequestedCarSave"
+            hide-request-message
+            @open-ad="handleOpenAd"
+            @more-actions="handleMoreActions"
+          />
+          <RequestMessageCard
+            v-if="request && (request.requestMessage || request.requestedCar?.requestMessage)"
+            :title="t('requestDetail.messageCard.title')"
+            :message="request.requestMessage || request.requestedCar?.requestMessage"
+          />
         </div>
       </div>
     </div>
@@ -128,24 +301,43 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { Car, CreditCard, Folder } from 'lucide-vue-next'
+import { Button } from '@motork/component-library/future/primitives'
 import { useDuplicateDetection } from '@/composables/useDuplicateDetection'
 import { mergeRequestIntoPrimary, getVehicleSummary } from '@/api/mergeRequest'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
+import { useUsersStore } from '@/stores/users'
 import { useToastStore } from '@/stores/toast'
+import { useLeadLqTeaser } from '@/composables/useLeadLqTeaser'
 import RequestDetailShell from './RequestDetailShell.vue'
-import LeadOpportunityDetailsCard from '@/components/shared/LeadOpportunityDetailsCard.vue'
 import VehicleRequestCard from '@/components/shared/VehicleRequestCard.vue'
-import TaskContactCard from '@/components/tasks/TaskContactCard.vue'
-import RequestRightColumnCard from './RequestRightColumnCard.vue'
-import RequestActivityCard from './RequestActivityCard.vue'
+import RequestMainTabs from './RequestMainTabs.vue'
+import RequestConversationsTabContent from './RequestConversationsTabContent.vue'
+import RequestTabEmptyState from './RequestTabEmptyState.vue'
+import RequestLeadProfileSection from './RequestLeadProfileSection.vue'
+import RequestInsightBanner from './RequestInsightBanner.vue'
+import RequestLeadQualificationTeaser from './RequestLeadQualificationTeaser.vue'
+import RequestMessageCard from './RequestMessageCard.vue'
 import SuggestedNextActionCard from './SuggestedNextActionCard.vue'
+import TaskActivityCard from '@/components/tasks/TaskActivityCard.vue'
+import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
+import AttachmentWidget from '@/components/shared/feed/AttachmentWidget.vue'
+import AddWhatsAppModal from '@/components/modals/AddWhatsAppModal.vue'
+import AddSMSModal from '@/components/modals/AddSMSModal.vue'
+import AddEmailModal from '@/components/modals/AddEmailModal.vue'
+import OfferModal from '@/components/modals/OfferModal.vue'
+import CreateEventModal from '@/components/modals/CreateEventModal.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
 import MergeConfirmModal from '@/components/modals/MergeConfirmModal.vue'
 import DuplicateDetectedCard from './DuplicateDetectedCard.vue'
+import LeadManagementWidget from '@/components/tasks/lead/LeadManagementWidget.vue'
+import PostponeWithAssigneeCard from '@/components/tasks/shared/PostponeWithAssigneeCard.vue'
+import { formatDate, formatTime } from '@/utils/formatters'
 import {
   getApiStatus,
   getOpportunityUpdateFromDisplayStage
@@ -170,12 +362,17 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'request-navigate', 'open-task-drawer'])
 
+const { t } = useI18n()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
 const toastStore = useToastStore()
+const usersStore = useUsersStore()
+
+const LQF_NEXT_ATTEMPT_NONE_KEY = '__none__'
 
 const showPostponeModal = ref(false)
+const showGenericComingSoon = ref(false)
 const showTradeInModal = ref(false)
 const showFinancingModal = ref(false)
 const editingTradeIn = ref(null)
@@ -184,15 +381,84 @@ const tradeInActionLoading = ref(false)
 const showMergeModal = ref(false)
 const duplicateToMerge = ref(null)
 const mergeLoading = ref(false)
-/** Dismiss duplicate banner for current request only (resets when request changes). */
 const duplicateBannerDismissed = ref(false)
-
-/** Activity tab: expanded state for AI summaries (same as task detail). */
+const mainTab = ref('overview')
+const lqfTeaserDismissed = ref(false)
+const lqfInlineManageOpen = ref(false)
+const lqfNotNowNextAttemptOpen = ref(false)
+const lqfNextAttemptSaving = ref(false)
+const showNoteModal = ref(false)
+const showAttachmentModal = ref(false)
+const showWhatsAppModal = ref(false)
+const showSMSModal = ref(false)
+const showEmailModal = ref(false)
+const showCallComingSoonModal = ref(false)
+const showOfferModal = ref(false)
+const showAppointmentModal = ref(false)
 const activityExpandedSummaries = ref({})
+
+const lqfNextAttemptAssigneeOptions = computed(() => {
+  const noneOption = {
+    _key: LQF_NEXT_ATTEMPT_NONE_KEY,
+    type: 'none',
+    label: 'Unassigned'
+  }
+  const users = (usersStore.assignableUsers || []).map((u) => ({
+    ...u,
+    type: 'user',
+    _key: `user-${u.id}`,
+    label: u.name
+  }))
+  const teams = (usersStore.assignableTeams || []).map((t) => ({
+    ...t,
+    type: 'team',
+    _key: `team-${t.id}`,
+    label: t.name
+  }))
+  return [noneOption, ...users, ...teams]
+})
+
+const lqfDefaultNextAttemptAssigneeKey = computed(() => {
+  const r = props.request
+  if (!r || r.type !== 'lead') return LQF_NEXT_ATTEMPT_NONE_KEY
+  const name = r.assignee
+  if (!name) return LQF_NEXT_ATTEMPT_NONE_KEY
+  const user = usersStore.assignableUsers?.find((u) => u.name === name)
+  if (user) return `user-${user.id}`
+  const team = usersStore.assignableTeams?.find((t) => t.name === name)
+  if (team) return `team-${team.id}`
+  return LQF_NEXT_ATTEMPT_NONE_KEY
+})
+
+const leadRef = computed(() => (props.request?.type === 'lead' ? props.request : null))
+const { showTeaser: lqfShowTeaser, teaserLine: lqfTeaserLine } = useLeadLqTeaser(leadRef)
+
+watch(
+  () => lqfShowTeaser.value,
+  (show) => {
+    if (!show) {
+      lqfInlineManageOpen.value = false
+      lqfNotNowNextAttemptOpen.value = false
+    }
+  }
+)
+
+const lqfAssigneeInitials = computed(() => {
+  const r = props.request
+  if (!r) return '?'
+  if (r.assigneeInitials) return String(r.assigneeInitials).slice(0, 3)
+  const name = r.assignee
+  if (!name || typeof name !== 'string') return '?'
+  return name
+    .split(/\s+/)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+})
 
 const { potentialDuplicates } = useDuplicateDetection(computed(() => props.request))
 
-/** Activities for current request (same source logic as task detail). */
 const requestActivities = computed(() => {
   const r = props.request
   if (!r) return []
@@ -211,16 +477,88 @@ const requestActivities = computed(() => {
     }
   }
   return [...list].sort((a, b) => {
-    const ta = (a.timestamp ? new Date(a.timestamp).getTime() : 0)
-    const tb = (b.timestamp ? new Date(b.timestamp).getTime() : 0)
+    const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0
+    const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0
     return tb - ta
   })
+})
+
+const conversationActivitiesForRequest = computed(() => {
+  const list = requestActivities.value.filter(
+    (a) =>
+      a.type === 'customer-email' ||
+      a.type === 'customer-whatsapp' ||
+      a.type === 'email' ||
+      a.type === 'whatsapp'
+  )
+  return [...list].sort(
+    (a, b) => new Date(a.timestamp || 0).getTime() - new Date(b.timestamp || 0).getTime()
+  )
+})
+
+const showAssociatedTasks = computed(() => {
+  const r = props.request
+  return !!(r?.customer || r?.customerId)
+})
+
+const attachmentsCount = computed(
+  () => requestActivities.value.filter((a) => a.type === 'attachment').length
+)
+
+const tradeInsCount = computed(() => props.request?.tradeIns?.length || 0)
+
+const financingOptionsCount = computed(() => props.request?.financingOptions?.length || 0)
+
+const insightMessage = computed(() => {
+  const r = props.request
+  if (!r) return ''
+  const car = r.requestedCar || r.vehicle
+  const days = car?.stockDays
+  const paid = r.channel === 'Paid' || r.channel === 'paid'
+  if (paid && typeof days === 'number' && days >= 5) {
+    return t('requestDetail.insight.highPaidStock', { days })
+  }
+  return ''
+})
+
+const overviewTabCount = computed(() => {
+  let n = 0
+  if (potentialDuplicates.value?.length) n += 1
+  if (insightMessage.value) n += 1
+  if (lqfShowTeaser.value && !lqfTeaserDismissed.value && props.request?.type === 'lead') n += 1
+  return n
+})
+
+const mainTabs = computed(() => [
+  { key: 'overview', label: t('requestDetail.tabs.overview'), count: overviewTabCount.value },
+  { key: 'conversations', label: t('requestDetail.tabs.conversations') },
+  { key: 'tradeIns', label: t('requestDetail.tabs.tradeIns'), count: tradeInsCount.value },
+  { key: 'purchaseMethod', label: t('requestDetail.tabs.purchaseMethod'), count: financingOptionsCount.value },
+  { key: 'attachments', label: t('requestDetail.tabs.attachments'), count: attachmentsCount.value },
+  { key: 'tasks', label: t('requestDetail.tabs.tasks'), count: tasksTabCount.value },
+  { key: 'activity', label: t('requestDetail.tabs.activity'), count: requestActivities.value.length }
+])
+
+const tradeInsSummary = computed(() => {
+  const n = tradeInsCount.value
+  if (n === 0) return t('messages.info.noData')
+  return t('requestDetail.tabs.tradeIns')
+})
+
+const financingSummary = computed(() => {
+  const n = financingOptionsCount.value
+  if (n === 0) return t('messages.info.noData')
+  return t('requestDetail.tabs.purchaseMethod')
 })
 
 watch(
   () => props.request?.compositeId,
   () => {
     duplicateBannerDismissed.value = false
+    lqfTeaserDismissed.value = false
+    lqfInlineManageOpen.value = false
+    lqfNotNowNextAttemptOpen.value = false
+    mainTab.value = 'overview'
   }
 )
 
@@ -232,19 +570,23 @@ const mergeDuplicateSummary = computed(() => {
 
 const activityAuthor = computed(() => userStore.currentUser?.name || 'You')
 
-/** Show Associated Tasks card when customer exists (other requests for same customer) */
-const showAssociatedTasks = computed(() => {
-  const r = props.request
-  return !!(r?.customer || r?.customerId)
-})
-
-/** Show Timeline for all requests */
 const showTimeline = computed(() => !!props.request)
 
-/** Closed lead: hide communicate, let Activity/Other requests span full width */
 const isClosedLead = computed(
   () => props.request?.type === 'lead' && props.request?.isDisqualified === true
 )
+
+const tasksTabCount = computed(() => {
+  const r = props.request
+  if (!r) return 0
+  if (r.type === 'lead') {
+    return lqfShowTeaser.value && !lqfTeaserDismissed.value ? 1 : 0
+  }
+  if (r.type === 'opportunity' && !isClosedLead.value) {
+    return 1
+  }
+  return 0
+})
 
 const showAssociatedTasksOrTimeline = computed(
   () => showAssociatedTasks.value || showTimeline.value
@@ -268,34 +610,112 @@ async function handleRequestedCarSave(carData) {
   }
 }
 
-function handleOpenAd() {
-  // TODO: open ad
+function handleOpenAd() {}
+
+function handleMoreActions() {}
+
+function handleQuickAction() {
+  showGenericComingSoon.value = true
 }
 
-function handleMoreActions() {
-  // TODO: more actions menu
+function handleAddSegment() {
+  showGenericComingSoon.value = true
 }
 
-function handleContactAction() {
-  // TODO: contact action
+function handleHeaderMoreAction(action) {
+  if (action === 'share') showGenericComingSoon.value = true
 }
 
-function handleActivityClick() {
-  // TODO: open activity detail modal when needed
+function handleOpenTaskDrawer(task) {
+  const t = task ?? props.request
+  if (!t?.compositeId) return
+  emit('open-task-drawer', t)
 }
 
-function toggleActivitySummaryExpanded(activityId) {
-  activityExpandedSummaries.value[activityId] = !activityExpandedSummaries.value[activityId]
+async function handleLqfManageTask() {
+  if (!props.request?.id || props.request.type !== 'lead') return
+  lqfNotNowNextAttemptOpen.value = false
+  lqfInlineManageOpen.value = true
+  try {
+    await leadsStore.fetchLeadById(props.request.id)
+  } catch {
+    // LQTask falls back to request payload when store load fails
+  }
 }
 
-function handleAddActivity() {
-  // Add-activity opens modals on task detail; request detail can wire Note/Attachment etc. later
-  toastStore.pushToast('info', 'Add activity – coming soon')
+function handleLqfNotNow() {
+  lqfInlineManageOpen.value = false
+  lqfNotNowNextAttemptOpen.value = true
+}
+
+function mapNextAttemptAssigneeToLeadUpdates(assignee) {
+  const updates = {}
+  if (!assignee || assignee.type === 'none') return updates
+  if (assignee.type === 'user' && assignee.id != null) {
+    updates.assignee = assignee.name || assignee.label
+    updates.assigneeId = assignee.id
+    updates.assigneeType = 'user'
+    updates.teamId = null
+    updates.team = null
+  } else if (assignee.type === 'team' && assignee.id != null) {
+    updates.assignee = assignee.name || assignee.label
+    updates.assigneeId = null
+    updates.assigneeType = 'team'
+    updates.teamId = assignee.id
+    updates.team = assignee.name || assignee.label
+  }
+  return updates
+}
+
+async function handleLqfNextAttemptConfirm(payload) {
+  const r = props.request
+  if (!r?.id || r.type !== 'lead' || !payload?.dateTime) return
+  lqfNextAttemptSaving.value = true
+  try {
+    const dueDateTime = new Date(payload.dateTime)
+    const isoTimestamp = dueDateTime.toISOString()
+    const assigneeUpdates = mapNextAttemptAssigneeToLeadUpdates(payload.assignee)
+    await leadsStore.updateLead(r.id, {
+      nextActionDue: isoTimestamp,
+      ...assigneeUpdates
+    })
+    let content = `Task postponed to ${formatDate(dueDateTime)} at ${formatTime(dueDateTime)}`
+    if (assigneeUpdates.assignee) {
+      content += ` and reassigned to ${assigneeUpdates.assignee}`
+    }
+    if (payload.noteToAssignee?.trim()) {
+      content += `. ${payload.noteToAssignee.trim()}`
+    }
+    await leadsStore.addActivity(r.id, {
+      type: 'note',
+      user: activityAuthor.value,
+      action: 'postponed lead qualification task',
+      content
+    })
+    await leadsStore.fetchLeadById(r.id)
+    lqfNotNowNextAttemptOpen.value = false
+    lqfTeaserDismissed.value = true
+    toastStore.pushToast('success', t('requestDetail.lqfTask.nextAttemptSaved'))
+  } catch {
+    toastStore.pushToast('error', t('requestDetail.lqfTask.nextAttemptSaveFailed'))
+  } finally {
+    lqfNextAttemptSaving.value = false
+  }
+}
+
+function handleLqfOpenPurchaseMethod() {
+  editingFinancingOption.value = null
+  showFinancingModal.value = true
+}
+
+function handleLqfOpenTradeIn() {
+  editingTradeIn.value = null
+  showTradeInModal.value = true
 }
 
 function handlePrevious() {
   if (!props.request?.compositeId || !props.filteredRequests?.length) return
-  const idx = props.filteredRequests.findIndex(r => r.compositeId === props.request.compositeId)
+  const idx = props.filteredRequests.findIndex((r) => r.compositeId === props.request.compositeId)
   if (idx > 0) {
     const prev = props.filteredRequests[idx - 1]
     emit('request-navigate', prev.compositeId)
@@ -304,24 +724,223 @@ function handlePrevious() {
 
 function handleNext() {
   if (!props.request?.compositeId || !props.filteredRequests?.length) return
-  const idx = props.filteredRequests.findIndex(r => r.compositeId === props.request.compositeId)
+  const idx = props.filteredRequests.findIndex((r) => r.compositeId === props.request.compositeId)
   if (idx >= 0 && idx < props.filteredRequests.length - 1) {
     const next = props.filteredRequests[idx + 1]
     emit('request-navigate', next.compositeId)
   }
 }
 
-function handleOfferSaved() {
-  if (props.request?.type === 'opportunity') {
-    useOpportunitiesStore().fetchOpportunityById(props.request.id)
+function handleActivitySummaryToggle(activityId) {
+  activityExpandedSummaries.value = {
+    ...activityExpandedSummaries.value,
+    [activityId]: !activityExpandedSummaries.value[activityId]
   }
 }
 
-function handleEventCreated() {
-  if (props.request?.type === 'lead') {
-    useLeadsStore().fetchLeadById(props.request.id)
-  } else {
-    useOpportunitiesStore().fetchOpportunityById(props.request.id)
+function handleTaskAddActivity(activityType) {
+  if (activityType === 'note') {
+    showNoteModal.value = true
+  } else if (activityType === 'attachment') {
+    showAttachmentModal.value = true
+  } else if (activityType === 'whatsapp') {
+    showWhatsAppModal.value = true
+  } else if (activityType === 'sms') {
+    showSMSModal.value = true
+  } else if (activityType === 'email') {
+    showEmailModal.value = true
+  } else if (activityType === 'call') {
+    showCallComingSoonModal.value = true
+  } else if (activityType === 'financing') {
+    editingFinancingOption.value = null
+    showFinancingModal.value = true
+  } else if (activityType === 'tradein') {
+    editingTradeIn.value = null
+    showTradeInModal.value = true
+  } else if (activityType === 'purchase') {
+    showOfferModal.value = true
+  } else if (activityType === 'appointment') {
+    showAppointmentModal.value = true
+  }
+}
+
+async function handleActivityNoteSave(noteData) {
+  const r = props.request
+  if (!r?.id) return
+  try {
+    const payload = {
+      type: 'note',
+      user: activityAuthor.value,
+      action: 'added a note',
+      content: noteData.content || noteData.message,
+      message: noteData.content || noteData.message,
+      timestamp: new Date().toISOString()
+    }
+    if (r.type === 'lead') {
+      await leadsStore.addActivity(r.id, payload)
+      await leadsStore.fetchLeadById(r.id)
+    } else {
+      await opportunitiesStore.addActivity(r.id, payload)
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    showNoteModal.value = false
+  } catch (err) {
+    console.error('Error saving note:', err)
+  }
+}
+
+async function handleActivityAttachmentSave(attachmentData) {
+  const r = props.request
+  if (!r?.id) return
+  try {
+    const payload = {
+      type: 'attachment',
+      user: activityAuthor.value,
+      action: 'uploaded an attachment',
+      fileName: attachmentData.fileName,
+      file: attachmentData.file,
+      content: `Attachment: ${attachmentData.fileName}`,
+      timestamp: new Date().toISOString()
+    }
+    if (r.type === 'lead') {
+      await leadsStore.addActivity(r.id, payload)
+      await leadsStore.fetchLeadById(r.id)
+    } else {
+      await opportunitiesStore.addActivity(r.id, payload)
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    showAttachmentModal.value = false
+  } catch (err) {
+    console.error('Error saving attachment:', err)
+  }
+}
+
+async function handleActivityWhatsAppSave(data) {
+  const r = props.request
+  if (!r?.id) return
+  try {
+    const payload = {
+      type: 'whatsapp',
+      user: activityAuthor.value,
+      action: 'sent a WhatsApp message',
+      message: data.message,
+      content: data.message,
+      template: data.template,
+      timestamp: new Date().toISOString()
+    }
+    if (r.type === 'lead') {
+      await leadsStore.addActivity(r.id, payload)
+      await leadsStore.fetchLeadById(r.id)
+    } else {
+      await opportunitiesStore.addActivity(r.id, payload)
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    showWhatsAppModal.value = false
+  } catch (err) {
+    console.error('Error saving WhatsApp:', err)
+  }
+}
+
+async function handleActivitySMSSave(data) {
+  const r = props.request
+  if (!r?.id) return
+  try {
+    const payload = {
+      type: 'sms',
+      user: activityAuthor.value,
+      action: 'sent an SMS',
+      message: data.message,
+      content: data.message,
+      template: data.template,
+      timestamp: new Date().toISOString()
+    }
+    if (r.type === 'lead') {
+      await leadsStore.addActivity(r.id, payload)
+      await leadsStore.fetchLeadById(r.id)
+    } else {
+      await opportunitiesStore.addActivity(r.id, payload)
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    showSMSModal.value = false
+  } catch (err) {
+    console.error('Error saving SMS:', err)
+  }
+}
+
+async function handleActivityEmailSave(data) {
+  const r = props.request
+  if (!r?.id) return
+  try {
+    const payload = {
+      type: 'email',
+      user: activityAuthor.value,
+      action: 'sent an email',
+      subject: data.subject,
+      message: data.message,
+      content: data.message,
+      template: data.template,
+      timestamp: new Date().toISOString()
+    }
+    if (r.type === 'lead') {
+      await leadsStore.addActivity(r.id, payload)
+      await leadsStore.fetchLeadById(r.id)
+    } else {
+      await opportunitiesStore.addActivity(r.id, payload)
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    showEmailModal.value = false
+  } catch (err) {
+    console.error('Error saving email:', err)
+  }
+}
+
+async function handleActivityOfferSave(data) {
+  const r = props.request
+  if (!r?.id) return
+  try {
+    const activityPayload = {
+      type: 'offer',
+      user: activityAuthor.value,
+      action: data.action || 'created an offer',
+      content: data.content || `Offer: €${data.data?.price || 0}`,
+      data: data.data,
+      timestamp: new Date().toISOString()
+    }
+    if (r.type === 'lead') {
+      await leadsStore.addActivity(r.id, activityPayload)
+      await leadsStore.fetchLeadById(r.id)
+    } else {
+      await opportunitiesStore.addActivity(r.id, activityPayload)
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    showOfferModal.value = false
+  } catch (err) {
+    console.error('Error saving offer:', err)
+  }
+}
+
+async function handleActivityAppointmentSave(data) {
+  const r = props.request
+  if (!r?.id) return
+  try {
+    const payload = {
+      type: 'appointment',
+      user: activityAuthor.value,
+      action: 'scheduled an appointment',
+      content: `Appointment: ${data.type || 'Meeting'} on ${data.date || ''}`,
+      data,
+      timestamp: new Date().toISOString()
+    }
+    if (r.type === 'lead') {
+      await leadsStore.addActivity(r.id, payload)
+      await leadsStore.fetchLeadById(r.id)
+    } else {
+      await opportunitiesStore.addActivity(r.id, payload)
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    showAppointmentModal.value = false
+  } catch (err) {
+    console.error('Error saving appointment:', err)
   }
 }
 
@@ -412,7 +1031,8 @@ async function handleTradeInSave(data) {
   try {
     const v = data.vehicle || {}
     const parts = [v.brand, v.model].filter(Boolean)
-    const label = (parts.length ? parts.join(' ') + (v.year ? ` (${v.year})` : '') : 'Trade-in') || 'Trade-in'
+    const label =
+      (parts.length ? parts.join(' ') + (v.year ? ` (${v.year})` : '') : 'Trade-in') || 'Trade-in'
     const valuation = data.valuation?.tradeInPrice ?? 0
     const activity = {
       type: 'tradein',
@@ -478,13 +1098,22 @@ async function handleFinancingSave(data) {
   const r = props.request
   if (!r?.id) return
   try {
-    const typeLabel = data.type === 'FIN' ? 'Captive Financing' : data.type === 'LEA' ? 'Leasing' : data.type === 'LTR' ? 'Long-Term Rental' : data.type || 'Financing'
+    const typeLabel =
+      data.type === 'FIN'
+        ? 'Captive Financing'
+        : data.type === 'LEA'
+          ? 'Leasing'
+          : data.type === 'LTR'
+            ? 'Long-Term Rental'
+            : data.type || 'Financing'
     const duration = data.fields?.duration ?? data.termMonths ?? null
     const content = duration ? `${typeLabel} ${duration} months` : typeLabel
     const activity = {
       type: 'financing',
       user: activityAuthor.value,
-      action: editingFinancingOption.value ? 'updated a financing proposal' : 'added a financing proposal',
+      action: editingFinancingOption.value
+        ? 'updated a financing proposal'
+        : 'added a financing proposal',
       content: data.successMessage || content,
       data: { type: data.type, ...(data.fields || {}) },
       timestamp: new Date().toISOString()

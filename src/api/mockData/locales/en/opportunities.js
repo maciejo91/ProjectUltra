@@ -1,4 +1,12 @@
-import { createDateOffset, createDateString, createDateTimeOffset, createHourOffset, DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
+import {
+  createDateOffset,
+  createDateString,
+  createDateTimeOffset,
+  createHourOffset,
+  DEFAULT_CAR_IMAGE,
+  DEMO_CUSTOMER_REQUEST_MESSAGE,
+  demoPlateNumber
+} from '@/utils/mockDataHelpers'
 
 /**
  * English mock opportunities – one per display stage/status for the state machine.
@@ -7,6 +15,7 @@ import { createDateOffset, createDateString, createDateTimeOffset, createHourOff
 
 const baseRequestedCar = (brand, model, year, price, opts = {}) => {
   const defaults = {
+    plateNumber: demoPlateNumber(brand, model, year),
     vin: 'WBA3B1C50EK123456',
     image: DEFAULT_CAR_IMAGE,
     dealership: 'Munich',
@@ -16,7 +25,7 @@ const baseRequestedCar = (brand, model, year, price, opts = {}) => {
     status: 'New',
     stockDays: 5,
     registration: '01/2024',
-    requestMessage: `Interested in ${brand} ${model}. Ready to discuss pricing and availability.`,
+    requestMessage: DEMO_CUSTOMER_REQUEST_MESSAGE,
     requestType: 'Quotation',
     adCampaign: 'Summer 2024',
     adMedium: 'Display',

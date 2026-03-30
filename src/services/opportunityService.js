@@ -48,7 +48,8 @@ export class OpportunityService {
           email: customer.email,
           phone: customer.phone,
           address: customer.address,
-          isBusiness: !!customer.isBusiness
+          isBusiness: !!customer.isBusiness,
+          tags: Array.isArray(customer.tags) ? customer.tags : []
         }
       }
     }

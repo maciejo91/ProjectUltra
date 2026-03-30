@@ -1,0 +1,112 @@
+{
+  "copyTitle": "Titel kopieren",
+  "titleCopied": "Titel kopiert",
+  "titleCopyFailed": "Kopieren fehlgeschlagen",
+  "moreMenuShare": "Teilen",
+  "headerTitle": "{entity} von {source} ({requestType})",
+  "headerPrimary": "{entity} von {source}",
+  "headerTypeLabel": "({requestType})",
+  "headerBack": "Zurück zu Anfragen",
+  "statusInProgress": "In Bearbeitung",
+  "created": "Erstellt",
+  "lastUpdated": "Zuletzt aktualisiert",
+  "moreMenu": "Weitere Aktionen",
+  "addSegment": "Segment hinzufügen",
+  "tabs": {
+    "overview": "Übersicht",
+    "conversations": "Gespräche",
+    "tradeIns": "Inzahlungnahmen",
+    "purchaseMethod": "Kaufmethode",
+    "attachments": "Anhänge",
+    "tasks": "Aufgaben",
+    "activity": "Aktivität"
+  },
+  "insight": {
+    "highPaidStock": "Dieser Lead stammt aus einer stark bezahlten Quelle und interessiert sich für ein Fahrzeug, das seit {days} Tagen auf Lager ist."
+  },
+  "lqfTask": {
+    "title": "Lead Qualification Task",
+    "manageTask": "Aufgabe bearbeiten",
+    "notNow": "Nicht jetzt",
+    "nextAttemptTitle": "Aufgabe verschieben auf",
+    "nextAttemptAssigneePlaceholder": "Zuweisen an…",
+    "nextAttemptSaved": "Aufgabe verschoben",
+    "nextAttemptSaveFailed": "Aufgabe konnte nicht verschoben werden",
+    "openFullTaskView": "Vollständige Aufgabenansicht öffnen",
+    "taskOptionsAria": "Aufgabenoptionen"
+  },
+  "quickActions": {
+    "phone": "Telefon",
+    "email": "E-Mail",
+    "whatsapp": "WhatsApp",
+    "document": "Dokument",
+    "more": "Mehr"
+  },
+  "contactCard": {
+    "otherInteractions": "Weitere Interaktionen ({count})",
+    "openProfile": "Kundenprofil öffnen",
+    "cardMenu": "Kundenkartenmenü",
+    "editCustomer": "Kunde bearbeiten",
+    "addTag": "Tag hinzufügen",
+    "privateCustomerTooltip": "Privatkunde",
+    "businessTag": "Geschäftlich",
+    "saving": "Wird gespeichert…",
+    "customerUpdated": "Kunde aktualisiert",
+    "saveFailed": "Speichern fehlgeschlagen",
+    "fields": {
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "address": "Adresse"
+    },
+    "placeholders": {
+      "name": "Kundenname",
+      "email": "email@example.com",
+      "phone": "+49…",
+      "address": "Adresse"
+    }
+  },
+  "vehicleCard": {
+    "title": "Angefragtes Fahrzeug",
+    "registrationDate": "Erstzulassung",
+    "carLocation": "Standort Fahrzeug",
+    "mileage": "Kilometerstand",
+    "landingPage": "Landing Page",
+    "visit": "Besuchen",
+    "editAria": "Angefragtes Fahrzeug bearbeiten"
+  },
+  "messageCard": {
+    "title": "Anfragenachricht",
+    "expandAria": "Anfragenachricht einblenden",
+    "collapseAria": "Anfragenachricht ausblenden",
+    "empty": "—"
+  },
+  "placeholders": {
+    "conversations": "Gespräche erscheinen hier.",
+    "attachments": "Anhänge erscheinen hier.",
+    "tasksTab": "Related tasks and requests for this customer will appear here."
+  },
+  "emptyStates": {
+    "conversations": {
+      "title": "Noch keine Gespräche",
+      "description": "E-Mails und WhatsApp-Nachrichten zu dieser Anfrage erscheinen hier.",
+      "action": "Nachricht senden"
+    },
+    "tradeIns": {
+      "title": "Noch keine Inzahlungnahmen",
+      "description": "Inzahlungnahmen, die Sie hier hinzufügen, erscheinen an dieser Stelle.",
+      "action": "Inzahlungnahme hinzufügen"
+    },
+    "purchaseMethod": {
+      "title": "Noch keine Kaufoption",
+      "description": "Finanzierungs- oder Leasingoptionen, die Sie hinzufügen, erscheinen hier.",
+      "action": "Finanzierung hinzufügen"
+    },
+    "attachments": {
+      "title": "Keine Daten gespeichert",
+      "description": "Notizen und Anhänge zu dieser Anfrage erscheinen hier.",
+      "action": "Anhang hinzufügen",
+      "hasItems": "{count} Anhänge zu dieser Anfrage."
+    }
+  }
+}

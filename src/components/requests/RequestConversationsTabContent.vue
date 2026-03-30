@@ -8,24 +8,22 @@
       />
     </div>
 
-    <div
+    <RequestTabEmptyState
       v-else
-      class="text-center py-16 bg-background rounded-xl border border-dashed border-border mx-2"
-    >
-      <div class="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
-        <MessageCircle class="w-6 h-6 text-muted-foreground" />
-      </div>
-      <h4 class="text-foreground font-medium mb-1">No conversations yet</h4>
-      <p class="text-muted-foreground text-sm">
-        No email or WhatsApp conversations on this request.
-      </p>
-    </div>
+      :icon="MessageCircle"
+      :title="t('requestDetail.emptyStates.conversations.title')"
+      :description="t('requestDetail.emptyStates.conversations.description')"
+      :action-label="t('requestDetail.emptyStates.conversations.action')"
+      @action="$emit('send-message')"
+    />
   </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { MessageCircle } from 'lucide-vue-next'
 import ConversationItem from './ConversationItem.vue'
+import RequestTabEmptyState from './RequestTabEmptyState.vue'
 
 defineProps({
   activities: {
@@ -33,4 +31,8 @@ defineProps({
     default: () => []
   }
 })
+
+defineEmits(['send-message'])
+
+const { t } = useI18n()
 </script>

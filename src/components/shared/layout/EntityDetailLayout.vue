@@ -1230,7 +1230,7 @@ const handleContactInfoAction = (action) => {
   }
   
   // For call, show ComingSoonModal
-  if (action === 'call') {
+  if (action === 'call' || action === 'phone') {
     showComingSoonModal.value = true
     return
   }

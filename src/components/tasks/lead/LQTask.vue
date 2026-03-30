@@ -9,7 +9,7 @@
 
     <!-- Success state (post qualify / disqualify / no-answer) -->
     <template v-else-if="successState">
-      <div class="pt-1 px-1">
+      <div class="pt-1">
         <div
           class="bg-white rounded-lg p-4 shadow-nsc-card flex flex-col relative"
         >
@@ -61,7 +61,7 @@
         </div>
         </div>
       </div>
-      <div class="px-4 py-2 flex items-center justify-between text-sm text-muted-foreground">
+      <div class="py-2 flex items-center justify-between text-sm text-muted-foreground">
         <span>Updated by {{ successState.actorName || 'Unknown' }}</span>
         <span class="tabular-nums">{{ successPerformedAtLabel }}</span>
       </div>
@@ -70,7 +70,15 @@
     <template v-else>
       <!-- Loading: until lead data (and hasPhone) is known -->
       <template v-if="isLeadDataLoading">
-        <div class="pt-1 px-1">
+        <div
+          v-if="hideContactCard"
+          class="flex items-center justify-center py-6"
+          aria-busy="true"
+          aria-label="Loading"
+        >
+          <Spinner class="size-6 text-foreground shrink-0" />
+        </div>
+        <div v-else class="pt-1">
           <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden">
             <div class="p-8 flex items-center justify-center gap-3 min-h-[120px]" aria-busy="true" aria-label="Loading">
               <Spinner class="size-6 text-foreground shrink-0" />
@@ -81,7 +89,7 @@
       </template>
       <template v-else>
       <!-- Contact block: white card (padding matches opportunity management cards) -->
-      <div class="pt-1 px-1">
+      <div v-if="!hideContactCard" class="pt-1">
         <div
           class="bg-white rounded-lg shadow-nsc-card overflow-hidden"
         >
@@ -125,15 +133,15 @@
     </div>
 
       <!-- Grey outcome area: outcome selection and expanded cards -->
-      <div class="mk-expanded-cards-area space-y-3">
+      <div class="mk-expanded-cards-area space-y-4" :class="hideContactCard ? 'pt-0' : ''">
         <!-- No phone: email form + inline conversations -->
-        <div v-if="!hasPhone && !successState" class="space-y-3">
+        <div v-if="!hasPhone && !successState" class="space-y-4">
           <LQTaskSendEmailCard
             :lead="lead"
             :contact-name="lead.customer?.name ?? 'the customer'"
             :recent-attachments="recentAttachmentsForEmail"
           />
-          <div id="lqtask-conversations" class="space-y-3">
+          <div id="lqtask-conversations" class="space-y-4">
             <h4 class="text-sm font-medium text-foreground">Conversations</h4>
             <RequestConversationsTabContent :activities="conversationActivities" />
           </div>
@@ -239,7 +247,7 @@
           <!-- No Answer + Postpone: follow-up and next call attempt -->
           <div v-if="selectedOutcome === 'no-answer' && selectedNextStep === 'postpone'" ref="expandedOutcomeRef" class="space-y-4">
             <!-- When did you call field -->
-            <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+            <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
               <Label class="form-label">When did you call?</Label>
               <Input
                 type="datetime-local"
@@ -249,7 +257,7 @@
             </div>
             
             <!-- Send follow-up message -->
-            <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+            <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
               <h5 class="font-semibold text-foreground text-sm mb-4">Send follow-up message</h5>
               
               <!-- Channel Selection -->
@@ -293,7 +301,7 @@
               </div>
               
               <!-- Template and editable message (only show if channel selected and not 'dont-send') -->
-              <div v-if="followupChannel && followupChannel !== 'dont-send'" class="space-y-3">
+              <div v-if="followupChannel && followupChannel !== 'dont-send'" class="space-y-4">
                 <!-- Template (for WhatsApp, template content is not editable) -->
                 <div>
                   <Label class="form-label">Template</Label>
@@ -323,7 +331,7 @@
             </div>
             
             <!-- Next call attempt -->
-            <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+            <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
               <h5 class="font-semibold text-foreground text-sm mb-4">Next call attempt</h5>
               <div class="reschedule-toggle-group flex flex-wrap gap-2">
                 <Toggle
@@ -463,7 +471,7 @@
       <!-- Answer + Interested (Inline) -->
           <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'interested'" ref="expandedOutcomeRef" class="space-y-4">
             <!-- Info note -->
-            <div class="text-xs text-muted-foreground px-2">
+            <div class="text-xs text-muted-foreground">
               <span class="text-red-600">*</span> Required fields
             </div>
             
@@ -688,7 +696,7 @@
               class="space-y-4"
             >
               <!-- Step 1: Event Type Selection (FIRST STEP) -->
-              <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+              <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
                 <Label class="form-label mb-2">Event type <span class="text-red-600">*</span></Label>
                 <SelectMenu
                   v-model="qualificationEventType"
@@ -704,14 +712,14 @@
               </div>
 
               <!-- Schedule (Calendar and Availability by assignee) - only after event type is selected -->
-              <div v-if="qualificationEventType" ref="eventTypeExpandedRef" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+              <div v-if="qualificationEventType" ref="eventTypeExpandedRef" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
                 <h5 class="font-semibold text-foreground text-sm mb-4">{{ t('forms.schedule.title') }} <span class="text-red-600">*</span></h5>
                 
                 <!-- Calendar and Time Slots - Two Column Layout -->
                 <div class="bg-white rounded-lg border border-border overflow-hidden">
                   <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-black/5">
                     <!-- Left Column - Calendar -->
-                    <div class="p-6">
+                    <div class="p-4">
                       <div class="flex items-center justify-between mb-4">
                         <button 
                           @click="previousMonth"
@@ -753,7 +761,7 @@
                     </div>
 
                     <!-- Right Column - Availability by assignee (sliding + dropdown with icon, full-width scroller) -->
-                    <div class="p-6 flex flex-col min-h-0 w-full">
+                    <div class="p-4 flex flex-col min-h-0 w-full">
                       <h6 class="text-sm font-semibold text-foreground mb-3 shrink-0">{{ selectedQualificationDateLabel }}</h6>
                       <div v-if="qualificationSelectedDate && availabilityByAssigneeForSelectedDate.length > 0" class="flex-1 min-h-0 flex flex-col w-full">
                         <!-- Sliding + assignee dropdown (trigger: avatar + name + ChevronDown like TaskAssignee) -->
@@ -889,7 +897,7 @@
         </div>
         
         <!-- Unified Action Buttons at Bottom Right of Gray Wrapper (hidden for Answer + Postpone; buttons appear below postpone card) -->
-        <div v-if="hasActiveOutcomeSelection && !successState && !(selectedOutcome === 'answer' && selectedNextStep === 'postpone')" class="flex justify-end gap-2 px-4 pb-4 pt-3 flex-wrap">
+        <div v-if="hasActiveOutcomeSelection && !successState && !(selectedOutcome === 'answer' && selectedNextStep === 'postpone')" class="flex justify-end gap-2 pt-3 flex-wrap">
           <Button
             variant="secondary"
             @click="cancelOutcome"
@@ -907,8 +915,8 @@
         </div>
 
         <!-- Next call attempt: when Answer + Postpone -->
-        <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'postpone'" ref="postponeBlockRef" class="pb-4">
-          <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6 w-full">
+        <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'postpone'" ref="postponeBlockRef">
+          <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4 w-full">
             <h5 class="font-semibold text-foreground text-sm mb-4">Next call attempt</h5>
             <div class="reschedule-toggle-group flex flex-wrap gap-2">
               <Toggle
@@ -1016,7 +1024,7 @@
         </div>
 
         <!-- Cancel + Confirm postpone below the card (Answer + Postpone only) -->
-        <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'postpone' && !successState" class="flex justify-end gap-2 px-4 pb-4 pt-3 flex-wrap">
+        <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'postpone' && !successState" class="flex justify-end gap-2 pt-3 flex-wrap">
           <Button variant="secondary" @click="cancelOutcome">
             Cancel
           </Button>
@@ -1166,6 +1174,10 @@ const props = defineProps({
     default: true
   },
   outcomeSaving: {
+    type: Boolean,
+    default: false
+  },
+  hideContactCard: {
     type: Boolean,
     default: false
   }
@@ -2010,7 +2022,11 @@ async function onConfirmPostpone() {
 function scrollToExpandedContent(getEl, delayMs = 0) {
   const run = () => {
     const el = typeof getEl === 'function' ? getEl() : getEl
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    if (!el) return
+    const options = props.hideContactCard
+      ? { behavior: 'smooth', block: 'nearest', inline: 'nearest' }
+      : { behavior: 'smooth', block: 'start' }
+    el.scrollIntoView(options)
   }
   if (delayMs > 0) {
     setTimeout(() => nextTick(run), delayMs)
@@ -2021,6 +2037,12 @@ function scrollToExpandedContent(getEl, delayMs = 0) {
 
 watch(selectedOutcome, (newOutcome) => {
   if (newOutcome) {
+    scrollToExpandedContent(() => expandedOutcomeRef.value)
+  }
+})
+
+watch(selectedNextStep, (next) => {
+  if (next && selectedOutcome.value) {
     scrollToExpandedContent(() => expandedOutcomeRef.value)
   }
 })

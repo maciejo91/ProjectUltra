@@ -4,6 +4,7 @@ import entities from './entities.json'
 import stages from './stages.json'
 import forms from './forms.json'
 import messages from './messages.json'
+import requestDetail from './requestDetail.json'
 
 export default {
   common,
@@ -11,7 +12,8 @@ export default {
   entities,
   stages,
   forms,
-  messages
+  messages,
+  requestDetail
 }
 
 

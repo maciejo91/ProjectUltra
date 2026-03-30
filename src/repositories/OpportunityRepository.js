@@ -1,6 +1,10 @@
 import { BaseRepository } from './BaseRepository.js'
 import { getMockData } from '@/api/mockData/localeLoader.js'
-import { DEFAULT_CAR_IMAGE, ensureRequestedCarImage } from '@/utils/mockDataHelpers'
+import {
+  DEFAULT_CAR_IMAGE,
+  demoPlateNumber,
+  ensureRequestedCarImage
+} from '@/utils/mockDataHelpers'
 
 const STORAGE_KEY = 'projectUltra.createdOpportunities'
 
@@ -34,6 +38,15 @@ export class OpportunityRepository extends BaseRepository {
     for (const opp of opportunities) {
       if (opp.requestedCar && !opp.requestedCar.image) {
         opp.requestedCar.image = DEFAULT_CAR_IMAGE
+        changed = true
+      }
+      if (
+        opp.requestedCar &&
+        !opp.requestedCar.plateNumber &&
+        !opp.requestedCar.plate
+      ) {
+        const rc = opp.requestedCar
+        rc.plateNumber = demoPlateNumber(rc.brand, rc.model, rc.year)
         changed = true
       }
       const offers = opp.offers || []

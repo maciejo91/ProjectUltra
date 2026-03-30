@@ -1,0 +1,112 @@
+{
+  "copyTitle": "Copy title",
+  "titleCopied": "Title copied",
+  "titleCopyFailed": "Could not copy",
+  "headerTitle": "{entity} from {source} ({requestType})",
+  "headerPrimary": "{entity} from {source}",
+  "headerTypeLabel": "({requestType})",
+  "headerBack": "Back to requests",
+  "statusInProgress": "In progress",
+  "created": "Created",
+  "lastUpdated": "Last updated",
+  "moreMenu": "More actions",
+  "moreMenuShare": "Share",
+  "addSegment": "Add segment",
+  "tabs": {
+    "overview": "Overview",
+    "conversations": "Conversations",
+    "tradeIns": "Trade-ins",
+    "purchaseMethod": "Purchase method",
+    "attachments": "Attachments",
+    "tasks": "Tasks",
+    "activity": "Activity"
+  },
+  "insight": {
+    "highPaidStock": "This lead comes from a highly paid source and is interested in a car that has been in stock for {days} days."
+  },
+  "lqfTask": {
+    "title": "Lead Qualification Task",
+    "manageTask": "Manage the task",
+    "notNow": "Not now",
+    "nextAttemptTitle": "Postpone task to",
+    "nextAttemptAssigneePlaceholder": "Assign to…",
+    "nextAttemptSaved": "Task postponed",
+    "nextAttemptSaveFailed": "Could not postpone task",
+    "openFullTaskView": "Open full task view",
+    "taskOptionsAria": "Task options"
+  },
+  "quickActions": {
+    "phone": "Phone",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "document": "Document",
+    "more": "More"
+  },
+  "contactCard": {
+    "otherInteractions": "Other interactions ({count})",
+    "openProfile": "Open customer profile",
+    "cardMenu": "Customer card menu",
+    "editCustomer": "Edit customer",
+    "addTag": "Add tag",
+    "privateCustomerTooltip": "Private customer",
+    "businessTag": "Business",
+    "saving": "Saving…",
+    "customerUpdated": "Customer updated",
+    "saveFailed": "Failed to save",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address"
+    },
+    "placeholders": {
+      "name": "Customer name",
+      "email": "email@example.com",
+      "phone": "+49…",
+      "address": "Address"
+    }
+  },
+  "vehicleCard": {
+    "title": "Requested vehicle",
+    "registrationDate": "Registration date",
+    "carLocation": "Car location",
+    "mileage": "Mileage",
+    "landingPage": "Landing page",
+    "visit": "Visit",
+    "editAria": "Edit requested vehicle"
+  },
+  "messageCard": {
+    "title": "Request message",
+    "expandAria": "Expand request message",
+    "collapseAria": "Collapse request message",
+    "empty": "—"
+  },
+  "placeholders": {
+    "conversations": "Conversations will appear here.",
+    "attachments": "Attachments will appear here.",
+    "tasksTab": "Related tasks and requests for this customer will appear here."
+  },
+  "emptyStates": {
+    "conversations": {
+      "title": "No conversations yet",
+      "description": "Email and WhatsApp messages for this request will appear here.",
+      "action": "Send a message"
+    },
+    "tradeIns": {
+      "title": "No trade-ins yet",
+      "description": "Trade-in vehicles you add for this request will appear here.",
+      "action": "Add a trade-in"
+    },
+    "purchaseMethod": {
+      "title": "No purchase method yet",
+      "description": "Financing or leasing options you add for this request will appear here.",
+      "action": "Add financing"
+    },
+    "attachments": {
+      "title": "No data stored",
+      "description": "Notes and attachments for this request will appear here.",
+      "action": "Add attachment",
+      "hasItems": "{count} attachment(s) on this request."
+    }
+  }
+}

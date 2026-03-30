@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+  <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
     <EmailForm
       :initial-template="initialTemplate"
       :initial-message="initialMessage"

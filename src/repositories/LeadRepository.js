@@ -1,9 +1,13 @@
 import { BaseRepository } from './BaseRepository.js'
 import { getMockData } from '@/api/mockData/localeLoader.js'
-import { DEFAULT_CAR_IMAGE, ensureRequestedCarImage } from '@/utils/mockDataHelpers'
+import {
+  DEFAULT_CAR_IMAGE,
+  demoPlateNumber,
+  ensureRequestedCarImage
+} from '@/utils/mockDataHelpers'
 
 const STORAGE_KEY = 'project-ultra-leads'
-const DATA_VERSION = 2
+const DATA_VERSION = 3
 
 /**
  * Lead Repository
@@ -67,6 +71,30 @@ export class LeadRepository extends BaseRepository {
   }
 
   /**
+   * Ensure requestedCar has plateNumber when missing (localStorage from before mock had plates).
+   */
+  _ensureRequestedCarPlates(leads) {
+    if (!Array.isArray(leads)) return
+    const mockLeads = getMockData().mockLeads || []
+    const mockById = new Map(mockLeads.map((l) => [l.id, l]))
+    let changed = false
+    for (const lead of leads) {
+      const rc = lead.requestedCar
+      if (!rc) continue
+      if (rc.plateNumber || rc.plate) continue
+      const mock = mockById.get(lead.id)
+      const fromMock = mock?.requestedCar?.plateNumber || mock?.requestedCar?.plate
+      if (fromMock) {
+        rc.plateNumber = fromMock
+      } else {
+        rc.plateNumber = demoPlateNumber(rc.brand, rc.model, rc.year)
+      }
+      changed = true
+    }
+    if (changed) this._persist()
+  }
+
+  /**
    * Merge mock leads that don't exist in stored data (e.g. new demo leads).
    * Ensures new mock leads appear even when user has existing localStorage.
    */
@@ -93,9 +121,11 @@ export class LeadRepository extends BaseRepository {
           this._leadsCache = Array.isArray(parsed) ? parsed : []
           this._ensureNextActionDue(this._leadsCache)
           this._ensureCarImages(this._leadsCache)
+          this._ensureRequestedCarPlates(this._leadsCache)
           const merged = this._mergeNewMockLeads(this._leadsCache)
           if (merged.length > this._leadsCache.length) {
             this._leadsCache = merged
+            this._ensureRequestedCarPlates(this._leadsCache)
             this._persist()
           }
         }
@@ -103,6 +133,7 @@ export class LeadRepository extends BaseRepository {
       if (this._leadsCache === null) {
         const mock = getMockData().mockLeads
         this._leadsCache = JSON.parse(JSON.stringify(mock || []))
+        this._ensureRequestedCarPlates(this._leadsCache)
         this._persist()
         try {
           localStorage.setItem(`${STORAGE_KEY}-version`, String(DATA_VERSION))

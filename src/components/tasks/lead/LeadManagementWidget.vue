@@ -17,6 +17,36 @@
     <Spinner class="size-8 text-foreground" />
   </div>
 
+  <template v-else-if="embedOutcomeOnly">
+    <LQTask
+      v-if="!leadState.isClosed.value && leadState.showLQWidget.value"
+      :key="lead.id"
+      :lead="lead"
+      :activities="activities"
+      :show-deadline-banner="leadState.showDeadlineBanner.value"
+      :outcome-saving="outcomeSaving"
+      hide-contact-card
+      @update:outcome-saving="outcomeSaving = $event"
+      @postponed="onPostponed"
+      @validated="handleValidated"
+      @qualified="handleQualified"
+      @disqualified="onDisqualified"
+      @call-attempt-logged="handleCallAttemptLogged"
+      @note-saved="handleNoteSaved"
+      @open-purchase-method="handleOpenPurchaseMethod"
+      @open-trade-in="handleOpenTradeIn"
+      @appointment-scheduled="handleAppointmentScheduled"
+      @postpone-expected-close="$emit('postpone-expected-close')"
+      @reassigned="$emit('reassigned', $event)"
+    />
+    <PrimaryActionWidget
+      v-else-if="!leadState.isClosed.value && leadState.primaryAction.value"
+      :action="leadState.primaryAction.value"
+      :color-scheme="leadState.primaryAction.value.colorScheme"
+      @action-clicked="leadState.primaryAction.value.handler"
+    />
+  </template>
+
   <TaskManagementWidget v-else :task="lead" hide-title hide-border>
     <template #primary-action>
       <!-- Assign to me banner is shown in TaskDetailView above the assignee/due date row -->
@@ -105,6 +135,10 @@ const props = defineProps({
   activities: {
     type: Array,
     default: () => []
+  },
+  embedOutcomeOnly: {
+    type: Boolean,
+    default: false
   }
 })
 

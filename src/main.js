@@ -4,8 +4,11 @@ import router from './router'
 import App from './App.vue'
 import { clickOutside } from '@/directives/clickOutside'
 import i18n from './locales'
+import { migrateSidebarStorage } from '@/utils/sidebarStorageMigration'
 // Import main CSS - includes Tailwind, Motork theme, and custom styles
 import './assets/css/main.css'
+
+migrateSidebarStorage()
 
 const app = createApp(App)
 

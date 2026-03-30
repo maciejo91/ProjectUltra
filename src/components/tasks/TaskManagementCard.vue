@@ -10,6 +10,8 @@
       v-bind="filteredAttrs"
       @postpone-expected-close="$emit('postpone-expected-close')"
       @reassigned="$emit('reassigned', $event)"
+      @open-purchase-method="$emit('open-purchase-method')"
+      @open-trade-in="$emit('open-trade-in')"
     />
   </div>
 </template>

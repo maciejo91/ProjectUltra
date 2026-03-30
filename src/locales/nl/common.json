@@ -16,7 +16,9 @@
   },
   "layout": {
     "openSidebar": "Zijbalk openen",
-    "closeSidebar": "Zijbalk sluiten"
+    "closeSidebar": "Zijbalk sluiten",
+    "toggleSidebar": "Zijbalk in- of uitklappen",
+    "userMenu": "Gebruikersmenu"
   },
   "buttons": {
     "save": "Opslaan",

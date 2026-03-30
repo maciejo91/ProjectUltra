@@ -1,0 +1,112 @@
+{
+  "copyTitle": "Copia titolo",
+  "titleCopied": "Titolo copiato",
+  "titleCopyFailed": "Impossibile copiare",
+  "moreMenuShare": "Condividi",
+  "headerTitle": "{entity} da {source} ({requestType})",
+  "headerPrimary": "{entity} da {source}",
+  "headerTypeLabel": "({requestType})",
+  "headerBack": "Torna alle richieste",
+  "statusInProgress": "In corso",
+  "created": "Creato",
+  "lastUpdated": "Ultimo aggiornamento",
+  "moreMenu": "Altre azioni",
+  "addSegment": "Aggiungi segmento",
+  "tabs": {
+    "overview": "Panoramica",
+    "conversations": "Conversazioni",
+    "tradeIns": "Permute",
+    "purchaseMethod": "Metodo di acquisto",
+    "attachments": "Allegati",
+    "tasks": "Attività",
+    "activity": "Attività"
+  },
+  "insight": {
+    "highPaidStock": "Questo lead proviene da una fonte a pagamento elevata ed è interessato a un'auto in stock da {days} giorni."
+  },
+  "lqfTask": {
+    "title": "Lead Qualification Task",
+    "manageTask": "Gestisci l'attività",
+    "notNow": "Non ora",
+    "nextAttemptTitle": "Posticipa attività al",
+    "nextAttemptAssigneePlaceholder": "Assegna a…",
+    "nextAttemptSaved": "Attività posticipata",
+    "nextAttemptSaveFailed": "Impossibile posticipare l'attività",
+    "openFullTaskView": "Apri vista attività completa",
+    "taskOptionsAria": "Opzioni attività"
+  },
+  "quickActions": {
+    "phone": "Telefono",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "document": "Documento",
+    "more": "Altro"
+  },
+  "contactCard": {
+    "otherInteractions": "Altre interazioni ({count})",
+    "openProfile": "Apri profilo cliente",
+    "cardMenu": "Menu scheda cliente",
+    "editCustomer": "Modifica cliente",
+    "addTag": "Aggiungi tag",
+    "privateCustomerTooltip": "Cliente privato",
+    "businessTag": "Business",
+    "saving": "Salvataggio…",
+    "customerUpdated": "Cliente aggiornato",
+    "saveFailed": "Salvataggio non riuscito",
+    "fields": {
+      "name": "Nome",
+      "email": "Email",
+      "phone": "Telefono",
+      "address": "Indirizzo"
+    },
+    "placeholders": {
+      "name": "Nome cliente",
+      "email": "email@example.com",
+      "phone": "+39…",
+      "address": "Indirizzo"
+    }
+  },
+  "vehicleCard": {
+    "title": "Veicolo richiesto",
+    "registrationDate": "Data di immatricolazione",
+    "carLocation": "Posizione veicolo",
+    "mileage": "Chilometraggio",
+    "landingPage": "Landing page",
+    "visit": "Visita",
+    "editAria": "Modifica veicolo richiesto"
+  },
+  "messageCard": {
+    "title": "Messaggio della richiesta",
+    "expandAria": "Espandi messaggio della richiesta",
+    "collapseAria": "Comprimi messaggio della richiesta",
+    "empty": "—"
+  },
+  "placeholders": {
+    "conversations": "Le conversazioni appariranno qui.",
+    "attachments": "Gli allegati appariranno qui.",
+    "tasksTab": "Qui appariranno le attività correlate e le altre richieste per questo cliente."
+  },
+  "emptyStates": {
+    "conversations": {
+      "title": "Nessuna conversazione",
+      "description": "Email e messaggi WhatsApp per questa richiesta appariranno qui.",
+      "action": "Invia un messaggio"
+    },
+    "tradeIns": {
+      "title": "Nessuna permuta",
+      "description": "I veicoli in permuta che aggiungi per questa richiesta appariranno qui.",
+      "action": "Aggiungi permuta"
+    },
+    "purchaseMethod": {
+      "title": "Nessun metodo di acquisto",
+      "description": "Le opzioni di finanziamento o leasing che aggiungi appariranno qui.",
+      "action": "Aggiungi finanziamento"
+    },
+    "attachments": {
+      "title": "Nessun dato salvato",
+      "description": "Note e allegati per questa richiesta appariranno qui.",
+      "action": "Aggiungi allegato",
+      "hasItems": "{count} allegato/i per questa richiesta."
+    }
+  }
+}

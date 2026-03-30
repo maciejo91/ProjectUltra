@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col overflow-hidden bg-surface">
+  <div class="h-full flex flex-col overflow-y-auto bg-[#F5F5F5]">
     <RequestDetailView
       v-if="request"
       :key="request?.compositeId || 'empty'"
@@ -10,7 +10,7 @@
       @request-navigate="handleRequestNavigate"
       @open-task-drawer="handleOpenTaskDrawer"
     />
-    <div v-else class="flex-1 flex items-center justify-center p-8">
+    <div v-else class="flex-1 flex items-center justify-center p-8 bg-[#F5F5F5]">
       <div class="text-center">
         <p class="text-muted-foreground">{{ loading ? 'Loading...' : 'Request not found' }}</p>
       </div>

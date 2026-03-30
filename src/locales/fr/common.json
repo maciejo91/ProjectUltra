@@ -16,7 +16,9 @@
   },
   "layout": {
     "openSidebar": "Ouvrir la barre latérale",
-    "closeSidebar": "Fermer la barre latérale"
+    "closeSidebar": "Fermer la barre latérale",
+    "toggleSidebar": "Réduire ou agrandir la barre latérale",
+    "userMenu": "Menu utilisateur"
   },
   "buttons": {
     "save": "Enregistrer",

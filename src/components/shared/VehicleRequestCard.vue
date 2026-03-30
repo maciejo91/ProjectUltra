@@ -1,82 +1,175 @@
 <template>
-  <div class="overflow-hidden p-4 rounded-lg bg-white shadow-nsc-card">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-base font-medium text-foreground leading-6">Requested Car</h3>
+  <div
+    class="flex flex-col gap-4 overflow-hidden rounded-lg border border-border bg-background p-4 shadow-nsc-card"
+  >
+    <div class="flex w-full items-center gap-2">
+      <h3 class="min-w-0 flex-1 text-base font-medium leading-6 text-foreground">
+        {{ displayHeading }}
+      </h3>
       <Button
         v-if="!isEditing"
-        variant="ghost"
+        variant="secondary"
         size="icon"
-        class="shrink-0 text-muted-foreground hover:text-foreground"
-        aria-label="Edit requested car"
+        class="size-7 shrink-0 rounded-md"
+        :aria-label="t('requestDetail.vehicleCard.editAria')"
         @click="startEditing"
       >
-        <Pencil class="size-3.5" />
+        <Pencil class="size-4 text-muted-foreground" />
       </Button>
     </div>
 
-    <!-- View mode -->
     <template v-if="!isEditing">
-      <div class="flex gap-4">
-        <div
-          class="w-24 shrink-0 aspect-3/2 rounded-lg overflow-hidden bg-muted"
-        >
+      <div class="flex w-full items-start gap-2">
+        <div class="h-9 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
           <img
             v-if="imageUrl && !imageError"
             :src="imageUrl"
-            :alt="`${vehicle.brand} ${vehicle.model}`"
-            class="w-full h-full object-cover"
+            :alt="titleLine"
+            class="h-full w-full object-cover"
             @error="handleImageError"
           />
-          <div
-            v-else
-            class="w-full h-full flex items-center justify-center"
-          >
-            <Car :size="32" class="text-muted-foreground" />
+          <div v-else class="flex h-full w-full items-center justify-center">
+            <Car class="size-6 text-muted-foreground" />
           </div>
         </div>
-
-        <div class="min-w-0 flex-1 flex flex-col justify-center">
-          <p class="text-sm font-semibold text-foreground truncate">
-            {{ vehicleNameWithYear }}
+        <div class="flex min-w-0 flex-1 flex-col gap-2">
+          <div class="flex w-full items-center gap-1 text-sm leading-5 text-foreground">
+            <p class="min-w-0 flex-1 truncate">{{ titleLine }}</p>
+            <p class="shrink-0 whitespace-nowrap text-right">{{ priceLine }}</p>
+          </div>
+          <p
+            v-if="subtitleLine"
+            class="w-full text-xs leading-4 text-muted-foreground"
+          >
+            {{ subtitleLine }}
           </p>
-          <div
-            v-if="vehicle.price"
-            class="flex items-center gap-2 mt-1 text-sm text-foreground flex-wrap"
-          >
-            <span v-if="vehicle.price" class="font-semibold">
-              €{{ formatPrice(vehicle.price) }}
-            </span>
-          </div>
-          <div
-            v-if="vehicleCondition || displayMileage || vehicle.fuelType || vehicle.gearType"
-            class="flex flex-wrap items-center gap-2 mt-1 text-xs text-muted-foreground"
-          >
-            <span
-              v-if="vehicleCondition"
-              class="inline-flex px-2 py-0.5 rounded font-medium bg-muted text-muted-foreground"
-            >
-              {{ vehicleCondition }}
-            </span>
-            <span v-if="vehicle.fuelType">{{ vehicle.fuelType }}</span>
-            <span v-if="vehicle.gearType">{{ vehicle.gearType }}</span>
-            <span v-if="displayMileage">{{ formatMileage(displayMileage) }} km</span>
-          </div>
         </div>
       </div>
 
-      <!-- Request message with source link -->
-      <div v-if="requestMessage || source" class="mt-4 pt-4 border-t border-border">
-        <div class="flex items-start gap-2 flex-wrap">
-          <p v-if="requestMessage" class="text-sm text-foreground leading-5 flex-1 min-w-0">
+      <div
+        v-if="plateDisplay || vinDisplay"
+        class="flex w-full flex-wrap items-center gap-4"
+      >
+        <div
+          v-if="plateDisplay"
+          class="inline-flex max-w-full items-center gap-1 overflow-hidden rounded-sm border border-border bg-background py-0.5 pl-0.5 pr-1 shadow-nsc-card"
+        >
+          <span
+            class="h-4 w-1.5 shrink-0 rounded-bl-sm rounded-tl-sm bg-[#0470e9]"
+            aria-hidden
+          />
+          <span class="text-xs font-semibold leading-4 text-foreground whitespace-nowrap">
+            {{ plateDisplay }}
+          </span>
+        </div>
+        <p
+          v-if="vinDisplay"
+          class="min-w-0 max-w-full truncate text-xs text-muted-foreground"
+        >
+          {{ vinDisplay }}
+        </p>
+      </div>
+
+      <div
+        v-if="conditionBadge || fuelLabel || mileageBadgeShort"
+        class="flex w-full flex-wrap items-center gap-2"
+      >
+        <span
+          v-if="conditionBadge"
+          class="inline-flex items-center justify-center rounded-md px-2 py-0.5 text-sm leading-5 text-foreground"
+          :class="conditionBadgeClass"
+        >
+          {{ conditionBadge }}
+        </span>
+        <span
+          v-if="fuelLabel"
+          class="inline-flex items-center justify-center rounded-md bg-muted px-2 py-0.5 text-sm leading-5 text-muted-foreground"
+        >
+          {{ fuelLabel }}
+        </span>
+        <span
+          v-if="mileageBadgeShort"
+          class="inline-flex items-center justify-center rounded-md bg-muted px-2 py-0.5 text-sm leading-5 text-muted-foreground"
+        >
+          {{ mileageBadgeShort }}
+        </span>
+      </div>
+
+      <div class="flex w-full flex-col gap-2">
+        <div
+          v-if="registrationDateDisplay"
+          class="flex w-full items-center justify-between gap-3"
+        >
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground"
+            >{{ t('requestDetail.vehicleCard.registrationDate') }}</span
+          >
+          <span
+            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
+            >{{ registrationDateDisplay }}</span
+          >
+        </div>
+        <div
+          v-if="vehicleLocationDisplay"
+          class="flex w-full items-center justify-between gap-3"
+        >
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground"
+            >{{ t('requestDetail.vehicleCard.carLocation') }}</span
+          >
+          <span
+            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
+            >{{ vehicleLocationDisplay }}</span
+          >
+        </div>
+        <div
+          v-if="mileageDetailLine"
+          class="flex w-full items-center justify-between gap-3"
+        >
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground"
+            >{{ t('requestDetail.vehicleCard.mileage') }}</span
+          >
+          <span
+            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
+            >{{ mileageDetailLine }}</span
+          >
+        </div>
+        <div
+          v-if="showLandingRow"
+          class="flex w-full items-center justify-between gap-3"
+        >
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground"
+            >{{ t('requestDetail.vehicleCard.landingPage') }}</span
+          >
+          <Button
+            type="button"
+            variant="outline"
+            size="small"
+            class="h-6 shrink-0 gap-1 rounded-md px-2 text-xs font-medium"
+            @click="handleVisitLanding"
+          >
+            {{ t('requestDetail.vehicleCard.visit') }}
+            <ArrowUpRight class="size-3" />
+          </Button>
+        </div>
+      </div>
+
+      <div
+        v-if="!hideRequestMessage && (requestMessage || source)"
+        class="flex flex-col gap-2 border-t border-border pt-4"
+      >
+        <div class="flex flex-wrap items-start gap-2">
+          <p
+            v-if="requestMessage"
+            class="min-w-0 flex-1 text-sm leading-5 text-foreground"
+          >
             "{{ requestMessage }}"
           </p>
-          <div v-if="source" class="flex items-center shrink-0 text-xs">
+          <div v-if="source" class="flex shrink-0 items-center text-xs">
             <a
               v-if="sourceUrl"
               :href="sourceUrl"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-primary underline underline-offset-2 hover:opacity-90 font-medium"
+              class="font-medium text-primary underline underline-offset-2 hover:opacity-90"
             >
               {{ source }}
             </a>
@@ -84,7 +177,7 @@
               v-else
               variant="link"
               size="small"
-              class="text-primary underline underline-offset-2 hover:opacity-90 p-0 h-auto font-medium text-xs"
+              class="h-auto p-0 text-xs font-medium text-primary underline underline-offset-2 hover:opacity-90"
               @click="$emit('open-ad')"
             >
               {{ source }}
@@ -94,7 +187,6 @@
       </div>
     </template>
 
-    <!-- Edit mode: inline form -->
     <div v-else class="flex flex-col gap-3">
       <div class="grid grid-cols-2 gap-3">
         <div class="space-y-2">
@@ -166,12 +258,7 @@
         </div>
       </div>
       <div class="flex gap-2 pt-1">
-        <Button
-          variant="outline"
-          size="small"
-          class="flex-1"
-          @click="cancelEditing"
-        >
+        <Button variant="outline" size="small" class="flex-1" @click="cancelEditing">
           Cancel
         </Button>
         <Button
@@ -190,6 +277,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   Button,
   Input,
@@ -200,7 +288,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@motork/component-library/future/primitives'
-import { Car, Pencil } from 'lucide-vue-next'
+import { ArrowUpRight, Car, Pencil } from 'lucide-vue-next'
 
 const props = defineProps({
   vehicle: {
@@ -215,7 +303,6 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  /** Optional URL for the source; when set, source is rendered as a real link opening in new tab */
   sourceUrl: {
     type: String,
     default: ''
@@ -224,14 +311,27 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  /** Optional: async function to persist requested car; card awaits and keeps saving state until done */
   saveRequestedCar: {
     type: Function,
     default: null
+  },
+  hideRequestMessage: {
+    type: Boolean,
+    default: false
+  },
+  heading: {
+    type: String,
+    default: ''
   }
 })
 
 const emit = defineEmits(['open-ad', 'more-actions', 'edit-vehicle', 'remove-vehicle', 'save'])
+
+const { t } = useI18n()
+
+const displayHeading = computed(
+  () => props.heading || t('requestDetail.vehicleCard.title')
+)
 
 const imageError = ref(false)
 const isEditing = ref(false)
@@ -308,7 +408,8 @@ async function saveEdit() {
     carData.kilometers = 0
   } else {
     carData.status = 'Used'
-    carData.kilometers = editForm.value.kilometers != null ? Number(editForm.value.kilometers) : 0
+    carData.kilometers =
+      editForm.value.kilometers != null ? Number(editForm.value.kilometers) : 0
   }
 
   saving.value = true
@@ -325,17 +426,52 @@ async function saveEdit() {
   }
 }
 
-const vehicleName = computed(() => {
+const titleLine = computed(() => {
   const parts = []
   if (props.vehicle.brand) parts.push(props.vehicle.brand)
   if (props.vehicle.model) parts.push(props.vehicle.model)
-  if (props.vehicle.variant) parts.push(props.vehicle.variant)
-  return parts.join(' ') || 'Vehicle Details'
+  return parts.join(' ') || '—'
 })
 
-const vehicleNameWithYear = computed(() => {
-  const name = vehicleName.value
-  return props.vehicle.year ? `${name} (${props.vehicle.year})` : name
+const subtitleLine = computed(() => {
+  const v = props.vehicle
+  return v?.variant || v?.trim || v?.engineLine || ''
+})
+
+const priceLine = computed(() => {
+  const p = props.vehicle.price
+  if (p == null || p === '') return '—'
+  const n = typeof p === 'string' ? parseFloat(p) : p
+  if (Number.isNaN(n)) return '—'
+  return `${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(n)}€`
+})
+
+const plateDisplay = computed(
+  () => props.vehicle.plateNumber || props.vehicle.plate || ''
+)
+
+const vinDisplay = computed(() => props.vehicle.vin || '')
+
+const registrationDateDisplay = computed(() => {
+  const r =
+    props.vehicle.registrationDate ||
+    props.vehicle.registration ||
+    props.vehicle.firstRegistration
+  return r || ''
+})
+
+const vehicleLocationDisplay = computed(
+  () =>
+    props.vehicle.dealership ||
+    props.vehicle.location ||
+    props.vehicle.city ||
+    ''
+)
+
+const mileageDetailLine = computed(() => {
+  const km = props.vehicle.kilometers ?? props.vehicle.mileage
+  if (km == null || km === '') return ''
+  return `${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(Number(km))} km`
 })
 
 const vehicleCondition = computed(() => {
@@ -349,27 +485,38 @@ const vehicleCondition = computed(() => {
   return status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Used'
 })
 
-const displayMileage = computed(() => {
-  const v = props.vehicle
-  return v?.kilometers ?? v?.mileage
+const conditionBadge = computed(() => vehicleCondition.value)
+
+const conditionBadgeClass = computed(() => {
+  const c = (conditionBadge.value || '').toLowerCase()
+  if (c === 'used') return 'bg-yellow-400 text-foreground'
+  if (c === 'km0' || c === 'new') return 'bg-emerald-100 text-emerald-900'
+  return 'bg-muted text-muted-foreground'
 })
 
-const formatPrice = (price) => {
-  if (!price) return '0'
-  const numPrice = typeof price === 'string' ? parseFloat(price) : price
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(numPrice)
-}
+const fuelLabel = computed(() => props.vehicle.fuelType || '')
 
-const formatMileage = (mileage) => {
-  if (!mileage) return '0'
-  const numMileage = typeof mileage === 'string' ? parseFloat(mileage) : mileage
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(numMileage)
+const mileageBadgeShort = computed(() => {
+  const v = props.vehicle
+  if (v.stockDistanceKm != null && v.stockDistanceKm !== '') {
+    return `${Number(v.stockDistanceKm)} km`
+  }
+  const km = v.kilometers ?? v.mileage
+  if (km == null || km === '') return ''
+  return `${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(Number(km))} km`
+})
+
+const showLandingRow = computed(
+  () => !!(props.sourceUrl || props.vehicle.listingUrl || props.source)
+)
+
+function handleVisitLanding() {
+  const url = props.sourceUrl || props.vehicle.listingUrl
+  if (url) {
+    window.open(url, '_blank', 'noopener,noreferrer')
+  } else {
+    emit('open-ad')
+  }
 }
 
 const handleImageError = () => {

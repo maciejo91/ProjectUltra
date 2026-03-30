@@ -24,6 +24,9 @@ dist-ssr
 package.json
 package-lock.json
 
+# Cursor / local agent files
+.agents/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

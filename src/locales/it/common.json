@@ -16,7 +16,9 @@
   },
   "layout": {
     "openSidebar": "Apri barra laterale",
-    "closeSidebar": "Chiudi barra laterale"
+    "closeSidebar": "Chiudi barra laterale",
+    "toggleSidebar": "Espandi o comprimi la barra laterale",
+    "userMenu": "Menu utente"
   },
   "buttons": {
     "save": "Salva",
