@@ -50,41 +50,127 @@
       </div>
     </SidebarHeader>
 
-    <SidebarContent>
-      <SidebarGroup>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              as-child
-              :is-active="isRouteActive('/add-new')"
-              :tooltip="addNewLabel"
-            >
-              <RouterLink to="/add-new" class="flex min-w-0 items-center gap-2">
-                <Plus class="size-4 shrink-0" />
-                <span class="truncate group-data-[collapsible=icon]:hidden">{{ addNewLabel }}</span>
-              </RouterLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroup>
+    <SidebarContent class="flex flex-1 min-h-0 flex-col overflow-hidden">
+      <div class="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem v-for="item in primaryNavItems" :key="item.href">
+              <SidebarMenuButton
+                as-child
+                :is-active="isRouteActive(item.href)"
+                :tooltip="item.name"
+                class="data-[active=true]:rounded-lg data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
+              >
+                <RouterLink :to="item.href" class="flex min-w-0 w-full items-center gap-2">
+                  <component :is="item.icon" class="size-4 shrink-0" />
+                  <span class="truncate group-data-[collapsible=icon]:hidden">{{ item.name }}</span>
+                  <SidebarMenuBadge
+                    v-if="item.notificationCount"
+                    class="ml-auto group-data-[collapsible=icon]:hidden"
+                  >
+                    {{ item.notificationCount }}
+                  </SidebarMenuBadge>
+                </RouterLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
 
-      <SidebarGroup>
-        <SidebarMenu>
-          <SidebarMenuItem v-for="item in navigationItems" :key="item.href">
-            <SidebarMenuButton
-              as-child
-              :is-active="isRouteActive(item.href)"
-              :tooltip="item.name"
-            >
-              <RouterLink :to="item.href" class="flex min-w-0 w-full items-center gap-2">
+        <SidebarGroup>
+          <SidebarGroupLabel
+            class="group-data-[collapsible=icon]:hidden px-2 text-xs font-medium text-muted-foreground"
+          >
+            {{ t('common.navigation.groups.data') }}
+          </SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem v-for="item in dataNavItems" :key="dataItemKey(item)">
+              <SidebarMenuButton
+                v-if="item.kind === 'comingSoon'"
+                :tooltip="item.name"
+                class="data-[active=true]:rounded-lg data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
+                @click="showMarketingModal = true"
+              >
                 <component :is="item.icon" class="size-4 shrink-0" />
                 <span class="truncate group-data-[collapsible=icon]:hidden">{{ item.name }}</span>
-                <SidebarMenuBadge
-                  v-if="item.notificationCount"
-                  class="ml-auto group-data-[collapsible=icon]:hidden"
+              </SidebarMenuButton>
+              <SidebarMenuButton
+                v-else
+                as-child
+                :is-active="isRouteActive(item.href)"
+                :tooltip="item.name"
+                class="data-[active=true]:rounded-lg data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
+              >
+                <RouterLink :to="item.href" class="flex min-w-0 w-full items-center gap-2">
+                  <component :is="item.icon" class="size-4 shrink-0" />
+                  <span class="truncate group-data-[collapsible=icon]:hidden">{{ item.name }}</span>
+                </RouterLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel
+            class="group-data-[collapsible=icon]:hidden px-2 text-xs font-medium text-muted-foreground"
+          >
+            {{ t('common.navigation.groups.actions') }}
+          </SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                as-child
+                :is-active="isRouteActive('/add-new')"
+                :tooltip="addNewLabel"
+                class="data-[active=true]:rounded-lg data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
+              >
+                <RouterLink to="/add-new" class="flex min-w-0 w-full items-center gap-2">
+                  <Plus class="size-4 shrink-0" />
+                  <span class="truncate group-data-[collapsible=icon]:hidden">{{ addNewLabel }}</span>
+                </RouterLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem v-if="navigationVisibility.search !== false">
+              <SidebarMenuButton as-child :tooltip="t('common.buttons.search')">
+                <button
+                  type="button"
+                  class="flex min-w-0 w-full items-center gap-2"
+                  @click="layoutStore.setSearchModalOpen(true)"
                 >
-                  {{ item.notificationCount }}
-                </SidebarMenuBadge>
+                  <Search class="size-4 shrink-0" />
+                  <span class="truncate group-data-[collapsible=icon]:hidden">{{
+                    t('common.buttons.search')
+                  }}</span>
+                </button>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+
+        <div class="min-h-4 flex-1 shrink-0" aria-hidden="true" />
+      </div>
+
+      <SidebarGroup class="shrink-0 border-t border-sidebar-border pt-2">
+        <SidebarMenu>
+          <SidebarMenuItem v-if="navigationVisibility.support !== false">
+            <SidebarMenuButton :tooltip="t('common.navigation.support')" @click="showSupportModal = true">
+              <LifeBuoy class="size-4 shrink-0" />
+              <span class="truncate group-data-[collapsible=icon]:hidden">{{
+                t('common.navigation.support')
+              }}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem v-if="userStore.canAccessSettings()">
+            <SidebarMenuButton
+              as-child
+              :is-active="isRouteActive(settingsPath)"
+              :tooltip="t('common.navigation.settings')"
+              class="data-[active=true]:rounded-lg data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
+            >
+              <RouterLink :to="settingsPath" class="flex min-w-0 w-full items-center gap-2">
+                <Settings class="size-4 shrink-0" />
+                <span class="truncate group-data-[collapsible=icon]:hidden">{{
+                  t('common.navigation.settings')
+                }}</span>
               </RouterLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -97,18 +183,31 @@
     </SidebarFooter>
 
     <SidebarRail />
+
+    <ComingSoonModal
+      :show="showMarketingModal"
+      :title="t('common.navigation.marketing')"
+      @close="showMarketingModal = false"
+    />
+    <ComingSoonModal
+      :show="showSupportModal"
+      :title="t('common.navigation.support')"
+      @close="showSupportModal = false"
+    />
   </Sidebar>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Plus } from 'lucide-vue-next'
+import { Plus, Search, LifeBuoy, Settings } from 'lucide-vue-next'
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
@@ -117,15 +216,42 @@ import {
   SidebarRail,
   SidebarTrigger
 } from '@motork/component-library/future/primitives'
+import { useLayoutStore } from '@/stores/layout'
+import { useUserStore } from '@/stores/user'
 import { useAppSidebarNavigation } from '@/composables/useAppSidebarNavigation'
+import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
 import SidebarUserChrome from './SidebarUserChrome.vue'
 
 const route = useRoute()
 const { t } = useI18n()
-const { firstVisibleRoute, navigationItems, addNewLabel } = useAppSidebarNavigation()
+const layoutStore = useLayoutStore()
+const userStore = useUserStore()
+const {
+  navigationVisibility,
+  firstVisibleRoute,
+  primaryNavItems,
+  dataNavItems,
+  addNewLabel
+} = useAppSidebarNavigation()
+
+const settingsPath = '/settings'
+const showMarketingModal = ref(false)
+const showSupportModal = ref(false)
+
+function dataItemKey(item) {
+  return item.kind === 'comingSoon' ? item.id : item.href
+}
 
 function isRouteActive(href) {
   if (href === '/home') return route.path === '/home' || route.path === '/'
+  if (href === '/tasks') {
+    if (route.path.startsWith('/requests') && route.query?.from === 'tasks') return true
+    return route.path.startsWith('/tasks')
+  }
+  if (href === '/requests') {
+    if (route.path.startsWith('/requests') && route.query?.from === 'tasks') return false
+    return route.path.startsWith('/requests')
+  }
   return route.path.startsWith(href)
 }
 </script>

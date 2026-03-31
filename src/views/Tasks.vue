@@ -3,8 +3,7 @@
     <!-- Card View: when header-over-list layout (desktop), teleport list and right panel to layout slots.
          Only mount Teleports after targets exist (avoids "Failed to locate Teleport target" on Tasks mount).
          Use disabled when route changes so content renders in place before unmount (avoids insertBefore null). -->
-    <div v-show="useTeleport" class="shrink-0 size-0 overflow-hidden">
-      <template v-if="teleportTargetsReady">
+    <div v-if="useTeleport && teleportTargetsReady" class="shrink-0 size-0 overflow-hidden">
       <Teleport to="#tasks-list-teleport" :disabled="!useTeleport">
         <div class="h-full flex flex-col overflow-hidden bg-surface">
           <EntityListSidebar
@@ -105,11 +104,13 @@
           </div>
         </div>
       </Teleport>
-      </template>
     </div>
 
     <!-- Card View - Normal layout (no task selected, or mobile) -->
-    <div v-if="viewMode === 'card' && !useTeleport" class="flex-1 flex flex-col lg:flex-row overflow-hidden min-w-0">
+    <div
+      v-if="viewMode === 'card' && (!useTeleport || !teleportTargetsReady)"
+      class="flex-1 flex flex-col lg:flex-row overflow-hidden min-w-0"
+    >
       <div
         class="flex flex-col overflow-hidden border-r border-border"
         :class="currentTask ? 'hidden lg:flex shrink-0' : 'w-full lg:w-auto lg:shrink-0'"
@@ -330,6 +331,17 @@ const viewMode = ref(
   })()
 )
 
+watch(
+  () => [route.path, route.params.id],
+  ([newPath, newId]) => {
+    if (newPath === '/tasks' && !newId) {
+      viewMode.value = 'table'
+      localStorage.setItem('tasksViewMode', 'table')
+    }
+  },
+  { immediate: true, flush: 'post' }
+)
+
 // True when list/detail should be teleported to layout slots (card view + task selected on desktop).
 // Require route.name === 'task-detail' so teleports are disabled before unmount when navigating away
 // (avoids "Cannot read properties of null (reading 'insertBefore')" in moveTeleport).
@@ -413,6 +425,22 @@ function toggleShowClosed() {
   showClosed.value = !showClosed.value
 }
 
+function updateTeleportTargetsReady() {
+  teleportTargetsReady.value = !!(
+    document.getElementById('tasks-list-teleport') &&
+    document.getElementById('tasks-detail-teleport')
+  )
+}
+
+watch(
+  () => useTeleport.value,
+  async () => {
+    await nextTick()
+    updateTeleportTargetsReady()
+  },
+  { immediate: true }
+)
+
 onMounted(() => {
   if (headerActionsRef) {
     headerActionsRef.value = {
@@ -421,13 +449,7 @@ onMounted(() => {
       onViewChange: handleViewChange
     }
   }
-  // Defer mounting Teleports until targets exist in DOM (MainLayout renders them as siblings of router-view)
-  nextTick(() => {
-    teleportTargetsReady.value = !!(
-      document.getElementById('tasks-list-teleport') &&
-      document.getElementById('tasks-detail-teleport')
-    )
-  })
+  updateTeleportTargetsReady()
 })
 
 onBeforeUnmount(() => {
@@ -673,9 +695,9 @@ const selectTask = (compositeId) => {
   // compositeId is in format "lead-1" or "opportunity-1"
   const [type, id] = compositeId.split('-')
   
-  // If in table view, update route (sync watch will open drawer) so URL reflects selection and survives refresh
+  // If in table view, open full-page request details (not a drawer)
   if (viewMode.value === 'table') {
-    router.push({ path: `/tasks/${id}`, query: { type } })
+    router.push({ path: `/requests/${id}`, query: { type, from: 'tasks' } })
     return
   }
   

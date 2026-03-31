@@ -810,6 +810,18 @@ button[class*="size-large"] {
 }
 
 /* Icon-only buttons */
+button[data-size="icon-xs"],
+button[class*="size-icon-xs"] {
+  padding: 0.25rem !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  min-width: 1.5rem !important;
+  min-height: 1.5rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 button[data-size="icon-sm"],
 button[class*="size-icon-sm"] {
   padding: 0.375rem !important;
@@ -823,7 +835,7 @@ button[class*="size-icon-sm"] {
 }
 
 button[data-size="icon"],
-button[class*="size-icon"]:not([class*="icon-sm"]):not([class*="icon-lg"]) {
+button[class*="size-icon"]:not([class*="icon-xs"]):not([class*="icon-sm"]):not([class*="icon-lg"]) {
   padding: 0.5rem !important;
   width: 2.5rem !important;
   height: 2.5rem !important;

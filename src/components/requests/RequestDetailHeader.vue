@@ -1,29 +1,30 @@
 <template>
   <header
-    class="shrink-0 flex flex-col border-b border-border bg-background"
+    class="sticky top-0 z-30 flex shrink-0 flex-col border-b border-border bg-background"
   >
     <div
-      class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 w-full min-w-0 px-4 py-2"
+      class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 w-full min-w-0 px-4 pt-1.5 pb-1.5"
     >
-      <div class="flex items-start gap-2 min-w-0 flex-1">
-        <Button
-          v-if="isFullPage"
-          variant="ghost"
-          size="icon"
-          class="rounded-md shrink-0 size-6 mt-0.5"
-          :aria-label="t('requestDetail.headerBack')"
-          @click="$emit('close')"
-        >
-          <ChevronLeft class="size-4 text-muted-foreground" />
-        </Button>
-        <div class="flex flex-col gap-1 min-w-0 flex-1">
-          <div class="flex flex-wrap items-baseline gap-2 min-w-0">
-            <DropdownMenu v-if="request" :modal="false">
-              <DropdownMenuTrigger as-child>
-                <button
-                  type="button"
-                  class="inline-flex items-baseline gap-2 min-w-0 max-w-full text-left rounded-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
+      <div class="flex min-w-0 flex-1">
+        <div class="flex flex-col min-w-0 flex-1 space-y-0">
+          <div class="flex items-center gap-2 min-w-0">
+            <Button
+              v-if="isFullPage"
+              variant="ghost"
+              size="icon-sm"
+              class="rounded-md shrink-0"
+              :aria-label="t('requestDetail.headerBack')"
+              @click="$emit('close')"
+            >
+              <ChevronLeft class="size-4 text-muted-foreground" />
+            </Button>
+            <div class="flex flex-wrap items-baseline gap-2 min-w-0">
+              <DropdownMenu v-if="request" :modal="false">
+                <DropdownMenuTrigger as-child>
+                  <button
+                    type="button"
+                    class="inline-flex items-baseline gap-2 min-w-0 max-w-full text-left rounded-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
                   <span class="text-base font-medium text-foreground truncate">{{
                     primaryTitleText
                   }}</span>
@@ -31,28 +32,30 @@
                     typeLabelText
                   }}</span>
                   <ChevronDown class="size-3 shrink-0 text-muted-foreground" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent class="min-w-56 p-1.5" align="start">
-                <DropdownMenuItem
-                  class="flex cursor-pointer rounded-sm px-2 py-1.5 text-sm"
-                  @select="copyTitleToClipboard"
-                >
-                  {{ t('requestDetail.copyTitle') }}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <span
-              v-else
-              class="text-base font-medium text-foreground truncate min-w-0"
-            >
-              {{ primaryTitleText }}
-            </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent class="min-w-56 p-1.5" align="start">
+                  <DropdownMenuItem
+                    class="flex cursor-pointer rounded-sm px-2 py-1.5 text-sm"
+                    @select="copyTitleToClipboard"
+                  >
+                    {{ t('requestDetail.copyTitle') }}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <span
+                v-else
+                class="text-base font-medium text-foreground truncate min-w-0"
+              >
+                {{ primaryTitleText }}
+              </span>
+            </div>
           </div>
 
           <div
             v-if="request"
-            class="flex flex-wrap items-center gap-x-4 gap-y-2"
+            class="flex flex-wrap items-center gap-x-4 gap-y-1"
+            :class="isFullPage ? 'pl-8' : ''"
           >
             <div class="flex flex-wrap items-center gap-2">
               <div class="flex flex-wrap items-center gap-1">
@@ -177,8 +180,8 @@
 
         <Button
           variant="outline"
-          size="icon"
-          class="rounded-md size-8"
+          size="icon-sm"
+          class="rounded-md"
           :disabled="!hasPrevious"
           @click="$emit('previous')"
         >
@@ -186,8 +189,8 @@
         </Button>
         <Button
           variant="outline"
-          size="icon"
-          class="rounded-md size-8"
+          size="icon-sm"
+          class="rounded-md"
           :disabled="!hasNext"
           @click="$emit('next')"
         >
@@ -196,8 +199,8 @@
         <Button
           v-if="!isFullPage"
           variant="outline"
-          size="icon"
-          class="rounded-md size-8"
+          size="icon-sm"
+          class="rounded-md"
           :aria-label="t('common.buttons.close')"
           @click="$emit('close')"
         >

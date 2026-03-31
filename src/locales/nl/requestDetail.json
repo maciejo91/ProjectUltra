@@ -12,6 +12,15 @@
   "lastUpdated": "Laatst bijgewerkt",
   "moreMenu": "Meer acties",
   "addSegment": "Segment toevoegen",
+  "duplicates": {
+    "important": "Belangrijk:",
+    "bodyOne": "Een andere open aanvraag voor deze klant is mogelijk een duplicaat.",
+    "bodyOther": "{count} andere open aanvragen voor deze klant zijn mogelijk duplicaten.",
+    "linkSeparator": " · ",
+    "noVehicle": "Geen voertuig",
+    "openDuplicateAria": "Duplicaat aanvraag openen",
+    "dismissAria": "Sluiten"
+  },
   "tabs": {
     "overview": "Overzicht",
     "conversations": "Gesprekken",
@@ -25,15 +34,30 @@
     "highPaidStock": "Deze lead komt uit een betalende bron met hoge kosten en gaat over een auto die al {days} dagen op voorraad is."
   },
   "lqfTask": {
-    "title": "Lead Qualification Task",
+    "title": "Next action",
     "manageTask": "Taak beheren",
     "notNow": "Niet nu",
+    "postponeReason": {
+      "label": "Reason for postponing",
+      "placeholder": "Select reason…",
+      "options": {
+        "interruptedByOtherCustomers": "Interrupted by other customers",
+        "inATestDrive": "In a test drive",
+        "checkingInventory": "Checking inventory",
+        "reviewingLeadInfo": "Reviewing lead info",
+        "scheduledForLater": "Scheduled for later"
+      }
+    },
     "nextAttemptTitle": "Taak uitstellen naar",
     "nextAttemptAssigneePlaceholder": "Toewijzen aan…",
     "nextAttemptSaved": "Taak uitgesteld",
     "nextAttemptSaveFailed": "Taak kon niet worden uitgesteld",
     "openFullTaskView": "Volledige taakweergave openen",
-    "taskOptionsAria": "Taakopties"
+    "taskOptionsAria": "Taakopties",
+    "timerAria": "Afteltimer",
+    "timerTitleRunning": "Klik om te pauzeren",
+    "timerTitlePaused": "Klik om te hervatten",
+    "inProgress": "In progress"
   },
   "quickActions": {
     "phone": "Telefoon",

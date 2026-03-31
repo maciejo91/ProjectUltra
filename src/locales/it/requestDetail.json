@@ -12,6 +12,15 @@
   "lastUpdated": "Ultimo aggiornamento",
   "moreMenu": "Altre azioni",
   "addSegment": "Aggiungi segmento",
+  "duplicates": {
+    "important": "Importante:",
+    "bodyOne": "Un'altra richiesta aperta per questo cliente potrebbe essere un duplicato.",
+    "bodyOther": "Altre {count} richieste aperte per questo cliente potrebbero essere duplicati.",
+    "linkSeparator": " · ",
+    "noVehicle": "Nessun veicolo",
+    "openDuplicateAria": "Apri richiesta duplicata",
+    "dismissAria": "Chiudi"
+  },
   "tabs": {
     "overview": "Panoramica",
     "conversations": "Conversazioni",
@@ -25,15 +34,30 @@
     "highPaidStock": "Questo lead proviene da una fonte a pagamento elevata ed è interessato a un'auto in stock da {days} giorni."
   },
   "lqfTask": {
-    "title": "Lead Qualification Task",
+    "title": "Next action",
     "manageTask": "Gestisci l'attività",
     "notNow": "Non ora",
+    "postponeReason": {
+      "label": "Reason for postponing",
+      "placeholder": "Select reason…",
+      "options": {
+        "interruptedByOtherCustomers": "Interrupted by other customers",
+        "inATestDrive": "In a test drive",
+        "checkingInventory": "Checking inventory",
+        "reviewingLeadInfo": "Reviewing lead info",
+        "scheduledForLater": "Scheduled for later"
+      }
+    },
     "nextAttemptTitle": "Posticipa attività al",
     "nextAttemptAssigneePlaceholder": "Assegna a…",
     "nextAttemptSaved": "Attività posticipata",
     "nextAttemptSaveFailed": "Impossibile posticipare l'attività",
     "openFullTaskView": "Apri vista attività completa",
-    "taskOptionsAria": "Opzioni attività"
+    "taskOptionsAria": "Opzioni attività",
+    "timerAria": "Timer di conto alla rovescia",
+    "timerTitleRunning": "Clicca per mettere in pausa",
+    "timerTitlePaused": "Clicca per riprendere",
+    "inProgress": "In progress"
   },
   "quickActions": {
     "phone": "Telefono",

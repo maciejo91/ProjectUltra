@@ -1,5 +1,5 @@
 <template>
-  <SidebarProvider class="min-h-svh w-full bg-muted">
+  <SidebarProvider class="max-h-svh min-h-svh w-full overflow-hidden bg-muted">
     <AppSidebar />
 
     <SidebarInset class="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted">
@@ -109,7 +109,10 @@
             </div>
           </div>
         </template>
-        <main v-else class="flex-1 flex flex-col overflow-hidden min-h-0">
+        <main
+          v-show="!showTaskDetailSplitPane"
+          class="flex-1 flex flex-col overflow-hidden min-h-0"
+        >
           <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
             <router-view />
           </div>
@@ -142,7 +145,9 @@ const ROUTE_TITLE_MAP = {
   'task-detail': 'common.navigation.tasks',
   'customer-view': 'entities.customer.title',
   vehicles: 'common.navigation.vehicles',
-  requests: 'common.navigation.requests',
+  requests: 'common.navigation.sales',
+  'after-sales': 'common.navigation.afterSales',
+  conversations: 'common.navigation.conversations',
   customers: 'common.navigation.customers',
   calendar: 'common.navigation.calendar',
   reports: 'common.navigation.reports',
@@ -182,6 +187,10 @@ const mobileCalendarHeaderActions = computed(() => {
 })
 
 const showTaskDetailSplitPane = computed(() => {
-  return route.name === 'task-detail' && layoutStore.hideHeaderForTaskDetail
+  return (
+    route.name === 'task-detail' &&
+    layoutStore.hideHeaderForTaskDetail &&
+    Boolean(route.params.id)
+  )
 })
 </script>

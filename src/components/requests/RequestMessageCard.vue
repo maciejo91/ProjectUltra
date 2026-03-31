@@ -9,8 +9,8 @@
       <Button
         type="button"
         variant="secondary"
-        size="icon"
-        class="size-7 shrink-0 rounded-md"
+        size="icon-sm"
+        class="shrink-0 rounded-md"
         :aria-expanded="expanded"
         :aria-label="expanded ? collapseLabel : expandLabel"
         @click="expanded = !expanded"

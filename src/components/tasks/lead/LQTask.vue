@@ -830,7 +830,7 @@
                           </button>
                         </div>
                         <!-- Full-width slide: one assignee's slots -->
-                        <div class="flex-1 min-h-0 overflow-hidden w-full">
+                        <div class="flex-1 min-h-0 w-full">
                           <div
                             class="flex h-full w-full transition-transform duration-300 ease-out"
                             :style="{ transform: `translateX(-${availabilityCarouselIndex * 100}%)` }"
@@ -838,7 +838,7 @@
                             <div
                               v-for="item in availabilityByAssigneeForSelectedDate"
                               :key="item.assigneeId"
-                              class="w-full min-w-full flex-shrink-0 flex flex-col overflow-y-auto"
+                              class="w-full min-w-full flex-shrink-0 flex flex-col"
                             >
                               <div class="flex items-center gap-2 mb-3">
                                 <div

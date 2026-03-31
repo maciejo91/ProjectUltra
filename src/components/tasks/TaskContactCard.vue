@@ -1,6 +1,6 @@
 <template>
   <div
-    class="overflow-hidden rounded-lg border border-border bg-background shadow-nsc-card"
+    class="overflow-hidden rounded-lg bg-background shadow-nsc-card"
   >
     <template v-if="!isEditing">
       <div class="flex flex-col gap-2 px-4 py-4">
@@ -23,20 +23,41 @@
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <div class="flex min-w-0 flex-1 flex-col gap-2">
-              <p class="min-w-0 text-base font-medium leading-6 text-foreground wrap-break-word">
-                <span>{{ nameParts.primary || '—' }}</span>
-                <span v-if="nameParts.location" class="text-muted-foreground">
-                  {{ ' ' }}{{ nameParts.location }}
-                </span>
-              </p>
-              <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <div class="min-w-0 flex-1">
+              <div class="flex min-w-0 items-center justify-between gap-2">
+                <p class="min-w-0 px-1.5 text-base font-medium leading-5 text-foreground wrap-break-word">
+                  <span>{{ nameParts.primary || '—' }}</span>
+                  <span v-if="nameParts.location" class="text-muted-foreground">
+                    {{ ' ' }}{{ nameParts.location }}
+                  </span>
+                </p>
+
+                <div
+                  v-if="showQuickActions"
+                  class="shrink-0 flex flex-wrap items-center justify-end gap-0.5"
+                >
+                  <Button
+                    v-for="item in quickActionItems"
+                    :key="item.key"
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    class="shrink-0 rounded-md"
+                    :aria-label="item.label"
+                    @click="emitQuick(item.key)"
+                  >
+                    <component :is="item.icon" class="size-4 text-muted-foreground" />
+                  </Button>
+                </div>
+              </div>
+
+              <div class="mt-0 flex flex-wrap items-center gap-x-2 gap-y-1">
                 <div class="flex min-w-0 max-w-full items-center gap-0">
                   <span
-                    class="inline-flex size-7 shrink-0 items-center justify-center rounded-md"
+                    class="inline-flex size-6 shrink-0 items-center justify-center rounded-md"
                     aria-hidden
                   >
-                    <Mail class="size-4 text-muted-foreground" />
+                    <Mail class="size-3.5 text-muted-foreground" />
                   </span>
                   <span class="min-w-0 truncate text-xs text-muted-foreground">{{
                     emailDisplay || '—'
@@ -47,7 +68,7 @@
                     class="inline-flex size-6 shrink-0 items-center justify-center rounded-md"
                     aria-hidden
                   >
-                    <Phone class="size-3 text-muted-foreground" />
+                    <Phone class="size-3.5 text-muted-foreground" />
                   </span>
                   <span class="min-w-0 truncate text-xs text-muted-foreground">{{
                     phoneDisplay || '—'
@@ -55,51 +76,6 @@
                 </div>
               </div>
             </div>
-          </div>
-
-          <div
-            v-if="showQuickActions"
-            class="flex shrink-0 flex-wrap items-start justify-end gap-1 pt-0.5"
-          >
-            <Button
-              v-for="item in quickActionItems"
-              :key="item.key"
-              type="button"
-              :variant="item.key === 'more' ? 'ghost' : 'secondary'"
-              size="icon"
-              class="size-7 shrink-0 rounded-md"
-              :aria-label="item.label"
-              @click="emitQuick(item.key)"
-            >
-              <component :is="item.icon" class="size-4 text-muted-foreground" />
-            </Button>
-            <DropdownMenu v-if="task.customer?.id" :modal="false">
-              <DropdownMenuTrigger as-child>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  class="size-7 shrink-0 rounded-md text-muted-foreground"
-                  :aria-label="t('requestDetail.contactCard.cardMenu')"
-                >
-                  <MoreVertical class="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" class="min-w-48 p-1.5">
-                <DropdownMenuItem
-                  class="cursor-pointer rounded-sm px-2 py-1.5 text-sm"
-                  @select="openCustomerProfileInNewTab"
-                >
-                  {{ t('requestDetail.contactCard.openProfile') }}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  class="cursor-pointer rounded-sm px-2 py-1.5 text-sm"
-                  @select="startEditing"
-                >
-                  {{ t('requestDetail.contactCard.editCustomer') }}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
 
@@ -259,7 +235,6 @@ import {
   ChevronDown,
   Mail,
   MessageCircle,
-  MoreVertical,
   Phone,
   PhoneCall,
   Plus,

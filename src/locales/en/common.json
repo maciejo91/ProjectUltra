@@ -6,13 +6,25 @@
     "home": "Home",
     "tasks": "Tasks",
     "requests": "Requests",
-    "customers": "Customers",
+    "sales": "Sales",
+    "afterSales": "Service",
+    "conversations": "Conversations",
+    "customers": "Contacts",
     "calendar": "Calendar",
     "reports": "Reports",
     "settings": "Settings",
     "vehicles": "Vehicles",
-    "addNew": "Add New",
-    "addNewCustomer": "Add New Customer"
+    "addNew": "Add new",
+    "addNewCustomer": "Add New Customer",
+    "marketing": "Marketing",
+    "support": "Support",
+    "groups": {
+      "data": "Data",
+      "actions": "Actions"
+    }
+  },
+  "pages": {
+    "comingSoon": "Coming soon"
   },
   "layout": {
     "openSidebar": "Open sidebar",

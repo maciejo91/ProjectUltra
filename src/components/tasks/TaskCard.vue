@@ -1,12 +1,49 @@
 <template>
   <div 
     ref="cardRef"
-    class="task-card bg-muted rounded-xl p-4 flex flex-col cursor-pointer relative transition-all border group border-black/5"
+    class="task-card bg-muted rounded-xl p-4 flex flex-col cursor-pointer relative transition-all border group border-black/5 overflow-hidden"
     :class="[cardClass, selectedBorderClass]"
     @click="$emit('select', itemId)"
   >
+    <svg
+      v-if="showAnimatedSelectedBorder"
+      class="pointer-events-none absolute inset-0 z-10 h-full w-full"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient
+          ref="selectedStrokeGradientRef"
+          :id="selectedStrokeGradId"
+          gradientUnits="objectBoundingBox"
+          gradientTransform="rotate(0 0.5 0.5)"
+          x1="0"
+          y1="0.5"
+          x2="1"
+          y2="0.5"
+        >
+          <stop offset="0%" :stop-color="selectedBorderColor" stop-opacity="0" />
+          <stop offset="28%" :stop-color="selectedBorderColor" stop-opacity="0" />
+          <stop offset="50%" :stop-color="selectedBorderColor" stop-opacity="0.82" />
+          <stop offset="72%" :stop-color="selectedBorderColor" stop-opacity="0" />
+          <stop offset="100%" :stop-color="selectedBorderColor" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <rect
+        x="1"
+        y="1"
+        width="calc(100% - 2px)"
+        height="calc(100% - 2px)"
+        rx="11"
+        ry="11"
+        fill="none"
+        :stroke="`url(#${selectedStrokeGradId})`"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
     <!-- Top row: Status (left) | Urgency | Due Date (right) -->
-    <div class="flex items-center justify-between gap-2 w-full shrink-0 mb-1">
+    <div class="relative z-20 flex items-center justify-between gap-2 w-full shrink-0 mb-1">
       <div class="flex items-center gap-2 shrink-0 min-w-0">
         <span
           v-if="taskStatusLabel"
@@ -35,9 +72,9 @@
       </span>
     </div>
 
-    <div class="flex flex-col min-w-0 flex-1 pr-2">
+    <div class="relative z-20 flex flex-col min-w-0 flex-1 pr-2">
       <div class="flex items-center gap-x-2 gap-y-0 overflow-hidden flex-wrap mb-0.5 leading-none pt-2 pb-1">
-        <h3 class="font-medium text-foreground text-sm break-words shrink-0 m-0">{{ cardTitle }}</h3>
+        <h3 class="font-medium text-foreground text-sm wrap-break-word shrink-0 m-0">{{ cardTitle }}</h3>
         <span
           v-if="showCustomerSubtitle"
           class="text-muted-foreground text-sm truncate shrink-0"
@@ -69,7 +106,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { useId } from 'vue'
 import { formatDueDateRelative, getDeadlineStatus } from '@/utils/formatters'
 import { getTaskDisplayTitle } from '@/utils/taskActionTitle'
 import { getTaskStatus } from '@/utils/taskStatus'
@@ -124,9 +162,62 @@ const cardClass = computed(() => {
 
 const selectedBorderClass = computed(() => {
   if (!isSelected.value) return ''
-  if (props.item?.type === 'opportunity') return 'task-card-selected task-card-selected-opportunity'
-  if (props.item?.type === 'lead') return 'task-card-selected task-card-selected-lead'
-  return 'task-card-selected'
+  if (props.item?.type === 'opportunity') return 'task-card-selected task-card-selected-opportunity task-card-selected-animated'
+  if (props.item?.type === 'lead') return 'task-card-selected task-card-selected-lead task-card-selected-animated'
+  return 'task-card-selected task-card-selected-animated'
+})
+
+const selectedBorderColor = computed(() => {
+  if (props.item?.type === 'lead') return '#047857'
+  if (props.item?.type === 'opportunity') return '#7c3aed'
+  return 'var(--brand-primary)'
+})
+
+const showAnimatedSelectedBorder = computed(() => {
+  return isSelected.value === true
+})
+
+const selectedStrokeGradId = `taskStrokeGrad-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
+const selectedStrokeGradientRef = ref(null)
+const STROKE_ORBIT_MS = 8000
+
+function easeInOutSine(t) {
+  return -(Math.cos(Math.PI * t) - 1) / 2
+}
+
+function prefersReducedMotion() {
+  return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+let rafId = 0
+let orbitStart = 0
+
+function runStrokeOrbit(now) {
+  const el = selectedStrokeGradientRef.value
+  if (!el) {
+    rafId = requestAnimationFrame(runStrokeOrbit)
+    return
+  }
+  if (!showAnimatedSelectedBorder.value || prefersReducedMotion()) {
+    el.setAttribute('gradientTransform', 'rotate(0 0.5 0.5)')
+    return
+  }
+  const t = ((now - orbitStart) % STROKE_ORBIT_MS) / STROKE_ORBIT_MS
+  const angle = easeInOutSine(t) * 360
+  el.setAttribute('gradientTransform', `rotate(${angle} 0.5 0.5)`)
+  rafId = requestAnimationFrame(runStrokeOrbit)
+}
+
+onMounted(() => {
+  nextTick(() => {
+    if (prefersReducedMotion()) return
+    orbitStart = performance.now()
+    rafId = requestAnimationFrame(runStrokeOrbit)
+  })
+})
+
+onUnmounted(() => {
+  if (rafId) cancelAnimationFrame(rafId)
 })
 
 
@@ -219,6 +310,18 @@ const callAttemptsValue = computed(() => `${callAttemptsCount.value}/${maxContac
 
 .task-card.task-card-selected {
   border: 2px solid var(--brand-primary) !important;
+}
+
+.task-card.task-card-selected.task-card-selected-animated {
+  border-color: transparent !important;
+}
+
+.task-card.task-card-selected.task-card-selected-lead.task-card-selected-animated {
+  border-color: transparent !important;
+}
+
+.task-card.task-card-selected.task-card-selected-opportunity.task-card-selected-animated {
+  border-color: transparent !important;
 }
 
 .task-card.task-card-selected.task-card-selected-lead {

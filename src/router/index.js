@@ -48,13 +48,25 @@ const routes = [
         name: 'request-detail',
         component: () => import('@/views/RequestDetailPage.vue'),
         props: true,
-        meta: { titleKey: 'common.navigation.requests' }
+        meta: { titleKey: 'common.navigation.sales' }
       },
       {
         path: 'requests',
         name: 'requests',
         component: () => import('@/views/Requests.vue'),
-        meta: { titleKey: 'common.navigation.requests' }
+        meta: { titleKey: 'common.navigation.sales' }
+      },
+      {
+        path: 'after-sales',
+        name: 'after-sales',
+        component: () => import('@/views/AfterSales.vue'),
+        meta: { titleKey: 'common.navigation.afterSales' }
+      },
+      {
+        path: 'conversations',
+        name: 'conversations',
+        component: () => import('@/views/Conversations.vue'),
+        meta: { titleKey: 'common.navigation.conversations' }
       },
       {
         path: 'customers',

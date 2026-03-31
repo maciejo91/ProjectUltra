@@ -101,7 +101,7 @@
               @mousedown.stop
             >
               <!-- Scrollable: log, summary, transcript only (keeps Extract button visible below) -->
-              <div class="overflow-y-auto space-y-4 max-h-64 shrink-0">
+              <div class="shrink-0 space-y-4">
                 <!-- Log when call has ended -->
                 <div v-if="callEnded && !isCallActive" class="text-sm text-muted-foreground">
                   {{ t('common.call.madeACall', { name: assignedPersonName || t('common.call.user') }) }}

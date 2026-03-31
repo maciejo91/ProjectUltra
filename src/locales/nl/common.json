@@ -6,13 +6,25 @@
     "home": "Home",
     "tasks": "Taken",
     "requests": "Verzoeken",
-    "customers": "Klanten",
+    "sales": "Sales",
+    "afterSales": "Service",
+    "conversations": "Conversations",
+    "customers": "Contacten",
     "calendar": "Kalender",
     "reports": "Rapporten",
     "settings": "Instellingen",
     "vehicles": "Voertuigen",
-    "addNew": "Nieuw Toevoegen",
-    "addNewCustomer": "Nieuwe Klant Toevoegen"
+    "addNew": "Nieuw toevoegen",
+    "addNewCustomer": "Nieuwe Klant Toevoegen",
+    "marketing": "Marketing",
+    "support": "Support",
+    "groups": {
+      "data": "Gegevens",
+      "actions": "Acties"
+    }
+  },
+  "pages": {
+    "comingSoon": "Coming soon"
   },
   "layout": {
     "openSidebar": "Zijbalk openen",

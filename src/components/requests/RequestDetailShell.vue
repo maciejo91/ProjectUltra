@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col flex-1 min-h-0 bg-[#F5F5F5]">
+  <div class="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted">
     <RequestDetailHeader
       :request="request"
       :filtered-requests="filteredRequests"
@@ -16,12 +16,12 @@
 
     <div
       v-if="request"
-      class="flex flex-1 min-h-0 flex-col bg-[#F5F5F5]"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted"
     >
       <slot />
     </div>
 
-    <div v-else class="flex-1 flex items-center justify-center p-8 bg-[#F5F5F5]">
+    <div v-else class="flex flex-1 items-center justify-center bg-muted p-8">
       <p class="text-muted-foreground">No request selected</p>
     </div>
   </div>

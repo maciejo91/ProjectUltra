@@ -12,6 +12,15 @@
   "lastUpdated": "Zuletzt aktualisiert",
   "moreMenu": "Weitere Aktionen",
   "addSegment": "Segment hinzufügen",
+  "duplicates": {
+    "important": "Wichtig:",
+    "bodyOne": "Eine weitere offene Anfrage für diesen Kunden könnte ein Duplikat sein.",
+    "bodyOther": "{count} weitere offene Anfragen für diesen Kunden könnten Duplikate sein.",
+    "linkSeparator": " · ",
+    "noVehicle": "Kein Fahrzeug",
+    "openDuplicateAria": "Duplikat-Anfrage öffnen",
+    "dismissAria": "Schließen"
+  },
   "tabs": {
     "overview": "Übersicht",
     "conversations": "Gespräche",
@@ -25,15 +34,30 @@
     "highPaidStock": "Dieser Lead stammt aus einer stark bezahlten Quelle und interessiert sich für ein Fahrzeug, das seit {days} Tagen auf Lager ist."
   },
   "lqfTask": {
-    "title": "Lead Qualification Task",
+    "title": "Next action",
     "manageTask": "Aufgabe bearbeiten",
     "notNow": "Nicht jetzt",
+    "postponeReason": {
+      "label": "Reason for postponing",
+      "placeholder": "Select reason…",
+      "options": {
+        "interruptedByOtherCustomers": "Interrupted by other customers",
+        "inATestDrive": "In a test drive",
+        "checkingInventory": "Checking inventory",
+        "reviewingLeadInfo": "Reviewing lead info",
+        "scheduledForLater": "Scheduled for later"
+      }
+    },
     "nextAttemptTitle": "Aufgabe verschieben auf",
     "nextAttemptAssigneePlaceholder": "Zuweisen an…",
     "nextAttemptSaved": "Aufgabe verschoben",
     "nextAttemptSaveFailed": "Aufgabe konnte nicht verschoben werden",
     "openFullTaskView": "Vollständige Aufgabenansicht öffnen",
-    "taskOptionsAria": "Aufgabenoptionen"
+    "taskOptionsAria": "Aufgabenoptionen",
+    "timerAria": "Countdown-Timer",
+    "timerTitleRunning": "Klicken, um den Timer zu pausieren",
+    "timerTitlePaused": "Klicken, um den Timer fortzusetzen",
+    "inProgress": "In progress"
   },
   "quickActions": {
     "phone": "Telefon",

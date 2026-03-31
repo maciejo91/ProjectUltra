@@ -12,6 +12,15 @@
   "moreMenu": "More actions",
   "moreMenuShare": "Share",
   "addSegment": "Add segment",
+  "duplicates": {
+    "important": "Important:",
+    "bodyOne": "Another open request for this customer may be a duplicate.",
+    "bodyOther": "{count} other open requests for this customer may be duplicates.",
+    "linkSeparator": " · ",
+    "noVehicle": "No vehicle",
+    "openDuplicateAria": "Open duplicate request",
+    "dismissAria": "Dismiss"
+  },
   "tabs": {
     "overview": "Overview",
     "conversations": "Conversations",
@@ -25,15 +34,30 @@
     "highPaidStock": "This lead comes from a highly paid source and is interested in a car that has been in stock for {days} days."
   },
   "lqfTask": {
-    "title": "Lead Qualification Task",
+    "title": "Next action",
     "manageTask": "Manage the task",
     "notNow": "Not now",
+    "postponeReason": {
+      "label": "Reason for postponing",
+      "placeholder": "Select reason…",
+      "options": {
+        "interruptedByOtherCustomers": "Interrupted by other customers",
+        "inATestDrive": "In a test drive",
+        "checkingInventory": "Checking inventory",
+        "reviewingLeadInfo": "Reviewing lead info",
+        "scheduledForLater": "Scheduled for later"
+      }
+    },
     "nextAttemptTitle": "Postpone task to",
     "nextAttemptAssigneePlaceholder": "Assign to…",
     "nextAttemptSaved": "Task postponed",
     "nextAttemptSaveFailed": "Could not postpone task",
     "openFullTaskView": "Open full task view",
-    "taskOptionsAria": "Task options"
+    "taskOptionsAria": "Task options",
+    "timerAria": "Countdown timer",
+    "timerTitleRunning": "Click to pause timer",
+    "timerTitlePaused": "Click to resume timer",
+    "inProgress": "In progress"
   },
   "quickActions": {
     "phone": "Phone",

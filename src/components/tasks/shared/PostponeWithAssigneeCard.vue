@@ -82,6 +82,16 @@
           class="w-full resize-none border-border bg-background text-foreground"
         />
       </div>
+      <div v-if="showPostponeReasonOptions && postponeReasonOptions.length" class="mt-4">
+        <Label class="form-label">{{ postponeReasonLabel }}</Label>
+        <SelectMenu
+          v-model="selectedPostponeReason"
+          :items="postponeReasonOptions"
+          value-key="value"
+          :placeholder="postponeReasonPlaceholder"
+          class="w-full"
+        />
+      </div>
       <div class="mt-4">
         <Label class="form-label">Assigned to</Label>
         <SelectMenu
@@ -154,7 +164,11 @@ const props = defineProps({
   aiSuggestionData: { type: Object, default: null },
   saving: { type: Boolean, default: false },
   showConfirmButtons: { type: Boolean, default: true },
-  showReasonField: { type: Boolean, default: false }
+  showReasonField: { type: Boolean, default: false },
+  showPostponeReasonOptions: { type: Boolean, default: false },
+  postponeReasonLabel: { type: String, default: 'Reason for postponing' },
+  postponeReasonPlaceholder: { type: String, default: 'Select reason…' },
+  postponeReasonOptions: { type: Array, default: () => [] }
 })
 
 const emit = defineEmits(['confirm', 'cancel'])
@@ -163,6 +177,7 @@ const rescheduleTime = ref(props.showQuickTimeOptions ? 'tomorrow-9am' : 'custom
 const customDate = ref('')
 const customTime = ref('')
 const reason = ref('')
+const selectedPostponeReason = ref('')
 const selectedAssigneeKey = ref(props.defaultAssigneeKey || (props.assigneeOptions[0]?._key ?? ''))
 const noteToAssignee = ref('')
 
@@ -228,6 +243,7 @@ function getPayload() {
     date: dateTime.split('T')[0],
     time: customTime.value || '12:00',
     reason: reason.value?.trim() || '',
+    postponeReason: selectedPostponeReason.value || '',
     assignee: assignee?.type === 'none' ? null : assignee,
     noteToAssignee: noteToAssignee.value?.trim() || ''
   }

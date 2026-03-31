@@ -535,7 +535,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useSettingsStore } from '@/stores/settings'
+import { useSettingsStore, DEFAULT_SETTINGS } from '@/stores/settings'
 import { resetMockData } from '@/utils/resetMockData'
 import { Button, Checkbox, Tabs, TabsList, TabsTrigger, TabsContent, Input, Label, Dialog, DialogContent, DialogDescription, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@motork/component-library/future/primitives'
 import PageHeader from '@/components/layout/PageHeader.vue'
@@ -572,15 +572,7 @@ const localSettings = ref({
     standard: 20
   },
   navigationVisibility: {
-    home: true,
-    tasks: true,
-    requests: true,
-    customers: true,
-    calendar: true,
-    reports: true,
-    lists: true,
-    search: true,
-    language: true
+    ...DEFAULT_SETTINGS.navigationVisibility
   },
   leadScoring: {
     weights: {
@@ -642,17 +634,9 @@ function loadSettings() {
       warm: settingsStore.settings.urgencyThresholds?.warm || 50,
       standard: settingsStore.settings.urgencyThresholds?.standard || 20
     },
-    // Ensure navigation visibility settings exist with defaults (all visible by default)
     navigationVisibility: {
-      home: settingsStore.settings.navigationVisibility?.home ?? true,
-      tasks: settingsStore.settings.navigationVisibility?.tasks ?? true,
-      requests: settingsStore.settings.navigationVisibility?.requests ?? true,
-      customers: settingsStore.settings.navigationVisibility?.customers ?? true,
-      calendar: settingsStore.settings.navigationVisibility?.calendar ?? true,
-      reports: settingsStore.settings.navigationVisibility?.reports ?? true,
-      lists: settingsStore.settings.navigationVisibility?.lists ?? true,
-      search: settingsStore.settings.navigationVisibility?.search ?? true,
-      language: settingsStore.settings.navigationVisibility?.language ?? true
+      ...DEFAULT_SETTINGS.navigationVisibility,
+      ...settingsStore.settings.navigationVisibility
     },
     // Deep copy lead scoring for editing
     leadScoring: {

@@ -12,6 +12,15 @@
   "lastUpdated": "Dernière mise à jour",
   "moreMenu": "Autres actions",
   "addSegment": "Ajouter un segment",
+  "duplicates": {
+    "important": "Important :",
+    "bodyOne": "Une autre demande ouverte pour ce client est peut-être un doublon.",
+    "bodyOther": "{count} autres demandes ouvertes pour ce client sont peut-être des doublons.",
+    "linkSeparator": " · ",
+    "noVehicle": "Aucun véhicule",
+    "openDuplicateAria": "Ouvrir la demande en doublon",
+    "dismissAria": "Fermer"
+  },
   "tabs": {
     "overview": "Vue d’ensemble",
     "conversations": "Conversations",
@@ -25,15 +34,30 @@
     "highPaidStock": "Ce lead provient d’une source payante importante et concerne un véhicule en stock depuis {days} jours."
   },
   "lqfTask": {
-    "title": "Lead Qualification Task",
+    "title": "Next action",
     "manageTask": "Gérer la tâche",
     "notNow": "Pas maintenant",
+    "postponeReason": {
+      "label": "Reason for postponing",
+      "placeholder": "Select reason…",
+      "options": {
+        "interruptedByOtherCustomers": "Interrupted by other customers",
+        "inATestDrive": "In a test drive",
+        "checkingInventory": "Checking inventory",
+        "reviewingLeadInfo": "Reviewing lead info",
+        "scheduledForLater": "Scheduled for later"
+      }
+    },
     "nextAttemptTitle": "Reporter la tâche au",
     "nextAttemptAssigneePlaceholder": "Attribuer à…",
     "nextAttemptSaved": "Tâche reportée",
     "nextAttemptSaveFailed": "Impossible de reporter la tâche",
     "openFullTaskView": "Ouvrir la vue tâche complète",
-    "taskOptionsAria": "Options de la tâche"
+    "taskOptionsAria": "Options de la tâche",
+    "timerAria": "Minuterie",
+    "timerTitleRunning": "Cliquer pour mettre en pause",
+    "timerTitlePaused": "Cliquer pour reprendre",
+    "inProgress": "In progress"
   },
   "quickActions": {
     "phone": "Téléphone",

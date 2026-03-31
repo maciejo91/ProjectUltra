@@ -1,8 +1,9 @@
 <template>
-  <div class="h-full flex flex-col overflow-y-auto bg-[#F5F5F5]">
+  <div class="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted">
     <RequestDetailView
       v-if="request"
       :key="request?.compositeId || 'empty'"
+      class="flex min-h-0 min-w-0 flex-1 flex-col"
       :request="request"
       :filtered-requests="filteredRequests"
       :is-full-page="true"
@@ -10,7 +11,7 @@
       @request-navigate="handleRequestNavigate"
       @open-task-drawer="handleOpenTaskDrawer"
     />
-    <div v-else class="flex-1 flex items-center justify-center p-8 bg-[#F5F5F5]">
+    <div v-else class="flex flex-1 items-center justify-center bg-muted p-8">
       <div class="text-center">
         <p class="text-muted-foreground">{{ loading ? 'Loading...' : 'Request not found' }}</p>
       </div>
@@ -175,6 +176,14 @@ function handleBack() {
   const from = route.query.from
   if (from === 'customer' && request.value?.customerId) {
     router.push({ path: `/customer/${request.value.customerId}` })
+    return
+  }
+  if (from === 'tasks') {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back()
+      return
+    }
+    router.push({ path: '/tasks', query: {} })
     return
   }
   const query = from === 'requests' && request.value?.compositeId

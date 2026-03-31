@@ -1,6 +1,6 @@
 <template>
-  <div 
-    class="overflow-visible p-4 flex flex-col flex-1 min-h-0 rounded-lg bg-white shadow-nsc-card"
+  <div
+    class="flex w-full min-w-0 flex-col rounded-lg bg-white p-4 shadow-nsc-card"
     style="border-radius: var(--border-radius-rounded-lg, 10px);"
   >
     <div class="mb-4">
@@ -88,8 +88,8 @@
         </div> <!-- Close flex items-center justify-between mb-2 -->
       </div> <!-- Close mb-4 -->
     
-    <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
-      <div v-if="sortedActivities.length > 0" class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+    <div class="flex min-w-0 flex-col">
+      <div v-if="sortedActivities.length > 0" class="flex min-w-0 flex-col overflow-x-hidden">
         <div class="flex flex-col items-start gap-1 mb-4">
           <h3
             class="text-sm font-normal text-muted-foreground leading-normal"
@@ -319,7 +319,7 @@
       </div>
       
       <!-- Empty State -->
-      <div v-else class="py-8 flex-1 flex flex-col justify-center min-h-full">
+      <div v-else class="flex flex-col justify-center py-8">
         <div class="text-center">
           <Clock :size="32" class="mx-auto text-muted-foreground mb-2" />
           <p class="text-sm text-muted-foreground">No activity yet</p>

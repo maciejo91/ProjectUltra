@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col gap-4 overflow-hidden rounded-lg border border-border bg-background p-4 shadow-nsc-card"
+    class="flex flex-col gap-4 overflow-hidden rounded-lg bg-background p-4 shadow-nsc-card"
   >
     <div class="flex w-full items-center gap-2">
       <h3 class="min-w-0 flex-1 text-base font-medium leading-6 text-foreground">
@@ -9,8 +9,8 @@
       <Button
         v-if="!isEditing"
         variant="secondary"
-        size="icon"
-        class="size-7 shrink-0 rounded-md"
+        size="icon-sm"
+        class="shrink-0 rounded-md"
         :aria-label="t('requestDetail.vehicleCard.editAria')"
         @click="startEditing"
       >

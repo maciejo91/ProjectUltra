@@ -214,7 +214,7 @@
       </div>
 
       <!-- Right: Activity Timeline (collapsed by default) -->
-      <div class="hidden lg:flex flex-col overflow-visible border-l border-border shrink-0 w-80 h-full">
+      <div class="hidden h-full min-h-0 w-80 shrink-0 flex-col overflow-y-auto border-l border-border lg:flex">
         <TaskActivityCard
           :activities="allActivities"
           :expanded-summaries="expandedSummaries"

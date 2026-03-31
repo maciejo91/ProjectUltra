@@ -7,10 +7,10 @@ export const useUserStore = defineStore('user', () => {
   // This will be replaced when real authentication is implemented
   const currentUser = ref({
     id: 1,
-    name: 'Salsabeel Khaleel',
-    email: 'salsabeel@motork.io',
+    name: 'Maciej Ogonowski',
+    email: 'maciej.ogonowski@example.com',
     role: 'manager',
-    initials: 'SK'
+    initials: 'MO'
   })
   const isAuthenticated = ref(true)
   

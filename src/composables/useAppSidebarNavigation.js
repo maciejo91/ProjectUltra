@@ -2,12 +2,15 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   Home,
-  Users,
+  UserSquare,
   CarFront,
-  ArrowDownToLine,
+  Tag,
+  MessageSquare,
+  Wrench,
   ListTodo,
   Calendar,
-  LineChart
+  BarChart3,
+  Megaphone
 } from 'lucide-vue-next'
 import { useSettingsStore } from '@/stores/settings'
 import { useUserStore } from '@/stores/user'
@@ -24,80 +27,101 @@ export function useAppSidebarNavigation() {
   const firstVisibleRoute = computed(() => {
     const nav = navigationVisibility.value
     if (nav.home !== false) return '/home'
-    if (nav.tasks !== false) return '/tasks'
-    if (nav.customers !== false) return '/customers'
-    if (nav.requests !== false) return '/requests'
     if (nav.calendar !== false) return '/calendar'
-    if (userStore.canAccessReports() && nav.reports !== false) return '/reports'
+    if (nav.tasks !== false) return '/tasks'
+    if (nav.conversations !== false) return '/conversations'
+    if (nav.customers !== false) return '/customers'
     if (nav.lists !== false) return '/vehicles'
+    if (nav.requests !== false) return '/requests'
+    if (nav.afterSales !== false) return '/after-sales'
+    if (userStore.canAccessReports() && nav.reports !== false) return '/reports'
     return '/tasks'
   })
 
   const hotLeadsCount = computed(() => leadsStore.hotLeads.length)
 
-  const navigationItems = computed(() => {
+  const primaryNavItems = computed(() => {
     const nav = navigationVisibility.value
     const items = []
-
-    const push = (entry) => {
-      items.push({
-        ...entry,
-        enabled: entry.enabled !== false
-      })
-    }
-
     if (nav.home !== false) {
-      push({
+      items.push({
         name: t('common.navigation.home'),
         href: '/home',
         icon: Home
       })
     }
-    if (nav.customers !== false) {
-      push({
-        name: t('common.navigation.customers'),
-        href: '/customers',
-        icon: Users
-      })
-    }
-    if (nav.lists !== false) {
-      push({
-        name: t('common.navigation.vehicles'),
-        href: '/vehicles',
-        icon: CarFront
-      })
-    }
-    if (nav.requests !== false) {
-      push({
-        name: t('common.navigation.requests'),
-        href: '/requests',
-        icon: ArrowDownToLine
+    if (nav.calendar !== false) {
+      items.push({
+        name: t('common.navigation.calendar'),
+        href: '/calendar',
+        icon: Calendar
       })
     }
     if (nav.tasks !== false) {
-      push({
+      items.push({
         name: t('common.navigation.tasks'),
         href: '/tasks',
         icon: ListTodo,
         notificationCount: hotLeadsCount.value > 0 ? hotLeadsCount.value : undefined
       })
     }
-    if (nav.calendar !== false) {
-      push({
-        name: t('common.navigation.calendar'),
-        href: '/calendar',
-        icon: Calendar
+    if (nav.conversations !== false) {
+      items.push({
+        name: t('common.navigation.conversations'),
+        href: '/conversations',
+        icon: MessageSquare
+      })
+    }
+    return items
+  })
+
+  const dataNavItems = computed(() => {
+    const nav = navigationVisibility.value
+    const items = []
+    if (nav.customers !== false) {
+      items.push({
+        name: t('common.navigation.customers'),
+        href: '/customers',
+        icon: UserSquare
+      })
+    }
+    if (nav.lists !== false) {
+      items.push({
+        name: t('common.navigation.vehicles'),
+        href: '/vehicles',
+        icon: CarFront
+      })
+    }
+    if (nav.requests !== false) {
+      items.push({
+        name: t('common.navigation.sales'),
+        href: '/requests',
+        icon: Tag
+      })
+    }
+    if (nav.afterSales !== false) {
+      items.push({
+        name: t('common.navigation.afterSales'),
+        href: '/after-sales',
+        icon: Wrench
       })
     }
     if (userStore.canAccessReports() && nav.reports !== false) {
-      push({
+      items.push({
         name: t('common.navigation.reports'),
         href: '/reports',
-        icon: LineChart
+        icon: BarChart3
       })
     }
-
-    return items.filter((i) => i.enabled !== false)
+    if (nav.marketing !== false) {
+      items.push({
+        kind: 'comingSoon',
+        id: 'marketing',
+        name: t('common.navigation.marketing'),
+        icon: Megaphone
+      })
+    }
+    return items
   })
 
   const addNewLabel = computed(() => t('common.navigation.addNew'))
@@ -105,7 +129,8 @@ export function useAppSidebarNavigation() {
   return {
     navigationVisibility,
     firstVisibleRoute,
-    navigationItems,
+    primaryNavItems,
+    dataNavItems,
     addNewLabel
   }
 }

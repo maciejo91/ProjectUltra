@@ -1,74 +1,74 @@
 <template>
   <div
     v-if="potentialDuplicates.length > 0"
-    class="rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 shadow-mk-dashboard-card flex items-start gap-2"
+    class="relative overflow-hidden rounded-lg"
   >
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 flex-1 min-w-0">
-      <div class="flex-1 min-w-0">
-        <h3 class="text-sm font-semibold text-foreground">Duplicate detected</h3>
-        <p class="mt-0.5 text-xs text-muted-foreground">
-          The following {{ potentialDuplicates.length > 1 ? 'requests' : 'request' }} may be duplicate{{ potentialDuplicates.length > 1 ? 's' : '' }}:
-          <template v-for="(dup, i) in potentialDuplicates" :key="dup.compositeId">
-            <span v-if="i > 0">, </span>
-            <button
-              type="button"
-              class="font-medium text-primary hover:underline align-baseline"
-              @click="emit('request-navigate', dup.compositeId)"
-            >
-              {{ getVehicleDisplay(dup) }} – {{ dup.displayStage || dup.stage || '—' }}
-            </button>
-          </template>
-          . Confirm merge to close the duplicate and merge its activities.
-        </p>
-      </div>
-      <div class="flex flex-wrap gap-2 justify-end shrink-0">
-        <button
-          v-for="dup in potentialDuplicates"
-          :key="dup.compositeId"
-          type="button"
-          class="inline-flex items-center justify-center rounded-sm px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none shrink-0"
-          :disabled="mergeLoading"
-          @click="emit('merge', dup)"
+    <div
+      class="duplicate-banner-inner relative z-10 m-px flex items-center gap-4 rounded-lg bg-destructive/10 px-4 py-2"
+    >
+      <div class="flex flex-1 min-w-0 items-center gap-3">
+        <div
+          class="flex shrink-0 items-center justify-center rounded-md bg-destructive p-1.5 text-white"
+          aria-hidden="true"
         >
-          Confirm merge
-        </button>
+          <TriangleAlert class="size-3.5" stroke-width="2" />
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm leading-5 text-foreground">
+            <span class="font-semibold">{{ t('requestDetail.duplicates.important') }}</span>
+            <span class="font-normal">
+              {{ ' ' }}{{ bodyMessage }}
+            </span>
+          </p>
+        </div>
+      </div>
+      <div class="flex shrink-0 flex-wrap items-center justify-end gap-2 sm:pl-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          class="size-7 shrink-0 text-secondary-foreground hover:bg-secondary hover:text-secondary-foreground"
+          :aria-label="t('requestDetail.duplicates.openDuplicateAria')"
+          @click="emit('request-navigate', potentialDuplicates[0].compositeId)"
+        >
+          <ArrowUpRight class="size-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          class="size-7 shrink-0 text-muted-foreground hover:text-foreground"
+          :aria-label="t('requestDetail.duplicates.dismissAria')"
+          @click="emit('dismiss')"
+        >
+          <X class="size-4" />
+        </Button>
       </div>
     </div>
-    <Button
-      variant="ghost"
-      size="icon"
-      class="shrink-0 h-8 w-8 text-muted-foreground hover:text-foreground"
-      aria-label="Dismiss banner"
-      @click="emit('dismiss')"
-    >
-      <X class="size-4" />
-    </Button>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Button } from '@motork/component-library/future/primitives'
-import { X } from 'lucide-vue-next'
+import { ArrowUpRight, TriangleAlert, X } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   potentialDuplicates: {
     type: Array,
     default: () => []
-  },
-  mergeLoading: {
-    type: Boolean,
-    default: false
   }
 })
 
-const emit = defineEmits(['merge', 'request-navigate', 'dismiss'])
+const emit = defineEmits(['request-navigate', 'dismiss'])
 
-function getVehicleDisplay(task) {
-  const vehicle = task.requestedCar || task.vehicle
-  if (!vehicle) return 'No vehicle'
-  const brand = vehicle.brand || ''
-  const model = vehicle.model || ''
-  const year = vehicle.year ? ` (${vehicle.year})` : ''
-  return `${brand} ${model}${year}`.trim() || '—'
-}
+const { t } = useI18n()
+
+const bodyMessage = computed(() => {
+  const n = props.potentialDuplicates.length
+  if (n === 1) return t('requestDetail.duplicates.bodyOne')
+  return t('requestDetail.duplicates.bodyOther', { count: n })
+})
 </script>
+
+<style scoped>
+</style>

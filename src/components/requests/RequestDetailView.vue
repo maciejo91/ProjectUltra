@@ -12,6 +12,7 @@
     @add-segment="handleAddSegment"
     @more-action="handleHeaderMoreAction"
   >
+    <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
     <ComingSoonModal :show="showPostponeModal" @close="showPostponeModal = false" />
     <ComingSoonModal :show="showGenericComingSoon" @close="showGenericComingSoon = false" />
 
@@ -24,16 +25,6 @@
       @save="handleFinancingSave"
       @delete="handleFinancingDelete"
       @close="showFinancingModal = false; editingFinancingOption = null"
-    />
-
-    <MergeConfirmModal
-      :show="showMergeModal"
-      :primary="request"
-      :duplicate="duplicateToMerge"
-      :duplicate-summary="mergeDuplicateSummary"
-      :loading="mergeLoading"
-      @close="showMergeModal = false; duplicateToMerge = null"
-      @confirm="handleMergeConfirm"
     />
 
     <AddVehicleModal
@@ -109,32 +100,34 @@
 
     <div
       v-if="showAssociatedTasksOrTimeline"
-      class="flex w-full min-h-full flex-col p-4"
+      class="flex min-h-0 w-full flex-1 flex-col overflow-y-auto p-4 lg:overflow-hidden"
     >
       <div
-        class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-stretch"
+        class="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-4 lg:overflow-hidden"
       >
-        <div class="order-1 flex flex-col gap-4 lg:col-span-2">
-          <DuplicateDetectedCard
-            v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
-            :potential-duplicates="potentialDuplicates"
-            :merge-loading="mergeLoading"
-            @merge="handleMergeClick"
-            @request-navigate="(...args) => $emit('request-navigate', ...args)"
-            @dismiss="duplicateBannerDismissed = true"
-          />
+        <div
+          class="order-1 flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+        >
           <RequestLeadProfileSection
             v-if="request"
+            class="shrink-0"
             :request="request"
             @quick-action="handleQuickAction"
           />
 
           <div
-            class="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-background shadow-mk-dashboard-card"
+            class="flex min-w-0 flex-col rounded-lg bg-background shadow-mk-dashboard-card"
           >
             <RequestMainTabs class="shrink-0" v-model="mainTab" :tabs="mainTabs" />
 
-            <div class="flex min-h-0 flex-1 flex-col gap-4 p-4">
+            <div class="flex flex-col gap-4 p-4">
+              <DuplicateDetectedCard
+                v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
+                class="shrink-0"
+                :potential-duplicates="potentialDuplicates"
+                @request-navigate="(...args) => $emit('request-navigate', ...args)"
+                @dismiss="duplicateBannerDismissed = true"
+              />
               <template v-if="mainTab === 'overview' || mainTab === 'tasks'">
                 <div class="flex flex-col gap-4">
                 <RequestInsightBanner
@@ -149,9 +142,12 @@
                   :dismissed="lqfTeaserDismissed"
                   :teaser-line="lqfTeaserLine"
                   :assignee-initials="lqfAssigneeInitials"
+                  :manage-open="lqfInlineManageOpen"
+                  :postpone-open="lqfNotNowNextAttemptOpen"
                   @manage-task="handleLqfManageTask"
                   @open-full-task="handleOpenTaskDrawer()"
                   @not-now="handleLqfNotNow"
+                  @cancel-action="lqfInlineManageOpen = false; lqfNotNowNextAttemptOpen = false"
                 >
                   <template v-if="lqfInlineManageOpen" #outcome>
                     <LeadManagementWidget
@@ -167,6 +163,10 @@
                   <template v-if="lqfNotNowNextAttemptOpen" #next-attempt>
                     <PostponeWithAssigneeCard
                       :title="t('requestDetail.lqfTask.nextAttemptTitle')"
+                      show-postpone-reason-options
+                      :postpone-reason-label="t('requestDetail.lqfTask.postponeReason.label')"
+                      :postpone-reason-placeholder="t('requestDetail.lqfTask.postponeReason.placeholder')"
+                      :postpone-reason-options="lqfPostponeReasonOptions"
                       :assignee-options="lqfNextAttemptAssigneeOptions"
                       :default-assignee-key="lqfDefaultNextAttemptAssigneeKey"
                       :assignee-placeholder="t('requestDetail.lqfTask.nextAttemptAssigneePlaceholder')"
@@ -187,7 +187,7 @@
               </template>
 
               <template v-else-if="mainTab === 'activity'">
-                <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+                <div class="flex min-w-0 flex-col">
                   <TaskActivityCard
                     v-if="showTimeline && request"
                     :activities="requestActivities"
@@ -274,7 +274,9 @@
           </div>
         </div>
 
-        <div class="order-2 lg:col-span-1 flex flex-col gap-4 min-w-0">
+        <div
+          class="order-2 flex min-w-0 flex-col gap-4 lg:sticky lg:top-0 lg:w-1/3 lg:shrink-0 lg:self-start lg:overflow-y-auto"
+        >
           <VehicleRequestCard
             v-if="request && (request.requestedCar || request.vehicle)"
             :heading="t('requestDetail.vehicleCard.title')"
@@ -296,6 +298,7 @@
         </div>
       </div>
     </div>
+    </div>
   </RequestDetailShell>
 </template>
 
@@ -305,7 +308,6 @@ import { useI18n } from 'vue-i18n'
 import { Car, CreditCard, Folder } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
 import { useDuplicateDetection } from '@/composables/useDuplicateDetection'
-import { mergeRequestIntoPrimary, getVehicleSummary } from '@/api/mergeRequest'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
@@ -333,7 +335,6 @@ import CreateEventModal from '@/components/modals/CreateEventModal.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
-import MergeConfirmModal from '@/components/modals/MergeConfirmModal.vue'
 import DuplicateDetectedCard from './DuplicateDetectedCard.vue'
 import LeadManagementWidget from '@/components/tasks/lead/LeadManagementWidget.vue'
 import PostponeWithAssigneeCard from '@/components/tasks/shared/PostponeWithAssigneeCard.vue'
@@ -378,9 +379,6 @@ const showFinancingModal = ref(false)
 const editingTradeIn = ref(null)
 const editingFinancingOption = ref(null)
 const tradeInActionLoading = ref(false)
-const showMergeModal = ref(false)
-const duplicateToMerge = ref(null)
-const mergeLoading = ref(false)
 const duplicateBannerDismissed = ref(false)
 const mainTab = ref('overview')
 const lqfTeaserDismissed = ref(false)
@@ -429,6 +427,14 @@ const lqfDefaultNextAttemptAssigneeKey = computed(() => {
   if (team) return `team-${team.id}`
   return LQF_NEXT_ATTEMPT_NONE_KEY
 })
+
+const lqfPostponeReasonOptions = computed(() => [
+  { value: 'interrupted_by_other_customers', label: t('requestDetail.lqfTask.postponeReason.options.interruptedByOtherCustomers') },
+  { value: 'in_a_test_drive', label: t('requestDetail.lqfTask.postponeReason.options.inATestDrive') },
+  { value: 'checking_inventory', label: t('requestDetail.lqfTask.postponeReason.options.checkingInventory') },
+  { value: 'reviewing_lead_info', label: t('requestDetail.lqfTask.postponeReason.options.reviewingLeadInfo') },
+  { value: 'scheduled_for_later', label: t('requestDetail.lqfTask.postponeReason.options.scheduledForLater') }
+])
 
 const leadRef = computed(() => (props.request?.type === 'lead' ? props.request : null))
 const { showTeaser: lqfShowTeaser, teaserLine: lqfTeaserLine } = useLeadLqTeaser(leadRef)
@@ -561,12 +567,6 @@ watch(
     mainTab.value = 'overview'
   }
 )
-
-const mergeDuplicateSummary = computed(() => {
-  const d = duplicateToMerge.value
-  if (!d) return ''
-  return getVehicleSummary(d)
-})
 
 const activityAuthor = computed(() => userStore.currentUser?.name || 'You')
 
@@ -941,35 +941,6 @@ async function handleActivityAppointmentSave(data) {
     showAppointmentModal.value = false
   } catch (err) {
     console.error('Error saving appointment:', err)
-  }
-}
-
-function handleMergeClick(duplicate) {
-  duplicateToMerge.value = duplicate
-  showMergeModal.value = true
-}
-
-async function handleMergeConfirm(payload) {
-  const master = payload?.master ?? props.request
-  const toMerge = payload?.toMerge ?? duplicateToMerge.value
-  if (!master?.id || !toMerge) return
-  mergeLoading.value = true
-  try {
-    await mergeRequestIntoPrimary(master, toMerge)
-    toastStore.pushToast('success', 'Duplicate merged successfully')
-    showMergeModal.value = false
-    duplicateToMerge.value = null
-    if (props.request.type === 'lead') {
-      await leadsStore.fetchLeadById(props.request.id)
-      leadsStore.fetchLeads()
-    } else {
-      await opportunitiesStore.fetchOpportunityById(props.request.id)
-      opportunitiesStore.fetchOpportunities()
-    }
-  } catch (err) {
-    toastStore.pushToast('error', 'Failed to merge duplicate')
-  } finally {
-    mergeLoading.value = false
   }
 }
 

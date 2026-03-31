@@ -1,5 +1,5 @@
 export const mockUsers = [
-  { id: 1, name: 'Salsabeel Khaleel', initials: 'SK', role: 'manager', email: 'salsabeel.khaleel@example.com', team: 'BDC', teamId: 1, dealership: 'Milano' },
+  { id: 1, name: 'Maciej Ogonowski', initials: 'MO', role: 'manager', email: 'maciej.ogonowski@example.com', team: 'BDC', teamId: 1, dealership: 'Milano' },
   { id: 2, name: 'Sarah Jenkins', initials: 'SJ', role: 'salesman', email: 'sarah.jenkins@example.com', team: 'Sales (New)', teamId: 5, dealership: 'Milano' },
   { id: 3, name: 'David Miller', initials: 'DM', role: 'operator', email: 'david.miller@example.com', team: 'Service', teamId: 4, dealership: 'Firenze' },
   { id: 4, name: 'Natalia Sung', initials: 'NS', role: 'operator', email: 'natalia.sung@example.com', team: 'Sales (New)', teamId: 10, dealership: 'Bari' },

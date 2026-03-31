@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="suggestedAction"
-    class="overflow-hidden p-4 rounded-lg border border-border bg-background shadow-nsc-card flex items-center gap-2.5"
+    class="overflow-hidden p-4 rounded-lg bg-background shadow-nsc-card flex items-center gap-2.5"
   >
     <div
       class="w-7 h-7 rounded-md shrink-0 flex items-center justify-center bg-yellow-100"

@@ -4,7 +4,7 @@ import { ref, computed } from 'vue'
 const STORAGE_KEY = 'projectultra_settings'
 
 // Default settings values
-const DEFAULT_SETTINGS = {
+export const DEFAULT_SETTINGS = {
   // Opportunity Task Widget Thresholds
   oofbMinDays: 7,
   oofbMaxDays: 13,
@@ -77,13 +77,16 @@ const DEFAULT_SETTINGS = {
     home: true,
     tasks: true,
     requests: true,
+    afterSales: true,
+    conversations: true,
     customers: true,
     calendar: true,
     reports: true,
     lists: true,
     search: true,
-    language: true
-    // Note: Settings is always visible
+    language: true,
+    marketing: true,
+    support: true
   },
   
   // PDF Generation Defaults

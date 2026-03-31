@@ -1,46 +1,14 @@
 <template>
-  <SidebarMenu>
-    <SidebarMenuItem v-if="navigationVisibility.search !== false">
-      <SidebarMenuButton as-child :tooltip="t('common.buttons.search')">
-        <button
-          type="button"
-          class="flex min-w-0 w-full items-center gap-2"
-          @click="showSearchModal = true"
-        >
-          <Search class="size-4 shrink-0" />
-          <span class="truncate group-data-[collapsible=icon]:hidden">{{
-            t('common.buttons.search')
-          }}</span>
-        </button>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-
-    <SidebarMenuItem v-if="userStore.canAccessSettings()">
-      <SidebarMenuButton
-        as-child
-        :is-active="isActive(settingsPath)"
-        :tooltip="t('common.navigation.settings')"
-      >
-        <RouterLink :to="settingsPath" class="flex min-w-0 w-full items-center gap-2">
-          <Settings class="size-4 shrink-0" />
-          <span class="truncate group-data-[collapsible=icon]:hidden">{{
-            t('common.navigation.settings')
-          }}</span>
-        </RouterLink>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  </SidebarMenu>
-
-  <div class="w-full px-2 pb-2 pt-2">
+  <div class="w-full py-2">
     <div class="relative" v-click-outside="() => (showUserMenu = false)">
       <button
         type="button"
         @click.stop="toggleUserMenu"
-        class="relative flex w-full items-center gap-3 rounded-md px-2 py-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent focus-visible:ring-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0"
+        class="relative flex h-10 w-full items-center gap-2 rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent focus-visible:ring-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0"
         :aria-label="t('common.layout.userMenu')"
       >
         <div
-          class="user-avatar user-avatar-logo rounded-full flex items-center justify-center font-medium text-sidebar-foreground shrink-0 bg-sidebar-accent"
+          class="user-avatar-logo rounded-full flex items-center justify-center font-medium shrink-0 bg-orange-50 text-orange-600"
         >
           {{ userInitials }}
         </div>
@@ -136,19 +104,6 @@
     </div>
   </div>
 
-  <div class="group-data-[collapsible=icon]:hidden w-full px-2 pb-2 shrink-0">
-    <button
-      type="button"
-      class="flex w-full items-center gap-3 rounded-md border border-sidebar-border bg-transparent px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-    >
-      <div class="min-w-0 flex-1 text-left">
-        <div class="truncate text-sm font-semibold">COMO</div>
-        <div class="truncate text-xs text-muted-foreground">Paris</div>
-      </div>
-      <ChevronDown :size="16" class="shrink-0 text-muted-foreground" />
-    </button>
-  </div>
-
   <FloatingSearchModal
     :show="showSearchModal"
     @close="handleCloseSearchModal"
@@ -158,24 +113,9 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { RouterLink, useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import {
-  Search,
-  Settings,
-  Shield,
-  User,
-  Headphones,
-  Moon,
-  Sun,
-  LogOut,
-  ChevronDown
-} from 'lucide-vue-next'
-import {
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton
-} from '@motork/component-library/future/primitives'
+import { Shield, User, Headphones, Moon, Sun, LogOut, ChevronDown } from 'lucide-vue-next'
 import { useLayoutStore } from '@/stores/layout'
 import { useUserStore } from '@/stores/user'
 import { useSettingsStore } from '@/stores/settings'
@@ -183,14 +123,12 @@ import { useTheme } from '@/composables/useTheme'
 import FloatingSearchModal from '@/components/shared/FloatingSearchModal.vue'
 
 const router = useRouter()
-const route = useRoute()
 const { locale, t } = useI18n()
 const layoutStore = useLayoutStore()
 const userStore = useUserStore()
 const settingsStore = useSettingsStore()
 const { isDark, toggleTheme } = useTheme()
 
-const settingsPath = '/settings'
 const navigationVisibility = computed(() => settingsStore.getSetting('navigationVisibility') || {})
 
 const showUserMenu = ref(false)
@@ -234,10 +172,6 @@ const languages = [
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'nl', name: 'Nederlands', flag: '🇳🇱' }
 ]
-
-function isActive(path) {
-  return route.path.startsWith(path)
-}
 
 function changeLanguage(langCode) {
   locale.value = langCode

@@ -6,13 +6,25 @@
     "home": "Accueil",
     "tasks": "Tâches",
     "requests": "Demandes",
-    "customers": "Clients",
+    "sales": "Sales",
+    "afterSales": "Service",
+    "conversations": "Conversations",
+    "customers": "Contacts",
     "calendar": "Calendrier",
     "reports": "Rapports",
     "settings": "Paramètres",
     "vehicles": "Véhicules",
-    "addNew": "Ajouter Nouveau",
-    "addNewCustomer": "Ajouter Nouveau Client"
+    "addNew": "Ajouter",
+    "addNewCustomer": "Ajouter Nouveau Client",
+    "marketing": "Marketing",
+    "support": "Support",
+    "groups": {
+      "data": "Données",
+      "actions": "Actions"
+    }
+  },
+  "pages": {
+    "comingSoon": "Coming soon"
   },
   "layout": {
     "openSidebar": "Ouvrir la barre latérale",
