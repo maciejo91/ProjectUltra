@@ -3,7 +3,7 @@
     class="sticky top-0 z-30 flex shrink-0 flex-col border-b border-border bg-background"
   >
     <div
-      class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 w-full min-w-0 px-4 pt-1.5 pb-1.5"
+      class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 w-full min-w-0 px-2 pt-1.5 pb-1.5 md:px-4"
     >
       <div class="flex min-w-0 flex-1">
         <div class="flex flex-col min-w-0 flex-1 space-y-0">

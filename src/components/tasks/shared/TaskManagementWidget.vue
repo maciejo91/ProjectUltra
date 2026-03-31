@@ -13,7 +13,7 @@
     </div>
 
     <!-- Content: no inner white card so action cards are not rendered inside a card -->
-    <div class="flex flex-col pt-2 px-4 pb-2">
+    <div class="flex flex-col pt-2 px-2 pb-2 min-[600px]:px-4">
       <slot name="threshold-banner" />
       <slot name="deadline-banner" />
       <div class="space-y-6">

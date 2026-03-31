@@ -222,12 +222,19 @@ body,
     0 24px 24px -12px rgba(14, 63, 126, 0.04) !important;
 }
 
-/* Expanded cards below main card: same top space and horizontal padding everywhere */
+/* Expanded cards below main card: tight horizontal padding on narrow viewports (see TaskManagementWidget px-2 <600px) */
 .mk-expanded-cards-area {
   padding-top: 1rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: 0;
+  padding-right: 0;
   padding-bottom: 1rem;
+}
+
+@media (min-width: 600px) {
+  .mk-expanded-cards-area {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 
 /* ========================================

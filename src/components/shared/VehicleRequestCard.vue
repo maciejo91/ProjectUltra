@@ -2,20 +2,33 @@
   <div
     class="flex flex-col gap-4 overflow-hidden rounded-lg bg-background p-4 shadow-nsc-card"
   >
-    <div class="flex w-full items-center gap-2">
+    <div class="flex w-full min-w-0 items-center gap-2">
       <h3 class="min-w-0 flex-1 text-base font-medium leading-6 text-foreground">
         {{ displayHeading }}
       </h3>
-      <Button
-        v-if="!isEditing"
-        variant="secondary"
-        size="icon-sm"
-        class="shrink-0 rounded-md"
-        :aria-label="t('requestDetail.vehicleCard.editAria')"
-        @click="startEditing"
-      >
-        <Pencil class="size-4 text-muted-foreground" />
-      </Button>
+      <div class="flex shrink-0 items-center gap-1">
+        <Button
+          v-if="!isEditing && showLandingRow"
+          type="button"
+          variant="outline"
+          size="small"
+          class="h-7 shrink-0 gap-1 rounded-md px-2 text-xs font-medium"
+          @click="handleVisitLanding"
+        >
+          {{ t('requestDetail.vehicleCard.visit') }}
+          <ArrowUpRight class="size-3" />
+        </Button>
+        <Button
+          v-if="!isEditing"
+          variant="secondary"
+          size="icon-sm"
+          class="shrink-0 rounded-md"
+          :aria-label="t('requestDetail.vehicleCard.editAria')"
+          @click="startEditing"
+        >
+          <Pencil class="size-4 text-muted-foreground" />
+        </Button>
+      </div>
     </div>
 
     <template v-if="!isEditing">
@@ -131,24 +144,6 @@
             class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
             >{{ mileageDetailLine }}</span
           >
-        </div>
-        <div
-          v-if="showLandingRow"
-          class="flex w-full items-center justify-between gap-3"
-        >
-          <span class="shrink-0 text-sm leading-5 text-muted-foreground"
-            >{{ t('requestDetail.vehicleCard.landingPage') }}</span
-          >
-          <Button
-            type="button"
-            variant="outline"
-            size="small"
-            class="h-6 shrink-0 gap-1 rounded-md px-2 text-xs font-medium"
-            @click="handleVisitLanding"
-          >
-            {{ t('requestDetail.vehicleCard.visit') }}
-            <ArrowUpRight class="size-3" />
-          </Button>
         </div>
       </div>
 
