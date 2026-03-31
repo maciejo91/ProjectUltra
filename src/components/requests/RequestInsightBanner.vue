@@ -1,10 +1,17 @@
 <template>
   <div
     v-if="message"
-    class="flex gap-3 rounded-lg border border-border bg-primary/10 px-4 py-3"
+    class="mk-ai-insight-banner flex w-full items-center gap-4 rounded-lg px-4 py-3"
   >
-    <Sparkles class="size-5 shrink-0 text-primary mt-0.5" aria-hidden />
-    <p class="text-sm text-foreground leading-relaxed min-w-0">{{ message }}</p>
+    <Sparkles
+      :size="24"
+      class="mk-sparkles-icon shrink-0 opacity-80"
+      aria-hidden
+      fill="url(#sparkles-gradient)"
+    />
+    <p class="min-w-0 flex-1 text-sm font-medium leading-5 text-foreground">
+      {{ message }}
+    </p>
   </div>
 </template>
 

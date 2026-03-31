@@ -58,6 +58,15 @@
   --nsc-card-shadow: var(--mk-dashboard-card-shadow);
 
   --ai-gradient: linear-gradient(to right, #40B3E9 0%, #8873FF 34%, #FE53A7 64%, #FF8B42 100%);
+  --ai-insight-banner-bg:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(136, 115, 255, 0.12) 33.654%,
+      rgba(254, 83, 167, 0.12) 64.423%,
+      rgba(255, 139, 66, 0.12) 100%
+    ),
+    #ffffff;
 }
 
 @media (max-width: 1024px) {
@@ -193,6 +202,17 @@ body,
 
 .bg-ai-gradient {
   background: var(--ai-gradient);
+}
+
+.mk-ai-insight-banner {
+  background: var(--ai-insight-banner-bg);
+}
+
+.mk-ai-insight-banner .mk-sparkles-icon,
+.mk-ai-insight-banner .mk-sparkles-icon path,
+.mk-ai-insight-banner .mk-sparkles-icon circle {
+  stroke: none !important;
+  stroke-width: 0 !important;
 }
 
 .text-ai-gradient {
