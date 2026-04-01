@@ -150,14 +150,12 @@
         <div v-else-if="!successState" class="space-y-4">
             <div>
             <p class="text-sm font-medium text-foreground leading-normal mb-3">What's the outcome?</p>
-            <div
-              class="outcome-toggle-group flex w-full flex-col gap-3 min-[600px]:grid min-[600px]:grid-cols-3 min-[600px]:gap-3"
-            >
+            <div class="outcome-toggle-group grid grid-cols-3 gap-3">
               <Toggle
                 variant="outline"
                 :model-value="selectedOutcome === 'answer'"
                 @update:model-value="(p) => selectOutcome(p ? 'answer' : null)"
-                class="outcome-toggle-item h-10 min-w-0 w-full max-[599px]:justify-center shadow-mk-dashboard-card border-0 text-sm"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
                   <Phone :size="14" class="text-muted-foreground" />
@@ -168,7 +166,7 @@
                 variant="outline"
                 :model-value="selectedOutcome === 'no-answer'"
                 @update:model-value="(p) => selectOutcome(p ? 'no-answer' : null)"
-                class="outcome-toggle-item h-10 min-w-0 w-full max-[599px]:justify-center shadow-mk-dashboard-card border-0 text-sm"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
                   <PhoneOff :size="14" class="text-muted-foreground" />
@@ -179,7 +177,7 @@
                 variant="outline"
                 :model-value="selectedOutcome === 'not-valid'"
                 @update:model-value="(p) => selectOutcome(p ? 'not-valid' : null)"
-                class="outcome-toggle-item h-10 min-w-0 w-full max-[599px]:justify-center shadow-mk-dashboard-card border-0 text-sm"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
                   <X :size="14" class="text-muted-foreground" />
@@ -192,12 +190,12 @@
           <!-- What's next? (when outcome is no-answer or answer) -->
           <div v-if="selectedOutcome === 'no-answer'" class="space-y-2">
             <p class="text-sm font-medium text-foreground leading-normal mb-2">What's next?</p>
-            <div class="outcome-toggle-group flex w-full flex-col gap-3">
+            <div class="outcome-toggle-group grid grid-cols-2 gap-3 w-4/5">
               <Toggle
                 variant="outline"
                 :model-value="selectedNextStep === 'postpone'"
                 @update:model-value="(p) => setNextStep(p ? 'postpone' : null)"
-                class="outcome-toggle-item h-10 min-w-0 w-full justify-center shadow-mk-dashboard-card border-0 text-sm"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <Clock :size="14" class="shrink-0 text-muted-foreground" />
                 <span>Postpone</span>
@@ -206,7 +204,7 @@
                 variant="outline"
                 :model-value="selectedNextStep === 'close-lead'"
                 @update:model-value="(p) => setNextStep(p ? 'close-lead' : null)"
-                class="outcome-toggle-item h-10 min-w-0 w-full justify-center shadow-mk-dashboard-card border-0 text-sm"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <X :size="14" class="shrink-0 text-muted-foreground" />
                 <span>Close</span>
@@ -215,12 +213,12 @@
           </div>
           <div v-if="selectedOutcome === 'answer'" class="space-y-2 w-full">
             <p class="text-sm font-medium text-foreground leading-normal mb-2">What's next?</p>
-            <div class="outcome-toggle-group flex w-full flex-col gap-3">
+            <div class="outcome-toggle-group grid grid-cols-3 gap-3 w-4/5">
               <Toggle
                 variant="outline"
                 :model-value="selectedNextStep === 'interested'"
                 @update:model-value="(p) => setNextStep(p ? 'interested' : null)"
-                class="outcome-toggle-item h-10 min-w-0 w-full justify-center shadow-mk-dashboard-card border-0 text-sm"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <ThumbsUp :size="14" class="shrink-0 text-muted-foreground" />
                 <span>Interested</span>
@@ -229,7 +227,7 @@
                 variant="outline"
                 :model-value="selectedNextStep === 'not-interested'"
                 @update:model-value="(p) => setNextStep(p ? 'not-interested' : null)"
-                class="outcome-toggle-item h-10 min-w-0 w-full justify-center shadow-mk-dashboard-card border-0 text-sm"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <ThumbsDown :size="14" class="shrink-0 text-muted-foreground" />
                 <span>Not interested</span>
@@ -238,7 +236,7 @@
                 variant="outline"
                 :model-value="selectedNextStep === 'postpone'"
                 @update:model-value="(p) => setNextStep(p ? 'postpone' : null)"
-                class="outcome-toggle-item h-10 min-w-0 w-full justify-center shadow-mk-dashboard-card border-0 text-sm"
+                class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <Clock :size="14" class="shrink-0 text-muted-foreground" />
                 <span>Postpone</span>
@@ -263,12 +261,12 @@
               <h5 class="font-semibold text-foreground text-sm mb-4">Send follow-up message</h5>
               
               <!-- Channel Selection -->
-              <div class="followup-channel-toggle-group mb-4 flex w-full flex-col gap-2">
+              <div class="followup-channel-toggle-group flex flex-wrap gap-2 mb-4">
                 <Toggle
                   variant="outline"
                   :model-value="followupChannel === 'whatsapp'"
                   @update:model-value="(p) => p && setFollowupChannel('whatsapp')"
-                  class="followup-toggle-item w-full justify-center"
+                  class="followup-toggle-item"
                 >
                   <MessageCircle class="w-3 h-3 shrink-0" />
                   <span>WhatsApp</span>
@@ -277,7 +275,7 @@
                   variant="outline"
                   :model-value="followupChannel === 'sms'"
                   @update:model-value="(p) => p && setFollowupChannel('sms')"
-                  class="followup-toggle-item w-full justify-center"
+                  class="followup-toggle-item"
                 >
                   <MessageCircle class="w-3 h-3 shrink-0" />
                   <span>SMS</span>
@@ -286,7 +284,7 @@
                   variant="outline"
                   :model-value="followupChannel === 'email'"
                   @update:model-value="(p) => p && setFollowupChannel('email')"
-                  class="followup-toggle-item w-full justify-center"
+                  class="followup-toggle-item"
                 >
                   <Mail class="w-3 h-3 shrink-0" />
                   <span>Email</span>
@@ -295,7 +293,7 @@
                   variant="outline"
                   :model-value="followupChannel === 'dont-send'"
                   @update:model-value="(p) => p && setFollowupChannel('dont-send')"
-                  class="followup-toggle-item w-full justify-center"
+                  class="followup-toggle-item"
                 >
                   <X class="w-3 h-3 shrink-0" />
                   <span>Don't send</span>
@@ -335,12 +333,12 @@
             <!-- Next call attempt -->
             <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
               <h5 class="font-semibold text-foreground text-sm mb-4">Next call attempt</h5>
-              <div class="reschedule-toggle-group flex w-full flex-col gap-2">
+              <div class="reschedule-toggle-group flex flex-wrap gap-2">
                 <Toggle
                   variant="outline"
                   :model-value="rescheduleTime === 'tomorrow-9am'"
                   @update:model-value="(p) => p && setRescheduleTime('tomorrow-9am')"
-                  class="followup-toggle-item w-full justify-center"
+                  class="followup-toggle-item"
                 >
                   Tomorrow 9:00 AM
                 </Toggle>
@@ -348,7 +346,7 @@
                   variant="outline"
                   :model-value="rescheduleTime === 'monday'"
                   @update:model-value="(p) => p && setRescheduleTime('monday')"
-                  class="followup-toggle-item mk-ai-mode-active-toggle w-full justify-center"
+                  class="followup-toggle-item mk-ai-mode-active-toggle"
                 >
                   <Sparkles
                     :size="14"
@@ -363,7 +361,7 @@
                   variant="outline"
                   :model-value="rescheduleTime === 'custom'"
                   @update:model-value="(p) => p && setRescheduleTime('custom')"
-                  class="followup-toggle-item w-full justify-center"
+                  class="followup-toggle-item"
                 >
                   Select time
                 </Toggle>
@@ -899,13 +897,9 @@
         </div>
         
         <!-- Unified Action Buttons at Bottom Right of Gray Wrapper (hidden for Answer + Postpone; buttons appear below postpone card) -->
-        <div
-          v-if="hasActiveOutcomeSelection && !successState && !(selectedOutcome === 'answer' && selectedNextStep === 'postpone')"
-          class="flex w-full flex-col gap-2 pt-3 sm:flex-row sm:flex-wrap sm:justify-end"
-        >
+        <div v-if="hasActiveOutcomeSelection && !successState && !(selectedOutcome === 'answer' && selectedNextStep === 'postpone')" class="flex justify-end gap-2 pt-3 flex-wrap">
           <Button
             variant="secondary"
-            class="w-full rounded-sm sm:w-auto"
             @click="cancelOutcome"
           >
             Cancel
@@ -913,8 +907,8 @@
           <Button
             variant="primary"
             :disabled="!canConfirmAction"
-            class="w-full rounded-sm bg-primary text-white sm:w-auto"
             @click="handleConfirmAction"
+            class="bg-primary text-white"
           >
             {{ actionButtonLabel }}
           </Button>
@@ -924,12 +918,12 @@
         <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'postpone'" ref="postponeBlockRef">
           <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4 w-full">
             <h5 class="font-semibold text-foreground text-sm mb-4">Next call attempt</h5>
-            <div class="reschedule-toggle-group flex w-full flex-col gap-2">
+            <div class="reschedule-toggle-group flex flex-wrap gap-2">
               <Toggle
                 variant="outline"
                 :model-value="rescheduleTime === 'tomorrow-9am'"
                 @update:model-value="(p) => p && setRescheduleTime('tomorrow-9am')"
-                class="followup-toggle-item w-full justify-center"
+                class="followup-toggle-item"
               >
                 Tomorrow 9:00 AM
               </Toggle>
@@ -937,7 +931,7 @@
                 variant="outline"
                 :model-value="rescheduleTime === 'monday'"
                 @update:model-value="(p) => p && setRescheduleTime('monday')"
-                class="followup-toggle-item mk-ai-mode-active-toggle w-full justify-center"
+                class="followup-toggle-item mk-ai-mode-active-toggle"
               >
                 <Sparkles
                   :size="14"
@@ -952,7 +946,7 @@
                 variant="outline"
                 :model-value="rescheduleTime === 'custom'"
                 @update:model-value="(p) => p && setRescheduleTime('custom')"
-                class="followup-toggle-item w-full justify-center"
+                class="followup-toggle-item"
               >
                 Select time
               </Toggle>

@@ -38,7 +38,7 @@
       <!-- Left: Tabs and Content -->
       <div class="flex-1 flex flex-col overflow-hidden min-w-0">
         <!-- Content area with feed -->
-        <main class="flex-1 overflow-y-auto px-2 py-4 md:px-8 md:py-8 scrollbar-hide bg-muted">
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide bg-muted">
           <!-- Tabs -->
           <div class="mb-4 -mt-1 pb-2">
             <Tabs 

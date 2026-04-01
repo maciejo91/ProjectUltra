@@ -100,23 +100,23 @@
 
     <div
       v-if="showAssociatedTasksOrTimeline"
-      class="flex min-h-0 w-full flex-1 flex-col overflow-y-auto px-2 py-4 md:px-4 lg:overflow-hidden"
+      class="flex min-h-0 w-full flex-1 flex-col overflow-y-auto p-4 lg:overflow-hidden"
     >
       <div
-        class="flex min-h-0 flex-1 flex-col gap-4 lg:grid lg:grid-cols-3 lg:items-start lg:gap-4 lg:overflow-hidden"
+        class="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-4 lg:overflow-hidden"
       >
         <div
-          class="max-lg:contents lg:col-span-2 lg:row-start-1 lg:row-span-2 lg:flex lg:min-h-0 lg:flex-col lg:gap-4 lg:overflow-y-auto"
+          class="order-1 flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
         >
           <RequestLeadProfileSection
             v-if="request"
-            class="order-1 shrink-0"
+            class="shrink-0"
             :request="request"
             @quick-action="handleQuickAction"
           />
 
           <div
-            class="order-4 flex min-w-0 flex-col rounded-lg bg-background shadow-mk-dashboard-card lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+            class="flex min-w-0 flex-col rounded-lg bg-background shadow-mk-dashboard-card"
           >
             <RequestMainTabs class="shrink-0" v-model="mainTab" :tabs="mainTabs" />
 
@@ -275,11 +275,10 @@
         </div>
 
         <div
-          class="max-lg:contents lg:col-span-1 lg:row-start-1 lg:row-span-2 lg:flex lg:min-h-0 lg:flex-col lg:gap-4 lg:self-start lg:overflow-y-auto lg:sticky lg:top-0"
+          class="order-2 flex min-w-0 flex-col gap-4 lg:sticky lg:top-0 lg:w-1/3 lg:shrink-0 lg:self-start lg:overflow-y-auto"
         >
           <VehicleRequestCard
             v-if="request && (request.requestedCar || request.vehicle)"
-            class="order-2 shrink-0"
             :heading="t('requestDetail.vehicleCard.title')"
             :vehicle="request.requestedCar || request.vehicle"
             :request-message="request.requestMessage || request.requestedCar?.requestMessage"
@@ -293,7 +292,6 @@
           />
           <RequestMessageCard
             v-if="request && (request.requestMessage || request.requestedCar?.requestMessage)"
-            class="order-3 shrink-0"
             :title="t('requestDetail.messageCard.title')"
             :message="request.requestMessage || request.requestedCar?.requestMessage"
           />
