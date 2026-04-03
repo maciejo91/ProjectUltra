@@ -58,7 +58,7 @@
               <div v-else class="rounded-lg border border-border bg-muted py-12 text-center">
                 <Search class="mx-auto mb-3 size-10 text-muted-foreground" />
                 <p class="text-sm font-medium text-foreground">No vehicles found</p>
-                <p class="text-xs text-muted-foreground mt-1">Try different keywords or clear the search</p>
+                <p class="text-sm text-muted-foreground mt-1">Try different keywords or clear the search</p>
               </div>
             </div>
           </template>

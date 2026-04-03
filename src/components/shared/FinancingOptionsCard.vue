@@ -20,7 +20,7 @@
         @click="$emit('open-edit', f)"
       >
         <span class="font-medium text-foreground">{{ f.label }}</span>
-        <span v-if="f.termMonths" class="text-muted-foreground shrink-0 text-xs">{{ f.termMonths }} months</span>
+        <span v-if="f.termMonths" class="text-muted-foreground shrink-0 text-sm">{{ f.termMonths }} months</span>
       </li>
     </ul>
   </div>

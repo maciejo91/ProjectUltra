@@ -15,10 +15,10 @@ defineEmits(['click'])
     :class="event.cssClass || 'calendar-event-other'"
     @click="$emit('click', event.id)"
   >
-    <p class="text-xs sm:text-sm font-semibold text-foreground truncate">
+    <p class="text-sm sm:text-sm font-semibold text-foreground truncate">
       {{ event.title }}
     </p>
-    <p v-if="event.location" class="text-xs text-muted-foreground truncate">
+    <p v-if="event.location" class="text-sm text-muted-foreground truncate">
       {{ event.location }}
     </p>
   </button>

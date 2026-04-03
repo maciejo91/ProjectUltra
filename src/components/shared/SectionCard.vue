@@ -3,7 +3,7 @@
     <CardHeader class="border-b border-border bg-muted/50 p-4">
       <div class="flex justify-between items-center">
         <div class="flex items-center gap-2">
-          <i v-if="icon" :class="[icon, 'text-muted-foreground text-xs']"></i>
+          <i v-if="icon" :class="[icon, 'text-muted-foreground text-sm']"></i>
           <CardTitle class="text-sm font-medium text-foreground">{{ title }}</CardTitle>
           <Badge
             v-if="count !== undefined && count > 0"

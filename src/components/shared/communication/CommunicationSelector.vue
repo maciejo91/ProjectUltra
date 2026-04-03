@@ -7,7 +7,7 @@
         <button
           v-if="showEmail"
           @click="selectChannel('email')"
-          class="flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all"
+          class="flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-all"
           :class="selectedChannel === 'email' ? 'border-green-600 bg-muted text-foreground' : 'border-D1D5DB bg-white text-muted-foreground hover:border-brand-dark/30'"
         >
           <Mail class="w-3 h-3 shrink-0" />
@@ -17,7 +17,7 @@
         <button
           v-if="showSMS"
           @click="selectChannel('sms')"
-          class="flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all"
+          class="flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-all"
           :class="selectedChannel === 'sms' ? 'border-green-600 bg-muted text-foreground' : 'border-D1D5DB bg-white text-muted-foreground hover:border-brand-dark/30'"
         >
           <MessageSquare class="w-3 h-3 shrink-0" />
@@ -27,7 +27,7 @@
         <button
           v-if="showWhatsApp"
           @click="selectChannel('whatsapp')"
-          class="flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all"
+          class="flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-all"
           :class="selectedChannel === 'whatsapp' ? 'border-green-600 bg-muted text-foreground' : 'border-D1D5DB bg-white text-muted-foreground hover:border-brand-dark/30'"
         >
           <MessageCircle class="w-3 h-3 shrink-0" />
@@ -37,7 +37,7 @@
         <button
           v-if="showDontSend"
           @click="selectChannel('dont-send')"
-          class="flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all"
+          class="flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-all"
           :class="selectedChannel === 'dont-send' ? 'border-green-600 bg-muted text-foreground' : 'border-D1D5DB bg-white text-muted-foreground hover:border-brand-dark/30'"
         >
           <X class="w-3 h-3 shrink-0" />

@@ -60,7 +60,7 @@
             <template #batch-action-bar>
               <div v-if="hasSelection" class="flex items-center gap-2">
                 <div class="flex items-center gap-2 mr-1">
-                  <div class="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-blue-600 text-white text-xs font-medium">
+                  <div class="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-blue-600 text-white text-sm font-medium">
                     {{ selectedCount }}
                   </div>
                   <span class="text-white text-fluid-sm font-medium whitespace-nowrap">Items selected</span>
@@ -307,7 +307,7 @@ const columns = computed(() => {
       }
       const dotClass = getUrgencyDotClass(task.urgencyLevel)
       return h('span', {
-        class: 'inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none'
+        class: 'inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground leading-none'
       }, [
         h('span', { class: ['shrink-0 rounded-full size-2', dotClass].join(' '), 'aria-hidden': 'true' }),
         task.urgencyLevel
@@ -353,12 +353,12 @@ const columns = computed(() => {
         const pillClass = status.type === 'overdue' ? 'mk-due-pill-overdue' : (status.type === 'urgent' || status.type === 'today' ? 'mk-due-pill-urgent' : 'mk-due-pill-normal')
         const text = formatDueDateRelative(date)
         parts.push(h('span', {
-          class: `inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium uppercase leading-none ${pillClass}`
+          class: `inline-flex items-center gap-1 px-2 py-0.5 rounded text-sm font-medium uppercase leading-none ${pillClass}`
         }, text))
       }
       if (hasRecall) {
         parts.push(h('span', {
-          class: 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium uppercase leading-none bg-blue-50 text-blue-700 ml-1'
+          class: 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-sm font-medium uppercase leading-none bg-blue-50 text-blue-700 ml-1'
         }, [h('span', { class: 'shrink-0 rounded-full size-1.5 bg-blue-500', 'aria-hidden': 'true' }), 'Recall']))
       }
       return h('div', { class: 'flex flex-wrap items-center gap-1' }, parts)
@@ -388,7 +388,7 @@ const columns = computed(() => {
       const task = row.original
       const typeClass = task.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'
       return h('span', {
-        class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${typeClass} w-fit`
+        class: `inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold ${typeClass} w-fit`
       }, task.type === 'lead' ? 'Lead' : 'Opportunity')
     }
   },
@@ -403,7 +403,7 @@ const columns = computed(() => {
       const stageClass = props.getStageBadgeClass(displayStage)
       return displayStage
         ? h('span', {
-            class: `inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${stageClass} w-fit`
+            class: `inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold ${stageClass} w-fit`
           }, displayStage)
         : h('span', { class: 'text-meta' }, '—')
     }
@@ -440,7 +440,7 @@ const columns = computed(() => {
       const vehicle = task.type === 'lead' ? task.requestedCar : (task.vehicle || task.requestedCar)
       const vin = vehicle?.vin ?? task.requestedCar?.vin
       if (!vin) return h('span', { class: 'text-meta' }, '—')
-      return h('div', { class: 'text-meta text-xs truncate font-mono min-w-0' }, vin)
+      return h('div', { class: 'text-meta text-sm truncate font-mono min-w-0' }, vin)
     }
   },
   {
@@ -500,7 +500,7 @@ const columns = computed(() => {
             'stroke-dashoffset': offset
           })
         ]),
-        h('span', { class: 'mk-attempts-progress-text text-xs font-medium text-foreground' }, `${attempts}/${max}`)
+        h('span', { class: 'mk-attempts-progress-text text-sm font-medium text-foreground' }, `${attempts}/${max}`)
       ])
     }
   },
@@ -517,7 +517,7 @@ const columns = computed(() => {
       return h('div', { class: 'flex flex-col gap-1 min-w-0' }, [
         h('span', { class: 'text-meta' }, `${main}${details}`.trim()),
         ...(badge ? [h('span', {
-          class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700 w-fit'
+          class: 'inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold bg-emerald-100 text-emerald-700 w-fit'
         }, badge)] : [])
       ])
     }
@@ -548,7 +548,7 @@ const columns = computed(() => {
       const statusClass = status === 'overdue' ? 'mk-task-status-overdue' : (status === 'in_progress' ? 'mk-task-status-in-progress' : 'mk-task-status-open')
       const icon = status === 'overdue' ? h(Triangle, { class: 'shrink-0 size-3.5', 'aria-hidden': 'true' }) : h(Circle, { class: 'shrink-0 size-3.5', 'aria-hidden': 'true' })
       return h('span', {
-        class: `inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold ${statusClass} w-fit`
+        class: `inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-sm font-semibold ${statusClass} w-fit`
       }, [icon, labels[status]])
     }
   }

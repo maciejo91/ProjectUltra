@@ -66,7 +66,7 @@
             <template #owner="{ item: task }">
               <template v-if="task.assignee">
                 <div class="flex items-center gap-2">
-                  <div class="w-3 h-3 rounded-full bg-black text-white font-medium flex items-center justify-center text-xs shrink-0" style="font-size: 0.5rem;">{{ getAssigneeInitials(task.assignee) }}</div>
+                  <div class="w-3 h-3 rounded-full bg-black text-white font-medium flex items-center justify-center text-sm shrink-0" style="font-size: 0.5rem;">{{ getAssigneeInitials(task.assignee) }}</div>
                   <span class="text-gray-600 font-medium">{{ task.assignee }}</span>
                 </div>
               </template>
@@ -175,7 +175,7 @@
           <template #owner="{ item: task }">
             <template v-if="task.assignee">
               <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-black text-white font-medium flex items-center justify-center text-xs shrink-0" style="font-size: 0.5rem;">{{ getAssigneeInitials(task.assignee) }}</div>
+                <div class="w-3 h-3 rounded-full bg-black text-white font-medium flex items-center justify-center text-sm shrink-0" style="font-size: 0.5rem;">{{ getAssigneeInitials(task.assignee) }}</div>
                 <span class="text-gray-600 font-medium">{{ task.assignee }}</span>
               </div>
             </template>

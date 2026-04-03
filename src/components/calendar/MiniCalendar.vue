@@ -83,7 +83,7 @@ const selectDate = (date) => {
       <span
         v-for="label in daysOfWeek"
         :key="label"
-        class="text-xs font-medium text-muted-foreground py-1"
+        class="text-sm font-medium text-muted-foreground py-1"
       >
         {{ label }}
       </span>
@@ -94,7 +94,7 @@ const selectDate = (date) => {
         v-for="day in gridDays"
         :key="day.date.toISOString()"
         type="button"
-        class="relative flex items-center justify-center py-1.5 rounded-md text-xs cursor-pointer transition-colors min-h-9"
+        class="relative flex items-center justify-center py-1.5 rounded-md text-sm cursor-pointer transition-colors min-h-9"
         :class="[
           day.inCurrentMonth ? 'text-foreground' : 'text-muted-foreground',
           day.isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-muted',

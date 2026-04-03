@@ -1,4 +1,4 @@
-/* ProjectUltra Main CSS - Exceptions only: card shadow, toggle selected, layout vars */
+/* ProjectUltra Main CSS - Exceptions only: card shadow, floating LQ chrome, toggle selected, layout vars */
 
 /* ========================================
    Core Imports
@@ -56,6 +56,13 @@
     0 3px 3px -1.5px rgba(42, 51, 70, 0.04), 0 6px 6px -3px rgba(42, 51, 70, 0.04),
     0 12px 12px -6px rgba(14, 63, 126, 0.04), 0 24px 24px -12px rgba(14, 63, 126, 0.04);
   --nsc-card-shadow: var(--mk-dashboard-card-shadow);
+  /* Floating LQ task card: light from above, soft drop below (calendar / task-card style) */
+  --mk-floating-lq-panel-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.08),
+    0 6px 20px rgba(15, 23, 42, 0.11),
+    0 18px 44px rgba(15, 23, 42, 0.13);
+  --mk-floating-lq-chrome-start: #2a3540;
+  --mk-floating-lq-chrome-end: #1e2832;
 
   --ai-gradient: linear-gradient(to right, #40B3E9 0%, #8873FF 34%, #FE53A7 64%, #FF8B42 100%);
   --ai-insight-banner-bg:
@@ -173,7 +180,7 @@ body,
   --vuecal-event-border: transparent;
   --vuecal-event-text-color: var(--foreground);
 }
-.vuecal-theme-project .vuecal__event { border-radius: 0.375rem; font-size: var(--text-xs); }
+.vuecal-theme-project .vuecal__event { border-radius: 0.375rem; font-size: var(--text-sm, 0.875rem); }
 .vuecal-theme-project .vuecal__heading { background: var(--muted); color: var(--muted-foreground); }
 .vuecal-theme-project .vuecal__cell { border-color: var(--border); }
 .vuecal-theme-project .vuecal__cell--out-of-scope { background: var(--muted); opacity: 0.6; }
@@ -240,6 +247,19 @@ body,
     0 6px 6px -3px rgba(42, 51, 70, 0.04),
     0 12px 12px -6px rgba(14, 63, 126, 0.04),
     0 24px 24px -12px rgba(14, 63, 126, 0.04) !important;
+}
+
+.shadow-mk-floating-lq-panel {
+  box-shadow: var(--mk-floating-lq-panel-shadow) !important;
+}
+
+.bg-mk-floating-lq-chrome {
+  background-color: var(--mk-floating-lq-chrome-end);
+  background-image: linear-gradient(
+    to bottom right,
+    var(--mk-floating-lq-chrome-start) 0%,
+    var(--mk-floating-lq-chrome-end) 100%
+  );
 }
 
 /* Expanded cards below main card: tight horizontal padding on narrow viewports (see TaskManagementWidget px-2 <600px) */
@@ -434,7 +454,7 @@ label[for] {
 }
 
 .card-caption {
-  font-size: var(--text-xs, 0.75rem);
+  font-size: var(--text-sm, 0.875rem);
   color: var(--muted-foreground);
   margin: 0;
 }
@@ -453,7 +473,7 @@ label[for] {
   line-height: 1.5;
 }
 /* Labels: text-sm (same as .text-content); use .text-content or .form-label for form labels */
-/* Supporting: .text-meta = text-xs, muted */
+/* Supporting: .text-meta = text-sm, muted */
 
 /* ========================================
    Layout Component Classes
@@ -796,7 +816,7 @@ button[aria-pressed="true"]:hover:not(:disabled) {
 .form-label.optional,
 .form-label .optional {
   color: var(--muted-foreground);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm, 0.875rem);
   font-weight: 400;
 }
 
@@ -1107,7 +1127,7 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 /* Extract with AI button (call popup) – compact size, icon in gold */
 .extract-with-ai-btn {
   padding: 0.375rem 0.75rem !important;
-  font-size: var(--text-xs) !important;
+  font-size: var(--text-sm, 0.875rem) !important;
   line-height: 1rem !important;
   min-height: 2rem !important;
   height: auto !important;
@@ -1166,7 +1186,7 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 .data-table-inner thead th,
 .data-table-inner [data-slot="table-container"] thead th,
 .data-table-inner thead [role="columnheader"] {
-  font-size: var(--text-xs, 0.75rem);
+  font-size: var(--text-sm, 0.875rem);
   font-weight: 500;
   color: var(--muted-foreground);
 }
@@ -1177,9 +1197,9 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
   color: var(--foreground);
 }
 
-/* Secondary table cell text (email, meta line): 12–13px, muted */
+/* Secondary table cell text (email, meta line): 14px, muted */
 .text-meta {
-  font-size: var(--text-xs, 0.75rem);
+  font-size: var(--text-sm, 0.875rem);
   color: var(--muted-foreground);
 }
 
@@ -1188,7 +1208,7 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
   font-size: var(--text-sm, 0.875rem);
 }
 .data-table-inner .text-fluid-xs {
-  font-size: var(--text-xs, 0.75rem);
+  font-size: var(--text-sm, 0.875rem);
 }
 
 /* Badge background utilities (use with text-* for full badge styling; all badges borderless) */
@@ -1219,7 +1239,7 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 
 /* Table badges: consistent small semibold label (reinforce theme token size) */
 .data-table-inner span.inline-flex.rounded[class*="px-2"] {
-  font-size: var(--text-xs, 0.75rem);
+  font-size: var(--text-sm, 0.875rem);
   font-weight: 600;
 }
 
@@ -1280,7 +1300,7 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
   align-items: center;
   justify-content: center;
   z-index: 1;
-  font-size: var(--text-xs, 0.75rem);
+  font-size: var(--text-sm, 0.875rem);
   font-weight: 500;
   line-height: 1;
 }

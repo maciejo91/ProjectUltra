@@ -35,7 +35,7 @@
 
           <!-- Salesperson -->
           <div>
-            <Label class="block text-sm font-medium text-muted-foreground mb-1.5">Salesperson <span class="text-muted-foreground text-xs">(optional)</span></Label>
+            <Label class="block text-sm font-medium text-muted-foreground mb-1.5">Salesperson <span class="text-muted-foreground text-sm">(optional)</span></Label>
             <SelectMenu
               v-model="selectedSalesmanId"
               :items="salespersonSelectOptions"

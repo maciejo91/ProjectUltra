@@ -8,7 +8,7 @@
         </DialogHeader>
 
         <div class="flex-1 overflow-y-auto px-6 py-4 w-full">
-          <p class="text-xs text-muted-foreground mb-4">
+          <p class="text-sm text-muted-foreground mb-4">
             Select a user or team to assign:
           </p>
 
@@ -41,7 +41,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <p class="font-medium text-sm text-foreground truncate">{{ item.name }}</p>
-                <p class="text-xs text-muted-foreground truncate capitalize">
+                <p class="text-sm text-muted-foreground truncate capitalize">
                   {{ item.type === 'team' ? t('common.assignee.teamsLabel') : `${item.role} • ${item.email}` }}
                 </p>
               </div>

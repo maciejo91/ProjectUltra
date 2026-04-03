@@ -26,7 +26,7 @@
         maxlength="160"
         class="w-full"
       />
-      <p class="text-xs text-muted-foreground mt-1">{{ message.length }}/160 characters</p>
+      <p class="text-sm text-muted-foreground mt-1">{{ message.length }}/160 characters</p>
     </div>
 
     <div v-if="showActions" class="flex justify-end gap-2">

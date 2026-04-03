@@ -25,29 +25,29 @@
           <Car v-else class="size-3.5 text-muted-foreground" />
         </div>
         <div class="flex-1 min-w-0 flex flex-col gap-1">
-          <div v-if="task.assignee" class="flex items-center gap-1 text-xs text-muted-foreground">
+          <div v-if="task.assignee" class="flex items-center gap-1 text-sm text-muted-foreground">
             <User class="size-3 shrink-0" aria-hidden />
             <span class="truncate">{{ task.assignee }}</span>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
             <span
-              class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
+              class="text-sm font-medium px-1.5 py-0.5 rounded shrink-0"
               :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
             >
               {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
             </span>
             <p class="text-sm font-medium text-foreground truncate">{{ getVehicleDisplay(task) }}</p>
-            <span class="text-xs text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
+            <span class="text-sm text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
             <span
               v-if="task.type === 'opportunity' && (task.value || task.estimatedValue)"
-              class="text-xs font-semibold text-foreground shrink-0"
+              class="text-sm font-semibold text-foreground shrink-0"
             >
               {{ formatCurrency(task.value ?? task.estimatedValue) }}
             </span>
           </div>
         </div>
         <div class="flex items-center gap-1 shrink-0">
-          <span class="text-xs text-muted-foreground whitespace-nowrap">{{ formatTaskDate(task) }}</span>
+          <span class="text-sm text-muted-foreground whitespace-nowrap">{{ formatTaskDate(task) }}</span>
           <ChevronRight class="size-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
         </div>
       </button>
@@ -67,7 +67,7 @@
   <div v-else-if="bare" class="flex-1 min-h-0 overflow-y-auto flex flex-col rounded-lg border border-border bg-background shadow-sm overflow-hidden">
     <div class="px-4 py-3 border-b border-border shrink-0">
       <h4 class="text-sm font-semibold text-foreground">Other requests</h4>
-      <p class="text-xs text-muted-foreground mt-0.5">Same customer</p>
+      <p class="text-sm text-muted-foreground mt-0.5">Same customer</p>
     </div>
     <div v-if="showAddButton && hasCustomer" class="flex justify-end px-4 py-2 border-b border-border shrink-0">
       <Button variant="outline" size="sm" @click="$emit('add-task')">
@@ -89,29 +89,29 @@
           <Car v-else class="size-3.5 text-muted-foreground" />
         </div>
         <div class="flex-1 min-w-0 flex flex-col gap-1">
-          <div v-if="task.assignee" class="flex items-center gap-1 text-xs text-muted-foreground">
+          <div v-if="task.assignee" class="flex items-center gap-1 text-sm text-muted-foreground">
             <User class="size-3 shrink-0" aria-hidden />
             <span class="truncate">{{ task.assignee }}</span>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
             <span
-              class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
+              class="text-sm font-medium px-1.5 py-0.5 rounded shrink-0"
               :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
             >
               {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
             </span>
             <p class="text-sm font-medium text-foreground truncate">{{ getVehicleDisplay(task) }}</p>
-            <span class="text-xs text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
+            <span class="text-sm text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
             <span
               v-if="task.type === 'opportunity' && (task.value || task.estimatedValue)"
-              class="text-xs font-semibold text-foreground shrink-0"
+              class="text-sm font-semibold text-foreground shrink-0"
             >
               {{ formatCurrency(task.value ?? task.estimatedValue) }}
             </span>
           </div>
         </div>
         <div class="flex items-center gap-1 shrink-0">
-          <span class="text-xs text-muted-foreground whitespace-nowrap">{{ formatTaskDate(task) }}</span>
+          <span class="text-sm text-muted-foreground whitespace-nowrap">{{ formatTaskDate(task) }}</span>
           <ChevronRight class="size-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
         </div>
       </button>
@@ -127,7 +127,7 @@
     <CardContent class="p-0 min-w-0 overflow-hidden">
       <div class="px-4 py-3 border-b border-border">
         <h4 class="text-sm font-semibold text-foreground">Other requests</h4>
-        <p class="text-xs text-muted-foreground mt-0.5">Same customer</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Same customer</p>
       </div>
       <div class="divide-y divide-border">
         <button
@@ -143,29 +143,29 @@
             <Car v-else class="size-3.5 text-muted-foreground" />
           </div>
           <div class="flex-1 min-w-0 flex flex-col gap-1">
-            <div v-if="task.assignee" class="flex items-center gap-1 text-xs text-muted-foreground">
+            <div v-if="task.assignee" class="flex items-center gap-1 text-sm text-muted-foreground">
               <User class="size-3 shrink-0" aria-hidden />
               <span class="truncate">{{ task.assignee }}</span>
             </div>
             <div class="flex items-center gap-2 flex-wrap">
               <span
-                class="text-xs font-medium px-1.5 py-0.5 rounded shrink-0"
+                class="text-sm font-medium px-1.5 py-0.5 rounded shrink-0"
                 :class="task.type === 'lead' ? 'bg-badge-green text-emerald-800' : 'bg-purple-50 text-purple-700'"
               >
                 {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
               </span>
               <p class="text-sm font-medium text-foreground truncate">{{ getVehicleDisplay(task) }}</p>
-              <span class="text-xs text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
+              <span class="text-sm text-muted-foreground shrink-0">{{ getTaskStage(task) }}</span>
               <span
                 v-if="task.type === 'opportunity' && (task.value || task.estimatedValue)"
-                class="text-xs font-semibold text-foreground shrink-0"
+                class="text-sm font-semibold text-foreground shrink-0"
               >
                 {{ formatCurrency(task.value ?? task.estimatedValue) }}
               </span>
             </div>
           </div>
           <div class="flex items-center gap-1 shrink-0">
-            <span class="text-xs text-muted-foreground whitespace-nowrap">{{ formatTaskDate(task) }}</span>
+            <span class="text-sm text-muted-foreground whitespace-nowrap">{{ formatTaskDate(task) }}</span>
             <ChevronRight class="size-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
           </div>
         </button>

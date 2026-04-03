@@ -77,6 +77,16 @@
   },
   "schedule": {
     "title": "Planen",
+    "dealership": {
+      "label": "Händler",
+      "placeholder": "Nach Händler filtern",
+      "all": "Alle Händler"
+    },
+    "team": {
+      "label": "Team",
+      "placeholder": "Nach Team filtern",
+      "all": "Alle Teams"
+    },
     "eventType": {
       "label": "Ereignistyp",
       "placeholder": "Ereignistyp auswählen",
@@ -98,7 +108,14 @@
     },
     "timeSlots": {
       "noSlots": "Keine verfügbaren Zeitslots für dieses Datum",
-      "selectDate": "Wählen Sie ein Datum aus, um verfügbare Zeitslots anzuzeigen"
+      "selectDate": "Wählen Sie ein Datum aus, um verfügbare Zeitslots anzuzeigen",
+      "morning": "Vormittag",
+      "afternoon": "Nachmittag"
+    },
+    "slotPopover": {
+      "people": "Personen",
+      "searchPlaceholder": "Nach Name oder Team suchen",
+      "noResults": "Keine Treffer"
     },
     "calendar": {
       "days": ["SO", "MO", "DI", "MI", "DO", "FR", "SA"]

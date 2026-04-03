@@ -77,6 +77,16 @@
   },
   "schedule": {
     "title": "Schedule",
+    "dealership": {
+      "label": "Dealership",
+      "placeholder": "Filter by dealership",
+      "all": "All dealerships"
+    },
+    "team": {
+      "label": "Team",
+      "placeholder": "Filter by team",
+      "all": "All teams"
+    },
     "eventType": {
       "label": "Event type",
       "placeholder": "Select event type",
@@ -98,7 +108,14 @@
     },
     "timeSlots": {
       "noSlots": "No available time slots for this date",
-      "selectDate": "Select a date to see available time slots"
+      "selectDate": "Select a date to see available time slots",
+      "morning": "Morning",
+      "afternoon": "Afternoon"
+    },
+    "slotPopover": {
+      "people": "People",
+      "searchPlaceholder": "Search by name or team",
+      "noResults": "No matches"
     },
     "calendar": {
       "days": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]

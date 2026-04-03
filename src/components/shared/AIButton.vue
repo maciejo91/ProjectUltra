@@ -3,7 +3,7 @@
     :class="[
       'mk-ai-mode-active flex items-center gap-2 rounded-lg',
       (disabled || loading) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
-      size === 'small' ? 'px-3 py-1.5 text-xs' : 'px-4 py-2 text-sm'
+      size === 'small' ? 'px-3 py-1.5 text-sm' : 'px-4 py-2 text-sm'
     ]"
     :disabled="disabled || loading"
     @click="$emit('click', $event)"

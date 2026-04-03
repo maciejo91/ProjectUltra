@@ -67,7 +67,7 @@
               @click="mobileCalendarHeaderActions.onFilters()"
             >
               <Filter class="size-4 shrink-0" />
-              <span v-if="mobileCalendarHeaderActions.activeFilterCount > 0" class="rounded-full bg-primary text-primary-foreground text-xs px-1.5 min-w-4 h-4 flex items-center justify-center">
+              <span v-if="mobileCalendarHeaderActions.activeFilterCount > 0" class="rounded-full bg-primary text-primary-foreground text-sm px-1.5 min-w-4 h-4 flex items-center justify-center">
                 {{ mobileCalendarHeaderActions.activeFilterCount }}
               </span>
             </Button>

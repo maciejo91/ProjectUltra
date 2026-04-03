@@ -15,7 +15,7 @@
         >
           <!-- Type Badge -->
           <div
-            class="absolute top-2 right-2 z-10 text-white text-xs font-bold px-2 py-1 rounded-md shadow-sm"
+            class="absolute top-2 right-2 z-10 text-white text-sm font-bold px-2 py-1 rounded-md shadow-sm"
             :class="getTypeBadgeClass(car.type)"
           >
             {{ getTypeLabel(car.type) }}
@@ -32,10 +32,10 @@
           </div>
           <div class="p-6">
             <h4 class="font-bold text-foreground text-sm mb-1">{{ car.brand }} {{ car.model }} ({{ car.year }})</h4>
-            <p v-if="car.price" class="text-xs text-muted-foreground mb-2">€ {{ formatCurrency(car.price) }}</p>
+            <p v-if="car.price" class="text-sm text-muted-foreground mb-2">€ {{ formatCurrency(car.price) }}</p>
             <div 
               v-if="car.stockDays !== null && car.stockDays !== undefined"
-              class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-green-50 text-green-700 text-xs font-semibold rounded-md mb-2"
+              class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-green-50 text-green-700 text-sm font-semibold rounded-md mb-2"
             >
               <div class="w-1 h-1 bg-green-500 rounded-full"></div> In stock ({{ car.stockDays }} days)
             </div>

@@ -34,7 +34,7 @@
           <span
             v-for="(spec, idx) in vehicleSpecs"
             :key="idx"
-            class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+            class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-sm font-medium text-muted-foreground"
           >
             {{ spec }}
           </span>
@@ -49,14 +49,14 @@
           </p>
         </div>
 
-        <p v-if="source" class="text-xs text-muted-foreground">
+        <p v-if="source" class="text-sm text-muted-foreground">
           Source: {{ source }}
         </p>
         <div v-if="showAddActions" class="mt-auto pt-3 border-t border-border flex flex-wrap gap-2 justify-end">
           <Button
             variant="ghost"
             size="sm"
-            class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 h-auto text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 border-0 gap-1"
+            class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 h-auto text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 border-0 gap-1"
             @click="$emit('add-tradein')"
           >
             <Plus class="size-3 shrink-0" />
@@ -65,7 +65,7 @@
           <Button
             variant="ghost"
             size="sm"
-            class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 h-auto text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 border-0 gap-1"
+            class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 h-auto text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 border-0 gap-1"
             @click="$emit('add-financing')"
           >
             <Plus class="size-3 shrink-0" />

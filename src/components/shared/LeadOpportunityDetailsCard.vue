@@ -12,7 +12,7 @@
       @postpone-expected-close="$emit('postpone-expected-close')"
       @reassigned="$emit('reassigned', $event)"
     />
-    <div class="grid grid-cols-2 @[20rem]:grid-cols-3 @[28rem]:grid-cols-4 @[36rem]:grid-cols-5 @[44rem]:grid-cols-6 gap-x-4 @[20rem]:gap-x-2 gap-y-1.5 text-xs">
+    <div class="grid grid-cols-2 @[20rem]:grid-cols-3 @[28rem]:grid-cols-4 @[36rem]:grid-cols-5 @[44rem]:grid-cols-6 gap-x-4 @[20rem]:gap-x-2 gap-y-1.5 text-sm">
       <div><span class="font-semibold text-muted-foreground">Generic sales:</span> <span class="text-foreground">{{ genericSales || '—' }}</span></div>
       <div><span class="font-semibold text-muted-foreground">Source:</span> <span class="text-foreground">{{ source || '—' }}</span></div>
       <div><span class="font-semibold text-muted-foreground">Channel:</span> <span class="text-foreground">{{ channel || '—' }}</span></div>

@@ -17,11 +17,11 @@
       </div>
       
       <div class="flex items-center gap-2 min-w-0">
-        <span class="text-xs font-bold uppercase tracking-wider" :class="deadlineStatus.textClass">
+        <span class="text-sm font-bold uppercase tracking-wider" :class="deadlineStatus.textClass">
           {{ deadlineStatus.type === 'overdue' ? 'Overdue' : 'Urgent' }}
         </span>
-        <span class="text-xs text-muted-foreground opacity-30">•</span>
-        <span class="text-xs font-medium truncate" :class="deadlineStatus.textClass">
+        <span class="text-sm text-muted-foreground opacity-30">•</span>
+        <span class="text-sm font-medium truncate" :class="deadlineStatus.textClass">
           Next Action: {{ formatDeadlineFull(nextActionDue) }}
         </span>
       </div>

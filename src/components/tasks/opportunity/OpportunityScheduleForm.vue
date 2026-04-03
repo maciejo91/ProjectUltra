@@ -88,7 +88,7 @@
               </button>
             </div>
             <div class="grid grid-cols-7 gap-1 mb-2">
-              <div v-for="label in calendarDayLabels" :key="label" class="text-center text-xs font-medium text-muted-foreground py-2">
+              <div v-for="label in calendarDayLabels" :key="label" class="text-center text-sm font-medium text-muted-foreground py-2">
                 {{ label }}
               </div>
             </div>

@@ -14,7 +14,7 @@
               @click="handleYes"
               size="sm"
               variant="default"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               Yes
             </Button>
@@ -22,7 +22,7 @@
               @click="handleNo"
               size="sm"
               variant="outline"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               No
             </Button>
@@ -33,7 +33,7 @@
               @click="handleYes"
               size="sm"
               variant="default"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               Yes
             </Button>
@@ -41,7 +41,7 @@
               @click="handleNo"
               size="sm"
               variant="outline"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               No
             </Button>
@@ -49,7 +49,7 @@
               @click="handleReassign"
               size="sm"
               variant="secondary"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               Reassign
             </Button>
@@ -60,7 +60,7 @@
               @click="handleViewTask"
               size="sm"
               variant="default"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               View Opportunity
             </Button>
@@ -71,7 +71,7 @@
               @click="handleYes"
               size="sm"
               variant="default"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               Yes
             </Button>
@@ -79,7 +79,7 @@
               @click="handleNo"
               size="sm"
               variant="outline"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               No
             </Button>
@@ -87,7 +87,7 @@
               @click="handleReassign"
               size="sm"
               variant="secondary"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               Reassign
             </Button>
@@ -98,7 +98,7 @@
               @click="handleYes"
               size="sm"
               variant="default"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               Yes
             </Button>
@@ -106,7 +106,7 @@
               @click="handleNo"
               size="sm"
               variant="outline"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               No
             </Button>
@@ -114,7 +114,7 @@
               @click="handleReassign"
               size="sm"
               variant="secondary"
-              class="h-7 text-xs"
+              class="h-7 text-sm"
             >
               Reassign
             </Button>
@@ -136,13 +136,13 @@
           v-else
           class="bg-background border border-border rounded-lg shadow-lg p-2 flex flex-col gap-2 z-10 min-w-24 shrink-0"
         >
-          <span class="text-xs font-semibold text-center text-muted-foreground uppercase">Dismiss?</span>
+          <span class="text-sm font-semibold text-center text-muted-foreground uppercase">Dismiss?</span>
           <div class="flex gap-1">
             <Button
               @click="handleDismiss"
               size="xs"
               variant="default"
-              class="h-7 flex-1 bg-destructive hover:bg-destructive/90 text-xs"
+              class="h-7 flex-1 bg-destructive hover:bg-destructive/90 text-sm"
             >
               Yes
             </Button>
@@ -150,7 +150,7 @@
               @click="showDismissConfirm = false"
               size="xs"
               variant="ghost"
-              class="h-7 flex-1 text-xs"
+              class="h-7 flex-1 text-sm"
             >
               No
             </Button>

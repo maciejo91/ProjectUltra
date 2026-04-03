@@ -37,11 +37,11 @@
             <!-- Email Content -->
             <div v-else-if="activity?.type === 'email'" class="space-y-3">
               <div v-if="activity?.subject">
-                <label class="block text-xs font-medium text-muted-foreground mb-1">Subject</label>
+                <label class="block text-sm font-medium text-muted-foreground mb-1">Subject</label>
                 <p class="text-sm text-foreground">{{ activity.subject }}</p>
               </div>
               <div>
-                <label class="block text-xs font-medium text-muted-foreground mb-1">Message</label>
+                <label class="block text-sm font-medium text-muted-foreground mb-1">Message</label>
                 <p class="text-sm text-foreground whitespace-pre-line">
                   {{ activity?.content || 'No content' }}
                 </p>
@@ -65,7 +65,7 @@
             <!-- Survey Content -->
             <div v-else-if="activity?.type === 'survey'" class="space-y-2">
               <div v-for="(answer, question) in getSurveyResponses()" :key="question">
-                <label class="block text-xs font-medium text-muted-foreground mb-1">{{ question }}</label>
+                <label class="block text-sm font-medium text-muted-foreground mb-1">{{ question }}</label>
                 <p class="text-sm text-foreground">{{ answer }}</p>
               </div>
             </div>

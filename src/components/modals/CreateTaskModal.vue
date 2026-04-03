@@ -12,7 +12,7 @@
 
         <div class="flex-1 overflow-y-auto py-4 w-full space-y-6 px-6">
           <div class="space-y-2">
-            <Label class="text-xs font-semibold uppercase text-muted-foreground">Task type</Label>
+            <Label class="text-sm font-semibold uppercase text-muted-foreground">Task type</Label>
             <Select v-model="taskCode">
               <SelectTrigger class="w-full bg-background">
                 <SelectValue placeholder="Select task type" />
@@ -30,7 +30,7 @@
           </div>
 
           <div class="space-y-2">
-            <Label class="text-xs font-semibold uppercase text-muted-foreground">Assignee</Label>
+            <Label class="text-sm font-semibold uppercase text-muted-foreground">Assignee</Label>
             <Popover :open="assigneeDropdownOpen" @update:open="(v) => (assigneeDropdownOpen = v)">
               <PopoverTrigger as-child>
                 <button
@@ -39,7 +39,7 @@
                 >
                   <template v-if="selectedAssignee">
                     <div
-                      class="w-6 h-6 rounded-full flex items-center justify-center font-semibold text-xs shrink-0 bg-muted text-foreground"
+                      class="w-6 h-6 rounded-full flex items-center justify-center font-semibold text-sm shrink-0 bg-muted text-foreground"
                     >
                       {{ selectedAssignee.initials || (selectedAssignee.name || '?').slice(0, 2).toUpperCase() }}
                     </div>
@@ -56,7 +56,7 @@
           </div>
 
           <div class="space-y-2">
-            <Label class="text-xs font-semibold uppercase text-muted-foreground">Due date</Label>
+            <Label class="text-sm font-semibold uppercase text-muted-foreground">Due date</Label>
             <Input
               v-model="dueDate"
               type="date"

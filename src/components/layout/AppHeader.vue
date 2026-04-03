@@ -81,7 +81,7 @@
             <span>Filters</span>
             <span
               v-if="calendarHeaderActions.activeFilterCount > 0"
-              class="rounded-full bg-primary text-primary-foreground text-xs px-2 min-w-5 h-5 flex items-center justify-center"
+              class="rounded-full bg-primary text-primary-foreground text-sm px-2 min-w-5 h-5 flex items-center justify-center"
             >
               {{ calendarHeaderActions.activeFilterCount }}
             </span>

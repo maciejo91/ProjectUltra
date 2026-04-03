@@ -13,7 +13,7 @@
     <template #actions>
       <button
         @click="handleCreateContract"
-        class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-btn text-xs flex items-center gap-2 transition-colors"
+        class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-btn text-sm flex items-center gap-2 transition-colors"
       >
         Create Offer
       </button>

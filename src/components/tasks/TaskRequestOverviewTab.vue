@@ -7,10 +7,10 @@
         <h2 class="text-base font-medium text-foreground leading-6">Requested Car</h2>
       </div>
       <div class="flex items-center gap-2">
-        <span class="text-xs text-muted-foreground font-medium">Owner:</span>
+        <span class="text-sm text-muted-foreground font-medium">Owner:</span>
         <button 
           @click="$emit('reassign')"
-          class="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+          class="text-sm font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors"
         >
           {{ task.assignee }}
         </button>
@@ -23,7 +23,7 @@
       <!-- Badges Row -->
       <div class="flex items-center gap-2 flex-wrap mb-3">
         <span 
-          class="px-2 py-1 rounded text-xs font-medium border"
+          class="px-2 py-1 rounded text-sm font-medium border"
           :class="entityType === 'lead' 
             ? 'bg-blue-50 text-blue-700 border-blue-200' 
             : 'bg-purple-50 text-purple-700 border-purple-200'"
@@ -31,7 +31,7 @@
           {{ entityType === 'lead' ? 'Lead' : 'Opportunity' }}
         </span>
         <span 
-          class="px-2 py-1 rounded text-xs font-medium border"
+          class="px-2 py-1 rounded text-sm font-medium border"
           :class="stageColorClass"
         >
           {{ task.displayStage || task.stage }}
@@ -62,7 +62,7 @@
               <span class="font-bold text-foreground text-sm">{{ carBrand }} {{ carModel }} ({{ carYear }})</span>
               <span
                 v-if="carCondition"
-                class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground"
+                class="inline-flex px-2 py-0.5 rounded text-sm font-medium bg-muted text-muted-foreground"
               >
                 {{ carCondition }}
               </span>
@@ -70,20 +70,20 @@
             <div class="flex items-center gap-2 flex-wrap">
               <div 
                 v-if="stockDays !== undefined && stockDays !== null"
-                class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-xs font-semibold rounded"
+                class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-sm font-semibold rounded"
               >
                 <div class="w-1 h-1 bg-green-500 rounded-full"></div> In stock ({{ stockDays }} days)
               </div>
               <div 
                 v-else
-                class="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-700 text-xs font-semibold rounded"
+                class="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-700 text-sm font-semibold rounded"
               >
                 <div class="w-1 h-1 bg-orange-500 rounded-full"></div> Out of stock
               </div>
             </div>
             <div
               v-if="carMileage !== null || carFuelType || carGearType"
-              class="flex gap-3 mt-0.5 text-xs text-muted-foreground"
+              class="flex gap-3 mt-0.5 text-sm text-muted-foreground"
             >
               <span v-if="carMileage !== null">{{ formatMileage(carMileage) }} km</span>
               <span v-if="carFuelType">{{ carFuelType }}</span>
@@ -91,7 +91,7 @@
             </div>
           </div>
           <div v-if="carPrice" class="text-right">
-            <div class="text-xs text-muted-foreground font-medium">Price</div>
+            <div class="text-sm text-muted-foreground font-medium">Price</div>
             <div class="font-bold text-foreground text-sm">€ {{ formatCurrency(carPrice) }}</div>
           </div>
         </div>
@@ -101,7 +101,7 @@
             variant="outline"
             size="small"
             @click="$emit('add-requested-car')"
-            class="text-xs"
+            class="text-sm"
           />
         </div>
       </div>
@@ -125,9 +125,9 @@
         class="mt-3"
       />
       <div v-if="requestMessage" class="mt-3 pt-2">
-        <div class="text-xs text-muted-foreground mb-1">Message</div>
+        <div class="text-sm text-muted-foreground mb-1">Message</div>
         <div class="bg-muted rounded-lg p-2">
-          <p class="text-xs text-muted-foreground leading-relaxed line-clamp-3">{{ requestMessage }}</p>
+          <p class="text-sm text-muted-foreground leading-relaxed line-clamp-3">{{ requestMessage }}</p>
         </div>
       </div>
     </div>

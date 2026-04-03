@@ -45,7 +45,7 @@
               v-if="message.role === 'user'"
               class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0"
             >
-              <span class="text-xs font-medium text-purple-700">You</span>
+              <span class="text-sm font-medium text-purple-700">You</span>
             </div>
           </div>
 

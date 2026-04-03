@@ -21,7 +21,7 @@
             </div>
             <div>
               <span class="font-bold text-foreground text-sm">{{ type.label }}</span>
-              <p class="text-muted-foreground text-xs">{{ type.description }}</p>
+              <p class="text-muted-foreground text-sm">{{ type.description }}</p>
             </div>
           </div>
         </CardContent>
@@ -77,14 +77,14 @@
     <Card v-if="processing" class="border-border">
       <CardContent class="space-y-3">
         <div class="flex items-center justify-between">
-          <span class="text-foreground text-xs font-bold">Importing...</span>
-          <span class="text-muted-foreground text-xs">{{ processedCount }} / {{ totalCount }}</span>
+          <span class="text-foreground text-sm font-bold">Importing...</span>
+          <span class="text-muted-foreground text-sm">{{ processedCount }} / {{ totalCount }}</span>
         </div>
         <Progress :value="progressPercentage" class="h-1.5" />
         <Card v-if="importErrors.length > 0" class="bg-orange-50 border-orange-200">
           <CardContent class="flex items-start gap-2">
             <AlertTriangle class="w-4 h-4 shrink-0 text-orange-600 mt-0.5" />
-            <span class="text-xs text-orange-700">
+            <span class="text-sm text-orange-700">
               {{ importErrors.length }} errors encountered
             </span>
           </CardContent>
@@ -97,9 +97,9 @@
       <CardContent class="space-y-2">
         <div class="flex items-center gap-2">
           <CheckCircle class="w-4 h-4 shrink-0 text-green-600" />
-          <span class="font-bold text-foreground text-xs">Import Successful</span>
+          <span class="font-bold text-foreground text-sm">Import Successful</span>
         </div>
-        <p class="text-muted-foreground text-xs">
+        <p class="text-muted-foreground text-sm">
           Successfully imported {{ successCount }} {{ selectedSource }}.
           <span v-if="importErrors.length > 0" class="text-orange-700 font-semibold">
             {{ importErrors.length }} rows had errors.

@@ -124,7 +124,7 @@ const columns = computed(() => [
       const member = row.original
       return h('div', { class: 'text-sm text-foreground' }, [
         h('span', member.qualifiedLeads),
-        h('span', { class: 'text-muted-foreground text-xs ml-1' }, `(${member.qualifiedPercentage}%)`)
+        h('span', { class: 'text-muted-foreground text-sm ml-1' }, `(${member.qualifiedPercentage}%)`)
       ])
     }
   },

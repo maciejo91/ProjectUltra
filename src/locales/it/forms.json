@@ -77,6 +77,16 @@
   },
   "schedule": {
     "title": "Programma",
+    "dealership": {
+      "label": "Concessionaria",
+      "placeholder": "Filtra per concessionaria",
+      "all": "Tutte le concessionarie"
+    },
+    "team": {
+      "label": "Team",
+      "placeholder": "Filtra per team",
+      "all": "Tutti i team"
+    },
     "eventType": {
       "label": "Tipo di evento",
       "placeholder": "Seleziona tipo di evento",
@@ -98,7 +108,14 @@
     },
     "timeSlots": {
       "noSlots": "Nessuno slot orario disponibile per questa data",
-      "selectDate": "Seleziona una data per vedere gli slot orari disponibili"
+      "selectDate": "Seleziona una data per vedere gli slot orari disponibili",
+      "morning": "Mattina",
+      "afternoon": "Pomeriggio"
+    },
+    "slotPopover": {
+      "people": "Persone",
+      "searchPlaceholder": "Cerca per nome o team",
+      "noResults": "Nessun risultato"
     },
     "calendar": {
       "days": ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"]

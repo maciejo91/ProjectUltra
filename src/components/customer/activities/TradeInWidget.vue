@@ -13,7 +13,7 @@
       <!-- Vehicle Information -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">Brand <span class="text-brand-red">*</span></Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">Brand <span class="text-brand-red">*</span></Label>
           <Input 
             v-model="vehicleData.brand"
             type="text" 
@@ -22,7 +22,7 @@
           />
         </div>
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">Model <span class="text-brand-red">*</span></Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">Model <span class="text-brand-red">*</span></Label>
           <Input 
             v-model="vehicleData.model"
             type="text" 
@@ -31,7 +31,7 @@
           />
         </div>
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">Year <span class="text-brand-red">*</span></Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">Year <span class="text-brand-red">*</span></Label>
           <Input 
             v-model="vehicleData.year"
             type="number" 
@@ -45,7 +45,7 @@
 
       <!-- Version/Trim -->
       <div>
-        <Label class="text-xs font-medium text-muted-foreground mb-1">Version/Trim</Label>
+        <Label class="text-sm font-medium text-muted-foreground mb-1">Version/Trim</Label>
         <Input 
           v-model="vehicleData.version"
           type="text" 
@@ -56,7 +56,7 @@
       <!-- Identification -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">VIN</Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">VIN</Label>
           <Input 
             v-model="vehicleData.vin"
             type="text" 
@@ -64,7 +64,7 @@
           />
         </div>
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">Plates</Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">Plates</Label>
           <Input 
             v-model="vehicleData.plates"
             type="text" 
@@ -76,7 +76,7 @@
       <!-- Vehicle Details -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">Fuel Type</Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">Fuel Type</Label>
           <Select v-model="vehicleData.fuelType">
             <SelectTrigger class="w-full h-10">
               <SelectValue placeholder="Select fuel type..." />
@@ -91,7 +91,7 @@
           </Select>
         </div>
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">Gear Type</Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">Gear Type</Label>
           <Select v-model="vehicleData.gearType">
             <SelectTrigger class="w-full h-10">
               <SelectValue placeholder="Select gear type..." />
@@ -104,7 +104,7 @@
           </Select>
         </div>
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">Mileage (km)</Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">Mileage (km)</Label>
           <Input 
             v-model.number="vehicleData.kilometers"
             type="number" 
@@ -116,7 +116,7 @@
 
       <!-- Registration -->
       <div>
-        <Label class="text-xs font-medium text-muted-foreground mb-1">Registration Year/Month</Label>
+        <Label class="text-sm font-medium text-muted-foreground mb-1">Registration Year/Month</Label>
         <Input 
           v-model="vehicleData.registration"
           type="text"
@@ -142,7 +142,7 @@
         <div v-if="showValuation" class="px-4 pb-4 space-y-4 border-t border-border pt-4">
           <!-- Trade-In Price -->
           <div>
-            <Label class="text-xs font-medium text-muted-foreground mb-1">Trade-In Price (€)</Label>
+            <Label class="text-sm font-medium text-muted-foreground mb-1">Trade-In Price (€)</Label>
             <Input 
               v-model.number="valuationData.tradeInPrice"
               type="number" 
@@ -155,7 +155,7 @@
           <!-- Evaluation Range -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label class="text-xs font-medium text-muted-foreground mb-1">Evaluation Range - Low (€)</Label>
+              <Label class="text-sm font-medium text-muted-foreground mb-1">Evaluation Range - Low (€)</Label>
               <Input 
                 v-model.number="valuationData.evaluationRangeLow"
                 type="number" 
@@ -165,7 +165,7 @@
               />
             </div>
             <div>
-              <Label class="text-xs font-medium text-muted-foreground mb-1">Evaluation Range - High (€)</Label>
+              <Label class="text-sm font-medium text-muted-foreground mb-1">Evaluation Range - High (€)</Label>
               <Input 
                 v-model.number="valuationData.evaluationRangeHigh"
                 type="number" 
@@ -179,7 +179,7 @@
           <!-- Provider and Evaluation Date -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label class="text-xs font-medium text-muted-foreground mb-1">Provider</Label>
+              <Label class="text-sm font-medium text-muted-foreground mb-1">Provider</Label>
               <Select v-model="valuationData.provider">
                 <SelectTrigger class="w-full h-10">
                   <SelectValue placeholder="Select provider..." />
@@ -193,7 +193,7 @@
               </Select>
             </div>
             <div>
-              <Label class="text-xs font-medium text-muted-foreground mb-1">Evaluation Date</Label>
+              <Label class="text-sm font-medium text-muted-foreground mb-1">Evaluation Date</Label>
               <Input 
                 v-model="valuationData.evaluationDate"
                 type="date" 

@@ -135,22 +135,29 @@ export const convertContactToOpportunity = async (contactId) => {
   return newOpp
 }
 
+function matchesCustomerOrAccount(entityCustomerId, entityAccountId, customerId, accountId) {
+  const cid =
+    customerId != null && customerId !== '' ? parseInt(String(customerId), 10) : NaN
+  const aid = accountId != null && accountId !== '' ? parseInt(String(accountId), 10) : NaN
+  const hasCid = Number.isFinite(cid)
+  const hasAid = Number.isFinite(aid)
+  const byCustomer = hasCid && parseInt(String(entityCustomerId), 10) === cid
+  const rawAcc = entityAccountId
+  const eAid = rawAcc != null && rawAcc !== '' ? parseInt(String(rawAcc), 10) : NaN
+  const byAccount = hasAid && Number.isFinite(eAid) && eAid === aid
+  if (hasCid && hasAid) return byCustomer || byAccount
+  if (hasCid) return byCustomer
+  if (hasAid) return byAccount
+  return false
+}
+
 // Fetch all leads associated with a customer or account
 export const fetchLeadsByCustomerId = async (customerId, accountId = null) => {
   await delay()
   const { mockLeads } = getMockData()
-  let leads = []
-  
-  if (accountId) {
-    // Fetch leads by account_id (leads linked to account)
-    leads = mockLeads.filter(lead => {
-      const leadAccountId = lead.account_id || lead.accountId
-      return leadAccountId && parseInt(leadAccountId) === parseInt(accountId)
-    })
-  } else {
-    // Match by customerId (leads now have customerId field)
-    leads = mockLeads.filter(lead => lead.customerId === parseInt(customerId))
-  }
+  const leads = mockLeads.filter((lead) =>
+    matchesCustomerOrAccount(lead.customerId, lead.account_id || lead.accountId, customerId, accountId)
+  )
   
   // Enrich leads with contact reference info if available
   const enrichedLeads = leads.map(lead => ({
@@ -168,18 +175,9 @@ export const fetchLeadsByCustomerId = async (customerId, accountId = null) => {
 export const fetchOpportunitiesByCustomerId = async (customerId, accountId = null) => {
   await delay()
   const { mockOpportunities } = getMockData()
-  let opportunities = []
-  
-  if (accountId) {
-    // Fetch opportunities by account_id (opportunities linked to account)
-    opportunities = mockOpportunities.filter(opp => {
-      const oppAccountId = opp.account_id || opp.accountId
-      return oppAccountId && parseInt(oppAccountId) === parseInt(accountId)
-    })
-  } else {
-    // Match by customerId (opportunities now have customerId field)
-    opportunities = mockOpportunities.filter(opp => opp.customerId === parseInt(customerId))
-  }
+  const opportunities = mockOpportunities.filter((opp) =>
+    matchesCustomerOrAccount(opp.customerId, opp.account_id || opp.accountId, customerId, accountId)
+  )
   
   // Enrich opportunities with contact reference info if available
   const enrichedOpportunities = opportunities.map(opp => ({

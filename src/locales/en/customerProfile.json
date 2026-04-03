@@ -1,0 +1,50 @@
+{
+  "tabs": {
+    "overview": "Overview",
+    "requests": "Requests",
+    "communication": "Communication"
+  },
+  "activeRequests": "Active requests",
+  "rightColumn": {
+    "contactDetails": "Contact details",
+    "otherInteractions": "Other interactions ({count})",
+    "otherInteractionsRegion": "Past leads and opportunities",
+    "typeLead": "Lead",
+    "typeOpportunity": "Opportunity",
+    "fallbackLeadTitle": "Lead",
+    "fallbackOpportunityTitle": "Opportunity",
+    "appointments": "Appointments",
+    "addAppointment": "Add",
+    "noAppointments": "No upcoming appointments.",
+    "recentActivity": "Recent activity"
+  },
+  "details": {
+    "customerName": "Customer name",
+    "account": "Account",
+    "accountOwner": "Account owner",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "language": "Language",
+    "fiscalEntities": "Fiscal entities",
+    "drivenVehicle": "Driven vehicle",
+    "copyPhoneAria": "Copy phone number",
+    "phoneCopied": "Phone number copied to clipboard",
+    "phoneCopyFailed": "Failed to copy phone number"
+  },
+  "activityFeed": {
+    "title": "Recent activity",
+    "add": "Add",
+    "empty": "No recent activities.",
+    "performedAction": "performed an action",
+    "systemUser": "System",
+    "justNow": "Just now",
+    "minutesAgo": "{count} min ago",
+    "hoursAgo": "{count} h ago"
+  },
+  "header": {
+    "backAria": "Back to customers",
+    "fallbackName": "Customer"
+  },
+  "sendMessage": "Send message"
+}

@@ -1,32 +1,28 @@
 <template>
   <div
     v-if="potentialDuplicates.length > 0"
-    class="relative overflow-hidden rounded-lg"
+    class="relative w-full overflow-hidden rounded-lg border border-yellow-500 bg-linear-to-r from-yellow-500/20 to-background dark:from-yellow-500/15"
   >
     <div
-      class="duplicate-banner-inner relative z-10 m-px flex items-center gap-4 rounded-lg bg-destructive/10 px-4 py-2"
+      class="relative z-10 flex w-full items-center gap-2 py-2 pl-2 pr-4"
     >
-      <div class="flex flex-1 min-w-0 items-center gap-3">
+      <div class="flex min-w-0 flex-1 items-center gap-2">
         <div
-          class="flex shrink-0 items-center justify-center rounded-md bg-destructive p-1.5 text-white"
+          class="flex shrink-0 items-center justify-center rounded-md bg-yellow-500 p-1.5 text-white"
           aria-hidden="true"
         >
-          <TriangleAlert class="size-3.5" stroke-width="2" />
+          <TriangleAlert class="size-3" stroke-width="2" />
         </div>
-        <div class="min-w-0 flex-1">
-          <p class="truncate text-sm leading-5 text-foreground">
-            <span class="font-semibold">{{ t('requestDetail.duplicates.important') }}</span>
-            <span class="font-normal">
-              {{ ' ' }}{{ bodyMessage }}
-            </span>
-          </p>
-        </div>
+        <p class="min-w-0 flex-1 text-sm leading-5 text-foreground">
+          <span class="font-semibold">{{ t('requestDetail.duplicates.conflictsLabel') }}</span>
+          <span class="font-normal">{{ ' ' }}{{ bodyMessage }}</span>
+        </p>
       </div>
-      <div class="flex shrink-0 flex-wrap items-center justify-end gap-2 sm:pl-2">
+      <div class="flex shrink-0 items-center gap-0">
         <Button
           variant="ghost"
           size="icon"
-          class="size-7 shrink-0 text-secondary-foreground hover:bg-secondary hover:text-secondary-foreground"
+          class="size-7 shrink-0 text-foreground hover:bg-muted hover:text-foreground"
           :aria-label="t('requestDetail.duplicates.openDuplicateAria')"
           @click="emit('request-navigate', potentialDuplicates[0].compositeId)"
         >
@@ -35,7 +31,7 @@
         <Button
           variant="ghost"
           size="icon"
-          class="size-7 shrink-0 text-muted-foreground hover:text-foreground"
+          class="size-7 shrink-0 text-foreground hover:bg-muted hover:text-foreground"
           :aria-label="t('requestDetail.duplicates.dismissAria')"
           @click="emit('dismiss')"
         >
@@ -69,6 +65,3 @@ const bodyMessage = computed(() => {
   return t('requestDetail.duplicates.bodyOther', { count: n })
 })
 </script>
-
-<style scoped>
-</style>

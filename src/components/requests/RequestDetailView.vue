@@ -10,7 +10,6 @@
     @postpone-expected-close="handlePostponeExpectedClose"
     @reassigned="handleReassigned"
     @add-segment="handleAddSegment"
-    @more-action="handleHeaderMoreAction"
   >
     <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
     <ComingSoonModal :show="showPostponeModal" @close="showPostponeModal = false" />
@@ -98,36 +97,85 @@
       @cancel="showAppointmentModal = false"
     />
 
+    <Dialog :open="showFloatingLqPostpone" @update:open="showFloatingLqPostpone = $event">
+      <DialogPortal>
+        <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
+        <DialogContent
+          class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
+          :show-close-button="true"
+        >
+          <DialogHeader class="shrink-0">
+            <DialogTitle>{{ t('requestDetail.lqfTask.nextAttemptTitle') }}</DialogTitle>
+          </DialogHeader>
+          <div class="flex-1 min-h-0 overflow-y-auto py-4 w-full">
+            <PostponeWithAssigneeCard
+              :title="t('requestDetail.lqfTask.nextAttemptTitle')"
+              show-postpone-reason-options
+              :postpone-reason-label="t('requestDetail.lqfTask.postponeReason.label')"
+              :postpone-reason-placeholder="t('requestDetail.lqfTask.postponeReason.placeholder')"
+              :postpone-reason-options="lqfPostponeReasonOptions"
+              :assignee-options="lqfNextAttemptAssigneeOptions"
+              :default-assignee-key="lqfDefaultNextAttemptAssigneeKey"
+              :assignee-placeholder="t('requestDetail.lqfTask.nextAttemptAssigneePlaceholder')"
+              :cancel-label="t('common.buttons.cancel')"
+              :show-quick-time-options="true"
+              :saving="lqfNextAttemptSaving"
+              @confirm="handleFloatingPostponeConfirm"
+              @cancel="showFloatingLqPostpone = false"
+            />
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
+
     <div
       v-if="showAssociatedTasksOrTimeline"
-      class="flex min-h-0 w-full flex-1 flex-col overflow-y-auto p-4 lg:overflow-hidden"
+      class="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto p-4 lg:overflow-hidden"
     >
+      <DuplicateDetectedCard
+        v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
+        class="shrink-0"
+        :potential-duplicates="potentialDuplicates"
+        @request-navigate="(...args) => $emit('request-navigate', ...args)"
+        @dismiss="duplicateBannerDismissed = true"
+      />
       <div
         class="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-4 lg:overflow-hidden"
       >
         <div
-          class="order-1 flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+          class="order-1 relative flex min-h-0 min-w-0 flex-col gap-0 lg:flex-1"
         >
-          <RequestLeadProfileSection
-            v-if="request"
-            class="shrink-0"
-            :request="request"
-            @quick-action="handleQuickAction"
-          />
-
           <div
-            class="flex min-w-0 flex-col rounded-lg bg-background shadow-mk-dashboard-card"
+            :class="[
+              'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain lg:min-h-0',
+              requestMainColumnScrollPb,
+              floatingLqFocusMode && 'overflow-hidden'
+            ]"
           >
-            <RequestMainTabs class="shrink-0" v-model="mainTab" :tabs="mainTabs" />
-
-            <div class="flex flex-col gap-4 p-4">
-              <DuplicateDetectedCard
-                v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
+          <div class="flex min-w-0 shrink-0 flex-col gap-4">
+            <div
+              class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg bg-background"
+            >
+              <RequestLeadProfileSection
+                v-if="request"
+                embedded-in-card
                 class="shrink-0"
-                :potential-duplicates="potentialDuplicates"
-                @request-navigate="(...args) => $emit('request-navigate', ...args)"
-                @dismiss="duplicateBannerDismissed = true"
+                :request="request"
+                :related-leads="customerRelatedLeads"
+                :related-opportunities="customerRelatedOpps"
+                :related-requests-loading="loadingCustomerRelatedRequests"
+                @quick-action="handleQuickAction"
               />
+            </div>
+
+            <div
+              class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-background"
+            >
+              <div class="shrink-0 px-4 pt-2">
+                <RequestMainTabs class="shrink-0" v-model="mainTab" :tabs="mainTabs" />
+              </div>
+
+              <div class="flex min-h-0 flex-1 flex-col gap-4 border-t border-border p-4">
               <template v-if="mainTab === 'overview' || mainTab === 'tasks'">
                 <div class="flex flex-col gap-4">
                 <RequestInsightBanner
@@ -135,11 +183,21 @@
                   class="shrink-0"
                   :message="insightMessage"
                 />
+                <RequestInsightBanner
+                  v-if="mainTab === 'overview' && showFloatingLqOverviewExtras"
+                  class="shrink-0"
+                  :message="t('requestDetail.aiOverviewSummary')"
+                />
                 <RequestLeadQualificationTeaser
-                  v-if="request?.type === 'lead'"
+                  v-if="request?.type === 'lead' && !useFloatingLqBar"
                   class="w-full min-w-0 shrink-0"
+                  floating-elevated
                   :show-teaser="lqfShowTeaser"
                   :dismissed="lqfTeaserDismissed"
+                  :header-task-title="lqfHeaderTaskTitle"
+                  :header-contact-subline="lqfHeaderContactSubline"
+                  :call-now-tel-href="lqfCallNowTelHref"
+                  :session-header-title="lqfInlineManageOpen ? lqfCallingSessionTitle : ''"
                   :teaser-line="lqfTeaserLine"
                   :assignee-initials="lqfAssigneeInitials"
                   :manage-open="lqfInlineManageOpen"
@@ -270,12 +328,31 @@
                 </div>
               </template>
 
+              </div>
             </div>
           </div>
+          </div>
+          <RequestFloatingLqTaskBar
+            v-if="useFloatingLqBar && lqfShowTeaser && !lqfTeaserDismissed && request"
+            :request="request"
+            :activities="requestActivities"
+            :header-task-title="lqfHeaderTaskTitle"
+            :header-contact-subline="lqfHeaderContactSubline"
+            :call-now-tel-href="lqfCallNowTelHref"
+            :calling-session-title="lqfCallingSessionTitle"
+            :teaser-line="lqfTeaserLine"
+            :assignee-initials="lqfAssigneeInitials"
+            @update:focus-mode="floatingLqFocusMode = $event"
+            @not-now="showFloatingLqPostpone = true"
+            @postpone-expected-close="handlePostponeExpectedClose"
+            @reassigned="handleReassigned"
+            @open-purchase-method="handleLqfOpenPurchaseMethod"
+            @open-trade-in="handleLqfOpenTradeIn"
+          />
         </div>
 
         <div
-          class="order-2 flex min-w-0 flex-col gap-4 lg:sticky lg:top-0 lg:w-1/3 lg:shrink-0 lg:self-start lg:overflow-y-auto"
+          class="order-2 flex min-w-0 flex-col gap-4 lg:sticky lg:top-0 lg:w-1/4 lg:shrink-0 lg:self-start lg:overflow-y-auto"
         >
           <VehicleRequestCard
             v-if="request && (request.requestedCar || request.vehicle)"
@@ -286,14 +363,28 @@
             :source-url="request.requestedCar?.listingUrl || request.sourceUrl || ''"
             :image-url="getCarImageUrl(request.requestedCar || request.vehicle)"
             :save-requested-car="handleRequestedCarSave"
+            :stock-status="request.carStatus || ''"
+            :metrics-funnel-count="request.listingMetrics?.funnelViews"
+            :metrics-tag-count="request.listingMetrics?.tagCount"
             hide-request-message
             @open-ad="handleOpenAd"
             @more-actions="handleMoreActions"
           />
           <RequestMessageCard
-            v-if="request && (request.requestMessage || request.requestedCar?.requestMessage)"
+            v-if="request && showRequestDetailsCard"
             :title="t('requestDetail.messageCard.title')"
-            :message="request.requestMessage || request.requestedCar?.requestMessage"
+            :message="request.requestMessage || request.requestedCar?.requestMessage || ''"
+            :utm-source="
+              request.utmSource || request.requestedCar?.adSource || ''
+            "
+            :utm-term="request.utmTerm || ''"
+            :utm-campaign="
+              request.utmCampaign || request.requestedCar?.adCampaign || ''
+            "
+            :advertisement-url="
+              request.requestedCar?.listingUrl || request.sourceUrl || ''
+            "
+            :original-email-url="request.originalMessageUrl || ''"
           />
         </div>
       </div>
@@ -306,7 +397,15 @@
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Car, CreditCard, Folder } from 'lucide-vue-next'
-import { Button } from '@motork/component-library/future/primitives'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle
+} from '@motork/component-library/future/primitives'
 import { useDuplicateDetection } from '@/composables/useDuplicateDetection'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
@@ -314,6 +413,8 @@ import { useUserStore } from '@/stores/user'
 import { useUsersStore } from '@/stores/users'
 import { useToastStore } from '@/stores/toast'
 import { useLeadLqTeaser } from '@/composables/useLeadLqTeaser'
+import { isFloatingLqTaskPrototypeLead } from '@/utils/requestPrototypeFlags'
+import RequestFloatingLqTaskBar from './RequestFloatingLqTaskBar.vue'
 import RequestDetailShell from './RequestDetailShell.vue'
 import VehicleRequestCard from '@/components/shared/VehicleRequestCard.vue'
 import RequestMainTabs from './RequestMainTabs.vue'
@@ -345,6 +446,7 @@ import {
 } from '@/utils/stageMapper'
 import { LEAD_STAGES } from '@/utils/stageMapper/constants'
 import { getCarImageUrl } from '@/utils/vehicleHelpers'
+import { fetchLeadsByCustomerId, fetchOpportunitiesByCustomerId } from '@/api/contacts'
 
 const props = defineProps({
   request: {
@@ -385,6 +487,8 @@ const lqfTeaserDismissed = ref(false)
 const lqfInlineManageOpen = ref(false)
 const lqfNotNowNextAttemptOpen = ref(false)
 const lqfNextAttemptSaving = ref(false)
+const floatingLqFocusMode = ref(false)
+const showFloatingLqPostpone = ref(false)
 const showNoteModal = ref(false)
 const showAttachmentModal = ref(false)
 const showWhatsAppModal = ref(false)
@@ -394,6 +498,10 @@ const showCallComingSoonModal = ref(false)
 const showOfferModal = ref(false)
 const showAppointmentModal = ref(false)
 const activityExpandedSummaries = ref({})
+
+const customerRelatedLeads = ref([])
+const customerRelatedOpps = ref([])
+const loadingCustomerRelatedRequests = ref(false)
 
 const lqfNextAttemptAssigneeOptions = computed(() => {
   const noneOption = {
@@ -437,7 +545,42 @@ const lqfPostponeReasonOptions = computed(() => [
 ])
 
 const leadRef = computed(() => (props.request?.type === 'lead' ? props.request : null))
-const { showTeaser: lqfShowTeaser, teaserLine: lqfTeaserLine } = useLeadLqTeaser(leadRef)
+
+const showRequestDetailsCard = computed(() => {
+  const r = props.request
+  if (!r) return false
+  const msg = (r.requestMessage || r.requestedCar?.requestMessage || '').trim()
+  if (msg) return true
+  if (r.utmSource || r.utmTerm || r.utmCampaign) return true
+  if (r.originalMessageUrl) return true
+  if (r.requestedCar?.listingUrl || r.sourceUrl) return true
+  if (r.requestedCar?.adSource || r.requestedCar?.adCampaign) return true
+  return false
+})
+
+const useFloatingLqBar = computed(() => isFloatingLqTaskPrototypeLead(props.request))
+const {
+  showTeaser: lqfShowTeaser,
+  teaserLine: lqfTeaserLine,
+  headerTaskTitle: lqfHeaderTaskTitle,
+  headerContactSubline: lqfHeaderContactSubline,
+  callNowTelHref: lqfCallNowTelHref,
+  callingSessionTitle: lqfCallingSessionTitle
+} = useLeadLqTeaser(leadRef)
+
+const showFloatingLqOverviewExtras = computed(
+  () =>
+    useFloatingLqBar.value &&
+    lqfShowTeaser.value &&
+    !lqfTeaserDismissed.value &&
+    props.request?.type === 'lead'
+)
+
+const requestMainColumnScrollPb = computed(() =>
+  useFloatingLqBar.value && lqfShowTeaser.value && !lqfTeaserDismissed.value
+    ? 'pb-72'
+    : 'pb-32'
+)
 
 watch(
   () => lqfShowTeaser.value,
@@ -447,6 +590,42 @@ watch(
       lqfNotNowNextAttemptOpen.value = false
     }
   }
+)
+
+watch(
+  () => {
+    const r = props.request
+    if (!r) return ''
+    return `${r.type}-${r.id}-${r.customerId ?? r.customer?.id ?? ''}`
+  },
+  async () => {
+    const r = props.request
+    if (!r) {
+      customerRelatedLeads.value = []
+      customerRelatedOpps.value = []
+      return
+    }
+    const cid = r.customerId || r.customer?.id
+    if (cid == null || cid === '') {
+      customerRelatedLeads.value = []
+      customerRelatedOpps.value = []
+      return
+    }
+    loadingCustomerRelatedRequests.value = true
+    try {
+      const accountId =
+        r.customer?.accountId || r.customer?.account_id || r.accountId || r.account_id
+      const [leadsRes, oppsRes] = await Promise.all([
+        fetchLeadsByCustomerId(cid, accountId),
+        fetchOpportunitiesByCustomerId(cid, accountId)
+      ])
+      customerRelatedLeads.value = leadsRes.data || []
+      customerRelatedOpps.value = oppsRes.data || []
+    } finally {
+      loadingCustomerRelatedRequests.value = false
+    }
+  },
+  { immediate: true }
 )
 
 const lqfAssigneeInitials = computed(() => {
@@ -564,6 +743,8 @@ watch(
     lqfTeaserDismissed.value = false
     lqfInlineManageOpen.value = false
     lqfNotNowNextAttemptOpen.value = false
+    floatingLqFocusMode.value = false
+    showFloatingLqPostpone.value = false
     mainTab.value = 'overview'
   }
 )
@@ -620,10 +801,6 @@ function handleQuickAction() {
 
 function handleAddSegment() {
   showGenericComingSoon.value = true
-}
-
-function handleHeaderMoreAction(action) {
-  if (action === 'share') showGenericComingSoon.value = true
 }
 
 function handleOpenTaskDrawer(task) {
@@ -711,6 +888,11 @@ function handleLqfOpenPurchaseMethod() {
 function handleLqfOpenTradeIn() {
   editingTradeIn.value = null
   showTradeInModal.value = true
+}
+
+async function handleFloatingPostponeConfirm(payload) {
+  await handleLqfNextAttemptConfirm(payload)
+  showFloatingLqPostpone.value = false
 }
 
 function handlePrevious() {

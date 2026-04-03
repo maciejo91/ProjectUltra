@@ -25,7 +25,7 @@
           :key="section.key"
           class="mb-3 last:mb-0"
         >
-          <p class="text-xs font-medium text-muted-foreground normal-case px-2 py-1 mb-1">
+          <p class="text-sm font-medium text-muted-foreground normal-case px-2 py-1 mb-1">
             {{ section.key === 'teams' ? t('common.assignee.teamsLabel') : section.label }}
           </p>
           <div class="space-y-0.5">
@@ -37,7 +37,7 @@
               class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-muted/80 transition-colors text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-muted-foreground/40 focus-visible:ring-offset-2"
             >
             <div
-              class="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs shrink-0"
+              class="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
               :class="item.type === 'team' ? getTeamAvatarClass(item.name) : getTeamAvatarClass(item.team) || getRoleAvatarClass(item.role)"
             >
               <Users v-if="item.type === 'team'" class="w-3 h-3 shrink-0" />
@@ -45,7 +45,7 @@
             </div>
             <div class="min-w-0 flex-1">
               <p class="font-medium text-sm text-foreground truncate">{{ item.name }}</p>
-              <p v-if="item.type === 'user'" class="text-xs text-muted-foreground truncate capitalize">
+              <p v-if="item.type === 'user'" class="text-sm text-muted-foreground truncate capitalize">
                 {{ item.role }} • {{ item.email }}
               </p>
             </div>

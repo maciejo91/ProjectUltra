@@ -13,7 +13,7 @@
             {{ customerName }}
           </h2>
           <div v-if="location" class="mt-1.5">
-            <span class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            <span class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-sm font-medium text-muted-foreground">
               {{ location }}
             </span>
           </div>

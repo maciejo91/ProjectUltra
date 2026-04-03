@@ -9,7 +9,7 @@
         <PopoverTrigger as-child>
           <button
             type="button"
-            class="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Change assignee"
           >
             <div
@@ -38,7 +38,7 @@
     </div>
     <div
       v-if="showLastUpdated && !assigneeOnly"
-      class="shrink-0 flex items-center gap-1 text-xs text-muted-foreground"
+      class="shrink-0 flex items-center gap-1 text-sm text-muted-foreground"
     >
       <History class="w-3.5 h-3.5 shrink-0" />
       <span>Last updated: {{ formattedLastUpdated }}</span>
@@ -49,7 +49,7 @@
     >
       <button
         type="button"
-        class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        class="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
         aria-expanded="showDueDateMenu"
         aria-haspopup="true"
         aria-label="Due date"
@@ -74,7 +74,7 @@
           v-for="item in dueDateMenuItems"
           :key="item.key"
           type="button"
-          class="w-full px-3 py-2 text-left text-xs text-foreground hover:bg-muted flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="!!item.disabled"
           @click="item.onClick()"
         >
@@ -88,7 +88,7 @@
     >
       <button
         type="button"
-        class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        class="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
         :class="{ 'cursor-default': isTaskClosed }"
         :aria-expanded="showExpectedCloseMenu && !isTaskClosed"
         aria-haspopup="true"
@@ -115,7 +115,7 @@
           v-for="item in expectedCloseMenuItems"
           :key="item.key"
           type="button"
-          class="w-full px-3 py-2 text-left text-xs text-foreground hover:bg-muted flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="!!item.disabled"
           @click="item.onClick()"
         >

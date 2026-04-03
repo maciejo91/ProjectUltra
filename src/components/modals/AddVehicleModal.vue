@@ -203,7 +203,7 @@
                     placeholder="License plate number" 
                     class="w-full"
                   />
-                  <p class="text-xs text-muted-foreground mt-1">These can be relevant for automatically retrieving other information.</p>
+                  <p class="text-sm text-muted-foreground mt-1">These can be relevant for automatically retrieving other information.</p>
                 </div>
               </div>
             </CollapsibleSection>

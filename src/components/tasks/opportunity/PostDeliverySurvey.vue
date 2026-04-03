@@ -193,7 +193,7 @@
         <div>
           <Label class="form-label mb-2">
             Internal notes for follow-up actions:
-            <span class="text-xs text-muted-foreground ml-1">(Private - only for internal staff)</span>
+            <span class="text-sm text-muted-foreground ml-1">(Private - only for internal staff)</span>
           </Label>
           <Textarea
             v-model="responses.q8"
@@ -221,7 +221,7 @@
               ⚠️ Email to Sales Manager + Branch Manager
             </span>
           </Label>
-          <span class="text-xs text-muted-foreground">(Q1 = Very Unsatisfied/Unsatisfied)</span>
+          <span class="text-sm text-muted-foreground">(Q1 = Very Unsatisfied/Unsatisfied)</span>
         </div>
         
         <!-- Issues Reported -->
@@ -235,7 +235,7 @@
               ⚠️ Email to Service Department
             </span>
           </Label>
-          <span class="text-xs text-muted-foreground">(Q3 = Issues reported)</span>
+          <span class="text-sm text-muted-foreground">(Q3 = Issues reported)</span>
         </div>
         
         <!-- Delivery Delay -->
@@ -249,7 +249,7 @@
               ⚠️ Email to Delivery Coordinator
             </span>
           </Label>
-          <span class="text-xs text-muted-foreground">(Q4 = Delayed major)</span>
+          <span class="text-sm text-muted-foreground">(Q4 = Delayed major)</span>
         </div>
         
         <!-- High NPS -->
@@ -263,7 +263,7 @@
               ✅ Email to Marketing
             </span>
           </Label>
-          <span class="text-xs text-muted-foreground">(Q7 = Definitely Yes)</span>
+          <span class="text-sm text-muted-foreground">(Q7 = Definitely Yes)</span>
         </div>
       </div>
     </div>

@@ -100,7 +100,7 @@
                 class="w-3 h-3 rounded-full shrink-0"
                 :style="{ backgroundColor: getSourceColor(source.color) }"
               ></div>
-              <span class="text-xs text-muted-foreground">{{ source.name }}</span>
+              <span class="text-sm text-muted-foreground">{{ source.name }}</span>
             </div>
           </div>
 
@@ -113,7 +113,7 @@
             >
               <Clock class="w-3 h-3 shrink-0 text-muted-foreground" />
               <span class="text-sm font-bold text-foreground">{{ getSourceAvgTime(source.name) }}</span>
-              <span class="text-xs text-muted-foreground">on avg.</span>
+              <span class="text-sm text-muted-foreground">on avg.</span>
             </div>
           </div>
         </div>

@@ -9,7 +9,7 @@
         <div class="flex justify-between items-start mb-3">
           <div>
             <h4 class="font-bold text-foreground text-sm">{{ title }}</h4>
-            <p class="text-xs text-muted-foreground mt-0.5">{{ description }}</p>
+            <p class="text-sm text-muted-foreground mt-0.5">{{ description }}</p>
           </div>
           <slot name="badge" />
         </div>
@@ -19,7 +19,7 @@
           <button
             v-if="showPostpone"
             @click="$emit('postpone')"
-            class="bg-white border border-D1D5DB text-brand-dark font-medium px-4 py-2 rounded-btn text-xs flex items-center gap-2 transition-colors hover:bg-muted"
+            class="bg-white border border-D1D5DB text-brand-dark font-medium px-4 py-2 rounded-btn text-sm flex items-center gap-2 transition-colors hover:bg-muted"
           >
             <Clock class="w-4 h-4 shrink-0" />
             <span>Postpone</span>

@@ -115,7 +115,7 @@
                 <template #item="{ item }">
                   <div class="flex items-center justify-between gap-2">
                     <span>{{ item.label }}</span>
-                    <span class="text-muted-foreground text-xs">€ {{ formatCurrency(item.price) }}</span>
+                    <span class="text-muted-foreground text-sm">€ {{ formatCurrency(item.price) }}</span>
                   </div>
                 </template>
               </SelectMenu>

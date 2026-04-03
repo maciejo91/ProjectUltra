@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white border border-border rounded-xl p-4 shadow-nsc-card flex gap-4 animate-fade-in mb-4 feed-item">
     <div 
-      class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 border"
+      class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 border"
       :class="getItemIconClass(item.type)"
     >
       <component :is="getLucideIcon(getItemIcon(item.type))" class="w-4 h-4 shrink-0" />
@@ -97,7 +97,7 @@
               :opportunity-id="item.opportunityId || item.leadId || ''"
               hide-add
             />
-            <span v-if="item.data.isMainOffer" class="inline-block mt-2 bg-purple-600 text-white text-xs font-bold px-1 py-0.5 rounded">Main Offer</span>
+            <span v-if="item.data.isMainOffer" class="inline-block mt-2 bg-purple-600 text-white text-sm font-bold px-1 py-0.5 rounded">Main Offer</span>
           </div>
           <div v-else-if="item.type === 'purchase'" class="flex items-center gap-3">
             <div class="flex-1">
@@ -136,9 +136,9 @@
               </div>
             </div>
             <div v-if="item.data.insuranceIncluded || item.data.maintenanceIncluded || item.data.registrationTaxesIncluded" class="flex flex-wrap gap-2 mt-2">
-              <span v-if="item.data.insuranceIncluded" class="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded border border-green-100">Insurance</span>
-              <span v-if="item.data.maintenanceIncluded" class="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded border border-blue-100">Maintenance</span>
-              <span v-if="item.data.registrationTaxesIncluded" class="bg-purple-50 text-purple-700 text-xs px-2 py-0.5 rounded border border-purple-100">Registration/Taxes</span>
+              <span v-if="item.data.insuranceIncluded" class="bg-green-50 text-green-700 text-sm px-2 py-0.5 rounded border border-green-100">Insurance</span>
+              <span v-if="item.data.maintenanceIncluded" class="bg-blue-50 text-blue-700 text-sm px-2 py-0.5 rounded border border-blue-100">Maintenance</span>
+              <span v-if="item.data.registrationTaxesIncluded" class="bg-purple-50 text-purple-700 text-sm px-2 py-0.5 rounded border border-purple-100">Registration/Taxes</span>
             </div>
           </div>
         </div>

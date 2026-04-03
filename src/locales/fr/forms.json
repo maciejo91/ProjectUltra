@@ -77,6 +77,16 @@
   },
   "schedule": {
     "title": "Planifier",
+    "dealership": {
+      "label": "Concession",
+      "placeholder": "Filtrer par concession",
+      "all": "Toutes les concessions"
+    },
+    "team": {
+      "label": "Équipe",
+      "placeholder": "Filtrer par équipe",
+      "all": "Toutes les équipes"
+    },
     "eventType": {
       "label": "Type d'événement",
       "placeholder": "Sélectionner le type d'événement",
@@ -98,7 +108,14 @@
     },
     "timeSlots": {
       "noSlots": "Aucun créneau horaire disponible pour cette date",
-      "selectDate": "Sélectionnez une date pour voir les créneaux horaires disponibles"
+      "selectDate": "Sélectionnez une date pour voir les créneaux horaires disponibles",
+      "morning": "Matin",
+      "afternoon": "Après-midi"
+    },
+    "slotPopover": {
+      "people": "Personnes",
+      "searchPlaceholder": "Rechercher par nom ou équipe",
+      "noResults": "Aucun résultat"
     },
     "calendar": {
       "days": ["DIM", "LUN", "MAR", "MER", "JEU", "VEN", "SAM"]

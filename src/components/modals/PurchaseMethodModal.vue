@@ -60,7 +60,7 @@
                     @blur="validateField('monthlyInstalment')"
                   />
                 </div>
-                <p v-if="errors.monthlyInstalment" class="text-xs text-destructive">{{ errors.monthlyInstalment }}</p>
+                <p v-if="errors.monthlyInstalment" class="text-sm text-destructive">{{ errors.monthlyInstalment }}</p>
               </div>
 
               <div class="space-y-2">
@@ -79,7 +79,7 @@
                     @blur="validateField('downPayment')"
                   />
                 </div>
-                <p v-if="errors.downPayment" class="text-xs text-destructive">{{ errors.downPayment }}</p>
+                <p v-if="errors.downPayment" class="text-sm text-destructive">{{ errors.downPayment }}</p>
               </div>
             </div>
 
@@ -104,7 +104,7 @@
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                  <p v-if="errors.duration" class="text-xs text-destructive">{{ errors.duration }}</p>
+                  <p v-if="errors.duration" class="text-sm text-destructive">{{ errors.duration }}</p>
                 </div>
                 <div class="space-y-2">
                   <Label class="block text-sm font-medium text-foreground">Unlock Kilometers</Label>
@@ -117,7 +117,7 @@
                     :class="{ 'border-destructive': errors.mileageLimit }"
                     @input="clearError('mileageLimit')"
                   />
-                  <p v-if="errors.mileageLimit" class="text-xs text-destructive">{{ errors.mileageLimit }}</p>
+                  <p v-if="errors.mileageLimit" class="text-sm text-destructive">{{ errors.mileageLimit }}</p>
                 </div>
               </div>
 
@@ -136,7 +136,7 @@
                     <SelectItem value="Fleet">Fleet</SelectItem>
                   </SelectContent>
                 </Select>
-                <p v-if="errors.customerType" class="text-xs text-destructive">{{ errors.customerType }}</p>
+                <p v-if="errors.customerType" class="text-sm text-destructive">{{ errors.customerType }}</p>
               </div>
             </template>
 

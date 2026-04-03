@@ -49,20 +49,20 @@
           <h4 class="text-sm font-medium text-foreground truncate mb-0.5">{{ vehicle.brand }} {{ vehicle.model }}</h4>
           <div class="flex items-baseline gap-1.5">
             <span class="text-sm font-semibold text-foreground leading-tight">{{ vehicle.views }}</span>
-            <span class="text-xs text-muted-foreground">views</span>
+            <span class="text-sm text-muted-foreground">views</span>
           </div>
         </div>
         
         <div class="flex items-center gap-2 mb-2">
           <span
-            class="text-xs font-medium flex items-center gap-0.5"
+            class="text-sm font-medium flex items-center gap-0.5"
             :class="vehicle.changeType === 'increase' ? 'text-green-600' : 'text-red-600'"
           >
             <ArrowUp v-if="vehicle.changeType === 'increase'" class="w-3 h-3 shrink-0" />
             <ArrowDown v-else class="w-3 h-3 shrink-0" />
             {{ Math.abs(vehicle.change) }}%
           </span>
-          <span class="text-xs text-muted-foreground">{{ vehicle.avgPerDay }} avg/day</span>
+          <span class="text-sm text-muted-foreground">{{ vehicle.avgPerDay }} avg/day</span>
         </div>
         
         <!-- Mini Line Chart with Smooth Curves and Gradient -->

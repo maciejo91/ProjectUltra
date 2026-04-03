@@ -3,216 +3,268 @@
     class="sticky top-0 z-30 flex shrink-0 flex-col border-b border-border bg-background"
   >
     <div
-      class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 w-full min-w-0 px-2 pt-1.5 pb-1.5 md:px-4"
+      class="flex w-full min-w-0 flex-col gap-3 px-2 py-3 md:px-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6"
     >
-      <div class="flex min-w-0 flex-1">
-        <div class="flex flex-col min-w-0 flex-1 space-y-0">
-          <div class="flex items-center gap-2 min-w-0">
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
+        <div class="flex min-w-0 flex-col gap-1">
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1.5 min-w-0">
             <Button
               v-if="isFullPage"
               variant="ghost"
               size="icon-sm"
-              class="rounded-md shrink-0"
+              class="shrink-0 rounded-md"
               :aria-label="t('requestDetail.headerBack')"
               @click="$emit('close')"
             >
               <ChevronLeft class="size-4 text-muted-foreground" />
             </Button>
-            <div class="flex flex-wrap items-baseline gap-2 min-w-0">
-              <DropdownMenu v-if="request" :modal="false">
-                <DropdownMenuTrigger as-child>
-                  <button
-                    type="button"
-                    class="inline-flex items-baseline gap-2 min-w-0 max-w-full text-left rounded-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  >
-                  <span class="text-base font-medium text-foreground truncate">{{
-                    primaryTitleText
-                  }}</span>
-                  <span class="text-xs text-muted-foreground shrink-0">{{
-                    typeLabelText
-                  }}</span>
-                  <ChevronDown class="size-3 shrink-0 text-muted-foreground" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent class="min-w-56 p-1.5" align="start">
-                  <DropdownMenuItem
-                    class="flex cursor-pointer rounded-sm px-2 py-1.5 text-sm"
-                    @select="copyTitleToClipboard"
-                  >
-                    {{ t('requestDetail.copyTitle') }}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+
+            <div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
+              <div class="flex min-w-0 max-w-full flex-wrap items-baseline gap-x-1.5 gap-y-0">
+                <DropdownMenu v-if="request" :modal="false">
+                  <DropdownMenuTrigger as-child>
+                    <button
+                      type="button"
+                      class="inline-flex max-w-full min-w-0 items-baseline gap-x-1.5 text-left rounded-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <span class="truncate text-base font-semibold text-foreground">{{
+                        primaryTitleText
+                      }}</span>
+                      <span class="shrink-0 text-sm text-muted-foreground">{{
+                        typeLabelText
+                      }}</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent class="min-w-56 p-1.5" align="start">
+                    <DropdownMenuItem
+                      class="flex cursor-pointer rounded-sm px-2 py-1.5 text-sm"
+                      @select="copyTitleToClipboard"
+                    >
+                      {{ t('requestDetail.copyTitle') }}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <span
+                  v-else
+                  class="min-w-0 truncate text-base font-semibold text-foreground"
+                >
+                  {{ primaryTitleText }}
+                </span>
+              </div>
+
               <span
-                v-else
-                class="text-base font-medium text-foreground truncate min-w-0"
+                v-if="request"
+                class="inline-flex shrink-0 items-center gap-1 text-sm tabular-nums text-muted-foreground"
+                :aria-label="`${t('requestDetail.created')}: ${createdLabel}`"
               >
-                {{ primaryTitleText }}
+                <Sun class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <span>{{ createdLabel }}</span>
               </span>
+
+              <Button
+                v-if="request"
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                class="shrink-0 rounded-md size-6"
+                :aria-expanded="headerDetailsExpanded"
+                :aria-controls="headerDetailsPanelId"
+                :aria-label="
+                  headerDetailsExpanded
+                    ? t('requestDetail.collapseHeaderDetails')
+                    : t('requestDetail.expandHeaderDetails')
+                "
+                @click="headerDetailsExpanded = !headerDetailsExpanded"
+              >
+                <ChevronDown
+                  class="size-3 text-muted-foreground transition-transform duration-200"
+                  :class="{ 'rotate-180': headerDetailsExpanded }"
+                  aria-hidden
+                />
+              </Button>
             </div>
           </div>
 
           <div
-            v-if="request"
-            class="flex flex-wrap items-center gap-x-4 gap-y-1"
+            v-if="request && headerDetailsExpanded"
+            :id="headerDetailsPanelId"
+            class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2 w-full min-w-0 text-sm"
             :class="isFullPage ? 'pl-8' : ''"
           >
-            <div class="flex flex-wrap items-center gap-2">
-              <div class="flex flex-wrap items-center gap-1">
-                <span
-                  v-if="priorityBadge"
-                  class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium leading-none"
-                  :class="priorityBadge.class"
-                >
-                  {{ priorityBadge.label }}
-                </span>
-                <span
-                  v-for="tag in displayTags"
-                  :key="tag"
-                  class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium leading-none bg-muted text-muted-foreground"
-                >
-                  {{ tag }}
-                </span>
-                <span
-                  v-for="seg in extraSegments"
-                  :key="seg"
-                  class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium leading-none bg-muted text-muted-foreground"
-                >
-                  {{ seg }}
-                </span>
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                class="rounded-md size-6 text-muted-foreground"
-                :aria-label="t('requestDetail.addSegment')"
-                @click="$emit('add-segment')"
-              >
-                <Plus class="size-3" />
-              </Button>
-            </div>
-
             <span
-              class="inline-flex items-center gap-2 text-xs text-muted-foreground tabular-nums"
+              class="inline-flex items-center gap-1 shrink-0 tabular-nums"
               :aria-label="`${t('requestDetail.created')}: ${createdLabel}`"
             >
-              <Info class="size-4 shrink-0" aria-hidden />
-              <span>{{ createdLabel }}</span>
+              <Upload class="size-4 shrink-0 text-muted-foreground" aria-hidden />
+              <span class="text-foreground">{{ createdLabel }}</span>
             </span>
+            <span class="text-muted-foreground shrink-0" aria-hidden>·</span>
             <span
-              class="inline-flex items-center gap-2 text-xs text-muted-foreground tabular-nums"
+              class="inline-flex items-center gap-1 shrink-0 tabular-nums"
               :aria-label="`${t('requestDetail.lastUpdated')}: ${updatedLabel}`"
             >
-              <RefreshCw class="size-4 shrink-0" aria-hidden />
-              <span>{{ updatedLabel }}</span>
+              <RefreshCw class="size-4 shrink-0 text-muted-foreground" aria-hidden />
+              <span class="text-foreground">{{ updatedLabel }}</span>
+            </span>
+            <span class="text-muted-foreground shrink-0" aria-hidden>·</span>
+            <span class="inline-flex items-baseline gap-1 min-w-0">
+              <span class="text-muted-foreground shrink-0">{{
+                t('requestDetail.headerDetailLabelSource')
+              }}</span>
+              <span class="text-foreground min-w-0">{{ sourceLabel }}</span>
+            </span>
+            <span class="text-muted-foreground shrink-0" aria-hidden>·</span>
+            <span class="inline-flex items-baseline gap-1 min-w-0">
+              <span class="text-muted-foreground shrink-0">{{
+                t('requestDetail.headerDetailLabelChannel')
+              }}</span>
+              <span class="text-foreground min-w-0">{{ channelDisplay }}</span>
+            </span>
+            <span class="text-muted-foreground shrink-0" aria-hidden>·</span>
+            <span class="inline-flex items-baseline gap-1 min-w-0">
+              <span class="text-muted-foreground shrink-0">{{
+                t('requestDetail.headerDetailLabelFiscalEntity')
+              }}</span>
+              <span class="text-foreground min-w-0">{{ fiscalEntityDisplay }}</span>
+            </span>
+            <span class="text-muted-foreground shrink-0" aria-hidden>·</span>
+            <span class="inline-flex items-baseline gap-1 min-w-0">
+              <span class="text-muted-foreground shrink-0">{{
+                t('requestDetail.headerDetailLabelDealership')
+              }}</span>
+              <span class="text-foreground min-w-0">{{ dealershipDisplay }}</span>
             </span>
           </div>
         </div>
-      </div>
 
-      <div class="flex flex-wrap items-center justify-end gap-2 shrink-0">
-        <DropdownMenu v-if="request" :modal="false">
-          <DropdownMenuTrigger as-child>
-            <button
-              type="button"
-              class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              :class="stageClass"
-            >
-              {{ displayStage }}
-              <ChevronDown class="size-3 shrink-0" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent class="min-w-48 max-h-64 overflow-y-auto p-1.5" align="end">
-            <DropdownMenuItem
-              v-for="stage in statusOptions"
-              :key="stage"
-              class="flex cursor-pointer items-center rounded-sm px-2 py-1.5"
-              @select="emit('update-status', stage)"
-            >
-              <span
-                class="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium leading-none"
-                :class="[
-                  getStageColorClass(stage),
-                  stage === displayStage && 'ring-1 ring-ring ring-inset'
-                ]"
-              >
-                {{ stage }}
-              </span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <span
-          v-if="request && showWorkflowPill"
-          class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary"
+        <div
+          v-if="request"
+          class="flex flex-wrap items-center gap-x-3 gap-y-1"
+          :class="isFullPage ? 'pl-8' : ''"
         >
-          <Loader2 class="size-3 shrink-0 animate-spin" aria-hidden />
-          {{ t('requestDetail.statusInProgress') }}
-        </span>
-
-        <Avatar v-if="request" class="size-6 shrink-0 rounded-full">
-          <AvatarFallback
-            class="bg-secondary text-secondary-foreground text-xs font-normal leading-none"
-          >
-            {{ assigneeInitials }}
-          </AvatarFallback>
-        </Avatar>
-
-        <DropdownMenu v-if="request" :modal="false">
-          <DropdownMenuTrigger as-child>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="flex flex-wrap items-center gap-1">
+              <span
+                v-if="priorityBadge"
+                class="inline-flex items-center rounded-md px-2 py-0.5 text-sm font-medium leading-none"
+                :class="priorityBadge.class"
+              >
+                {{ priorityBadge.label }}
+              </span>
+              <span
+                v-for="tag in displayTags"
+                :key="tag"
+                class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-sm font-medium leading-none text-muted-foreground"
+              >
+                {{ tag }}
+              </span>
+              <span
+                v-for="seg in extraSegments"
+                :key="seg"
+                class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-sm font-medium leading-none text-muted-foreground"
+              >
+                {{ seg }}
+              </span>
+            </div>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              class="rounded-md shrink-0 size-6"
-              :aria-label="t('requestDetail.moreMenu')"
+              class="size-6 rounded-md text-muted-foreground"
+              :aria-label="t('requestDetail.addSegment')"
+              @click="$emit('add-segment')"
             >
-              <MoreVertical class="size-3 text-muted-foreground" />
+              <Plus class="size-3" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" class="min-w-40 p-1.5">
-            <DropdownMenuItem class="rounded-sm" @select="$emit('more-action', 'share')">
-              {{ t('requestDetail.moreMenuShare') }}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </div>
+        </div>
+      </div>
 
-        <Button
-          variant="outline"
-          size="icon-sm"
-          class="rounded-md"
-          :disabled="!hasPrevious"
-          @click="$emit('previous')"
+      <div
+        class="flex shrink-0 flex-col items-stretch gap-2 sm:items-end lg:pt-0.5"
+      >
+        <div class="flex flex-wrap items-center justify-end gap-2">
+          <DropdownMenu v-if="request" :modal="false">
+            <DropdownMenuTrigger as-child>
+              <button
+                type="button"
+                class="rounded-full border border-transparent p-0 transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                :aria-label="lifecycleAriaLabel || t('requestDetail.headerLifecycleMenuAria')"
+              >
+                <RequestHeaderLifecycleStepper :steps="lifecycleSteps" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent class="min-w-48 max-h-64 overflow-y-auto p-1.5" align="end">
+              <DropdownMenuItem
+                v-for="stage in statusOptions"
+                :key="stage"
+                class="flex cursor-pointer items-center rounded-sm px-2 py-1.5"
+                @select="emit('update-status', stage)"
+              >
+                <span
+                  class="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium leading-none"
+                  :class="[
+                    getStageColorClass(stage),
+                    stage === displayStage && 'ring-1 ring-ring ring-inset'
+                  ]"
+                >
+                  {{ stage }}
+                </span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button
+            variant="outline"
+            size="icon-sm"
+            class="rounded-md"
+            :disabled="!hasPrevious"
+            @click="$emit('previous')"
+          >
+            <ChevronLeft class="size-4 text-muted-foreground" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon-sm"
+            class="rounded-md"
+            :disabled="!hasNext"
+            @click="$emit('next')"
+          >
+            <ChevronRight class="size-4 text-muted-foreground" />
+          </Button>
+
+          <Button
+            v-if="!isFullPage"
+            variant="outline"
+            size="icon-sm"
+            class="rounded-md"
+            :aria-label="t('common.buttons.close')"
+            @click="$emit('close')"
+          >
+            <X class="size-4 text-muted-foreground" />
+          </Button>
+        </div>
+
+        <div
+          v-if="request"
+          class="flex items-center justify-end gap-2 text-sm text-muted-foreground"
         >
-          <ChevronLeft class="size-4 text-muted-foreground" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          class="rounded-md"
-          :disabled="!hasNext"
-          @click="$emit('next')"
-        >
-          <ChevronRight class="size-4 text-muted-foreground" />
-        </Button>
-        <Button
-          v-if="!isFullPage"
-          variant="outline"
-          size="icon-sm"
-          class="rounded-md"
-          :aria-label="t('common.buttons.close')"
-          @click="$emit('close')"
-        >
-          <X class="size-4 text-muted-foreground" />
-        </Button>
+          <span>{{ t('requestDetail.headerOwnedBy') }}</span>
+          <Avatar class="size-7 shrink-0 rounded-full">
+            <AvatarFallback
+              class="bg-secondary text-sm font-medium leading-none text-secondary-foreground"
+            >
+              {{ assigneeInitials }}
+            </AvatarFallback>
+          </Avatar>
+        </div>
       </div>
     </div>
   </header>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, useId } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import { useI18n } from 'vue-i18n'
 import {
@@ -220,11 +272,10 @@ import {
   ChevronRight,
   X,
   ChevronDown,
-  Info,
+  Upload,
   RefreshCw,
   Plus,
-  MoreVertical,
-  Loader2
+  Sun
 } from 'lucide-vue-next'
 import {
   Button,
@@ -235,9 +286,8 @@ import {
   Avatar,
   AvatarFallback
 } from '@motork/component-library/future/primitives'
+import RequestHeaderLifecycleStepper from './RequestHeaderLifecycleStepper.vue'
 import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
-import { getStageBadgeClass } from '@/utils/formatters'
-import { formatDateTime } from '@/utils/formatters'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 
 const props = defineProps({
@@ -262,12 +312,50 @@ const emit = defineEmits([
   'update-status',
   'postpone-expected-close',
   'reassigned',
-  'add-segment',
-  'more-action'
+  'add-segment'
 ])
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toastStore = useToastStore()
+
+const headerDetailsExpanded = ref(false)
+const headerDetailsPanelId = `request-header-details-${useId().replace(/:/g, '')}`
+
+const channelDisplay = computed(() => {
+  if (!props.request?.channel) return '—'
+  return String(props.request.channel)
+})
+
+const fiscalEntityDisplay = computed(() => {
+  if (!props.request?.fiscalEntity) return '—'
+  return String(props.request.fiscalEntity)
+})
+
+const dealershipDisplay = computed(() => {
+  const r = props.request
+  if (!r) return '—'
+  const d =
+    r.dealership ??
+    r.requestedCar?.dealership ??
+    r.vehicle?.dealership ??
+    null
+  if (!d) return '—'
+  return String(d)
+})
+
+function formatHeaderDateTime(iso) {
+  if (!iso) return '—'
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return '—'
+  return date.toLocaleString(locale.value, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  })
+}
 
 async function copyTitleToClipboard() {
   const text = titleText.value
@@ -285,8 +373,71 @@ const displayStage = computed(() => {
   return getDisplayStage(props.request, props.request.type || 'lead') || 'Open'
 })
 
-const stageClass = computed(() => {
-  return getStageBadgeClass(displayStage.value)
+function isTerminalClosedStage(stage, type) {
+  if (!stage) return false
+  if (type === 'lead') {
+    return [
+      LEAD_STAGES.CLOSED_INVALID,
+      LEAD_STAGES.CLOSED_NOT_INTERESTED,
+      LEAD_STAGES.CLOSED_DUPLICATE
+    ].includes(stage)
+  }
+  return [
+    OPPORTUNITY_STAGES.CLOSED_WON,
+    OPPORTUNITY_STAGES.CLOSED_LOST,
+    OPPORTUNITY_STAGES.ABANDONED
+  ].includes(stage)
+}
+
+function isOpenPhaseStage(stage, type) {
+  if (type === 'lead') {
+    return stage === LEAD_STAGES.NEW
+  }
+  return (
+    stage === OPPORTUNITY_STAGES.QUALIFIED ||
+    stage === OPPORTUNITY_STAGES.AWAITING_APPOINTMENT
+  )
+}
+
+const lifecycleSteps = computed(() => {
+  if (!props.request) return []
+  const type = props.request.type || 'lead'
+  const stage = displayStage.value
+  let openState = 'upcoming'
+  let midState = 'upcoming'
+  let closedState = 'upcoming'
+
+  if (isTerminalClosedStage(stage, type)) {
+    openState = 'complete'
+    midState = 'complete'
+    closedState = 'complete'
+  } else if (isOpenPhaseStage(stage, type)) {
+    openState = 'current'
+  } else {
+    openState = 'complete'
+    midState = 'current'
+  }
+
+  return [
+    { key: 'open', label: t('requestDetail.headerLifecycleOpen'), state: openState },
+    { key: 'mid', label: t('requestDetail.headerLifecycleInProgress'), state: midState },
+    { key: 'closed', label: t('requestDetail.headerLifecycleClosed'), state: closedState }
+  ]
+})
+
+const lifecycleAriaLabel = computed(() => {
+  if (!lifecycleSteps.value.length) return ''
+  return lifecycleSteps.value
+    .map((s) => {
+      const stateKey =
+        s.state === 'complete'
+          ? 'requestDetail.headerLifecycleStateComplete'
+          : s.state === 'current'
+            ? 'requestDetail.headerLifecycleStateCurrent'
+            : 'requestDetail.headerLifecycleStateUpcoming'
+      return `${s.label}: ${t(stateKey)}`
+    })
+    .join(', ')
 })
 
 function getStageColorClass(stage) {
@@ -368,12 +519,12 @@ const titleText = computed(() => {
 
 const createdLabel = computed(() => {
   const d = props.request?.createdAt || props.request?.importedAt
-  return d ? formatDateTime(d) : '—'
+  return formatHeaderDateTime(d)
 })
 
 const updatedLabel = computed(() => {
   const d = props.request?.lastActivity || props.request?.updatedAt
-  return d ? formatDateTime(d) : '—'
+  return formatHeaderDateTime(d)
 })
 
 const priorityBadge = computed(() => {
@@ -401,7 +552,10 @@ const extraSegments = computed(() => {
   const out = []
   if (r.channel === 'Paid' || r.channel === 'paid') out.push('ADV')
   const st = (r.carStatus || '').toLowerCase()
-  if (st.includes('oem') || (Array.isArray(r.tags) && r.tags.some((x) => String(x).toUpperCase() === 'OEM'))) {
+  if (
+    st.includes('oem') ||
+    (Array.isArray(r.tags) && r.tags.some((x) => String(x).toUpperCase() === 'OEM'))
+  ) {
     out.push('OEM')
   }
   return out
@@ -419,12 +573,5 @@ const assigneeInitials = computed(() => {
     .join('')
     .toUpperCase()
     .slice(0, 2)
-})
-
-const showWorkflowPill = computed(() => {
-  const r = props.request
-  if (!r) return false
-  if (r.type === 'lead' && r.isDisqualified) return false
-  return true
 })
 </script>

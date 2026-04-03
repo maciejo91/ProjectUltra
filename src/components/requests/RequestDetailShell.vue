@@ -11,7 +11,6 @@
       @postpone-expected-close="$emit('postpone-expected-close')"
       @reassigned="$emit('reassigned', $event)"
       @add-segment="$emit('add-segment')"
-      @more-action="$emit('more-action', $event)"
     />
 
     <div
@@ -52,7 +51,6 @@ defineEmits([
   'update-status',
   'postpone-expected-close',
   'reassigned',
-  'add-segment',
-  'more-action'
+  'add-segment'
 ])
 </script>

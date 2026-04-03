@@ -10,14 +10,14 @@
         <div class="flex items-center gap-2">
           <span class="font-medium text-sm text-foreground">{{ activity.user }}</span>
           <span
-            class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium uppercase leading-none"
+            class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-sm font-medium uppercase leading-none"
             :class="channelBadgeClass"
           >
             <component :is="channelIcon" class="w-3 h-3 shrink-0" />
             {{ channelLabel }}
           </span>
         </div>
-        <span class="text-xs text-muted-foreground">{{ formatTimestamp(activity.timestamp) }}</span>
+        <span class="text-sm text-muted-foreground">{{ formatTimestamp(activity.timestamp) }}</span>
       </div>
       <p
         class="text-sm text-muted-foreground break-words leading-normal"
@@ -28,7 +28,7 @@
       <button
         v-if="isLong"
         type="button"
-        class="text-xs font-medium text-primary hover:underline mt-0.5"
+        class="text-sm font-medium text-primary hover:underline mt-0.5"
         @click="expanded = !expanded"
       >
         {{ expanded ? 'Show less' : 'Show more' }}
@@ -82,7 +82,7 @@ const containerClass = computed(() => {
 // Badge logic: show channel name (Email/WhatsApp) instead of direction
 const channelLabel = computed(() => isEmail.value ? 'Email' : isWhatsapp.value ? 'WhatsApp' : 'Unknown')
 
-// Badge styling: match TaskBadges (px-1.5 py-0.5 rounded text-xs font-medium uppercase leading-none)
+// Badge styling: match TaskBadges (px-1.5 py-0.5 rounded text-sm font-medium uppercase leading-none)
 const channelBadgeClass = computed(() => {
   if (isEmail.value) return 'bg-blue-50 text-blue-700'
   if (isWhatsapp.value) return 'bg-badge-green text-emerald-700'

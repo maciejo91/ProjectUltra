@@ -4,7 +4,7 @@
       variant="secondary"
       @click.stop="toggleDropdown"
       :disabled="!actions || actions.length === 0"
-      class="inline-flex items-center gap-2 cursor-pointer text-xs"
+      class="inline-flex items-center gap-2 cursor-pointer text-sm"
     >
       <span>More actions</span>
       <ChevronDown 
@@ -25,7 +25,7 @@
         :key="menuItem.key"
         @click="menuItem.onClick"
         :disabled="menuItem.disabled"
-        class="w-full px-3 py-1.5 text-left text-xs text-foreground hover:bg-muted flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {{ menuItem.label }}
       </button>

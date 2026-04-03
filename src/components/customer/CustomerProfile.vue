@@ -1,6 +1,5 @@
 <template>
-  <div class="h-full flex flex-col overflow-hidden bg-surface mb-6">
-    <!-- Header with prev/next and Back (when from listing) or Close (when in drawer) -->
+  <div class="mb-6 flex h-full flex-col overflow-hidden bg-surface">
     <header
       v-if="showCloseButton || from"
       class="customer-profile-drawer-header shrink-0 px-4 sm:px-6"
@@ -10,15 +9,15 @@
           v-if="from"
           variant="ghost"
           size="icon"
-          class="rounded-sm shrink-0 -ml-0.5"
-          aria-label="Back to customers"
+          class="-ml-0.5 shrink-0 rounded-sm"
+          :aria-label="t('customerProfile.header.backAria')"
           @click="emit('close')"
         >
           <ChevronLeft :size="16" class="text-muted-foreground" />
         </Button>
-        <div class="min-w-0 flex-1 flex items-center min-h-0">
-          <h3 class="text-sm sm:text-base font-semibold text-foreground truncate leading-tight">
-            {{ customerDisplayName || 'Customer' }}
+        <div class="flex min-h-0 min-w-0 flex-1 items-center">
+          <h3 class="truncate text-sm font-semibold leading-tight text-foreground sm:text-base">
+            {{ customerDisplayName || t('customerProfile.header.fallbackName') }}
           </h3>
         </div>
         <div class="customer-profile-drawer-header-actions shrink-0">
@@ -46,7 +45,7 @@
             v-if="!from"
             variant="secondary"
             size="icon"
-            class="rounded-sm ml-0.5 sm:ml-1"
+            class="ml-0.5 rounded-sm sm:ml-1"
             aria-label="Close"
             @click="emit('close')"
           >
@@ -55,49 +54,77 @@
         </div>
       </div>
     </header>
-    <div class="flex-1 flex min-h-0 overflow-hidden">
-    <!-- Left Sidebar: Customer Profile Card -->
-    <div class="w-[350px] shrink-0 border-r border-border h-full overflow-y-auto bg-white">
-      <CustomerProfileSidebar
-        :customer="customerData"
-        :account="accountData"
-        :cars="customerCars"
-        :loading="loadingCustomer"
-        :customer-id="customerId"
-        :customer-type="customerType"
-        @add-tag="showAddTagModal = true"
-      />
+
+    <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div
+        class="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 lg:overflow-hidden"
+      >
+        <div
+          class="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-4 lg:overflow-hidden"
+        >
+          <div
+            class="order-1 flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+          >
+            <div class="flex min-w-0 shrink-0 flex-col gap-4">
+              <div
+                class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg bg-background"
+              >
+                <TaskContactCard
+                  v-if="customer"
+                  embedded-in-card
+                  :task="taskForContactCard"
+                  task-type="contact"
+                  :customer-id="customerId"
+                  @add-tag="showAddTagModal = true"
+                  @quick-action="handleContactQuickAction"
+                  @action="handleContactQuickAction"
+                />
+              </div>
+              <div
+                class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-background"
+              >
+                <div class="shrink-0 px-4 pt-2">
+                  <RequestMainTabs class="shrink-0" v-model="activeTab" :tabs="mainTabs" />
+                </div>
+                <div class="flex min-h-0 flex-1 flex-col gap-4 border-t border-border p-4">
+                  <CustomerDuplicateDetectedCard
+                    v-if="customer && potentialDuplicates.length"
+                    :potential-duplicates="potentialDuplicates"
+                    :merge-loading="mergeLoading"
+                    class="shrink-0"
+                    @merge="handleMergeClick"
+                    @customer-navigate="handleDuplicateCustomerNavigate"
+                  />
+                  <CustomerProfileContent
+                    :active-tab="activeTab"
+                    :summary="customerSummary"
+                    :activities="customerActivities"
+                    :leads="customerLeads"
+                    :opportunities="customerOpportunities"
+                    @send-message="handleSendMessage"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <CustomerProfileRightColumn
+            :customer="customerData"
+            :account="accountData"
+            :cars="customerCars"
+            :appointments="customerAppointments"
+            :activities="customerActivities"
+            :leads="customerLeads"
+            :opportunities="customerOpportunities"
+            :requests-loading="loadingLeads || loadingOpportunities"
+            :loading="loadingCustomer"
+            @add-appointment="showCreateAppointmentModal = true"
+            @add-activity="handleAddActivity"
+          />
+        </div>
+      </div>
     </div>
 
-    <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-muted/30">
-      <CustomerDuplicateDetectedCard
-        v-if="customer && potentialDuplicates.length"
-        :potential-duplicates="potentialDuplicates"
-        :merge-loading="mergeLoading"
-        class="shrink-0 mx-4 mt-4 mb-4"
-        @merge="handleMergeClick"
-        @customer-navigate="handleDuplicateCustomerNavigate"
-      />
-      <CustomerProfileContent
-        v-model:active-tab="activeTab"
-        :summary="customerSummary"
-        :activities="customerActivities"
-        :appointments="customerAppointments"
-        :leads="customerLeads"
-        :opportunities="customerOpportunities"
-        :loading="loadingActivities"
-        :phone-number="customer?.phone || ''"
-        :customer-id="customerId"
-        :customer-initials="customer?.initials || '?'"
-        :hide-tab-counts="!!(showCloseButton || from)"
-        @add-activity="handleAddActivity"
-        @add-appointment="showCreateAppointmentModal = true"
-      />
-    </div>
-    </div>
-
-    <!-- Modals -->
     <AddLeadOpportunityModal
       v-if="customer"
       :show="showAddModal"
@@ -106,7 +133,7 @@
       @close="showAddModal = false"
       @save="handleAddModalSave"
     />
-    
+
     <CreateEventModal
       v-if="showCreateAppointmentModal"
       :show="showCreateAppointmentModal"
@@ -116,15 +143,14 @@
       @create="handleAppointmentCreated"
       @cancel="showCreateAppointmentModal = false"
     />
-    
+
     <AddTagModal
       :show="showAddTagModal"
       :existing-tags="customerData?.tags || []"
       @close="showAddTagModal = false"
       @add="handleAddTag"
     />
-    
-    <!-- Placeholder modals for actions -->
+
     <ComingSoonModal
       :show="showComingSoonModal"
       :title="comingSoonTitle"
@@ -145,16 +171,16 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { Button } from '@motork/component-library/future/primitives'
 import { X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
-import { useLeadsStore } from '@/stores/leads'
-import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useCustomersStore } from '@/stores/customers'
 import { useUserStore } from '@/stores/user'
 import { useToastStore } from '@/stores/toast'
-import CustomerProfileSidebar from '@/components/customer/profile/CustomerProfileSidebar.vue'
+import TaskContactCard from '@/components/tasks/TaskContactCard.vue'
+import RequestMainTabs from '@/components/requests/RequestMainTabs.vue'
 import CustomerProfileContent from '@/components/customer/profile/CustomerProfileContent.vue'
+import CustomerProfileRightColumn from '@/components/customer/profile/CustomerProfileRightColumn.vue'
 import AddLeadOpportunityModal from '@/components/modals/AddLeadOpportunityModal.vue'
 import CreateEventModal from '@/components/modals/CreateEventModal.vue'
 import AddTagModal from '@/components/modals/AddTagModal.vue'
@@ -199,12 +225,11 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'customer-navigate', 'navigate-to-customer'])
 
-const router = useRouter()
+const { t } = useI18n()
 const customersStore = useCustomersStore()
 const userStore = useUserStore()
 const toastStore = useToastStore()
 
-// Loading states
 const loadingCustomer = ref(false)
 const loadingAccount = ref(false)
 const loadingLeads = ref(false)
@@ -213,7 +238,6 @@ const loadingActivities = ref(false)
 const loadingAppointments = ref(false)
 const error = ref(null)
 
-// Data
 const customerData = ref(null)
 const accountData = ref(null)
 const customerLeads = ref([])
@@ -223,12 +247,10 @@ const customerAppointments = ref([])
 const customerTasks = ref([])
 const customerCars = ref([])
 
-// Duplicate merge
 const showMergeModal = ref(false)
 const duplicateToMerge = ref(null)
 const mergeLoading = ref(false)
 
-// Modals
 const showAddModal = ref(false)
 const addModalType = ref('lead')
 const showCreateAppointmentModal = ref(false)
@@ -241,6 +263,44 @@ const activeTab = ref('overview')
 const currentUser = computed(() => userStore.currentUser)
 
 const customer = computed(() => customerData.value || customersStore.currentCustomer)
+
+const taskForContactCard = computed(() => {
+  const c = customer.value
+  if (!c) {
+    return { customer: null, activities: [] }
+  }
+  return {
+    id: null,
+    customer: { ...c, tags: c.tags || [] },
+    activities: customerActivities.value || []
+  }
+})
+
+const hideTabCounts = computed(() => !!(props.showCloseButton || props.from))
+
+const communicationActivitiesCount = computed(() => {
+  return customerActivities.value.filter(
+    (a) =>
+      a.type === 'customer-email' ||
+      a.type === 'customer-whatsapp' ||
+      a.type === 'email' ||
+      a.type === 'whatsapp'
+  ).length
+})
+
+const mainTabs = computed(() => {
+  const overview = { key: 'overview', label: t('customerProfile.tabs.overview') }
+  const requests = { key: 'requests', label: t('customerProfile.tabs.requests') }
+  const communication = { key: 'communication', label: t('customerProfile.tabs.communication') }
+  if (hideTabCounts.value) {
+    return [overview, requests, communication]
+  }
+  return [
+    overview,
+    { ...requests, count: customerLeads.value.length + customerOpportunities.value.length },
+    { ...communication, count: communicationActivitiesCount.value }
+  ]
+})
 
 const customerForDuplicateDetection = computed(() => {
   const c = customer.value
@@ -257,13 +317,13 @@ const mergeDuplicateSummary = computed(() => {
 })
 
 const customerSummary = computed(() => {
-   return customerData.value?.summary || ''
+  return customerData.value?.summary || ''
 })
 
 const customerDisplayName = computed(() => {
   const c = customer.value
   if (!c) return ''
-  return c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Customer'
+  return c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || ''
 })
 
 const currentCustomerIndex = computed(() => {
@@ -295,22 +355,20 @@ const getContactForModal = computed(() => {
 
 const loadCustomerData = async () => {
   if (!props.customerId) return
-  
+
   try {
     loadingCustomer.value = true
     loadingLeads.value = true
     loadingOpportunities.value = true
     loadingActivities.value = true
     loadingAppointments.value = true
-    
-    // Fetch customer
-    const customer = await customersStore.fetchCustomerById(props.customerId, props.customerType)
-    customerData.value = customer || customersStore.currentCustomer
+
+    const customerRow = await customersStore.fetchCustomerById(props.customerId, props.customerType)
+    customerData.value = customerRow || customersStore.currentCustomer
     loadingCustomer.value = false
 
     const accountId = customerData.value?.accountId || customerData.value?.account_id
-    
-    // Fetch related data in parallel
+
     const [leadsResult, oppsResult, tasksResult, appointmentsResult, carsResult] = await Promise.all([
       fetchLeadsByCustomerId(props.customerId, accountId),
       fetchOpportunitiesByCustomerId(props.customerId, accountId),
@@ -318,18 +376,17 @@ const loadCustomerData = async () => {
       fetchAppointmentsByCustomerId(props.customerId),
       fetchCustomerCars(accountId || props.customerId)
     ])
-    
+
     customerLeads.value = leadsResult.data || []
     customerOpportunities.value = oppsResult.data || []
     customerTasks.value = tasksResult.data || []
     customerAppointments.value = appointmentsResult || []
     customerCars.value = carsResult.data || []
-    
+
     loadingLeads.value = false
     loadingOpportunities.value = false
     loadingAppointments.value = false
-    
-    // Fetch account if exists
+
     if (customerData.value?.accountId) {
       loadingAccount.value = true
       try {
@@ -339,14 +396,11 @@ const loadCustomerData = async () => {
       } finally {
         loadingAccount.value = false
       }
+    } else {
+      accountData.value = null
     }
 
-    // Fetch activities (aggregate from leads/opps)
     const allActivities = []
-    // Add logic to fetch activities... simplified for now
-    // In a real app, you'd likely have an endpoint for customer activities
-    // For now, let's mock or use what we have
-    // Reuse logic from original file:
     for (const lead of customerLeads.value) {
       try {
         const acts = await fetchLeadActivities(lead.id)
@@ -361,21 +415,33 @@ const loadCustomerData = async () => {
     }
     customerActivities.value = allActivities
     loadingActivities.value = false
-
   } catch (err) {
     console.error('Error loading customer data:', err)
     error.value = err.message
     loadingCustomer.value = false
+    loadingLeads.value = false
+    loadingOpportunities.value = false
+    loadingActivities.value = false
+    loadingAppointments.value = false
   }
 }
 
-const handleAddActivity = () => {
+function handleAddActivity() {
   comingSoonTitle.value = 'Add Activity'
   showComingSoonModal.value = true
 }
 
+function handleContactQuickAction() {
+  comingSoonTitle.value = 'Quick action'
+  showComingSoonModal.value = true
+}
+
+function handleSendMessage() {
+  comingSoonTitle.value = t('customerProfile.sendMessage')
+  showComingSoonModal.value = true
+}
+
 const handleAppointmentCreated = async (eventData) => {
-  // Create appointment logic
   const payload = {
     ...eventData,
     customerId: props.customerId,
@@ -383,7 +449,7 @@ const handleAppointmentCreated = async (eventData) => {
   }
   try {
     await createCalendarEvent(payload)
-    await loadCustomerData() // reload
+    await loadCustomerData()
   } catch (e) {
     console.error(e)
   }
@@ -391,7 +457,6 @@ const handleAppointmentCreated = async (eventData) => {
 }
 
 const handleAddTag = async (tag) => {
-  // Tag logic
   const tagName = typeof tag === 'string' ? tag : tag.name
   const currentTags = customerData.value?.tags || []
   if (!currentTags.includes(tagName)) {
@@ -407,7 +472,6 @@ const handleAddTag = async (tag) => {
 }
 
 const handleAddModalSave = async () => {
-  // Logic from original file
   if (addModalType.value === 'lead') {
     await customersStore.convertToLead(props.customerId)
   } else {
@@ -450,9 +514,13 @@ onMounted(() => {
   loadCustomerData()
 })
 
-watch(() => props.customerId, () => {
-  loadCustomerData()
-})
+watch(
+  () => props.customerId,
+  () => {
+    activeTab.value = 'overview'
+    loadCustomerData()
+  }
+)
 </script>
 
 <style scoped>

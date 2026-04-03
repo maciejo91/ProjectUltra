@@ -2,7 +2,7 @@
   <div class="flex flex-wrap items-center gap-2">
     <!-- Type Badge (Lead/Opportunity) – same style as tasks table -->
     <span 
-      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui"
+      class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold uppercase leading-none badge-ui"
       :class="typeBadgeClass"
     >
       {{ typeLabel }}
@@ -11,7 +11,7 @@
     <!-- Attempts (call attempts indicator; hidden when shown under card title) -->
     <span
       v-if="!attemptsShownElsewhere && callAttemptsCount > 0"
-      class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
+      class="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground leading-none shrink-0"
     >
       <Phone class="shrink-0 size-2.5" aria-hidden />
       {{ callAttemptsValue }}
@@ -20,7 +20,7 @@
     <!-- Base Status Badge (shown when there's a substatus) – same colors as tasks table -->
     <span 
       v-if="baseStatus && hasSubstatus"
-      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui"
+      class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold uppercase leading-none badge-ui"
       :class="getStageBadgeClass(baseStatus)"
     >
       {{ baseStatus }}
@@ -29,7 +29,7 @@
     <!-- Substatus Badge (or single status if no substatus) -->
     <span 
       v-if="displayStatus"
-      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui"
+      class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold uppercase leading-none badge-ui"
       :class="getStageBadgeClass(displayStatus)"
     >
       {{ displayStatus }}

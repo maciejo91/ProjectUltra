@@ -6,7 +6,7 @@
       </div>
       <div class="flex-1 min-w-0">
         <h4 class="font-bold text-sm text-foreground mb-2">{{ appointmentData.type }}</h4>
-        <div class="space-y-1.5 text-xs text-gray-600">
+        <div class="space-y-1.5 text-sm text-gray-600">
           <div class="flex items-center gap-2">
             <Calendar class="w-4 h-4 shrink-0 text-muted-foreground" />
             <span>{{ formattedDate }}</span>
@@ -22,7 +22,7 @@
         </div>
         <div v-if="appointmentData.status" class="mt-2">
           <span 
-            class="inline-flex px-2 py-0.5 rounded text-xs font-semibold"
+            class="inline-flex px-2 py-0.5 rounded text-sm font-semibold"
             :class="getStatusClass(appointmentData.status)"
           >
             {{ appointmentData.status }}

@@ -56,7 +56,7 @@
                 :required="contactMode === 'new'"
                 :error="errors.name"
               />
-              <p v-if="errors.name" class="text-brand-red text-xs mt-1">{{ errors.name }}</p>
+              <p v-if="errors.name" class="text-brand-red text-sm mt-1">{{ errors.name }}</p>
             </div>
             
             <div class="space-y-3 w-full">
@@ -81,7 +81,7 @@
                 :required="contactMode === 'new'"
                 :error="errors.email"
               />
-              <p v-if="errors.email" class="text-brand-red text-xs mt-1">{{ errors.email }}</p>
+              <p v-if="errors.email" class="text-brand-red text-sm mt-1">{{ errors.email }}</p>
             </div>
             
             <div class="space-y-3 w-full">
@@ -100,12 +100,12 @@
         <Card v-else-if="selectedContact" class="bg-muted border-border">
           <CardContent class="p-4">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-white text-primary flex items-center justify-center text-xs font-bold border border-border">
+              <div class="w-10 h-10 rounded-full bg-white text-primary flex items-center justify-center text-sm font-bold border border-border">
                 {{ selectedContact.initials }}
               </div>
               <div>
                 <div class="text-sm font-semibold text-foreground">{{ selectedContact.name }}</div>
-                <div class="text-xs text-muted-foreground">{{ selectedContact.email }}</div>
+                <div class="text-sm text-muted-foreground">{{ selectedContact.email }}</div>
               </div>
             </div>
           </CardContent>
@@ -118,7 +118,7 @@
       <CardHeader>
         <CardTitle>
           Vehicle Details 
-          <span class="text-xs font-normal text-muted-foreground">(Optional)</span>
+          <span class="text-sm font-normal text-muted-foreground">(Optional)</span>
         </CardTitle>
       </CardHeader>
       <CardContent class="space-y-8">
@@ -273,7 +273,7 @@
                 >
                   Mark as Lead
                 </span>
-                <p class="text-xs text-muted-foreground mt-0.5">New lead task</p>
+                <p class="text-sm text-muted-foreground mt-0.5">New lead task</p>
               </div>
             </CardContent>
           </Card>
@@ -295,7 +295,7 @@
                 >
                   Mark as Opportunity
                 </span>
-                <p class="text-xs text-muted-foreground mt-0.5">New opportunity</p>
+                <p class="text-sm text-muted-foreground mt-0.5">New opportunity</p>
               </div>
             </CardContent>
           </Card>
@@ -316,7 +316,7 @@
         <Card v-if="!hasVehicleData && !forceType" class="bg-orange-50 border-orange-200">
           <CardContent class="flex items-start gap-2">
             <AlertTriangle class="w-4 h-4 shrink-0 text-orange-600 mt-0.5" />
-            <span class="text-xs text-orange-700">Fill in vehicle details to enable lead/opportunity creation</span>
+            <span class="text-sm text-orange-700">Fill in vehicle details to enable lead/opportunity creation</span>
           </CardContent>
         </Card>
       </CardContent>

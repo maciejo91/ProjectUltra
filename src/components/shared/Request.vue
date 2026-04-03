@@ -10,7 +10,7 @@
             </div>
             <div class="flex items-center gap-1.5">
               <span 
-                class="px-2 py-0.5 rounded text-xs font-medium border"
+                class="px-2 py-0.5 rounded text-sm font-medium border"
                 :class="entityType === 'lead' 
                   ? 'bg-blue-50 text-blue-700 border-blue-200' 
                   : 'bg-purple-50 text-purple-700 border-purple-200'"
@@ -18,7 +18,7 @@
                 {{ entityType === 'lead' ? 'Lead' : 'Opportunity' }}
               </span>
               <span 
-                class="px-2 py-0.5 rounded text-xs font-medium border"
+                class="px-2 py-0.5 rounded text-sm font-medium border"
                 :class="stageColorClass"
               >
                 {{ stage }}
@@ -41,12 +41,12 @@
 
           <!-- Right: Owner -->
           <div class="flex items-center gap-2">
-            <span class="hidden md:inline text-xs text-muted-foreground font-medium">Owner</span>
+            <span class="hidden md:inline text-sm text-muted-foreground font-medium">Owner</span>
             <Button
               @click="$emit('reassign')"
               variant="link"
               size="small"
-              class="text-xs font-bold"
+              class="text-sm font-bold"
             >
               {{ owner }}
             </Button>
@@ -69,25 +69,25 @@
                 <div class="flex items-center gap-2 flex-wrap">
                   <div 
                     v-if="stockDays !== undefined && stockDays !== null"
-                    class="inline-flex items-center gap-1.5 px-2 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-md"
+                    class="inline-flex items-center gap-1.5 px-2 py-1 bg-green-50 text-green-700 text-sm font-semibold rounded-md"
                   >
                     <div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div> In stock ({{ stockDays }} days)
                   </div>
                   <div 
                     v-else-if="hasCar"
-                    class="inline-flex items-center gap-1.5 px-2 py-1 bg-orange-50 text-orange-700 text-xs font-semibold rounded-md"
+                    class="inline-flex items-center gap-1.5 px-2 py-1 bg-orange-50 text-orange-700 text-sm font-semibold rounded-md"
                   >
                     <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> Out of stock
                   </div>
                   <div
                     v-if="vehicleCondition"
-                    class="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-semibold rounded-md"
+                    class="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-sm font-semibold rounded-md"
                   >
                     {{ vehicleCondition }}
                   </div>
                   <div
                     v-if="vin"
-                    class="inline-flex items-center min-w-0 max-w-36 px-2 py-1 bg-muted text-muted-foreground text-xs font-mono rounded-md"
+                    class="inline-flex items-center min-w-0 max-w-36 px-2 py-1 bg-muted text-muted-foreground text-sm font-mono rounded-md"
                     :title="`VIN: ${vin}`"
                   >
                     <span class="truncate block min-w-0">VIN: {{ vin }}</span>
@@ -96,14 +96,14 @@
               </div>
             </div>
             <div v-if="carPrice" class="text-right">
-              <div class="text-xs text-muted-foreground font-medium mb-1">Price</div>
+              <div class="text-sm text-muted-foreground font-medium mb-1">Price</div>
               <div class="font-bold text-foreground text-lg">€ {{ formatCurrency(carPrice) }}</div>
             </div>
           </div>
 
           <!-- Request message (when car exists) -->
           <div v-if="requestMessage" class="pt-2">
-            <div class="text-xs text-muted-foreground font-medium mb-2">Request Message</div>
+            <div class="text-sm text-muted-foreground font-medium mb-2">Request Message</div>
             <div class="bg-muted border border-border rounded-lg p-3">
               <p class="text-sm text-muted-foreground leading-relaxed">{{ requestMessage }}</p>
             </div>
@@ -113,7 +113,7 @@
         <!-- Request-only display (no car but request data exists) -->
         <div v-else class="space-y-3">
           <div v-if="requestMessage" class="bg-muted border border-border rounded-lg p-3">
-            <div class="text-xs text-muted-foreground font-medium mb-2">Request Message</div>
+            <div class="text-sm text-muted-foreground font-medium mb-2">Request Message</div>
             <p class="text-sm text-muted-foreground leading-relaxed">{{ requestMessage }}</p>
           </div>
         </div>
@@ -145,33 +145,33 @@
         <div v-if="hasCar">
           <div>
             <div class="flex justify-between items-center mb-4">
-              <h4 class="text-xs font-bold uppercase text-muted-foreground tracking-wider">VEHICLE DETAILS</h4>
+              <h4 class="text-sm font-bold uppercase text-muted-foreground tracking-wider">VEHICLE DETAILS</h4>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-6">
               <div v-if="registration">
-                <div class="text-xs text-muted-foreground mb-1">Registration</div>
+                <div class="text-sm text-muted-foreground mb-1">Registration</div>
                 <div class="font-medium text-muted-foreground">{{ registration }}</div>
               </div>
               <div v-if="kilometers !== undefined && kilometers !== null">
-                <div class="text-xs text-muted-foreground mb-1">Kilometers</div>
+                <div class="text-sm text-muted-foreground mb-1">Kilometers</div>
                 <div class="font-medium text-muted-foreground">{{ formatNumber(kilometers) }} Km</div>
               </div>
               <div v-if="fuelType">
-                <div class="text-xs text-muted-foreground mb-1">Fuel type</div>
+                <div class="text-sm text-muted-foreground mb-1">Fuel type</div>
                 <div class="font-medium text-muted-foreground">{{ fuelType }}</div>
               </div>
               <div v-if="gearType">
-                <div class="text-xs text-muted-foreground mb-1">Gear type</div>
+                <div class="text-sm text-muted-foreground mb-1">Gear type</div>
                 <div class="font-medium text-muted-foreground">{{ gearType }}</div>
               </div>
               <div v-if="vin">
-                <div class="text-xs text-muted-foreground mb-1">VIN Number</div>
-                <div class="font-mono text-xs bg-surface border border-border px-2 py-1 rounded inline-block text-muted-foreground">
+                <div class="text-sm text-muted-foreground mb-1">VIN Number</div>
+                <div class="font-mono text-sm bg-surface border border-border px-2 py-1 rounded inline-block text-muted-foreground">
                   {{ vin }}
                 </div>
               </div>
               <div v-if="dealership">
-                <div class="text-xs text-muted-foreground mb-1">Dealership</div>
+                <div class="text-sm text-muted-foreground mb-1">Dealership</div>
                 <div class="font-medium text-muted-foreground">{{ dealership }}</div>
               </div>
             </div>

@@ -41,7 +41,7 @@
             <Badge variant="secondary" :class="getStatusClass(item.status)">{{ item.status }}</Badge>
           </div>
           <h4 class="font-medium text-foreground truncate">{{ item.title }}</h4>
-          <div class="text-xs text-muted-foreground mt-1">{{ item.subtitle }}</div>
+          <div class="text-sm text-muted-foreground mt-1">{{ item.subtitle }}</div>
         </div>
       </div>
     </div>

@@ -47,7 +47,7 @@
     <template #batch-action-bar>
       <div v-if="hasSelection" class="flex items-center gap-2">
         <div class="flex items-center gap-2 mr-1">
-          <div class="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-blue-600 text-white text-xs font-medium">
+          <div class="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-blue-600 text-white text-sm font-medium">
             {{ selectedCount }}
           </div>
           <span class="text-white text-fluid-sm font-medium whitespace-nowrap">Items selected</span>

@@ -8,7 +8,7 @@
       <template v-for="tag in normalizedTags" :key="tag.name">
         <span
           v-if="tag.color"
-          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-xs font-medium shrink-0"
+          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-sm font-medium shrink-0"
           :class="isLightColor(tag.color) ? 'text-foreground' : 'text-white'"
           :style="{ backgroundColor: tag.color }"
         >
@@ -24,7 +24,7 @@
         </span>
         <span
           v-else
-          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-xs font-medium shrink-0 bg-primary/15 text-foreground"
+          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-sm font-medium shrink-0 bg-primary/15 text-foreground"
         >
           <span class="min-w-0 truncate">{{ tag.name }}</span>
           <button
@@ -40,7 +40,7 @@
       <button
         type="button"
         @click.stop="showAddTagModal = true"
-        class="text-xs text-muted-foreground hover:text-primary font-medium hover:underline transition-colors whitespace-nowrap shrink-0"
+        class="text-sm text-muted-foreground hover:text-primary font-medium hover:underline transition-colors whitespace-nowrap shrink-0"
       >
         + tag
       </button>
@@ -49,7 +49,7 @@
       <template v-for="tag in normalizedTags" :key="tag.name">
         <span
           v-if="tag.color"
-          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-xs font-medium shrink-0"
+          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-sm font-medium shrink-0"
           :class="isLightColor(tag.color) ? 'text-foreground' : 'text-white'"
           :style="{ backgroundColor: tag.color }"
         >
@@ -65,7 +65,7 @@
         </span>
         <span
           v-else
-          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-xs font-medium shrink-0 bg-primary/15 text-foreground"
+          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-sm font-medium shrink-0 bg-primary/15 text-foreground"
         >
           <span class="min-w-0 truncate">{{ tag.name }}</span>
           <button
@@ -81,7 +81,7 @@
       <button
         type="button"
         @click.stop="showAddTagModal = true"
-        class="text-xs text-muted-foreground hover:text-primary font-medium hover:underline transition-colors whitespace-nowrap shrink-0"
+        class="text-sm text-muted-foreground hover:text-primary font-medium hover:underline transition-colors whitespace-nowrap shrink-0"
       >
         + tag
       </button>

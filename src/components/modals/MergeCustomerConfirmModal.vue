@@ -49,7 +49,7 @@
               </div>
             </div>
             <div class="grid grid-cols-[1fr_1fr_1fr] gap-0 divide-y divide-border">
-              <div class="px-4 py-2 text-xs text-muted-foreground">
+              <div class="px-4 py-2 text-sm text-muted-foreground">
                 —
               </div>
               <div
@@ -58,7 +58,7 @@
                   isMasterPrimary ? 'bg-primary/5' : ''
                 ]"
               >
-                <span class="text-xs text-muted-foreground">Contact ID: {{ masterRecord?.id ?? '—' }}</span>
+                <span class="text-sm text-muted-foreground">Contact ID: {{ masterRecord?.id ?? '—' }}</span>
                 <span class="text-sm font-medium text-foreground">Master record</span>
               </div>
               <div
@@ -67,7 +67,7 @@
                   !isMasterPrimary ? 'bg-primary/5' : ''
                 ]"
               >
-                <span class="text-xs text-muted-foreground">Contact ID: {{ otherRecord?.id ?? '—' }}</span>
+                <span class="text-sm text-muted-foreground">Contact ID: {{ otherRecord?.id ?? '—' }}</span>
                 <Button
                   variant="outline"
                   size="sm"

@@ -16,7 +16,7 @@
     </p>
     <Button
       v-if="actionLabel"
-      variant="default"
+      variant="secondary"
       class="rounded-sm w-full sm:w-auto"
       type="button"
       @click="$emit('action')"

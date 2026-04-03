@@ -3,25 +3,25 @@
     <div class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">Start date</Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">Start date</Label>
           <Input type="date" v-model="financingData.startDate" />
         </div>
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">Expiration date</Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">Expiration date</Label>
           <Input type="date" v-model="financingData.expDate" />
         </div>
       </div>
       <div>
-        <Label class="text-xs font-medium text-muted-foreground mb-1">Financial product name</Label>
+        <Label class="text-sm font-medium text-muted-foreground mb-1">Financial product name</Label>
         <Input type="text" v-model="financingData.productName" placeholder="Enter product name" />
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">Deposit</Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">Deposit</Label>
           <Input type="number" v-model="financingData.deposit" placeholder="0" />
         </div>
         <div>
-          <Label class="text-xs font-medium text-muted-foreground mb-1">Total loan amount</Label>
+          <Label class="text-sm font-medium text-muted-foreground mb-1">Total loan amount</Label>
           <Input type="number" v-model="financingData.loanAmount" placeholder="0" />
         </div>
       </div>

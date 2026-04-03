@@ -42,7 +42,7 @@
               class="w-14 h-14 rounded-lg bg-muted border border-border flex flex-col items-center justify-center shrink-0 text-center"
             >
               <span class="text-lg font-semibold text-foreground leading-none">{{ parseEventDate(event.date).day }}</span>
-              <span class="text-xs font-medium text-muted-foreground leading-none mt-0.5">{{ parseEventDate(event.date).month }}</span>
+              <span class="text-sm font-medium text-muted-foreground leading-none mt-0.5">{{ parseEventDate(event.date).month }}</span>
             </div>
             <div class="flex-1 min-w-0 flex flex-col gap-0.5">
               <p class="text-sm font-semibold text-foreground">{{ event.title || event.type }}</p>

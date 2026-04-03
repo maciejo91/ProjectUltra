@@ -8,7 +8,7 @@
           </div>
           <div>
             <h4 class="text-sm font-semibold">{{ appointment.title || 'Appointment' }}</h4>
-            <div class="text-xs text-muted-foreground">{{ formattedDate }}</div>
+            <div class="text-sm text-muted-foreground">{{ formattedDate }}</div>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -26,7 +26,7 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
         <span class="flex items-center gap-1.5 shrink-0">
           <MapPin class="size-3.5 shrink-0" />
           {{ appointment.location || appointment.dealership || 'Unknown location' }}

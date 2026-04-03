@@ -29,7 +29,7 @@
                            'polygon(12px 0, calc(100% - 12px) 0, calc(100% - 12px) 100%, 12px 100%)'
                 }"
               >
-                <span class="text-gray-900 text-xs font-bold z-10">{{ stage.percentage }}%</span>
+                <span class="text-gray-900 text-sm font-bold z-10">{{ stage.percentage }}%</span>
               </div>
             </div>
           </div>
@@ -47,7 +47,7 @@
               :class="getStageColorClass(stage.color)"
             ></div>
             <div class="text-2xl font-bold text-gray-900">{{ formatNumber(stage.count) }}</div>
-            <div class="text-xs text-gray-500 mt-1">{{ stage.name }}</div>
+            <div class="text-sm text-gray-500 mt-1">{{ stage.name }}</div>
           </div>
         </div>
       </div>
@@ -84,7 +84,7 @@
             </div>
           </div>
         </div>
-        <div class="text-xs text-gray-500 mt-2 text-center">Conversion rate</div>
+        <div class="text-sm text-gray-500 mt-2 text-center">Conversion rate</div>
       </div>
     </div>
   </div>

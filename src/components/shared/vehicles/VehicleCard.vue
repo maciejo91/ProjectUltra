@@ -27,10 +27,10 @@
 
     <!-- Details -->
     <div class="flex flex-col p-2">
-      <h4 class="font-bold text-foreground leading-tight line-clamp-2 text-xs">
+      <h4 class="font-bold text-foreground leading-tight line-clamp-2 text-sm">
         {{ vehicle.brand }} {{ vehicle.model }} ({{ vehicle.year }})
       </h4>
-      <p class="font-bold text-foreground text-xs mt-0.5">€ {{ formatPrice(vehicle.price) }}</p>
+      <p class="font-bold text-foreground text-sm mt-0.5">€ {{ formatPrice(vehicle.price) }}</p>
 
       <!-- Stock pill -->
       <div

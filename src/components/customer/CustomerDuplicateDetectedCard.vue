@@ -6,7 +6,7 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
       <div class="flex-1 min-w-0">
         <h3 class="text-sm font-semibold text-foreground">Duplicate customer detected</h3>
-        <p class="mt-0.5 text-xs text-muted-foreground">
+        <p class="mt-0.5 text-sm text-muted-foreground">
           The following {{ potentialDuplicates.length > 1 ? 'customers' : 'customer' }} may be duplicate{{ potentialDuplicates.length > 1 ? 's' : '' }}:
           <template v-for="(dup, i) in potentialDuplicates" :key="dup.id">
             <span v-if="i > 0">, </span>

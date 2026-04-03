@@ -13,7 +13,7 @@
               <template v-for="(s, i) in stepLabels" :key="s.key">
                 <li class="flex flex-col items-center gap-2 shrink-0 w-16 sm:w-24">
                   <span
-                    class="flex size-6 sm:size-7 shrink-0 items-center justify-center rounded-full text-[10px] sm:text-xs transition-colors"
+                    class="flex size-6 sm:size-7 shrink-0 items-center justify-center rounded-full text-[10px] sm:text-sm transition-colors"
                     :class="currentStepIndex === i ? 'bg-primary text-primary-foreground font-bold shadow-sm' : 'bg-muted text-muted-foreground'"
                   >
                     {{ i + 1 }}
@@ -39,7 +39,7 @@
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Contract Status</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Contract Status</Label>
                   <Select v-model="formData.core.contractStatus">
                     <SelectTrigger class="bg-background">
                       <SelectValue placeholder="Select status" />
@@ -53,7 +53,7 @@
                   </Select>
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Contract Date <span class="text-destructive">*</span></Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Contract Date <span class="text-destructive">*</span></Label>
                   <Input
                     v-model="formData.core.contractDate"
                     type="date"
@@ -62,19 +62,19 @@
                   />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Time (Optional)</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Time (Optional)</Label>
                   <Input v-model="formData.core.contractTime" type="time" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">External ID</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">External ID</Label>
                   <Input v-model="formData.core.contractExternalId" placeholder="External reference" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Expected Delivery</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Expected Delivery</Label>
                   <Input v-model="formData.core.expectedDeliveryDate" type="date" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Delivery Date</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Delivery Date</Label>
                   <Input v-model="formData.core.deliveryDate" type="date" class="bg-background" />
                 </div>
               </div>
@@ -86,7 +86,7 @@
                 <h3 class="text-sm font-bold text-foreground uppercase tracking-tight">Customer Information</h3>
               </div>
               <div class="space-y-2">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Account Type</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Account Type</Label>
                 <div class="outcome-toggle-group flex gap-3">
                   <Toggle
                     variant="outline"
@@ -108,24 +108,24 @@
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">First Name</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">First Name</Label>
                   <Input v-model="formData.contact.firstName" placeholder="First name" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Last Name</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Last Name</Label>
                   <Input v-model="formData.contact.lastName" placeholder="Last name" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Email</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Email</Label>
                   <Input v-model="formData.contact.email" type="email" placeholder="email@example.com" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Phone</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Phone</Label>
                   <Input v-model="formData.contact.phone" type="tel" placeholder="+49..." class="bg-background" />
                 </div>
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Address</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Address</Label>
                 <Input v-model="formData.contact.address" placeholder="Street address" class="bg-background" />
               </div>
               <div class="flex items-center gap-3 p-3 rounded-md bg-muted/30 border border-border/50">
@@ -134,7 +134,7 @@
                   @update:checked="formData.contact.privacyConsent = $event"
                   id="privacy-consent"
                 />
-                <Label for="privacy-consent" class="text-xs font-medium text-foreground cursor-pointer select-none">
+                <Label for="privacy-consent" class="text-sm font-medium text-foreground cursor-pointer select-none">
                   Customer has provided privacy consent
                 </Label>
               </div>
@@ -149,31 +149,31 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Make</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Make</Label>
                 <Input v-model="formData.vehicle.make" placeholder="e.g., Volkswagen" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Model</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Model</Label>
                 <Input v-model="formData.vehicle.model" placeholder="e.g., ID.4" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Version</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Version</Label>
                 <Input v-model="formData.vehicle.version" placeholder="Version/trim" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">VIN</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">VIN</Label>
                 <Input v-model="formData.vehicle.vin" placeholder="Vehicle ID number" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Plate Number</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Plate Number</Label>
                 <Input v-model="formData.vehicle.plateNumber" placeholder="License plate" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">External ID</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">External ID</Label>
                 <Input v-model="formData.vehicle.vehicleExternalId" placeholder="External reference" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Vehicle Type</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Vehicle Type</Label>
                 <Select v-model="formData.vehicle.vehicleType">
                   <SelectTrigger class="bg-background">
                     <SelectValue placeholder="Select type" />
@@ -185,11 +185,11 @@
                 </Select>
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Registration Date</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Registration Date</Label>
                 <Input v-model="formData.vehicle.registrationDate" type="date" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Gear Type</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Gear Type</Label>
                 <Select v-model="formData.vehicle.gearType">
                   <SelectTrigger class="bg-background">
                     <SelectValue placeholder="Select gear type" />
@@ -202,7 +202,7 @@
                 </Select>
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Fuel Type</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Fuel Type</Label>
                 <Select v-model="formData.vehicle.fuelType">
                   <SelectTrigger class="bg-background">
                     <SelectValue placeholder="Select fuel type" />
@@ -217,7 +217,7 @@
                 </Select>
               </div>
               <div class="space-y-1.5 sm:col-span-2 bg-primary/5 p-4 rounded-lg border border-primary/10">
-                <Label class="text-xs font-bold uppercase text-primary">Vehicle Pricing (€)</Label>
+                <Label class="text-sm font-bold uppercase text-primary">Vehicle Pricing (€)</Label>
                 <Input v-model="formData.vehicle.vehiclePricing" type="number" placeholder="0" class="bg-background mt-1 text-lg font-bold" />
               </div>
             </div>
@@ -231,35 +231,35 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Make</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Make</Label>
                 <Input v-model="formData.tradein.make" placeholder="Brand" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Model</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Model</Label>
                 <Input v-model="formData.tradein.model" placeholder="Model" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Version</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Version</Label>
                 <Input v-model="formData.tradein.version" placeholder="Version/trim" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Mileage (km)</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Mileage (km)</Label>
                 <Input v-model="formData.tradein.mileage" type="number" placeholder="km" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Plate Number</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Plate Number</Label>
                 <Input v-model="formData.tradein.plateNumber" placeholder="License plate" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Offered Price (€)</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Offered Price (€)</Label>
                 <Input v-model="formData.tradein.price" type="number" placeholder="0" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Color</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Color</Label>
                 <Input v-model="formData.tradein.color" placeholder="Color" class="bg-background" />
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Fuel Type</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Fuel Type</Label>
                 <Select v-model="formData.tradein.fuelType">
                   <SelectTrigger class="bg-background">
                     <SelectValue placeholder="Select" />
@@ -274,7 +274,7 @@
                 </Select>
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Gear Type</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Gear Type</Label>
                 <Select v-model="formData.tradein.gearType">
                   <SelectTrigger class="bg-background">
                     <SelectValue placeholder="Select" />
@@ -287,11 +287,11 @@
                 </Select>
               </div>
               <div class="space-y-1.5">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Registration Date</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Registration Date</Label>
                 <Input v-model="formData.tradein.registrationDate" type="date" class="bg-background" />
               </div>
               <div class="space-y-1.5 sm:col-span-2">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Current Owner</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Current Owner</Label>
                 <Input v-model="formData.tradein.owner" placeholder="Full name of owner" class="bg-background" />
               </div>
             </div>
@@ -306,7 +306,7 @@
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Service Type</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Service Type</Label>
                   <Select v-model="formData.financial.serviceType">
                     <SelectTrigger class="bg-background">
                       <SelectValue placeholder="Select type" />
@@ -320,23 +320,23 @@
                   </Select>
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Service Name</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Service Name</Label>
                   <Input v-model="formData.financial.serviceName" placeholder="e.g. Standard Financing" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Provider</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Provider</Label>
                   <Input v-model="formData.financial.provider" placeholder="e.g. Bank Name" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Duration (months)</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Duration (months)</Label>
                   <Input v-model="formData.financial.contractDuration" type="number" placeholder="36" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Monthly Payment (€)</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Monthly Payment (€)</Label>
                   <Input v-model="formData.financial.monthlyQuote" type="number" placeholder="0.00" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Down Payment (€)</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Down Payment (€)</Label>
                   <Input v-model="formData.financial.downPayment" type="number" placeholder="0.00" class="bg-background" />
                 </div>
               </div>
@@ -397,13 +397,13 @@
                   </div>
                   <div class="flex items-center gap-2 pt-1">
                     <Checkbox :checked="pm.paid" @update:checked="pm.paid = $event" :id="'paid-'+index" />
-                    <Label :for="'paid-'+index" class="text-xs font-semibold text-muted-foreground cursor-pointer select-none">
+                    <Label :for="'paid-'+index" class="text-sm font-semibold text-muted-foreground cursor-pointer select-none">
                       Mark as already paid
                     </Label>
                   </div>
                 </div>
                 <div v-if="!formData.paymentMethods.length" class="text-center py-8 border-2 border-dashed border-border rounded-xl">
-                  <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">No payment methods defined</p>
+                  <p class="text-sm font-medium text-muted-foreground uppercase tracking-wider">No payment methods defined</p>
                   <Button variant="link" size="sm" @click="addPaymentMethod" class="mt-1 text-primary">
                     Click to add your first payment method
                   </Button>
@@ -421,20 +421,20 @@
               </div>
               <div class="space-y-4">
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Contract Terms & Conditions</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Contract Terms & Conditions</Label>
                   <Textarea v-model="formData.legal.termsAndConditions" rows="3" placeholder="Enter full terms..." class="resize-none bg-background text-sm" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Disclaimer Statement</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Disclaimer Statement</Label>
                   <Textarea v-model="formData.legal.disclaimer" rows="2" placeholder="Legal disclaimer..." class="resize-none bg-background text-sm" />
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                   <div class="space-y-1.5">
-                    <Label class="text-xs font-semibold uppercase text-muted-foreground">Signature Area Text</Label>
+                    <Label class="text-sm font-semibold uppercase text-muted-foreground">Signature Area Text</Label>
                     <Textarea v-model="formData.legal.signatureAreaStatement" rows="2" placeholder="Text near signature..." class="resize-none bg-background text-sm" />
                   </div>
                   <div class="space-y-1.5">
-                    <Label class="text-xs font-semibold uppercase text-muted-foreground">Trade-in Statement</Label>
+                    <Label class="text-sm font-semibold uppercase text-muted-foreground">Trade-in Statement</Label>
                     <Textarea v-model="formData.legal.tradeinLegalStatement" rows="2" placeholder="Specific trade-in terms..." class="resize-none bg-background text-sm" />
                   </div>
                 </div>
@@ -448,7 +448,7 @@
               </div>
               <div class="space-y-5">
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Sales Representative / Owner</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Sales Representative / Owner</Label>
                   <Select v-model="formData.owner.contractOwner">
                     <SelectTrigger class="bg-background">
                       <SelectValue placeholder="Assign a representative" />
@@ -467,16 +467,16 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                   <div class="space-y-1.5">
-                    <Label class="text-xs font-semibold uppercase text-muted-foreground">Lead Source</Label>
+                    <Label class="text-sm font-semibold uppercase text-muted-foreground">Lead Source</Label>
                     <Input v-model="formData.additional.source" placeholder="e.g. Website, Walk-in" class="bg-background" />
                   </div>
                   <div class="space-y-1.5">
-                    <Label class="text-xs font-semibold uppercase text-muted-foreground">Deal Location</Label>
+                    <Label class="text-sm font-semibold uppercase text-muted-foreground">Deal Location</Label>
                     <Input v-model="formData.additional.dealLocation" placeholder="e.g. Main Showroom" class="bg-background" />
                   </div>
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Internal Notes</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Internal Notes</Label>
                   <Textarea v-model="formData.additional.notes" rows="3" placeholder="Private notes for the dealership..." class="resize-none bg-background text-sm" />
                 </div>
               </div>

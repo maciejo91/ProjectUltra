@@ -13,7 +13,7 @@
         <span>{{ tab.label }}</span>
         <span 
           v-if="!hideCounts && tab.count !== undefined && tab.count > 0"
-          class="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-xs font-bold leading-none"
+          class="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-sm font-bold leading-none"
           :class="modelValue === tab.key 
             ? 'bg-primary text-white' 
             : 'bg-gray-200 text-foreground'"

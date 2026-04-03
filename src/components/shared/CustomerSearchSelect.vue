@@ -23,12 +23,12 @@
           class="flex items-center gap-2 p-3 hover:bg-muted cursor-pointer border-b border-border last:border-b-0 transition-colors"
           @click="selectContact(contact)"
         >
-          <div class="w-8 h-8 rounded-full bg-muted text-primary flex items-center justify-center text-xs font-bold shrink-0">
+          <div class="w-8 h-8 rounded-full bg-muted text-primary flex items-center justify-center text-sm font-bold shrink-0">
             {{ contact.initials || getInitials(contact) }}
           </div>
           <div class="flex-1 min-w-0">
             <div class="text-sm font-semibold text-foreground truncate">{{ contact.name || [contact.firstName, contact.lastName].filter(Boolean).join(' ') }}</div>
-            <div class="text-xs text-muted-foreground truncate">{{ contact.email }}</div>
+            <div class="text-sm text-muted-foreground truncate">{{ contact.email }}</div>
           </div>
           <ChevronRight class="w-3 h-3 shrink-0 text-muted-foreground" />
         </div>
@@ -39,12 +39,12 @@
       <CardContent class="p-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-background text-primary flex items-center justify-center text-xs font-bold border border-border shrink-0">
+            <div class="w-10 h-10 rounded-full bg-background text-primary flex items-center justify-center text-sm font-bold border border-border shrink-0">
               {{ modelValue.initials || getInitials(modelValue) }}
             </div>
             <div class="min-w-0">
               <div class="text-sm font-semibold text-foreground truncate">{{ modelValue.name || [modelValue.firstName, modelValue.lastName].filter(Boolean).join(' ') }}</div>
-              <div class="text-xs text-muted-foreground truncate">{{ modelValue.email }}</div>
+              <div class="text-sm text-muted-foreground truncate">{{ modelValue.email }}</div>
             </div>
           </div>
           <Button

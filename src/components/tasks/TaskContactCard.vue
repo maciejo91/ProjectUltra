@@ -1,6 +1,7 @@
 <template>
   <div
-    class="overflow-hidden rounded-lg bg-background shadow-nsc-card"
+    class="overflow-hidden"
+    :class="embeddedInCard ? '' : 'rounded-lg bg-background'"
   >
     <template v-if="!isEditing">
       <div class="flex flex-col gap-2 px-4 py-4">
@@ -59,7 +60,7 @@
                   >
                     <Mail class="size-3.5 text-muted-foreground" />
                   </span>
-                  <span class="min-w-0 truncate text-xs text-muted-foreground">{{
+                  <span class="min-w-0 truncate text-sm text-muted-foreground">{{
                     emailDisplay || '—'
                   }}</span>
                 </div>
@@ -70,7 +71,7 @@
                   >
                     <Phone class="size-3.5 text-muted-foreground" />
                   </span>
-                  <span class="min-w-0 truncate text-xs text-muted-foreground">{{
+                  <span class="min-w-0 truncate text-sm text-muted-foreground">{{
                     phoneDisplay || '—'
                   }}</span>
                 </div>
@@ -79,72 +80,135 @@
           </div>
         </div>
 
-        <div
-          v-if="showTagsAndInteractionsRow"
-          class="flex w-full min-w-0 flex-wrap items-center gap-2"
-          :class="tagsAndInteractionsRowJustifyClass"
-        >
-          <div
-            v-if="task.customer"
-            class="flex min-w-0 flex-wrap items-center gap-1 pl-12"
-            :class="interactionCount > 0 && showQuickActions ? 'flex-1' : ''"
-          >
-            <span
-              v-if="task.customer?.isBusiness"
-              class="badge-ui inline-flex w-fit items-center rounded-md px-2 py-0.5 text-xs font-medium leading-none bg-muted text-muted-foreground"
+        <div v-if="showTagsOrMetaRow" class="flex w-full min-w-0 flex-col gap-2">
+          <div class="flex w-full min-w-0 flex-wrap items-center gap-2">
+            <div
+              v-if="task.customer"
+              class="flex min-w-0 flex-1 flex-wrap items-center gap-1 pl-12"
             >
-              {{ t('requestDetail.contactCard.businessTag') }}
-            </span>
-            <span
-              v-for="tag in task.customer?.tags || []"
-              :key="tag"
-              class="badge-ui inline-flex w-fit items-center rounded-md px-2 py-0.5 text-xs font-medium leading-none"
-              :class="tagBadgeClass(tag)"
-            >
-              {{ tag }}
-            </span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              class="size-6 rounded-md text-muted-foreground"
-              :aria-label="t('requestDetail.contactCard.addTag')"
-              @click="emit('add-tag')"
-            >
-              <Plus class="size-3" />
-            </Button>
+              <span
+                v-if="task.customer?.isBusiness"
+                class="badge-ui inline-flex w-fit items-center rounded-md px-2 py-0.5 text-sm font-medium leading-none bg-muted text-muted-foreground"
+              >
+                {{ t('requestDetail.contactCard.businessTag') }}
+              </span>
+              <span
+                v-for="tag in task.customer?.tags || []"
+                :key="tag"
+                class="badge-ui inline-flex w-fit items-center rounded-md px-2 py-0.5 text-sm font-medium leading-none"
+                :class="tagBadgeClass(tag)"
+              >
+                {{ tag }}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                class="size-6 rounded-md text-muted-foreground"
+                :aria-label="t('requestDetail.contactCard.addTag')"
+                @click="emit('add-tag')"
+              >
+                <Plus class="size-3" />
+              </Button>
+            </div>
+            <div v-else class="min-w-0 flex-1" />
+
+            <div class="ml-auto flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+              <div v-if="showQuickActions && interactionCount > 0" class="shrink-0">
+                <DropdownMenu :modal="false">
+                  <DropdownMenuTrigger as-child>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      class="max-w-full shrink-0 gap-1 text-sm"
+                    >
+                      <span class="truncate">{{ activityMenuLabel }}</span>
+                      <ChevronDown class="size-3 shrink-0 opacity-70" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" class="min-w-56 p-1.5">
+                    <DropdownMenuItem
+                      v-for="act in recentInteractions"
+                      :key="interactionKey(act)"
+                      class="cursor-pointer rounded-sm px-2 py-1.5 text-sm"
+                      @select="emit('open-activity', act)"
+                    >
+                      {{ formatActivityLine(act) }}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <Button
+                v-if="showPastRequestsSection"
+                type="button"
+                variant="secondary"
+                size="sm"
+                class="max-w-full shrink-0 justify-between gap-1 text-left text-sm"
+                :aria-expanded="pastRequestsOpen"
+                :aria-controls="pastRequestsPanelId"
+                @click="pastRequestsOpen = !pastRequestsOpen"
+              >
+                <span class="min-w-0 truncate">{{
+                  t('customerProfile.rightColumn.otherInteractions', { count: pastRequestRows.length })
+                }}</span>
+                <ChevronDown
+                  class="size-3 shrink-0 opacity-70 transition-transform duration-200"
+                  :class="{ 'rotate-180': pastRequestsOpen }"
+                />
+              </Button>
+            </div>
           </div>
-          <div v-if="showQuickActions && interactionCount > 0" class="shrink-0">
-            <DropdownMenu :modal="false">
-              <DropdownMenuTrigger as-child>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  class="h-7 shrink-0 gap-1 rounded-md px-2.5 text-xs font-medium text-secondary-foreground"
-                >
-                  <span class="truncate">{{ otherInteractionsLabel }}</span>
-                  <ChevronDown class="size-3.5 shrink-0 opacity-70" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" class="min-w-56 p-1.5">
-                <DropdownMenuItem
-                  v-for="act in recentInteractions"
-                  :key="interactionKey(act)"
-                  class="cursor-pointer rounded-sm px-2 py-1.5 text-sm"
-                  @select="emit('open-activity', act)"
-                >
-                  {{ formatActivityLine(act) }}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+
+          <Transition name="task-contact-past-requests">
+            <div
+              v-if="showPastRequestsSection && pastRequestsOpen"
+              :id="pastRequestsPanelId"
+              class="flex flex-col gap-1.5 border-t border-border pt-2 pl-12 pr-0"
+              role="region"
+              :aria-label="t('customerProfile.rightColumn.otherInteractionsRegion')"
+            >
+              <button
+                v-for="item in pastRequestRows"
+                :key="item.compositeId"
+                type="button"
+                class="flex w-full min-w-0 items-start justify-between gap-2 rounded-md border border-border bg-muted/20 p-2 text-left transition-colors hover:bg-muted/40"
+                @click="handlePastRequestClick(item)"
+              >
+                <div class="min-w-0 flex-1">
+                  <span class="text-sm font-medium leading-tight text-foreground">{{ item.title }}</span>
+                  <span v-if="item.subtitle" class="mt-0.5 block text-sm text-muted-foreground">{{
+                    item.subtitle
+                  }}</span>
+                </div>
+                <div class="flex shrink-0 flex-col items-end gap-0.5 text-right">
+                  <Badge
+                    variant="secondary"
+                    class="h-5 px-1.5 py-0 text-sm font-medium leading-none"
+                    :class="
+                      item.type === 'lead'
+                        ? 'bg-badge-green text-emerald-700'
+                        : 'bg-purple-50 text-purple-700'
+                    "
+                  >
+                    {{
+                      item.type === 'lead'
+                        ? t('customerProfile.rightColumn.typeLead')
+                        : t('customerProfile.rightColumn.typeOpportunity')
+                    }}
+                  </Badge>
+                  <span class="text-sm leading-none text-muted-foreground">{{ item.stage }}</span>
+                </div>
+              </button>
+            </div>
+          </Transition>
         </div>
       </div>
     </template>
 
     <div v-else class="flex flex-col gap-3">
       <div class="space-y-2">
-        <Label class="text-xs font-medium text-muted-foreground">{{
+        <Label class="text-sm font-medium text-muted-foreground">{{
           t('requestDetail.contactCard.fields.name')
         }}</Label>
         <Input
@@ -155,7 +219,7 @@
         />
       </div>
       <div class="space-y-2">
-        <Label class="text-xs font-medium text-muted-foreground">{{
+        <Label class="text-sm font-medium text-muted-foreground">{{
           t('requestDetail.contactCard.fields.email')
         }}</Label>
         <Input
@@ -167,7 +231,7 @@
         />
       </div>
       <div class="space-y-2">
-        <Label class="text-xs font-medium text-muted-foreground">{{
+        <Label class="text-sm font-medium text-muted-foreground">{{
           t('requestDetail.contactCard.fields.phone')
         }}</Label>
         <Input
@@ -179,7 +243,7 @@
         />
       </div>
       <div class="space-y-2">
-        <Label class="text-xs font-medium text-muted-foreground">{{
+        <Label class="text-sm font-medium text-muted-foreground">{{
           t('requestDetail.contactCard.fields.address')
         }}</Label>
         <Input
@@ -216,7 +280,9 @@ import { useUserStore } from '@/stores/user'
 import { useCustomersStore } from '@/stores/customers'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
+import { useRequestNavigationStore } from '@/stores/requestNavigation'
 import {
+  Badge,
   Button,
   Input,
   Label,
@@ -258,6 +324,30 @@ const props = defineProps({
   showQuickActions: {
     type: Boolean,
     default: true
+  },
+  relatedLeads: {
+    type: Array,
+    default: () => []
+  },
+  relatedOpportunities: {
+    type: Array,
+    default: () => []
+  },
+  relatedRequestsLoading: {
+    type: Boolean,
+    default: false
+  },
+  excludeRequestId: {
+    type: [Number, String],
+    default: null
+  },
+  excludeRequestType: {
+    type: String,
+    default: ''
+  },
+  embeddedInCard: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -270,7 +360,10 @@ const router = useRouter()
 const customersStore = useCustomersStore()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
+const requestNavigationStore = useRequestNavigationStore()
 const isEditing = ref(false)
+const pastRequestsOpen = ref(false)
+const pastRequestsPanelId = 'task-contact-past-requests-panel'
 const saving = ref(false)
 const editForm = ref({ name: '', phone: '', email: '', address: '' })
 
@@ -327,16 +420,102 @@ const showTagsAndInteractionsRow = computed(
     (props.showQuickActions && interactionCount.value > 0)
 )
 
-const tagsAndInteractionsRowJustifyClass = computed(() => {
-  const hasTags = !!props.task.customer
-  const hasInteractions = props.showQuickActions && interactionCount.value > 0
-  if (hasTags && hasInteractions) return 'justify-between'
-  if (hasTags && !hasInteractions) return 'justify-start'
-  return 'justify-end'
+const activityMenuLabel = computed(() =>
+  t('requestDetail.contactCard.activityMenu', { count: interactionCount.value })
+)
+
+function interactionSortTime(raw) {
+  const t1 = raw?.lastActivity || raw?.updatedAt || raw?.createdAt
+  return t1 ? new Date(t1).getTime() : 0
+}
+
+const pastRequestRows = computed(() => {
+  const rows = []
+  const exId =
+    props.excludeRequestId != null && props.excludeRequestId !== ''
+      ? parseInt(String(props.excludeRequestId), 10)
+      : null
+  const exType = props.excludeRequestType || ''
+
+  ;(props.relatedLeads || []).forEach((l) => {
+    if (Number.isFinite(exId) && exType === 'lead' && l.id === exId) return
+    rows.push({
+      id: l.id,
+      type: 'lead',
+      compositeId: `lead-${l.id}`,
+      stage: l.stage || 'Open',
+      title: l.requestedCar
+        ? `${l.requestedCar.brand} ${l.requestedCar.model}`
+        : t('customerProfile.rightColumn.fallbackLeadTitle'),
+      subtitle: l.requestedCar?.year ? String(l.requestedCar.year) : '',
+      sortTime: interactionSortTime(l),
+      customer: l.customer || l
+    })
+  })
+  ;(props.relatedOpportunities || []).forEach((o) => {
+    if (Number.isFinite(exId) && exType === 'opportunity' && o.id === exId) return
+    rows.push({
+      id: o.id,
+      type: 'opportunity',
+      compositeId: `opportunity-${o.id}`,
+      stage: o.stage || 'Open',
+      title: o.requestedCar
+        ? `${o.requestedCar.brand} ${o.requestedCar.model}`
+        : t('customerProfile.rightColumn.fallbackOpportunityTitle'),
+      subtitle: o.requestedCar?.year ? String(o.requestedCar.year) : '',
+      sortTime: interactionSortTime(o),
+      customer: o.customer || o
+    })
+  })
+  return rows.sort((a, b) => b.sortTime - a.sortTime)
 })
 
-const otherInteractionsLabel = computed(() =>
-  t('requestDetail.contactCard.otherInteractions', { count: interactionCount.value })
+const showPastRequestsSection = computed(
+  () => !props.relatedRequestsLoading && pastRequestRows.value.length > 0
+)
+
+const showTagsOrMetaRow = computed(
+  () => showTagsAndInteractionsRow.value || showPastRequestsSection.value
+)
+
+const allRelatedRequestNavigationRows = computed(() => {
+  const rows = []
+  ;(props.relatedLeads || []).forEach((l) => {
+    rows.push({
+      id: l.id,
+      type: 'lead',
+      compositeId: `lead-${l.id}`,
+      displayStage: l.stage || 'Open',
+      customer: l.customer || l
+    })
+  })
+  ;(props.relatedOpportunities || []).forEach((o) => {
+    rows.push({
+      id: o.id,
+      type: 'opportunity',
+      compositeId: `opportunity-${o.id}`,
+      displayStage: o.stage || 'Open',
+      customer: o.customer || o
+    })
+  })
+  return rows
+})
+
+function handlePastRequestClick(item) {
+  const rows = allRelatedRequestNavigationRows.value
+  requestNavigationStore.setRequestRows(rows)
+  router.push({
+    path: `/requests/${item.id}`,
+    query: { type: item.type, from: 'customer' },
+    state: { requestRows: rows }
+  })
+}
+
+watch(
+  () => [props.task?.customer?.id, props.customerId, props.excludeRequestId],
+  () => {
+    pastRequestsOpen.value = false
+  }
 )
 
 const quickActionItems = computed(() => [
@@ -468,3 +647,23 @@ async function saveEdit() {
   }
 }
 </script>
+
+<style scoped>
+.task-contact-past-requests-enter-active,
+.task-contact-past-requests-leave-active {
+  transition: opacity 0.2s ease, max-height 0.25s ease;
+  overflow: hidden;
+}
+
+.task-contact-past-requests-enter-from,
+.task-contact-past-requests-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+.task-contact-past-requests-enter-to,
+.task-contact-past-requests-leave-from {
+  max-height: 24rem;
+  opacity: 1;
+}
+</style>

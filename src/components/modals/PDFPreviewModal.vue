@@ -21,7 +21,7 @@
               <div class="text-center p-6 bg-red-50 border border-red-200 rounded-lg">
                 <AlertTriangle class="w-10 h-10 shrink-0 text-red-600 mb-4" />
                 <p class="text-sm text-red-600 font-semibold mb-2">Failed to load PDF</p>
-                <p class="text-xs text-red-500">{{ error }}</p>
+                <p class="text-sm text-red-500">{{ error }}</p>
               </div>
             </div>
             

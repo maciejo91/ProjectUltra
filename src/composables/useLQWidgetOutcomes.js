@@ -108,8 +108,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
   const successState = ref(null) // { kind: 'qualified'|'no-answer'|'not-interested', statusText, meeting? }
   const successPerformedAt = ref(null) // Date
 
-  // Qualification method (Assign only | Assign and schedule) and schedule state
-  const qualificationMethod = ref('assign-only')
+  const qualificationMethod = ref('assign-and-schedule')
   const qualificationEventType = ref('')
   const qualificationDurationMinutes = ref(null) // 30 | 60 | null
   const qualificationCustomDuration = ref('')
@@ -120,6 +119,9 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
   const qualificationCustomDateEnd = ref('')
   const qualificationSelectedDate = ref(null) // Will be set based on range
   const qualificationSelectedSlot = ref('')
+  const qualificationScheduleDepartment = ref('')
+  const qualificationScheduleDealership = ref('')
+  const qualificationScheduleTeamId = ref(null)
 
   const setQualificationSelectedSlot = (slot) => {
     qualificationSelectedSlot.value = slot
@@ -336,10 +338,6 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
 
   const setNextStep = (step) => {
     selectedNextStep.value = step
-    // Default to qualify without appointment when entering Interested flow
-    if (step === 'interested') {
-      qualificationMethod.value = 'assign-only'
-    }
   }
 
   const selectOutcome = (outcome) => {
@@ -431,13 +429,16 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     nextAttemptAssignee.value = null
     successState.value = null
     successPerformedAt.value = null
-    qualificationMethod.value = 'assign-only'
+    qualificationMethod.value = 'assign-and-schedule'
     qualificationEventType.value = ''
     qualificationDateRange.value = null
     qualificationCustomDateStart.value = ''
     qualificationCustomDateEnd.value = ''
     qualificationSelectedDate.value = null
     qualificationSelectedSlot.value = ''
+    qualificationScheduleDepartment.value = ''
+    qualificationScheduleDealership.value = ''
+    qualificationScheduleTeamId.value = null
     qualificationSelectedTeam.value = null
     qualificationSelectedSalesman.value = null
     qualificationDurationMinutes.value = null
@@ -452,7 +453,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
   /**
    * Restore outcome and qualification form state from a postponed-interested draft (e.g. lead.postponedInterestedState).
    * Call when opening a task that was postponed from the interested flow.
-   * @param {Object} draft - Saved draft: enrichLeadData, qualificationMethod, qualificationEventType, qualificationSelectedDate (ISO string), qualificationSelectedSlot, qualificationSelectedTeam, qualificationSelectedSalesman, assignment, callLogDateTime
+   * @param {Object} draft - Saved draft: enrichLeadData, qualificationMethod, qualificationEventType, qualificationScheduleDealership, qualificationScheduleTeamId, qualificationSelectedDate (ISO string), qualificationSelectedSlot, qualificationScheduleDepartment, qualificationSelectedTeam, qualificationSelectedSalesman, assignment, callLogDateTime
    */
   const restorePostponedInterestedState = (draft) => {
     if (!draft) return
@@ -461,10 +462,20 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     selectedOutcome.value = 'answer'
     selectedNextStep.value = 'interested'
     showOutcomeSelection.value = true
-    qualificationMethod.value = draft.qualificationMethod ?? 'assign-only'
+    qualificationMethod.value =
+      draft.qualificationMethod === 'assign-only' ? 'assign-and-schedule' : (draft.qualificationMethod ?? 'assign-and-schedule')
     qualificationEventType.value = draft.qualificationEventType ?? ''
     qualificationSelectedDate.value = draft.qualificationSelectedDate ? new Date(draft.qualificationSelectedDate) : null
     qualificationSelectedSlot.value = draft.qualificationSelectedSlot ?? ''
+    qualificationScheduleDepartment.value = draft.qualificationScheduleDepartment ?? ''
+    qualificationScheduleDealership.value = draft.qualificationScheduleDealership ?? ''
+    const rawTeamId = draft.qualificationScheduleTeamId
+    let scheduleTeamId = null
+    if (rawTeamId != null && rawTeamId !== '') {
+      const n = typeof rawTeamId === 'number' ? rawTeamId : parseInt(String(rawTeamId), 10)
+      scheduleTeamId = Number.isFinite(n) ? n : null
+    }
+    qualificationScheduleTeamId.value = scheduleTeamId
     qualificationSelectedTeam.value = draft.qualificationSelectedTeam ?? null
     qualificationSelectedSalesman.value = draft.qualificationSelectedSalesman ?? null
     if (draft.assignment?.assignee) {
@@ -581,6 +592,9 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     availableDatesForRange,
     qualificationSelectedDate,
     qualificationSelectedSlot,
+    qualificationScheduleDepartment,
+    qualificationScheduleDealership,
+    qualificationScheduleTeamId,
     setQualificationSelectedSlot,
     qualificationScheduleSlotOptions,
     qualificationDurationValue

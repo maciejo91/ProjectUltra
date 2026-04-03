@@ -1,39 +1,29 @@
 <template>
   <div
-    class="flex flex-col gap-4 overflow-hidden rounded-lg bg-background p-4 shadow-nsc-card"
+    class="flex flex-col gap-4 overflow-hidden rounded-lg bg-background p-4"
   >
     <div class="flex w-full min-w-0 items-center gap-2">
       <h3 class="min-w-0 flex-1 text-base font-medium leading-6 text-foreground">
         {{ displayHeading }}
       </h3>
-      <div class="flex shrink-0 items-center gap-1">
-        <Button
-          v-if="!isEditing && showLandingRow"
-          type="button"
-          variant="outline"
-          size="small"
-          class="h-7 shrink-0 gap-1 rounded-md px-2 text-xs font-medium"
-          @click="handleVisitLanding"
-        >
-          {{ t('requestDetail.vehicleCard.visit') }}
-          <ArrowUpRight class="size-3" />
-        </Button>
-        <Button
-          v-if="!isEditing"
-          variant="secondary"
-          size="icon-sm"
-          class="shrink-0 rounded-md"
-          :aria-label="t('requestDetail.vehicleCard.editAria')"
-          @click="startEditing"
-        >
-          <Pencil class="size-4 text-muted-foreground" />
-        </Button>
-      </div>
+      <Button
+        v-if="!isEditing"
+        type="button"
+        variant="secondary"
+        size="icon-sm"
+        class="shrink-0"
+        :aria-label="t('requestDetail.vehicleCard.editAria')"
+        @click="startEditing"
+      >
+        <Pencil class="size-3 opacity-70" />
+      </Button>
     </div>
 
     <template v-if="!isEditing">
-      <div class="flex w-full items-start gap-2">
-        <div class="h-9 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
+      <div class="flex w-full min-w-0 items-start gap-3">
+        <div
+          class="w-[90px] shrink-0 overflow-hidden rounded-md bg-muted aspect-4/3"
+        >
           <img
             v-if="imageUrl && !imageError"
             :src="imageUrl"
@@ -42,108 +32,180 @@
             @error="handleImageError"
           />
           <div v-else class="flex h-full w-full items-center justify-center">
-            <Car class="size-6 text-muted-foreground" />
+            <Car class="size-10 text-muted-foreground" />
           </div>
         </div>
-        <div class="flex min-w-0 flex-1 flex-col gap-2">
-          <div class="flex w-full items-center gap-1 text-sm leading-5 text-foreground">
-            <p class="min-w-0 flex-1 truncate">{{ titleLine }}</p>
-            <p class="shrink-0 whitespace-nowrap text-right">{{ priceLine }}</p>
+        <div class="flex min-w-0 flex-1 flex-col gap-1">
+          <div class="flex min-w-0 flex-wrap items-center gap-2">
+            <a
+              v-if="listingHref"
+              :href="listingHref"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex min-w-0 max-w-full items-center gap-1 rounded-sm text-sm font-medium leading-5 text-primary outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <span class="min-w-0 truncate">{{ titleLine }}</span>
+              <span
+                class="inline-flex size-8 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-primary hover:bg-muted"
+                aria-hidden
+              >
+                <ArrowUpRight class="size-4 opacity-80" />
+              </span>
+            </a>
+            <p
+              v-else
+              class="min-w-0 flex-1 truncate text-sm font-medium leading-5 text-foreground"
+            >
+              {{ titleLine }}
+            </p>
+            <span
+              v-if="conditionBadge"
+              class="inline-flex items-center justify-center rounded-md px-2 py-0.5 text-sm leading-5 text-foreground"
+              :class="conditionBadgeClass"
+            >
+              {{ conditionBadge }}
+            </span>
           </div>
           <p
-            v-if="subtitleLine"
-            class="w-full text-xs leading-4 text-muted-foreground"
+            v-if="trimLine"
+            class="w-full text-sm leading-4 text-muted-foreground"
           >
-            {{ subtitleLine }}
+            {{ trimLine }}
           </p>
         </div>
       </div>
 
-      <div
-        v-if="plateDisplay || vinDisplay"
-        class="flex w-full flex-wrap items-center gap-4"
-      >
-        <div
-          v-if="plateDisplay"
-          class="inline-flex max-w-full items-center gap-1 overflow-hidden rounded-sm border border-border bg-background py-0.5 pl-0.5 pr-1 shadow-nsc-card"
-        >
-          <span
-            class="h-4 w-1.5 shrink-0 rounded-bl-sm rounded-tl-sm bg-[#0470e9]"
-            aria-hidden
-          />
-          <span class="text-xs font-semibold leading-4 text-foreground whitespace-nowrap">
-            {{ plateDisplay }}
-          </span>
-        </div>
-        <p
-          v-if="vinDisplay"
-          class="min-w-0 max-w-full truncate text-xs text-muted-foreground"
-        >
-          {{ vinDisplay }}
-        </p>
-      </div>
-
-      <div
-        v-if="conditionBadge || fuelLabel || mileageBadgeShort"
-        class="flex w-full flex-wrap items-center gap-2"
-      >
-        <span
-          v-if="conditionBadge"
-          class="inline-flex items-center justify-center rounded-md px-2 py-0.5 text-sm leading-5 text-foreground"
-          :class="conditionBadgeClass"
-        >
-          {{ conditionBadge }}
-        </span>
-        <span
-          v-if="fuelLabel"
-          class="inline-flex items-center justify-center rounded-md bg-muted px-2 py-0.5 text-sm leading-5 text-muted-foreground"
-        >
-          {{ fuelLabel }}
-        </span>
-        <span
-          v-if="mileageBadgeShort"
-          class="inline-flex items-center justify-center rounded-md bg-muted px-2 py-0.5 text-sm leading-5 text-muted-foreground"
-        >
-          {{ mileageBadgeShort }}
-        </span>
-      </div>
-
       <div class="flex w-full flex-col gap-2">
         <div
-          v-if="registrationDateDisplay"
+          v-if="stockStatusDisplay"
           class="flex w-full items-center justify-between gap-3"
         >
-          <span class="shrink-0 text-sm leading-5 text-muted-foreground"
-            >{{ t('requestDetail.vehicleCard.registrationDate') }}</span
-          >
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.vehicleCard.status')
+          }}</span>
           <span
             class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
-            >{{ registrationDateDisplay }}</span
+            >{{ stockStatusDisplay }}</span
           >
         </div>
         <div
           v-if="vehicleLocationDisplay"
           class="flex w-full items-center justify-between gap-3"
         >
-          <span class="shrink-0 text-sm leading-5 text-muted-foreground"
-            >{{ t('requestDetail.vehicleCard.carLocation') }}</span
-          >
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.vehicleCard.dealership')
+          }}</span>
           <span
             class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
             >{{ vehicleLocationDisplay }}</span
+          >
+        </div>
+        <div class="flex w-full items-center justify-between gap-3">
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.vehicleCard.price')
+          }}</span>
+          <span
+            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
+            >{{ priceLine }}</span
+          >
+        </div>
+        <div
+          v-if="specificationLine"
+          class="flex w-full items-center justify-between gap-3"
+        >
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.vehicleCard.specification')
+          }}</span>
+          <span
+            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
+            >{{ specificationLine }}</span
           >
         </div>
         <div
           v-if="mileageDetailLine"
           class="flex w-full items-center justify-between gap-3"
         >
-          <span class="shrink-0 text-sm leading-5 text-muted-foreground"
-            >{{ t('requestDetail.vehicleCard.mileage') }}</span
-          >
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.vehicleCard.mileage')
+          }}</span>
           <span
             class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
             >{{ mileageDetailLine }}</span
           >
+        </div>
+        <div
+          v-if="registrationDateDisplay"
+          class="flex w-full items-center justify-between gap-3"
+        >
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.vehicleCard.registrationDate')
+          }}</span>
+          <span
+            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
+            >{{ registrationDateDisplay }}</span
+          >
+        </div>
+        <div
+          v-if="hasInteractionMetrics"
+          class="flex w-full items-center justify-between gap-3"
+        >
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.vehicleCard.interactions')
+          }}</span>
+          <div
+            class="flex shrink-0 flex-wrap items-center justify-end gap-4 text-sm leading-5 text-foreground"
+          >
+            <span
+              v-if="metricsFunnelCount != null"
+              class="inline-flex items-center gap-1"
+            >
+              <Filter class="size-4 shrink-0 text-muted-foreground" aria-hidden />
+              {{ metricsFunnelCount }}
+            </span>
+            <span
+              v-if="metricsTagCount != null"
+              class="inline-flex items-center gap-1"
+            >
+              <Tag class="size-4 shrink-0 text-muted-foreground" aria-hidden />
+              {{ metricsTagCount }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="plateDisplay || vinDisplay"
+        class="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3"
+      >
+        <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+          t('requestDetail.vehicleCard.identity')
+        }}</span>
+        <div
+          class="flex min-w-0 w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-1"
+        >
+          <div
+            v-if="plateDisplay"
+            class="inline-flex max-w-full items-center gap-1 overflow-hidden rounded-sm border border-border bg-background py-0.5 pl-0.5 pr-2"
+          >
+            <span
+              class="h-4 w-1.5 shrink-0 rounded-bl-sm rounded-tl-sm bg-primary"
+              aria-hidden
+            />
+            <span
+              class="whitespace-nowrap text-sm font-semibold leading-4 text-foreground"
+            >
+              {{ plateDisplay }}
+            </span>
+          </div>
+          <div
+            v-if="vinDisplay"
+            class="inline-flex min-w-0 max-w-full items-center overflow-hidden rounded-sm border border-border bg-background px-2 py-0.5"
+          >
+            <span
+              class="truncate font-mono text-sm leading-4 text-foreground"
+              >{{ vinDisplay }}</span
+            >
+          </div>
         </div>
       </div>
 
@@ -158,7 +220,7 @@
           >
             "{{ requestMessage }}"
           </p>
-          <div v-if="source" class="flex shrink-0 items-center text-xs">
+          <div v-if="source" class="flex shrink-0 items-center text-sm">
             <a
               v-if="sourceUrl"
               :href="sourceUrl"
@@ -172,7 +234,7 @@
               v-else
               variant="link"
               size="small"
-              class="h-auto p-0 text-xs font-medium text-primary underline underline-offset-2 hover:opacity-90"
+              class="h-auto p-0 text-sm font-medium text-primary underline underline-offset-2 hover:opacity-90"
               @click="$emit('open-ad')"
             >
               {{ source }}
@@ -185,7 +247,7 @@
     <div v-else class="flex flex-col gap-3">
       <div class="grid grid-cols-2 gap-3">
         <div class="space-y-2">
-          <Label class="text-xs font-medium text-muted-foreground">Brand</Label>
+          <Label class="text-sm font-medium text-muted-foreground">Brand</Label>
           <Input
             v-model="editForm.brand"
             type="text"
@@ -194,7 +256,7 @@
           />
         </div>
         <div class="space-y-2">
-          <Label class="text-xs font-medium text-muted-foreground">Model</Label>
+          <Label class="text-sm font-medium text-muted-foreground">Model</Label>
           <Input
             v-model="editForm.model"
             type="text"
@@ -205,7 +267,7 @@
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div class="space-y-2">
-          <Label class="text-xs font-medium text-muted-foreground">Year</Label>
+          <Label class="text-sm font-medium text-muted-foreground">Year</Label>
           <Input
             v-model.number="editForm.year"
             type="number"
@@ -216,7 +278,7 @@
           />
         </div>
         <div class="space-y-2">
-          <Label class="text-xs font-medium text-muted-foreground">Price (€)</Label>
+          <Label class="text-sm font-medium text-muted-foreground">Price (€)</Label>
           <Input
             v-model.number="editForm.price"
             type="number"
@@ -229,7 +291,7 @@
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div class="space-y-2">
-          <Label class="text-xs font-medium text-muted-foreground">Condition</Label>
+          <Label class="text-sm font-medium text-muted-foreground">Condition</Label>
           <Select v-model="editForm.condition">
             <SelectTrigger class="h-8 text-sm">
               <SelectValue placeholder="Condition" />
@@ -242,7 +304,7 @@
           </Select>
         </div>
         <div class="space-y-2">
-          <Label class="text-xs font-medium text-muted-foreground">Mileage (km)</Label>
+          <Label class="text-sm font-medium text-muted-foreground">Mileage (km)</Label>
           <Input
             v-model.number="editForm.kilometers"
             type="number"
@@ -283,7 +345,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@motork/component-library/future/primitives'
-import { ArrowUpRight, Car, Pencil } from 'lucide-vue-next'
+import { ArrowUpRight, Car, Filter, Pencil, Tag } from 'lucide-vue-next'
 
 const props = defineProps({
   vehicle: {
@@ -317,6 +379,18 @@ const props = defineProps({
   heading: {
     type: String,
     default: ''
+  },
+  stockStatus: {
+    type: String,
+    default: ''
+  },
+  metricsFunnelCount: {
+    type: Number,
+    default: undefined
+  },
+  metricsTagCount: {
+    type: Number,
+    default: undefined
   }
 })
 
@@ -428,9 +502,10 @@ const titleLine = computed(() => {
   return parts.join(' ') || '—'
 })
 
-const subtitleLine = computed(() => {
+const trimLine = computed(() => {
   const v = props.vehicle
-  return v?.variant || v?.trim || v?.engineLine || ''
+  const line = v?.trim || v?.variant || v?.engineLine || ''
+  return typeof line === 'string' ? line.trim() : ''
 })
 
 const priceLine = computed(() => {
@@ -440,6 +515,34 @@ const priceLine = computed(() => {
   if (Number.isNaN(n)) return '—'
   return `${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(n)}€`
 })
+
+const listingHref = computed(
+  () => props.sourceUrl || props.vehicle?.listingUrl || ''
+)
+
+const stockStatusDisplay = computed(() => {
+  const raw = (props.stockStatus || props.vehicle?.carStatus || '').trim()
+  if (!raw) return ''
+  const key = raw.toLowerCase().replace(/\s+/g, '')
+  if (key === 'instock')
+    return t('requestDetail.vehicleCard.stockInStock')
+  if (key === 'notinstock')
+    return t('requestDetail.vehicleCard.stockNotInStock')
+  return raw
+})
+
+const specificationLine = computed(() => {
+  const v = props.vehicle
+  const fuel = (v?.fuelType || '').trim()
+  const gear = (v?.gearType || v?.transmission || '').trim()
+  if (fuel && gear) return `${fuel} - ${gear}`
+  return fuel || gear || ''
+})
+
+const hasInteractionMetrics = computed(
+  () =>
+    props.metricsFunnelCount != null || props.metricsTagCount != null
+)
 
 const plateDisplay = computed(
   () => props.vehicle.plateNumber || props.vehicle.plate || ''
@@ -488,31 +591,6 @@ const conditionBadgeClass = computed(() => {
   if (c === 'km0' || c === 'new') return 'bg-emerald-100 text-emerald-900'
   return 'bg-muted text-muted-foreground'
 })
-
-const fuelLabel = computed(() => props.vehicle.fuelType || '')
-
-const mileageBadgeShort = computed(() => {
-  const v = props.vehicle
-  if (v.stockDistanceKm != null && v.stockDistanceKm !== '') {
-    return `${Number(v.stockDistanceKm)} km`
-  }
-  const km = v.kilometers ?? v.mileage
-  if (km == null || km === '') return ''
-  return `${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(Number(km))} km`
-})
-
-const showLandingRow = computed(
-  () => !!(props.sourceUrl || props.vehicle.listingUrl || props.source)
-)
-
-function handleVisitLanding() {
-  const url = props.sourceUrl || props.vehicle.listingUrl
-  if (url) {
-    window.open(url, '_blank', 'noopener,noreferrer')
-  } else {
-    emit('open-ad')
-  }
-}
 
 const handleImageError = () => {
   imageError.value = true

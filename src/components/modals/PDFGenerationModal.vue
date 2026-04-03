@@ -101,7 +101,7 @@
                 @click="documentType = 'contract'"
               >
                 <div class="font-semibold text-sm text-foreground mb-1">Contract</div>
-                <div class="text-xs text-muted-foreground">Formal contract with signature area</div>
+                <div class="text-sm text-muted-foreground">Formal contract with signature area</div>
               </button>
               <button
                 type="button"
@@ -114,7 +114,7 @@
                 @click="documentType = 'offer'"
               >
                 <div class="font-semibold text-sm text-foreground mb-1">Offer</div>
-                <div class="text-xs text-muted-foreground">Purchase proposal for customer</div>
+                <div class="text-sm text-muted-foreground">Purchase proposal for customer</div>
               </button>
             </div>
           </div>
@@ -170,7 +170,7 @@
                   @click="options.template = 'classic'"
                 >
                   <div class="font-semibold text-sm text-foreground mb-1">Classic</div>
-                  <div class="text-xs text-muted-foreground">
+                  <div class="text-sm text-muted-foreground">
                     Detailed with comprehensive information and legal sections
                   </div>
                 </button>
@@ -185,7 +185,7 @@
                   @click="options.template = 'express'"
                 >
                   <div class="font-semibold text-sm text-foreground mb-1">Express</div>
-                  <div class="text-xs text-muted-foreground">
+                  <div class="text-sm text-muted-foreground">
                     Streamlined with essential information
                   </div>
                 </button>

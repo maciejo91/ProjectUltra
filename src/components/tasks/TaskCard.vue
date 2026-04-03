@@ -47,14 +47,14 @@
       <div class="flex items-center gap-2 shrink-0 min-w-0">
         <span
           v-if="taskStatusLabel"
-          class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold shrink-0 w-fit"
+          class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-sm font-semibold shrink-0 w-fit"
           :class="taskStatusClass"
         >
           {{ taskStatusLabel }}
         </span>
         <span
           v-if="showUrgencyBadge"
-          class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground leading-none shrink-0"
+          class="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground leading-none shrink-0"
         >
           <span
             :class="['shrink-0 rounded-full size-2', urgencyDotClass]"
@@ -65,7 +65,7 @@
       </div>
       <span
         v-if="displayDate"
-        class="text-xs font-medium uppercase leading-none shrink-0"
+        class="text-sm font-medium uppercase leading-none shrink-0"
         :class="displayDate.status.textClass"
       >
         {{ displayDate.text }}
@@ -90,13 +90,13 @@
       <TaskBadges :task="item" :attempts-shown-elsewhere="true" />
       <span
         v-if="showScheduledRecallBadge"
-        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-blue-100 text-blue-700"
+        class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold uppercase leading-none badge-ui bg-blue-100 text-blue-700"
       >
         Recall
       </span>
       <span
         v-if="callAttemptsCount > 0"
-        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-muted text-muted-foreground"
+        class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold uppercase leading-none badge-ui bg-muted text-muted-foreground"
       >
         {{ callAttemptsValue }}
       </span>

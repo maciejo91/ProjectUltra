@@ -97,7 +97,7 @@
           placeholder="https://example.com/car-image.jpg" 
           class="w-full h-10"
         />
-        <p class="text-xs text-muted-foreground mt-1">Enter a URL to an image of the vehicle</p>
+        <p class="text-sm text-muted-foreground mt-1">Enter a URL to an image of the vehicle</p>
       </div>
       
       <!-- Additional Details (Collapsed by default) -->

@@ -1,37 +1,90 @@
 <template>
   <div
     v-if="showCard"
-    class="flex w-full min-w-0 shrink-0 flex-col gap-0 overflow-hidden rounded-xl bg-muted p-1"
+    :class="[
+      'flex w-full min-w-0 shrink-0 flex-col gap-0 rounded-xl',
+      floatingInverse ? 'bg-mk-floating-lq-chrome' : 'bg-background',
+      expandableCollapsedCard
+        ? [
+            'cursor-pointer select-none p-0 shadow-mk-floating-lq-panel focus-within:ring-2 focus-within:ring-ring',
+            floatingInverse ? 'hover:brightness-105' : 'hover:bg-muted/30'
+          ]
+        : 'p-1',
+      !expandableCollapsedCard && floatingElevated && 'shadow-mk-floating-lq-panel',
+      manageExpandedMode && 'shadow-mk-floating-lq-panel'
+    ]"
+    :role="expandableCollapsedCard ? 'region' : undefined"
+    :aria-label="expandableCollapsedCard ? t('requestDetail.floatingLq.continue') : undefined"
+    :tabindex="expandableCollapsedCard ? 0 : undefined"
+    :data-lqf-expand-task="expandableCollapsedCard ? true : undefined"
+    @click="onCollapsedShellClick"
+    @keydown="onCollapsedShellKeydown"
   >
     <div
-      class="flex w-full shrink-0 items-center justify-between gap-2 px-4 py-1.5"
+      :class="[
+        'flex w-full min-w-0 flex-col gap-0',
+        expandableCollapsedCard ? 'overflow-hidden rounded-xl' : 'rounded-lg'
+      ]"
     >
-      <p class="min-w-0 flex-1 text-xs font-medium leading-none text-foreground">
-        {{ titleLabel }}
-      </p>
-      <div class="flex shrink-0 items-center gap-0.5">
-        <span
-          class="inline-flex size-6 items-center justify-center rounded-full bg-green-100 text-xs font-normal leading-none text-green-600"
-          aria-hidden
-        >
-          {{ assigneeInitials }}
-        </span>
-        <button
-          type="button"
-          class="inline-flex h-6 shrink-0 select-none items-center gap-1.5 rounded-full border border-border bg-background px-2 text-xs font-medium tabular-nums text-foreground hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          :aria-label="timerAria"
-          :title="timerTitle"
-          @click="toggleTimerRunning"
-        >
-          <Clock class="size-3 shrink-0 text-muted-foreground" aria-hidden="true" />
-          <span class="leading-none">{{ countdownLabel }}</span>
-        </button>
+    <template v-if="manageExpandedMode">
+      <RequestLqTaskHeaderRow
+        :title="effectiveHeaderTitle"
+        :subtitle="manageHeaderSubtitle"
+        :title-cta-label="manageHeaderCallCtaLabel"
+        :title-cta-href="manageHeaderCallCtaHref"
+        :assignee-initials="assigneeInitials"
+        :countdown-label="headerCountdownLabel"
+        :timer-aria="timerAria"
+        :timer-title="timerTitle"
+        :show-chevron="true"
+        chevron-direction="down"
+        :chevron-aria-label="t('requestDetail.floatingLq.minimize')"
+        :on-dark-surface="floatingInverse"
+        @toggle-timer="onHeaderTimerToggle"
+        @chevron-click="$emit('cancel-action')"
+      />
+      <div class="w-full min-w-0 shrink-0">
+        <RequestLqTaskExpandedOutcomeShell :active="true" :flex-fill="false">
+          <slot name="outcome" />
+        </RequestLqTaskExpandedOutcomeShell>
       </div>
-    </div>
+    </template>
+    <template v-else>
+    <RequestLqTaskHeaderRow
+      :title="peekHeaderTitle"
+      :subtitle="peekHeaderSubtitle"
+      :title-cta-label="peekHeaderCallCtaLabel"
+      :title-cta-href="peekHeaderCallCtaHref"
+      :assignee-initials="assigneeInitials"
+      :countdown-label="headerCountdownLabel"
+      :timer-aria="timerAria"
+      :timer-title="timerTitle"
+      :show-chevron="expandableCollapsedCard"
+      chevron-direction="up"
+      :chevron-aria-label="t('requestDetail.floatingLq.continue')"
+      :on-dark-surface="floatingInverse"
+      @toggle-timer="onHeaderTimerToggle"
+      @chevron-click="resumeCollapsedTask"
+    />
     <div
-      class="relative flex w-full shrink-0 flex-col gap-0 overflow-hidden rounded-lg border-2 border-transparent bg-background px-4 py-3 shadow-nsc-card"
+      :class="[
+        'w-full shrink-0',
+        !expandableCollapsedCard && 'rounded-lg',
+        !expandableCollapsedCard &&
+          (!floatingElevated || floatingInverse) &&
+          'shadow-nsc-card'
+      ]"
     >
+      <div
+        :class="[
+          'relative flex w-full flex-col gap-0 overflow-hidden bg-background px-4 py-5',
+          expandableCollapsedCard
+            ? 'rounded-none border-t border-border'
+            : 'rounded-lg border-2 border-transparent'
+        ]"
+      >
       <svg
+        v-if="!expandableCollapsedCard"
         class="pointer-events-none absolute inset-0 z-10 h-full w-full"
         aria-hidden="true"
       >
@@ -42,9 +95,9 @@
             gradientUnits="objectBoundingBox"
             gradientTransform="rotate(0 0.5 0.5)"
             x1="0"
-            y1="0.5"
+            y1="0"
             x2="1"
-            y2="0.5"
+            y2="1"
           >
             <stop offset="0%" stop-color="var(--primary)" stop-opacity="0" />
             <stop offset="28%" stop-color="var(--primary)" stop-opacity="0" />
@@ -70,13 +123,21 @@
       <div
         class="relative z-20 flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-2"
       >
-        <p class="min-w-0 flex-1 text-base font-medium leading-normal text-foreground">
-          {{ teaserLine }}
-        </p>
+        <div class="min-w-0 flex-1 flex flex-col gap-1">
+          <p class="text-base font-semibold leading-snug text-foreground">
+            {{ bodyTaskTitle }}
+          </p>
+          <p
+            v-if="bodyTaskSubheader"
+            class="text-sm leading-normal text-muted-foreground"
+          >
+            {{ bodyTaskSubheader }}
+          </p>
+        </div>
         <div class="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <div
             v-if="isTaskActionInProgress"
-            class="inline-flex h-9 w-full items-center justify-center gap-1 rounded-sm border border-border bg-background pl-3 pr-1 text-sm font-medium text-foreground sm:w-auto"
+            class="inline-flex h-10 min-h-10 w-full items-center justify-center gap-1 rounded-sm border border-border bg-background pl-3 pr-1 text-sm font-medium text-foreground sm:w-auto"
             aria-live="polite"
           >
             <LoaderCircle class="size-4 shrink-0 animate-spin text-muted-foreground" aria-hidden="true" />
@@ -95,14 +156,17 @@
           <template v-else>
             <Button
               variant="default"
-              class="h-9 w-full rounded-sm sm:w-40"
+              size="lg"
+              class="w-full rounded-sm sm:min-w-40 sm:w-auto"
+              data-lqf-manage-task
               @click="handleManageClick"
             >
-              {{ manageLabel }}
+              {{ primaryActionButtonLabel }}
             </Button>
             <Button
               variant="secondary"
-              class="h-9 w-full rounded-sm sm:w-auto"
+              size="lg"
+              class="w-full rounded-sm sm:w-auto"
               @click="handleNotNowClick"
             >
               {{ notNowLabel }}
@@ -110,27 +174,31 @@
           </template>
         </div>
       </div>
-    </div>
-    <div
-      v-if="$slots.outcome || $slots['next-attempt']"
-      class="flex w-full min-w-0 shrink-0 flex-col gap-3 px-4 pb-3 pt-3"
-    >
-      <div v-if="$slots.outcome" class="min-w-0">
-        <slot name="outcome" />
       </div>
-      <div v-if="$slots['next-attempt']" class="min-w-0">
+    </div>
+    </template>
+    <div
+      v-if="!manageExpandedMode && $slots['next-attempt']"
+      :class="[
+        'flex w-full min-w-0 shrink-0 flex-col gap-3 px-4 pb-5 pt-5',
+        floatingInverse && 'border-t border-border bg-background'
+      ]"
+    >
+      <div class="min-w-0">
         <slot name="next-attempt" />
       </div>
+    </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useId } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, useId, useSlots, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Clock, LoaderCircle, X } from 'lucide-vue-next'
+import { LoaderCircle, X } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
+import RequestLqTaskExpandedOutcomeShell from './RequestLqTaskExpandedOutcomeShell.vue'
+import RequestLqTaskHeaderRow from './RequestLqTaskHeaderRow.vue'
 
 const props = defineProps({
   showTeaser: {
@@ -156,24 +224,64 @@ const props = defineProps({
   assigneeInitials: {
     type: String,
     default: ''
+  },
+  resumeFromCollapsed: {
+    type: Boolean,
+    default: false
+  },
+  internalTimer: {
+    type: Boolean,
+    default: true
+  },
+  parentCountdownLabel: {
+    type: String,
+    default: ''
+  },
+  parentTimerRunning: {
+    type: Boolean,
+    default: true
+  },
+  floatingElevated: {
+    type: Boolean,
+    default: false
+  },
+  floatingInverse: {
+    type: Boolean,
+    default: false
+  },
+  headerTaskTitle: {
+    type: String,
+    default: ''
+  },
+  headerContactSubline: {
+    type: String,
+    default: ''
+  },
+  callNowTelHref: {
+    type: String,
+    default: ''
+  },
+  sessionHeaderTitle: {
+    type: String,
+    default: ''
   }
 })
 
-const emit = defineEmits(['manage-task', 'not-now', 'open-full-task', 'cancel-action'])
+const emit = defineEmits([
+  'manage-task',
+  'not-now',
+  'open-full-task',
+  'cancel-action',
+  'resume-collapsed',
+  'toggle-timer'
+])
 
 const { t } = useI18n()
+const slots = useSlots()
 
-const showCard = computed(() => props.showTeaser && !props.dismissed && props.teaserLine)
-
-const titleLabel = computed(() => t('requestDetail.lqfTask.title'))
-const manageLabel = computed(() => t('requestDetail.lqfTask.manageTask'))
-const notNowLabel = computed(() => t('requestDetail.lqfTask.notNow'))
-const inProgressLabel = computed(() => t('requestDetail.lqfTask.inProgress'))
-const timerAria = computed(() => t('requestDetail.lqfTask.timerAria'))
-const timerTitle = computed(() =>
-  isTimerRunning.value
-    ? t('requestDetail.lqfTask.timerTitleRunning')
-    : t('requestDetail.lqfTask.timerTitlePaused')
+const hasOutcomeSlot = computed(() => typeof slots.outcome === 'function')
+const manageExpandedMode = computed(
+  () => props.manageOpen && hasOutcomeSlot.value
 )
 
 const ONE_HOUR_SECONDS = 60 * 60
@@ -181,13 +289,7 @@ const remainingSeconds = ref(ONE_HOUR_SECONDS)
 const isTimerRunning = ref(true)
 let intervalId = 0
 
-const isManagingTask = ref(false)
-const isPostponingTask = ref(false)
-const isTaskActionInProgress = computed(
-  () => isManagingTask.value || isPostponingTask.value || props.manageOpen || props.postponeOpen
-)
-
-const countdownLabel = computed(() => {
+const countdownLabelInternal = computed(() => {
   const total = Math.max(0, remainingSeconds.value)
   const h = Math.floor(total / 3600)
   const m = Math.floor((total % 3600) / 60)
@@ -205,6 +307,121 @@ function tickCountdown() {
 
 function toggleTimerRunning() {
   isTimerRunning.value = !isTimerRunning.value
+}
+
+const showCard = computed(() => {
+  if (!props.showTeaser || props.dismissed) return false
+  const line = (props.teaserLine || '').trim()
+  const task = (props.headerTaskTitle || '').trim()
+  return !!(line || task)
+})
+
+const titleLabel = computed(() => t('requestDetail.lqfTask.title'))
+const effectiveHeaderTitle = computed(() => {
+  const session = (props.sessionHeaderTitle || '').trim()
+  if (session) return session
+  const custom = (props.headerTaskTitle || '').trim()
+  return custom || titleLabel.value
+})
+
+const activeSessionHeader = computed(() => !!(props.sessionHeaderTitle || '').trim())
+
+const callNowCtaLabel = computed(() => t('requestDetail.floatingLq.callNow'))
+
+const manageHeaderSubtitle = computed(() =>
+  activeSessionHeader.value ? '' : (props.headerContactSubline || '')
+)
+
+const manageHeaderCallCtaLabel = computed(() =>
+  activeSessionHeader.value || !props.callNowTelHref ? '' : callNowCtaLabel.value
+)
+
+const manageHeaderCallCtaHref = computed(() =>
+  activeSessionHeader.value ? '' : props.callNowTelHref
+)
+const manageLabel = computed(() => t('requestDetail.lqfTask.manageTask'))
+const notNowLabel = computed(() => t('requestDetail.lqfTask.notNow'))
+const inProgressLabel = computed(() => t('requestDetail.lqfTask.inProgress'))
+const timerAria = computed(() => t('requestDetail.lqfTask.timerAria'))
+const headerCountdownLabel = computed(() =>
+  props.internalTimer ? countdownLabelInternal.value : props.parentCountdownLabel
+)
+
+const effectiveTimerRunning = computed(() =>
+  props.internalTimer ? isTimerRunning.value : props.parentTimerRunning
+)
+
+const timerTitle = computed(() =>
+  effectiveTimerRunning.value
+    ? t('requestDetail.lqfTask.timerTitleRunning')
+    : t('requestDetail.lqfTask.timerTitlePaused')
+)
+
+function onHeaderTimerToggle() {
+  if (props.internalTimer) toggleTimerRunning()
+  else emit('toggle-timer')
+}
+
+const isManagingTask = ref(false)
+const isPostponingTask = ref(false)
+const isTaskActionInProgress = computed(
+  () => isManagingTask.value || isPostponingTask.value || props.manageOpen || props.postponeOpen
+)
+
+const expandableCollapsedCard = computed(
+  () => props.resumeFromCollapsed && isTaskActionInProgress.value
+)
+
+const useCompactPeekHeader = computed(
+  () => !expandableCollapsedCard.value
+)
+
+const peekHeaderTitle = computed(() =>
+  useCompactPeekHeader.value ? titleLabel.value : effectiveHeaderTitle.value
+)
+
+const peekHeaderSubtitle = computed(() => {
+  if (useCompactPeekHeader.value || activeSessionHeader.value) return ''
+  return props.headerContactSubline || ''
+})
+
+const peekHeaderCallCtaLabel = computed(() => {
+  if (useCompactPeekHeader.value || activeSessionHeader.value) return ''
+  return props.callNowTelHref ? callNowCtaLabel.value : ''
+})
+
+const peekHeaderCallCtaHref = computed(() => {
+  if (useCompactPeekHeader.value || activeSessionHeader.value) return ''
+  return props.callNowTelHref
+})
+
+const bodyTaskTitle = computed(() => {
+  const task = (props.headerTaskTitle || '').trim()
+  return task || titleLabel.value
+})
+
+const bodyTaskSubheader = computed(() => (props.headerContactSubline || '').trim())
+
+const primaryActionButtonLabel = computed(() =>
+  props.callNowTelHref ? callNowCtaLabel.value : manageLabel.value
+)
+
+function resumeCollapsedTask() {
+  emit('resume-collapsed')
+}
+
+function onCollapsedShellClick(e) {
+  if (!expandableCollapsedCard.value) return
+  if (e.target.closest('button')) return
+  resumeCollapsedTask()
+}
+
+function onCollapsedShellKeydown(e) {
+  if (!expandableCollapsedCard.value) return
+  if (e.target !== e.currentTarget) return
+  if (e.key !== 'Enter' && e.key !== ' ') return
+  e.preventDefault()
+  resumeCollapsedTask()
 }
 
 function handleManageClick() {
@@ -256,7 +473,7 @@ let orbitStart = 0
 let stopped = false
 
 function runStrokeOrbit(now) {
-  if (stopped) return
+  if (stopped || expandableCollapsedCard.value) return
   const el = strokeGradientRef.value
   if (!el) {
     rafId = requestAnimationFrame(runStrokeOrbit)
@@ -272,15 +489,30 @@ function runStrokeOrbit(now) {
   rafId = requestAnimationFrame(runStrokeOrbit)
 }
 
+watch(expandableCollapsedCard, (collapsed) => {
+  if (collapsed) {
+    if (rafId) cancelAnimationFrame(rafId)
+    rafId = 0
+    return
+  }
+  nextTick(() => {
+    if (stopped || prefersReducedMotion() || !strokeGradientRef.value) return
+    orbitStart = performance.now()
+    rafId = requestAnimationFrame(runStrokeOrbit)
+  })
+})
+
 onMounted(() => {
   stopped = false
   nextTick(() => {
-    if (prefersReducedMotion() || stopped) return
+    if (prefersReducedMotion() || stopped || expandableCollapsedCard.value) return
     orbitStart = performance.now()
     rafId = requestAnimationFrame(runStrokeOrbit)
   })
 
-  intervalId = window.setInterval(tickCountdown, 1000)
+  if (props.internalTimer) {
+    intervalId = window.setInterval(tickCountdown, 1000)
+  }
 })
 
 onUnmounted(() => {

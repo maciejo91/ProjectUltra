@@ -1,0 +1,50 @@
+{
+  "tabs": {
+    "overview": "Panoramica",
+    "requests": "Richieste",
+    "communication": "Comunicazione"
+  },
+  "activeRequests": "Richieste attive",
+  "rightColumn": {
+    "contactDetails": "Dettagli contatto",
+    "otherInteractions": "Altre interazioni ({count})",
+    "otherInteractionsRegion": "Lead e opportunity passati",
+    "typeLead": "Lead",
+    "typeOpportunity": "Opportunity",
+    "fallbackLeadTitle": "Lead",
+    "fallbackOpportunityTitle": "Opportunity",
+    "appointments": "Appuntamenti",
+    "addAppointment": "Aggiungi",
+    "noAppointments": "Nessun appuntamento in programma.",
+    "recentActivity": "Attività recente"
+  },
+  "details": {
+    "customerName": "Nome cliente",
+    "account": "Account",
+    "accountOwner": "Titolare account",
+    "email": "E-mail",
+    "phone": "Telefono",
+    "address": "Indirizzo",
+    "language": "Lingua",
+    "fiscalEntities": "Entità fiscali",
+    "drivenVehicle": "Veicolo guidato",
+    "copyPhoneAria": "Copia numero di telefono",
+    "phoneCopied": "Numero copiato negli appunti",
+    "phoneCopyFailed": "Impossibile copiare il numero"
+  },
+  "activityFeed": {
+    "title": "Attività recente",
+    "add": "Aggiungi",
+    "empty": "Nessuna attività recente.",
+    "performedAction": "ha eseguito un'azione",
+    "systemUser": "Sistema",
+    "justNow": "Proprio ora",
+    "minutesAgo": "{count} min fa",
+    "hoursAgo": "{count} h fa"
+  },
+  "header": {
+    "backAria": "Torna ai contatti",
+    "fallbackName": "Cliente"
+  },
+  "sendMessage": "Invia messaggio"
+}

@@ -72,7 +72,7 @@
                 <span>Activity</span>
                 <span 
                   v-if="activityCount > 0"
-                  class="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-xs font-bold leading-none"
+                  class="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-sm font-bold leading-none"
                   :class="sidebarTab === 'activity' 
                     ? 'bg-primary text-white' 
                     : 'bg-gray-200 text-foreground'"
@@ -113,13 +113,13 @@
                       <template #after-badges>
                         <span
                           v-if="showScheduledRecallBadge"
-                          class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-blue-100 text-blue-700"
+                          class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold uppercase leading-none badge-ui bg-blue-100 text-blue-700"
                         >
                           Recall
                         </span>
                         <span
                           v-if="requestTabAttemptsCount > 0"
-                          class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold uppercase leading-none badge-ui bg-muted text-muted-foreground"
+                          class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-sm font-semibold uppercase leading-none badge-ui bg-muted text-muted-foreground"
                         >
                           <Phone class="shrink-0 size-2.5" aria-hidden />
                           {{ requestTabAttemptsValue }}
@@ -139,7 +139,11 @@
                   :vehicle="displayTask.requestedCar || displayTask.vehicle"
                   :request-message="displayTask.requestMessage || displayTask.requestedCar?.requestMessage"
                   :source="displayTask.source"
+                  :source-url="displayTask.requestedCar?.listingUrl || displayTask.sourceUrl || ''"
                   :image-url="getCarImageUrl(displayTask.requestedCar || displayTask.vehicle)"
+                  :stock-status="displayTask.carStatus || ''"
+                  :metrics-funnel-count="displayTask.listingMetrics?.funnelViews"
+                  :metrics-tag-count="displayTask.listingMetrics?.tagCount"
                   @open-ad="handleOpenAd"
                   @more-actions="handleMoreActions"
                 />

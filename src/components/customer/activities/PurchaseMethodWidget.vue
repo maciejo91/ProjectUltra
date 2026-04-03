@@ -12,7 +12,7 @@
     <form @submit.prevent="handleSave" class="space-y-4">
       <!-- Type Selector (Radio buttons styled as tabs) -->
       <div>
-        <label class="block text-xs font-medium text-muted-foreground mb-2">Purchase Method Type <span class="text-brand-red">*</span></label>
+        <label class="block text-sm font-medium text-muted-foreground mb-2">Purchase Method Type <span class="text-brand-red">*</span></label>
         <div class="flex gap-2">
           <label
             v-for="typeOption in typeOptions"
@@ -43,7 +43,7 @@
         <!-- Common Fields -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-medium text-muted-foreground mb-1">
+            <label class="block text-sm font-medium text-muted-foreground mb-1">
               Monthly Instalment <span class="text-brand-red">*</span>
             </label>
             <div class="relative">
@@ -59,13 +59,13 @@
                 @input="clearError('monthlyInstalment')"
               />
             </div>
-            <p v-if="errors.monthlyInstalment" class="text-xs text-red-600 mt-1">
+            <p v-if="errors.monthlyInstalment" class="text-sm text-red-600 mt-1">
               {{ errors.monthlyInstalment }}
             </p>
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-muted-foreground mb-1">
+            <label class="block text-sm font-medium text-muted-foreground mb-1">
               Down Payment <span class="text-brand-red">*</span>
             </label>
             <div class="relative">
@@ -81,7 +81,7 @@
                 @input="clearError('downPayment')"
               />
             </div>
-            <p v-if="errors.downPayment" class="text-xs text-red-600 mt-1">
+            <p v-if="errors.downPayment" class="text-sm text-red-600 mt-1">
               {{ errors.downPayment }}
             </p>
           </div>
@@ -89,7 +89,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-medium text-muted-foreground mb-1">
+            <label class="block text-sm font-medium text-muted-foreground mb-1">
               Duration (months) <span class="text-brand-red">*</span>
             </label>
             <select
@@ -107,14 +107,14 @@
                 {{ month }} months
               </option>
             </select>
-            <p v-if="errors.duration" class="text-xs text-red-600 mt-1">
+            <p v-if="errors.duration" class="text-sm text-red-600 mt-1">
               {{ errors.duration }}
             </p>
           </div>
 
           <!-- FIN/LEA: Interest Rate -->
           <div v-if="formData.type === 'FIN' || formData.type === 'LEA'">
-            <label class="block text-xs font-medium text-muted-foreground mb-1">Interest Rate / APR (%)</label>
+            <label class="block text-sm font-medium text-muted-foreground mb-1">Interest Rate / APR (%)</label>
             <div class="relative">
               <input
                 v-model.number="formData.fields.interestRate"
@@ -132,7 +132,7 @@
 
           <!-- LEA/LTR: Mileage Limit -->
           <div v-if="formData.type === 'LEA' || formData.type === 'LTR'">
-            <label class="block text-xs font-medium text-muted-foreground mb-1">Mileage Limit (annual km)</label>
+            <label class="block text-sm font-medium text-muted-foreground mb-1">Mileage Limit (annual km)</label>
             <input
               v-model.number="formData.fields.mileageLimit"
               type="number"
@@ -147,7 +147,7 @@
         <template v-if="formData.type === 'FIN'">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-medium text-muted-foreground mb-1">Effective Interest Rate / TAEG (%)</label>
+              <label class="block text-sm font-medium text-muted-foreground mb-1">Effective Interest Rate / TAEG (%)</label>
               <div class="relative">
                 <input
                   v-model.number="formData.fields.effectiveInterestRate"
@@ -163,7 +163,7 @@
             </div>
 
             <div>
-              <label class="block text-xs font-medium text-muted-foreground mb-1">Guaranteed Future Value / GFV (€)</label>
+              <label class="block text-sm font-medium text-muted-foreground mb-1">Guaranteed Future Value / GFV (€)</label>
               <div class="relative">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">€</span>
                 <input
@@ -195,7 +195,7 @@
         <template v-if="formData.type === 'LEA'">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-medium text-muted-foreground mb-1">Final Instalment (€)</label>
+              <label class="block text-sm font-medium text-muted-foreground mb-1">Final Instalment (€)</label>
               <div class="relative">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">€</span>
                 <input
@@ -216,7 +216,7 @@
               <span class="text-sm font-medium text-muted-foreground">Total Leasing Amount:</span>
               <span class="text-lg font-bold text-foreground">€ {{ formatCurrency(totalLeasingAmount) }}</span>
             </div>
-            <p class="text-xs text-muted-foreground mt-1">
+            <p class="text-sm text-muted-foreground mt-1">
               (Monthly × Duration + Down Payment + Final Instalment)
             </p>
           </div>
@@ -250,7 +250,7 @@
         <!-- LTR-specific Fields -->
         <template v-if="formData.type === 'LTR'">
           <div>
-            <label class="block text-xs font-medium text-muted-foreground mb-1">
+            <label class="block text-sm font-medium text-muted-foreground mb-1">
               Customer Type <span class="text-brand-red">*</span>
             </label>
             <select
@@ -264,7 +264,7 @@
               <option value="Business">Business</option>
               <option value="Fleet">Fleet</option>
             </select>
-            <p v-if="errors.customerType" class="text-xs text-red-600 mt-1">
+            <p v-if="errors.customerType" class="text-sm text-red-600 mt-1">
               {{ errors.customerType }}
             </p>
           </div>
@@ -275,7 +275,7 @@
               <span class="text-sm font-medium text-muted-foreground">Total Rental Amount:</span>
               <span class="text-lg font-bold text-foreground">€ {{ formatCurrency(totalRentalAmount) }}</span>
             </div>
-            <p class="text-xs text-muted-foreground mt-1">
+            <p class="text-sm text-muted-foreground mt-1">
               (Monthly × Duration + Down Payment)
             </p>
           </div>

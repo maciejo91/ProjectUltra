@@ -10,7 +10,15 @@
         cardStyle ? 'bg-white hover:bg-muted/30' : 'bg-muted/30 hover:bg-muted/50'
       ]"
     >
-      <h5 class="font-semibold text-foreground text-sm mb-0" :class="noSidePadding ? 'px-4' : ''">{{ title }}</h5>
+      <h5
+        class="mb-0 text-foreground"
+        :class="[
+          titleClass || 'text-sm font-semibold',
+          noSidePadding ? 'px-4' : ''
+        ]"
+      >
+        {{ title }}
+      </h5>
       <ChevronDown
         class="w-3 h-3 shrink-0 text-muted-foreground transition-transform duration-200"
         :class="[{ 'rotate-180': isExpanded }, noSidePadding ? 'mr-4' : '']"
@@ -45,6 +53,10 @@ defineProps({
   cardStyle: {
     type: Boolean,
     default: false
+  },
+  titleClass: {
+    type: String,
+    default: ''
   }
 })
 

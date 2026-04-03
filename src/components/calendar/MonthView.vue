@@ -80,7 +80,7 @@ const handleEventClick = (id) => {
           @click="handleCellClick(cell)"
         >
           <span
-            class="inline-flex items-center justify-center size-6 rounded-full text-xs shrink-0"
+            class="inline-flex items-center justify-center size-6 rounded-full text-sm shrink-0"
             :class="
               cell.isToday
                 ? 'bg-foreground text-background'
@@ -97,7 +97,7 @@ const handleEventClick = (id) => {
               v-for="event in cell.events.slice(0, 3)"
               :key="event.id"
               type="button"
-              class="w-full text-left rounded-md px-2 py-1 text-xs font-medium truncate cursor-pointer overflow-hidden"
+              class="w-full text-left rounded-md px-2 py-1 text-sm font-medium truncate cursor-pointer overflow-hidden"
               :class="event.cssClass || 'calendar-event-other'"
               @click.stop="handleEventClick(event.id)"
             >
@@ -106,7 +106,7 @@ const handleEventClick = (id) => {
             </button>
             <span
               v-if="cell.events.length > 3"
-              class="text-xs text-muted-foreground px-1.5"
+              class="text-sm text-muted-foreground px-1.5"
             >
               +{{ cell.events.length - 3 }} more
             </span>

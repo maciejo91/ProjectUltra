@@ -5,6 +5,12 @@
     :task-type="request.type"
     :customer-id="request.customerId || request.customer?.id"
     :show-quick-actions="showQuickActions"
+    :related-leads="relatedLeads"
+    :related-opportunities="relatedOpportunities"
+    :related-requests-loading="relatedRequestsLoading"
+    :exclude-request-id="request.id"
+    :exclude-request-type="request.type"
+    :embedded-in-card="embeddedInCard"
     @quick-action="emit('quick-action', $event)"
   />
 </template>
@@ -21,6 +27,22 @@ const props = defineProps({
   showQuickActions: {
     type: Boolean,
     default: true
+  },
+  relatedLeads: {
+    type: Array,
+    default: () => []
+  },
+  relatedOpportunities: {
+    type: Array,
+    default: () => []
+  },
+  relatedRequestsLoading: {
+    type: Boolean,
+    default: false
+  },
+  embeddedInCard: {
+    type: Boolean,
+    default: false
   }
 })
 

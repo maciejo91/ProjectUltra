@@ -109,24 +109,24 @@ const handleDelete = () => {
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex flex-col gap-1.5">
-      <label class="text-xs font-medium text-foreground">Title</label>
+      <label class="text-sm font-medium text-foreground">Title</label>
       <Input v-model="title" type="text" class="h-9" placeholder="Event title" />
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-medium text-foreground">Starts</label>
+        <label class="text-sm font-medium text-foreground">Starts</label>
         <Input v-model="startInput" type="datetime-local" class="h-9" />
       </div>
       <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-medium text-foreground">Ends</label>
+        <label class="text-sm font-medium text-foreground">Ends</label>
         <Input v-model="endInput" type="datetime-local" class="h-9" />
       </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-medium text-foreground">Category</label>
+        <label class="text-sm font-medium text-foreground">Category</label>
         <Select v-model="selectedTypeId">
           <SelectTrigger class="h-9">
             <SelectValue :placeholder="eventTypes[0]?.label || 'Select type'" />
@@ -143,7 +143,7 @@ const handleDelete = () => {
         </Select>
       </div>
       <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-medium text-foreground">Owner</label>
+        <label class="text-sm font-medium text-foreground">Owner</label>
         <Select v-model="selectedUserId">
           <SelectTrigger class="h-9">
             <SelectValue placeholder="Select owner" />
@@ -162,17 +162,17 @@ const handleDelete = () => {
     </div>
 
     <div class="flex flex-col gap-1.5">
-      <label class="text-xs font-medium text-foreground">Location</label>
+      <label class="text-sm font-medium text-foreground">Location</label>
       <Input v-model="location" type="text" class="h-9" placeholder="Meeting room or address" />
     </div>
 
     <div class="flex flex-col gap-1.5">
-      <label class="text-xs font-medium text-foreground">Attendees</label>
+      <label class="text-sm font-medium text-foreground">Attendees</label>
       <Input v-model="attendees" type="text" class="h-9" placeholder="Names or team" />
     </div>
 
     <div class="flex flex-col gap-1.5">
-      <label class="text-xs font-medium text-foreground">Notes</label>
+      <label class="text-sm font-medium text-foreground">Notes</label>
       <Textarea
         v-model="description"
         rows="3"

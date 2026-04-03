@@ -47,7 +47,7 @@
     </button>
     <div v-else class="text-center py-6 px-3 bg-muted border border-border rounded-lg">
       <FileText class="w-8 h-8 shrink-0 text-muted-foreground mx-auto mb-2" />
-      <p class="text-xs font-medium text-muted-foreground">No offers created yet</p>
+      <p class="text-sm font-medium text-muted-foreground">No offers created yet</p>
     </div>
   </div>
 </template>

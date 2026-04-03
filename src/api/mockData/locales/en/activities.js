@@ -248,5 +248,17 @@ export const mockActivities = [
     content: 'Hi Emma, I tried calling you. I will call again after 2 PM as requested.',
     timestamp: createHourOffset(-0.5),
     leadId: 2
+  },
+  {
+    id: 28,
+    type: 'ai-summary',
+    user: 'MotorKAI',
+    action: 'summarized recent interactions',
+    message:
+      'Strong intent on the VW ID.4; the customer asked for an afternoon callback after a short WhatsApp thread.\nPaid search and WhatsApp are the latest touchpoints—keep momentum before the scheduled recall.\nSuggested next step: confirm stock, pricing, and home-charging options in one concise call.',
+    content:
+      'Strong intent on the VW ID.4; the customer asked for an afternoon callback after a short WhatsApp thread.\nPaid search and WhatsApp are the latest touchpoints—keep momentum before the scheduled recall.\nSuggested next step: confirm stock, pricing, and home-charging options in one concise call.',
+    timestamp: createHourOffset(-0.2),
+    leadId: 2
   }
 ]

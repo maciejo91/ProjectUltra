@@ -1,0 +1,50 @@
+{
+  "tabs": {
+    "overview": "Übersicht",
+    "requests": "Anfragen",
+    "communication": "Kommunikation"
+  },
+  "activeRequests": "Aktive Anfragen",
+  "rightColumn": {
+    "contactDetails": "Kontaktdaten",
+    "otherInteractions": "Weitere Interaktionen ({count})",
+    "otherInteractionsRegion": "Frühere Leads und Opportunities",
+    "typeLead": "Lead",
+    "typeOpportunity": "Opportunity",
+    "fallbackLeadTitle": "Lead",
+    "fallbackOpportunityTitle": "Opportunity",
+    "appointments": "Termine",
+    "addAppointment": "Hinzufügen",
+    "noAppointments": "Keine anstehenden Termine.",
+    "recentActivity": "Letzte Aktivität"
+  },
+  "details": {
+    "customerName": "Kundenname",
+    "account": "Konto",
+    "accountOwner": "Kontoinhaber",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "address": "Adresse",
+    "language": "Sprache",
+    "fiscalEntities": "Steuerliche Einheiten",
+    "drivenVehicle": "Gefahrenes Fahrzeug",
+    "copyPhoneAria": "Telefonnummer kopieren",
+    "phoneCopied": "Telefonnummer in die Zwischenablage kopiert",
+    "phoneCopyFailed": "Kopieren der Telefonnummer fehlgeschlagen"
+  },
+  "activityFeed": {
+    "title": "Letzte Aktivität",
+    "add": "Hinzufügen",
+    "empty": "Keine letzten Aktivitäten.",
+    "performedAction": "hat eine Aktion ausgeführt",
+    "systemUser": "System",
+    "justNow": "Gerade eben",
+    "minutesAgo": "vor {count} Min.",
+    "hoursAgo": "vor {count} Std."
+  },
+  "header": {
+    "backAria": "Zurück zu Kontakten",
+    "fallbackName": "Kunde"
+  },
+  "sendMessage": "Nachricht senden"
+}

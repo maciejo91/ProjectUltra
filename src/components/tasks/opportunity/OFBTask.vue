@@ -93,7 +93,7 @@
         <div v-if="showQ4">
           <Label class="form-label mb-2">
             4. If no, why?
-            <span class="text-xs text-muted-foreground ml-1">(optional notes)</span>
+            <span class="text-sm text-muted-foreground ml-1">(optional notes)</span>
           </Label>
           <Textarea
             v-model="responses.q4"

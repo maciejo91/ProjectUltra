@@ -46,7 +46,7 @@
               <p class="text-sm font-semibold text-foreground mb-1">
                 {{ aiSuggestionData.formattedDate }} at {{ aiSuggestionData.time }}
               </p>
-              <p class="text-xs text-muted-foreground">
+              <p class="text-sm text-muted-foreground">
                 {{ aiSuggestionData.reason }}
               </p>
             </div>

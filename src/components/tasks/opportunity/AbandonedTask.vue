@@ -7,19 +7,19 @@
     <template #actions>
       <button
         @click="handleReopen"
-        class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-btn text-xs flex items-center gap-2 transition-colors"
+        class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-btn text-sm flex items-center gap-2 transition-colors"
       >
         <RotateCcw class="w-4 h-4 shrink-0 inline" /> Reopen Opportunity
       </button>
       <button
         @click="handleCloseLost"
-        class="bg-white border border-D1D5DB text-brand-dark font-medium px-4 py-2 rounded-btn text-xs flex items-center gap-2 transition-colors hover:bg-muted"
+        class="bg-white border border-D1D5DB text-brand-dark font-medium px-4 py-2 rounded-btn text-sm flex items-center gap-2 transition-colors hover:bg-muted"
       >
         <X class="w-4 h-4 shrink-0 inline" /> Close as Lost
       </button>
       <button
         @click="handleRequalify"
-        class="bg-white border border-D1D5DB text-brand-dark font-medium px-4 py-2 rounded-btn text-xs flex items-center gap-2 transition-colors hover:bg-muted"
+        class="bg-white border border-D1D5DB text-brand-dark font-medium px-4 py-2 rounded-btn text-sm flex items-center gap-2 transition-colors hover:bg-muted"
       >
         <ArrowLeft class="w-4 h-4 shrink-0 inline" /> Requalify as Lead
       </button>

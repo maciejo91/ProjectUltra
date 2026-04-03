@@ -15,7 +15,7 @@
     >
       <div class="flex flex-col items-center gap-2">
         <div class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <span class="text-xs text-muted-foreground">Updating...</span>
+        <span class="text-sm text-muted-foreground">Updating...</span>
       </div>
     </div>
     <!-- Status Badge -->
@@ -57,7 +57,7 @@
           v-for="menuItem in menuItems"
           :key="menuItem.key"
           @click="() => { menuItem.onClick(); closeMenu(); }"
-          class="w-full px-3 py-2 text-left text-xs text-foreground hover:bg-muted flex items-center gap-2"
+          class="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2"
           style="font-size: 0.75rem; line-height: 1.5;"
         >
           {{ menuItem.label }}
@@ -196,15 +196,15 @@ const detailsHeightClass = computed(() => {
 })
 
 const titleSizeClass = computed(() => {
-  return props.variant === 'carousel' ? 'text-xs' : 'text-sm'
+  return props.variant === 'carousel' ? 'text-sm' : 'text-sm'
 })
 
 const priceSizeClass = computed(() => {
-  return props.variant === 'carousel' ? 'text-xs' : 'text-sm'
+  return props.variant === 'carousel' ? 'text-sm' : 'text-sm'
 })
 
 const dateSizeClass = computed(() => {
-  return props.variant === 'carousel' ? 'text-xs' : 'text-xs'
+  return props.variant === 'carousel' ? 'text-sm' : 'text-sm'
 })
 
 const setButtonRef = (offerId, el) => {

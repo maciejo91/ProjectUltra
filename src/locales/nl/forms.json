@@ -77,6 +77,16 @@
   },
   "schedule": {
     "title": "Inplannen",
+    "dealership": {
+      "label": "Dealer",
+      "placeholder": "Filter op dealer",
+      "all": "Alle dealers"
+    },
+    "team": {
+      "label": "Team",
+      "placeholder": "Filter op team",
+      "all": "Alle teams"
+    },
     "eventType": {
       "label": "Type evenement",
       "placeholder": "Selecteer type evenement",
@@ -98,7 +108,14 @@
     },
     "timeSlots": {
       "noSlots": "Geen beschikbare tijdslots voor deze datum",
-      "selectDate": "Selecteer een datum om beschikbare tijdslots te zien"
+      "selectDate": "Selecteer een datum om beschikbare tijdslots te zien",
+      "morning": "Ochtend",
+      "afternoon": "Namiddag"
+    },
+    "slotPopover": {
+      "people": "Personen",
+      "searchPlaceholder": "Zoek op naam of team",
+      "noResults": "Geen resultaten"
     },
     "calendar": {
       "days": ["ZON", "MAA", "DIN", "WOE", "DON", "VRI", "ZAT"]

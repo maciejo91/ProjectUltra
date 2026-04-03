@@ -177,7 +177,7 @@
             <div>
               <Label class="block text-sm font-medium text-muted-foreground mb-2">
                 Notes for follow-up actions:
-                <span class="text-xs text-muted-foreground ml-1">(Private - only for internal staff)</span>
+                <span class="text-sm text-muted-foreground ml-1">(Private - only for internal staff)</span>
               </Label>
               <Textarea
                 v-model="responses.q7"
@@ -207,7 +207,7 @@
               ⚠️ Email to Sales Manager + Regional Manager
             </span>
           </Label>
-          <span class="text-xs text-muted-foreground">(Q1 = Very Unsatisfied)</span>
+          <span class="text-sm text-muted-foreground">(Q1 = Very Unsatisfied)</span>
         </div>
         
         <!-- Document Clarity Issues -->
@@ -221,7 +221,7 @@
               ⚠️ Email to Compliance/Legal team
             </span>
           </Label>
-          <span class="text-xs text-muted-foreground">(Q2 = Not clear at all)</span>
+          <span class="text-sm text-muted-foreground">(Q2 = Not clear at all)</span>
         </div>
         
         <!-- Poor Salesperson Support -->
@@ -235,7 +235,7 @@
               ⚠️ Email to Sales Manager for coaching
             </span>
           </Label>
-          <span class="text-xs text-muted-foreground">(Q5 = 1 star)</span>
+          <span class="text-sm text-muted-foreground">(Q5 = 1 star)</span>
         </div>
       </div>
     </div>

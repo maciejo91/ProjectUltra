@@ -10,7 +10,7 @@
         <p v-if="sentenceStyle" class="text-base leading-normal font-medium text-foreground">{{ cardDescription || cardTitle }}</p>
         <template v-else>
           <h4 class="font-bold text-foreground text-sm">{{ cardTitle }}</h4>
-          <p class="text-xs text-muted-foreground mt-0.5">{{ cardDescription }}</p>
+          <p class="text-sm text-muted-foreground mt-0.5">{{ cardDescription }}</p>
         </template>
       </div>
     </div>
@@ -20,7 +20,7 @@
         :key="item.key || index"
         type="button"
         :class="item.buttonClass || 'bg-primary hover:opacity-90 text-white'"
-        class="font-medium px-4 py-2 rounded-lg text-xs flex items-center gap-2 transition-colors shadow-sm"
+        class="font-medium px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors shadow-sm"
         @click="item.handler ? item.handler() : $emit('action-clicked', item)"
       >
         <component :is="getLucideIcon(item.icon)" class="w-4 h-4 shrink-0" />

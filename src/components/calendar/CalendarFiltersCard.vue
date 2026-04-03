@@ -20,7 +20,7 @@ const update = (key, value) => {
     <p class="text-sm font-medium text-foreground">Filters</p>
     <div class="flex flex-col gap-3">
       <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-medium text-muted-foreground">Dealership</label>
+        <label class="text-sm font-medium text-muted-foreground">Dealership</label>
         <Select :model-value="filters.dealership || '__all__'" @update:model-value="(v) => update('dealership', v === '__all__' ? '' : v)">
           <SelectTrigger class="h-9">
             <SelectValue placeholder="All dealerships" />
@@ -34,7 +34,7 @@ const update = (key, value) => {
         </Select>
       </div>
       <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-medium text-muted-foreground">Team members</label>
+        <label class="text-sm font-medium text-muted-foreground">Team members</label>
         <Select :model-value="filters.team || '__all__'" @update:model-value="(v) => update('team', v === '__all__' ? '' : v)">
           <SelectTrigger class="h-9">
             <SelectValue placeholder="All team members" />

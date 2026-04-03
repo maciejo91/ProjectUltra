@@ -13,7 +13,7 @@
               <template v-for="(s, i) in stepLabels" :key="s.key">
                 <li class="flex flex-col items-center gap-2 shrink-0 w-16 sm:w-24">
                   <span
-                    class="flex size-6 sm:size-7 shrink-0 items-center justify-center rounded-full text-[10px] sm:text-xs font-bold transition-colors"
+                    class="flex size-6 sm:size-7 shrink-0 items-center justify-center rounded-full text-[10px] sm:text-sm font-bold transition-colors"
                     :class="currentStepIndex === i ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground'"
                   >
                     {{ i + 1 }}
@@ -147,7 +147,7 @@
               </div>
               
               <div class="space-y-2">
-                <Label class="text-xs font-semibold uppercase text-muted-foreground">Salutation</Label>
+                <Label class="text-sm font-semibold uppercase text-muted-foreground">Salutation</Label>
                 <div class="outcome-toggle-group flex gap-3">
                   <Toggle
                     v-for="s in ['Mr.', 'Mrs.', 'Ms.']"
@@ -164,19 +164,19 @@
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">First Name</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">First Name</Label>
                   <Input v-model="offerData.firstName" placeholder="Enter first name" :disabled="!!customer" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Last Name</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Last Name</Label>
                   <Input v-model="offerData.lastName" placeholder="Enter last name" :disabled="!!customer" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Email</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Email</Label>
                   <Input type="email" v-model="offerData.email" placeholder="email@example.com" :disabled="!!customer" class="bg-background" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Phone Number</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Phone Number</Label>
                   <Input type="tel" v-model="offerData.phone" placeholder="+1 (555) 000-0000" :disabled="!!customer" class="bg-background" />
                 </div>
               </div>
@@ -188,16 +188,16 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                   <div class="space-y-1.5">
-                    <Label class="text-xs font-semibold uppercase text-muted-foreground">ZIP / Postal Code</Label>
+                    <Label class="text-sm font-semibold uppercase text-muted-foreground">ZIP / Postal Code</Label>
                     <Input v-model="offerData.zipCode" placeholder="Enter ZIP" :disabled="!!customer" class="bg-background" />
                   </div>
                   <div class="space-y-1.5">
-                    <Label class="text-xs font-semibold uppercase text-muted-foreground">City</Label>
+                    <Label class="text-sm font-semibold uppercase text-muted-foreground">City</Label>
                     <Input v-model="offerData.city" placeholder="Enter city" :disabled="!!customer" class="bg-background" />
                   </div>
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-xs font-semibold uppercase text-muted-foreground">Address / Street</Label>
+                  <Label class="text-sm font-semibold uppercase text-muted-foreground">Address / Street</Label>
                   <Input v-model="offerData.address" placeholder="Enter street address" :disabled="!!customer" class="bg-background" />
                 </div>
               </div>
@@ -281,7 +281,7 @@
             <div v-if="!resolvedVehicle" class="p-5 rounded-xl border border-border bg-muted/20 space-y-4">
               <div class="flex items-center gap-2 border-b border-border pb-2">
                 <FileText class="size-4 text-primary" />
-                <h3 class="text-xs font-bold text-foreground uppercase tracking-wider">Manual Vehicle Entry</h3>
+                <h3 class="text-sm font-bold text-foreground uppercase tracking-wider">Manual Vehicle Entry</h3>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                 <div class="space-y-1.5">
@@ -308,7 +308,7 @@
                 <div class="space-y-4">
                   <div class="flex items-center gap-2 border-b border-border pb-2">
                     <Tags class="size-4 text-primary" />
-                    <h3 class="text-xs font-bold text-foreground uppercase tracking-wider">Base Configuration</h3>
+                    <h3 class="text-sm font-bold text-foreground uppercase tracking-wider">Base Configuration</h3>
                   </div>
                   <div class="space-y-4">
                     <div class="space-y-1.5 bg-primary/5 p-4 rounded-lg border border-primary/10">
@@ -317,7 +317,7 @@
                     </div>
                     <div class="flex items-center gap-3 px-1">
                       <Checkbox :checked="offerData.showVat" @update:checked="offerData.showVat = $event" id="show-vat" />
-                      <Label for="show-vat" class="text-xs font-bold text-muted-foreground cursor-pointer uppercase tracking-tight">Show VAT breakdown</Label>
+                      <Label for="show-vat" class="text-sm font-bold text-muted-foreground cursor-pointer uppercase tracking-tight">Show VAT breakdown</Label>
                     </div>
                     <div v-if="offerData.showVat" class="p-4 rounded-lg bg-muted/30 border border-border space-y-3 animate-in fade-in slide-in-from-top-2">
                       <div class="grid grid-cols-2 gap-4">
@@ -340,7 +340,7 @@
                   <div class="flex items-center justify-between border-b border-border pb-2">
                     <div class="flex items-center gap-2">
                       <PlusCircle class="size-4 text-primary" />
-                      <h3 class="text-xs font-bold text-foreground uppercase tracking-wider">Options & Extras</h3>
+                      <h3 class="text-sm font-bold text-foreground uppercase tracking-wider">Options & Extras</h3>
                     </div>
                     <Button variant="ghost" size="sm" @click="addQuotationItem" class="h-7 text-[10px] font-black uppercase text-primary">
                       <Plus class="size-3 mr-1" /> Add
@@ -380,7 +380,7 @@
                   <div class="flex items-center justify-between border-b border-border pb-2">
                     <div class="flex items-center gap-2">
                       <Percent class="size-4 text-primary" />
-                      <h3 class="text-xs font-bold text-foreground uppercase tracking-wider">Discounts</h3>
+                      <h3 class="text-sm font-bold text-foreground uppercase tracking-wider">Discounts</h3>
                     </div>
                     <Button variant="ghost" size="sm" @click="addDiscount" class="h-7 text-[10px] font-black uppercase text-primary">
                       <Plus class="size-3 mr-1" /> Add
@@ -423,7 +423,7 @@
                 <div class="space-y-4">
                   <div class="flex items-center gap-2 border-b border-border pb-2">
                     <Sparkles class="size-4 text-primary" />
-                    <h3 class="text-xs font-bold text-foreground uppercase tracking-wider">Promotions</h3>
+                    <h3 class="text-sm font-bold text-foreground uppercase tracking-wider">Promotions</h3>
                   </div>
                   <div class="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
                     <div class="flex items-center justify-between p-3 rounded-lg bg-background border border-border shadow-sm">
@@ -481,7 +481,7 @@
                     </div>
                     <div class="flex items-center gap-3 pt-1">
                       <Checkbox :checked="payment.paid" @update:checked="payment.paid = $event" :id="'pm-paid-'+index" />
-                      <Label :for="'pm-paid-'+index" class="text-xs font-bold text-muted-foreground cursor-pointer uppercase select-none">Mark as paid</Label>
+                      <Label :for="'pm-paid-'+index" class="text-sm font-bold text-muted-foreground cursor-pointer uppercase select-none">Mark as paid</Label>
                     </div>
                   </div>
                   <div v-if="!offerData.paymentMethods.length" class="text-center py-12 border-2 border-dashed border-border rounded-xl bg-muted/5">
@@ -499,11 +499,11 @@
                   </div>
                   <div class="space-y-3 pt-4 border-t border-primary-foreground/20">
                     <div class="flex justify-between items-center opacity-90">
-                      <span class="text-xs font-bold uppercase tracking-tight">Down Payment</span>
+                      <span class="text-sm font-bold uppercase tracking-tight">Down Payment</span>
                       <span class="text-sm font-bold">€ {{ formatCurrency(offerData.downPayment || 0) }}</span>
                     </div>
                     <div class="flex justify-between items-center bg-white/10 p-3 rounded-lg">
-                      <span class="text-xs font-bold uppercase tracking-tight">Remaining (Cash)</span>
+                      <span class="text-sm font-bold uppercase tracking-tight">Remaining (Cash)</span>
                       <span class="text-sm font-black">€ {{ formatCurrency(remainingBalanceCash) }}</span>
                     </div>
                   </div>
@@ -557,14 +557,14 @@
                     <div class="flex items-start gap-3 p-4 rounded-xl border border-border bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer" @click="offerData.privacyConsent = !offerData.privacyConsent">
                       <Checkbox :checked="offerData.privacyConsent" class="mt-0.5" />
                       <div class="space-y-1">
-                        <p class="text-xs font-bold text-foreground uppercase tracking-tight">Privacy Policy</p>
+                        <p class="text-sm font-bold text-foreground uppercase tracking-tight">Privacy Policy</p>
                         <p class="text-[10px] text-muted-foreground leading-relaxed font-medium">The customer has read and agreed to the dealership's privacy policy and data processing terms.</p>
                       </div>
                     </div>
                     <div class="flex items-start gap-3 p-4 rounded-xl border border-border bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer" @click="offerData.marketingConsent = !offerData.marketingConsent">
                       <Checkbox :checked="offerData.marketingConsent" class="mt-0.5" />
                       <div class="space-y-1">
-                        <p class="text-xs font-bold text-foreground uppercase tracking-tight">Marketing Communications</p>
+                        <p class="text-sm font-bold text-foreground uppercase tracking-tight">Marketing Communications</p>
                         <p class="text-[10px] text-muted-foreground leading-relaxed font-medium">The customer wishes to receive updates, news, and promotional offers from our dealership.</p>
                       </div>
                     </div>

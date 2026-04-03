@@ -22,7 +22,7 @@
         @click="$emit('open-edit', t)"
       >
         <span class="font-medium text-foreground">{{ t.label }}</span>
-        <span v-if="t.valuation != null" class="text-muted-foreground shrink-0 text-xs">€ {{ formatCurrency(t.valuation) }}</span>
+        <span v-if="t.valuation != null" class="text-muted-foreground shrink-0 text-sm">€ {{ formatCurrency(t.valuation) }}</span>
       </li>
     </ul>
   </div>

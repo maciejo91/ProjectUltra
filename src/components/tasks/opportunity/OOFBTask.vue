@@ -13,13 +13,13 @@
     <template #actions>
       <button
         @click="handleCreateOffer"
-        class="bg-orange-600 hover:bg-orange-700 text-white font-medium px-4 py-2 rounded-btn text-xs flex items-center gap-2 transition-colors"
+        class="bg-orange-600 hover:bg-orange-700 text-white font-medium px-4 py-2 rounded-btn text-sm flex items-center gap-2 transition-colors"
       >
         Create Offer
       </button>
       <button
         @click="handleReview"
-        class="bg-white border border-D1D5DB text-brand-dark font-medium px-4 py-2 rounded-btn text-xs flex items-center gap-2 transition-colors hover:bg-muted"
+        class="bg-white border border-D1D5DB text-brand-dark font-medium px-4 py-2 rounded-btn text-sm flex items-center gap-2 transition-colors hover:bg-muted"
       >
         Review Opportunity
       </button>

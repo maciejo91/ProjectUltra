@@ -40,7 +40,7 @@
           >
             <div class="timeline-slot relative z-10 flex shrink-0 flex-col items-center gap-0.5 w-14">
               <span
-                class="text-xs font-medium tabular-nums text-muted-foreground"
+                class="text-sm font-medium tabular-nums text-muted-foreground"
               >
                 {{ item.time }}
               </span>
@@ -59,7 +59,7 @@
                   {{ item.title }}
                 </p>
               </div>
-              <p class="truncate text-xs text-muted-foreground">
+              <p class="truncate text-sm text-muted-foreground">
                 {{ item.subtitle }}
               </p>
               <div class="flex flex-wrap gap-1.5">

@@ -483,7 +483,7 @@
                   class="w-full"
                 />
               </div>
-              <p class="text-xs text-muted-foreground -mt-2">At least one of VIN or plate number is required.</p>
+              <p class="text-sm text-muted-foreground -mt-2">At least one of VIN or plate number is required.</p>
 
               <!-- Driver / owner -->
               <div>

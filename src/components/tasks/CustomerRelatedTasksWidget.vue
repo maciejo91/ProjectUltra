@@ -4,8 +4,8 @@
     <div class="px-4 py-2.5 flex items-center justify-between shrink-0">
       <div class="flex items-center gap-2">
         <List class="w-3 h-3 shrink-0 text-foreground" />
-        <h2 class="text-xs font-medium text-foreground">Other Tasks for This Customer</h2>
-        <span v-if="relatedTasks.length > 0" class="ml-1 px-2 py-0.5 bg-brand-blue/10 text-brand-blue text-xs font-bold rounded-full">
+        <h2 class="text-sm font-medium text-foreground">Other Tasks for This Customer</h2>
+        <span v-if="relatedTasks.length > 0" class="ml-1 px-2 py-0.5 bg-brand-blue/10 text-brand-blue text-sm font-bold rounded-full">
           {{ relatedTasks.length }}
         </span>
       </div>
@@ -15,7 +15,7 @@
     <div class="bg-white rounded-lg p-3 shadow-nsc-card flex flex-col flex-1 min-h-0">
       <div v-if="loading" class="text-center py-6 text-muted-foreground">
         <Loader2 class="w-5 h-5 shrink-0 mb-2 animate-spin text-muted-foreground" />
-        <p class="text-xs">Loading related tasks...</p>
+        <p class="text-sm">Loading related tasks...</p>
       </div>
       
       <div v-else-if="relatedTasks.length > 0" class="space-y-2 overflow-y-auto flex-1">
@@ -30,7 +30,7 @@
               <!-- Type, Status and Details in a compact layout -->
               <div class="flex items-center gap-2 mb-1 flex-wrap">
                 <span 
-                  class="px-1 py-0.5 rounded text-xs font-bold border leading-none uppercase"
+                  class="px-1 py-0.5 rounded text-sm font-bold border leading-none uppercase"
                   :class="task.type === 'lead' 
                     ? 'bg-blue-50 text-blue-700 border-blue-200' 
                     : 'bg-purple-50 text-purple-700 border-purple-200'"
@@ -38,13 +38,13 @@
                   {{ task.type === 'lead' ? 'Lead' : 'Opp' }}
                 </span>
                 <span 
-                  class="px-1 py-0.5 rounded text-xs font-bold border leading-none uppercase"
+                  class="px-1 py-0.5 rounded text-sm font-bold border leading-none uppercase"
                   :class="getStageColor(task.displayStage || task.stage, task.type)"
                 >
                   {{ task.displayStage || task.stage }}
                 </span>
                 
-                <div v-if="task.createdAt" class="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
+                <div v-if="task.createdAt" class="hidden sm:flex items-center gap-1 text-sm text-muted-foreground">
                   <span>{{ formatDate(task.createdAt) }}</span>
                 </div>
               </div>
@@ -52,25 +52,25 @@
               <!-- Details Row -->
               <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5">
                 <!-- Mobile only creation date -->
-                <div v-if="task.createdAt" class="flex sm:hidden items-center gap-1 text-xs text-muted-foreground">
+                <div v-if="task.createdAt" class="flex sm:hidden items-center gap-1 text-sm text-muted-foreground">
                   <Calendar class="w-4 h-4 shrink-0 opacity-70" />
                   <span>{{ formatDate(task.createdAt) }}</span>
                 </div>
 
                 <!-- Assignee -->
-                <div v-if="task.assignee" class="flex items-center gap-1 text-xs text-muted-foreground">
+                <div v-if="task.assignee" class="flex items-center gap-1 text-sm text-muted-foreground">
                   <User class="w-4 h-4 shrink-0 opacity-70" />
                   <span>{{ task.assignee }}</span>
                 </div>
                 
                 <!-- Car Requested -->
-                <div v-if="getCarName(task)" class="flex items-center gap-1 text-xs text-muted-foreground">
+                <div v-if="getCarName(task)" class="flex items-center gap-1 text-sm text-muted-foreground">
                   <Car class="w-4 h-4 shrink-0 opacity-70" />
                   <span class="truncate max-w-[150px]">{{ getCarName(task) }}</span>
                 </div>
                 
                 <!-- Value (only for opportunities) -->
-                <div v-if="task.type === 'opportunity' && task.value" class="flex items-center gap-1 text-xs">
+                <div v-if="task.type === 'opportunity' && task.value" class="flex items-center gap-1 text-sm">
                   <Tag class="w-4 h-4 shrink-0 text-muted-foreground opacity-70" />
                   <span class="font-bold text-foreground">€ {{ formatCurrency(task.value) }}</span>
                 </div>
@@ -88,7 +88,7 @@
       <!-- Empty State -->
       <div v-else class="text-center py-8 text-muted-foreground">
         <Inbox class="w-6 h-6 shrink-0 mb-2 opacity-30" />
-        <p class="text-xs">No other tasks for this customer</p>
+        <p class="text-sm">No other tasks for this customer</p>
       </div>
     </div>
   </div>

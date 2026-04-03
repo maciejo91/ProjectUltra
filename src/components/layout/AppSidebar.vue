@@ -78,7 +78,7 @@
 
         <SidebarGroup>
           <SidebarGroupLabel
-            class="group-data-[collapsible=icon]:hidden px-2 text-xs font-medium text-muted-foreground"
+            class="group-data-[collapsible=icon]:hidden px-2 text-sm font-medium text-muted-foreground"
           >
             {{ t('common.navigation.groups.data') }}
           </SidebarGroupLabel>
@@ -111,7 +111,7 @@
 
         <SidebarGroup>
           <SidebarGroupLabel
-            class="group-data-[collapsible=icon]:hidden px-2 text-xs font-medium text-muted-foreground"
+            class="group-data-[collapsible=icon]:hidden px-2 text-sm font-medium text-muted-foreground"
           >
             {{ t('common.navigation.groups.actions') }}
           </SidebarGroupLabel>

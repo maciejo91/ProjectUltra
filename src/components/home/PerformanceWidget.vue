@@ -5,7 +5,7 @@
       <select
         v-model="selectedPeriod"
         @change="loadMetrics"
-        class="input text-xs w-full sm:w-auto bg-muted/50 border-border rounded-md px-2 py-1 outline-none focus:ring-1 focus:ring-primary/20"
+        class="input text-sm w-full sm:w-auto bg-muted/50 border-border rounded-md px-2 py-1 outline-none focus:ring-1 focus:ring-primary/20"
       >
         <option value="month">Month</option>
         <option value="quarter">Quarter</option>
@@ -24,14 +24,14 @@
         <!-- SLA Compliance -->
         <div class="bg-muted rounded-lg p-4 border border-border">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-muted-foreground tracking-wider">SLA Compliance</span>
+            <span class="text-sm font-medium text-muted-foreground tracking-wider">SLA Compliance</span>
             <Badge
               :text="`${slaCompliancePercentage}%`"
               size="small"
               :theme="slaCompliancePercentage >= 90 ? 'green' : 'orange'"
             />
           </div>
-          <div class="text-xs text-foreground font-medium">
+          <div class="text-sm text-foreground font-medium">
             {{ bdcMetrics?.slaCompliance?.withinSLA || 0 }} / {{ bdcMetrics?.slaCompliance?.total || 0 }} tasks completed within SLA
           </div>
         </div>
@@ -39,9 +39,9 @@
         <!-- Managed Lead Tasks -->
         <div class="bg-muted rounded-lg p-4 border border-border">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-medium text-muted-foreground tracking-wider">Managed Lead Tasks</span>
+            <span class="text-sm font-medium text-muted-foreground tracking-wider">Managed Lead Tasks</span>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-bold" :class="getManagedTaskStatusClass(bdcMetrics?.managedLeadTasks?.dailyAvg, bdcMetrics?.managedLeadTasks?.target)">
+              <span class="text-sm font-bold" :class="getManagedTaskStatusClass(bdcMetrics?.managedLeadTasks?.dailyAvg, bdcMetrics?.managedLeadTasks?.target)">
                 {{ bdcMetrics?.managedLeadTasks?.dailyAvg || 0 }} / {{ bdcMetrics?.managedLeadTasks?.target || 0 }}
               </span>
             </div>
@@ -53,24 +53,24 @@
               :style="{ width: `${Math.min((bdcMetrics?.managedLeadTasks?.dailyAvg || 0) / 50 * 100, 100)}%` }"
             ></div>
           </div>
-          <div class="text-xs text-muted-foreground mt-2 font-medium">Target: 20-50/day (avg this period)</div>
+          <div class="text-sm text-muted-foreground mt-2 font-medium">Target: 20-50/day (avg this period)</div>
         </div>
 
         <!-- Handled No-Show Tasks -->
         <div class="bg-muted rounded-lg p-4 border border-border">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-muted-foreground tracking-wider">Handled No-Show Tasks</span>
+            <span class="text-sm font-medium text-muted-foreground tracking-wider">Handled No-Show Tasks</span>
             <span class="text-sm font-bold text-foreground">{{ bdcMetrics?.handledNoShowTasks?.total || 0 }}</span>
           </div>
-          <div class="text-xs text-muted-foreground font-medium">{{ bdcMetrics?.handledNoShowTasks?.dailyAvg || 0 }} avg/day (this period)</div>
+          <div class="text-sm text-muted-foreground font-medium">{{ bdcMetrics?.handledNoShowTasks?.dailyAvg || 0 }} avg/day (this period)</div>
         </div>
 
         <!-- Follow-Up Tasks -->
         <div class="bg-muted rounded-lg p-4 border border-border">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-medium text-muted-foreground tracking-wider">Follow-Up Tasks</span>
+            <span class="text-sm font-medium text-muted-foreground tracking-wider">Follow-Up Tasks</span>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-bold" :class="getManagedTaskStatusClass(bdcMetrics?.followUpTasks?.dailyAvg, bdcMetrics?.followUpTasks?.target)">
+              <span class="text-sm font-bold" :class="getManagedTaskStatusClass(bdcMetrics?.followUpTasks?.dailyAvg, bdcMetrics?.followUpTasks?.target)">
                 {{ bdcMetrics?.followUpTasks?.dailyAvg || 0 }} / {{ bdcMetrics?.followUpTasks?.target || 0 }}
               </span>
             </div>
@@ -82,7 +82,7 @@
               :style="{ width: `${Math.min((bdcMetrics?.followUpTasks?.dailyAvg || 0) / 20 * 100, 100)}%` }"
             ></div>
           </div>
-          <div class="text-xs text-muted-foreground mt-2 font-medium">Target: {{ bdcMetrics?.followUpTasks?.target || 10 }}/day (avg this period)</div>
+          <div class="text-sm text-muted-foreground mt-2 font-medium">Target: {{ bdcMetrics?.followUpTasks?.target || 10 }}/day (avg this period)</div>
         </div>
 
         <!-- Appointments Reserved -->
@@ -90,7 +90,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Appointments Reserved</div>
+                <div class="text-sm font-medium text-muted-foreground tracking-wider mb-2">Appointments Reserved</div>
                 <div class="text-sm font-bold text-foreground leading-none">{{ bdcMetrics?.appointmentsReserved || 0 }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="bdcMetrics?.appointmentsReservedTrend">
@@ -122,7 +122,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Lead-to-Opp Rate</div>
+                <div class="text-sm font-medium text-muted-foreground tracking-wider mb-2">Lead-to-Opp Rate</div>
                 <div class="text-sm font-bold text-foreground leading-none">{{ bdcMetrics?.leadToOpportunityConversion || 0 }}%</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="bdcMetrics?.leadToOpportunityConversionTrend">
@@ -158,12 +158,12 @@
       <div v-else-if="userRole === 'salesman'" class="space-y-4">
         <!-- Nudges -->
         <div v-if="salespersonNudges.length" class="bg-primary/15 border border-primary rounded-lg p-4 space-y-2">
-          <div class="text-xs font-medium text-muted-foreground tracking-wider">What to do next</div>
+          <div class="text-sm font-medium text-muted-foreground tracking-wider">What to do next</div>
           <ul class="space-y-1.5">
             <li
               v-for="nudge in salespersonNudges"
               :key="nudge.id"
-              class="text-xs text-foreground flex items-start gap-2"
+              class="text-sm text-foreground flex items-start gap-2"
             >
               <Lightbulb class="w-3.5 h-3.5 shrink-0 mt-0.5 text-primary" />
               <span>{{ nudge.text }}</span>
@@ -176,7 +176,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Contracts Closed</div>
+                <div class="text-sm font-medium text-muted-foreground tracking-wider mb-2">Contracts Closed</div>
                 <div class="text-sm font-bold text-foreground leading-none">{{ salespersonMetrics?.contractsClosed?.[selectedPeriod] || 0 }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="getTrendData('contractsClosed')">
@@ -208,7 +208,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Total Revenue</div>
+                <div class="text-sm font-medium text-muted-foreground tracking-wider mb-2">Total Revenue</div>
                 <div class="text-sm font-bold text-foreground leading-none">€{{ formatCurrency(salespersonMetrics?.revenue?.[selectedPeriod] || 0) }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="getTrendData('revenue')">
@@ -242,7 +242,7 @@
         <!-- Revenue Targets -->
         <div class="space-y-3 bg-muted rounded-lg p-4 border border-border">
           <div class="space-y-1">
-            <div class="flex items-center justify-between text-xs font-medium text-muted-foreground tracking-wider">
+            <div class="flex items-center justify-between text-sm font-medium text-muted-foreground tracking-wider">
               <span>Monthly Target</span>
               <span class="font-bold text-foreground">{{ getRevenueProgress('month') }}%</span>
             </div>
@@ -254,7 +254,7 @@
             </div>
           </div>
           <div class="space-y-1">
-            <div class="flex items-center justify-between text-xs font-medium text-muted-foreground tracking-wider">
+            <div class="flex items-center justify-between text-sm font-medium text-muted-foreground tracking-wider">
               <span>Quarterly Target</span>
               <span class="font-bold text-foreground">{{ getRevenueProgress('quarter') }}%</span>
             </div>
@@ -272,7 +272,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Pipeline Value</div>
+                <div class="text-sm font-medium text-muted-foreground tracking-wider mb-2">Pipeline Value</div>
                 <div class="text-sm font-bold text-foreground leading-none">€{{ formatCurrency(salespersonMetrics?.pipelineValue || 0) }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="salespersonMetrics?.pipelineValueTrend">
@@ -304,7 +304,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Current Win Rate</div>
+                <div class="text-sm font-medium text-muted-foreground tracking-wider mb-2">Current Win Rate</div>
                 <div class="text-sm font-bold text-foreground leading-none">{{ salespersonMetrics?.winRate || 0 }}%</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="salespersonMetrics?.winRateTrend">
@@ -340,7 +340,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">New Opps</div>
+                <div class="text-sm font-medium text-muted-foreground tracking-wider mb-2">New Opps</div>
                 <div class="text-sm font-bold text-foreground leading-none">{{ salespersonMetrics?.newOpportunities?.[selectedPeriod] || 0 }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="getTrendData('newOpportunities')">
@@ -372,7 +372,7 @@
           <div class="bg-muted rounded-lg p-4 border border-border">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
-                <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Dormant Opps</div>
+                <div class="text-sm font-medium text-muted-foreground tracking-wider mb-2">Dormant Opps</div>
                 <div class="text-sm font-bold text-destructive leading-none">{{ salespersonMetrics?.dormantOpportunities || 0 }}</div>
               </div>
               <div class="h-10 w-16 shrink-0" v-if="salespersonMetrics?.dormantOpportunitiesTrend">
@@ -429,7 +429,7 @@
               </div>
             </div>
           </div>
-          <div class="text-xs font-medium text-muted-foreground tracking-wider mb-1">Conversion Rate</div>
+          <div class="text-sm font-medium text-muted-foreground tracking-wider mb-1">Conversion Rate</div>
           <Badge
             :text="getConversionDescription(managerMetrics?.conversionRate || 0)"
             size="small"
@@ -439,14 +439,14 @@
 
         <!-- Sales Funnel (full width) -->
         <div class="w-full bg-muted border border-border rounded-lg p-4">
-          <h3 class="text-xs font-medium text-muted-foreground tracking-wider mb-4">Sales Funnel</h3>
+          <h3 class="text-sm font-medium text-muted-foreground tracking-wider mb-4">Sales Funnel</h3>
           <div class="space-y-3">
             <div
               v-for="stage in managerMetrics?.stages || []"
               :key="stage.name"
               class="flex items-center gap-1 sm:gap-1.5"
             >
-              <span class="text-xs font-medium text-foreground w-16 sm:w-20 flex-shrink-0 pr-0.5">{{ stage.name }}</span>
+              <span class="text-sm font-medium text-foreground w-16 sm:w-20 flex-shrink-0 pr-0.5">{{ stage.name }}</span>
               <div class="flex-1 min-w-0">
                 <div class="w-full bg-muted rounded-full h-2 overflow-hidden">
                   <div
@@ -455,7 +455,7 @@
                   ></div>
                 </div>
               </div>
-              <span class="text-[10px] sm:text-xs font-semibold text-muted-foreground w-11 sm:w-12 text-right flex-shrink-0 whitespace-nowrap tabular-nums">{{ formatNumber(stage.count) }} ({{ stage.percentage }}%)</span>
+              <span class="text-[10px] sm:text-sm font-semibold text-muted-foreground w-11 sm:w-12 text-right flex-shrink-0 whitespace-nowrap tabular-nums">{{ formatNumber(stage.count) }} ({{ stage.percentage }}%)</span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -471,10 +471,10 @@
 
         <!-- Task Completion (full width) -->
         <div class="w-full bg-muted rounded-lg p-4 border border-border">
-          <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Task Completion</div>
+          <div class="text-sm font-medium text-muted-foreground tracking-wider mb-2">Task Completion</div>
           <div class="flex items-baseline gap-2 mb-2">
             <span class="text-sm font-bold text-foreground">{{ taskCompletionPercentage }}%</span>
-            <span class="text-xs text-muted-foreground">completed on time</span>
+            <span class="text-sm text-muted-foreground">completed on time</span>
           </div>
           <div class="w-full bg-muted rounded-full h-2 overflow-hidden mb-2">
             <div
@@ -482,7 +482,7 @@
               :style="{ width: `${taskCompletionPercentage}%`, backgroundColor: '#0470e9' }"
             ></div>
           </div>
-          <div class="text-xs text-foreground">
+          <div class="text-sm text-foreground">
             {{ managerMetrics?.taskCompletion?.completed || 0 }} / {{ managerMetrics?.taskCompletion?.total || 0 }} tasks
           </div>
           <div v-if="(managerMetrics?.taskCompletion?.overdueCount || 0) > 0" class="mt-2">
@@ -492,13 +492,13 @@
 
         <!-- Deals Won vs Lost (full width) -->
         <div class="w-full bg-muted rounded-lg p-4 border border-border">
-          <div class="text-xs font-medium text-muted-foreground tracking-wider mb-2">Deals Won vs Lost</div>
+          <div class="text-sm font-medium text-muted-foreground tracking-wider mb-2">Deals Won vs Lost</div>
           <div class="flex items-baseline gap-2 mb-2">
             <span class="text-sm font-bold" style="color:#0470e9">{{ managerMetrics?.dealsReport?.won || 0 }}</span>
-            <span class="text-xs text-muted-foreground">won</span>
+            <span class="text-sm text-muted-foreground">won</span>
             <span class="text-muted-foreground mx-1">|</span>
             <span class="text-sm font-bold" style="color:#EF4444">{{ managerMetrics?.dealsReport?.lost || 0 }}</span>
-            <span class="text-xs text-muted-foreground">lost</span>
+            <span class="text-sm text-muted-foreground">lost</span>
           </div>
           <div class="w-full bg-muted rounded-full h-2 overflow-hidden flex">
             <div
@@ -510,7 +510,7 @@
               :style="{ width: `${100 - dealsWonPercentage}%`, backgroundColor: '#EF4444' }"
             ></div>
           </div>
-          <div class="text-xs text-muted-foreground mt-1">{{ managerMetrics?.dealsReport?.wonRate || 0 }}% win rate</div>
+          <div class="text-sm text-muted-foreground mt-1">{{ managerMetrics?.dealsReport?.wonRate || 0 }}% win rate</div>
         </div>
       </div>
 
@@ -518,7 +518,7 @@
       <div v-else class="text-center py-8 text-muted-foreground">
         <LineChart class="w-10 h-10 shrink-0 mb-2 text-muted-foreground/50" />
         <p class="text-sm">Performance metrics not available</p>
-        <p class="text-xs text-muted-foreground mt-1">Contact your administrator</p>
+        <p class="text-sm text-muted-foreground mt-1">Contact your administrator</p>
       </div>
     </CardContent>
   </Card>

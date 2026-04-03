@@ -13,7 +13,7 @@
       ]"
       :title="option.label"
     >
-      <component :is="getLucideIcon(option.icon)" class="w-4 h-4 shrink-0 text-xs" />
+      <component :is="getLucideIcon(option.icon)" class="w-4 h-4 shrink-0 text-sm" />
     </button>
   </div>
 </template>

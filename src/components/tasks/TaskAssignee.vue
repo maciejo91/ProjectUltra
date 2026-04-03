@@ -14,7 +14,7 @@
       <div v-if="isAssigned" class="flex items-center justify-between gap-2 w-full">
         <div class="flex items-center gap-2 min-w-0 flex-1">
           <div
-            class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
+            class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
             :class="getRoleAvatarClass(ownerInfo.role)"
           >
             {{ getInitials(ownerInfo.name) }}
@@ -24,7 +24,7 @@
               {{ ownerInfo.name }}
               <span class="font-normal text-muted-foreground">• {{ ownerInfo.team }}</span>
             </p>
-            <p class="text-xs text-muted-foreground truncate leading-tight">
+            <p class="text-sm text-muted-foreground truncate leading-tight">
               {{ ownerInfo.dealership }}
             </p>
           </div>
@@ -33,7 +33,7 @@
           variant="ghost"
           size="sm"
           @click="showReassignModal = true"
-          class="shrink-0 text-xs px-2 py-1"
+          class="shrink-0 text-sm px-2 py-1"
         >
           Change
         </Button>

@@ -32,7 +32,7 @@
             >
               <div class="flex-1 min-w-0">
                 <p class="font-medium text-sm text-foreground truncate">{{ opp.customer?.name || 'Unknown' }}</p>
-                <p class="text-xs text-muted-foreground truncate">
+                <p class="text-sm text-muted-foreground truncate">
                   {{ carLabel(opp) }}
                 </p>
               </div>

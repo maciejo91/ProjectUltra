@@ -66,7 +66,7 @@
       <button @click="handleCancel" class="text-muted-foreground hover:text-muted-foreground"><X class="w-4 h-4 shrink-0" /></button>
     </div>
     <div class="w-full">
-      <label class="block text-xs font-medium text-muted-foreground mb-1">File</label>
+      <label class="block text-sm font-medium text-muted-foreground mb-1">File</label>
       <div class="flex flex-wrap items-center gap-3 w-full">
         <input
           type="file"

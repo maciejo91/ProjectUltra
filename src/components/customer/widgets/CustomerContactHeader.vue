@@ -19,7 +19,7 @@
             <h1 class="text-lg font-semibold text-foreground truncate leading-tight">{{ name }}</h1>
             <span
               v-if="taskType && taskType !== 'contact'"
-              class="px-2 py-0.5 rounded text-xs font-medium border shrink-0"
+              class="px-2 py-0.5 rounded text-sm font-medium border shrink-0"
               :class="taskType === 'lead'
                 ? 'bg-badge-green text-emerald-700'
                 : 'bg-purple-50 text-purple-700 border-purple-200'"
@@ -37,7 +37,7 @@
               />
               <button
                 @click.stop="handleAddTag"
-                class="text-xs text-muted-foreground hover:text-primary font-medium hover:underline flex items-center gap-1 transition-colors whitespace-nowrap"
+                class="text-sm text-muted-foreground hover:text-primary font-medium hover:underline flex items-center gap-1 transition-colors whitespace-nowrap"
               >
                 <Plus class="w-3 h-3" />
                 <span>tag</span>

@@ -1,28 +1,27 @@
 <template>
-  <div class="border rounded-lg bg-white shadow-sm p-3">
-    <div class="flex items-center justify-between mb-2">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
-          <Calendar class="w-4 h-4" />
+  <div class="w-full overflow-hidden rounded-lg bg-muted p-3">
+    <div class="mb-2 flex items-start justify-between gap-2">
+      <div class="flex min-w-0 items-center gap-2">
+        <div class="flex size-8 shrink-0 items-center justify-center rounded-md bg-background">
+          <Calendar class="size-4 text-muted-foreground" />
         </div>
-        <div>
-          <h4 class="text-sm font-semibold">{{ title }}</h4>
-          <div class="text-xs text-muted-foreground">{{ date }}</div>
+        <div class="min-w-0">
+          <h4 class="text-sm font-medium leading-5 text-foreground">{{ title }}</h4>
+          <div class="text-sm leading-4 text-muted-foreground">{{ date }}</div>
         </div>
       </div>
-      <Button variant="outline" size="sm">Details</Button>
     </div>
-    
-    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-      <span class="flex items-center gap-1.5 shrink-0">
+
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+      <span class="flex min-w-0 items-center gap-1.5">
         <MapPin class="size-3.5 shrink-0" />
-        {{ location || 'Unknown location' }}
+        {{ location || '—' }}
       </span>
-      <span class="flex items-center gap-1.5 shrink-0">
+      <span class="flex min-w-0 items-center gap-1.5">
         <User class="size-3.5 shrink-0" />
-        {{ customerName || 'Unknown customer' }}
+        {{ customerName || '—' }}
       </span>
-      <span v-if="vehicle" class="flex items-center gap-1.5 shrink-0">
+      <span v-if="vehicle" class="flex min-w-0 items-center gap-1.5">
         <Car class="size-3.5 shrink-0" />
         {{ vehicle }}
       </span>
@@ -32,7 +31,6 @@
 
 <script setup>
 import { Calendar, MapPin, User, Car } from 'lucide-vue-next'
-import { Button } from '@motork/component-library/future/primitives'
 
 defineProps({
   title: String,

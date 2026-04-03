@@ -376,7 +376,7 @@
                       <div v-else-if="activity.content && activity.type !== 'call'" class="mt-2 bg-orange-50/50 border border-orange-100 p-3 rounded-lg text-sm text-muted-foreground">
                         {{ activity.content }}
                       </div>
-                      <div class="text-xs text-muted-foreground mt-1">{{ formatActivityTime(activity.timestamp) }}</div>
+                      <div class="text-sm text-muted-foreground mt-1">{{ formatActivityTime(activity.timestamp) }}</div>
                     </div>
                   </div>
                 </div>
@@ -450,7 +450,7 @@
           <div v-else-if="!enrichWidgetType" class="text-center py-12 text-muted-foreground">
             <FolderOpen class="w-12 h-12 shrink-0 mb-3" />
             <p class="text-sm text-muted-foreground">No enrichment data yet</p>
-            <p class="text-xs text-muted-foreground mt-1">Click the + button above to add notes, attachments, trade-ins, or purchase methods</p>
+            <p class="text-sm text-muted-foreground mt-1">Click the + button above to add notes, attachments, trade-ins, or purchase methods</p>
           </div>
         </div>
 
@@ -480,8 +480,8 @@
                 <div class="space-y-2 max-h-52 overflow-y-auto">
                   <div v-for="comm in gridCommunications" :key="comm.id" class="p-3 bg-muted border border-border rounded-lg">
                     <div class="flex items-center gap-2 mb-1">
-                      <span class="text-xs font-semibold text-foreground">{{ comm.type }}</span>
-                      <span class="text-xs text-muted-foreground">{{ formatGridDate(comm.timestamp) }}</span>
+                      <span class="text-sm font-semibold text-foreground">{{ comm.type }}</span>
+                      <span class="text-sm text-muted-foreground">{{ formatGridDate(comm.timestamp) }}</span>
                     </div>
                     <p class="text-sm text-muted-foreground">{{ comm.content }}</p>
                   </div>

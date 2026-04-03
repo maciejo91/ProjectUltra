@@ -25,7 +25,7 @@
         >
           <div class="p-3 border-b border-border sidebar-user-dropdown-header">
             <div class="text-sm font-semibold text-foreground">{{ userStore.currentUser.name }}</div>
-            <div class="text-xs text-muted-foreground">{{ userStore.currentUser.email }}</div>
+            <div class="text-sm text-muted-foreground">{{ userStore.currentUser.email }}</div>
           </div>
           <div class="p-2">
             <button

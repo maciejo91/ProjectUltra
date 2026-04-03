@@ -24,14 +24,14 @@
                   variant="ghost"
                   size="small"
                   @click="$router.push('/tasks')"
-                  class="text-xs"
+                  class="text-sm"
                 />
                 <Button
                   label="Calendar"
                   variant="ghost"
                   size="small"
                   @click="$router.push('/calendar')"
-                  class="text-xs"
+                  class="text-sm"
                 />
               </div>
             </CardHeader>
@@ -58,7 +58,7 @@
                 variant="ghost"
                 size="small"
                 @click="$router.push('/tasks')"
-                class="text-xs"
+                class="text-sm"
               />
             </CardHeader>
             <CardContent class="flex flex-col pt-0">
@@ -82,7 +82,7 @@
                   <div v-if="notifications.length === 0" class="text-center py-12 text-muted-foreground bg-muted/30 rounded-lg">
                     <CheckCircle class="w-10 h-10 shrink-0 mx-auto mb-3 text-muted-foreground opacity-50" />
                     <p class="text-sm font-medium">All caught up!</p>
-                    <p class="text-xs mt-1">No quick actions needed</p>
+                    <p class="text-sm mt-1">No quick actions needed</p>
                   </div>
                   <ActionableQuestionCard
                     v-for="question in notifications.slice(0, 5)"

@@ -20,14 +20,14 @@
       <p class="text-meta mb-2">
         Connecting to {{ connectingTo === 'google' ? 'Google Calendar' : 'Microsoft Outlook' }}...
       </p>
-      <p class="text-xs text-gray-400">Please complete authentication in the popup window</p>
+      <p class="text-sm text-gray-400">Please complete authentication in the popup window</p>
     </div>
 
     <!-- Calendar Options -->
         <div v-else class="space-y-3">
       <!-- Connected Calendars -->
       <div v-if="connectedCalendars.length > 0" class="mb-4">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Connected</p>
+        <p class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">Connected</p>
         <div class="space-y-2">
           <div
             v-for="cal in connectedCalendars"
@@ -43,14 +43,14 @@
               </div>
               <div>
                 <p class="text-sm font-medium text-foreground">{{ cal.email }}</p>
-                <p class="text-xs text-green-600">
+                <p class="text-sm text-green-600">
                   <CheckCircle class="w-4 h-4 shrink-0 mr-1 inline" />Connected
                 </p>
               </div>
             </div>
             <button
               @click="$emit('disconnect', cal.id)"
-              class="text-xs text-red-600 hover:text-red-700 font-medium"
+              class="text-sm text-red-600 hover:text-red-700 font-medium"
             >
               Disconnect
             </button>
@@ -68,7 +68,7 @@
         </div>
         <div class="flex-1 text-left">
           <p class="font-semibold text-foreground">Google Calendar</p>
-          <p class="text-xs text-gray-500">Connect your Google account</p>
+          <p class="text-sm text-gray-500">Connect your Google account</p>
         </div>
         <ChevronRight class="w-4 h-4 shrink-0 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
       </button>
@@ -83,7 +83,7 @@
         </div>
         <div class="flex-1 text-left">
           <p class="font-semibold text-foreground">Microsoft Outlook</p>
-          <p class="text-xs text-gray-500">Connect your Microsoft account</p>
+          <p class="text-sm text-gray-500">Connect your Microsoft account</p>
         </div>
         <ChevronRight class="w-4 h-4 shrink-0 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
       </button>

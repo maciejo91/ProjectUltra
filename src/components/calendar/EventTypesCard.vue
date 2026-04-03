@@ -47,7 +47,7 @@ const toggleAll = () => {
       <p class="text-sm font-medium text-foreground">Event types</p>
       <button
         type="button"
-        class="text-xs text-muted-foreground underline underline-offset-2 cursor-pointer hover:text-foreground"
+        class="text-sm text-muted-foreground underline underline-offset-2 cursor-pointer hover:text-foreground"
         @click="toggleAll"
       >
         {{ selectedTypesLabel }}

@@ -27,10 +27,10 @@
                 <p class="font-medium text-sm text-foreground">
                   {{ vehicle.brand }} {{ vehicle.model }} ({{ vehicle.year }})
                 </p>
-                <p class="text-xs text-muted-foreground mt-0.5">
+                <p class="text-sm text-muted-foreground mt-0.5">
                   VIN: {{ vehicle.vin }} · Plate: {{ vehicle.plateNumber || '—' }}
                 </p>
-                <p v-if="vehicle.soldTo" class="text-xs text-muted-foreground mt-0.5">
+                <p v-if="vehicle.soldTo" class="text-sm text-muted-foreground mt-0.5">
                   Owner: {{ vehicle.soldTo }}
                 </p>
               </div>

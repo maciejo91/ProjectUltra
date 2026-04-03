@@ -24,14 +24,14 @@
             <p class="text-foreground text-sm font-bold mb-1">
               {{ selectedFile ? selectedFile.name : 'Click to upload or drag and drop' }}
             </p>
-            <p class="text-muted-foreground text-xs">CSV or Excel (.csv, .xls, .xlsx) up to 10MB</p>
+            <p class="text-muted-foreground text-sm">CSV or Excel (.csv, .xls, .xlsx) up to 10MB</p>
           </CardContent>
         </Card>
       </div>
       <Card v-if="error" class="bg-red-50 border-red-200 mt-2">
         <CardContent class="flex items-start gap-2 p-3">
           <AlertTriangle class="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
-          <span class="text-xs text-red-700">{{ error }}</span>
+          <span class="text-sm text-red-700">{{ error }}</span>
         </CardContent>
       </Card>
     </div>
@@ -46,7 +46,7 @@
       </CardHeader>
       <CardContent>
         <div class="overflow-x-auto">
-          <table class="w-full text-xs">
+          <table class="w-full text-sm">
             <thead>
               <tr class="border-b border-border">
                 <th
@@ -76,7 +76,7 @@
           </table>
         </div>
         
-        <p v-if="parsedData.length > previewLimit" class="text-muted-foreground text-xs mt-3 text-center">
+        <p v-if="parsedData.length > previewLimit" class="text-muted-foreground text-sm mt-3 text-center">
           Showing first {{ previewLimit }} of {{ parsedData.length }} rows
         </p>
       </CardContent>

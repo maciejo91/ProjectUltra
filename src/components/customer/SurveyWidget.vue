@@ -16,7 +16,7 @@
         <h5 class="text-sm font-semibold text-foreground">Lead Qualification Survey</h5>
         <button
           @click="isExpanded = false"
-          class="text-xs text-muted-foreground hover:text-muted-foreground transition-colors"
+          class="text-sm text-muted-foreground hover:text-muted-foreground transition-colors"
         >
           <ChevronUp class="w-4 h-4 shrink-0" />
         </button>

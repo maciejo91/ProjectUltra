@@ -38,6 +38,9 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
     qualificationDurationValue,
     qualificationSelectedDate,
     qualificationSelectedSlot,
+    qualificationScheduleDepartment,
+    qualificationScheduleDealership,
+    qualificationScheduleTeamId,
     qualificationSelectedTeam,
     qualificationSelectedSalesman,
     communicationPreferences,
@@ -94,20 +97,15 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
     emit('call-attempt-logged', attempt)
     emit('validated', { scheduleFollowUp: false })
 
-    // Determine assignee name based on method (team or salesperson from form, or assignment for assign-only fallback)
     let assigneeName = 'Unassigned'
     const formAssignee = qualificationSelectedSalesman.value?.name || qualificationSelectedTeam.value?.name
-    if (qualificationMethod.value === 'assign-and-schedule') {
-      assigneeName = formAssignee || 'Unassigned'
-    } else {
-      assigneeName = formAssignee || assignment.value?.assignee?.name || 'Unassigned'
-    }
+    assigneeName = formAssignee || 'Unassigned'
 
     let meeting = null
     let scheduleAppointment = false
     let appointmentData = null
 
-    if (qualificationMethod.value === 'assign-and-schedule' && qualificationSelectedDate.value && qualificationSelectedSlot.value) {
+    if (qualificationSelectedDate.value && qualificationSelectedSlot.value) {
       const d = qualificationSelectedDate.value
       const dateStr = d.toLocaleDateString(undefined, { month: 'long', day: 'numeric' })
       const eventTypeLabel = { 'test-drive': 'Test Drive', 'in-store-visit': 'In-Store Visit' }[qualificationEventType.value] || qualificationEventType.value
@@ -131,7 +129,8 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
         team: qualificationSelectedTeam.value?.name || null,
         teamId: qualificationSelectedTeam.value?.id || null,
         salesperson: qualificationSelectedSalesman.value?.name || null,
-        salespersonId: qualificationSelectedSalesman.value?.id || null
+        salespersonId: qualificationSelectedSalesman.value?.id || null,
+        department: qualificationScheduleDepartment.value || null
       }
       meeting = {
         date: dateStr,
@@ -213,39 +212,32 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
       }
     }
 
-    // Update assignment.value for assign-and-schedule method
-    if (qualificationMethod.value === 'assign-and-schedule') {
-      // Set assignment to selected salesperson if available, otherwise to team
-      if (qualificationSelectedSalesman.value) {
-        assignment.value = {
-          ...assignment.value,
-          assignee: {
-            ...qualificationSelectedSalesman.value,
-            type: 'user'
-          },
-          assigneeId: qualificationSelectedSalesman.value.id,
-          salesperson: qualificationSelectedSalesman.value
-        }
-      } else if (qualificationSelectedTeam.value) {
-        assignment.value = {
-          ...assignment.value,
-          assignee: {
-            ...qualificationSelectedTeam.value,
-            type: 'team'
-          },
-          team: qualificationSelectedTeam.value
-        }
+    if (qualificationSelectedSalesman.value) {
+      assignment.value = {
+        ...assignment.value,
+        assignee: {
+          ...qualificationSelectedSalesman.value,
+          type: 'user'
+        },
+        assigneeId: qualificationSelectedSalesman.value.id,
+        salesperson: qualificationSelectedSalesman.value
+      }
+    } else if (qualificationSelectedTeam.value) {
+      assignment.value = {
+        ...assignment.value,
+        assignee: {
+          ...qualificationSelectedTeam.value,
+          type: 'team'
+        },
+        team: qualificationSelectedTeam.value
       }
     }
 
-    // Prepare assignment data for qualified event
-    const assignmentData = qualificationMethod.value === 'assign-and-schedule' 
-      ? {
-          assignee: qualificationSelectedSalesman.value || qualificationSelectedTeam.value,
-          salesperson: qualificationSelectedSalesman.value || null,
-          team: qualificationSelectedTeam.value || null
-        }
-      : assignment.value
+    const assignmentData = {
+      assignee: qualificationSelectedSalesman.value || qualificationSelectedTeam.value,
+      salesperson: qualificationSelectedSalesman.value || null,
+      team: qualificationSelectedTeam.value || null
+    }
 
     // Prepare survey/enrich data from enrichLeadData if available, otherwise fall back to surveyResponses
     let enrichData = null
@@ -406,6 +398,9 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
       qualificationEventType: qualificationEventType.value,
       qualificationSelectedDate: qualificationSelectedDate.value ? qualificationSelectedDate.value.toISOString() : null,
       qualificationSelectedSlot: qualificationSelectedSlot.value ?? '',
+      qualificationScheduleDepartment: qualificationScheduleDepartment.value ?? '',
+      qualificationScheduleDealership: qualificationScheduleDealership.value ?? '',
+      qualificationScheduleTeamId: qualificationScheduleTeamId.value ?? null,
       qualificationSelectedTeam: qualificationSelectedTeam.value ?? null,
       qualificationSelectedSalesman: qualificationSelectedSalesman.value ?? null,
       assignment: assignment.value ? { ...assignment.value } : {},

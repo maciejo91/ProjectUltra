@@ -1,0 +1,50 @@
+{
+  "tabs": {
+    "overview": "Overzicht",
+    "requests": "Aanvragen",
+    "communication": "Communicatie"
+  },
+  "activeRequests": "Actieve aanvragen",
+  "rightColumn": {
+    "contactDetails": "Contactgegevens",
+    "otherInteractions": "Overige interacties ({count})",
+    "otherInteractionsRegion": "Eerdere leads en opportunities",
+    "typeLead": "Lead",
+    "typeOpportunity": "Opportunity",
+    "fallbackLeadTitle": "Lead",
+    "fallbackOpportunityTitle": "Opportunity",
+    "appointments": "Afspraken",
+    "addAppointment": "Toevoegen",
+    "noAppointments": "Geen aankomende afspraken.",
+    "recentActivity": "Recente activiteit"
+  },
+  "details": {
+    "customerName": "Klantnaam",
+    "account": "Account",
+    "accountOwner": "Accounthouder",
+    "email": "E-mail",
+    "phone": "Telefoon",
+    "address": "Adres",
+    "language": "Taal",
+    "fiscalEntities": "Fiscale entiteiten",
+    "drivenVehicle": "Gereden voertuig",
+    "copyPhoneAria": "Telefoonnummer kopiëren",
+    "phoneCopied": "Telefoonnummer gekopieerd naar klembord",
+    "phoneCopyFailed": "Kopiëren van telefoonnummer mislukt"
+  },
+  "activityFeed": {
+    "title": "Recente activiteit",
+    "add": "Toevoegen",
+    "empty": "Geen recente activiteiten.",
+    "performedAction": "heeft een actie uitgevoerd",
+    "systemUser": "Systeem",
+    "justNow": "Zojuist",
+    "minutesAgo": "{count} min geleden",
+    "hoursAgo": "{count} u geleden"
+  },
+  "header": {
+    "backAria": "Terug naar contacten",
+    "fallbackName": "Klant"
+  },
+  "sendMessage": "Bericht verzenden"
+}

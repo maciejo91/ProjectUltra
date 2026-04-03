@@ -109,7 +109,7 @@
 
                 <!-- Summary when call has ended (hidden for call simulation)
                 <div v-if="callEnded && !isCallActive" class="space-y-1">
-                  <h4 class="text-xs font-bold uppercase tracking-wider text-greys-400">Summary</h4>
+                  <h4 class="text-sm font-bold uppercase tracking-wider text-greys-400">Summary</h4>
                   <p class="text-sm text-white">
                     Lead confirmed their details and the call covered the main inquiry discussed in the transcript below.
                   </p>
@@ -119,11 +119,11 @@
                 <!-- Transcript (grey card, 3 lines with expand/collapse) - hidden for call simulation
                 <div class="bg-greys-800 rounded-lg p-3 space-y-2 border border-greys-700">
                   <div class="flex items-center justify-between gap-2">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ t('common.call.transcript') }}</span>
+                    <span class="text-sm font-semibold uppercase tracking-wider text-muted-foreground">{{ t('common.call.transcript') }}</span>
                     <button
                       v-if="transcriptLines.length > transcriptPreviewCount"
                       type="button"
-                      class="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      class="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                       @click="transcriptExpanded = !transcriptExpanded"
                     >
                       {{ transcriptExpanded ? t('common.call.collapseTranscript') : t('common.call.expandTranscript') }}

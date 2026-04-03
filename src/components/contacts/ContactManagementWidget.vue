@@ -19,7 +19,7 @@
         <AlertTriangle class="w-5 h-5 shrink-0 text-orange-600 mt-0.5" />
         <div class="flex-1">
           <p class="text-sm font-semibold text-orange-900 mb-1">No Requested Car</p>
-          <p class="text-xs text-orange-700">
+          <p class="text-sm text-orange-700">
             Add a requested car to this contact before converting to a lead or opportunity.
           </p>
         </div>
@@ -33,7 +33,7 @@
         <CheckCircle class="w-5 h-5 shrink-0 text-green-600 mt-0.5" />
         <div class="flex-1">
           <p class="text-sm font-semibold text-green-900 mb-1">Requested Car Added</p>
-          <p class="text-xs text-green-700">
+          <p class="text-sm text-green-700">
             {{ contact.requestedCar.brand }} {{ contact.requestedCar.model }} ({{ contact.requestedCar.year }})
           </p>
         </div>

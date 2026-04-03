@@ -18,7 +18,7 @@
           <span class="truncate">{{ tab.label }}</span>
           <span
             v-if="tab.count !== undefined && tab.count > 0"
-            class="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-xs font-medium leading-none"
+            class="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-sm font-medium leading-none"
             :class="
               modelValue === tab.key
                 ? 'bg-primary text-primary-foreground'

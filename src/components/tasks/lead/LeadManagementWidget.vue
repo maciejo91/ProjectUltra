@@ -93,7 +93,7 @@
       >
         <div>
           <h4 class="font-bold text-foreground text-sm">Outcome</h4>
-          <p class="text-xs text-muted-foreground mt-0.5">
+          <p class="text-sm text-muted-foreground mt-0.5">
             {{ leadState.displayStage.value }}
             <span v-if="lead.disqualifyReason"> – {{ lead.disqualifyReason }}</span>
           </p>

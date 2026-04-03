@@ -61,7 +61,7 @@
             <!-- Due Time -->
             <div class="shrink-0 text-right">
               <div class="text-sm font-medium text-foreground">{{ task.dueTime }}</div>
-              <div class="text-xs text-muted-foreground">{{ formatDate(task.dueDate) }}</div>
+              <div class="text-sm text-muted-foreground">{{ formatDate(task.dueDate) }}</div>
             </div>
           </div>
         </div>

@@ -1,0 +1,50 @@
+{
+  "tabs": {
+    "overview": "Vue d'ensemble",
+    "requests": "Demandes",
+    "communication": "Communication"
+  },
+  "activeRequests": "Demandes actives",
+  "rightColumn": {
+    "contactDetails": "Coordonnées",
+    "otherInteractions": "Autres interactions ({count})",
+    "otherInteractionsRegion": "Leads et opportunités passés",
+    "typeLead": "Lead",
+    "typeOpportunity": "Opportunity",
+    "fallbackLeadTitle": "Lead",
+    "fallbackOpportunityTitle": "Opportunity",
+    "appointments": "Rendez-vous",
+    "addAppointment": "Ajouter",
+    "noAppointments": "Aucun rendez-vous à venir.",
+    "recentActivity": "Activité récente"
+  },
+  "details": {
+    "customerName": "Nom du client",
+    "account": "Compte",
+    "accountOwner": "Propriétaire du compte",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "language": "Langue",
+    "fiscalEntities": "Entités fiscales",
+    "drivenVehicle": "Véhicule conduit",
+    "copyPhoneAria": "Copier le numéro de téléphone",
+    "phoneCopied": "Numéro copié dans le presse-papiers",
+    "phoneCopyFailed": "Échec de la copie du numéro"
+  },
+  "activityFeed": {
+    "title": "Activité récente",
+    "add": "Ajouter",
+    "empty": "Aucune activité récente.",
+    "performedAction": "a effectué une action",
+    "systemUser": "Système",
+    "justNow": "À l’instant",
+    "minutesAgo": "Il y a {count} min",
+    "hoursAgo": "Il y a {count} h"
+  },
+  "header": {
+    "backAria": "Retour aux contacts",
+    "fallbackName": "Client"
+  },
+  "sendMessage": "Envoyer un message"
+}
