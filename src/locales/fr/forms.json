@@ -87,6 +87,11 @@
       "placeholder": "Filtrer par équipe",
       "all": "Toutes les équipes"
     },
+    "assignee": {
+      "label": "Assigné",
+      "placeholder": "Filtrer par assigné",
+      "all": "Tous les assignés"
+    },
     "eventType": {
       "label": "Type d'événement",
       "placeholder": "Sélectionner le type d'événement",

@@ -95,6 +95,37 @@ export class LeadRepository extends BaseRepository {
   }
 
   /**
+   * Backfill UTM / WebSpark / original email from current mock when localStorage predates those fields.
+   */
+  _ensureLeadAttributionFromMock(leads) {
+    if (!Array.isArray(leads)) return
+    const mockLeads = getMockData().mockLeads || []
+    const mockById = new Map(mockLeads.map((l) => [l.id, l]))
+    const topKeys = ['utmSource', 'utmTerm', 'utmCampaign', 'webSparkCampaign', 'originalMessageUrl']
+    let changed = false
+    for (const lead of leads) {
+      const mock = mockById.get(lead.id)
+      if (!mock) continue
+      for (const k of topKeys) {
+        const v = lead[k]
+        if (v != null && v !== '') continue
+        const mv = mock[k]
+        if (mv != null && mv !== '') {
+          lead[k] = mv
+          changed = true
+        }
+      }
+      const rc = lead.requestedCar
+      const mrc = mock.requestedCar
+      if (rc && mrc?.webSparkCampaign && !rc.webSparkCampaign) {
+        rc.webSparkCampaign = mrc.webSparkCampaign
+        changed = true
+      }
+    }
+    if (changed) this._persist()
+  }
+
+  /**
    * Merge mock leads that don't exist in stored data (e.g. new demo leads).
    * Ensures new mock leads appear even when user has existing localStorage.
    */
@@ -122,10 +153,12 @@ export class LeadRepository extends BaseRepository {
           this._ensureNextActionDue(this._leadsCache)
           this._ensureCarImages(this._leadsCache)
           this._ensureRequestedCarPlates(this._leadsCache)
+          this._ensureLeadAttributionFromMock(this._leadsCache)
           const merged = this._mergeNewMockLeads(this._leadsCache)
           if (merged.length > this._leadsCache.length) {
             this._leadsCache = merged
             this._ensureRequestedCarPlates(this._leadsCache)
+            this._ensureLeadAttributionFromMock(this._leadsCache)
             this._persist()
           }
         }
@@ -134,6 +167,7 @@ export class LeadRepository extends BaseRepository {
         const mock = getMockData().mockLeads
         this._leadsCache = JSON.parse(JSON.stringify(mock || []))
         this._ensureRequestedCarPlates(this._leadsCache)
+        this._ensureLeadAttributionFromMock(this._leadsCache)
         this._persist()
         try {
           localStorage.setItem(`${STORAGE_KEY}-version`, String(DATA_VERSION))

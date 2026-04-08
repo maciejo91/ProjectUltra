@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '@/components/layout/MainLayout.vue'
 import { useUserStore } from '@/stores/user'
+import { SETTINGS_PLACEHOLDER_ROUTE_ITEMS } from '@/constants/settingsNavRoutes'
 
 const routes = [
   {
@@ -88,9 +89,8 @@ const routes = [
       },
       {
         path: 'settings',
-        name: 'settings',
-        component: () => import('@/views/Settings.vue'),
-        meta: { titleKey: 'common.navigation.settings' },
+        component: () => import('@/views/SettingsLayout.vue'),
+        redirect: { name: 'settings-prototype' },
         beforeEnter: (to, from, next) => {
           const userStore = useUserStore()
           if (userStore.canAccessSettings()) {
@@ -98,7 +98,21 @@ const routes = [
           } else {
             next('/access-denied')
           }
-        }
+        },
+        children: [
+          {
+            path: 'prototype',
+            name: 'settings-prototype',
+            component: () => import('@/views/Settings.vue'),
+            meta: { titleKey: 'common.navigation.settingsPrototype' }
+          },
+          ...SETTINGS_PLACEHOLDER_ROUTE_ITEMS.map((r) => ({
+            path: r.relPath,
+            name: r.name,
+            component: () => import('@/views/settings/SettingsAdminPlaceholder.vue'),
+            meta: { titleKey: r.titleKey }
+          }))
+        ]
       },
       {
         path: 'access-denied',

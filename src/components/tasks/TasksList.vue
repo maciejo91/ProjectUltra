@@ -1,6 +1,7 @@
 <template>
-  <div 
-    class="tasks-list-container border-r border-border flex flex-col shrink-0 w-full lg:w-80 h-full bg-muted"
+  <div
+    ref="scrollContainer"
+    class="tasks-list-container flex w-full shrink-0 flex-col border-border border-r bg-muted lg:w-80"
   >
     <!-- Search: same Motork InputGroup as DataTable; inner input border removed so only group border shows -->
     <div class="px-2 py-3 tasks-list-search">
@@ -29,7 +30,7 @@
       </div>
     </div>
     
-    <div ref="scrollContainer" class="task-list-cards flex-1 overflow-y-auto px-2 space-y-2 pt-2 pb-6 scrollbar-hide">
+    <div class="task-list-cards px-2 space-y-2 pt-2 pb-6">
       <div
         v-for="item in filteredItems"
         :key="item.compositeId || `${item.type || 'task'}-${item.id}`"

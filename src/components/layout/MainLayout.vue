@@ -95,16 +95,26 @@
 
       <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
         <template v-if="showTaskDetailSplitPane">
-          <div class="flex flex-1 min-w-0 overflow-hidden">
-            <aside class="hidden md:flex w-80 shrink-0 overflow-hidden flex-col bg-background border-r border-border">
-              <AppHeader v-if="route.name !== 'customer-view' && route.name !== 'request-detail'" class="shrink-0 border-b border-border" />
-              <div class="flex-1 min-h-0 overflow-hidden">
-                <div id="tasks-list-teleport" class="h-full w-full min-h-0" />
+          <!-- One scroll for list + detail (no nested column scrollbars) -->
+          <div
+            class="flex min-h-0 flex-1 min-w-0 items-start overflow-x-hidden overflow-y-auto overscroll-contain"
+          >
+            <aside
+              class="hidden shrink-0 flex-col border-border border-r bg-background md:flex md:w-80"
+            >
+              <AppHeader
+                v-if="route.name !== 'customer-view' && route.name !== 'request-detail'"
+                class="sticky top-0 z-10 shrink-0 border-border border-b bg-background"
+              />
+              <div class="w-full min-w-0">
+                <div id="tasks-list-teleport" class="flex w-full flex-col" />
               </div>
             </aside>
-            <div class="flex-1 flex flex-col min-h-0 min-w-0 relative border-l border-border">
-              <div class="flex-1 min-h-0 overflow-hidden hidden md:flex flex-col">
-                <div id="tasks-detail-teleport" class="h-full w-full min-h-0 flex flex-col" />
+            <div
+              class="relative flex min-h-0 min-w-0 flex-1 flex-col border-border border-l bg-background"
+            >
+              <div class="hidden w-full min-w-0 flex-col md:flex">
+                <div id="tasks-detail-teleport" class="flex w-full min-w-0 flex-col" />
               </div>
             </div>
           </div>
@@ -151,7 +161,6 @@ const ROUTE_TITLE_MAP = {
   customers: 'common.navigation.customers',
   calendar: 'common.navigation.calendar',
   reports: 'common.navigation.reports',
-  settings: 'common.navigation.settings',
   'access-denied': null
 }
 

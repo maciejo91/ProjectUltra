@@ -281,6 +281,7 @@ import { useCustomersStore } from '@/stores/customers'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useRequestNavigationStore } from '@/stores/requestNavigation'
+import { getCustomerNameParts } from '@/utils/customerDisplay'
 import {
   Badge,
   Button,
@@ -398,14 +399,7 @@ watch(
 
 const saveDisabled = computed(() => !(editForm.value.name ?? '').trim())
 
-const nameParts = computed(() => {
-  const raw = props.task.customer?.name || ''
-  const match = raw.match(/^(.*?)\s*(\([^)]+\))\s*$/)
-  if (match && match[1].trim()) {
-    return { primary: match[1].trim(), location: match[2] }
-  }
-  return { primary: raw.trim(), location: '' }
-})
+const nameParts = computed(() => getCustomerNameParts(props.task.customer?.name))
 
 const phoneDisplay = computed(() => props.task.customer?.phone || null)
 const emailDisplay = computed(() => props.task.customer?.email || null)

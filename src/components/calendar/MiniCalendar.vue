@@ -5,7 +5,19 @@ import { Button } from '@motork/component-library/future/primitives'
 
 const props = defineProps({
   modelValue: { type: Date, required: true },
+  preserveDayWhenChangingMonth: { type: Boolean, default: false },
 })
+
+function addMonthsClampingDay(date, deltaMonths) {
+  const d = new Date(date)
+  const day = d.getDate()
+  d.setDate(1)
+  d.setMonth(d.getMonth() + deltaMonths)
+  const lastDayOfMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
+  d.setDate(Math.min(day, lastDayOfMonth))
+  d.setHours(0, 0, 0, 0)
+  return d
+}
 
 const emit = defineEmits(['update:modelValue'])
 
@@ -49,19 +61,29 @@ const gridDays = computed(() => {
 })
 
 const goToPreviousMonth = () => {
+  if (props.preserveDayWhenChangingMonth) {
+    emit('update:modelValue', addMonthsClampingDay(props.modelValue, -1))
+    return
+  }
   const d = new Date(monthStart.value)
   d.setMonth(d.getMonth() - 1)
   emit('update:modelValue', d)
 }
 
 const goToNextMonth = () => {
+  if (props.preserveDayWhenChangingMonth) {
+    emit('update:modelValue', addMonthsClampingDay(props.modelValue, 1))
+    return
+  }
   const d = new Date(monthStart.value)
   d.setMonth(d.getMonth() + 1)
   emit('update:modelValue', d)
 }
 
 const selectDate = (date) => {
-  emit('update:modelValue', new Date(date))
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  emit('update:modelValue', d)
 }
 </script>
 

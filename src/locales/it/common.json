@@ -20,8 +20,37 @@
     "support": "Supporto",
     "groups": {
       "data": "Dati",
-      "actions": "Azioni"
-    }
+      "actions": "Azioni",
+      "workspace": "Area di lavoro"
+    },
+    "settingsSections": {
+      "administration": "Amministrazione",
+      "operations": "Operazioni",
+      "templates": "Modelli",
+      "prototype": "Prototipo"
+    },
+    "settingsPrototype": "Prototipo",
+    "settingsAdminFiscalEntities": "Entità fiscali",
+    "settingsAdminDealerships": "Concessionarie",
+    "settingsAdminTeams": "Team",
+    "settingsAdminUsers": "Utenti",
+    "settingsAdminWhatsappBusiness": "WhatsApp Business",
+    "settingsOpsDataNormalization": "Normalizzazione dati",
+    "settingsOpsSalesAlerts": "Avvisi vendite",
+    "settingsOpsSalesTasks": "Attività vendite",
+    "settingsOpsAfterSalesTasks": "Attività post-vendita",
+    "settingsOpsTimetablesAndHolidays": "Orari e festività",
+    "settingsOpsQuotesAndContracts": "Preventivi e contratti",
+    "settingsOpsFailureReasons": "Motivi di fallimento",
+    "settingsOpsTags": "TAGs",
+    "settingsOpsSourcesDetail": "Dettaglio fonti",
+    "settingsOpsAfterSalesServices": "Servizi post-vendita",
+    "settingsOpsCustomFields": "Campi personalizzati",
+    "settingsOpsNotifications": "Notifiche",
+    "settingsOpsCalendarEvents": "Eventi di calendario",
+    "settingsTplEmail": "Email",
+    "settingsTplSms": "SMS",
+    "settingsTplSurvey": "Sondaggio"
   },
   "pages": {
     "comingSoon": "Coming soon"
@@ -30,7 +59,8 @@
     "openSidebar": "Apri barra laterale",
     "closeSidebar": "Chiudi barra laterale",
     "toggleSidebar": "Espandi o comprimi la barra laterale",
-    "userMenu": "Menu utente"
+    "userMenu": "Menu utente",
+    "goToMyProfile": "Vai al mio profilo"
   },
   "buttons": {
     "save": "Salva",
@@ -69,6 +99,7 @@
     "createOpportunity": "Crea Opportunità",
     "createLead": "Crea Lead",
     "switchRole": "Cambia Ruolo",
+    "signOut": "Esci",
     "logout": "Esci",
     "lightMode": "Modalità Chiara",
     "darkMode": "Modalità Scura"

@@ -20,8 +20,37 @@
     "support": "Support",
     "groups": {
       "data": "Gegevens",
-      "actions": "Acties"
-    }
+      "actions": "Acties",
+      "workspace": "Werkruimte"
+    },
+    "settingsSections": {
+      "administration": "Administratie",
+      "operations": "Operaties",
+      "templates": "Sjablonen",
+      "prototype": "Prototype"
+    },
+    "settingsPrototype": "Prototype",
+    "settingsAdminFiscalEntities": "Fiscale entiteiten",
+    "settingsAdminDealerships": "Dealers",
+    "settingsAdminTeams": "Teams",
+    "settingsAdminUsers": "Gebruikers",
+    "settingsAdminWhatsappBusiness": "WhatsApp Business",
+    "settingsOpsDataNormalization": "Gegevensnormalisatie",
+    "settingsOpsSalesAlerts": "Verkoopmeldingen",
+    "settingsOpsSalesTasks": "Verkooptaken",
+    "settingsOpsAfterSalesTasks": "Aftersales-taken",
+    "settingsOpsTimetablesAndHolidays": "Tijdschema’s en feestdagen",
+    "settingsOpsQuotesAndContracts": "Offertes en contracten",
+    "settingsOpsFailureReasons": "Faalredenen",
+    "settingsOpsTags": "TAGs",
+    "settingsOpsSourcesDetail": "Bronnen detail",
+    "settingsOpsAfterSalesServices": "Aftersales-services",
+    "settingsOpsCustomFields": "Aangepaste velden",
+    "settingsOpsNotifications": "Meldingen",
+    "settingsOpsCalendarEvents": "Agenda-items",
+    "settingsTplEmail": "E-mail",
+    "settingsTplSms": "SMS",
+    "settingsTplSurvey": "Enquête"
   },
   "pages": {
     "comingSoon": "Coming soon"
@@ -30,7 +59,8 @@
     "openSidebar": "Zijbalk openen",
     "closeSidebar": "Zijbalk sluiten",
     "toggleSidebar": "Zijbalk in- of uitklappen",
-    "userMenu": "Gebruikersmenu"
+    "userMenu": "Gebruikersmenu",
+    "goToMyProfile": "Naar mijn profiel"
   },
   "buttons": {
     "save": "Opslaan",
@@ -69,6 +99,7 @@
     "createOpportunity": "Kans Aanmaken",
     "createLead": "Lead Aanmaken",
     "switchRole": "Rol Wisselen",
+    "signOut": "Afmelden",
     "logout": "Uitloggen",
     "lightMode": "Lichte Modus",
     "darkMode": "Donkere Modus"

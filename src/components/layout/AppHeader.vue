@@ -170,7 +170,6 @@ const ROUTE_TITLE_MAP = {
   customers: 'common.navigation.customers',
   calendar: 'common.navigation.calendar',
   reports: 'common.navigation.reports',
-  settings: 'common.navigation.settings',
   'access-denied': null
 }
 

@@ -5,7 +5,7 @@
          Use disabled when route changes so content renders in place before unmount (avoids insertBefore null). -->
     <div v-if="useTeleport && teleportTargetsReady" class="shrink-0 size-0 overflow-hidden">
       <Teleport to="#tasks-list-teleport" :disabled="!useTeleport">
-        <div class="h-full flex flex-col overflow-hidden bg-surface">
+        <div class="flex w-full flex-col bg-surface">
           <EntityListSidebar
             title="Tasks"
             :items="filteredTasks"
@@ -109,11 +109,11 @@
     <!-- Card View - Normal layout (no task selected, or mobile) -->
     <div
       v-if="viewMode === 'card' && (!useTeleport || !teleportTargetsReady)"
-      class="flex-1 flex flex-col lg:flex-row overflow-hidden min-w-0"
+      class="flex min-h-0 flex-1 flex-col items-start overflow-x-hidden overflow-y-auto overscroll-contain min-w-0 lg:flex-row"
     >
       <div
-        class="flex flex-col overflow-hidden border-r border-border"
-        :class="currentTask ? 'hidden lg:flex shrink-0' : 'w-full lg:w-auto lg:shrink-0'"
+        class="flex shrink-0 flex-col border-border border-r"
+        :class="currentTask ? 'hidden lg:flex' : 'w-full lg:w-auto'"
       >
         <EntityListSidebar
           title="Tasks"
@@ -188,7 +188,7 @@
           </template>
         </EntityListSidebar>
       </div>
-      <div class="flex-1 flex flex-col min-w-0 overflow-hidden border-l border-border">
+      <div class="flex min-h-0 min-w-0 flex-1 flex-col border-border border-l">
         <TaskDetailView
           v-if="currentTask && managementWidget && storeAdapter && addNewConfig"
           :key="currentTask?.compositeId || 'card-empty'"

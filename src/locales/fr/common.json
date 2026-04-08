@@ -20,8 +20,37 @@
     "support": "Support",
     "groups": {
       "data": "Données",
-      "actions": "Actions"
-    }
+      "actions": "Actions",
+      "workspace": "Espace de travail"
+    },
+    "settingsSections": {
+      "administration": "Administration",
+      "operations": "Opérations",
+      "templates": "Modèles",
+      "prototype": "Prototype"
+    },
+    "settingsPrototype": "Prototype",
+    "settingsAdminFiscalEntities": "Entités fiscales",
+    "settingsAdminDealerships": "Concessions",
+    "settingsAdminTeams": "Équipes",
+    "settingsAdminUsers": "Utilisateurs",
+    "settingsAdminWhatsappBusiness": "WhatsApp Business",
+    "settingsOpsDataNormalization": "Normalisation des données",
+    "settingsOpsSalesAlerts": "Alertes commerciales",
+    "settingsOpsSalesTasks": "Tâches commerciales",
+    "settingsOpsAfterSalesTasks": "Tâches après-vente",
+    "settingsOpsTimetablesAndHolidays": "Horaires et jours fériés",
+    "settingsOpsQuotesAndContracts": "Devis et contrats",
+    "settingsOpsFailureReasons": "Raisons d’échec",
+    "settingsOpsTags": "TAGs",
+    "settingsOpsSourcesDetail": "Détail des sources",
+    "settingsOpsAfterSalesServices": "Services après-vente",
+    "settingsOpsCustomFields": "Champs personnalisés",
+    "settingsOpsNotifications": "Notifications",
+    "settingsOpsCalendarEvents": "Événements du calendrier",
+    "settingsTplEmail": "E-mail",
+    "settingsTplSms": "SMS",
+    "settingsTplSurvey": "Enquête"
   },
   "pages": {
     "comingSoon": "Coming soon"
@@ -30,7 +59,8 @@
     "openSidebar": "Ouvrir la barre latérale",
     "closeSidebar": "Fermer la barre latérale",
     "toggleSidebar": "Réduire ou agrandir la barre latérale",
-    "userMenu": "Menu utilisateur"
+    "userMenu": "Menu utilisateur",
+    "goToMyProfile": "Accéder à mon profil"
   },
   "buttons": {
     "save": "Enregistrer",
@@ -69,6 +99,7 @@
     "createOpportunity": "Créer Opportunité",
     "createLead": "Créer Lead",
     "switchRole": "Changer de Rôle",
+    "signOut": "Se déconnecter",
     "logout": "Déconnexion",
     "lightMode": "Mode Clair",
     "darkMode": "Mode Sombre"

@@ -131,6 +131,7 @@
     "utmSource": "UTM-bron",
     "utmTerm": "UTM-term",
     "utmCampaign": "UTM-campagne",
+    "webSparkCampaign": "WebSpark-campagne",
     "advertisement": "Advertentie",
     "originalEmail": "Originele e-mail",
     "linkVisit": "Bezoeken",

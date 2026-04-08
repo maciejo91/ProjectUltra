@@ -6,6 +6,17 @@ import {
   demoPlateNumber
 } from '@/utils/mockDataHelpers'
 
+const demoListingUrl = (slug) => `https://www.example.com/inventory/${slug}`
+
+/** Full UTM + WebSpark + original email for Request details → More details */
+const demoRequestAttribution = {
+  utmSource: 'google',
+  utmTerm: 'cpc',
+  utmCampaign: 'used_audi_vehicle',
+  webSparkCampaign: 'audia4_detail_page',
+  originalMessageUrl: 'https://example.com/inbox/original-email'
+}
+
 const baseRequestedCar = (brand, model, year, price) => ({
   brand,
   model,
@@ -56,6 +67,7 @@ export const mockLeads = [
     utmSource: 'google',
     utmTerm: 'cpc',
     utmCampaign: 'used_audi_vehicle',
+    webSparkCampaign: 'audia4_detail_page',
     originalMessageUrl: 'https://example.com/inbox/original-email',
     requestType: 'Generic sales',
     source: 'Autoscout24.es',
@@ -81,7 +93,13 @@ export const mockLeads = [
     customerId: 2,
     status: 'Open',
     priority: 'Hot',
-    requestedCar: baseRequestedCar('Volkswagen', 'ID.4', 2024, 45000),
+    requestedCar: {
+      ...baseRequestedCar('Volkswagen', 'ID.4', 2024, 45000),
+      listingUrl: demoListingUrl('vw-id4-2024')
+    },
+    ...demoRequestAttribution,
+    utmCampaign: 'spring_ev_promo',
+    webSparkCampaign: 'vw_id4_landing',
     carStatus: 'In Stock',
     requestType: 'Quotation',
     source: 'Google Ads',
@@ -112,7 +130,13 @@ export const mockLeads = [
     customerId: 3,
     status: 'Open',
     priority: 'Warm',
-    requestedCar: baseRequestedCar('BMW', 'iX xDrive50', 2024, 105000),
+    requestedCar: {
+      ...baseRequestedCar('BMW', 'iX xDrive50', 2024, 105000),
+      listingUrl: demoListingUrl('bmw-ix-2024')
+    },
+    ...demoRequestAttribution,
+    utmCampaign: 'bmw_ix_electric',
+    webSparkCampaign: 'bmw_ix_detail',
     carStatus: 'In Stock',
     requestType: 'Test Drive',
     source: 'Google Ads',
@@ -140,7 +164,13 @@ export const mockLeads = [
     customerId: 4,
     status: 'Open',
     priority: 'Warm',
-    requestedCar: baseRequestedCar('Mercedes-Benz', 'C-Class', 2024, 48000),
+    requestedCar: {
+      ...baseRequestedCar('Mercedes-Benz', 'C-Class', 2024, 48000),
+      listingUrl: demoListingUrl('mb-c-class-2024')
+    },
+    ...demoRequestAttribution,
+    utmCampaign: 'mercedes_c_class',
+    webSparkCampaign: 'mb_c_class_stock',
     carStatus: 'In Stock',
     requestType: 'Quotation',
     source: 'Website',
@@ -166,7 +196,13 @@ export const mockLeads = [
     customerId: 5,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: baseRequestedCar('Tesla', 'Model 3', 2023, 42000),
+    requestedCar: {
+      ...baseRequestedCar('Tesla', 'Model 3', 2023, 42000),
+      listingUrl: demoListingUrl('tesla-m3-used')
+    },
+    utmSource: 'bing',
+    utmTerm: 'ev',
+    utmCampaign: 'tesla_used',
     carStatus: 'Not In Stock',
     requestType: 'Quotation',
     source: '3rd Party',
@@ -191,7 +227,13 @@ export const mockLeads = [
     customerId: 6,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: baseRequestedCar('Porsche', 'Cayenne', 2024, 95000),
+    requestedCar: {
+      ...baseRequestedCar('Porsche', 'Cayenne', 2024, 95000),
+      listingUrl: demoListingUrl('porsche-cayenne-2024')
+    },
+    ...demoRequestAttribution,
+    utmCampaign: 'porsche_suv',
+    webSparkCampaign: 'cayenne_gallery',
     carStatus: 'In Stock',
     requestType: 'Quotation',
     source: 'Facebook',
@@ -218,7 +260,11 @@ export const mockLeads = [
     customerId: 1,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: baseRequestedCar('Audi', 'A6 Allroad', 2023, 19000),
+    requestedCar: {
+      ...baseRequestedCar('Audi', 'A6 Allroad', 2023, 19000),
+      listingUrl: demoListingUrl('audi-a6-allroad-dup')
+    },
+    ...demoRequestAttribution,
     carStatus: 'In Stock',
     requestType: 'Quotation',
     source: 'Website',
@@ -243,7 +289,13 @@ export const mockLeads = [
     customerId: 2,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: baseRequestedCar('Volkswagen', 'ID.4', 2024, 45000),
+    requestedCar: {
+      ...baseRequestedCar('Volkswagen', 'ID.4', 2024, 45000),
+      listingUrl: demoListingUrl('vw-id4-dup')
+    },
+    ...demoRequestAttribution,
+    utmCampaign: 'spring_ev_promo',
+    webSparkCampaign: 'vw_id4_landing',
     carStatus: 'In Stock',
     requestType: 'Quotation',
     source: 'Website',
@@ -268,7 +320,13 @@ export const mockLeads = [
     customerId: 3,
     status: 'Open',
     priority: 'Warm',
-    requestedCar: baseRequestedCar('BMW', 'iX xDrive50', 2024, 105000),
+    requestedCar: {
+      ...baseRequestedCar('BMW', 'iX xDrive50', 2024, 105000),
+      listingUrl: demoListingUrl('bmw-ix-dup')
+    },
+    ...demoRequestAttribution,
+    utmCampaign: 'bmw_ix_electric',
+    webSparkCampaign: 'bmw_ix_detail',
     carStatus: 'In Stock',
     requestType: 'Test Drive',
     source: 'Website',
@@ -293,7 +351,13 @@ export const mockLeads = [
     customerId: 7,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: baseRequestedCar('Audi', 'A4', 2024, 42000),
+    requestedCar: {
+      ...baseRequestedCar('Audi', 'A4', 2024, 42000),
+      listingUrl: demoListingUrl('audi-a4-dup-close')
+    },
+    ...demoRequestAttribution,
+    utmCampaign: 'audi_a4_stock',
+    webSparkCampaign: 'a4_listing',
     carStatus: 'In Stock',
     requestType: 'Quotation',
     source: 'Walk-in',

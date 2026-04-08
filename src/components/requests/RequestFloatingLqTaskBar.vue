@@ -67,43 +67,43 @@
 
         <div
           v-else
-          class="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-xl"
+          class="flex min-h-0 w-full flex-1 flex-col overflow-y-auto overscroll-contain rounded-xl"
         >
-          <div class="flex min-h-0 flex-1 flex-col gap-0 overflow-hidden">
-            <RequestLqTaskHeaderRow
-              ref="expandedHeaderRef"
-              :title="expandedHeaderTitle"
-              :subtitle="expandedHeaderSubtitle"
-              :title-cta-label="expandedHeaderCallCtaLabel"
-              :title-cta-href="expandedHeaderCallCtaHref"
-              :title-id="focusTitleId"
-              :assignee-initials="assigneeInitials"
-              :countdown-label="lqTimer.countdownLabel"
-              :timer-aria="t('requestDetail.lqfTask.timerAria')"
-              :timer-title="expandedTimerTitle"
-              :show-chevron="true"
-              chevron-direction="down"
-              :chevron-aria-label="t('requestDetail.floatingLq.minimize')"
-              on-dark-surface
-              @toggle-timer="lqTimer.toggleTimerRunning"
-              @chevron-click="collapseToMinimized"
-            />
+          <RequestLqTaskHeaderRow
+            ref="expandedHeaderRef"
+            class="shrink-0"
+            :title="expandedHeaderTitle"
+            :subtitle="expandedHeaderSubtitle"
+            :title-cta-label="expandedHeaderCallCtaLabel"
+            :title-cta-href="expandedHeaderCallCtaHref"
+            :title-id="focusTitleId"
+            :assignee-initials="assigneeInitials"
+            :countdown-label="lqTimer.countdownLabel"
+            :timer-aria="t('requestDetail.lqfTask.timerAria')"
+            :timer-title="expandedTimerTitle"
+            :show-chevron="true"
+            chevron-direction="down"
+            :chevron-aria-label="t('requestDetail.floatingLq.minimize')"
+            on-dark-surface
+            @toggle-timer="lqTimer.toggleTimerRunning"
+            @chevron-click="collapseToMinimized"
+          />
 
-            <RequestLqTaskExpandedOutcomeShell
-              :active="view === 'expanded'"
-              :flex-fill="true"
-            >
-              <LeadManagementWidget
-                :lead="request"
-                :activities="activities"
-                embed-outcome-only
-                @postpone-expected-close="$emit('postpone-expected-close')"
-                @reassigned="$emit('reassigned', $event)"
-                @open-purchase-method="$emit('open-purchase-method')"
-                @open-trade-in="$emit('open-trade-in')"
-              />
-            </RequestLqTaskExpandedOutcomeShell>
-          </div>
+          <RequestLqTaskExpandedOutcomeShell
+            :active="view === 'expanded'"
+            :flex-fill="true"
+            :use-shell-scroll="false"
+          >
+            <LeadManagementWidget
+              :lead="request"
+              :activities="activities"
+              embed-outcome-only
+              @postpone-expected-close="$emit('postpone-expected-close')"
+              @reassigned="$emit('reassigned', $event)"
+              @open-purchase-method="$emit('open-purchase-method')"
+              @open-trade-in="$emit('open-trade-in')"
+            />
+          </RequestLqTaskExpandedOutcomeShell>
         </div>
       </div>
     </div>
@@ -157,7 +157,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
-  'update:focusMode',
+  'update:focus-mode',
   'not-now',
   'postpone-expected-close',
   'reassigned',
@@ -215,7 +215,7 @@ const isFocusMode = computed(() => view.value === 'expanded')
 watch(
   isFocusMode,
   (v) => {
-    emit('update:focusMode', v)
+    emit('update:focus-mode', v)
   },
   { immediate: true }
 )
@@ -304,7 +304,7 @@ function detachTrap() {
 
 onBeforeUnmount(() => {
   detachTrap()
-  emit('update:focusMode', false)
+  emit('update:focus-mode', false)
 })
 
 watch(

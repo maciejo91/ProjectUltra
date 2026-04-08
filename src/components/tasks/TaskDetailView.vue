@@ -1,8 +1,12 @@
 <template>
-  <div class="relative flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
-    <div v-if="displayTask" class="flex flex-col flex-1 min-h-0 overflow-hidden">
-      <!-- Task Header -->
+  <div class="relative flex w-full min-w-0 flex-col overflow-visible">
+    <div
+      v-if="displayTask"
+      class="flex w-full min-w-0 flex-col overflow-x-hidden overflow-visible"
+    >
+      <!-- Sticky header: scroll parent is split-pane row (drawer: inner column) -->
       <TaskDetailHeader
+        class="sticky top-0 z-20"
         :task="displayTask"
         :filtered-tasks="filteredTasks"
         :is-drawer-view="isDrawerView"
@@ -14,12 +18,12 @@
         @reassigned="handleReassigned"
       />
 
-      <!-- Center + Right Panels Row -->
-      <div class="flex flex-col lg:flex-row flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
+      <!-- Center + Right: natural height; page or drawer shell scrolls -->
+      <div class="flex w-full min-h-0 flex-col lg:flex-row lg:items-start">
         <!-- Center Panel: Task Management Widget Only -->
-        <div class="shrink-0 lg:flex-1 flex flex-col min-h-0 overflow-visible lg:overflow-hidden bg-white min-w-0">
-          <div class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
-            <div class="p-2">
+        <div class="flex min-h-0 min-w-0 shrink-0 flex-col overflow-x-hidden bg-white lg:flex-1">
+          <div class="w-full min-w-0 overflow-x-hidden">
+            <div class="min-w-0 p-2">
               <div v-if="showAssignToMeBanner" class="px-2 mb-2">
                 <TaskAssignee
                   :task="displayTask"
@@ -44,11 +48,11 @@
 
         <!-- Right Sidebar with Tabs -->
         <div
-          class="right-sidebar flex flex-col min-h-0 overflow-hidden shrink-0 w-full lg:w-[320px] lg:min-w-[320px] border-t lg:border-t-0 lg:border-l border-border bg-background"
+          class="right-sidebar flex w-full shrink-0 flex-col overflow-x-hidden border-border border-t bg-background lg:w-[320px] lg:min-h-0 lg:min-w-[320px] lg:border-l lg:border-t-0"
         >
-          <Tabs v-model="sidebarTab" class="flex flex-col flex-1 min-h-0 overflow-hidden gap-0">
+          <Tabs v-model="sidebarTab" class="flex w-full flex-col gap-0 overflow-x-hidden">
             <!-- Sidebar Tabs -->
-            <TabsList class="flex shrink-0 border-0 bg-background rounded-none w-full relative h-full">
+            <TabsList class="relative flex w-full shrink-0 rounded-none border-0 bg-background">
               <TabsTrigger 
                 value="request" 
                 class="flex items-center gap-2 text-sm font-medium transition-all relative flex-1 justify-center bg-transparent outline-none h-full"
@@ -86,10 +90,10 @@
               </TabsTrigger>
             </TabsList>
             
-            <!-- Sidebar Content -->
-            <div class="flex-1 min-h-0 flex flex-col lg:overflow-y-auto bg-muted">
+            <!-- Sidebar Content (scrolls with center via row scroll above) -->
+            <div class="flex w-full flex-col bg-muted">
               <!-- Request Tab -->
-              <TabsContent value="request" class="space-y-2 p-2 mt-0 flex-1 min-h-full">
+              <TabsContent value="request" class="mt-0 space-y-2 p-2">
                 <!-- Details card: badges/tags + request details, with open-in-new-tab in header -->
                 <div class="rounded-lg border border-border bg-background shadow-nsc-card shrink-0 w-full min-w-0 overflow-hidden">
                   <div class="shrink-0 flex items-center justify-between gap-2 px-4 pt-4 pb-2 border-b border-border">
@@ -147,6 +151,17 @@
                   @open-ad="handleOpenAd"
                   @more-actions="handleMoreActions"
                 />
+                <RequestMessageCard
+                  v-if="showRequestMessageCard"
+                  :title="t('requestDetail.messageCard.title')"
+                  :message="displayTask.requestMessage || displayTask.requestedCar?.requestMessage || ''"
+                  :utm-source="taskAttribution.utmSource"
+                  :utm-term="taskAttribution.utmTerm"
+                  :utm-campaign="taskAttribution.utmCampaign"
+                  :web-spark-campaign="taskAttribution.webSparkCampaign"
+                  :advertisement-url="taskAttribution.advertisementUrl"
+                  :original-email-url="taskAttribution.originalEmailUrl"
+                />
                 <TaskContactCard
                   :task="displayTask"
                   :task-type="displayTask.type"
@@ -170,7 +185,7 @@
               </TabsContent>
               
               <!-- Activity Tab -->
-              <TabsContent value="activity" class="p-2 flex-1 overflow-visible h-full flex flex-col mt-0">
+              <TabsContent value="activity" class="mt-0 flex flex-col overflow-visible p-2">
                 <TaskActivityCard
                   :activities="allActivities"
                   :expanded-summaries="expandedSummaries"
@@ -285,6 +300,7 @@
 import { ListTodo, Phone, ExternalLink } from 'lucide-vue-next'
 import { ref, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-library/future/primitives'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
@@ -303,6 +319,7 @@ import TaskBadgesAndTags from './TaskBadgesAndTags.vue'
 import TradeInsCard from '@/components/shared/TradeInsCard.vue'
 import FinancingOptionsCard from '@/components/shared/FinancingOptionsCard.vue'
 import LeadOpportunityDetailsCard from '@/components/shared/LeadOpportunityDetailsCard.vue'
+import RequestMessageCard from '@/components/requests/RequestMessageCard.vue'
 import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
 import AttachmentWidget from '@/components/shared/feed/AttachmentWidget.vue'
 import AddWhatsAppModal from '@/components/modals/AddWhatsAppModal.vue'
@@ -313,11 +330,12 @@ import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
 import OfferModal from '@/components/modals/OfferModal.vue'
 import CreateEventModal from '@/components/modals/CreateEventModal.vue'
+import { getRequestAttributionProps } from '@/utils/requestAttribution'
 
 const props = defineProps({
-  task: { 
-    type: Object, 
-    default: null 
+  task: {
+    type: Object,
+    default: null
   },
   managementWidget: { 
     type: Object, 
@@ -349,6 +367,7 @@ const userStore = useUserStore()
 const toastStore = useToastStore()
 const settingsStore = useSettingsStore()
 const router = useRouter()
+const { t } = useI18n()
 
 // Use store's current lead/opportunity when id matches so drawer and card view show the same loaded data and stay in sync after LQ actions (no-answer, not interested)
 const displayTask = computed(() => {
@@ -373,6 +392,21 @@ const displayTask = computed(() => {
     }
   }
   return t
+})
+
+const taskAttribution = computed(() => getRequestAttributionProps(displayTask.value))
+
+const showRequestMessageCard = computed(() => {
+  const r = displayTask.value
+  if (!r) return false
+  const msg = (r.requestMessage || r.requestedCar?.requestMessage || '').trim()
+  if (msg) return true
+  if (r.utmSource || r.utmTerm || r.utmCampaign || r.webSparkCampaign) return true
+  if (r.originalMessageUrl) return true
+  if (r.requestedCar?.listingUrl || r.sourceUrl) return true
+  if (r.requestedCar?.adSource || r.requestedCar?.adCampaign) return true
+  if (r.requestedCar?.adMedium || r.requestedCar?.webSparkCampaign) return true
+  return false
 })
 
 const showAssignToMeBanner = computed(() => {

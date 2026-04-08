@@ -1,7 +1,5 @@
 <template>
-  <header
-    class="sticky top-0 z-30 flex shrink-0 flex-col border-b border-border bg-background"
-  >
+  <header class="flex shrink-0 flex-col border-b border-border bg-background">
     <div
       class="flex w-full min-w-0 flex-col gap-3 px-2 py-3 md:px-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6"
     >

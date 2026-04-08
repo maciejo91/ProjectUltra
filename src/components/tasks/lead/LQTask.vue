@@ -591,9 +591,11 @@
             </div>
 
             <div class="space-y-4">
-              <!-- Dealership + team (narrow who appears in schedule slots) -->
-              <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <!-- Schedule: filters + event type + calendar / slots -->
+              <div ref="eventTypeExpandedRef" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
+                <h5 class="font-semibold text-foreground text-sm mb-4">{{ t('forms.schedule.title') }} <span class="text-red-600">*</span></h5>
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3 mb-6">
                   <div>
                     <Label class="form-label mb-2">{{ t('forms.schedule.dealership.label') }}</Label>
                     <SelectMenu
@@ -622,12 +624,21 @@
                       </template>
                     </SelectMenu>
                   </div>
+                  <div>
+                    <Label class="form-label mb-2">{{ t('forms.schedule.assignee.label') }}</Label>
+                    <SelectMenu
+                      v-model="qualificationScheduleAssigneeSelect"
+                      :items="scheduleAssigneeSelectOptions"
+                      :placeholder="t('forms.schedule.assignee.placeholder')"
+                      value-key="value"
+                      class="w-full"
+                    >
+                      <template #item="{ item }">
+                        <span>{{ item.label }}</span>
+                      </template>
+                    </SelectMenu>
+                  </div>
                 </div>
-              </div>
-
-              <!-- Schedule: event type + calendar / slots -->
-              <div ref="eventTypeExpandedRef" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
-                <h5 class="font-semibold text-foreground text-sm mb-4">{{ t('forms.schedule.title') }} <span class="text-red-600">*</span></h5>
 
                 <div class="mb-4">
                   <Label class="form-label mb-2">{{ t('forms.schedule.eventType.label') }} <span class="text-red-600">*</span></Label>
@@ -645,140 +656,150 @@
                 </div>
 
                 <!-- Calendar and Time Slots - Two Column Layout -->
-                <div class="bg-white rounded-lg border border-border overflow-hidden">
-                  <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-black/5">
-                    <!-- Left Column - Calendar -->
-                    <div class="p-4">
-                      <div class="flex items-center justify-between mb-4">
-                        <button 
-                          @click="previousMonth"
-                          class="p-1 hover:bg-muted rounded transition-colors cursor-pointer"
-                        >
-                          <ChevronLeft class="w-4 h-4 shrink-0 text-muted-foreground" />
-                        </button>
-                        <h6 class="text-sm font-semibold text-foreground">{{ currentMonthYear }}</h6>
-                        <button 
-                          @click="nextMonth"
-                          class="p-1 hover:bg-muted rounded transition-colors cursor-pointer"
-                        >
-                          <ChevronRight class="w-4 h-4 shrink-0 text-muted-foreground" />
-                        </button>
-                      </div>
-                      
-                      <!-- Calendar Grid -->
-                      <div class="grid grid-cols-7 gap-1 mb-2">
-                        <div v-for="day in calendarDayLabels" 
-                          :key="day"
-                          class="text-center text-sm font-medium text-muted-foreground py-2">
-                          {{ day }}
-                        </div>
-                      </div>
-                      
-                      <div class="grid grid-cols-7 gap-1">
-                        <div 
-                          v-for="(day, index) in calendarDays" 
-                          :key="index"
-                          @click="selectQualificationDate(day)"
-                          class="aspect-square flex items-center justify-center text-sm font-medium rounded-lg transition-all"
-                          :class="isSelectedQualificationDate(day) 
-                            ? 'bg-primary text-white cursor-pointer' 
-                            : day ? 'text-muted-foreground hover:bg-muted cursor-pointer' : 'text-transparent'"
-                        >
-                          {{ day }}
-                        </div>
-                      </div>
+                <div
+                  v-if="qualificationEventType && qualificationSelectedDate"
+                  class="min-w-0 bg-white rounded-lg border border-border overflow-hidden"
+                >
+                  <div
+                    class="flex min-w-0 flex-col md:flex-row md:divide-x md:divide-black/5"
+                  >
+                    <div class="shrink-0 w-fit max-w-full min-w-0">
+                      <MiniCalendar
+                        v-model="qualificationSelectedDate"
+                        :preserve-day-when-changing-month="true"
+                        class="gap-2 p-3"
+                      />
                     </div>
 
                     <!-- Right column: unique time slots; slot opens popover (assignee list) -->
-                    <div class="p-4 flex flex-col min-h-0 w-full">
-                      <h6 class="text-sm font-semibold text-foreground mb-3 shrink-0">{{ selectedQualificationDateLabel }}</h6>
+                    <div class="min-w-0 min-h-0 overflow-x-hidden p-4 flex flex-col md:flex-1">
                       <div
-                        v-if="qualificationSelectedDate && scheduleSlotGroupsForSelectedDate.length > 0"
-                        class="flex flex-col gap-4 w-full"
+                        class="flex items-center gap-3 mb-3 shrink-0 min-w-0 w-full"
+                      >
+                        <h6 class="text-sm font-semibold text-foreground min-w-0 truncate">
+                          {{ selectedQualificationDateLabel }}
+                        </h6>
+                        <div
+                          v-if="scheduleHeaderAssigneeDisplay"
+                          class="flex items-center gap-2 ml-auto min-w-0 shrink"
+                        >
+                          <div
+                            v-if="scheduleHeaderAssigneeDisplay.kind === 'user'"
+                            class="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
+                            :class="getRoleAvatarClass(scheduleHeaderAssigneeDisplay.role)"
+                          >
+                            {{ getInitials(scheduleHeaderAssigneeDisplay.name) }}
+                          </div>
+                          <div
+                            v-else
+                            class="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0"
+                          >
+                            <Users class="w-4 h-4 text-muted-foreground" />
+                          </div>
+                          <span class="text-sm font-medium text-foreground truncate text-right min-w-0">
+                            {{ scheduleHeaderAssigneeDisplay.name }}
+                          </span>
+                        </div>
+                      </div>
+                      <div
+                        v-if="qualificationSelectedDate && uniqueSlotsForSelectedDate.length > 0"
+                        class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full"
                       >
                         <div
-                          v-for="group in scheduleSlotGroupsForSelectedDate"
-                          :key="group.key"
-                          class="space-y-2 min-w-0"
+                          v-for="column in scheduleSlotColumns"
+                          :key="column.key"
+                          class="flex flex-col min-w-0"
                         >
-                          <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                            {{ group.label }}
+                          <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground shrink-0 mb-2">
+                            {{ column.label }}
                           </p>
-                          <div class="flex flex-wrap gap-2 w-full">
-                            <Popover
-                              v-for="slot in group.slots"
-                              :key="slot"
-                              :open="openScheduleSlotPopover === slot"
-                              @update:open="(v) => onScheduleSlotPopoverOpenChange(slot, v)"
-                            >
-                              <PopoverTrigger as-child>
-                                <button
-                                  type="button"
-                                  class="px-3 py-1.5 rounded-md text-sm font-medium border transition-colors min-w-16"
-                                  :class="isScheduleSlotConfirmed(slot)
-                                    ? 'bg-background text-foreground border-primary ring-2 ring-primary ring-offset-1 ring-offset-background'
-                                    : 'bg-background text-foreground border-border hover:bg-muted'"
-                                >
-                                  {{ slot }}
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent
-                                class="w-full sm:max-w-xl p-0 rounded-lg border border-border bg-background shadow-lg"
-                                side="bottom"
-                                align="start"
+                          <div
+                            class="schedule-slot-toggle-group flex flex-col gap-2"
+                          >
+                            <template v-for="slot in column.slots" :key="slot">
+                              <button
+                                v-if="!shouldPickAssigneeViaPopover"
+                                type="button"
+                                class="schedule-slot-toggle-item w-full shrink-0 transition-colors"
+                                :class="{ 'hover:bg-muted': !isScheduleSlotConfirmed(slot) }"
+                                :aria-pressed="isScheduleSlotConfirmed(slot) ? 'true' : 'false'"
+                                @click="handleScheduleSlotDirectSelect(slot)"
                               >
-                                <div class="p-3 flex flex-col gap-3 min-w-0">
-                                  <p class="text-sm font-medium text-foreground">{{ t('forms.schedule.slotPopover.people') }}</p>
-                                  <Input
-                                    v-model="scheduleSlotAssigneeSearchQuery"
-                                    type="search"
-                                    :placeholder="t('forms.schedule.slotPopover.searchPlaceholder')"
-                                    class="w-full"
-                                    :aria-label="t('forms.schedule.slotPopover.searchPlaceholder')"
-                                    autocomplete="off"
-                                  />
-                                  <div class="max-h-56 overflow-y-auto space-y-1 min-h-0">
-                                    <button
-                                      v-for="item in assigneesFilteredForSlot(slot)"
-                                      :key="item.assigneeId"
-                                      type="button"
-                                      class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-left border transition-colors"
-                                      :class="isScheduleSlotItemSelected(slot, item)
-                                        ? 'border-primary bg-muted/50'
-                                        : 'border-transparent hover:bg-muted'"
-                                      @click="selectScheduleSlotAssignee(slot, item)"
-                                    >
-                                      <div
-                                        v-if="item.type === 'user'"
-                                        class="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
-                                        :class="item.avatarClass"
+                                {{ slot }}
+                              </button>
+                              <Popover
+                                v-else
+                                :open="openScheduleSlotPopover === slot"
+                                @update:open="(v) => onScheduleSlotPopoverOpenChange(slot, v)"
+                              >
+                                <PopoverTrigger as-child>
+                                  <button
+                                    type="button"
+                                    class="schedule-slot-toggle-item w-full shrink-0 transition-colors"
+                                    :class="{ 'hover:bg-muted': !isScheduleSlotConfirmed(slot) }"
+                                    :aria-pressed="isScheduleSlotConfirmed(slot) ? 'true' : 'false'"
+                                  >
+                                    {{ slot }}
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                  class="min-w-96 max-w-2xl p-0 rounded-lg border border-border bg-background shadow-lg"
+                                  side="bottom"
+                                  align="start"
+                                >
+                                  <div class="p-3 flex flex-col gap-3 min-w-0">
+                                    <p class="text-sm font-medium text-foreground">{{ t('forms.schedule.slotPopover.people') }}</p>
+                                    <Input
+                                      v-model="scheduleSlotAssigneeSearchQuery"
+                                      type="search"
+                                      :placeholder="t('forms.schedule.slotPopover.searchPlaceholder')"
+                                      class="w-full"
+                                      :aria-label="t('forms.schedule.slotPopover.searchPlaceholder')"
+                                      autocomplete="off"
+                                    />
+                                    <div class="max-h-56 overflow-y-auto space-y-1 min-h-0">
+                                      <button
+                                        v-for="item in assigneesFilteredForSlot(slot)"
+                                        :key="item.assigneeId"
+                                        type="button"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-left border transition-colors"
+                                        :class="isScheduleSlotItemSelected(slot, item)
+                                          ? 'border-primary bg-muted/50'
+                                          : 'border-transparent hover:bg-muted'"
+                                        @click="selectScheduleSlotAssignee(slot, item)"
                                       >
-                                        {{ getInitials(item.name) }}
-                                      </div>
-                                      <div
-                                        v-else
-                                        class="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0"
+                                        <div
+                                          v-if="item.type === 'user'"
+                                          class="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
+                                          :class="item.avatarClass"
+                                        >
+                                          {{ getInitials(item.name) }}
+                                        </div>
+                                        <div
+                                          v-else
+                                          class="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0"
+                                        >
+                                          <Users class="w-4 h-4 text-muted-foreground" />
+                                        </div>
+                                        <span class="min-w-0 flex-1 flex flex-col gap-0.5 text-left">
+                                          <span class="text-sm font-medium text-foreground truncate">{{ item.name }}</span>
+                                          <span class="text-xs text-muted-foreground truncate">{{ item.departmentLabel }}</span>
+                                        </span>
+                                      </button>
+                                      <p
+                                        v-if="
+                                          assigneesAvailableForSlot(slot).length > 0 &&
+                                          assigneesFilteredForSlot(slot).length === 0
+                                        "
+                                        class="text-sm text-muted-foreground px-3 py-2 text-center"
                                       >
-                                        <Users class="w-4 h-4 text-muted-foreground" />
-                                      </div>
-                                      <span class="min-w-0 flex-1 flex flex-col gap-0.5 text-left">
-                                        <span class="text-sm font-medium text-foreground truncate">{{ item.name }}</span>
-                                        <span class="text-xs text-muted-foreground truncate">{{ item.departmentLabel }}</span>
-                                      </span>
-                                    </button>
-                                    <p
-                                      v-if="
-                                        assigneesAvailableForSlot(slot).length > 0 &&
-                                        assigneesFilteredForSlot(slot).length === 0
-                                      "
-                                      class="text-sm text-muted-foreground px-3 py-2 text-center"
-                                    >
-                                      {{ t('forms.schedule.slotPopover.noResults') }}
-                                    </p>
+                                        {{ t('forms.schedule.slotPopover.noResults') }}
+                                      </p>
+                                    </div>
                                   </div>
-                                </div>
-                              </PopoverContent>
-                            </Popover>
+                                </PopoverContent>
+                              </Popover>
+                            </template>
                           </div>
                         </div>
                       </div>
@@ -1045,7 +1066,7 @@ import {
   PopoverTrigger,
   PopoverContent
 } from '@motork/component-library/future/primitives'
-import { Check, PhoneOff, ThumbsUp, ThumbsDown, Clock, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, ChevronLeft, ChevronRight, Plus, Users } from 'lucide-vue-next'
+import { Check, PhoneOff, ThumbsUp, ThumbsDown, Clock, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, Plus, Users } from 'lucide-vue-next'
 import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
@@ -1072,6 +1093,7 @@ const LQTaskSendEmailCard = defineAsyncComponent(() =>
 )
 import DeadlineBanner from '@/components/tasks/shared/DeadlineBanner.vue'
 import AppointmentCommunications from '@/components/shared/communication/AppointmentCommunications.vue'
+import MiniCalendar from '@/components/calendar/MiniCalendar.vue'
 import CloseAsLostForm from '@/components/shared/CloseAsLostForm.vue'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
 import RequestConversationsTabContent from '@/components/requests/RequestConversationsTabContent.vue'
@@ -1488,6 +1510,7 @@ const {
   qualificationScheduleDepartment,
   qualificationScheduleDealership,
   qualificationScheduleTeamId,
+  qualificationScheduleAssigneeFilter,
   setQualificationSelectedSlot,
   qualificationDateRange,
   qualificationCustomDateStart,
@@ -1632,7 +1655,9 @@ const qualificationScheduleTeamSelect = computed({
   }
 })
 
-const scheduleAssignees = computed(() => {
+const SCHEDULE_ASSIGNEE_ALL = '__all__'
+
+const scheduleAssigneeCandidates = computed(() => {
   const dealershipFilter = qualificationScheduleDealership.value
   const teamIdFilter = qualificationScheduleTeamId.value
   let teams = assignableTeams.value || []
@@ -1671,6 +1696,39 @@ const scheduleAssignees = computed(() => {
   }))
   return [...users, ...teamAssignees]
 })
+
+const scheduleAssigneeSelectOptions = computed(() => [
+  { label: t('forms.schedule.assignee.all'), value: SCHEDULE_ASSIGNEE_ALL },
+  ...scheduleAssigneeCandidates.value.map((a) => ({
+    label:
+      a.type === 'user' && a.departmentLabel
+        ? `${a.name} · ${a.departmentLabel}`
+        : a.name,
+    value: a.assigneeId
+  }))
+])
+
+const qualificationScheduleAssigneeSelect = computed({
+  get: () =>
+    qualificationScheduleAssigneeFilter.value
+      ? qualificationScheduleAssigneeFilter.value
+      : SCHEDULE_ASSIGNEE_ALL,
+  set: (v) => {
+    qualificationScheduleAssigneeFilter.value =
+      v === SCHEDULE_ASSIGNEE_ALL || v == null || v === '' ? '' : String(v)
+  }
+})
+
+const scheduleAssignees = computed(() => {
+  const list = scheduleAssigneeCandidates.value
+  const f = qualificationScheduleAssigneeFilter.value
+  if (!f) return list
+  return list.filter((a) => a.assigneeId === f)
+})
+
+const shouldPickAssigneeViaPopover = computed(
+  () => !qualificationScheduleAssigneeFilter.value
+)
 
 // For selected date: each assignee with their available slots (for calendar right column)
 const availabilityByAssigneeForSelectedDate = computed(() => {
@@ -1730,8 +1788,34 @@ const scheduleSlotGroupsForSelectedDate = computed(() => {
   return groups
 })
 
+const scheduleSlotColumns = computed(() => {
+  const morning = scheduleSlotGroupsForSelectedDate.value.find((g) => g.key === 'morning')
+  const afternoon = scheduleSlotGroupsForSelectedDate.value.find((g) => g.key === 'afternoon')
+  return [
+    {
+      key: 'morning',
+      label: t('forms.schedule.timeSlots.morning'),
+      slots: morning?.slots ?? []
+    },
+    {
+      key: 'afternoon',
+      label: t('forms.schedule.timeSlots.afternoon'),
+      slots: afternoon?.slots ?? []
+    }
+  ]
+})
+
 function assigneesAvailableForSlot(slot) {
   return availabilityByAssigneeForSelectedDate.value.filter((item) => item.slots.includes(slot))
+}
+
+function handleScheduleSlotDirectSelect(slot) {
+  const filterId = qualificationScheduleAssigneeFilter.value
+  if (!filterId) return
+  const item = assigneesAvailableForSlot(slot).find((a) => a.assigneeId === filterId)
+  if (item) {
+    selectScheduleSlotAssignee(slot, item)
+  }
 }
 
 function assigneesFilteredForSlot(slot) {
@@ -1791,6 +1875,7 @@ watch(qualificationSelectedDate, () => {
 
 watch(qualificationScheduleDealership, () => {
   qualificationScheduleTeamId.value = null
+  qualificationScheduleAssigneeFilter.value = ''
   qualificationSelectedSlot.value = ''
   qualificationScheduleDepartment.value = ''
   qualificationSelectedSalesman.value = null
@@ -1799,6 +1884,15 @@ watch(qualificationScheduleDealership, () => {
 })
 
 watch(qualificationScheduleTeamId, () => {
+  qualificationScheduleAssigneeFilter.value = ''
+  qualificationSelectedSlot.value = ''
+  qualificationScheduleDepartment.value = ''
+  qualificationSelectedSalesman.value = null
+  qualificationSelectedTeam.value = null
+  openScheduleSlotPopover.value = null
+})
+
+watch(qualificationScheduleAssigneeFilter, () => {
   qualificationSelectedSlot.value = ''
   qualificationScheduleDepartment.value = ''
   qualificationSelectedSalesman.value = null
@@ -1851,9 +1945,6 @@ watch(qualificationEventType, (eventType) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     qualificationSelectedDate.value = today
-    // Update calendar to show current month
-    qualificationCurrentMonth.value = today.getMonth()
-    qualificationCurrentYear.value = today.getFullYear()
     qualificationSelectedSlot.value = ''
     qualificationScheduleDepartment.value = ''
   }
@@ -1889,14 +1980,16 @@ async function onConfirmPostpone() {
   showPostponeRescheduleBlock.value = false
 }
 
-function scrollToExpandedContent(getEl, delayMs = 0) {
+function scrollToExpandedContent(getEl, delayMs = 0, block = null) {
   const run = () => {
     const el = typeof getEl === 'function' ? getEl() : getEl
     if (!el) return
-    const options = props.hideContactCard
-      ? { behavior: 'smooth', block: 'nearest', inline: 'nearest' }
-      : { behavior: 'smooth', block: 'start' }
-    el.scrollIntoView(options)
+    const defaultBlock = props.hideContactCard ? 'nearest' : 'start'
+    el.scrollIntoView({
+      behavior: 'smooth',
+      block: block ?? defaultBlock,
+      inline: 'nearest'
+    })
   }
   if (delayMs > 0) {
     setTimeout(() => nextTick(run), delayMs)
@@ -1919,7 +2012,11 @@ watch(selectedNextStep, (next) => {
 
 watch(qualificationEventType, (eventType) => {
   if (eventType) {
-    scrollToExpandedContent(() => eventTypeExpandedRef.value)
+    nextTick(() => {
+      nextTick(() => {
+        scrollToExpandedContent(() => eventTypeExpandedRef.value, 0, 'nearest')
+      })
+    })
   }
 })
 
@@ -2026,39 +2123,6 @@ const qualificationEventTypeOptionsForSelect = computed(() =>
   }))
 )
 
-// Calendar state
-const qualificationCurrentMonth = ref(new Date().getMonth())
-const qualificationCurrentYear = ref(new Date().getFullYear())
-
-// Calendar day labels - start from Monday
-const calendarDayLabels = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
-
-// Current month/year display
-const currentMonthYear = computed(() => {
-  const date = new Date(qualificationCurrentYear.value, qualificationCurrentMonth.value)
-  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-})
-
-// Calendar days for current month (Monday = 0, Sunday = 6)
-const calendarDays = computed(() => {
-  const firstDay = new Date(qualificationCurrentYear.value, qualificationCurrentMonth.value, 1)
-  const lastDay = new Date(qualificationCurrentYear.value, qualificationCurrentMonth.value + 1, 0)
-  const daysInMonth = lastDay.getDate()
-  // Convert Sunday (0) to 6, Monday (1) to 0, etc. so Monday is first
-  const startingDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1
-  
-  const days = []
-  // Empty cells for days before month starts
-  for (let i = 0; i < startingDayOfWeek; i++) {
-    days.push(null)
-  }
-  // Days of the month
-  for (let day = 1; day <= daysInMonth; day++) {
-    days.push(day)
-  }
-  return days
-})
-
 // Selected date label
 const selectedQualificationDateLabel = computed(() => {
   if (!qualificationSelectedDate.value) {
@@ -2070,41 +2134,18 @@ const selectedQualificationDateLabel = computed(() => {
   return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`
 })
 
-// Check if date is selected
-const isSelectedQualificationDate = (day) => {
-  if (!day || !qualificationSelectedDate.value) return false
-  const selected = qualificationSelectedDate.value
-  return selected.getDate() === day && 
-         selected.getMonth() === qualificationCurrentMonth.value && 
-         selected.getFullYear() === qualificationCurrentYear.value
-}
-
-// Select date from calendar
-const selectQualificationDate = (day) => {
-  if (!day) return
-  const date = new Date(qualificationCurrentYear.value, qualificationCurrentMonth.value, day)
-  qualificationSelectedDate.value = date
-  qualificationSelectedSlot.value = ''
-}
-
-// Navigate months
-const previousMonth = () => {
-  if (qualificationCurrentMonth.value === 0) {
-    qualificationCurrentMonth.value = 11
-    qualificationCurrentYear.value--
-  } else {
-    qualificationCurrentMonth.value--
+const scheduleHeaderAssigneeDisplay = computed(() => {
+  if (!shouldPickAssigneeViaPopover.value || !qualificationSelectedSlot.value) return null
+  const u = qualificationSelectedSalesman.value
+  if (u?.name) {
+    return { kind: 'user', name: u.name, role: u.role }
   }
-}
-
-const nextMonth = () => {
-  if (qualificationCurrentMonth.value === 11) {
-    qualificationCurrentMonth.value = 0
-    qualificationCurrentYear.value++
-  } else {
-    qualificationCurrentMonth.value++
+  const team = qualificationSelectedTeam.value
+  if (team?.name) {
+    return { kind: 'team', name: team.name }
   }
-}
+  return null
+})
 
 // Map event types to their durations in minutes
 const eventTypeDurationMap = {

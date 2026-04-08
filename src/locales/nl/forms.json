@@ -87,6 +87,11 @@
       "placeholder": "Filter op team",
       "all": "Alle teams"
     },
+    "assignee": {
+      "label": "Toegewezen aan",
+      "placeholder": "Filter op toegewezen persoon",
+      "all": "Alle medewerkers"
+    },
     "eventType": {
       "label": "Type evenement",
       "placeholder": "Selecteer type evenement",

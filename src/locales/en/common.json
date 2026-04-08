@@ -20,8 +20,37 @@
     "support": "Support",
     "groups": {
       "data": "Data",
-      "actions": "Actions"
-    }
+      "actions": "Actions",
+      "workspace": "Workspace"
+    },
+    "settingsSections": {
+      "administration": "Administration",
+      "operations": "Operations",
+      "templates": "Templates",
+      "prototype": "Prototype"
+    },
+    "settingsPrototype": "Prototype",
+    "settingsAdminFiscalEntities": "Fiscal entities",
+    "settingsAdminDealerships": "Dealerships",
+    "settingsAdminTeams": "Teams",
+    "settingsAdminUsers": "Users",
+    "settingsAdminWhatsappBusiness": "WhatsApp business",
+    "settingsOpsDataNormalization": "Data normalization",
+    "settingsOpsSalesAlerts": "Sales alerts",
+    "settingsOpsSalesTasks": "Sales tasks",
+    "settingsOpsAfterSalesTasks": "After-sales tasks",
+    "settingsOpsTimetablesAndHolidays": "Timetables and holidays",
+    "settingsOpsQuotesAndContracts": "Quotes and contracts",
+    "settingsOpsFailureReasons": "Failure reasons",
+    "settingsOpsTags": "TAGs",
+    "settingsOpsSourcesDetail": "Sources detail",
+    "settingsOpsAfterSalesServices": "After-sales services",
+    "settingsOpsCustomFields": "Custom Fields",
+    "settingsOpsNotifications": "Notifications",
+    "settingsOpsCalendarEvents": "Calendar events",
+    "settingsTplEmail": "Email",
+    "settingsTplSms": "SMS",
+    "settingsTplSurvey": "Survey"
   },
   "pages": {
     "comingSoon": "Coming soon"
@@ -30,7 +59,8 @@
     "openSidebar": "Open sidebar",
     "closeSidebar": "Close sidebar",
     "toggleSidebar": "Expand or collapse sidebar",
-    "userMenu": "User menu"
+    "userMenu": "User menu",
+    "goToMyProfile": "Go to my profile"
   },
   "buttons": {
     "save": "Save",
@@ -69,6 +99,7 @@
     "createOpportunity": "Create Opportunity",
     "createLead": "Create Lead",
     "switchRole": "Switch Role",
+    "signOut": "Sign out",
     "logout": "Logout",
     "lightMode": "Light Mode",
     "darkMode": "Dark Mode"

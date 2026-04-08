@@ -122,6 +122,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
   const qualificationScheduleDepartment = ref('')
   const qualificationScheduleDealership = ref('')
   const qualificationScheduleTeamId = ref(null)
+  const qualificationScheduleAssigneeFilter = ref('')
 
   const setQualificationSelectedSlot = (slot) => {
     qualificationSelectedSlot.value = slot
@@ -439,6 +440,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     qualificationScheduleDepartment.value = ''
     qualificationScheduleDealership.value = ''
     qualificationScheduleTeamId.value = null
+    qualificationScheduleAssigneeFilter.value = ''
     qualificationSelectedTeam.value = null
     qualificationSelectedSalesman.value = null
     qualificationDurationMinutes.value = null
@@ -453,7 +455,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
   /**
    * Restore outcome and qualification form state from a postponed-interested draft (e.g. lead.postponedInterestedState).
    * Call when opening a task that was postponed from the interested flow.
-   * @param {Object} draft - Saved draft: enrichLeadData, qualificationMethod, qualificationEventType, qualificationScheduleDealership, qualificationScheduleTeamId, qualificationSelectedDate (ISO string), qualificationSelectedSlot, qualificationScheduleDepartment, qualificationSelectedTeam, qualificationSelectedSalesman, assignment, callLogDateTime
+   * @param {Object} draft - Saved draft: enrichLeadData, qualificationMethod, qualificationEventType, qualificationScheduleDealership, qualificationScheduleTeamId, qualificationScheduleAssigneeFilter, qualificationSelectedDate (ISO string), qualificationSelectedSlot, qualificationScheduleDepartment, qualificationSelectedTeam, qualificationSelectedSalesman, assignment, callLogDateTime
    */
   const restorePostponedInterestedState = (draft) => {
     if (!draft) return
@@ -476,6 +478,10 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
       scheduleTeamId = Number.isFinite(n) ? n : null
     }
     qualificationScheduleTeamId.value = scheduleTeamId
+    qualificationScheduleAssigneeFilter.value =
+      typeof draft.qualificationScheduleAssigneeFilter === 'string'
+        ? draft.qualificationScheduleAssigneeFilter
+        : ''
     qualificationSelectedTeam.value = draft.qualificationSelectedTeam ?? null
     qualificationSelectedSalesman.value = draft.qualificationSelectedSalesman ?? null
     if (draft.assignment?.assignee) {
@@ -595,6 +601,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     qualificationScheduleDepartment,
     qualificationScheduleDealership,
     qualificationScheduleTeamId,
+    qualificationScheduleAssigneeFilter,
     setQualificationSelectedSlot,
     qualificationScheduleSlotOptions,
     qualificationDurationValue

@@ -14,8 +14,7 @@
       v-if="show"
       class="fixed top-0 right-0 bottom-0 w-full lg:w-4/5 xl:w-3/4 bg-background z-50 shadow-xl flex flex-col overflow-hidden border-l border-border"
     >
-      <!-- Content Slot - fills height so TaskDetailView can use independent scroll -->
-      <div class="flex-1 min-h-0 flex flex-col overflow-hidden">
+      <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain">
         <slot />
       </div>
     </div>

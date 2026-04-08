@@ -87,6 +87,11 @@
       "placeholder": "Filter by team",
       "all": "All teams"
     },
+    "assignee": {
+      "label": "Assignee",
+      "placeholder": "Filter by assignee",
+      "all": "All assignees"
+    },
     "eventType": {
       "label": "Event type",
       "placeholder": "Select event type",

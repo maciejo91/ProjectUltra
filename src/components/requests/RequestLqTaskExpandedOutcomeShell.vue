@@ -2,13 +2,14 @@
   <div
     :class="[
       'relative flex min-h-0 flex-col rounded-lg shadow-nsc-card',
-      flexFill && 'flex-1'
+      flexFill && (useShellScroll ? 'flex-1' : 'w-full shrink-0')
     ]"
   >
     <div
       :class="[
-        'relative flex min-h-0 flex-col overflow-hidden rounded-lg border-2 border-transparent bg-background',
-        flexFill && 'flex-1'
+        'relative flex min-h-0 flex-col rounded-lg border-2 border-transparent bg-background',
+        shellOverflowClass,
+        flexFill && useShellScroll && 'flex-1'
       ]"
     >
       <svg
@@ -49,14 +50,15 @@
       </svg>
       <div
         :class="[
-          'relative z-20 m-1 flex min-h-0 flex-col overflow-hidden rounded-md bg-muted',
-          flexFill && 'flex-1'
+          'relative z-20 m-1 flex min-h-0 flex-col rounded-md bg-muted',
+          shellOverflowClass,
+          flexFill && useShellScroll && 'flex-1'
         ]"
       >
         <div
           :class="[
-            'min-h-0 overflow-y-auto px-2 pb-3 pt-2',
-            flexFill ? 'flex-1' : 'max-h-[calc(100vh-4rem)]'
+            'min-h-0 px-2 pb-3 pt-2',
+            contentScrollClass
           ]"
         >
           <slot />
@@ -67,7 +69,7 @@
 </template>
 
 <script setup>
-import { nextTick, onMounted, onUnmounted, ref, useId, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, useId, watch } from 'vue'
 
 const props = defineProps({
   active: {
@@ -77,7 +79,25 @@ const props = defineProps({
   flexFill: {
     type: Boolean,
     default: false
+  },
+  useShellScroll: {
+    type: Boolean,
+    default: true
   }
+})
+
+const shellOverflowClass = computed(() =>
+  props.useShellScroll ? 'overflow-hidden' : 'overflow-visible'
+)
+
+const contentScrollClass = computed(() => {
+  if (!props.useShellScroll) {
+    return 'overflow-visible'
+  }
+  if (props.flexFill) {
+    return 'min-h-0 flex-1 overflow-y-auto'
+  }
+  return 'max-h-[calc(100vh-4rem)] overflow-y-auto'
 })
 
 const strokeGradId = `lqfExpandedShellGrad-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`

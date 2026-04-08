@@ -87,6 +87,12 @@
    App-wide typography: Figtree (loaded in index.html)
    ======================================== */
 html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+html,
 body,
 #app {
   font-family: 'Figtree', sans-serif;
@@ -735,6 +741,8 @@ button[aria-pressed="true"]:hover:not(:disabled) {
 .followup-channel-toggle-group button[data-state="on"],
 .schedule-slot-toggle-group [data-state="on"],
 .schedule-slot-toggle-group button[data-state="on"],
+.schedule-slot-toggle-group [aria-pressed="true"],
+.schedule-slot-toggle-group button[aria-pressed="true"],
 .reschedule-toggle-group [data-state="on"],
 .reschedule-toggle-group button[data-state="on"] {
   border: 1.5px solid var(--primary) !important;
@@ -749,6 +757,8 @@ button[aria-pressed="true"]:hover:not(:disabled) {
 .followup-channel-toggle-group button[data-state="on"]:hover:not(:disabled),
 .schedule-slot-toggle-group [data-state="on"]:hover:not(:disabled),
 .schedule-slot-toggle-group button[data-state="on"]:hover:not(:disabled),
+.schedule-slot-toggle-group [aria-pressed="true"]:hover:not(:disabled),
+.schedule-slot-toggle-group button[aria-pressed="true"]:hover:not(:disabled),
 .reschedule-toggle-group [data-state="on"]:hover:not(:disabled),
 .reschedule-toggle-group button[data-state="on"]:hover:not(:disabled) {
   border: 1.5px solid var(--primary) !important;

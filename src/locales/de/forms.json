@@ -87,6 +87,11 @@
       "placeholder": "Nach Team filtern",
       "all": "Alle Teams"
     },
+    "assignee": {
+      "label": "Zugewiesene Person",
+      "placeholder": "Nach Bearbeiter filtern",
+      "all": "Alle Bearbeiter"
+    },
     "eventType": {
       "label": "Ereignistyp",
       "placeholder": "Ereignistyp auswählen",

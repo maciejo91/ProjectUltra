@@ -22,84 +22,82 @@
       @toggle="moreExpanded = !moreExpanded"
     >
       <div class="flex w-full flex-col gap-3 border-t border-border pt-3">
-        <template v-if="hasAttributionContent">
-          <div
-            v-if="utmSource"
-            class="flex w-full items-center justify-between gap-3"
+        <div class="flex w-full items-center justify-between gap-3">
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.messageCard.utmSource')
+          }}</span>
+          <span
+            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
+            >{{ textOrDash(utmSource) }}</span
           >
-            <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
-              t('requestDetail.messageCard.utmSource')
-            }}</span>
-            <span
-              class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
-              >{{ utmSource }}</span
-            >
-          </div>
-          <div
-            v-if="utmTerm"
-            class="flex w-full items-center justify-between gap-3"
+        </div>
+        <div class="flex w-full items-center justify-between gap-3">
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.messageCard.utmTerm')
+          }}</span>
+          <span
+            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
+            >{{ textOrDash(utmTerm) }}</span
           >
-            <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
-              t('requestDetail.messageCard.utmTerm')
-            }}</span>
-            <span
-              class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
-              >{{ utmTerm }}</span
-            >
-          </div>
-          <div
-            v-if="utmCampaign"
-            class="flex w-full items-center justify-between gap-3"
+        </div>
+        <div class="flex w-full items-center justify-between gap-3">
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.messageCard.utmCampaign')
+          }}</span>
+          <span
+            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
+            >{{ textOrDash(utmCampaign) }}</span
           >
-            <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
-              t('requestDetail.messageCard.utmCampaign')
-            }}</span>
-            <span
-              class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
-              >{{ utmCampaign }}</span
-            >
-          </div>
-          <div
+        </div>
+        <div class="flex w-full items-center justify-between gap-3">
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.messageCard.webSparkCampaign')
+          }}</span>
+          <span
+            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
+            >{{ textOrDash(webSparkCampaign) }}</span
+          >
+        </div>
+        <div class="flex w-full items-center justify-between gap-3">
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.messageCard.advertisement')
+          }}</span>
+          <a
             v-if="advertisementUrl"
-            class="flex w-full items-center justify-between gap-3"
+            :href="advertisementUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary underline underline-offset-2 hover:opacity-90"
           >
-            <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
-              t('requestDetail.messageCard.advertisement')
-            }}</span>
-            <a
-              :href="advertisementUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary underline underline-offset-2 hover:opacity-90"
-            >
-              {{ t('requestDetail.messageCard.linkVisit') }}
-              <ArrowUpRight class="size-3 shrink-0 opacity-70" aria-hidden />
-            </a>
-          </div>
-          <div
+            {{ t('requestDetail.messageCard.linkVisit') }}
+            <ArrowUpRight class="size-3 shrink-0 opacity-70" aria-hidden />
+          </a>
+          <span
+            v-else
+            class="text-sm leading-5 text-muted-foreground"
+            >{{ t('requestDetail.messageCard.empty') }}</span
+          >
+        </div>
+        <div class="flex w-full items-center justify-between gap-3">
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.messageCard.originalEmail')
+          }}</span>
+          <a
             v-if="originalEmailUrl"
-            class="flex w-full items-center justify-between gap-3"
+            :href="originalEmailUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary underline underline-offset-2 hover:opacity-90"
           >
-            <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
-              t('requestDetail.messageCard.originalEmail')
-            }}</span>
-            <a
-              :href="originalEmailUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary underline underline-offset-2 hover:opacity-90"
-            >
-              {{ t('requestDetail.messageCard.linkCheck') }}
-              <ArrowUpRight class="size-3 shrink-0 opacity-70" aria-hidden />
-            </a>
-          </div>
-        </template>
-        <p
-          v-else
-          class="text-sm leading-5 text-muted-foreground"
-        >
-          {{ t('requestDetail.messageCard.noMoreDetails') }}
-        </p>
+            {{ t('requestDetail.messageCard.linkCheck') }}
+            <ArrowUpRight class="size-3 shrink-0 opacity-70" aria-hidden />
+          </a>
+          <span
+            v-else
+            class="text-sm leading-5 text-muted-foreground"
+            >{{ t('requestDetail.messageCard.empty') }}</span
+          >
+        </div>
       </div>
     </CollapsibleSection>
   </div>
@@ -132,6 +130,10 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  webSparkCampaign: {
+    type: String,
+    default: ''
+  },
   advertisementUrl: {
     type: String,
     default: ''
@@ -151,12 +153,8 @@ const displayBody = computed(() => {
   return t('requestDetail.messageCard.empty')
 })
 
-const hasAttributionContent = computed(
-  () =>
-    !!(props.utmSource ||
-      props.utmTerm ||
-      props.utmCampaign ||
-      props.advertisementUrl ||
-      props.originalEmailUrl)
-)
+function textOrDash(value) {
+  const s = (value || '').trim()
+  return s || t('requestDetail.messageCard.empty')
+}
 </script>

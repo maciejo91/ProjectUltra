@@ -67,46 +67,16 @@
     <!-- Step 3: Schedule (Calendar and Time Slots) - only after event type is selected (same as LQTask) -->
     <div v-if="eventType" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
       <h5 class="font-semibold text-foreground text-sm mb-4">Schedule <span class="text-red-600">*</span></h5>
-      <div class="bg-white border border-border rounded-lg overflow-hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-black/5">
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-4">
-              <button
-                type="button"
-                @click="previousMonth"
-                class="p-1 hover:bg-muted rounded transition-colors cursor-pointer"
-              >
-                <ChevronLeft class="w-4 h-4 shrink-0 text-muted-foreground" />
-              </button>
-              <h6 class="text-sm font-semibold text-foreground">{{ currentMonthYear }}</h6>
-              <button
-                type="button"
-                @click="nextMonth"
-                class="p-1 hover:bg-muted rounded transition-colors cursor-pointer"
-              >
-                <ChevronRight class="w-4 h-4 shrink-0 text-muted-foreground" />
-              </button>
-            </div>
-            <div class="grid grid-cols-7 gap-1 mb-2">
-              <div v-for="label in calendarDayLabels" :key="label" class="text-center text-sm font-medium text-muted-foreground py-2">
-                {{ label }}
-              </div>
-            </div>
-            <div class="grid grid-cols-7 gap-1">
-              <div
-                v-for="(day, index) in calendarDays"
-                :key="index"
-                @click="day && selectDate(day)"
-                class="aspect-square flex items-center justify-center text-sm font-medium rounded-lg transition-all"
-                :class="isSelectedDate(day)
-                  ? 'bg-primary text-white cursor-pointer'
-                  : day ? 'text-muted-foreground hover:bg-muted cursor-pointer' : 'text-transparent'"
-              >
-                {{ day }}
-              </div>
-            </div>
+      <div class="min-w-0 bg-white border border-border rounded-lg overflow-hidden">
+        <div class="flex min-w-0 flex-col md:flex-row md:divide-x md:divide-black/5">
+          <div v-if="selectedDate" class="shrink-0 w-fit max-w-full min-w-0">
+            <MiniCalendar
+              v-model="selectedDate"
+              :preserve-day-when-changing-month="true"
+              class="gap-2 p-3"
+            />
           </div>
-          <div class="p-6">
+          <div class="min-w-0 min-h-0 overflow-x-hidden p-6 flex flex-col md:flex-1">
             <h6 class="text-sm font-semibold text-foreground mb-4">{{ selectedDateLabel }}</h6>
             <div v-if="selectedDate && availableScheduleSlots.length > 0" class="schedule-slot-toggle-group flex flex-col gap-2 w-full space-y-2">
               <Toggle
@@ -170,9 +140,9 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { Button, Label, Toggle } from '@motork/component-library/future/primitives'
 import { SelectMenu } from '@motork/component-library/future/components'
+import MiniCalendar from '@/components/calendar/MiniCalendar.vue'
 import { useUsersStore } from '@/stores/users'
 import { getAvailabilityForAssignee } from '@/services/availabilityService'
 import AppointmentCommunications from '@/components/shared/communication/AppointmentCommunications.vue'
@@ -208,8 +178,6 @@ const selectedTeam = ref(null)
 const selectedSalesman = ref(null)
 const durationMinutes = ref(null)
 const customDuration = ref('')
-const currentMonth = ref(new Date().getMonth())
-const currentYear = ref(new Date().getFullYear())
 const communicationPreferences = ref({
   immediateConfirmation: { enabled: true, channels: ['email'] },
   reminder: { enabled: true, channels: ['email'] },
@@ -263,24 +231,6 @@ const primaryButtonLabel = computed(() =>
 const canSubmit = computed(() =>
   !!(eventType.value && selectedDate.value && selectedSlot.value && selectedTeam.value)
 )
-
-const calendarDayLabels = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
-
-const currentMonthYear = computed(() => {
-  const date = new Date(currentYear.value, currentMonth.value)
-  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-})
-
-const calendarDays = computed(() => {
-  const firstDay = new Date(currentYear.value, currentMonth.value, 1)
-  const lastDay = new Date(currentYear.value, currentMonth.value + 1, 0)
-  const daysInMonth = lastDay.getDate()
-  const startingDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1
-  const days = []
-  for (let i = 0; i < startingDayOfWeek; i++) days.push(null)
-  for (let day = 1; day <= daysInMonth; day++) days.push(day)
-  return days
-})
 
 const selectedDateLabel = computed(() => {
   if (!selectedDate.value) return 'Select a date'
@@ -370,41 +320,6 @@ function getRoleAvatarClass(role) {
   return map[role] || 'bg-muted text-muted-foreground'
 }
 
-function selectDate(day) {
-  if (!day) return
-  const date = new Date(currentYear.value, currentMonth.value, day)
-  selectedDate.value = date
-  selectedSlot.value = ''
-}
-
-function isSelectedDate(day) {
-  if (!day || !selectedDate.value) return false
-  const d = selectedDate.value
-  return (
-    d.getDate() === day &&
-    d.getMonth() === currentMonth.value &&
-    d.getFullYear() === currentYear.value
-  )
-}
-
-function previousMonth() {
-  if (currentMonth.value === 0) {
-    currentMonth.value = 11
-    currentYear.value--
-  } else {
-    currentMonth.value--
-  }
-}
-
-function nextMonth() {
-  if (currentMonth.value === 11) {
-    currentMonth.value = 0
-    currentYear.value++
-  } else {
-    currentMonth.value++
-  }
-}
-
 function selectSoonestAvailability(assigneeId) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -416,8 +331,6 @@ function selectSoonestAvailability(assigneeId) {
     const slots = getAvailabilityForAssignee(assigneeId, dateStr)
     if (slots?.length) {
       selectedDate.value = check
-      currentMonth.value = check.getMonth()
-      currentYear.value = check.getFullYear()
       const filtered = scheduleSlotOptions.value.filter((s) => slots.includes(s))
       if (filtered.length) selectedSlot.value = filtered[0]
       break
@@ -471,8 +384,6 @@ function prefillFromAppointment(app) {
     const d = new Date(app.start)
     const dateOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate())
     selectedDate.value = dateOnly
-    currentMonth.value = d.getMonth()
-    currentYear.value = d.getFullYear()
     const h = d.getHours()
     const m = d.getMinutes()
     const rounded = m < 15 ? 0 : m < 45 ? 30 : 60
@@ -521,8 +432,6 @@ watch(eventType, (v) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     selectedDate.value = today
-    currentMonth.value = today.getMonth()
-    currentYear.value = today.getFullYear()
   }
 })
 

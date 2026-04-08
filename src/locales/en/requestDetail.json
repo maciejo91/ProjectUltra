@@ -131,6 +131,7 @@
     "utmSource": "UTM source",
     "utmTerm": "UTM term",
     "utmCampaign": "UTM campaign",
+    "webSparkCampaign": "WebSpark campaign",
     "advertisement": "Advertisement",
     "originalEmail": "Original email",
     "linkVisit": "Visit",

@@ -1,16 +1,5 @@
 <template>
-  <RequestDetailShell
-    :request="request"
-    :filtered-requests="filteredRequests"
-    :is-full-page="isFullPage"
-    @close="$emit('close')"
-    @previous="handlePrevious"
-    @next="handleNext"
-    @update-status="handleUpdateStatus"
-    @postpone-expected-close="handlePostponeExpectedClose"
-    @reassigned="handleReassigned"
-    @add-segment="handleAddSegment"
-  >
+  <RequestDetailShell :request="request">
     <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
     <ComingSoonModal :show="showPostponeModal" @close="showPostponeModal = false" />
     <ComingSoonModal :show="showGenericComingSoon" @close="showGenericComingSoon = false" />
@@ -129,16 +118,51 @@
     </Dialog>
 
     <div
+      ref="requestDetailBodyRef"
       v-if="showAssociatedTasksOrTimeline"
-      class="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto p-4 lg:overflow-hidden"
+      :class="[
+        'flex min-h-0 w-full flex-1 flex-col',
+        floatingLqFocusMode ? 'overflow-hidden' : 'max-lg:overflow-y-auto lg:overflow-hidden'
+      ]"
     >
-      <DuplicateDetectedCard
-        v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
-        class="shrink-0"
-        :potential-duplicates="potentialDuplicates"
-        @request-navigate="(...args) => $emit('request-navigate', ...args)"
-        @dismiss="duplicateBannerDismissed = true"
-      />
+      <div v-if="request" ref="requestHeaderStripRef" class="w-full min-w-0 shrink-0">
+        <RequestDetailCompactHeader
+          v-if="showCompactRequestHeader"
+          :request="request"
+          :filtered-requests="filteredRequests"
+          :is-full-page="isFullPage"
+          :show="true"
+          layout="fullWidth"
+          @close="$emit('close')"
+          @previous="handlePrevious"
+          @next="handleNext"
+          @update-status="handleUpdateStatus"
+          @quick-action="handleQuickAction"
+        />
+        <RequestDetailHeader
+          v-else
+          :request="request"
+          :filtered-requests="filteredRequests"
+          :is-full-page="isFullPage"
+          @close="$emit('close')"
+          @previous="handlePrevious"
+          @next="handleNext"
+          @update-status="handleUpdateStatus"
+          @postpone-expected-close="handlePostponeExpectedClose"
+          @reassigned="handleReassigned"
+          @add-segment="handleAddSegment"
+        />
+      </div>
+      <div
+        class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 p-4 lg:overflow-hidden"
+      >
+        <DuplicateDetectedCard
+          v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
+          class="shrink-0"
+          :potential-duplicates="potentialDuplicates"
+          @request-navigate="(...args) => $emit('request-navigate', ...args)"
+          @dismiss="duplicateBannerDismissed = true"
+        />
       <div
         class="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-4 lg:overflow-hidden"
       >
@@ -146,14 +170,16 @@
           class="order-1 relative flex min-h-0 min-w-0 flex-col gap-0 lg:flex-1"
         >
           <div
+            ref="requestMainColumnScrollRef"
             :class="[
-              'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain lg:min-h-0',
+              'flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden overscroll-contain lg:min-h-0',
               requestMainColumnScrollPb,
               floatingLqFocusMode && 'overflow-hidden'
             ]"
           >
           <div class="flex min-w-0 shrink-0 flex-col gap-4">
             <div
+              ref="requestCustomerSectionRef"
               class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg bg-background"
             >
               <RequestLeadProfileSection
@@ -352,7 +378,10 @@
         </div>
 
         <div
-          class="order-2 flex min-w-0 flex-col gap-4 lg:sticky lg:top-0 lg:w-1/4 lg:shrink-0 lg:self-start lg:overflow-y-auto"
+          :class="[
+            'order-2 flex min-w-0 flex-col gap-4 lg:sticky lg:top-0 lg:w-1/4 lg:shrink-0 lg:self-start',
+            floatingLqFocusMode ? 'lg:overflow-hidden' : 'lg:overflow-y-auto'
+          ]"
         >
           <VehicleRequestCard
             v-if="request && (request.requestedCar || request.vehicle)"
@@ -374,27 +403,23 @@
             v-if="request && showRequestDetailsCard"
             :title="t('requestDetail.messageCard.title')"
             :message="request.requestMessage || request.requestedCar?.requestMessage || ''"
-            :utm-source="
-              request.utmSource || request.requestedCar?.adSource || ''
-            "
-            :utm-term="request.utmTerm || ''"
-            :utm-campaign="
-              request.utmCampaign || request.requestedCar?.adCampaign || ''
-            "
-            :advertisement-url="
-              request.requestedCar?.listingUrl || request.sourceUrl || ''
-            "
-            :original-email-url="request.originalMessageUrl || ''"
+            :utm-source="requestAttribution.utmSource"
+            :utm-term="requestAttribution.utmTerm"
+            :utm-campaign="requestAttribution.utmCampaign"
+            :web-spark-campaign="requestAttribution.webSparkCampaign"
+            :advertisement-url="requestAttribution.advertisementUrl"
+            :original-email-url="requestAttribution.originalEmailUrl"
           />
         </div>
       </div>
+    </div>
     </div>
     </div>
   </RequestDetailShell>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Car, CreditCard, Folder } from 'lucide-vue-next'
 import {
@@ -416,6 +441,8 @@ import { useLeadLqTeaser } from '@/composables/useLeadLqTeaser'
 import { isFloatingLqTaskPrototypeLead } from '@/utils/requestPrototypeFlags'
 import RequestFloatingLqTaskBar from './RequestFloatingLqTaskBar.vue'
 import RequestDetailShell from './RequestDetailShell.vue'
+import RequestDetailHeader from './RequestDetailHeader.vue'
+import RequestDetailCompactHeader from './RequestDetailCompactHeader.vue'
 import VehicleRequestCard from '@/components/shared/VehicleRequestCard.vue'
 import RequestMainTabs from './RequestMainTabs.vue'
 import RequestConversationsTabContent from './RequestConversationsTabContent.vue'
@@ -446,6 +473,7 @@ import {
 } from '@/utils/stageMapper'
 import { LEAD_STAGES } from '@/utils/stageMapper/constants'
 import { getCarImageUrl } from '@/utils/vehicleHelpers'
+import { getRequestAttributionProps } from '@/utils/requestAttribution'
 import { fetchLeadsByCustomerId, fetchOpportunitiesByCustomerId } from '@/api/contacts'
 
 const props = defineProps({
@@ -482,6 +510,15 @@ const editingTradeIn = ref(null)
 const editingFinancingOption = ref(null)
 const tradeInActionLoading = ref(false)
 const duplicateBannerDismissed = ref(false)
+const requestMainColumnScrollRef = ref(null)
+const requestDetailBodyRef = ref(null)
+const requestHeaderStripRef = ref(null)
+const requestCustomerSectionRef = ref(null)
+const showCompactRequestHeader = ref(false)
+let removeRequestHeaderCompactScrollListeners = null
+let requestHeaderCompactWindowResize = null
+let compactHeaderResizeObserver = null
+let compactHeaderRafPending = false
 const mainTab = ref('overview')
 const lqfTeaserDismissed = ref(false)
 const lqfInlineManageOpen = ref(false)
@@ -546,15 +583,18 @@ const lqfPostponeReasonOptions = computed(() => [
 
 const leadRef = computed(() => (props.request?.type === 'lead' ? props.request : null))
 
+const requestAttribution = computed(() => getRequestAttributionProps(props.request))
+
 const showRequestDetailsCard = computed(() => {
   const r = props.request
   if (!r) return false
   const msg = (r.requestMessage || r.requestedCar?.requestMessage || '').trim()
   if (msg) return true
-  if (r.utmSource || r.utmTerm || r.utmCampaign) return true
+  if (r.utmSource || r.utmTerm || r.utmCampaign || r.webSparkCampaign) return true
   if (r.originalMessageUrl) return true
   if (r.requestedCar?.listingUrl || r.sourceUrl) return true
   if (r.requestedCar?.adSource || r.requestedCar?.adCampaign) return true
+  if (r.requestedCar?.adMedium || r.requestedCar?.webSparkCampaign) return true
   return false
 })
 
@@ -773,6 +813,146 @@ const showAssociatedTasksOrTimeline = computed(
   () => showAssociatedTasks.value || showTimeline.value
 )
 
+function isCustomerSectionScrolledPast(scrollRoot, sectionEl) {
+  if (!scrollRoot || !sectionEl) return false
+  if (scrollRoot.scrollHeight <= scrollRoot.clientHeight + 1) return false
+  const rootRect = scrollRoot.getBoundingClientRect()
+  const y =
+    sectionEl.getBoundingClientRect().top -
+    rootRect.top +
+    scrollRoot.scrollTop
+  const sectionBottomInContent = y + sectionEl.offsetHeight
+  return scrollRoot.scrollTop >= sectionBottomInContent - 1
+}
+
+function updateCompactHeaderVisibility() {
+  const section = requestCustomerSectionRef.value
+  const mainCol = requestMainColumnScrollRef.value
+  const body = requestDetailBodyRef.value
+  if (!section) {
+    showCompactRequestHeader.value = false
+    return
+  }
+  if (isCustomerSectionScrolledPast(mainCol, section)) {
+    showCompactRequestHeader.value = true
+    return
+  }
+  if (isCustomerSectionScrolledPast(body, section)) {
+    showCompactRequestHeader.value = true
+    return
+  }
+  showCompactRequestHeader.value = false
+}
+
+function scheduleCompactHeaderUpdate() {
+  if (compactHeaderRafPending) return
+  compactHeaderRafPending = true
+  requestAnimationFrame(() => {
+    compactHeaderRafPending = false
+    updateCompactHeaderVisibility()
+  })
+}
+
+function attachScrollListenersToScrollableAncestors(el, onScroll) {
+  const cleanups = []
+  let node = el
+  while (node && node !== document.documentElement) {
+    const style = window.getComputedStyle(node)
+    const oy = style.overflowY
+    const canScroll =
+      (oy === 'auto' || oy === 'scroll' || oy === 'overlay') &&
+      node.scrollHeight > node.clientHeight + 1
+    if (canScroll) {
+      node.addEventListener('scroll', onScroll, { passive: true })
+      cleanups.push(() => node.removeEventListener('scroll', onScroll))
+    }
+    node = node.parentElement
+  }
+  return cleanups
+}
+
+function attachRequestHeaderCompactTracking() {
+  if (removeRequestHeaderCompactScrollListeners) {
+    removeRequestHeaderCompactScrollListeners()
+    removeRequestHeaderCompactScrollListeners = null
+  }
+  if (compactHeaderResizeObserver) {
+    compactHeaderResizeObserver.disconnect()
+    compactHeaderResizeObserver = null
+  }
+  if (requestHeaderCompactWindowResize) {
+    window.removeEventListener('resize', requestHeaderCompactWindowResize)
+    requestHeaderCompactWindowResize = null
+  }
+
+  const onScroll = () => scheduleCompactHeaderUpdate()
+  const cleanups = []
+  window.addEventListener('scroll', onScroll, true)
+  cleanups.push(() => window.removeEventListener('scroll', onScroll, true))
+
+  const mainCol = requestMainColumnScrollRef.value
+  const body = requestDetailBodyRef.value
+  if (mainCol) {
+    mainCol.addEventListener('scroll', onScroll, { passive: true })
+    cleanups.push(() => mainCol.removeEventListener('scroll', onScroll))
+    cleanups.push(...attachScrollListenersToScrollableAncestors(mainCol, onScroll))
+  }
+  if (body) {
+    body.addEventListener('scroll', onScroll, { passive: true })
+    cleanups.push(() => body.removeEventListener('scroll', onScroll))
+  }
+
+  removeRequestHeaderCompactScrollListeners = () => cleanups.forEach((fn) => fn())
+
+  requestHeaderCompactWindowResize = () => scheduleCompactHeaderUpdate()
+  window.addEventListener('resize', requestHeaderCompactWindowResize)
+
+  const section = requestCustomerSectionRef.value
+  const strip = requestHeaderStripRef.value
+  compactHeaderResizeObserver = new ResizeObserver(() => scheduleCompactHeaderUpdate())
+  if (section) compactHeaderResizeObserver.observe(section)
+  if (strip) compactHeaderResizeObserver.observe(strip)
+
+  scheduleCompactHeaderUpdate()
+}
+
+function setupRequestHeaderCompactTracking() {
+  showCompactRequestHeader.value = false
+  requestAnimationFrame(() => {
+    attachRequestHeaderCompactTracking()
+  })
+}
+
+watch(
+  () => [props.request?.compositeId, showAssociatedTasksOrTimeline.value],
+  async () => {
+    showCompactRequestHeader.value = false
+    await nextTick()
+    setupRequestHeaderCompactTracking()
+  },
+  { flush: 'post' }
+)
+
+onMounted(async () => {
+  await nextTick()
+  setupRequestHeaderCompactTracking()
+})
+
+onBeforeUnmount(() => {
+  if (removeRequestHeaderCompactScrollListeners) {
+    removeRequestHeaderCompactScrollListeners()
+    removeRequestHeaderCompactScrollListeners = null
+  }
+  if (compactHeaderResizeObserver) {
+    compactHeaderResizeObserver.disconnect()
+    compactHeaderResizeObserver = null
+  }
+  if (requestHeaderCompactWindowResize) {
+    window.removeEventListener('resize', requestHeaderCompactWindowResize)
+    requestHeaderCompactWindowResize = null
+  }
+})
+
 async function handleRequestedCarSave(carData) {
   const r = props.request
   if (!r?.id) return
@@ -795,7 +975,27 @@ function handleOpenAd() {}
 
 function handleMoreActions() {}
 
-function handleQuickAction() {
+function handleQuickAction(key) {
+  if (key === 'phone') {
+    showCallComingSoonModal.value = true
+    return
+  }
+  if (key === 'email') {
+    showEmailModal.value = true
+    return
+  }
+  if (key === 'whatsapp') {
+    showWhatsAppModal.value = true
+    return
+  }
+  if (key === 'document') {
+    showAttachmentModal.value = true
+    return
+  }
+  if (key === 'more') {
+    showNoteModal.value = true
+    return
+  }
   showGenericComingSoon.value = true
 }
 

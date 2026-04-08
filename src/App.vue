@@ -1,6 +1,6 @@
 <template>
-  <div id="app" class="h-screen">
-    <router-view />
+  <div id="app" class="flex h-dvh min-h-0 flex-col overflow-hidden">
+    <router-view class="min-h-0 flex-1 overflow-hidden" />
     <Toast :notifications="toastStore.notifications" :delay="toastStore.defaultDelayMs" />
   </div>
 </template>

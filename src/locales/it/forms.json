@@ -87,6 +87,11 @@
       "placeholder": "Filtra per team",
       "all": "Tutti i team"
     },
+    "assignee": {
+      "label": "Assegnatario",
+      "placeholder": "Filtra per assegnatario",
+      "all": "Tutti gli assegnatari"
+    },
     "eventType": {
       "label": "Tipo di evento",
       "placeholder": "Seleziona tipo di evento",

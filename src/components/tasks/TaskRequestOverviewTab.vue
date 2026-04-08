@@ -124,24 +124,35 @@
         :show-assignee-bar="false"
         class="mt-3"
       />
-      <div v-if="requestMessage" class="mt-3 pt-2">
-        <div class="text-sm text-muted-foreground mb-1">Message</div>
-        <div class="bg-muted rounded-lg p-2">
-          <p class="text-sm text-muted-foreground leading-relaxed line-clamp-3">{{ requestMessage }}</p>
-        </div>
-      </div>
+      <RequestMessageCard
+        v-if="showRequestMessageCard"
+        class="mt-3"
+        :title="t('requestDetail.messageCard.title')"
+        :message="task.requestMessage || task.requestedCar?.requestMessage || ''"
+        :utm-source="requestAttribution.utmSource"
+        :utm-term="requestAttribution.utmTerm"
+        :utm-campaign="requestAttribution.utmCampaign"
+        :web-spark-campaign="requestAttribution.webSparkCampaign"
+        :advertisement-url="requestAttribution.advertisementUrl"
+        :original-email-url="requestAttribution.originalEmailUrl"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Car } from 'lucide-vue-next'
 import { Badge, Button } from '@motork/component-library/future/primitives'
 import LeadOpportunityDetailsCard from '@/components/shared/LeadOpportunityDetailsCard.vue'
+import RequestMessageCard from '@/components/requests/RequestMessageCard.vue'
+import { getRequestAttributionProps } from '@/utils/requestAttribution'
 import { getStageColor } from '@/utils/stageMapper'
 import { calculateDaysSince } from '@/utils/formatters'
 import { getLatestOffer } from '@/utils/activityHelpers'
+
+const { t } = useI18n()
 
 const props = defineProps({
   task: {
@@ -171,7 +182,21 @@ const carYear = computed(() => props.task.requestedCar?.year || '')
 const carImage = computed(() => props.task.requestedCar?.image || '')
 const carPrice = computed(() => props.task.requestedCar?.price || null)
 const stockDays = computed(() => props.task.requestedCar?.stockDays !== undefined ? props.task.requestedCar.stockDays : null)
-const requestMessage = computed(() => props.task.requestedCar?.requestMessage || '')
+
+const requestAttribution = computed(() => getRequestAttributionProps(props.task))
+
+const showRequestMessageCard = computed(() => {
+  const r = props.task
+  if (!r) return false
+  const msg = (r.requestMessage || r.requestedCar?.requestMessage || '').trim()
+  if (msg) return true
+  if (r.utmSource || r.utmTerm || r.utmCampaign || r.webSparkCampaign) return true
+  if (r.originalMessageUrl) return true
+  if (r.requestedCar?.listingUrl || r.sourceUrl) return true
+  if (r.requestedCar?.adSource || r.requestedCar?.adCampaign) return true
+  if (r.requestedCar?.adMedium || r.requestedCar?.webSparkCampaign) return true
+  return false
+})
 
 // Mileage - support both kilometers (mock) and mileage
 const carMileage = computed(() => {

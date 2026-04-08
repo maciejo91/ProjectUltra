@@ -20,8 +20,37 @@
     "support": "Support",
     "groups": {
       "data": "Daten",
-      "actions": "Aktionen"
-    }
+      "actions": "Aktionen",
+      "workspace": "Arbeitsbereich"
+    },
+    "settingsSections": {
+      "administration": "Verwaltung",
+      "operations": "Betrieb",
+      "templates": "Vorlagen",
+      "prototype": "Prototyp"
+    },
+    "settingsPrototype": "Prototyp",
+    "settingsAdminFiscalEntities": "Finanzielle Einheiten",
+    "settingsAdminDealerships": "Händler",
+    "settingsAdminTeams": "Teams",
+    "settingsAdminUsers": "Benutzer",
+    "settingsAdminWhatsappBusiness": "WhatsApp Business",
+    "settingsOpsDataNormalization": "Datennormalisierung",
+    "settingsOpsSalesAlerts": "Verkaufsbenachrichtigungen",
+    "settingsOpsSalesTasks": "Verkaufsaufgaben",
+    "settingsOpsAfterSalesTasks": "After-Sales-Aufgaben",
+    "settingsOpsTimetablesAndHolidays": "Zeitpläne und Feiertage",
+    "settingsOpsQuotesAndContracts": "Angebote und Verträge",
+    "settingsOpsFailureReasons": "Fehlergründe",
+    "settingsOpsTags": "TAGs",
+    "settingsOpsSourcesDetail": "Quellen-Details",
+    "settingsOpsAfterSalesServices": "After-Sales-Services",
+    "settingsOpsCustomFields": "Benutzerdefinierte Felder",
+    "settingsOpsNotifications": "Benachrichtigungen",
+    "settingsOpsCalendarEvents": "Kalenderereignisse",
+    "settingsTplEmail": "E-Mail",
+    "settingsTplSms": "SMS",
+    "settingsTplSurvey": "Umfrage"
   },
   "pages": {
     "comingSoon": "Coming soon"
@@ -30,7 +59,8 @@
     "openSidebar": "Seitenleiste öffnen",
     "closeSidebar": "Seitenleiste schließen",
     "toggleSidebar": "Seitenleiste ein- oder ausklappen",
-    "userMenu": "Benutzermenü"
+    "userMenu": "Benutzermenü",
+    "goToMyProfile": "Zu meinem Profil"
   },
   "buttons": {
     "save": "Speichern",
@@ -69,6 +99,7 @@
     "createOpportunity": "Chance Erstellen",
     "createLead": "Lead Erstellen",
     "switchRole": "Rolle Wechseln",
+    "signOut": "Abmelden",
     "logout": "Abmelden",
     "lightMode": "Hellmodus",
     "darkMode": "Dunkelmodus"
