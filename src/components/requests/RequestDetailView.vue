@@ -209,14 +209,10 @@
               <template v-if="mainTab === 'overview' || mainTab === 'tasks'">
                 <div class="flex flex-col gap-4">
                 <RequestInsightBanner
-                  v-if="mainTab === 'overview' && insightMessage"
-                  class="shrink-0"
-                  :message="insightMessage"
-                />
-                <RequestInsightBanner
                   v-if="mainTab === 'overview' && overviewAiInsightMessage"
                   class="shrink-0"
                   :message="overviewAiInsightMessage"
+                  :generating="overviewAiInsightGenerating"
                 />
                 <RequestLeadQualificationTeaser
                   v-if="request?.type === 'lead' && !useFloatingLqBar"
@@ -629,6 +625,12 @@ const overviewAiInsightMessage = computed(() => {
   return ''
 })
 
+const overviewAiInsightGenerating = computed(() => {
+  const r = props.request
+  if (!r || r.type !== 'lead') return false
+  return !Boolean(r.aiSummary?.trim())
+})
+
 const requestFloatingBarScrollPadding = computed(() => {
   const tight =
     useFloatingLqBar.value && lqfShowTeaser.value && !lqfTeaserDismissed.value
@@ -749,22 +751,9 @@ const tradeInsCount = computed(() => props.request?.tradeIns?.length || 0)
 
 const financingOptionsCount = computed(() => props.request?.financingOptions?.length || 0)
 
-const insightMessage = computed(() => {
-  const r = props.request
-  if (!r) return ''
-  const car = r.requestedCar || r.vehicle
-  const days = car?.stockDays
-  const paid = r.channel === 'Paid' || r.channel === 'paid'
-  if (paid && typeof days === 'number' && days >= 5) {
-    return t('requestDetail.insight.highPaidStock', { days })
-  }
-  return ''
-})
-
 const overviewTabCount = computed(() => {
   let n = 0
   if (potentialDuplicates.value?.length) n += 1
-  if (insightMessage.value) n += 1
   if (lqfShowTeaser.value && !lqfTeaserDismissed.value && props.request?.type === 'lead') n += 1
   return n
 })
