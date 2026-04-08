@@ -115,7 +115,15 @@
       "noSlots": "Aucun créneau horaire disponible pour cette date",
       "selectDate": "Sélectionnez une date pour voir les créneaux horaires disponibles",
       "morning": "Matin",
-      "afternoon": "Après-midi"
+      "afternoon": "Après-midi",
+      "showMore": "Voir plus",
+      "showLess": "Voir moins"
+    },
+    "summary": {
+      "edit": "Modifier",
+      "dateTime": "Date et heure",
+      "internalNote": "Note interne sur l’événement",
+      "internalNotePlaceholder": "Note facultative, visible uniquement par votre équipe"
     },
     "slotPopover": {
       "people": "Personnes",

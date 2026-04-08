@@ -115,12 +115,20 @@
       "noSlots": "Keine verfügbaren Zeitslots für dieses Datum",
       "selectDate": "Wählen Sie ein Datum aus, um verfügbare Zeitslots anzuzeigen",
       "morning": "Vormittag",
-      "afternoon": "Nachmittag"
+      "afternoon": "Nachmittag",
+      "showMore": "Mehr anzeigen",
+      "showLess": "Weniger anzeigen"
     },
     "slotPopover": {
       "people": "Personen",
       "searchPlaceholder": "Nach Name oder Team suchen",
       "noResults": "Keine Treffer"
+    },
+    "summary": {
+      "edit": "Bearbeiten",
+      "dateTime": "Datum und Uhrzeit",
+      "internalNote": "Interne Notiz zum Termin",
+      "internalNotePlaceholder": "Optionale Notiz nur für Ihr Team"
     },
     "calendar": {
       "days": ["SO", "MO", "DI", "MI", "DO", "FR", "SA"]

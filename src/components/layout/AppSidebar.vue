@@ -1,7 +1,7 @@
 <template>
   <Sidebar
     side="left"
-    collapsible="icon"
+    :collapsible="isSettingsArea ? 'none' : 'icon'"
     variant="sidebar"
     class="border-sidebar-border overflow-x-hidden"
   >
@@ -52,9 +52,7 @@
       </template>
 
       <template v-else>
-        <div
-          class="flex min-w-0 w-full items-center gap-2 group-data-[collapsible=icon]:hidden"
-        >
+        <div class="flex min-w-0 w-full items-center gap-2">
           <RouterLink
             :to="firstVisibleRoute"
             class="flex size-8 shrink-0 items-center justify-center rounded-md outline-none ring-sidebar-ring transition-colors hover:bg-sidebar-accent focus-visible:ring-2"
@@ -67,26 +65,6 @@
           >
             {{ t('common.navigation.settings') }}
           </span>
-          <SidebarTrigger
-            class="shrink-0 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-            :aria-label="t('common.layout.toggleSidebar')"
-          />
-        </div>
-
-        <div
-          class="relative hidden h-10 w-full items-center justify-center group-data-[collapsible=icon]:flex"
-        >
-          <RouterLink
-            :to="firstVisibleRoute"
-            class="flex size-10 items-center justify-center rounded-md outline-none ring-sidebar-ring transition-opacity hover:bg-sidebar-accent focus-visible:ring-2 group-hover:pointer-events-none group-hover:opacity-0"
-            :aria-label="t('common.buttons.back')"
-          >
-            <ChevronLeft class="size-4 shrink-0 text-sidebar-foreground" />
-          </RouterLink>
-          <SidebarTrigger
-            class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 opacity-0 pointer-events-none transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-            :aria-label="t('common.layout.toggleSidebar')"
-          />
         </div>
       </template>
     </SidebarHeader>
@@ -285,7 +263,7 @@
       </SidebarGroup>
     </SidebarContent>
 
-    <SidebarRail />
+    <SidebarRail v-if="!isSettingsArea" />
 
     <ComingSoonModal
       :show="showMarketingModal"

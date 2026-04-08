@@ -74,7 +74,9 @@
     "timerTitleRunning": "Click to pause timer",
     "timerTitlePaused": "Click to resume timer",
     "inProgress": "In progress",
-    "nextStepQuestion": "What's next?"
+    "nextStepQuestion": "What's next?",
+    "backToCallOutcome": "Back to call outcome",
+    "backToWhatsNext": "Back to what's next"
   },
   "quickActions": {
     "phone": "Phone",

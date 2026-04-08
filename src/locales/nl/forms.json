@@ -115,12 +115,20 @@
       "noSlots": "Geen beschikbare tijdslots voor deze datum",
       "selectDate": "Selecteer een datum om beschikbare tijdslots te zien",
       "morning": "Ochtend",
-      "afternoon": "Namiddag"
+      "afternoon": "Namiddag",
+      "showMore": "Meer tonen",
+      "showLess": "Minder tonen"
     },
     "slotPopover": {
       "people": "Personen",
       "searchPlaceholder": "Zoek op naam of team",
       "noResults": "Geen resultaten"
+    },
+    "summary": {
+      "edit": "Bewerken",
+      "dateTime": "Datum en tijd",
+      "internalNote": "Interne notitie bij de afspraak",
+      "internalNotePlaceholder": "Optionele notitie, alleen zichtbaar voor je team"
     },
     "calendar": {
       "days": ["ZON", "MAA", "DIN", "WOE", "DON", "VRI", "ZAT"]

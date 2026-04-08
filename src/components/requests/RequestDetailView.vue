@@ -120,10 +120,7 @@
     <div
       ref="requestDetailBodyRef"
       v-if="showAssociatedTasksOrTimeline"
-      :class="[
-        'flex min-h-0 w-full flex-1 flex-col',
-        floatingLqFocusMode ? 'overflow-hidden' : 'max-lg:overflow-y-auto lg:overflow-hidden'
-      ]"
+      class="flex min-h-0 w-full flex-1 flex-col overflow-hidden"
     >
       <div v-if="request" ref="requestHeaderStripRef" class="w-full min-w-0 shrink-0">
         <RequestDetailCompactHeader
@@ -133,6 +130,7 @@
           :is-full-page="isFullPage"
           :show="true"
           layout="fullWidth"
+          :ai-summary="request?.type === 'lead' ? request.aiSummary || '' : ''"
           @close="$emit('close')"
           @previous="handlePrevious"
           @next="handleNext"
@@ -154,7 +152,7 @@
         />
       </div>
       <div
-        class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 p-4 lg:overflow-hidden"
+        class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-hidden p-4"
       >
         <DuplicateDetectedCard
           v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
@@ -164,17 +162,23 @@
           @dismiss="duplicateBannerDismissed = true"
         />
       <div
-        class="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-4 lg:overflow-hidden"
+        ref="requestDetailRowRef"
+        :class="[
+          'flex min-h-0 flex-1 flex-col gap-4 overflow-x-hidden overscroll-contain lg:flex-row lg:items-stretch lg:gap-4 lg:min-h-0',
+          'max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto',
+          'lg:overflow-hidden',
+          requestFloatingBarScrollPadding.row
+        ]"
       >
         <div
-          class="order-1 relative flex min-h-0 min-w-0 flex-col gap-0 lg:flex-1"
+          class="order-1 relative flex min-h-0 min-w-0 flex-col gap-4 lg:min-h-0 lg:min-w-0 lg:flex-1"
         >
           <div
             ref="requestMainColumnScrollRef"
             :class="[
-              'flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden overscroll-contain lg:min-h-0',
-              requestMainColumnScrollPb,
-              floatingLqFocusMode && 'overflow-hidden'
+              'flex min-h-0 min-w-0 flex-1 flex-col gap-4 max-lg:overflow-visible',
+              'lg:overflow-y-auto lg:overflow-x-hidden lg:overscroll-contain lg:min-h-0',
+              requestFloatingBarScrollPadding.main
             ]"
           >
           <div class="flex min-w-0 shrink-0 flex-col gap-4">
@@ -195,13 +199,13 @@
             </div>
 
             <div
-              class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-background"
+              class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg bg-background"
             >
               <div class="shrink-0 px-4 pt-2">
                 <RequestMainTabs class="shrink-0" v-model="mainTab" :tabs="mainTabs" />
               </div>
 
-              <div class="flex min-h-0 flex-1 flex-col gap-4 border-t border-border p-4">
+              <div class="flex shrink-0 flex-col gap-4 border-t border-border p-4">
               <template v-if="mainTab === 'overview' || mainTab === 'tasks'">
                 <div class="flex flex-col gap-4">
                 <RequestInsightBanner
@@ -210,9 +214,9 @@
                   :message="insightMessage"
                 />
                 <RequestInsightBanner
-                  v-if="mainTab === 'overview' && showFloatingLqOverviewExtras"
+                  v-if="mainTab === 'overview' && overviewAiInsightMessage"
                   class="shrink-0"
-                  :message="t('requestDetail.aiOverviewSummary')"
+                  :message="overviewAiInsightMessage"
                 />
                 <RequestLeadQualificationTeaser
                   v-if="request?.type === 'lead' && !useFloatingLqBar"
@@ -357,7 +361,6 @@
               </div>
             </div>
           </div>
-          </div>
           <RequestFloatingLqTaskBar
             v-if="useFloatingLqBar && lqfShowTeaser && !lqfTeaserDismissed && request"
             :request="request"
@@ -375,11 +378,12 @@
             @open-purchase-method="handleLqfOpenPurchaseMethod"
             @open-trade-in="handleLqfOpenTradeIn"
           />
+          </div>
         </div>
 
         <div
           :class="[
-            'order-2 flex min-w-0 flex-col gap-4 lg:sticky lg:top-0 lg:w-1/4 lg:shrink-0 lg:self-start',
+            'order-2 flex min-h-0 min-w-0 flex-col gap-4 lg:sticky lg:top-0 lg:w-1/4 lg:shrink-0 lg:self-start lg:max-h-[calc(100vh-4rem)] lg:overscroll-contain',
             floatingLqFocusMode ? 'lg:overflow-hidden' : 'lg:overflow-y-auto'
           ]"
         >
@@ -511,6 +515,7 @@ const editingFinancingOption = ref(null)
 const tradeInActionLoading = ref(false)
 const duplicateBannerDismissed = ref(false)
 const requestMainColumnScrollRef = ref(null)
+const requestDetailRowRef = ref(null)
 const requestDetailBodyRef = ref(null)
 const requestHeaderStripRef = ref(null)
 const requestCustomerSectionRef = ref(null)
@@ -616,11 +621,21 @@ const showFloatingLqOverviewExtras = computed(
     props.request?.type === 'lead'
 )
 
-const requestMainColumnScrollPb = computed(() =>
-  useFloatingLqBar.value && lqfShowTeaser.value && !lqfTeaserDismissed.value
-    ? 'pb-72'
-    : 'pb-32'
-)
+const overviewAiInsightMessage = computed(() => {
+  const r = props.request
+  if (!r || r.type !== 'lead') return ''
+  if (r.aiSummary?.trim()) return r.aiSummary.trim()
+  if (showFloatingLqOverviewExtras.value) return t('requestDetail.aiOverviewSummary')
+  return ''
+})
+
+const requestFloatingBarScrollPadding = computed(() => {
+  const tight =
+    useFloatingLqBar.value && lqfShowTeaser.value && !lqfTeaserDismissed.value
+  return tight
+    ? { row: 'max-lg:pb-4', main: 'lg:pb-4' }
+    : { row: 'max-lg:pb-32', main: 'lg:pb-32' }
+})
 
 watch(
   () => lqfShowTeaser.value,
@@ -825,9 +840,16 @@ function isCustomerSectionScrolledPast(scrollRoot, sectionEl) {
   return scrollRoot.scrollTop >= sectionBottomInContent - 1
 }
 
+function getScrollRootForHeader() {
+  if (typeof window === 'undefined') return requestMainColumnScrollRef.value
+  return window.matchMedia('(min-width: 1024px)').matches
+    ? requestMainColumnScrollRef.value
+    : requestDetailRowRef.value
+}
+
 function updateCompactHeaderVisibility() {
   const section = requestCustomerSectionRef.value
-  const mainCol = requestMainColumnScrollRef.value
+  const mainCol = getScrollRootForHeader()
   const body = requestDetailBodyRef.value
   if (!section) {
     showCompactRequestHeader.value = false
@@ -891,11 +913,17 @@ function attachRequestHeaderCompactTracking() {
   cleanups.push(() => window.removeEventListener('scroll', onScroll, true))
 
   const mainCol = requestMainColumnScrollRef.value
+  const row = requestDetailRowRef.value
   const body = requestDetailBodyRef.value
   if (mainCol) {
     mainCol.addEventListener('scroll', onScroll, { passive: true })
     cleanups.push(() => mainCol.removeEventListener('scroll', onScroll))
     cleanups.push(...attachScrollListenersToScrollableAncestors(mainCol, onScroll))
+  }
+  if (row) {
+    row.addEventListener('scroll', onScroll, { passive: true })
+    cleanups.push(() => row.removeEventListener('scroll', onScroll))
+    cleanups.push(...attachScrollListenersToScrollableAncestors(row, onScroll))
   }
   if (body) {
     body.addEventListener('scroll', onScroll, { passive: true })

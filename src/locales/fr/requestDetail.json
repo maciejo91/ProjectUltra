@@ -74,7 +74,9 @@
     "timerTitleRunning": "Cliquer pour mettre en pause",
     "timerTitlePaused": "Cliquer pour reprendre",
     "inProgress": "In progress",
-    "nextStepQuestion": "Et ensuite ?"
+    "nextStepQuestion": "Et ensuite ?",
+    "backToCallOutcome": "Retour au résultat de l’appel",
+    "backToWhatsNext": "Retour à la suite"
   },
   "quickActions": {
     "phone": "Téléphone",

@@ -65,10 +65,10 @@
     </div>
 
     <!-- Step 3: Schedule (Calendar and Time Slots) - only after event type is selected (same as LQTask) -->
-    <div v-if="eventType" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+    <div v-if="eventType" class="bg-white rounded-lg shadow-nsc-card overflow-x-hidden overflow-y-visible p-6">
       <h5 class="font-semibold text-foreground text-sm mb-4">Schedule <span class="text-red-600">*</span></h5>
-      <div class="min-w-0 bg-white border border-border rounded-lg overflow-hidden">
-        <div class="flex min-w-0 flex-col md:flex-row md:divide-x md:divide-black/5">
+      <div class="min-w-0 bg-white border border-border rounded-lg overflow-x-hidden overflow-y-visible">
+        <div class="flex min-w-0 flex-col md:flex-row md:items-start md:divide-x md:divide-black/5">
           <div v-if="selectedDate" class="shrink-0 w-fit max-w-full min-w-0">
             <MiniCalendar
               v-model="selectedDate"
@@ -76,7 +76,7 @@
               class="gap-2 p-3"
             />
           </div>
-          <div class="min-w-0 min-h-0 overflow-x-hidden p-6 flex flex-col md:flex-1">
+          <div class="min-w-0 overflow-x-hidden p-6 flex flex-col md:flex-1">
             <h6 class="text-sm font-semibold text-foreground mb-4">{{ selectedDateLabel }}</h6>
             <div v-if="selectedDate && availableScheduleSlots.length > 0" class="schedule-slot-toggle-group flex flex-col gap-2 w-full space-y-2">
               <Toggle

@@ -1,17 +1,13 @@
 <template>
-  <div
-    class="pointer-events-none absolute inset-x-0 bottom-0 top-0 z-20 flex min-h-0 flex-col justify-end px-2 pb-4"
-  >
-    <div
-      class="pointer-events-auto relative z-20 flex min-h-0 max-h-full w-full flex-col justify-end"
-    >
+  <div class="relative z-20 flex h-auto max-h-none w-full shrink-0 flex-col px-2 pb-4 pt-2">
+    <div class="relative z-20 flex h-auto max-h-none w-full shrink-0 flex-col">
       <div
         ref="panelShellRef"
         :role="isFocusMode ? 'dialog' : undefined"
         :aria-modal="isFocusMode"
         :aria-labelledby="focusTitleId"
         :class="[
-          'flex max-h-full min-h-0 w-full flex-col rounded-xl',
+          'flex min-h-min w-full shrink-0 flex-col overflow-visible rounded-xl',
           isFocusMode ? 'bg-mk-floating-lq-chrome p-1 shadow-mk-floating-lq-panel' : 'bg-transparent p-0'
         ]"
       >
@@ -67,7 +63,7 @@
 
         <div
           v-else
-          class="flex min-h-0 w-full flex-1 flex-col overflow-y-auto overscroll-contain rounded-xl"
+          class="flex min-h-min w-full shrink-0 flex-col overflow-visible rounded-xl"
         >
           <RequestLqTaskHeaderRow
             ref="expandedHeaderRef"
@@ -91,7 +87,7 @@
 
           <RequestLqTaskExpandedOutcomeShell
             :active="view === 'expanded'"
-            :flex-fill="true"
+            :flex-fill="false"
             :use-shell-scroll="false"
           >
             <LeadManagementWidget

@@ -4,102 +4,126 @@
     :aria-hidden="ariaHidden"
   >
     <template v-if="request">
-      <Button
-        v-if="isFullPage"
-        variant="ghost"
-        size="icon-sm"
-        class="shrink-0 rounded-md"
-        :aria-label="t('requestDetail.headerBack')"
-        @click="$emit('close')"
+      <div
+        class="grid w-full min-w-0 grid-cols-1 gap-2 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:items-start lg:gap-x-3"
       >
-        <ChevronLeft class="size-4 text-muted-foreground" />
-      </Button>
+        <div class="flex min-w-0 items-start gap-2">
+          <Button
+            v-if="isFullPage"
+            variant="ghost"
+            size="icon-sm"
+            class="size-10 shrink-0 rounded-md"
+            :aria-label="t('requestDetail.headerBack')"
+            @click="$emit('close')"
+          >
+            <ChevronLeft class="size-4 text-muted-foreground" />
+          </Button>
+          <div
+            v-else
+            class="size-10 shrink-0"
+            aria-hidden="true"
+          />
+          <div class="flex min-w-0 flex-1 flex-col gap-0">
+            <div class="flex w-full min-w-0 items-center justify-between gap-2">
+              <div class="min-w-0 flex-1 overflow-hidden">
+                <p class="truncate text-sm leading-tight whitespace-nowrap">
+                  <span class="font-semibold text-foreground">{{ nameParts.primary || '—' }}</span>
+                  <span class="text-sm font-normal text-muted-foreground">
+                    <template v-if="customerCityLabel">{{ ' · ' }}{{ customerCityLabel }}</template>
+                    <template v-if="nameParts.location">{{ ' · ' }}{{ nameParts.location }}</template>
+                    {{ ' · ' }}{{ t('requestDetail.headerDetailLabelSource') }}
+                  </span>
+                  <span class="text-sm font-normal text-foreground">{{ ' ' + sourceLabel }}</span>
+                </p>
+              </div>
+              <div class="flex shrink-0 flex-wrap items-center justify-end gap-0.5">
+                <Button
+                  v-for="item in quickActionItems"
+                  :key="item.key"
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  class="shrink-0 rounded-md"
+                  :aria-label="item.label"
+                  @click="$emit('quick-action', item.key)"
+                >
+                  <component :is="item.icon" class="size-4 text-muted-foreground" />
+                </Button>
+              </div>
+            </div>
+            <RequestInsightBanner
+              v-if="showLeadAiSummary"
+              compact
+              class="mt-1.5"
+              :message="aiSummary"
+            />
+          </div>
+        </div>
 
-      <div class="min-w-0 flex-1 basis-0">
-        <p class="truncate text-sm font-semibold leading-tight text-foreground">
-          <span>{{ nameParts.primary || '—' }}</span>
-          <span v-if="nameParts.location" class="text-muted-foreground">{{ ' ' }}{{ nameParts.location }}</span>
-        </p>
-        <p class="mt-0.5 truncate text-xs text-muted-foreground">
-          <span class="text-muted-foreground">{{ t('requestDetail.headerDetailLabelSource') }}</span>
-          <span class="text-foreground"> {{ sourceLabel }}</span>
-        </p>
-      </div>
-
-      <div class="flex shrink-0 flex-wrap items-center justify-end gap-0.5">
-        <Button
-          v-for="item in quickActionItems"
-          :key="item.key"
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          class="shrink-0 rounded-md"
-          :aria-label="item.label"
-          @click="$emit('quick-action', item.key)"
+        <div
+          class="flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-2 lg:justify-end"
         >
-          <component :is="item.icon" class="size-4 text-muted-foreground" />
-        </Button>
-      </div>
+          <DropdownMenu :modal="false">
+            <DropdownMenuTrigger as-child>
+              <button
+                type="button"
+                class="shrink-0 rounded-full border border-transparent p-0 transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                :aria-label="lifecycleAriaLabel || t('requestDetail.headerLifecycleMenuAria')"
+              >
+                <RequestHeaderLifecycleStepper :steps="lifecycleSteps" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent class="max-h-64 min-w-48 overflow-y-auto p-1.5" align="end">
+              <DropdownMenuItem
+                v-for="stage in statusOptions"
+                :key="stage"
+                class="flex cursor-pointer items-center rounded-sm px-2 py-1.5"
+                @select="emit('update-status', stage)"
+              >
+                <span
+                  class="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium leading-none"
+                  :class="[
+                    getStageColorClass(stage),
+                    stage === displayStage && 'ring-1 ring-ring ring-inset'
+                  ]"
+                >
+                  {{ stage }}
+                </span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-      <DropdownMenu :modal="false">
-        <DropdownMenuTrigger as-child>
-          <button
-            type="button"
-            class="shrink-0 rounded-full border border-transparent p-0 transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            :aria-label="lifecycleAriaLabel || t('requestDetail.headerLifecycleMenuAria')"
-          >
-            <RequestHeaderLifecycleStepper :steps="lifecycleSteps" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent class="max-h-64 min-w-48 overflow-y-auto p-1.5" align="end">
-          <DropdownMenuItem
-            v-for="stage in statusOptions"
-            :key="stage"
-            class="flex cursor-pointer items-center rounded-sm px-2 py-1.5"
-            @select="emit('update-status', stage)"
-          >
-            <span
-              class="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium leading-none"
-              :class="[
-                getStageColorClass(stage),
-                stage === displayStage && 'ring-1 ring-ring ring-inset'
-              ]"
+          <div class="flex shrink-0 items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon-sm"
+              class="rounded-md"
+              :disabled="!hasPrevious"
+              @click="$emit('previous')"
             >
-              {{ stage }}
-            </span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <div class="flex shrink-0 items-center gap-2">
-        <Button
-          variant="outline"
-          size="icon-sm"
-          class="rounded-md"
-          :disabled="!hasPrevious"
-          @click="$emit('previous')"
-        >
-          <ChevronLeft class="size-4 text-muted-foreground" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          class="rounded-md"
-          :disabled="!hasNext"
-          @click="$emit('next')"
-        >
-          <ChevronRight class="size-4 text-muted-foreground" />
-        </Button>
-        <Button
-          v-if="!isFullPage"
-          variant="outline"
-          size="icon-sm"
-          class="rounded-md"
-          :aria-label="t('common.buttons.close')"
-          @click="$emit('close')"
-        >
-          <X class="size-4 text-muted-foreground" />
-        </Button>
+              <ChevronLeft class="size-4 text-muted-foreground" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              class="rounded-md"
+              :disabled="!hasNext"
+              @click="$emit('next')"
+            >
+              <ChevronRight class="size-4 text-muted-foreground" />
+            </Button>
+            <Button
+              v-if="!isFullPage"
+              variant="outline"
+              size="icon-sm"
+              class="rounded-md"
+              :aria-label="t('common.buttons.close')"
+              @click="$emit('close')"
+            >
+              <X class="size-4 text-muted-foreground" />
+            </Button>
+          </div>
+        </div>
       </div>
     </template>
   </header>
@@ -126,9 +150,10 @@ import {
   DropdownMenuItem
 } from '@motork/component-library/future/primitives'
 import RequestHeaderLifecycleStepper from './RequestHeaderLifecycleStepper.vue'
+import RequestInsightBanner from './RequestInsightBanner.vue'
 import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
-import { getCustomerNameParts } from '@/utils/customerDisplay'
+import { getCustomerCityLabel, getCustomerNameParts } from '@/utils/customerDisplay'
 
 const props = defineProps({
   request: {
@@ -150,6 +175,10 @@ const props = defineProps({
   layout: {
     type: String,
     default: 'sticky'
+  },
+  aiSummary: {
+    type: String,
+    default: ''
   }
 })
 
@@ -181,7 +210,13 @@ const ariaHidden = computed(() => {
 
 const nameParts = computed(() => getCustomerNameParts(props.request?.customer?.name))
 
+const customerCityLabel = computed(() => getCustomerCityLabel(props.request?.customer))
+
 const sourceLabel = computed(() => props.request?.source || '—')
+
+const showLeadAiSummary = computed(
+  () => props.request?.type === 'lead' && Boolean(props.aiSummary?.trim())
+)
 
 const quickActionItems = computed(() => [
   { key: 'phone', icon: PhoneCall, label: t('requestDetail.quickActions.phone') },

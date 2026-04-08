@@ -115,12 +115,20 @@
       "noSlots": "Nessuno slot orario disponibile per questa data",
       "selectDate": "Seleziona una data per vedere gli slot orari disponibili",
       "morning": "Mattina",
-      "afternoon": "Pomeriggio"
+      "afternoon": "Pomeriggio",
+      "showMore": "Mostra altro",
+      "showLess": "Mostra meno"
     },
     "slotPopover": {
       "people": "Persone",
       "searchPlaceholder": "Cerca per nome o team",
       "noResults": "Nessun risultato"
+    },
+    "summary": {
+      "edit": "Modifica",
+      "dateTime": "Data e ora",
+      "internalNote": "Nota interna sull’evento",
+      "internalNotePlaceholder": "Nota facoltativa visibile solo al team"
     },
     "calendar": {
       "days": ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"]

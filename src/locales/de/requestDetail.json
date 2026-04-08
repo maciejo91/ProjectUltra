@@ -74,7 +74,9 @@
     "timerTitleRunning": "Klicken, um den Timer zu pausieren",
     "timerTitlePaused": "Klicken, um den Timer fortzusetzen",
     "inProgress": "In progress",
-    "nextStepQuestion": "Wie geht es weiter?"
+    "nextStepQuestion": "Wie geht es weiter?",
+    "backToCallOutcome": "Zurück zur Anrufauswertung",
+    "backToWhatsNext": "Zurück zu „Wie geht es weiter?“"
   },
   "quickActions": {
     "phone": "Telefon",

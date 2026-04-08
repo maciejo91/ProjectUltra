@@ -1,5 +1,5 @@
 <template>
-  <div class="relative">
+  <div class="relative h-auto max-h-none w-full shrink-0">
   <PostponeTaskDialog
     :show="showPostponeDueDateDialog"
     task-type="lead"

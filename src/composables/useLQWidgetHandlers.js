@@ -5,7 +5,7 @@ import { LEAD_STAGES } from '@/utils/stageMapper'
  * Coordinates between call and outcome composables
  * @param {Object} currentUserRef - optional ref to current user for "Updated by" in success state
  */
-export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contactAttemptsRef, maxContactAttemptsRef, leadsStore, currentUserRef, enrichLeadDataRef = null) {
+export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contactAttemptsRef, maxContactAttemptsRef, leadsStore, currentUserRef, enrichLeadDataRef = null, qualificationScheduleInternalNoteRef = null) {
   const { callData, extractedData, isCallActive, callEnded } = callState
   const {
     showOutcomeSelection,
@@ -118,6 +118,7 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
       const day = String(d.getDate()).padStart(2, '0')
       const dateFormatted = `${year}-${month}-${day}`
       
+      const internalNote = (qualificationScheduleInternalNoteRef?.value || '').trim()
       appointmentData = {
         datetime: d,
         date: dateFormatted,
@@ -131,7 +132,8 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
         teamId: qualificationSelectedTeam.value?.id || null,
         salesperson: qualificationSelectedSalesman.value?.name || null,
         salespersonId: qualificationSelectedSalesman.value?.id || null,
-        department: qualificationScheduleDepartment.value || null
+        department: qualificationScheduleDepartment.value || null,
+        internalNote: internalNote || null
       }
       meeting = {
         date: dateStr,

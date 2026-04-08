@@ -101,7 +101,14 @@ export class LeadRepository extends BaseRepository {
     if (!Array.isArray(leads)) return
     const mockLeads = getMockData().mockLeads || []
     const mockById = new Map(mockLeads.map((l) => [l.id, l]))
-    const topKeys = ['utmSource', 'utmTerm', 'utmCampaign', 'webSparkCampaign', 'originalMessageUrl']
+    const topKeys = [
+      'utmSource',
+      'utmTerm',
+      'utmCampaign',
+      'webSparkCampaign',
+      'originalMessageUrl',
+      'aiSummary'
+    ]
     let changed = false
     for (const lead of leads) {
       const mock = mockById.get(lead.id)

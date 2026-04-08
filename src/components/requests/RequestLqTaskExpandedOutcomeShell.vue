@@ -1,14 +1,16 @@
 <template>
   <div
     :class="[
-      'relative flex min-h-0 flex-col rounded-lg shadow-nsc-card',
-      flexFill && (useShellScroll ? 'flex-1' : 'w-full shrink-0')
+      'relative flex w-full flex-col rounded-lg shadow-nsc-card',
+      useShellScroll ? 'min-h-0' : 'h-auto max-h-none shrink-0',
+      flexFill && (useShellScroll ? 'flex-1' : 'shrink-0')
     ]"
   >
     <div
       :class="[
-        'relative flex min-h-0 flex-col rounded-lg border-2 border-transparent bg-background',
+        'relative flex flex-col rounded-lg border-2 border-transparent bg-background',
         shellOverflowClass,
+        useShellScroll ? 'min-h-0' : 'h-auto max-h-none shrink-0',
         flexFill && useShellScroll && 'flex-1'
       ]"
     >
@@ -50,14 +52,16 @@
       </svg>
       <div
         :class="[
-          'relative z-20 m-1 flex min-h-0 flex-col rounded-md bg-muted',
+          'relative z-20 m-1 flex flex-col rounded-md bg-muted',
           shellOverflowClass,
+          useShellScroll ? 'min-h-0' : 'h-auto max-h-none shrink-0',
           flexFill && useShellScroll && 'flex-1'
         ]"
       >
         <div
           :class="[
-            'min-h-0 px-2 pb-3 pt-2',
+            'px-2 pb-3 pt-2',
+            useShellScroll ? 'min-h-0' : 'h-auto max-h-none',
             contentScrollClass
           ]"
         >

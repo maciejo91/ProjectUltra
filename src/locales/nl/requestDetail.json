@@ -74,7 +74,9 @@
     "timerTitleRunning": "Klik om te pauzeren",
     "timerTitlePaused": "Klik om te hervatten",
     "inProgress": "In progress",
-    "nextStepQuestion": "Wat nu?"
+    "nextStepQuestion": "Wat nu?",
+    "backToCallOutcome": "Terug naar uitkomst oproep",
+    "backToWhatsNext": "Terug naar wat nu"
   },
   "quickActions": {
     "phone": "Telefoon",

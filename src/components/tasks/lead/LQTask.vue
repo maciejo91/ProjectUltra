@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex h-auto max-h-none w-full shrink-0 flex-col">
     <!-- Loading state before outcome (closing / postponing) -->
     <template v-if="outcomeSaving">
       <div class="flex-1 min-h-0 flex items-center justify-center rounded-lg bg-muted/80 py-4" aria-busy="true" aria-label="Saving outcome">
@@ -189,7 +189,19 @@
 
           <!-- What's next? (when outcome is no-answer or answer) -->
           <div v-if="selectedOutcome === 'no-answer'" class="space-y-2">
-            <p class="text-sm font-medium text-foreground leading-normal mb-2">{{ t('requestDetail.lqfTask.nextStepQuestion') }}</p>
+            <div class="space-y-2 mb-2">
+              <div>
+                <button
+                  type="button"
+                  class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  :aria-label="t('requestDetail.lqfTask.backToCallOutcome')"
+                  @click="handleBackToCallOutcome"
+                >
+                  <ArrowLeft class="size-4" aria-hidden="true" />
+                </button>
+              </div>
+              <p class="text-sm font-medium text-foreground leading-normal">{{ t('requestDetail.lqfTask.nextStepQuestion') }}</p>
+            </div>
             <div class="outcome-toggle-group grid grid-cols-2 gap-3 w-4/5">
               <Toggle
                 variant="outline"
@@ -212,7 +224,19 @@
             </div>
           </div>
           <div v-if="selectedOutcome === 'answer' && !selectedNextStep" class="space-y-2 w-full">
-            <p class="text-sm font-medium text-foreground leading-normal mb-2">{{ t('requestDetail.lqfTask.nextStepQuestion') }}</p>
+            <div class="space-y-2 mb-2">
+              <div>
+                <button
+                  type="button"
+                  class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  :aria-label="t('requestDetail.lqfTask.backToCallOutcome')"
+                  @click="handleBackToCallOutcome"
+                >
+                  <ArrowLeft class="size-4" aria-hidden="true" />
+                </button>
+              </div>
+              <p class="text-sm font-medium text-foreground leading-normal">{{ t('requestDetail.lqfTask.nextStepQuestion') }}</p>
+            </div>
             <div class="outcome-toggle-group grid grid-cols-3 gap-3 w-4/5">
               <Toggle
                 variant="outline"
@@ -246,6 +270,16 @@
 
           <!-- No Answer + Postpone: follow-up and next call attempt -->
           <div v-if="selectedOutcome === 'no-answer' && selectedNextStep === 'postpone'" ref="expandedOutcomeRef" class="space-y-4">
+            <div>
+              <button
+                type="button"
+                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                :aria-label="t('requestDetail.lqfTask.backToWhatsNext')"
+                @click="handleBackToWhatsNextChoices"
+              >
+                <ArrowLeft class="size-4" aria-hidden="true" />
+              </button>
+            </div>
             <!-- When did you call field -->
             <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
               <Label class="form-label">When did you call?</Label>
@@ -431,6 +465,16 @@
 
           <!-- No Answer + Close lead: reuse close reason card -->
           <div v-if="selectedOutcome === 'no-answer' && selectedNextStep === 'close-lead'" ref="expandedOutcomeRef" class="space-y-4">
+            <div>
+              <button
+                type="button"
+                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                :aria-label="t('requestDetail.lqfTask.backToWhatsNext')"
+                @click="handleBackToWhatsNextChoices"
+              >
+                <ArrowLeft class="size-4" aria-hidden="true" />
+              </button>
+            </div>
             <div class="bg-white rounded-lg p-4 shadow-nsc-card">
               <Label class="form-label">When did you call?</Label>
               <Input
@@ -450,6 +494,16 @@
 
           <!-- Not Valid (or Answer + Not interested): close as lost -->
           <div v-if="(selectedOutcome === 'not-valid') || (selectedOutcome === 'answer' && selectedNextStep === 'not-interested')" ref="expandedOutcomeRef" class="space-y-4">
+            <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'not-interested'">
+              <button
+                type="button"
+                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                :aria-label="t('requestDetail.lqfTask.backToWhatsNext')"
+                @click="handleBackToWhatsNextChoices"
+              >
+                <ArrowLeft class="size-4" aria-hidden="true" />
+              </button>
+            </div>
             <p
               v-if="selectedOutcome === 'not-valid'"
               class="text-sm font-medium text-foreground leading-normal mb-2"
@@ -476,6 +530,16 @@
 
       <!-- Answer + Interested (Inline) -->
           <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'interested'" ref="expandedOutcomeRef" class="space-y-4">
+            <div>
+              <button
+                type="button"
+                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                :aria-label="t('requestDetail.lqfTask.backToWhatsNext')"
+                @click="handleBackToWhatsNextChoices"
+              >
+                <ArrowLeft class="size-4" aria-hidden="true" />
+              </button>
+            </div>
             <!-- Info note -->
             <div class="text-sm text-muted-foreground">
               <span class="text-red-600">*</span> Required fields
@@ -592,9 +656,69 @@
 
             <div class="space-y-4">
               <!-- Schedule: filters + event type + calendar / slots -->
-              <div ref="eventTypeExpandedRef" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
+              <div ref="eventTypeExpandedRef" class="bg-white rounded-lg shadow-nsc-card overflow-x-hidden overflow-y-visible p-4">
                 <h5 class="font-semibold text-foreground text-sm mb-4">{{ t('forms.schedule.title') }} <span class="text-red-600">*</span></h5>
 
+                <div
+                  v-if="qualificationScheduleSummaryVisible"
+                  class="rounded-lg border border-border bg-muted/40 overflow-hidden"
+                >
+                  <div class="flex min-w-0 gap-0">
+                    <div class="w-1 shrink-0 bg-primary" aria-hidden="true" />
+                    <div class="flex-1 min-w-0 p-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div class="space-y-3 min-w-0 flex-1">
+                        <p class="text-sm font-semibold text-foreground leading-snug">
+                          {{ qualificationScheduleEventTypeLabel }}
+                        </p>
+                        <p class="text-sm text-foreground">
+                          <span class="text-muted-foreground">{{ t('forms.schedule.summary.dateTime') }}</span>
+                          {{ selectedQualificationDateLabel }}
+                          <span class="text-muted-foreground" aria-hidden="true"> · </span>
+                          {{ qualificationSelectedSlot }}
+                        </p>
+                        <div class="flex items-start gap-3 min-w-0">
+                          <span class="text-sm text-muted-foreground shrink-0 pt-0.5">{{ t('forms.schedule.assignee.label') }}</span>
+                          <div class="flex items-center gap-2 min-w-0">
+                            <div
+                              v-if="qualificationScheduleSummaryAssigneeIsUser"
+                              class="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
+                              :class="getRoleAvatarClass(qualificationSelectedSalesman?.role)"
+                            >
+                              {{ getInitials(qualificationSelectedSalesman?.name) }}
+                            </div>
+                            <div
+                              v-else
+                              class="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0"
+                            >
+                              <Users class="w-4 h-4 text-muted-foreground" aria-hidden="true" />
+                            </div>
+                            <span class="text-sm font-medium text-foreground truncate">{{ qualificationScheduleSummaryAssigneeName }}</span>
+                          </div>
+                        </div>
+                        <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm">
+                          <span class="text-muted-foreground shrink-0">{{ t('forms.schedule.dealership.label') }}</span>
+                          <span class="text-foreground">{{ qualificationScheduleSummaryDealership || '—' }}</span>
+                        </div>
+                        <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm">
+                          <span class="text-muted-foreground shrink-0">{{ t('forms.schedule.team.label') }}</span>
+                          <span class="text-foreground">{{ qualificationScheduleSummaryTeamName || '—' }}</span>
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        class="rounded-sm shrink-0 w-full sm:w-auto"
+                        @click="openQualificationScheduleEditor"
+                      >
+                        <Pencil class="w-4 h-4 shrink-0 mr-2" aria-hidden="true" />
+                        {{ t('forms.schedule.summary.edit') }}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <template v-else>
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-3 mb-6">
                   <div>
                     <Label class="form-label mb-2">{{ t('forms.schedule.dealership.label') }}</Label>
@@ -658,12 +782,12 @@
                 <!-- Calendar and Time Slots - Two Column Layout -->
                 <div
                   v-if="qualificationEventType && qualificationSelectedDate"
-                  class="min-w-0 bg-white rounded-lg border border-border overflow-hidden"
+                  class="min-w-0 bg-white rounded-lg border border-border overflow-x-hidden overflow-y-visible"
                 >
                   <div
-                    class="flex min-w-0 flex-col md:flex-row md:divide-x md:divide-black/5"
+                    class="flex min-w-0 flex-col md:flex-row md:items-start md:divide-x md:divide-black/5"
                   >
-                    <div class="shrink-0 w-fit max-w-full min-w-0">
+                    <div class="shrink-0 max-w-full min-w-0 md:min-w-80">
                       <MiniCalendar
                         v-model="qualificationSelectedDate"
                         :preserve-day-when-changing-month="true"
@@ -672,7 +796,7 @@
                     </div>
 
                     <!-- Right column: unique time slots; slot opens popover (assignee list) -->
-                    <div class="min-w-0 min-h-0 overflow-x-hidden p-4 flex flex-col md:flex-1">
+                    <div class="min-w-0 overflow-x-hidden p-4 flex flex-col md:flex-1">
                       <div
                         class="flex items-center gap-3 mb-3 shrink-0 min-w-0 w-full"
                       >
@@ -703,20 +827,21 @@
                       </div>
                       <div
                         v-if="qualificationSelectedDate && uniqueSlotsForSelectedDate.length > 0"
-                        class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full"
+                        class="flex flex-col gap-2 w-full"
                       >
-                        <div
-                          v-for="column in scheduleSlotColumns"
-                          :key="column.key"
-                          class="flex flex-col min-w-0"
-                        >
-                          <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground shrink-0 mb-2">
-                            {{ column.label }}
-                          </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                           <div
-                            class="schedule-slot-toggle-group flex flex-col gap-2"
+                            v-for="column in scheduleSlotColumnsDisplay"
+                            :key="column.key"
+                            class="flex flex-col min-w-0"
                           >
-                            <template v-for="slot in column.slots" :key="slot">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground shrink-0 mb-2">
+                              {{ column.label }}
+                            </p>
+                            <div
+                              class="schedule-slot-toggle-group flex flex-col gap-2"
+                            >
+                              <template v-for="slot in column.slots" :key="slot">
                               <button
                                 v-if="!shouldPickAssigneeViaPopover"
                                 type="button"
@@ -799,9 +924,24 @@
                                   </div>
                                 </PopoverContent>
                               </Popover>
-                            </template>
+                              </template>
+                            </div>
                           </div>
                         </div>
+                        <Button
+                          v-if="scheduleSlotsExceedsCollapsedMax"
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          class="w-full shrink-0 rounded-sm"
+                          @click="scheduleTimeSlotsExpanded = !scheduleTimeSlotsExpanded"
+                        >
+                          {{
+                            scheduleTimeSlotsExpanded
+                              ? t('forms.schedule.timeSlots.showLess')
+                              : t('forms.schedule.timeSlots.showMore')
+                          }}
+                        </Button>
                       </div>
                       <div v-else-if="qualificationSelectedDate && uniqueSlotsForSelectedDate.length === 0" class="text-sm text-muted-foreground py-4 text-center">
                         {{ t('forms.schedule.timeSlots.noSlots') }}
@@ -811,6 +951,24 @@
                       </div>
                     </div>
                   </div>
+                </div>
+                </template>
+
+                <div
+                  v-if="isQualificationScheduleComplete"
+                  class="mt-4 pt-4 border-t border-border"
+                >
+                  <Label class="text-sm font-medium text-foreground mb-2 block" :for="qualificationScheduleInternalNoteId">
+                    {{ t('forms.schedule.summary.internalNote') }}
+                  </Label>
+                  <Textarea
+                    :id="qualificationScheduleInternalNoteId"
+                    v-model="qualificationScheduleInternalNote"
+                    rows="2"
+                    class="w-full min-h-16 text-sm resize-y"
+                    :placeholder="t('forms.schedule.summary.internalNotePlaceholder')"
+                    :aria-label="t('forms.schedule.summary.internalNote')"
+                  />
                 </div>
               </div>
 
@@ -853,7 +1011,19 @@
         <!-- Next call attempt: when Answer + Postpone -->
         <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'postpone'" ref="postponeBlockRef">
           <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4 w-full">
-            <h5 class="font-semibold text-foreground text-sm mb-4">Next call attempt</h5>
+            <div class="space-y-2 mb-4">
+              <div>
+                <button
+                  type="button"
+                  class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  :aria-label="t('requestDetail.lqfTask.backToWhatsNext')"
+                  @click="handleBackToWhatsNextChoices"
+                >
+                  <ArrowLeft class="size-4" aria-hidden="true" />
+                </button>
+              </div>
+              <h5 class="font-semibold text-foreground text-sm">Next call attempt</h5>
+            </div>
             <div class="reschedule-toggle-group flex flex-wrap gap-2">
               <Toggle
                 variant="outline"
@@ -1035,7 +1205,7 @@
 </template>
 
 <script setup>
-import { ref, computed, toRef, watch, nextTick } from 'vue'
+import { ref, computed, toRef, watch, nextTick, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { 
   Button,
@@ -1066,7 +1236,7 @@ import {
   PopoverTrigger,
   PopoverContent
 } from '@motork/component-library/future/primitives'
-import { Check, PhoneOff, ThumbsUp, ThumbsDown, Clock, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, Plus, Users } from 'lucide-vue-next'
+import { Check, PhoneOff, ThumbsUp, ThumbsDown, Clock, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, Plus, Users, Pencil, ArrowLeft } from 'lucide-vue-next'
 import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
@@ -1744,6 +1914,21 @@ const availabilityByAssigneeForSelectedDate = computed(() => {
 
 const openScheduleSlotPopover = ref(null)
 const scheduleSlotAssigneeSearchQuery = ref('')
+const scheduleFiltersSyncFromSlotPopover = ref(false)
+const qualificationScheduleEditing = ref(true)
+const qualificationScheduleInternalNote = ref('')
+const qualificationScheduleInternalNoteId = useId()
+
+function resolveAssignableTeamForScheduleUser(user) {
+  if (!user) return null
+  const byId = user.teamId != null
+    ? assignableTeams.value?.find((t) => t.id === user.teamId)
+    : null
+  if (byId) return byId
+  return assignableTeams.value?.find((t) => t.name === user.team) ?? null
+}
+const SCHEDULE_VISIBLE_TIME_SLOTS_MAX = 8
+const scheduleTimeSlotsExpanded = ref(false)
 
 function qualificationDepartmentKeyFromTeamLabel(label) {
   if (!label) return ''
@@ -1805,6 +1990,32 @@ const scheduleSlotColumns = computed(() => {
   ]
 })
 
+const scheduleSlotsExceedsCollapsedMax = computed(() => {
+  const cols = scheduleSlotColumns.value
+  const total = (cols[0]?.slots?.length ?? 0) + (cols[1]?.slots?.length ?? 0)
+  return total > SCHEDULE_VISIBLE_TIME_SLOTS_MAX
+})
+
+const scheduleSlotColumnsDisplay = computed(() => {
+  const cols = scheduleSlotColumns.value
+  const morning = cols[0]?.slots ?? []
+  const afternoon = cols[1]?.slots ?? []
+  if (
+    scheduleTimeSlotsExpanded.value ||
+    morning.length + afternoon.length <= SCHEDULE_VISIBLE_TIME_SLOTS_MAX
+  ) {
+    return cols
+  }
+  let budget = SCHEDULE_VISIBLE_TIME_SLOTS_MAX
+  const visMorning = morning.slice(0, Math.min(morning.length, budget))
+  budget -= visMorning.length
+  const visAfternoon = afternoon.slice(0, Math.min(afternoon.length, budget))
+  return [
+    { ...cols[0], slots: visMorning },
+    { ...cols[1], slots: visAfternoon }
+  ]
+})
+
 function assigneesAvailableForSlot(slot) {
   return availabilityByAssigneeForSelectedDate.value.filter((item) => item.slots.includes(slot))
 }
@@ -1847,17 +2058,45 @@ function isScheduleSlotItemSelected(slot, item) {
 }
 
 function selectScheduleSlotAssignee(slot, item) {
-  qualificationSelectedSlot.value = slot
-  if (item.type === 'user') {
-    qualificationSelectedSalesman.value = assignableUsers.value?.find((u) => u.id === item.id) ?? null
-    qualificationSelectedTeam.value = null
-    qualificationScheduleDepartment.value = qualificationDepartmentKeyFromTeamLabel(item.team || '')
-  } else {
-    qualificationSelectedTeam.value = assignableTeams.value?.find((t) => t.id === item.id) ?? null
-    qualificationSelectedSalesman.value = null
-    qualificationScheduleDepartment.value = qualificationDepartmentKeyFromTeamLabel(item.name || '')
+  scheduleFiltersSyncFromSlotPopover.value = true
+  try {
+    if (item.type === 'user') {
+      const user = assignableUsers.value?.find((u) => u.id === item.id) ?? null
+      const team = resolveAssignableTeamForScheduleUser(user)
+      qualificationScheduleDealership.value = team?.dealership || user?.dealership || ''
+      qualificationScheduleTeamId.value = team?.id ?? null
+      qualificationScheduleAssigneeFilter.value = item.assigneeId
+      qualificationSelectedSlot.value = slot
+      qualificationSelectedSalesman.value = user
+      qualificationSelectedTeam.value = null
+      qualificationScheduleDepartment.value = qualificationDepartmentKeyFromTeamLabel(
+        user?.team || item.team || ''
+      )
+    } else {
+      const team = assignableTeams.value?.find((t) => t.id === item.id) ?? null
+      qualificationScheduleDealership.value = team?.dealership || ''
+      qualificationScheduleTeamId.value = team?.id ?? null
+      qualificationScheduleAssigneeFilter.value = item.assigneeId
+      qualificationSelectedSlot.value = slot
+      qualificationSelectedTeam.value = team
+      qualificationSelectedSalesman.value = null
+      qualificationScheduleDepartment.value = qualificationDepartmentKeyFromTeamLabel(team?.name || '')
+    }
+  } finally {
+    nextTick(() => {
+      scheduleFiltersSyncFromSlotPopover.value = false
+    })
   }
+  scheduleSlotAssigneeSearchQuery.value = ''
   openScheduleSlotPopover.value = null
+  if (
+    qualificationEventType.value &&
+    qualificationSelectedDate.value &&
+    qualificationSelectedSlot.value &&
+    (qualificationSelectedSalesman.value || qualificationSelectedTeam.value)
+  ) {
+    qualificationScheduleEditing.value = false
+  }
 }
 
 function isScheduleSlotConfirmed(slot) {
@@ -1866,6 +2105,7 @@ function isScheduleSlotConfirmed(slot) {
 }
 
 watch(qualificationSelectedDate, () => {
+  scheduleTimeSlotsExpanded.value = false
   qualificationSelectedSlot.value = ''
   qualificationScheduleDepartment.value = ''
   qualificationSelectedSalesman.value = null
@@ -1874,6 +2114,7 @@ watch(qualificationSelectedDate, () => {
 })
 
 watch(qualificationScheduleDealership, () => {
+  if (scheduleFiltersSyncFromSlotPopover.value) return
   qualificationScheduleTeamId.value = null
   qualificationScheduleAssigneeFilter.value = ''
   qualificationSelectedSlot.value = ''
@@ -1884,6 +2125,7 @@ watch(qualificationScheduleDealership, () => {
 })
 
 watch(qualificationScheduleTeamId, () => {
+  if (scheduleFiltersSyncFromSlotPopover.value) return
   qualificationScheduleAssigneeFilter.value = ''
   qualificationSelectedSlot.value = ''
   qualificationScheduleDepartment.value = ''
@@ -1893,6 +2135,7 @@ watch(qualificationScheduleTeamId, () => {
 })
 
 watch(qualificationScheduleAssigneeFilter, () => {
+  if (scheduleFiltersSyncFromSlotPopover.value) return
   qualificationSelectedSlot.value = ''
   qualificationScheduleDepartment.value = ''
   qualificationSelectedSalesman.value = null
@@ -1996,6 +2239,22 @@ function scrollToExpandedContent(getEl, delayMs = 0, block = null) {
   } else {
     nextTick(run)
   }
+}
+
+function openQualificationScheduleEditor() {
+  qualificationScheduleEditing.value = true
+  nextTick(() => {
+    scrollToExpandedContent(() => eventTypeExpandedRef.value, 0, 'nearest')
+  })
+}
+
+function handleBackToCallOutcome() {
+  selectOutcome(null)
+  setNextStep(null)
+}
+
+function handleBackToWhatsNextChoices() {
+  setNextStep(null)
 }
 
 watch(selectedOutcome, (newOutcome) => {
@@ -2147,6 +2406,68 @@ const scheduleHeaderAssigneeDisplay = computed(() => {
   return null
 })
 
+const isQualificationScheduleComplete = computed(() =>
+  Boolean(
+    qualificationEventType.value &&
+      qualificationSelectedDate.value &&
+      qualificationSelectedSlot.value &&
+      (qualificationSelectedSalesman.value || qualificationSelectedTeam.value)
+  )
+)
+
+const qualificationScheduleSummaryVisible = computed(
+  () => !qualificationScheduleEditing.value && isQualificationScheduleComplete.value
+)
+
+const qualificationScheduleEventTypeLabel = computed(() => {
+  const v = qualificationEventType.value
+  if (!v) return ''
+  const opt = qualificationEventTypeOptions.find((o) => o.value === v)
+  return opt?.label ?? v
+})
+
+const qualificationScheduleSummaryAssigneeIsUser = computed(
+  () => !!qualificationSelectedSalesman.value
+)
+
+const qualificationScheduleSummaryAssigneeName = computed(() => {
+  if (qualificationSelectedSalesman.value?.name) {
+    return qualificationSelectedSalesman.value.name
+  }
+  return qualificationSelectedTeam.value?.name ?? ''
+})
+
+const qualificationScheduleSummaryDealership = computed(() => {
+  if (qualificationSelectedTeam.value?.dealership) {
+    return qualificationSelectedTeam.value.dealership
+  }
+  const u = qualificationSelectedSalesman.value
+  const team = u ? resolveAssignableTeamForScheduleUser(u) : null
+  return (
+    team?.dealership ||
+    u?.dealership ||
+    qualificationScheduleDealership.value ||
+    ''
+  )
+})
+
+const qualificationScheduleSummaryTeamName = computed(() => {
+  if (qualificationSelectedTeam.value?.name) {
+    return qualificationSelectedTeam.value.name
+  }
+  const u = qualificationSelectedSalesman.value
+  if (!u) return ''
+  const team = resolveAssignableTeamForScheduleUser(u)
+  return team?.name || u.team || ''
+})
+
+watch(isQualificationScheduleComplete, (complete) => {
+  if (!complete) {
+    qualificationScheduleEditing.value = true
+    qualificationScheduleInternalNote.value = ''
+  }
+})
+
 // Map event types to their durations in minutes
 const eventTypeDurationMap = {
   'appointment-on-phone': 15,
@@ -2286,7 +2607,8 @@ const handlers = useLQWidgetHandlers(
   maxContactAttempts,
   leadsStore,
   currentUser,
-  enrichLeadData
+  enrichLeadData,
+  qualificationScheduleInternalNote
 )
 
 const {

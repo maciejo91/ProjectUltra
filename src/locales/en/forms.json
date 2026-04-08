@@ -115,12 +115,20 @@
       "noSlots": "No available time slots for this date",
       "selectDate": "Select a date to see available time slots",
       "morning": "Morning",
-      "afternoon": "Afternoon"
+      "afternoon": "Afternoon",
+      "showMore": "Show more",
+      "showLess": "Show less"
     },
     "slotPopover": {
       "people": "People",
       "searchPlaceholder": "Search by name or team",
       "noResults": "No matches"
+    },
+    "summary": {
+      "edit": "Edit",
+      "dateTime": "Date and time",
+      "internalNote": "Internal note for the event",
+      "internalNotePlaceholder": "Optional note visible to your team only"
     },
     "calendar": {
       "days": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]

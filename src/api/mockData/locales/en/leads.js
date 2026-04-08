@@ -85,7 +85,9 @@ export const mockLeads = [
     disqualifyReason: null,
     scheduledAppointment: null,
     contactAttempts: [],
-    distanceKm: 5
+    distanceKm: 5,
+    aiSummary:
+      'Strong interest in the used Audi A6 Allroad; asked about stock and delivery via the Autoscout listing. Suggested next step: confirm availability and send a tailored quote.'
   },
   // 2. To be called back – callbackDate, scheduled recall
   {
@@ -122,7 +124,9 @@ export const mockLeads = [
     contactAttempts: [
       { timestamp: createHourOffset(-2), outcome: 'spoke-to-customer', channel: 'phone', notes: 'Customer requested callback.', transcription: null }
     ],
-    distanceKm: 3
+    distanceKm: 3,
+    aiSummary:
+      'Clear intent on the VW ID.4; customer asked for an afternoon callback after WhatsApp. Keep momentum before the scheduled recall—confirm stock, pricing, and charging options in one short call.'
   },
   // 3. Valid - to be called back
   {
@@ -156,7 +160,9 @@ export const mockLeads = [
     contactAttempts: [
       { timestamp: createHourOffset(-3), outcome: 'spoke-to-customer', channel: 'phone', notes: 'Validated interest. Will call back.', transcription: null }
     ],
-    distanceKm: 15
+    distanceKm: 15,
+    aiSummary:
+      'Validated interest in the BMW iX; customer wants a follow-up call on range and lease options. Next: schedule a test drive and share current stock and incentives.'
   },
   // 4. New – NO PHONE – shows contact-by-email form
   {
@@ -188,7 +194,9 @@ export const mockLeads = [
     disqualifyReason: null,
     scheduledAppointment: null,
     contactAttempts: [],
-    distanceKm: 20
+    distanceKm: 20,
+    aiSummary:
+      'Mercedes C-Class quotation request with no phone on file; prefers email. Next: send specs and pricing, then propose a call once they reply.'
   },
   // 5. Closed - Invalid
   {
@@ -219,7 +227,9 @@ export const mockLeads = [
     disqualifyReason: 'Invalid contact details',
     scheduledAppointment: null,
     contactAttempts: [],
-    distanceKm: 120
+    distanceKm: 120,
+    aiSummary:
+      'Lead marked invalid after failed contact attempts; inquiry was for a used Tesla Model 3. No further outreach recommended unless details are corrected.'
   },
   // 6. Closed - Not Interested
   {
@@ -252,7 +262,9 @@ export const mockLeads = [
     contactAttempts: [
       { timestamp: createHourOffset(-3), outcome: 'spoke-to-customer', channel: 'phone', notes: 'Customer chose competitor.', transcription: null }
     ],
-    distanceKm: 50
+    distanceKm: 50,
+    aiSummary:
+      'Customer confirmed they bought elsewhere; Porsche Cayenne inquiry is closed as not interested. Archive for reporting; no follow-up unless they re-engage.'
   },
   // 7. Duplicate candidate – same customer + same vehicle as Lead 1 (for Duplicate Detected card)
   {
@@ -281,7 +293,9 @@ export const mockLeads = [
     disqualifyReason: null,
     scheduledAppointment: null,
     contactAttempts: [],
-    distanceKm: 5
+    distanceKm: 5,
+    aiSummary:
+      'Second inquiry on the Audi A6 Allroad for the same customer—likely duplicate of an open lead. Merge records before sending duplicate quotes.'
   },
   // 8. Duplicate candidate – same customer + same vehicle as Lead 2 (VW ID.4)
   {
@@ -312,7 +326,9 @@ export const mockLeads = [
     disqualifyReason: null,
     scheduledAppointment: null,
     contactAttempts: [],
-    distanceKm: 3
+    distanceKm: 3,
+    aiSummary:
+      'Another VW ID.4 request from the same contact—align with the primary lead before scheduling callbacks to avoid mixed messaging.'
   },
   // 9. Duplicate candidate – same customer + same vehicle as Lead 3 (BMW iX)
   {
@@ -343,7 +359,9 @@ export const mockLeads = [
     disqualifyReason: null,
     scheduledAppointment: null,
     contactAttempts: [],
-    distanceKm: 15
+    distanceKm: 15,
+    aiSummary:
+      'Duplicate BMW iX lead for the same customer; consolidate under one owner and one next step to prevent parallel outreach.'
   },
   // 10. Closed - Duplicate
   {
@@ -375,6 +393,8 @@ export const mockLeads = [
     isDuplicate: true,
     scheduledAppointment: null,
     contactAttempts: [],
-    distanceKm: 5
+    distanceKm: 5,
+    aiSummary:
+      'Closed as duplicate of an existing Audi A4 pipeline record; retain for audit only and route future contact to the primary request.'
   }
 ]
