@@ -15,38 +15,39 @@
   
   <!-- Actual Content -->
   <div v-else>
-    <div class="mb-1">
-    <UnifiedSearchBar
+    <DataTableWithUnifiedSearch
       active-tab="reports"
       placeholder="Search team performance..."
       :pagination="pagination"
-      @update:globalFilter="globalFilter = $event"
-      @update:columnFilters="columnFilters = $event"
+      :include-margin-bottom="false"
+      @update:global-filter="globalFilter = $event"
+      @update:column-filters="columnFilters = $event"
       @update:pagination="pagination = $event"
-    />
-    </div>
-    <div class="data-table-inner table-search-wrapper">
-    <DataTable 
-      :data="paginatedData" 
-      :columns="columns"
-      :pagination="pagination"
-      :sorting="sorting"
-      :pagination-options="{
-        rowCount: totalFilteredCount,
-        pageSizeOptions: [10, 20, 50]
-      }"
-      @update:pagination="pagination = $event"
-      @update:sorting="sorting = $event"
-      class="h-full"
     >
-    <template #toolbar>
-      <div class="flex items-center gap-2">
-        <Trophy :size="16" class="text-foreground" />
-        <h3 class="text-lg font-medium text-foreground leading-5">Best performers</h3>
-      </div>
-    </template>
-  </DataTable>
-    </div>
+      <DataTable
+        :data="paginatedData"
+        :columns="columns"
+        v-model:pagination="pagination"
+        v-model:global-filter="globalFilter"
+        v-model:sorting="sorting"
+        v-model:column-filters="columnFilters"
+        :column-filters-options="{
+          filterDefs: filterDefinitions
+        }"
+        :pagination-options="{
+          rowCount: totalFilteredCount,
+          pageSizeOptions: [10, 20, 50]
+        }"
+        class="h-full"
+      >
+        <template #toolbar>
+          <div class="flex items-center gap-2">
+            <Trophy :size="16" class="text-foreground" />
+            <h3 class="text-lg font-medium text-foreground leading-5">Best performers</h3>
+          </div>
+        </template>
+      </DataTable>
+    </DataTableWithUnifiedSearch>
   </div>
 </template>
 
@@ -55,7 +56,7 @@ import { ref, computed, h } from 'vue'
 import { Trophy } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Avatar, AvatarFallback } from '@motork/component-library/future/primitives'
-import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
+import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import { useDataTableData } from '@/composables/useDataTableData'
 
 const props = defineProps({
@@ -78,7 +79,12 @@ const pagination = ref({
 const sorting = ref([{ id: 'leads', desc: true }])
 const globalFilter = ref('')
 const columnFilters = ref([])
-const filterDefsRef = ref([])
+
+const numericRangeOperators = [
+  { value: 'between', label: 'is between' },
+  { value: 'gte', label: 'is at least' },
+  { value: 'lte', label: 'is at most' }
+]
 
 const getInitials = (name) => {
   if (!name) return 'U'
@@ -167,6 +173,58 @@ const enrichedTeamMembers = computed(() =>
   })
 )
 
+const filterDefinitions = computed(() => {
+  const members = enrichedTeamMembers.value ?? []
+  const nameOptions = [...new Set(members.map((m) => m.name).filter(Boolean))].sort()
+  return [
+    {
+      key: 'name',
+      label: 'Name',
+      type: 'multiselect',
+      operators: [
+        { value: 'in', label: 'is any of' },
+        { value: 'notIn', label: 'is none of' }
+      ],
+      options: nameOptions.map((n) => ({ value: n, label: n }))
+    },
+    {
+      key: 'leads',
+      label: 'Leads',
+      type: 'inputrange',
+      inputType: 'number',
+      operators: numericRangeOperators
+    },
+    {
+      key: 'qualifiedLeads',
+      label: 'Qualified leads',
+      type: 'inputrange',
+      inputType: 'number',
+      operators: numericRangeOperators
+    },
+    {
+      key: 'opportunities',
+      label: 'Opportunities',
+      type: 'inputrange',
+      inputType: 'number',
+      operators: numericRangeOperators
+    },
+    {
+      key: 'contracts',
+      label: 'Contracts',
+      type: 'inputrange',
+      inputType: 'number',
+      operators: numericRangeOperators
+    },
+    {
+      key: 'conversionRate',
+      label: 'Conversion rate',
+      type: 'inputrange',
+      inputType: 'number',
+      operators: numericRangeOperators
+    }
+  ]
+})
+
 const { paginatedData, totalFilteredCount } = useDataTableData({
   rawData: enrichedTeamMembers,
   columns,
@@ -174,101 +232,8 @@ const { paginatedData, totalFilteredCount } = useDataTableData({
   columnFilters,
   sorting,
   pagination,
-  filterDefs: filterDefsRef,
+  filterDefs: filterDefinitions,
   searchableFields,
 })
 </script>
-
-<style scoped>
-/* DataTable styling overrides to match reference design */
-:deep(thead),
-:deep(thead th),
-:deep(thead tr),
-:deep(thead tr th) {
-  background-color: transparent !important;
-  background: transparent !important;
-  border-color: rgba(0, 0, 0, 0.05) !important;
-}
-
-:deep(div[data-slot='frame-panel'].relative.bg-clip-padding) {
-  border-top-left-radius: 10px !important;
-  border-top-right-radius: 10px !important;
-}
-
-:deep(footer.flex.items-center.justify-between) {
-  border-bottom-left-radius: 10px !important;
-  border-bottom-right-radius: 10px !important;
-}
-
-:deep([data-radix-avatar-fallback]),
-:deep(.avatar-fallback),
-:deep(span[class*='AvatarFallback']) {
-  background-color: #d4d4d4 !important;
-}
-
-/* Table border overrides - make borders very subtle */
-:deep(table),
-:deep(tbody),
-:deep(tbody tr),
-:deep(tbody td),
-:deep(thead),
-:deep(thead th) {
-  border-color: rgba(0, 0, 0, 0.05) !important;
-}
-
-:deep(tbody tr) {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-}
-
-:deep(tbody tr:last-child) {
-  border-bottom: none !important;
-}
-
-/* Remove any dark borders from table container */
-:deep([data-slot="table-container"]),
-:deep(.table-wrapper) {
-  border: none !important;
-}
-
-/* Pagination dropdown - transparent in footer */
-:deep(footer select),
-:deep(footer button[role="combobox"]) {
-  background-color: transparent !important;
-  border: none !important;
-}
-
-/* Hide built-in DataTable search row only (UnifiedSearchBar is above) */
-.data-table-inner.table-search-wrapper :deep([data-slot="table-search"]),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[placeholder*="Search"])),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[type="search"])) {
-  display: none !important;
-}
-
-/* Search input - white background like reference */
-:deep(input[type="search"]),
-:deep(input[placeholder*="Search"]),
-:deep([data-slot="table-search"] input) {
-  background-color: white !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-}
-
-/* Filter button - white background like reference */
-:deep(button[aria-label*="filter"]),
-:deep(button[aria-label*="Filter"]),
-:deep([data-slot="table-filter"] button) {
-  background-color: white !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-}
-
-/* Enable horizontal and vertical scrolling */
-:deep([data-slot="table-container"]) {
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  max-height: 600px !important;
-}
-
-:deep(table) {
-  min-width: 100% !important;
-}
-</style>
 

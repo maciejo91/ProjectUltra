@@ -116,18 +116,30 @@ export function useCalendarEvents({ appliedFilters, currentDate, currentView }) 
     modalEditingEvent.value = null
   }
 
+  const toLocalDateTimeString = (d) => {
+    const date = d instanceof Date ? d : new Date(d)
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const h = String(date.getHours()).padStart(2, '0')
+    const min = String(date.getMinutes()).padStart(2, '0')
+    const s = String(date.getSeconds()).padStart(2, '0')
+    return `${y}-${m}-${day}T${h}:${min}:${s}`
+  }
+
   const apiEventFromForm = (payload) => {
     const start = payload.startTime instanceof Date ? payload.startTime : new Date(payload.startTime)
     const end = payload.endTime instanceof Date ? payload.endTime : new Date(payload.endTime)
+    const dealership = payload.dealership || payload.location
     return {
       title: payload.title,
       type: payload.typeId || payload.type,
-      start: start.toISOString().slice(0, 19),
-      end: end.toISOString().slice(0, 19),
+      start: toLocalDateTimeString(start),
+      end: toLocalDateTimeString(end),
       customer: payload.customer,
       assignee: payload.assignee,
       assigneeId: payload.assigneeId,
-      dealership: payload.dealership,
+      dealership,
       vehicle: payload.vehicle,
     }
   }

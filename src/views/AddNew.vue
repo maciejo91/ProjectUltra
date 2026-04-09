@@ -24,8 +24,11 @@
       </PageHeader>
 
       <div
-        class="pt-2 px-4 pb-8 md:pt-3 md:px-6 md:pb-10 lg:pt-4 lg:px-8 lg:pb-12 text-sm w-full"
-        :class="{ 'bg-white': activeTab === 'campaigns' }"
+        :class="[
+          'px-6 pb-8 md:pb-10 lg:pb-12 text-sm w-full',
+          isTablePageLayout ? 'pt-1 md:pt-2 lg:pt-3' : 'pt-2 md:pt-3 lg:pt-4',
+          { 'bg-white': activeTab === 'campaigns' }
+        ]"
       >
         <TabsContent value="manual" class="add-new-manual data-[state=inactive]:hidden w-full">
           <ManualTab ref="manualTabRef" @submit="handleSubmit" />
@@ -44,8 +47,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useCustomersStore } from '@/stores/customers'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
@@ -57,6 +60,8 @@ import CampaignsTab from '@/components/addnew/CampaignsTab.vue'
 import { useTabPersistence } from '@/composables/useTabPersistence'
 
 const router = useRouter()
+const route = useRoute()
+const isTablePageLayout = computed(() => Boolean(route.meta?.tablePageLayout))
 const customersStore = useCustomersStore()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()

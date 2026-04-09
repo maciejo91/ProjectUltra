@@ -1,19 +1,7 @@
 <template>
   <div class="space-y-4">
-    <div class="flex flex-wrap items-center gap-2">
-      <div class="outcome-toggle-group flex flex-wrap gap-3">
-        <Toggle
-          v-for="chip in filterChips"
-          :key="chip.key"
-          variant="outline"
-          :model-value="selectedFilter === chip.key"
-          :aria-pressed="selectedFilter === chip.key"
-          class="outcome-toggle-item rounded-sm"
-          @update:model-value="(p) => p && (selectedFilter = chip.key)"
-        >
-          {{ chip.label }} ({{ chip.count }})
-        </Toggle>
-      </div>
+    <div class="shrink-0 overflow-visible pb-2 pt-1">
+      <RequestMainTabs v-model="selectedFilter" :tabs="filterChips" />
     </div>
 
     <div v-if="filteredItems.length === 0" class="text-muted-foreground text-sm italic">
@@ -24,7 +12,7 @@
       <div
         v-for="item in filteredItems"
         :key="item.compositeId"
-        class="border rounded-lg p-4 bg-white shadow-sm flex items-start gap-4 cursor-pointer hover:shadow-md transition-shadow"
+        class="flex cursor-pointer items-start gap-4 rounded-lg border border-border bg-background p-4 transition-colors hover:bg-muted/50"
         @click="$emit('click', item, filteredItems)"
       >
         <!-- Car Image or Icon -->
@@ -50,7 +38,8 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Badge, Toggle } from '@motork/component-library/future/primitives'
+import { Badge } from '@motork/component-library/future/primitives'
+import RequestMainTabs from '@/components/requests/RequestMainTabs.vue'
 import { Car } from 'lucide-vue-next'
 import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
 

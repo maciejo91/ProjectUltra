@@ -60,7 +60,14 @@
     "closeSidebar": "Close sidebar",
     "toggleSidebar": "Expand or collapse sidebar",
     "userMenu": "User menu",
-    "goToMyProfile": "Go to my profile"
+    "goToMyProfile": "Go to my profile",
+    "switchProfile": "Switch profile",
+    "profiles": {
+      "admin": "Admin",
+      "salesRep": "Sales rep",
+      "bdcOperator": "BDC operator",
+      "externalBdc": "External BDC"
+    }
   },
   "buttons": {
     "save": "Save",
@@ -102,7 +109,9 @@
     "signOut": "Sign out",
     "logout": "Logout",
     "lightMode": "Light Mode",
-    "darkMode": "Dark Mode"
+    "darkMode": "Dark Mode",
+    "newContact": "New Contact",
+    "newVehicle": "New Vehicle"
   },
   "status": {
     "hot": "Hot",
@@ -143,6 +152,7 @@
   },
   "common": {
     "loading": "Loading...",
+    "loadingLabel": "Loading",
     "error": "Error",
     "success": "Success",
     "noData": "No data available",
@@ -185,7 +195,44 @@
     "expandTranscript": "Expand",
     "collapseTranscript": "Collapse"
   },
+  "conversations": {
+    "channels": {
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "sms": "SMS",
+      "unknown": "Unknown"
+    },
+    "list": {
+      "searchPlaceholder": "Search conversations",
+      "messageTypeLabel": "Message"
+    },
+    "thread": {
+      "showMore": "Show more",
+      "showLess": "Show less",
+      "empty": "No messages in this thread.",
+      "composerPlaceholder": "Type a message…",
+      "send": "Send",
+      "channelReplyHint": "Replies are sent on this channel.",
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "summary": {
+      "title": "Summary",
+      "empty": "Select a conversation to see lead details.",
+      "requestDetails": "Request details",
+      "openRequest": "Open request in new tab",
+      "recall": "Recall"
+    },
+    "empty": {
+      "noSelectionTitle": "No conversation selected",
+      "noSelectionHint": "Choose a conversation from the list to read messages and reply."
+    },
+    "mobile": {
+      "backToList": "Back to conversations"
+    }
+  },
   "assignee": {
+    "assignedTo": "Assigned to",
     "taskUnassigned": "This task is unassigned",
     "assignToMe": "Assign to me",
     "assignToSomeone": "Assign to someone",

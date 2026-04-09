@@ -77,7 +77,20 @@ const init = () => {
   selectedUserId.value = String(props.defaultUserId || '')
 }
 
-watch(() => [props.event, props.initialRange], init, { immediate: true })
+watch(() => [props.event, props.initialRange], init, { immediate: true, deep: true })
+
+watch(
+  () => props.eventTypes,
+  (types) => {
+    if (props.event) return
+    if (!types?.length) return
+    const valid = types.some((t) => t.value === selectedTypeId.value)
+    if (!selectedTypeId.value || !valid) {
+      selectedTypeId.value = types[0].value
+    }
+  },
+  { immediate: true }
+)
 
 const isValid = computed(() =>
   title.value.trim() && parseInput(startInput.value) && parseInput(endInput.value) && selectedTypeId.value

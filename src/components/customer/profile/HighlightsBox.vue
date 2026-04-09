@@ -1,8 +1,8 @@
 <template>
-  <div class="border border-orange-200 rounded-lg p-4 bg-white shadow-sm relative overflow-hidden">
+  <div class="relative overflow-hidden rounded-lg border border-border bg-background p-4">
     <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
     <div class="pl-2">
-      <ul class="space-y-2 text-sm text-gray-700 list-disc list-inside">
+      <ul class="list-inside list-disc space-y-2 text-sm text-foreground">
         <li v-if="summary">{{ summary }}</li>
         <li v-else class="italic text-muted-foreground">No highlights available.</li>
         

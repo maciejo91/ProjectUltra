@@ -13,7 +13,7 @@
         </div>
       </div>
     </header>
-    <div class="section-header-bottom px-4" :class="{ 'section-header-bottom-tabs-only': !title && !$slots.actions }">
+    <div class="section-header-bottom px-6" :class="{ 'section-header-bottom-tabs-only': !title && !$slots.actions }">
       <slot name="bottom"></slot>
     </div>
   </div>

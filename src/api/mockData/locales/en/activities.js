@@ -260,5 +260,41 @@ export const mockActivities = [
       'Strong intent on the VW ID.4; the customer asked for an afternoon callback after a short WhatsApp thread.\nPaid search and WhatsApp are the latest touchpoints—keep momentum before the scheduled recall.\nSuggested next step: confirm stock, pricing, and home-charging options in one concise call.',
     timestamp: createHourOffset(-0.2),
     leadId: 2
+  },
+  {
+    id: 29,
+    type: 'customer-sms',
+    user: 'Liam Johnson',
+    action: 'sent an SMS',
+    content: 'Can you confirm the BMW iX is still available for a test drive this Saturday?',
+    timestamp: createHourOffset(-2.5),
+    leadId: 3
+  },
+  {
+    id: 30,
+    type: 'sms',
+    user: 'Sarah Jenkins',
+    action: 'sent an SMS',
+    content: 'Yes, Saturday works. I will reserve the iX for 11:00. See you at the Munich showroom.',
+    timestamp: createHourOffset(-2.2),
+    leadId: 3
+  },
+  {
+    id: 31,
+    type: 'customer-sms',
+    user: 'Salsabeel Khaleel',
+    action: 'sent an SMS',
+    content: 'Running 10 min late for the appointment — still OK?',
+    timestamp: createHourOffset(-8),
+    opportunityId: 2
+  },
+  {
+    id: 32,
+    type: 'sms',
+    user: 'David Miller',
+    action: 'sent an SMS',
+    content: 'No problem, we will hold the bay. Drive safe.',
+    timestamp: createHourOffset(-7.5),
+    opportunityId: 2
   }
 ]

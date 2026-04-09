@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full overflow-hidden bg-surface">
+  <div class="h-full overflow-hidden bg-muted">
     <CustomerProfile
       :customer-id="customerId"
       :customer-type="customerType"

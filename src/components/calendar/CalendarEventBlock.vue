@@ -11,14 +11,14 @@ defineEmits(['click'])
 <template>
   <button
     type="button"
-    class="absolute inset-x-0 left-1 right-1 rounded-md px-3 py-2 cursor-pointer overflow-hidden text-left"
+    class="absolute inset-x-0 left-1 right-1 rounded-md px-2 py-1 cursor-pointer overflow-hidden text-left"
     :class="event.cssClass || 'calendar-event-other'"
     @click="$emit('click', event.id)"
   >
-    <p class="text-sm sm:text-sm font-semibold text-foreground truncate">
+    <p class="text-xs font-semibold text-foreground truncate leading-tight">
       {{ event.title }}
     </p>
-    <p v-if="event.location" class="text-sm text-muted-foreground truncate">
+    <p v-if="event.location" class="text-xs text-muted-foreground truncate leading-tight">
       {{ event.location }}
     </p>
   </button>

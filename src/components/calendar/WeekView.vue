@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { startOfWeek } from '@/composables/useCalendarView'
 import CalendarEventBlock from './CalendarEventBlock.vue'
 
@@ -14,8 +14,8 @@ const emit = defineEmits(['create-range', 'event-click'])
 const startHour = 0
 const endHour = 23
 const slotMinutes = 30
-const slotHeight = 64
-const headerHeight = 44
+const slotHeight = 48
+const headerHeight = 36
 
 const containerRef = ref(null)
 const isDragging = ref(false)
@@ -37,6 +37,16 @@ const weekDays = computed(() => {
     })
   }
   return result
+})
+
+const weekContainsToday = computed(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const start = new Date(startOfWeek(props.currentDate))
+  start.setHours(0, 0, 0, 0)
+  const end = new Date(start)
+  end.setDate(start.getDate() + props.daysToShow - 1)
+  return today >= start && today <= end
 })
 
 const totalSlots = computed(
@@ -169,14 +179,32 @@ const updateCurrentTimeOffset = () => {
     (getMinutesFromStart(now) / slotMinutes) * slotHeight
 }
 
+const scrollTimeIntoView = () => {
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      const el = containerRef.value
+      if (!el) return
+      updateCurrentTimeOffset()
+      if (weekContainsToday.value && currentTimeOffset.value != null) {
+        el.scrollTop = Math.max(0, currentTimeOffset.value - slotHeight * 3)
+      } else {
+        el.scrollTop = 0
+      }
+    })
+  })
+}
+
 onMounted(() => {
   window.addEventListener('mouseup', handleWindowMouseUp)
   updateCurrentTimeOffset()
   currentTimeIntervalId = setInterval(updateCurrentTimeOffset, 60000)
-  if (containerRef.value && currentTimeOffset.value != null) {
-    containerRef.value.scrollTop = Math.max(0, currentTimeOffset.value - 160)
-  }
+  scrollTimeIntoView()
 })
+
+watch(
+  () => props.currentDate.getTime(),
+  () => scrollTimeIntoView()
+)
 
 onBeforeUnmount(() => {
   window.removeEventListener('mouseup', handleWindowMouseUp)
@@ -199,9 +227,9 @@ onBeforeUnmount(() => {
           <div
             v-for="day in weekDays"
             :key="day.date.toISOString()"
-            class="px-2 sm:px-3 py-3 flex items-center justify-center"
+            class="px-2 sm:px-3 py-2 flex items-center justify-center"
           >
-            <span class="text-sm font-medium text-muted-foreground truncate">
+            <span class="text-xs sm:text-sm font-medium text-muted-foreground truncate">
               {{ day.label }}
             </span>
           </div>
@@ -213,7 +241,7 @@ onBeforeUnmount(() => {
           <div
             v-for="(label, idx) in timeLabels"
             :key="`t-${idx}`"
-            class="h-16 text-sm text-muted-foreground pr-2 relative flex items-end justify-end"
+            class="h-12 text-xs text-muted-foreground pr-2 relative flex items-end justify-end"
           >
             <span v-if="label" class="pb-0.5">{{ label }}</span>
           </div>
@@ -235,7 +263,7 @@ onBeforeUnmount(() => {
               <div
                 v-for="slotIdx in totalSlots"
                 :key="`s-${dayIdx}-${slotIdx}`"
-                class="h-16 cursor-pointer border-b border-border/60"
+                class="h-12 cursor-pointer border-b border-border/60"
                 :class="{ 'border-b-border': (slotIdx - 1) % 2 === 0 }"
                 @mousedown.prevent="handleMouseDownSlot(dayIdx, slotIdx - 1)"
                 @mouseenter.prevent="handleMouseEnterSlot(dayIdx, slotIdx - 1)"

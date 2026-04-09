@@ -25,6 +25,46 @@
             :style="popoverStyle"
             @click.stop
           >
+            <div class="px-2 py-2">
+              <div class="w-full">
+                <button
+                  type="button"
+                  class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-foreground outline-none ring-sidebar-ring hover:bg-muted focus-visible:ring-2"
+                  :class="{ 'bg-muted': profileExpanded }"
+                  :aria-expanded="profileExpanded"
+                  @click.stop="toggleProfileExpanded"
+                >
+                  <span class="min-w-0 flex-1 truncate">{{ currentProfileLabel }}</span>
+                  <ChevronDown
+                    v-if="!profileExpanded"
+                    class="size-4 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  <ChevronUp
+                    v-else
+                    class="size-4 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                </button>
+
+                <transition name="dropdown">
+                  <div v-if="profileExpanded" class="mt-1 grid grid-cols-1 gap-1">
+                    <button
+                      v-for="profile in otherProfiles"
+                      :key="profile.id"
+                      type="button"
+                      class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-foreground outline-none ring-sidebar-ring hover:bg-muted focus-visible:ring-2"
+                      @click="setSidebarProfile(profile.id)"
+                    >
+                      <span class="truncate">{{ profile.label }}</span>
+                    </button>
+                  </div>
+                </transition>
+              </div>
+            </div>
+
+            <div class="h-px bg-border my-1" role="presentation" />
+
             <button
               type="button"
               class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-foreground outline-none ring-sidebar-ring hover:bg-muted focus-visible:ring-2"
@@ -36,18 +76,42 @@
 
             <template v-if="navigationVisibility.language !== false">
               <div class="h-px bg-border my-1" role="presentation" />
-              <button
-                ref="languageRowRef"
-                type="button"
-                class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-foreground outline-none ring-sidebar-ring hover:bg-muted focus-visible:ring-2"
-                :class="{ 'bg-muted': languageFlyoutOpen }"
-                :aria-expanded="languageFlyoutOpen"
-                @click.stop="toggleLanguageFlyout"
-              >
-                <Languages class="size-4 shrink-0" />
-                <span class="min-w-0 flex-1 truncate">{{ currentLanguageLabel }}</span>
-                <component :is="languageChevronIcon" class="size-4 shrink-0 text-muted-foreground" />
-              </button>
+              <div class="w-full">
+                <button
+                  type="button"
+                  class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-foreground outline-none ring-sidebar-ring hover:bg-muted focus-visible:ring-2"
+                  :class="{ 'bg-muted': languageExpanded }"
+                  :aria-expanded="languageExpanded"
+                  @click.stop="toggleLanguageExpanded"
+                >
+                  <Languages class="size-4 shrink-0" />
+                  <span class="min-w-0 flex-1 truncate">{{ currentLanguageLabel }}</span>
+                  <ChevronDown
+                    v-if="!languageExpanded"
+                    class="size-4 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  <ChevronUp
+                    v-else
+                    class="size-4 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                </button>
+
+                <transition name="dropdown">
+                  <div v-if="languageExpanded" class="mt-1 grid grid-cols-1 gap-1 pl-6">
+                    <button
+                      v-for="lang in otherLanguages"
+                      :key="lang.code"
+                      type="button"
+                      class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-foreground outline-none ring-sidebar-ring hover:bg-muted focus-visible:ring-2"
+                      @click="changeLanguage(lang.code)"
+                    >
+                      <span class="truncate">{{ lang.name }}</span>
+                    </button>
+                  </div>
+                </transition>
+              </div>
             </template>
 
             <div class="h-px bg-border my-1" role="presentation" />
@@ -59,34 +123,6 @@
             >
               <LogOut class="size-4 shrink-0" />
               <span>{{ t('common.actions.signOut') }}</span>
-            </button>
-          </div>
-        </transition>
-      </Teleport>
-
-      <Teleport to="body">
-        <transition name="dropdown">
-          <div
-            v-if="showUserMenu && languageFlyoutOpen && navigationVisibility.language !== false"
-            ref="languageFlyoutRef"
-            class="fixed w-44 overflow-y-auto overflow-x-hidden rounded-lg border border-border bg-background p-1 shadow-mk-dashboard-card"
-            :style="languageFlyoutStyle"
-            @click.stop
-          >
-            <button
-              v-for="lang in languages"
-              :key="lang.code"
-              type="button"
-              class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-foreground hover:bg-muted"
-              @click="changeLanguage(lang.code)"
-            >
-              <span class="flex size-4 shrink-0 items-center justify-center" aria-hidden="true">
-                <span
-                  v-if="currentLocale === lang.code"
-                  class="size-1.5 rounded-full bg-foreground"
-                />
-              </span>
-              <span>{{ lang.name }}</span>
             </button>
           </div>
         </transition>
@@ -105,7 +141,7 @@
 import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { UserRound, Languages, ChevronRight, ChevronLeft, ChevronDown, LogOut } from 'lucide-vue-next'
+import { UserRound, Languages, ChevronDown, ChevronUp, LogOut } from 'lucide-vue-next'
 import { useLayoutStore } from '@/stores/layout'
 import { useUserStore } from '@/stores/user'
 import { useSettingsStore } from '@/stores/settings'
@@ -119,29 +155,24 @@ const userStore = useUserStore()
 const settingsStore = useSettingsStore()
 
 const navigationVisibility = computed(() => settingsStore.getSetting('navigationVisibility') || {})
+const sidebarProfile = computed(() => settingsStore.getSetting('sidebarProfile') || 'admin')
+
+const sidebarProfiles = computed(() => [
+  { id: 'salesRep', label: t('common.layout.profiles.salesRep') },
+  { id: 'bdc', label: t('common.layout.profiles.bdcOperator') },
+  { id: 'admin', label: t('common.layout.profiles.admin') },
+  { id: 'externalBdc', label: t('common.layout.profiles.externalBdc') }
+])
 
 const showUserMenu = ref(false)
-const languageFlyoutOpen = ref(false)
+const profileExpanded = ref(false)
+const languageExpanded = ref(false)
 const showSearchModal = ref(false)
 const triggerWrapRef = ref(null)
 const popoverPanelRef = ref(null)
-const languageRowRef = ref(null)
-const languageFlyoutRef = ref(null)
 const popoverStyle = ref({})
-const languageFlyoutStyle = ref({})
-const languageSubPlacement = ref('left')
-
-const languageChevronIcon = computed(() => {
-  if (languageSubPlacement.value === 'right') return ChevronLeft
-  if (languageSubPlacement.value === 'below' || languageSubPlacement.value === 'above') return ChevronDown
-  return ChevronRight
-})
 
 let docClickBound = false
-
-const LANGUAGE_PANEL_WIDTH = 176
-const GAP = 8
-const VIEWPORT_MARGIN = 8
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -150,109 +181,6 @@ const languages = [
   { code: 'it', name: 'Italiano' },
   { code: 'nl', name: 'Nederlands' }
 ]
-
-function estimateLanguagePanelHeight() {
-  const row = 40
-  const pad = 8
-  return languages.length * row + pad
-}
-
-function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max)
-}
-
-function updateLanguageFlyoutPosition() {
-  const anchor = languageRowRef.value
-  if (!anchor) return
-
-  const r = anchor.getBoundingClientRect()
-  const w = LANGUAGE_PANEL_WIDTH
-  const estH = estimateLanguagePanelHeight()
-  const vw = window.innerWidth
-  const vh = window.innerHeight
-
-  const spaceLeft = r.left - VIEWPORT_MARGIN
-  const spaceRight = vw - r.right - VIEWPORT_MARGIN
-  const spaceBelow = vh - r.bottom - VIEWPORT_MARGIN
-  const spaceAbove = r.top - VIEWPORT_MARGIN
-
-  let left
-  let top
-  let maxH
-
-  const fitsLeft = spaceLeft >= w + GAP
-  const fitsRight = spaceRight >= w + GAP
-
-  if (fitsLeft && (!fitsRight || spaceLeft >= spaceRight)) {
-    languageSubPlacement.value = 'left'
-    left = r.left - w - GAP
-    top = clamp(r.top, VIEWPORT_MARGIN, vh - VIEWPORT_MARGIN - Math.min(estH, vh - VIEWPORT_MARGIN * 2))
-    maxH = vh - top - VIEWPORT_MARGIN
-  } else if (fitsRight) {
-    languageSubPlacement.value = 'right'
-    left = r.right + GAP
-    top = clamp(r.top, VIEWPORT_MARGIN, vh - VIEWPORT_MARGIN - Math.min(estH, vh - VIEWPORT_MARGIN * 2))
-    maxH = vh - top - VIEWPORT_MARGIN
-  } else if (spaceBelow >= Math.min(estH, 160) || spaceBelow >= spaceAbove) {
-    languageSubPlacement.value = 'below'
-    left = clamp(r.left + r.width / 2 - w / 2, VIEWPORT_MARGIN, vw - w - VIEWPORT_MARGIN)
-    top = r.bottom + GAP
-    maxH = vh - top - VIEWPORT_MARGIN
-  } else if (spaceAbove >= Math.min(estH, 120)) {
-    languageSubPlacement.value = 'above'
-    left = clamp(r.left + r.width / 2 - w / 2, VIEWPORT_MARGIN, vw - w - VIEWPORT_MARGIN)
-    const desiredTop = r.top - estH - GAP
-    top = clamp(desiredTop, VIEWPORT_MARGIN, vh - VIEWPORT_MARGIN - 80)
-    maxH = r.top - GAP - top
-  } else {
-    languageSubPlacement.value = 'fallback'
-    if (spaceLeft >= spaceRight) {
-      left = VIEWPORT_MARGIN
-    } else {
-      left = vw - w - VIEWPORT_MARGIN
-    }
-    top = clamp(r.top, VIEWPORT_MARGIN, vh - VIEWPORT_MARGIN - 120)
-    maxH = vh - top - VIEWPORT_MARGIN
-  }
-
-  left = clamp(left, VIEWPORT_MARGIN, vw - w - VIEWPORT_MARGIN)
-
-  languageFlyoutStyle.value = {
-    position: 'fixed',
-    left: `${left}px`,
-    top: `${top}px`,
-    width: `${w}px`,
-    maxHeight: `${Math.max(80, Math.min(estH, maxH))}px`,
-    zIndex: 110
-  }
-
-  nextTick(() => {
-    const el = languageFlyoutRef.value
-    if (!el) return
-    const measured = el.getBoundingClientRect()
-    if (measured.bottom > vh - VIEWPORT_MARGIN) {
-      const shift = measured.bottom - (vh - VIEWPORT_MARGIN)
-      const newTop = Math.max(VIEWPORT_MARGIN, measured.top - shift)
-      languageFlyoutStyle.value = {
-        ...languageFlyoutStyle.value,
-        top: `${newTop}px`,
-        maxHeight: `${vh - newTop - VIEWPORT_MARGIN}px`
-      }
-    }
-    if (measured.right > vw - VIEWPORT_MARGIN) {
-      languageFlyoutStyle.value = {
-        ...languageFlyoutStyle.value,
-        left: `${vw - measured.width - VIEWPORT_MARGIN}px`
-      }
-    }
-    if (measured.left < VIEWPORT_MARGIN) {
-      languageFlyoutStyle.value = {
-        ...languageFlyoutStyle.value,
-        left: `${VIEWPORT_MARGIN}px`
-      }
-    }
-  })
-}
 
 function updatePopoverPosition() {
   const wrap = triggerWrapRef.value
@@ -270,12 +198,7 @@ function updatePopoverPosition() {
 function onDocClickCapture(e) {
   const wrap = triggerWrapRef.value
   const panel = popoverPanelRef.value
-  const langPanel = languageFlyoutRef.value
-  if (
-    wrap?.contains(e.target) ||
-    panel?.contains(e.target) ||
-    langPanel?.contains(e.target)
-  ) {
+  if (wrap?.contains(e.target) || panel?.contains(e.target)) {
     return
   }
   showUserMenu.value = false
@@ -284,7 +207,6 @@ function onDocClickCapture(e) {
 function onScrollOrResize() {
   if (showUserMenu.value) {
     updatePopoverPosition()
-    if (languageFlyoutOpen.value) updateLanguageFlyoutPosition()
   }
 }
 
@@ -304,7 +226,8 @@ function unbindOutsideClose() {
 
 watch(showUserMenu, (open) => {
   if (!open) {
-    languageFlyoutOpen.value = false
+    profileExpanded.value = false
+    languageExpanded.value = false
     unbindOutsideClose()
     window.removeEventListener('scroll', onScrollOrResize, true)
     window.removeEventListener('resize', onScrollOrResize)
@@ -316,11 +239,6 @@ watch(showUserMenu, (open) => {
     window.addEventListener('resize', onScrollOrResize)
     bindOutsideClose()
   })
-})
-
-watch(languageFlyoutOpen, (open) => {
-  if (!open) return
-  nextTick(() => updateLanguageFlyoutPosition())
 })
 
 onUnmounted(() => {
@@ -348,6 +266,19 @@ const currentLanguageLabel = computed(() => {
   return found?.name ?? 'English'
 })
 
+const currentProfileLabel = computed(() => {
+  const found = sidebarProfiles.value.find((p) => p.id === sidebarProfile.value)
+  return found?.label ?? t('common.layout.switchProfile')
+})
+
+const otherProfiles = computed(() =>
+  sidebarProfiles.value.filter((p) => p.id !== sidebarProfile.value)
+)
+
+const otherLanguages = computed(() =>
+  languages.filter((l) => l.code !== currentLocale.value)
+)
+
 const userInitials = computed(() => {
   if (!userStore.currentUser || !userStore.currentUser.name) {
     return 'U'
@@ -362,12 +293,16 @@ const userInitials = computed(() => {
 function changeLanguage(langCode) {
   locale.value = langCode
   localStorage.setItem('app-locale', langCode)
-  languageFlyoutOpen.value = false
+  languageExpanded.value = false
   showUserMenu.value = false
 }
 
-function toggleLanguageFlyout() {
-  languageFlyoutOpen.value = !languageFlyoutOpen.value
+function toggleLanguageExpanded() {
+  languageExpanded.value = !languageExpanded.value
+}
+
+function toggleProfileExpanded() {
+  profileExpanded.value = !profileExpanded.value
 }
 
 function toggleUserMenu() {
@@ -381,6 +316,11 @@ function goToMyProfile() {
 
 function handleLogout() {
   showUserMenu.value = false
+}
+
+function setSidebarProfile(profileId) {
+  settingsStore.setSetting('sidebarProfile', profileId)
+  profileExpanded.value = false
 }
 
 function handleSearch() {

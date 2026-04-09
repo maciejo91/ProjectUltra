@@ -1,6 +1,6 @@
 <template>
   <div class="page-container flex flex-col min-h-0">
-    <div class="flex-1 overflow-y-auto pt-4 px-4 pb-8 md:pt-6 md:px-6 md:pb-10 lg:pt-8 lg:px-8 lg:pb-12 min-h-0">
+    <div class="flex-1 overflow-y-auto px-6 pb-8 md:pb-10 lg:pb-12 min-h-0">
       <!-- Main Content Grid - 2/3 vs 1/3 starting from top -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full">
         

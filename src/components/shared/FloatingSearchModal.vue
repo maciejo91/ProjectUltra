@@ -10,8 +10,8 @@
         <div class="absolute inset-0 bg-black/50" @click="close"></div>
         
         <!-- Search Input Container -->
-        <div class="relative w-full max-w-2xl mx-4">
-          <div class="bg-white rounded-lg shadow-xl border border-border overflow-hidden">
+        <div class="relative w-full max-w-[460px] mx-4">
+          <div class="bg-white rounded-lg shadow-xl border border-input overflow-hidden">
             <div class="flex items-center gap-3 px-4 py-3">
               <Search :size="20" class="text-muted-foreground shrink-0" />
               <input

@@ -60,7 +60,14 @@
     "closeSidebar": "Seitenleiste schließen",
     "toggleSidebar": "Seitenleiste ein- oder ausklappen",
     "userMenu": "Benutzermenü",
-    "goToMyProfile": "Zu meinem Profil"
+    "goToMyProfile": "Zu meinem Profil",
+    "switchProfile": "Profil wechseln",
+    "profiles": {
+      "admin": "Admin",
+      "salesRep": "Sales rep",
+      "bdcOperator": "BDC operator",
+      "externalBdc": "External BDC"
+    }
   },
   "buttons": {
     "save": "Speichern",
@@ -102,7 +109,9 @@
     "signOut": "Abmelden",
     "logout": "Abmelden",
     "lightMode": "Hellmodus",
-    "darkMode": "Dunkelmodus"
+    "darkMode": "Dunkelmodus",
+    "newContact": "Neuer Kontakt",
+    "newVehicle": "Neues Fahrzeug"
   },
   "status": {
     "hot": "Hot",
@@ -143,6 +152,7 @@
   },
   "common": {
     "loading": "Lädt...",
+    "loadingLabel": "Laden",
     "error": "Fehler",
     "success": "Erfolg",
     "noData": "Keine Daten verfügbar",
@@ -185,7 +195,44 @@
     "expandTranscript": "Erweitern",
     "collapseTranscript": "Einklappen"
   },
+  "conversations": {
+    "channels": {
+      "email": "E-Mail",
+      "whatsapp": "WhatsApp",
+      "sms": "SMS",
+      "unknown": "Unbekannt"
+    },
+    "list": {
+      "searchPlaceholder": "Konversationen durchsuchen",
+      "messageTypeLabel": "Nachricht"
+    },
+    "thread": {
+      "showMore": "Mehr anzeigen",
+      "showLess": "Weniger anzeigen",
+      "empty": "Keine Nachrichten in diesem Thread.",
+      "composerPlaceholder": "Nachricht eingeben…",
+      "send": "Senden",
+      "channelReplyHint": "Antworten werden über diesen Kanal gesendet.",
+      "today": "Heute",
+      "yesterday": "Gestern"
+    },
+    "summary": {
+      "title": "Übersicht",
+      "empty": "Wählen Sie eine Konversation, um Lead-Details zu sehen.",
+      "requestDetails": "Anfragedetails",
+      "openRequest": "Anfrage in neuem Tab öffnen",
+      "recall": "Rückruf"
+    },
+    "empty": {
+      "noSelectionTitle": "Keine Konversation ausgewählt",
+      "noSelectionHint": "Wählen Sie eine Konversation aus der Liste, um Nachrichten zu lesen und zu antworten."
+    },
+    "mobile": {
+      "backToList": "Zurück zu Konversationen"
+    }
+  },
   "assignee": {
+    "assignedTo": "Zugewiesen an",
     "taskUnassigned": "Diese Aufgabe ist nicht zugewiesen",
     "assignToMe": "Mir zuweisen",
     "assignToSomeone": "Jemand anderem zuweisen",

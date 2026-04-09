@@ -4,40 +4,19 @@
 
     <SidebarInset class="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted">
       <header
-        v-if="route.name !== 'customer-view' && route.name !== 'request-detail'"
-        class="mobile-header md:hidden h-16 border-b border-border bg-background flex items-center justify-between gap-3 px-4 shrink-0 z-50"
+        v-if="showMobileHeader"
+        class="mobile-header md:hidden shrink-0 z-50 flex items-start justify-between gap-3 px-6 py-6"
+        :class="route.meta?.mutedPageChrome ? 'bg-muted' : 'bg-background'"
       >
         <SidebarTrigger
           class="w-11 h-11 shrink-0 rounded-lg text-muted-foreground hover:text-brand-red hover:bg-red-50"
           :aria-label="t('common.layout.openSidebar')"
         />
-        <h1 class="truncate text-base font-medium text-foreground flex-1 min-w-0">
+        <h1 class="truncate text-xl leading-6 font-semibold text-foreground flex-1 min-w-0">
           {{ mobilePageTitle }}
         </h1>
         <div class="flex shrink-0 items-center gap-2 ml-auto">
-          <template v-if="mobileTasksHeaderActions">
-            <div class="outcome-toggle-group bg-muted p-0.5 rounded-btn inline-flex gap-0.5 shrink-0">
-              <Toggle
-                variant="outline"
-                :model-value="mobileTasksHeaderActions.viewModeRef.value === 'card'"
-                class="h-7 w-7 rounded-md inline-flex items-center justify-center border transition-colors min-w-7 p-0"
-                title="Card View"
-                @update:model-value="(p) => p && mobileTasksHeaderActions.onViewChange('card')"
-              >
-                <LayoutGrid :size="14" />
-              </Toggle>
-              <Toggle
-                variant="outline"
-                :model-value="mobileTasksHeaderActions.viewModeRef.value === 'table'"
-                class="h-7 w-7 rounded-md inline-flex items-center justify-center border transition-colors min-w-7 p-0"
-                title="Table View"
-                @update:model-value="(p) => p && mobileTasksHeaderActions.onViewChange('table')"
-              >
-                <Table :size="14" />
-              </Toggle>
-            </div>
-          </template>
-          <template v-else-if="route.name === 'reports'">
+          <template v-if="route.name === 'reports'">
             <select
               v-model="mobileReportsTimeRange"
               class="px-2 py-1 rounded-lg border border-border bg-background text-sm font-medium text-muted-foreground"
@@ -82,13 +61,15 @@
             </Button>
           </template>
           <template v-else-if="mobileCustomHeaderActions">
-            <button
-              type="button"
-              class="flex items-center justify-center w-8 h-8 rounded-lg border border-border bg-muted text-muted-foreground hover:border-red-100 hover:bg-red-50 hover:text-brand-red transition-all"
+            <Button
+              variant="default"
+              size="sm"
+              class="size-8 shrink-0 p-0 rounded-sm"
+              :aria-label="mobileCustomAddLabel"
               @click="mobileCustomHeaderActions.onAddNew()"
             >
-              <Plus class="w-4 h-4 shrink-0" />
-            </button>
+              <Plus class="size-4 shrink-0" />
+            </Button>
           </template>
         </div>
       </header>
@@ -103,8 +84,8 @@
               class="hidden shrink-0 flex-col border-border border-r bg-background md:flex md:w-80"
             >
               <AppHeader
-                v-if="route.name !== 'customer-view' && route.name !== 'request-detail'"
-                class="sticky top-0 z-10 shrink-0 border-border border-b bg-background"
+                v-if="showDesktopHeader"
+                class="sticky top-0 z-10 shrink-0 bg-background"
               />
               <div class="w-full min-w-0">
                 <div id="tasks-list-teleport" class="flex w-full flex-col" />
@@ -119,11 +100,43 @@
             </div>
           </div>
         </template>
+        <template v-else-if="showConversationsSplitPane">
+          <div
+            class="flex min-h-0 min-w-0 flex-1 overflow-hidden"
+          >
+            <aside
+              class="hidden min-h-0 w-full shrink-0 flex-col overflow-hidden border-border border-r bg-background md:flex md:w-1/4 md:min-w-0"
+            >
+              <AppHeader
+                v-if="showDesktopHeader"
+                class="sticky top-0 z-10 shrink-0 bg-background"
+              />
+              <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+                <div
+                  id="conversations-list-teleport"
+                  class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+                />
+              </div>
+            </aside>
+            <div
+              class="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-border border-l bg-background"
+            >
+              <div class="hidden h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:flex">
+                <div
+                  id="conversations-detail-teleport"
+                  class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+                />
+              </div>
+            </div>
+          </div>
+        </template>
         <main
-          v-show="!showTaskDetailSplitPane"
-          class="flex-1 flex flex-col overflow-hidden min-h-0"
+          v-show="!showTaskDetailSplitPane && !showConversationsSplitPane"
+          class="flex min-h-0 flex-1 flex-col overflow-hidden"
+          :class="route.meta?.mutedPageChrome ? 'bg-muted' : 'bg-background'"
         >
-          <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <AppHeader v-if="showDesktopHeader" class="sticky top-0 z-10 shrink-0" />
+          <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
             <router-view />
           </div>
         </main>
@@ -136,8 +149,8 @@
 import { ref, provide, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { LayoutGrid, Table, Plus, RefreshCw, Filter } from 'lucide-vue-next'
-import { Toggle, Button, SidebarProvider, SidebarInset, SidebarTrigger } from '@motork/component-library/future/primitives'
+import { Plus, RefreshCw, Filter } from 'lucide-vue-next'
+import { Button, SidebarProvider, SidebarInset, SidebarTrigger } from '@motork/component-library/future/primitives'
 import { useLayoutStore } from '@/stores/layout'
 import AppHeader from './AppHeader.vue'
 import AppSidebar from './AppSidebar.vue'
@@ -161,6 +174,7 @@ const ROUTE_TITLE_MAP = {
   customers: 'common.navigation.customers',
   calendar: 'common.navigation.calendar',
   reports: 'common.navigation.reports',
+  marketing: 'common.navigation.marketing',
   'access-denied': null
 }
 
@@ -169,12 +183,6 @@ const mobilePageTitle = computed(() => {
   if (meta?.title) return meta.title
   const key = meta?.titleKey ?? ROUTE_TITLE_MAP[route.name]
   return key ? t(key) : t('common.navigation.tasks')
-})
-
-const mobileTasksHeaderActions = computed(() => {
-  const ref = headerActionsRef?.value
-  if (ref?.type === 'tasks') return ref
-  return null
 })
 
 const mobileHomeHeaderActions = computed(() => {
@@ -189,10 +197,31 @@ const mobileCustomHeaderActions = computed(() => {
   return null
 })
 
+const mobileCustomAddLabel = computed(() => {
+  const ref = mobileCustomHeaderActions.value
+  if (!ref) return ''
+  if (ref.addLabelKey) return t(ref.addLabelKey)
+  return t('common.navigation.addNew')
+})
+
 const mobileCalendarHeaderActions = computed(() => {
   const ref = headerActionsRef?.value
   if (ref?.type === 'calendar') return ref
   return null
+})
+
+const showDesktopHeader = computed(() => {
+  if (route?.meta?.showPageTitle === false) return false
+  if (route.name === 'task-detail' && Boolean(route.params.id)) return false
+  if (route.name === 'conversations' && Boolean(route.params.threadId)) return false
+  return true
+})
+
+const showMobileHeader = computed(() => {
+  if (route?.meta?.showPageTitle === false) return false
+  if (route.name === 'task-detail' && Boolean(route.params.id)) return false
+  if (route.name === 'conversations' && Boolean(route.params.threadId)) return false
+  return true
 })
 
 const showTaskDetailSplitPane = computed(() => {
@@ -200,6 +229,14 @@ const showTaskDetailSplitPane = computed(() => {
     route.name === 'task-detail' &&
     layoutStore.hideHeaderForTaskDetail &&
     Boolean(route.params.id)
+  )
+})
+
+const showConversationsSplitPane = computed(() => {
+  return (
+    route.name === 'conversations' &&
+    layoutStore.hideHeaderForConversations &&
+    Boolean(route.params.threadId)
   )
 })
 </script>

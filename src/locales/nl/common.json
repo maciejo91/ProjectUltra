@@ -60,7 +60,14 @@
     "closeSidebar": "Zijbalk sluiten",
     "toggleSidebar": "Zijbalk in- of uitklappen",
     "userMenu": "Gebruikersmenu",
-    "goToMyProfile": "Naar mijn profiel"
+    "goToMyProfile": "Naar mijn profiel",
+    "switchProfile": "Profiel wisselen",
+    "profiles": {
+      "admin": "Admin",
+      "salesRep": "Sales rep",
+      "bdcOperator": "BDC operator",
+      "externalBdc": "External BDC"
+    }
   },
   "buttons": {
     "save": "Opslaan",
@@ -102,7 +109,9 @@
     "signOut": "Afmelden",
     "logout": "Uitloggen",
     "lightMode": "Lichte Modus",
-    "darkMode": "Donkere Modus"
+    "darkMode": "Donkere Modus",
+    "newContact": "Nieuw contact",
+    "newVehicle": "Nieuw voertuig"
   },
   "status": {
     "hot": "Hot",
@@ -143,6 +152,7 @@
   },
   "common": {
     "loading": "Laden...",
+    "loadingLabel": "Laden",
     "error": "Fout",
     "success": "Succes",
     "noData": "Geen gegevens beschikbaar",
@@ -185,7 +195,44 @@
     "expandTranscript": "Uitklappen",
     "collapseTranscript": "Inklappen"
   },
+  "conversations": {
+    "channels": {
+      "email": "E-mail",
+      "whatsapp": "WhatsApp",
+      "sms": "SMS",
+      "unknown": "Onbekend"
+    },
+    "list": {
+      "searchPlaceholder": "Zoek gesprekken",
+      "messageTypeLabel": "Bericht"
+    },
+    "thread": {
+      "showMore": "Meer tonen",
+      "showLess": "Minder tonen",
+      "empty": "Geen berichten in dit gesprek.",
+      "composerPlaceholder": "Typ een bericht…",
+      "send": "Verzenden",
+      "channelReplyHint": "Antwoorden worden via dit kanaal verstuurd.",
+      "today": "Vandaag",
+      "yesterday": "Gisteren"
+    },
+    "summary": {
+      "title": "Samenvatting",
+      "empty": "Selecteer een gesprek om leadgegevens te zien.",
+      "requestDetails": "Aanvraagdetails",
+      "openRequest": "Aanvraag in nieuw tabblad openen",
+      "recall": "Terugbel"
+    },
+    "empty": {
+      "noSelectionTitle": "Geen gesprek geselecteerd",
+      "noSelectionHint": "Kies een gesprek in de lijst om berichten te lezen en te antwoorden."
+    },
+    "mobile": {
+      "backToList": "Terug naar gesprekken"
+    }
+  },
   "assignee": {
+    "assignedTo": "Toegewezen aan",
     "taskUnassigned": "Deze taak is niet toegewezen",
     "assignToMe": "Aan mij toewijzen",
     "assignToSomeone": "Aan iemand toewijzen",

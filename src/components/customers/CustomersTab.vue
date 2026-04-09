@@ -1,25 +1,16 @@
 <template>
-  <div class="mb-8">
-    <div class="bg-white">
-      <div class="mb-1">
-      <UnifiedSearchBar
-        active-tab="customers"
-        full-width
-        placeholder="Search customers..."
-        :pagination="pagination"
-        :source-options="customersSourceOptions"
-        :account-type-options="accountTypeOptions"
-        @update:globalFilter="globalFilter = $event"
-        @update:columnFilters="columnFilters = $event"
-        @update:pagination="pagination = $event"
-      />
-      </div>
-      <div
-        ref="tableScrollContainer"
-        class="data-table-inner table-search-wrapper"
-        :class="{ 'hide-table-filter': !hasActiveFilters }"
-        @click="onTableContainerClick"
-      >
+  <DataTableWithUnifiedSearch
+    ref="datatableShellRef"
+    active-tab="customers"
+    placeholder="Search customers..."
+    :pagination="pagination"
+    :source-options="customersSourceOptions"
+    :account-type-options="accountTypeOptions"
+    @update:global-filter="globalFilter = $event"
+    @update:column-filters="columnFilters = $event"
+    @update:pagination="pagination = $event"
+    @wrapper-click="onTableContainerClick"
+  >
       <DataTable 
         :data="paginatedData" 
         :columns="columns"
@@ -76,9 +67,7 @@
           </div>
         </template>
       </DataTable>
-      </div>
-    </div>
-  </div>
+  </DataTableWithUnifiedSearch>
 </template>
 
 <script setup>
@@ -86,7 +75,7 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { Inbox, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
-import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
+import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import { useCustomersStore } from '@/stores/customers'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
@@ -171,7 +160,7 @@ const props = defineProps({
 })
 
 const activeTab = ref('customers')
-const tableScrollContainer = ref(null)
+const datatableShellRef = ref(null)
 const { columns, filterDefinitions, tableMeta: baseTableMeta } = useCustomersTable(activeTab, handleRowClick, { rows })
 
 const isHighlighted = (row) => {
@@ -231,7 +220,8 @@ const { onTableContainerClick } = useTableRowClick(paginatedData, handleRowClick
 watch(
   () => props.highlightId,
   async (id) => {
-    if (!id || !tableScrollContainer.value) return
+    const tableScrollContainer = datatableShellRef.value?.tableScrollContainer
+    if (!id || !tableScrollContainer) return
     const idx = sortedData.value.findIndex(r => r.id === id)
     if (idx === -1) return
     const pageSize = pagination.value.pageSize || 10
@@ -240,7 +230,7 @@ watch(
       pagination.value = { ...pagination.value, pageIndex }
     }
     await nextTick()
-    const rows = tableScrollContainer.value.querySelectorAll('tbody tr')
+    const rows = tableScrollContainer.querySelectorAll('tbody tr')
     const rowIndexOnPage = idx % pageSize
     const rowEl = rows[rowIndexOnPage]
     if (rowEl) {
@@ -260,12 +250,6 @@ const customersSourceOptions = computed(() => {
 const accountTypeOptions = computed(() => {
   const def = filterDefinitions.value?.find(d => d.key === 'accountType')
   return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
-})
-
-const hasActiveFilters = computed(() => {
-  const hasColumnFilters = Array.isArray(columnFilters.value) && columnFilters.value.length > 0
-  const hasSearch = Boolean(globalFilter.value && String(globalFilter.value).trim())
-  return hasColumnFilters || hasSearch
 })
 
 // Bulk delete handler
@@ -295,47 +279,4 @@ onMounted(async () => {
   await opportunitiesStore.fetchOpportunities()
 })
 </script>
-
-<style scoped>
-/* Component-specific styles only - global table styles are in main.css */
-
-/* Avatar fallback - use greys-300 color */
-:deep([data-radix-avatar-fallback]),
-:deep(.avatar-fallback),
-:deep(span[class*='AvatarFallback']) {
-  background-color: #d4d4d4 !important;
-}
-
-/* Table border overrides - make borders very subtle (border-black/5) */
-:deep(tbody tr) {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-}
-
-:deep(tbody tr:last-child) {
-  border-bottom: none !important;
-}
-
-/* Hide built-in DataTable search row only (UnifiedSearchBar is used above the table) */
-.data-table-inner.table-search-wrapper :deep([data-slot="table-search"]),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[placeholder*="Search"])),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[type="search"])) {
-  display: none !important;
-}
-
-/* Hide filter row when no filter is applied */
-.hide-table-filter :deep([data-slot="table-filter"]) {
-  display: none !important;
-}
-
-/* Enable horizontal and vertical scrolling */
-:deep([data-slot="table-container"]) {
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  max-height: 600px !important;
-}
-
-:deep(table) {
-  min-width: 100% !important;
-}
-</style>
 

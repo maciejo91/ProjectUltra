@@ -2,7 +2,7 @@
   <div class="page-container flex flex-col overflow-hidden h-full">
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col overflow-hidden min-h-0">
-      <div class="flex-1 overflow-y-auto p-4 md:p-8 min-h-0">
+      <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 min-h-0">
       <div class="flex flex-col lg:flex-row gap-4 sm:gap-5 md:gap-6 max-w-screen-2xl mx-auto w-full">
         <!-- Left Section: Main Dashboard -->
         <div class="flex-1 flex flex-col gap-6 min-w-0">

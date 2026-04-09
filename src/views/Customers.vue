@@ -2,7 +2,7 @@
   <div class="page-container relative flex flex-col overflow-hidden h-full bg-surface">
     <!-- Filters + Table -->
     <div class="flex-1 flex flex-col overflow-hidden">
-      <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide">
+      <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide">
         <!-- Customers table (tabs hidden for now) -->
         <Suspense>
           <CustomersTab ref="customersTabRef" :highlight-id="highlightId" @row-click="handleRowClick" />
@@ -207,6 +207,7 @@ onMounted(async () => {
   if (headerActionsRef) {
     headerActionsRef.value = {
       type: 'customers',
+      addLabelKey: 'common.actions.newContact',
       onAddNew: () => router.push('/add-new')
     }
   }

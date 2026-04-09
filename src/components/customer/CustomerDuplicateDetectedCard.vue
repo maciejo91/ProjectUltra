@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="potentialDuplicates.length > 0"
-    class="rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 shadow-mk-dashboard-card"
+    class="rounded-lg border border-primary/20 bg-primary/10 px-4 py-3"
   >
     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
       <div class="flex-1 min-w-0">

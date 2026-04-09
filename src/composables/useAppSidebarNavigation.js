@@ -1,7 +1,6 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
-  Home,
   UserSquare,
   CarFront,
   Tag,
@@ -22,11 +21,95 @@ export function useAppSidebarNavigation() {
   const userStore = useUserStore()
   const leadsStore = useLeadsStore()
 
-  const navigationVisibility = computed(() => settingsStore.getSetting('navigationVisibility') || {})
+  const sidebarProfile = computed(() => settingsStore.getSetting('sidebarProfile') || 'admin')
+  const storedNavigationVisibility = computed(() => settingsStore.getSetting('navigationVisibility') || {})
+
+  const profileNavigationVisibility = computed(() => {
+    const profile = sidebarProfile.value
+    if (profile === 'admin') return null
+
+    const v = {
+      home: false,
+      tasks: false,
+      requests: false,
+      afterSales: false,
+      conversations: false,
+      customers: false,
+      calendar: false,
+      reports: false,
+      lists: false,
+      search: false,
+      language: false,
+      marketing: false,
+      support: false
+    }
+
+    if (profile === 'salesRep') {
+      return {
+        ...v,
+        tasks: true,
+        calendar: true,
+        conversations: true,
+        customers: true,
+        lists: true,
+        requests: true,
+        search: true,
+        support: true
+      }
+    }
+
+    if (profile === 'bdc') {
+      return {
+        ...v,
+        tasks: true,
+        calendar: true,
+        conversations: true,
+        customers: true,
+        lists: true,
+        requests: true,
+        afterSales: true,
+        reports: true,
+        search: true,
+        support: true
+      }
+    }
+
+    if (profile === 'externalBdc') {
+      return {
+        ...v,
+        tasks: true,
+        support: true
+      }
+    }
+
+    return null
+  })
+
+  const navigationVisibility = computed(() => profileNavigationVisibility.value ?? storedNavigationVisibility.value)
+
+  const actionsVisibility = computed(() => {
+    const profile = sidebarProfile.value
+    const nav = navigationVisibility.value
+    if (profile === 'externalBdc') {
+      return { addNew: false, search: false }
+    }
+    return {
+      addNew: true,
+      search: nav.search !== false
+    }
+  })
+
+  const bottomNavVisibility = computed(() => {
+    const profile = sidebarProfile.value
+    const nav = navigationVisibility.value
+    return {
+      support: nav.support !== false,
+      settings: profile === 'admin' && userStore.canAccessSettings()
+    }
+  })
 
   const firstVisibleRoute = computed(() => {
     const nav = navigationVisibility.value
-    if (nav.home !== false) return '/home'
     if (nav.calendar !== false) return '/calendar'
     if (nav.tasks !== false) return '/tasks'
     if (nav.conversations !== false) return '/conversations'
@@ -34,7 +117,7 @@ export function useAppSidebarNavigation() {
     if (nav.lists !== false) return '/vehicles'
     if (nav.requests !== false) return '/requests'
     if (nav.afterSales !== false) return '/after-sales'
-    if (userStore.canAccessReports() && nav.reports !== false) return '/reports'
+    if (nav.reports !== false && (sidebarProfile.value !== 'admin' || userStore.canAccessReports())) return '/reports'
     return '/tasks'
   })
 
@@ -43,11 +126,12 @@ export function useAppSidebarNavigation() {
   const primaryNavItems = computed(() => {
     const nav = navigationVisibility.value
     const items = []
-    if (nav.home !== false) {
+    if (nav.tasks !== false) {
       items.push({
-        name: t('common.navigation.home'),
-        href: '/home',
-        icon: Home
+        name: t('common.navigation.tasks'),
+        href: '/tasks',
+        icon: ListTodo,
+        notificationCount: hotLeadsCount.value > 0 ? hotLeadsCount.value : undefined
       })
     }
     if (nav.calendar !== false) {
@@ -55,14 +139,6 @@ export function useAppSidebarNavigation() {
         name: t('common.navigation.calendar'),
         href: '/calendar',
         icon: Calendar
-      })
-    }
-    if (nav.tasks !== false) {
-      items.push({
-        name: t('common.navigation.tasks'),
-        href: '/tasks',
-        icon: ListTodo,
-        notificationCount: hotLeadsCount.value > 0 ? hotLeadsCount.value : undefined
       })
     }
     if (nav.conversations !== false) {
@@ -106,7 +182,7 @@ export function useAppSidebarNavigation() {
         icon: Wrench
       })
     }
-    if (userStore.canAccessReports() && nav.reports !== false) {
+    if (nav.reports !== false && (sidebarProfile.value !== 'admin' || userStore.canAccessReports())) {
       items.push({
         name: t('common.navigation.reports'),
         href: '/reports',
@@ -115,9 +191,8 @@ export function useAppSidebarNavigation() {
     }
     if (nav.marketing !== false) {
       items.push({
-        kind: 'comingSoon',
-        id: 'marketing',
         name: t('common.navigation.marketing'),
+        href: '/marketing',
         icon: Megaphone
       })
     }
@@ -127,7 +202,10 @@ export function useAppSidebarNavigation() {
   const addNewLabel = computed(() => t('common.navigation.addNew'))
 
   return {
+    sidebarProfile,
     navigationVisibility,
+    actionsVisibility,
+    bottomNavVisibility,
     firstVisibleRoute,
     primaryNavItems,
     dataNavItems,

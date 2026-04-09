@@ -1,19 +1,14 @@
 <template>
   <div class="mb-8">
-    <div class="bg-white">
-      <div class="mb-1">
-        <UnifiedSearchBar
-          active-tab="campaigns"
-          full-width
-          placeholder="Search campaigns..."
-          :pagination="pagination"
-          :status-options="statusOptions"
-          @update:globalFilter="globalFilter = $event"
-          @update:columnFilters="columnFilters = $event"
-          @update:pagination="pagination = $event"
-        />
-      </div>
-      <div class="data-table-inner table-search-wrapper">
+  <DataTableWithUnifiedSearch
+    active-tab="campaigns"
+    placeholder="Search campaigns..."
+    :pagination="pagination"
+    :status-options="statusOptions"
+    @update:global-filter="globalFilter = $event"
+    @update:column-filters="columnFilters = $event"
+    @update:pagination="pagination = $event"
+  >
         <DataTable
           :data="paginatedData"
           :columns="columns"
@@ -35,8 +30,7 @@
             </div>
           </template>
         </DataTable>
-      </div>
-    </div>
+  </DataTableWithUnifiedSearch>
 
     <LinkLeadModal
       :show="showLinkLeadModal"
@@ -64,7 +58,7 @@
 import { ref, computed, h, onMounted } from 'vue'
 import { Inbox, User, Mail, MessageCircle, ArrowUpRight, ArrowDownLeft, Link2, Eye, ExternalLink } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
-import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
+import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import LinkLeadModal from '@/components/modals/LinkLeadModal.vue'
 import LinkOpportunityModal from '@/components/modals/LinkOpportunityModal.vue'
 import ConversationViewModal from '@/components/modals/ConversationViewModal.vue'
@@ -376,31 +370,3 @@ onMounted(async () => {
   await campaignsStore.fetchInteractions()
 })
 </script>
-
-<style scoped>
-/* Table border overrides - make borders very subtle */
-:deep(tbody tr) {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-}
-
-:deep(tbody tr:last-child) {
-  border-bottom: none !important;
-}
-
-/* Hide built-in DataTable search row (UnifiedSearchBar is above) */
-.data-table-inner.table-search-wrapper :deep([data-slot="table-search"]),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[placeholder*="Search"])),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[type="search"])) {
-  display: none !important;
-}
-
-:deep([data-slot="table-container"]) {
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  max-height: 600px !important;
-}
-
-:deep(table) {
-  min-width: 100% !important;
-}
-</style>

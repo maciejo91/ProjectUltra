@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-6 flex h-full flex-col overflow-hidden bg-surface">
+  <div class="mb-6 flex h-full flex-col overflow-hidden bg-muted">
     <header
       v-if="showCloseButton || from"
       class="customer-profile-drawer-header shrink-0 px-4 sm:px-6"
@@ -56,18 +56,16 @@
     </header>
 
     <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div
-        class="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 lg:overflow-hidden"
-      >
+      <div class="flex min-h-0 flex-1 flex-col overflow-y-auto lg:overflow-hidden">
         <div
-          class="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-4 lg:overflow-hidden"
+          class="flex min-h-0 w-full min-w-0 flex-1 flex-col gap-4 overflow-x-hidden overscroll-contain p-4 lg:min-h-0 lg:flex-row lg:items-stretch lg:gap-4 lg:overflow-hidden"
         >
           <div
-            class="order-1 flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+            class="order-1 relative flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden bg-muted lg:min-h-0 lg:min-w-0 lg:shrink-0"
           >
-            <div class="flex min-w-0 shrink-0 flex-col gap-4">
+            <div class="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
               <div
-                class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg bg-background"
+                class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg border border-border bg-background"
               >
                 <TaskContactCard
                   v-if="customer"
@@ -81,7 +79,7 @@
                 />
               </div>
               <div
-                class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-background"
+                class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-background"
               >
                 <div class="shrink-0 px-4 pt-2">
                   <RequestMainTabs class="shrink-0" v-model="activeTab" :tabs="mainTabs" />

@@ -1,52 +1,39 @@
 <template>
   <div class="page-container relative flex flex-col overflow-hidden h-full bg-surface">
     <div class="flex-1 flex flex-col overflow-hidden">
-      <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide min-h-0">
-        <div class="bg-white mb-8">
-          <div class="flex flex-wrap items-center gap-2 py-2 mb-4">
-            <div class="outcome-toggle-group flex flex-wrap gap-3">
-              <Toggle
-                v-for="chip in filterChips"
-                :key="chip.key"
-                variant="outline"
-                :model-value="selectedInventoryChip === chip.key"
-                :aria-pressed="selectedInventoryChip === chip.key"
-                class="outcome-toggle-item rounded-sm"
-                @update:model-value="(p) => p && (selectedInventoryChip = chip.key)"
-              >
-                {{ chip.label }} ({{ chip.count }})
-              </Toggle>
-            </div>
+      <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide min-h-0">
+        <div class="mb-8 flex flex-col gap-2 md:gap-3">
+          <div class="shrink-0 overflow-visible pb-2 pt-1">
+            <RequestMainTabs v-model="selectedInventoryChip" :tabs="filterChips" />
           </div>
-          <div class="mb-1">
-            <UnifiedSearchBar
+          <div class="bg-background min-w-0 w-full">
+            <DataTableWithUnifiedSearch
               active-tab="vehicles"
-              full-width
               placeholder="Search vehicles..."
               :pagination="pagination"
               :status-options="vehicleStatusOptions"
               :volvo-model-options="volvoModelOptions"
               :brand-options="vehicleBrandOptions"
+              :include-margin-bottom="false"
               @update:global-filter="globalFilter = $event"
               @update:column-filters="columnFilters = $event"
               @update:pagination="pagination = $event"
-            />
-          </div>
-          <div class="data-table-inner table-search-wrapper">
-            <VehicleGrid
-              :filtered-vehicles="paginatedData"
-              :row-count="totalFilteredCount"
-              :columns="columns"
-              :loading="vehiclesStore.loading"
-              :table-meta="tableMeta"
-              :filter-definitions="filterDefinitions"
-              v-model:pagination="pagination"
-              v-model:global-filter="globalFilter"
-              v-model:sorting="sorting"
-              v-model:column-filters="columnFilters"
-              v-model:column-visibility="columnVisibility"
-              @row-click="handleRowClick"
-            />
+            >
+              <VehicleGrid
+                :filtered-vehicles="paginatedData"
+                :row-count="totalFilteredCount"
+                :columns="columns"
+                :loading="vehiclesStore.loading"
+                :table-meta="tableMeta"
+                :filter-definitions="filterDefinitions"
+                v-model:pagination="pagination"
+                v-model:global-filter="globalFilter"
+                v-model:sorting="sorting"
+                v-model:column-filters="columnFilters"
+                v-model:column-visibility="columnVisibility"
+                @row-click="handleRowClick"
+              />
+            </DataTableWithUnifiedSearch>
           </div>
         </div>
       </div>
@@ -244,11 +231,12 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount, inject, h } from 'vue'
 import { X, FilePlus } from 'lucide-vue-next'
 import { useVehiclesStore } from '@/stores/vehicles'
-import { Badge, Button, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea, Toggle } from '@motork/component-library/future/primitives'
+import { Badge, Button, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea } from '@motork/component-library/future/primitives'
 import DrawerContainer from '@/components/shared/DrawerContainer.vue'
+import RequestMainTabs from '@/components/requests/RequestMainTabs.vue'
 import VehicleGrid from '@/components/vehicles/VehicleGrid.vue'
 import AddOfferModal from '@/components/modals/AddOfferModal.vue'
-import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
+import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import { useVehicleDetail } from '@/composables/useVehicleDetail'
 import { useDataTableData } from '@/composables/useDataTableData'
 
@@ -505,6 +493,7 @@ onMounted(() => {
   if (headerActionsRef) {
     headerActionsRef.value = {
       type: 'vehicles',
+      addLabelKey: 'common.actions.newVehicle',
       onAddNew: () => { showAddModal.value = true }
     }
   }

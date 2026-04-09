@@ -60,7 +60,14 @@
     "closeSidebar": "Chiudi barra laterale",
     "toggleSidebar": "Espandi o comprimi la barra laterale",
     "userMenu": "Menu utente",
-    "goToMyProfile": "Vai al mio profilo"
+    "goToMyProfile": "Vai al mio profilo",
+    "switchProfile": "Cambia profilo",
+    "profiles": {
+      "admin": "Admin",
+      "salesRep": "Sales rep",
+      "bdcOperator": "BDC operator",
+      "externalBdc": "External BDC"
+    }
   },
   "buttons": {
     "save": "Salva",
@@ -102,7 +109,9 @@
     "signOut": "Esci",
     "logout": "Esci",
     "lightMode": "Modalità Chiara",
-    "darkMode": "Modalità Scura"
+    "darkMode": "Modalità Scura",
+    "newContact": "Nuovo contatto",
+    "newVehicle": "Nuovo veicolo"
   },
   "status": {
     "hot": "Hot",
@@ -143,6 +152,7 @@
   },
   "common": {
     "loading": "Caricamento...",
+    "loadingLabel": "Caricamento",
     "error": "Errore",
     "success": "Successo",
     "noData": "Nessun dato disponibile",
@@ -185,7 +195,44 @@
     "expandTranscript": "Espandi",
     "collapseTranscript": "Comprimi"
   },
+  "conversations": {
+    "channels": {
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "sms": "SMS",
+      "unknown": "Sconosciuto"
+    },
+    "list": {
+      "searchPlaceholder": "Cerca conversazioni",
+      "messageTypeLabel": "Messaggio"
+    },
+    "thread": {
+      "showMore": "Mostra di più",
+      "showLess": "Mostra meno",
+      "empty": "Nessun messaggio in questa conversazione.",
+      "composerPlaceholder": "Scrivi un messaggio…",
+      "send": "Invia",
+      "channelReplyHint": "Le risposte vengono inviate su questo canale.",
+      "today": "Oggi",
+      "yesterday": "Ieri"
+    },
+    "summary": {
+      "title": "Riepilogo",
+      "empty": "Seleziona una conversazione per vedere i dettagli del lead.",
+      "requestDetails": "Dettagli richiesta",
+      "openRequest": "Apri richiesta in una nuova scheda",
+      "recall": "Richiamo"
+    },
+    "empty": {
+      "noSelectionTitle": "Nessuna conversazione selezionata",
+      "noSelectionHint": "Scegli una conversazione dall’elenco per leggere i messaggi e rispondere."
+    },
+    "mobile": {
+      "backToList": "Torna alle conversazioni"
+    }
+  },
   "assignee": {
+    "assignedTo": "Assegnato a",
     "taskUnassigned": "Questa attività non è assegnata",
     "assignToMe": "Assegna a me",
     "assignToSomeone": "Assegna a qualcuno",

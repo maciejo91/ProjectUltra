@@ -56,7 +56,7 @@
       </PageHeader>
 
       <!-- Content -->
-      <div class="pt-2 px-4 pb-8 md:pt-3 md:px-6 md:pb-10 lg:pt-4 lg:px-8 lg:pb-12">
+      <div class="px-6 pt-2 pb-8 md:pt-3 md:pb-10 lg:pt-4 lg:pb-12">
         <form @submit.prevent="handleSave" class="mt-6 flex flex-col">
           <!-- Tasks Tab Content -->
           <TabsContent value="tasks" class="data-[state=inactive]:hidden">

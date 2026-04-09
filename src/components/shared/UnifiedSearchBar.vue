@@ -1,12 +1,9 @@
 <template>
   <div class="mb-0 unified-search-bar">
     <div
-      class="relative flex items-center rounded-lg transition-all duration-300 ease-in-out"
+      class="relative flex w-full max-w-[460px] items-center rounded-lg transition-all duration-300 ease-in-out"
       :class="[
-        isAIMode
-          ? 'p-px bg-gradient-to-r from-[#40B3E9] via-[#8873FF] to-[#FF8B42] w-full'
-          : 'w-full',
-        !fullWidth && (isAIMode ? 'max-w-2xl' : 'max-w-md'),
+        isAIMode && 'p-px bg-gradient-to-r from-[#40B3E9] via-[#8873FF] to-[#FF8B42]',
       ]"
     >
       <div
@@ -22,7 +19,7 @@
         :placeholder="computedPlaceholder"
         :class="[
           'w-full pl-9 py-2 rounded-lg text-fluid-sm bg-background focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300',
-          isAIMode ? 'border-0' : 'border border-border',
+          isAIMode ? 'border-0 shadow-none' : 'border border-input shadow-xs',
         ]"
         :style="{ paddingRight: 'calc(2px + 2px + 80px)' }"
         :disabled="isProcessingQuery"
@@ -63,7 +60,6 @@ import { useNaturalLanguageQuery } from '@/composables/useNaturalLanguageQuery'
 
 const props = defineProps({
   activeTab: { type: String, default: 'opportunities' },
-  fullWidth: { type: Boolean, default: false },
   placeholder: { type: String, default: '' },
   assigneeOptions: { type: Array, default: () => [] },
   volvoModelOptions: { type: Array, default: () => [] },

@@ -1,31 +1,23 @@
 <template>
   <div class="flex-1 flex flex-col overflow-hidden min-w-0">
     <!-- Same as Customers: one scroll area with padding, one white card (search + table) -->
-    <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide min-h-0">
-      <div class="bg-background mb-8">
-        <div class="mb-1">
-          <UnifiedSearchBar
-            active-tab="tasks"
-            full-width
-            placeholder="Search tasks..."
-            :pagination="pagination"
-            :assignee-options="assigneeOptions"
-            :request-type-options="requestTypeOptions"
-            :status-options="tasksStatusOptions"
-            :source-options="tasksSourceOptions"
-            :priority-options="tasksPriorityOptions"
-            :requested-car-brand-options="tasksRequestedCarBrandOptions"
-            @update:global-filter="globalFilter = $event"
-            @update:column-filters="columnFilters = $event"
-            @update:pagination="pagination = $event"
-          />
-        </div>
-        <div
-          ref="tableScrollContainer"
-          class="data-table-inner table-search-wrapper"
-          :class="{ 'hide-table-filter': !hasActiveFilters }"
-          @click="onTableContainerClick"
-        >
+    <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide min-h-0">
+      <DataTableWithUnifiedSearch
+        ref="datatableShellRef"
+        active-tab="tasks"
+        placeholder="Search tasks..."
+        :pagination="pagination"
+        :assignee-options="assigneeOptions"
+        :request-type-options="requestTypeOptions"
+        :status-options="tasksStatusOptions"
+        :source-options="tasksSourceOptions"
+        :priority-options="tasksPriorityOptions"
+        :requested-car-brand-options="tasksRequestedCarBrandOptions"
+        @update:global-filter="globalFilter = $event"
+        @update:column-filters="columnFilters = $event"
+        @update:pagination="pagination = $event"
+        @wrapper-click="onTableContainerClick"
+      >
           <DataTable 
             :data="displayedData" 
             :columns="columns"
@@ -85,8 +77,7 @@
               </div>
             </template>
           </DataTable>
-        </div>
-      </div>
+      </DataTableWithUnifiedSearch>
     </div>
   </div>
 </template>
@@ -96,7 +87,7 @@ import { ref, computed, h, watch, nextTick, onUnmounted } from 'vue'
 import { ListTodo, Trash2, X, Triangle, Circle } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
-import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
+import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import { formatCurrency, formatDueDateRelative, formatRelativeTime, getDeadlineStatus } from '@/utils/formatters'
 import { calculateLeadUrgency, getUrgencyDotClass } from '@/composables/useLeadUrgency'
 import { useSettingsStore } from '@/stores/settings'
@@ -135,7 +126,7 @@ const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const { getCustomerCity } = useTaskHelpers()
 const searchQuery = ref('')
-const tableScrollContainer = ref(null)
+const datatableShellRef = ref(null)
 
 const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
 
@@ -231,13 +222,6 @@ watch(
   },
   { deep: true }
 )
-
-// Show filter row when we have filters (including default Show Closed, Type, Status) or search
-const hasActiveFilters = computed(() => {
-  const hasColumnFilters = Array.isArray(columnFilters.value) && columnFilters.value.length > 0
-  const hasSearch = Boolean(globalFilter.value && String(globalFilter.value).trim())
-  return hasColumnFilters || hasSearch
-})
 
 // Table has its own filters (column filters); TaskFilters button/chips apply to card view only.
 const { filterDefinitions } = useTasksTableFilters({
@@ -698,7 +682,8 @@ watch(
   () => [props.currentTaskId, props.highlightId],
   async ([currentTaskId, highlightId]) => {
     const targetId = currentTaskId || highlightId
-    if (!targetId || !tableScrollContainer.value) return
+    const tableScrollContainer = datatableShellRef.value?.tableScrollContainer
+    if (!targetId || !tableScrollContainer) return
     const idx = sortedData.value.findIndex((t) => t.compositeId === targetId)
     if (idx === -1) return
     const pageSize = pagination.value.pageSize || 10
@@ -707,7 +692,7 @@ watch(
       pagination.value = { ...pagination.value, pageIndex }
     }
     await nextTick()
-    const rows = tableScrollContainer.value.querySelectorAll('tbody tr')
+    const rows = tableScrollContainer.querySelectorAll('tbody tr')
     const rowIndexOnPage = idx % pageSize
     const row = rows[rowIndexOnPage]
     if (row) {
@@ -733,71 +718,4 @@ const tableMeta = computed(() => ({
 }))
 
 </script>
-
-<style scoped>
-/* Component-specific styles only - global table styles are in main.css */
-
-/* Avatar fallback - use greys-300 color */
-:deep([data-radix-avatar-fallback]),
-:deep(.avatar-fallback),
-:deep(span[class*='AvatarFallback']) {
-  background-color: #d4d4d4 !important;
-}
-
-/* Table border overrides - make borders very subtle (border-black/5) */
-:deep(tbody tr) {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-}
-
-:deep(tbody tr:last-child) {
-  border-bottom: none !important;
-}
-
-/* Hide built-in DataTable search row only (UnifiedSearchBar is above) – scope to table container */
-.data-table-inner.table-search-wrapper :deep([data-slot="table-search"]),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[placeholder*="Search"])),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[type="search"])) {
-  display: none !important;
-}
-
-/* Remove any dark borders from table container */
-:deep([data-slot="table-container"]),
-:deep(.table-wrapper) {
-  border: none !important;
-}
-
-/* Pagination dropdown - transparent in footer */
-:deep(footer select),
-:deep(footer button[role="combobox"]) {
-  background-color: transparent !important;
-  border: none !important;
-}
-
-/* Filter row: flex so pills sit in one row */
-.data-table-inner.table-search-wrapper :deep([data-slot="table-filter"]) {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* Filter button - same styling (light bg, subtle border) */
-:deep(button[aria-label*="filter"]),
-:deep(button[aria-label*="Filter"]),
-:deep([data-slot="table-filter"] button) {
-  background-color: var(--background) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-}
-
-/* Enable horizontal and vertical scrolling */
-:deep([data-slot="table-container"]) {
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  max-height: 600px !important;
-}
-
-:deep(table) {
-  min-width: 100% !important;
-}
-</style>
 

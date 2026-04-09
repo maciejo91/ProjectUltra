@@ -1,9 +1,9 @@
 <template>
-  <div class="page-container flex flex-col min-h-0">
-    <div class="flex-1 overflow-y-auto p-4 md:p-6 min-h-0">
-      <div class="flex flex-col md:flex-row gap-4 md:gap-6 w-full">
+  <div class="page-container flex flex-col min-h-0 h-full overflow-hidden">
+    <div class="flex flex-1 min-h-0 flex-col overflow-hidden px-6 pb-4 md:pb-6">
+      <div class="flex flex-1 min-h-0 flex-col md:flex-row gap-4 md:gap-6 w-full">
         <aside
-          class="hidden md:flex flex-col gap-4 shrink-0 w-72 lg:w-80"
+          class="hidden md:flex flex-col gap-4 shrink-0 w-72 lg:w-80 min-h-0 overflow-y-auto"
         >
           <CalendarSidebar
             :current-date="currentDate"
@@ -16,8 +16,8 @@
           />
         </aside>
 
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden gap-4 md:gap-6">
-          <div class="bg-background rounded-lg shadow-mk-dashboard-card px-4 py-3 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div class="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden gap-4 md:gap-6">
+          <div class="shrink-0 flex flex-wrap items-center justify-between gap-3 py-3 border-b border-border">
             <div class="flex flex-wrap items-center gap-2">
               <Button variant="secondary" size="icon-sm" @click="goToPrevious">
                 <ChevronLeft class="size-4 shrink-0" />
@@ -52,8 +52,8 @@
             </div>
           </div>
 
-          <div class="flex-1 min-h-96 bg-background rounded-lg shadow-mk-dashboard-card overflow-hidden flex flex-col">
-            <div class="flex-1 min-h-0">
+          <div class="flex-1 min-h-0 bg-background rounded-lg border border-border shadow-mk-dashboard-card overflow-hidden flex flex-col">
+            <div class="flex-1 min-h-0 flex flex-col">
               <WeekView
                 v-if="currentView === 'week'"
                 :current-date="currentDate"

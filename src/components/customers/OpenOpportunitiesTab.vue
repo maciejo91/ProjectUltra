@@ -1,21 +1,17 @@
 <template>
-  <div class="mb-8">
-    <div class="bg-white">
-      <div class="mb-1">
-        <UnifiedSearchBar
-        active-tab="opportunities"
-        placeholder="Search opportunities..."
-        :pagination="pagination"
-        :assignee-options="assigneeOptions"
-        :request-type-options="requestTypeOptions"
-        :status-options="oppStatusOptions"
-        :source-options="oppSourceOptions"
-        @update:globalFilter="globalFilter = $event"
-        @update:columnFilters="columnFilters = $event"
-        @update:pagination="pagination = $event"
-      />
-      </div>
-      <div class="data-table-inner table-search-wrapper" @click="onTableContainerClick">
+  <DataTableWithUnifiedSearch
+    active-tab="opportunities"
+    placeholder="Search opportunities..."
+    :pagination="pagination"
+    :assignee-options="assigneeOptions"
+    :request-type-options="requestTypeOptions"
+    :status-options="oppStatusOptions"
+    :source-options="oppSourceOptions"
+    @update:global-filter="globalFilter = $event"
+    @update:column-filters="columnFilters = $event"
+    @update:pagination="pagination = $event"
+    @wrapper-click="onTableContainerClick"
+  >
       <DataTable 
         :data="paginatedData" 
         :columns="columns"
@@ -72,9 +68,7 @@
           </div>
         </template>
       </DataTable>
-      </div>
-    </div>
-  </div>
+  </DataTableWithUnifiedSearch>
 </template>
 
 <script setup>
@@ -82,7 +76,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Inbox, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
-import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
+import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { formatDueDate, formatDeadlineFull, getDeadlineStatus } from '@/utils/formatters'
 import { useCustomersTable } from '@/composables/useCustomersTable'
@@ -220,41 +214,3 @@ onMounted(async () => {
   await opportunitiesStore.fetchOpportunities()
 })
 </script>
-
-<style scoped>
-/* Component-specific styles only - global table styles are in main.css */
-
-/* Avatar fallback - use greys-300 color */
-:deep([data-radix-avatar-fallback]),
-:deep(.avatar-fallback),
-:deep(span[class*='AvatarFallback']) {
-  background-color: #d4d4d4 !important;
-}
-
-/* Table border overrides - make borders very subtle (border-black/5) */
-:deep(tbody tr) {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-}
-
-:deep(tbody tr:last-child) {
-  border-bottom: none !important;
-}
-
-/* Hide built-in DataTable search row only (UnifiedSearchBar is used above the table) */
-.data-table-inner.table-search-wrapper :deep([data-slot="table-search"]),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[placeholder*="Search"])),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[type="search"])) {
-  display: none !important;
-}
-
-/* Enable horizontal and vertical scrolling */
-:deep([data-slot="table-container"]) {
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  max-height: 600px !important;
-}
-
-:deep(table) {
-  min-width: 100% !important;
-}
-</style>

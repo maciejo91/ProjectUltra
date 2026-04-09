@@ -88,6 +88,9 @@ export const DEFAULT_SETTINGS = {
     marketing: true,
     support: true
   },
+
+  // Sidebar profile preview (UI-only)
+  sidebarProfile: 'admin',
   
   // PDF Generation Defaults
   defaultPDFLanguage: 'en',

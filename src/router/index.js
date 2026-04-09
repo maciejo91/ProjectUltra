@@ -23,39 +23,39 @@ const routes = [
         path: 'add-new',
         name: 'add-new',
         component: () => import('@/views/AddNew.vue'),
-        meta: { titleKey: 'common.navigation.addNewCustomer' }
+        meta: { titleKey: 'common.navigation.addNewCustomer', tablePageLayout: true }
       },
       {
         path: 'tasks/:id?',
         name: 'task-detail',
         component: () => import('@/views/Tasks.vue'),
-        meta: { titleKey: 'common.navigation.tasks' }
+        meta: { titleKey: 'common.navigation.tasks', tablePageLayout: true }
       },
       {
         path: 'customer/:id',
         name: 'customer-view',
         component: () => import('@/views/Customer.vue'),
         props: true,
-        meta: { titleKey: 'entities.customer.title' }
+        meta: { titleKey: 'entities.customer.title', showPageTitle: false }
       },
       {
         path: 'vehicles',
         name: 'vehicles',
         component: () => import('@/views/Vehicles.vue'),
-        meta: { titleKey: 'common.navigation.vehicles' }
+        meta: { titleKey: 'common.navigation.vehicles', tablePageLayout: true }
       },
       {
         path: 'requests/:id',
         name: 'request-detail',
         component: () => import('@/views/RequestDetailPage.vue'),
         props: true,
-        meta: { titleKey: 'common.navigation.sales' }
+        meta: { titleKey: 'common.navigation.sales', showPageTitle: false }
       },
       {
         path: 'requests',
         name: 'requests',
         component: () => import('@/views/Requests.vue'),
-        meta: { titleKey: 'common.navigation.sales' }
+        meta: { titleKey: 'common.navigation.sales', tablePageLayout: true }
       },
       {
         path: 'after-sales',
@@ -64,7 +64,7 @@ const routes = [
         meta: { titleKey: 'common.navigation.afterSales' }
       },
       {
-        path: 'conversations',
+        path: 'conversations/:threadId?',
         name: 'conversations',
         component: () => import('@/views/Conversations.vue'),
         meta: { titleKey: 'common.navigation.conversations' }
@@ -73,19 +73,25 @@ const routes = [
         path: 'customers',
         name: 'customers',
         component: () => import('@/views/Customers.vue'),
-        meta: { titleKey: 'common.navigation.customers' }
+        meta: { titleKey: 'common.navigation.customers', tablePageLayout: true }
       },
       {
         path: 'calendar',
         name: 'calendar',
         component: () => import('@/views/Calendar.vue'),
-        meta: { titleKey: 'common.navigation.calendar' }
+        meta: { titleKey: 'common.navigation.calendar', mutedPageChrome: true }
       },
       {
         path: 'reports',
         name: 'reports',
         component: () => import('@/views/Reports.vue'),
-        meta: { titleKey: 'common.navigation.reports' }
+        meta: { titleKey: 'common.navigation.reports', tablePageLayout: true }
+      },
+      {
+        path: 'marketing',
+        name: 'marketing',
+        component: () => import('@/views/MarketingLoaderPreview.vue'),
+        meta: { titleKey: 'common.navigation.marketing', showPageTitle: false }
       },
       {
         path: 'settings',
@@ -118,7 +124,7 @@ const routes = [
         path: 'access-denied',
         name: 'access-denied',
         component: () => import('@/views/AccessDenied.vue'),
-        meta: { title: 'Access Denied' }
+        meta: { title: 'Access Denied', showPageTitle: false }
       }
     ]
   }

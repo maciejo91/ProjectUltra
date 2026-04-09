@@ -51,17 +51,6 @@
       {{ title }}
     </p>
     <div class="flex shrink-0 items-center gap-2 self-center">
-      <span
-        :class="[
-          'inline-flex size-7 items-center justify-center rounded-full text-sm font-normal leading-none',
-          onDarkSurface
-            ? 'bg-background text-foreground'
-            : 'bg-green-100 text-green-600'
-        ]"
-        aria-hidden
-      >
-        {{ assigneeInitials }}
-      </span>
       <button
         type="button"
         :class="[
@@ -77,6 +66,25 @@
         <Clock class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
         <span class="leading-none">{{ countdownLabel }}</span>
       </button>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <span
+          class="text-sm leading-none whitespace-nowrap"
+          :class="onDarkSurface ? 'text-background/80' : 'text-muted-foreground'"
+        >
+          {{ t('common.assignee.assignedTo') }}
+        </span>
+        <span
+          :class="[
+            'inline-flex size-7 items-center justify-center rounded-full text-sm font-normal leading-none',
+            onDarkSurface
+              ? 'bg-background text-foreground'
+              : 'bg-green-100 text-green-600'
+          ]"
+          aria-hidden
+        >
+          {{ assigneeInitials }}
+        </span>
+      </div>
       <Button
         v-if="showChevron"
         type="button"
@@ -98,8 +106,11 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ChevronDown, ChevronUp, Clock } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
+
+const { t } = useI18n()
 
 defineProps({
   title: {

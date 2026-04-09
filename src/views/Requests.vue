@@ -1,57 +1,24 @@
 <template>
   <div class="page-container relative flex flex-col overflow-hidden h-full bg-surface">
     <div class="flex-1 flex flex-col overflow-hidden">
-      <div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide min-h-0">
-        <div class="bg-white mb-8">
-          <div class="flex flex-wrap items-center gap-2 py-2 mb-4">
-            <TransitionGroup
-              tag="div"
-              name="chip-move"
-              class="outcome-toggle-group flex flex-wrap gap-3"
-            >
-              <Toggle
-                v-for="chip in orderedFilterChips"
-                :key="chip.key"
-                variant="outline"
-                :model-value="selectedSegment === chip.key"
-                :aria-pressed="selectedSegment === chip.key"
-                class="outcome-toggle-item rounded-sm"
-                @update:model-value="(p) => p && (selectedSegment = chip.key)"
-              >
-                <span class="flex items-center gap-2">
-                  <span>{{ chip.label }} ({{ chip.count }})</span>
-                  <button
-                    type="button"
-                    class="shrink-0 rounded p-0.5 text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                    :aria-label="pinnedSegmentKey === chip.key ? 'Unpin' : 'Pin to front'"
-                    @click.stop="togglePin(chip.key)"
-                  >
-                    <PinOff v-if="pinnedSegmentKey === chip.key" class="size-3.5" aria-hidden />
-                    <Pin v-else class="size-3.5" aria-hidden />
-                  </button>
-                </span>
-              </Toggle>
-            </TransitionGroup>
+      <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide min-h-0">
+        <div class="bg-background mb-8">
+          <div class="shrink-0 overflow-visible pb-2 pt-1 mb-2">
+            <RequestMainTabs v-model="selectedSegment" :tabs="filterChips" />
           </div>
-          <div class="mb-1">
-            <UnifiedSearchBar
-              active-tab="requests"
-              full-width
-              placeholder="Search requests..."
-              :pagination="pagination"
-              :assignee-options="assigneeOptions"
-              :status-options="statusOptions"
-              :source-options="sourceOptions"
-              @update:global-filter="globalFilter = $event"
-              @update:column-filters="columnFilters = $event"
-              @update:pagination="pagination = $event"
-            />
-          </div>
-          <div
-            ref="tableScrollContainer"
-            class="data-table-inner table-search-wrapper"
-            :class="{ 'hide-table-filter': !hasActiveFilters }"
-            @click="onTableContainerClick"
+          <DataTableWithUnifiedSearch
+            ref="datatableShellRef"
+            active-tab="requests"
+            placeholder="Search requests..."
+            :pagination="pagination"
+            :assignee-options="assigneeOptions"
+            :status-options="statusOptions"
+            :source-options="sourceOptions"
+            :include-margin-bottom="false"
+            @update:global-filter="globalFilter = $event"
+            @update:column-filters="columnFilters = $event"
+            @update:pagination="pagination = $event"
+            @wrapper-click="onTableContainerClick"
           >
             <DataTable
               :data="displayedData"
@@ -111,7 +78,7 @@
                 </div>
               </template>
             </DataTable>
-          </div>
+          </DataTableWithUnifiedSearch>
         </div>
       </div>
     </div>
@@ -120,12 +87,13 @@
 </template>
 
 <script setup>
-import { ref, computed, h, watch, onUnmounted, onMounted, nextTick, TransitionGroup } from 'vue'
+import { ref, computed, h, watch, onUnmounted, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { FileText, Pin, PinOff, Trash2, X } from 'lucide-vue-next'
+import { FileText, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
-import { Button, Toggle } from '@motork/component-library/future/primitives'
-import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
+import { Button } from '@motork/component-library/future/primitives'
+import RequestMainTabs from '@/components/requests/RequestMainTabs.vue'
+import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import { useTableRowClick } from '@/composables/useTableRowClick'
 import { useRequestsList, SEGMENT_KEYS } from '@/composables/useRequestsList'
 import { useDataTableData, getNestedProperty } from '@/composables/useDataTableData'
@@ -147,28 +115,7 @@ const {
   SEGMENT_KEYS: SK
 } = useRequestsList()
 
-const REQUESTS_PINNED_SEGMENT_KEY = 'project-ultra-requests-pinned-segment'
 const selectableSegmentKeys = Object.values(SK).filter(k => k !== SK.ALL)
-const getStoredPinnedSegment = () => {
-  try {
-    const stored = localStorage.getItem(REQUESTS_PINNED_SEGMENT_KEY)
-    return stored && selectableSegmentKeys.includes(stored) ? stored : ''
-  } catch {
-    return ''
-  }
-}
-const pinnedSegmentKey = ref(getStoredPinnedSegment())
-watch(pinnedSegmentKey, (key) => {
-  try {
-    if (key) {
-      localStorage.setItem(REQUESTS_PINNED_SEGMENT_KEY, key)
-    } else {
-      localStorage.removeItem(REQUESTS_PINNED_SEGMENT_KEY)
-    }
-  } catch {
-    // ignore
-  }
-})
 
 const route = useRoute()
 const router = useRouter()
@@ -176,7 +123,7 @@ const usersStore = useUsersStore()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 
-const tableScrollContainer = ref(null)
+const datatableShellRef = ref(null)
 const highlightId = computed(() => route.query.highlight || null)
 const requestNavigationStore = useRequestNavigationStore()
 
@@ -213,13 +160,6 @@ const sourceOptions = computed(() => {
   return def?.options ?? []
 })
 
-// Show filter row when we have filters (Type, Status, Assignee) or search
-const hasActiveFilters = computed(() => {
-  const hasColumnFilters = Array.isArray(columnFilters.value) && columnFilters.value.length > 0
-  const hasSearch = Boolean(globalFilter.value && String(globalFilter.value).trim())
-  return hasColumnFilters || hasSearch
-})
-
 const filterChips = computed(() => [
   { key: SK.NEW_LEADS, label: 'New Leads', count: counts.value[SK.NEW_LEADS] },
   { key: SK.OPEN_OPPORTUNITIES, label: 'Opportunities Qualified', count: counts.value[SK.OPEN_OPPORTUNITIES] },
@@ -227,18 +167,6 @@ const filterChips = computed(() => [
   { key: SK.WON, label: 'Opportunities won', count: counts.value[SK.WON] },
   { key: SK.LOST, label: 'Opportunities lost', count: counts.value[SK.LOST] }
 ])
-
-const orderedFilterChips = computed(() => {
-  const chips = filterChips.value
-  if (!pinnedSegmentKey.value) return chips
-  const pinned = chips.find((c) => c.key === pinnedSegmentKey.value)
-  if (!pinned) return chips
-  return [pinned, ...chips.filter((c) => c.key !== pinnedSegmentKey.value)]
-})
-
-function togglePin(key) {
-  pinnedSegmentKey.value = pinnedSegmentKey.value === key ? '' : key
-}
 
 const emptyStateText = computed(() => {
   if (selectedSegment.value === SK.NEW_LEADS) return 'No New Leads'
@@ -435,7 +363,8 @@ const { onTableContainerClick } = useTableRowClick(displayedData, (row) => {
 watch(
   highlightId,
   async (id) => {
-    if (!id || !tableScrollContainer.value) return
+    const tableScrollContainer = datatableShellRef.value?.tableScrollContainer
+    if (!id || !tableScrollContainer) return
     const idx = sortedData.value.findIndex(r => r.compositeId === id)
     if (idx === -1) return
     const pageSize = pagination.value.pageSize || 50
@@ -444,7 +373,7 @@ watch(
       pagination.value = { ...pagination.value, pageIndex }
     }
     await nextTick()
-    const rows = tableScrollContainer.value.querySelectorAll('tbody tr')
+    const rows = tableScrollContainer.querySelectorAll('tbody tr')
     const rowIndexOnPage = idx % pageSize
     const rowEl = rows[rowIndexOnPage]
     if (rowEl) {
@@ -494,15 +423,3 @@ watch(() => route.query.segment, (segment) => {
 })
 
 </script>
-
-<style scoped>
-.chip-move-move {
-  transition: transform 0.35s ease;
-}
-
-.data-table-inner.table-search-wrapper :deep([data-slot="table-search"]),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[placeholder*="Search"])),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[type="search"])) {
-  display: none !important;
-}
-</style>

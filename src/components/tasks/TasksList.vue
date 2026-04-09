@@ -7,7 +7,7 @@
     <div class="px-2 py-3 tasks-list-search">
       <div class="flex items-center gap-2">
         <div class="flex-1 min-w-0">
-          <InputGroup class="tasks-list-search-group bg-white rounded-lg border border-border overflow-hidden">
+          <InputGroup class="tasks-list-search-group bg-white rounded-lg overflow-hidden">
             <InputGroupInput
               v-model="searchQuery"
               :placeholder="searchPlaceholder"

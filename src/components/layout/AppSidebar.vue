@@ -3,7 +3,7 @@
     side="left"
     :collapsible="isSettingsArea ? 'none' : 'icon'"
     variant="sidebar"
-    class="border-sidebar-border overflow-x-hidden"
+    class="relative border-sidebar-border overflow-visible"
   >
     <SidebarHeader class="shrink-0 px-2 py-2">
       <template v-if="!isSettingsArea">
@@ -11,43 +11,35 @@
           class="flex min-w-0 items-center justify-between gap-2 group-data-[collapsible=icon]:hidden"
         >
           <RouterLink
-            :to="firstVisibleRoute"
+            to="/home"
             class="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 outline-none ring-sidebar-ring transition-colors hover:bg-sidebar-accent focus-visible:ring-2"
           >
             <div class="flex size-8 shrink-0 items-center justify-center rounded-md">
               <img
                 src="@/assets/images/leadspark-logo.png"
                 alt="LeadSparK"
-                class="size-6 object-contain"
+                class="size-7 rounded-sm object-contain"
               />
             </div>
             <span class="truncate text-left text-sm font-semibold text-sidebar-foreground">
               LeadSparK
             </span>
           </RouterLink>
-          <SidebarTrigger
-            class="shrink-0 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-            :aria-label="t('common.layout.toggleSidebar')"
-          />
         </div>
 
         <div
           class="relative hidden h-10 w-full items-center justify-center group-data-[collapsible=icon]:flex"
         >
           <RouterLink
-            :to="firstVisibleRoute"
-            class="flex size-10 items-center justify-center rounded-md outline-none ring-sidebar-ring transition-opacity hover:bg-sidebar-accent focus-visible:ring-2 group-hover:pointer-events-none group-hover:opacity-0"
+            to="/home"
+            class="flex size-10 items-center justify-center rounded-md outline-none ring-sidebar-ring transition-colors hover:bg-sidebar-accent focus-visible:ring-2"
           >
             <img
               src="@/assets/images/leadspark-logo.png"
               alt="LeadSparK"
-              class="size-6 object-contain"
+              class="size-7 rounded-sm object-contain"
             />
           </RouterLink>
-          <SidebarTrigger
-            class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 opacity-0 pointer-events-none transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-            :aria-label="t('common.layout.toggleSidebar')"
-          />
         </div>
       </template>
 
@@ -71,14 +63,9 @@
 
     <SidebarContent class="flex flex-1 min-h-0 flex-col overflow-hidden">
       <div v-if="!isSettingsArea" class="flex min-h-0 flex-1 flex-col overflow-y-auto">
-        <SidebarGroup>
-          <SidebarGroupLabel
-            class="group-data-[collapsible=icon]:hidden px-2 text-sm font-medium text-muted-foreground"
-          >
-            {{ t('common.navigation.groups.actions') }}
-          </SidebarGroupLabel>
+        <SidebarGroup v-if="hasActionsGroup">
           <SidebarMenu>
-            <SidebarMenuItem>
+            <SidebarMenuItem v-if="actionsVisibility.addNew">
               <SidebarMenuButton
                 as-child
                 :is-active="isRouteActive('/add-new')"
@@ -91,7 +78,7 @@
                 </RouterLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarMenuItem v-if="navigationVisibility.search !== false">
+            <SidebarMenuItem v-if="actionsVisibility.search">
               <SidebarMenuButton as-child :tooltip="t('common.buttons.search')">
                 <button
                   type="button"
@@ -108,7 +95,7 @@
           </SidebarMenu>
         </SidebarGroup>
 
-        <SidebarGroup>
+        <SidebarGroup v-if="primaryNavItems.length > 0">
           <SidebarGroupLabel
             class="group-data-[collapsible=icon]:hidden px-2 text-sm font-medium text-muted-foreground"
           >
@@ -137,7 +124,7 @@
           </SidebarMenu>
         </SidebarGroup>
 
-        <SidebarGroup>
+        <SidebarGroup v-if="dataNavItems.length > 0">
           <SidebarGroupLabel
             class="group-data-[collapsible=icon]:hidden px-2 text-sm font-medium text-muted-foreground"
           >
@@ -146,16 +133,6 @@
           <SidebarMenu>
             <SidebarMenuItem v-for="item in dataNavItems" :key="dataItemKey(item)">
               <SidebarMenuButton
-                v-if="item.kind === 'comingSoon'"
-                :tooltip="item.name"
-                class="data-[active=true]:rounded-lg data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
-                @click="showMarketingModal = true"
-              >
-                <component :is="item.icon" class="size-4 shrink-0" />
-                <span class="truncate group-data-[collapsible=icon]:hidden">{{ item.name }}</span>
-              </SidebarMenuButton>
-              <SidebarMenuButton
-                v-else
                 as-child
                 :is-active="isRouteActive(item.href)"
                 :tooltip="item.name"
@@ -230,46 +207,55 @@
 
         <div class="min-h-4 flex-1 shrink-0" aria-hidden="true" />
       </div>
-
-      <SidebarGroup class="shrink-0 border-t border-sidebar-border pt-2">
-        <SidebarMenu>
-          <SidebarMenuItem v-if="userStore.canAccessSettings() && !isSettingsArea">
-            <SidebarMenuButton
-              as-child
-              :is-active="isRouteActive(settingsPath)"
-              :tooltip="t('common.navigation.settings')"
-              class="data-[active=true]:rounded-lg data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
-            >
-              <RouterLink :to="settingsPath" class="flex min-w-0 w-full items-center gap-2">
-                <Settings class="size-4 shrink-0" />
-                <span class="truncate group-data-[collapsible=icon]:hidden">{{
-                  t('common.navigation.settings')
-                }}</span>
-              </RouterLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem v-if="navigationVisibility.support !== false">
-            <SidebarMenuButton :tooltip="t('common.navigation.support')" @click="showSupportModal = true">
-              <LifeBuoy class="size-4 shrink-0" />
-              <span class="truncate group-data-[collapsible=icon]:hidden">{{
-                t('common.navigation.support')
-              }}</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarUserChrome />
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroup>
     </SidebarContent>
+
+    <SidebarGroup class="relative shrink-0 border-t border-sidebar-border pt-2">
+      <div
+        v-if="!isSettingsArea"
+        class="absolute right-0 top-0 z-30 -translate-y-1/2 translate-x-1/2"
+      >
+        <button
+          type="button"
+          class="h-7 w-7 rounded-full border border-sidebar-border bg-background text-sidebar-foreground shadow-sm hover:bg-sidebar-accent hover:text-sidebar-foreground flex items-center justify-center"
+          :aria-label="t('common.layout.toggleSidebar')"
+          @click="toggleSidebar"
+        >
+          <ChevronLeft v-if="sidebarState === 'expanded'" class="size-3" />
+          <ChevronRight v-else class="size-3" />
+        </button>
+      </div>
+      <SidebarMenu>
+        <SidebarMenuItem v-if="bottomNavVisibility.settings && !isSettingsArea">
+          <SidebarMenuButton
+            as-child
+            :is-active="isRouteActive(settingsPath)"
+            :tooltip="t('common.navigation.settings')"
+            class="data-[active=true]:rounded-lg data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
+          >
+            <RouterLink :to="settingsPath" class="flex min-w-0 w-full items-center gap-2">
+              <Settings class="size-4 shrink-0" />
+              <span class="truncate group-data-[collapsible=icon]:hidden">{{
+                t('common.navigation.settings')
+              }}</span>
+            </RouterLink>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem v-if="bottomNavVisibility.support">
+          <SidebarMenuButton :tooltip="t('common.navigation.support')" @click="showSupportModal = true">
+            <LifeBuoy class="size-4 shrink-0" />
+            <span class="truncate group-data-[collapsible=icon]:hidden">{{
+              t('common.navigation.support')
+            }}</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarUserChrome />
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarGroup>
 
     <SidebarRail v-if="!isSettingsArea" />
 
-    <ComingSoonModal
-      :show="showMarketingModal"
-      :title="t('common.navigation.marketing')"
-      @close="showMarketingModal = false"
-    />
     <ComingSoonModal
       :show="showSupportModal"
       :title="t('common.navigation.support')"
@@ -282,7 +268,7 @@
 import { computed, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Plus, Search, LifeBuoy, Settings, ChevronLeft } from 'lucide-vue-next'
+import { Plus, Search, LifeBuoy, Settings, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import {
   Sidebar,
   SidebarContent,
@@ -296,6 +282,7 @@ import {
   SidebarRail,
   SidebarTrigger
 } from '@motork/component-library/future/primitives'
+import { useSidebar } from '@motork/component-library/future/primitives'
 import { useLayoutStore } from '@/stores/layout'
 import { useUserStore } from '@/stores/user'
 import { useAppSidebarNavigation } from '@/composables/useAppSidebarNavigation'
@@ -313,6 +300,8 @@ const layoutStore = useLayoutStore()
 const userStore = useUserStore()
 const {
   navigationVisibility,
+  actionsVisibility,
+  bottomNavVisibility,
   firstVisibleRoute,
   primaryNavItems,
   dataNavItems,
@@ -320,13 +309,15 @@ const {
 } = useAppSidebarNavigation()
 
 const settingsPath = '/settings'
-const showMarketingModal = ref(false)
 const showSupportModal = ref(false)
 
 const isSettingsArea = computed(() => route.path.startsWith('/settings'))
+const { state: sidebarState, toggleSidebar } = useSidebar()
+
+const hasActionsGroup = computed(() => actionsVisibility.value.addNew || actionsVisibility.value.search)
 
 function dataItemKey(item) {
-  return item.kind === 'comingSoon' ? item.id : item.href
+  return item.href
 }
 
 function isSettingsNavActive(path) {
