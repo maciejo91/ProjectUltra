@@ -17,7 +17,7 @@ const routes = [
         path: 'home',
         name: 'home-dashboard',
         component: () => import('@/views/Home.vue'),
-        meta: { titleKey: 'common.navigation.home' }
+        meta: { titleKey: 'common.navigation.home', mutedPageChrome: true }
       },
       {
         path: 'add-new',
@@ -67,7 +67,7 @@ const routes = [
         path: 'conversations/:threadId?',
         name: 'conversations',
         component: () => import('@/views/Conversations.vue'),
-        meta: { titleKey: 'common.navigation.conversations' }
+        meta: { titleKey: 'common.navigation.conversations', mutedPageChrome: true }
       },
       {
         path: 'customers',

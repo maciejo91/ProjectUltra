@@ -4,7 +4,6 @@ import { ref } from 'vue'
 export const useLayoutStore = defineStore('layout', () => {
   const searchModalOpen = ref(false)
   const hideHeaderForTaskDetail = ref(false)
-  const hideHeaderForConversations = ref(false)
 
   function openSearchModal() {
     searchModalOpen.value = true
@@ -18,17 +17,11 @@ export const useLayoutStore = defineStore('layout', () => {
     hideHeaderForTaskDetail.value = Boolean(value)
   }
 
-  function setHideHeaderForConversations(value) {
-    hideHeaderForConversations.value = Boolean(value)
-  }
-
   return {
     searchModalOpen,
     hideHeaderForTaskDetail,
-    hideHeaderForConversations,
     openSearchModal,
     setSearchModalOpen,
-    setHideHeaderForTaskDetail,
-    setHideHeaderForConversations
+    setHideHeaderForTaskDetail
   }
 })

@@ -1,9 +1,9 @@
 <template>
   <div
-    class="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden bg-background lg:flex-row lg:items-stretch"
+    class="flex h-full min-h-0 w-full min-w-0 flex-col gap-3 overflow-hidden bg-muted p-3 lg:flex-row lg:items-stretch"
   >
     <ConversationThreadPanel
-      class="min-h-0 min-w-0 flex-1 lg:flex-[2]"
+      class="min-h-0 min-w-0 flex-1 lg:min-h-0"
       :thread-meta="threadMeta"
       :messages="messages"
       :loading="loadingMessages"

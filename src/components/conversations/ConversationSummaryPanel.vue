@@ -1,8 +1,17 @@
 <template>
   <div
-    class="flex h-full min-h-0 w-full min-w-0 shrink-0 flex-col overflow-hidden border-border border-t bg-muted lg:min-w-0 lg:flex-1 lg:border-l lg:border-t-0"
+    class="flex h-full min-h-0 w-full shrink-0 flex-col overflow-hidden rounded-lg bg-muted lg:w-96"
   >
-    <div v-if="!displayTask" class="p-4 text-sm text-muted-foreground">
+    <div
+      v-if="summaryPanelLoading"
+      class="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 p-6 text-center"
+    >
+      <p class="text-sm text-muted-foreground">{{ t('common.common.loading') }}</p>
+    </div>
+    <div
+      v-else-if="!displayTask"
+      class="flex min-h-0 flex-1 flex-col items-center justify-center p-6 text-center text-sm text-muted-foreground"
+    >
       {{ t('common.conversations.summary.empty') }}
     </div>
     <div
@@ -155,6 +164,13 @@ const displayTask = computed(() => {
     }
   }
   return null
+})
+
+const summaryPanelLoading = computed(() => {
+  const p = parsedThread.value
+  if (!p || displayTask.value) return false
+  if (p.entityType === 'lead') return leadsStore.loading
+  return opportunitiesStore.loading
 })
 
 const contactCustomer = computed(() => displayTask.value?.customer ?? null)

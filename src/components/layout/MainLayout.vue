@@ -100,38 +100,8 @@
             </div>
           </div>
         </template>
-        <template v-else-if="showConversationsSplitPane">
-          <div
-            class="flex min-h-0 min-w-0 flex-1 overflow-hidden"
-          >
-            <aside
-              class="hidden min-h-0 w-full shrink-0 flex-col overflow-hidden border-border border-r bg-background md:flex md:w-1/4 md:min-w-0"
-            >
-              <AppHeader
-                v-if="showDesktopHeader"
-                class="sticky top-0 z-10 shrink-0 bg-background"
-              />
-              <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-                <div
-                  id="conversations-list-teleport"
-                  class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
-                />
-              </div>
-            </aside>
-            <div
-              class="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-border border-l bg-background"
-            >
-              <div class="hidden h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:flex">
-                <div
-                  id="conversations-detail-teleport"
-                  class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
-                />
-              </div>
-            </div>
-          </div>
-        </template>
         <main
-          v-show="!showTaskDetailSplitPane && !showConversationsSplitPane"
+          v-show="!showTaskDetailSplitPane"
           class="flex min-h-0 flex-1 flex-col overflow-hidden"
           :class="route.meta?.mutedPageChrome ? 'bg-muted' : 'bg-background'"
         >
@@ -213,14 +183,12 @@ const mobileCalendarHeaderActions = computed(() => {
 const showDesktopHeader = computed(() => {
   if (route?.meta?.showPageTitle === false) return false
   if (route.name === 'task-detail' && Boolean(route.params.id)) return false
-  if (route.name === 'conversations' && Boolean(route.params.threadId)) return false
   return true
 })
 
 const showMobileHeader = computed(() => {
   if (route?.meta?.showPageTitle === false) return false
   if (route.name === 'task-detail' && Boolean(route.params.id)) return false
-  if (route.name === 'conversations' && Boolean(route.params.threadId)) return false
   return true
 })
 
@@ -232,11 +200,4 @@ const showTaskDetailSplitPane = computed(() => {
   )
 })
 
-const showConversationsSplitPane = computed(() => {
-  return (
-    route.name === 'conversations' &&
-    layoutStore.hideHeaderForConversations &&
-    Boolean(route.params.threadId)
-  )
-})
 </script>

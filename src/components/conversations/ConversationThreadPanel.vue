@@ -1,5 +1,7 @@
 <template>
-  <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
+  <div
+    class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-black/5 bg-background shadow-mk-dashboard-card"
+  >
     <div
       v-if="threadMeta"
       class="shrink-0 border-b border-border px-4 py-3 md:px-6"
