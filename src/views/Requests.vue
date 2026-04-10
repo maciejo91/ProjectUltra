@@ -89,6 +89,7 @@
 <script setup>
 import { ref, computed, h, watch, onUnmounted, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { FileText, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
@@ -119,6 +120,7 @@ const selectableSegmentKeys = Object.values(SK).filter(k => k !== SK.ALL)
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const usersStore = useUsersStore()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
@@ -161,20 +163,20 @@ const sourceOptions = computed(() => {
 })
 
 const filterChips = computed(() => [
-  { key: SK.NEW_LEADS, label: 'New Leads', count: counts.value[SK.NEW_LEADS] },
-  { key: SK.OPEN_OPPORTUNITIES, label: 'Opportunities Qualified', count: counts.value[SK.OPEN_OPPORTUNITIES] },
-  { key: SK.IN_NEGOTIATION, label: 'Opportunities in negotiation', count: counts.value[SK.IN_NEGOTIATION] },
-  { key: SK.WON, label: 'Opportunities won', count: counts.value[SK.WON] },
-  { key: SK.LOST, label: 'Opportunities lost', count: counts.value[SK.LOST] }
+  { key: SK.NEW_LEADS, label: t('common.navigation.salesSub.newLeads'), count: counts.value[SK.NEW_LEADS] },
+  { key: SK.OPEN_OPPORTUNITIES, label: t('common.navigation.salesSub.openOpportunities'), count: counts.value[SK.OPEN_OPPORTUNITIES] },
+  { key: SK.IN_NEGOTIATION, label: t('common.navigation.salesSub.inNegotiation'), count: counts.value[SK.IN_NEGOTIATION] },
+  { key: SK.WON, label: t('common.navigation.salesSub.won'), count: counts.value[SK.WON] },
+  { key: SK.ALL_OPPORTUNITIES, label: t('common.navigation.salesSub.allOpportunities'), count: counts.value[SK.ALL_OPPORTUNITIES] }
 ])
 
 const emptyStateText = computed(() => {
-  if (selectedSegment.value === SK.NEW_LEADS) return 'No New Leads'
-  if (selectedSegment.value === SK.OPEN_OPPORTUNITIES) return 'No Opportunities Qualified'
-  if (selectedSegment.value === SK.IN_NEGOTIATION) return 'No Opportunities in negotiation'
-  if (selectedSegment.value === SK.WON) return 'No Opportunities won'
-  if (selectedSegment.value === SK.LOST) return 'No Opportunities lost'
-  return 'No requests'
+  if (selectedSegment.value === SK.NEW_LEADS) return t('common.pages.requestsEmpty.newLeads')
+  if (selectedSegment.value === SK.OPEN_OPPORTUNITIES) return t('common.pages.requestsEmpty.openOpportunities')
+  if (selectedSegment.value === SK.IN_NEGOTIATION) return t('common.pages.requestsEmpty.inNegotiation')
+  if (selectedSegment.value === SK.WON) return t('common.pages.requestsEmpty.won')
+  if (selectedSegment.value === SK.ALL_OPPORTUNITIES) return t('common.pages.requestsEmpty.allOpportunities')
+  return t('common.pages.requestsEmpty.default')
 })
 
 function getCustomerName(row) {
@@ -387,6 +389,8 @@ function applySegmentFromQuery() {
   const segment = route.query.segment
   if (segment === 'all') {
     selectedSegment.value = SK.NEW_LEADS
+  } else if (segment === 'lost') {
+    selectedSegment.value = SK.ALL_OPPORTUNITIES
   } else if (segment && selectableSegmentKeys.includes(segment)) {
     selectedSegment.value = segment
   }
@@ -417,6 +421,8 @@ onMounted(() => {
 watch(() => route.query.segment, (segment) => {
   if (segment === 'all') {
     selectedSegment.value = SK.NEW_LEADS
+  } else if (segment === 'lost') {
+    selectedSegment.value = SK.ALL_OPPORTUNITIES
   } else if (segment && selectableSegmentKeys.includes(segment)) {
     selectedSegment.value = segment
   }

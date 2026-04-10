@@ -14,6 +14,13 @@
     "reports": "Rapporten",
     "settings": "Instellingen",
     "vehicles": "Voertuigen",
+    "salesSub": {
+      "newLeads": "Nieuwe leads",
+      "openOpportunities": "Gekwalificeerde opportunities",
+      "inNegotiation": "Opportunities in onderhandeling",
+      "won": "Gewonnen opportunities",
+      "allOpportunities": "Alle opportunities"
+    },
     "addNew": "Nieuw toevoegen",
     "addNewCustomer": "Nieuwe Klant Toevoegen",
     "marketing": "Marketing",
@@ -53,7 +60,15 @@
     "settingsTplSurvey": "Enquête"
   },
   "pages": {
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "requestsEmpty": {
+      "default": "Geen verzoeken",
+      "newLeads": "Geen nieuwe leads",
+      "openOpportunities": "Geen gekwalificeerde opportunities",
+      "inNegotiation": "Geen opportunities in onderhandeling",
+      "won": "Geen gewonnen opportunities",
+      "allOpportunities": "Geen opportunities"
+    }
   },
   "layout": {
     "openSidebar": "Zijbalk openen",

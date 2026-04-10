@@ -227,11 +227,18 @@
             :tooltip="t('common.navigation.settings')"
             class="data-[active=true]:rounded-lg data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
           >
-            <RouterLink :to="settingsPath" class="flex min-w-0 w-full items-center gap-2">
+            <RouterLink
+              :to="settingsPath"
+              class="flex min-w-0 w-full items-center gap-2"
+              @click="expandSidebarFromIconMode"
+            >
               <Settings class="size-4 shrink-0" />
               <span class="truncate group-data-[collapsible=icon]:hidden">{{
                 t('common.navigation.settings')
               }}</span>
+              <ChevronRight
+                class="ml-auto size-4 shrink-0 text-muted-foreground group-data-[collapsible=icon]:hidden"
+              />
             </RouterLink>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -263,7 +270,7 @@
 import { computed, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Plus, Search, LifeBuoy, Settings, ChevronLeft } from 'lucide-vue-next'
+import { Plus, Search, LifeBuoy, Settings, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import {
   Sidebar,
   SidebarContent,
@@ -275,10 +282,10 @@ import {
   SidebarMenuButton,
   SidebarMenuBadge,
   SidebarRail,
-  SidebarTrigger
+  SidebarTrigger,
+  useSidebar
 } from '@motork/component-library/future/primitives'
 import { useLayoutStore } from '@/stores/layout'
-import { useUserStore } from '@/stores/user'
 import { useAppSidebarNavigation } from '@/composables/useAppSidebarNavigation'
 import {
   SETTINGS_NAV_SECTIONS,
@@ -291,9 +298,8 @@ import SidebarUserChrome from './SidebarUserChrome.vue'
 const route = useRoute()
 const { t } = useI18n()
 const layoutStore = useLayoutStore()
-const userStore = useUserStore()
+const { state: sidebarUiState, setOpen, isMobile, setOpenMobile } = useSidebar()
 const {
-  navigationVisibility,
   actionsVisibility,
   bottomNavVisibility,
   firstVisibleRoute,
@@ -306,6 +312,11 @@ const settingsPath = '/settings'
 const showSupportModal = ref(false)
 
 const isSettingsArea = computed(() => route.path.startsWith('/settings'))
+
+function expandSidebarFromIconMode() {
+  if (isMobile.value) setOpenMobile(true)
+  else if (sidebarUiState.value === 'collapsed') setOpen(true)
+}
 
 const hasActionsGroup = computed(() => actionsVisibility.value.addNew || actionsVisibility.value.search)
 

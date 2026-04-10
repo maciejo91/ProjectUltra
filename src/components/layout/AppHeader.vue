@@ -35,7 +35,7 @@
       </template>
       <template v-else-if="customHeaderActions">
         <Button
-          variant="default"
+          :variant="customHeaderAddButtonVariant"
           size="sm"
           class="flex items-center gap-2 rounded-sm"
           @click="customHeaderActions.onAddNew()"
@@ -102,6 +102,11 @@ const customAddButtonLabel = computed(() => {
   const ref = customHeaderActions.value
   if (ref?.addLabelKey) return t(ref.addLabelKey)
   return t('common.navigation.addNew')
+})
+
+const customHeaderAddButtonVariant = computed(() => {
+  const ref = customHeaderActions.value
+  return ref?.addButtonVariant === 'outline' ? 'outline' : 'default'
 })
 
 const homeHeaderActions = computed(() => {

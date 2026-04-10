@@ -14,6 +14,13 @@
     "reports": "Berichte",
     "settings": "Einstellungen",
     "vehicles": "Fahrzeuge",
+    "salesSub": {
+      "newLeads": "Neue Leads",
+      "openOpportunities": "Qualifizierte Opportunities",
+      "inNegotiation": "Opportunities in Verhandlung",
+      "won": "Gewonnene Opportunities",
+      "allOpportunities": "Alle Opportunities"
+    },
     "addNew": "Neu hinzufügen",
     "addNewCustomer": "Neuen Kunden Hinzufügen",
     "marketing": "Marketing",
@@ -53,7 +60,15 @@
     "settingsTplSurvey": "Umfrage"
   },
   "pages": {
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "requestsEmpty": {
+      "default": "Keine Anfragen",
+      "newLeads": "Keine neuen Leads",
+      "openOpportunities": "Keine qualifizierten Opportunities",
+      "inNegotiation": "Keine Opportunities in Verhandlung",
+      "won": "Keine gewonnenen Opportunities",
+      "allOpportunities": "Keine Opportunities"
+    }
   },
   "layout": {
     "openSidebar": "Seitenleiste öffnen",

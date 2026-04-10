@@ -39,183 +39,6 @@
       </div>
     </div>
 
-    <!-- Add Vehicle Drawer -->
-    <DrawerContainer :show="showAddModal" @close="handleCloseModal">
-      <div class="h-full flex flex-col overflow-hidden bg-background">
-        <header class="shrink-0 flex items-center justify-between gap-4 border-b border-border px-4 py-3 md:px-6">
-          <h2 class="text-base font-medium text-foreground">Add Vehicle</h2>
-          <button
-            type="button"
-            class="flex items-center justify-center w-9 h-9 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-            aria-label="Close"
-            @click="handleCloseModal"
-          >
-            <X class="w-5 h-5 shrink-0" />
-          </button>
-        </header>
-        <div class="flex-1 overflow-y-auto py-4 px-4 md:px-6 w-full">
-          <form @submit.prevent="handleSubmit" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="w-full">
-                <Label class="form-label text-foreground">Brand</Label>
-                <Input
-                  v-model="newVehicle.brand"
-                  type="text"
-                  placeholder="e.g., Volkswagen"
-                  class="w-full"
-                  required
-                />
-              </div>
-              <div class="w-full">
-                <Label class="form-label text-foreground">Model</Label>
-                <Input
-                  v-model="newVehicle.model"
-                  type="text"
-                  placeholder="e.g., ID.4"
-                  class="w-full"
-                  required
-                />
-              </div>
-              <div class="w-full">
-                <Label class="form-label text-foreground">Year</Label>
-                <Input
-                  v-model="newVehicle.year"
-                  type="number"
-                  placeholder="e.g., 2024"
-                  :min="1900"
-                  :max="new Date().getFullYear() + 1"
-                  class="w-full"
-                  required
-                />
-              </div>
-              <div class="w-full">
-                <Label class="form-label text-foreground">VIN</Label>
-                <Input
-                  v-model="newVehicle.vin"
-                  type="text"
-                  placeholder="Vehicle Identification Number"
-                  class="w-full"
-                />
-              </div>
-              <div class="w-full">
-                <Label class="form-label text-foreground">Plates</Label>
-                <Input
-                  v-model="newVehicle.plates"
-                  type="text"
-                  placeholder="License plate number"
-                  class="w-full"
-                />
-              </div>
-              <div class="w-full">
-                <Label class="form-label text-foreground">Fuel Type</Label>
-                <Select v-model="newVehicle.fuelType">
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select fuel type..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Petrol">Petrol</SelectItem>
-                    <SelectItem value="Diesel">Diesel</SelectItem>
-                    <SelectItem value="Electric">Electric</SelectItem>
-                    <SelectItem value="Hybrid">Hybrid</SelectItem>
-                    <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div class="w-full">
-                <Label class="form-label text-foreground">Gear Type</Label>
-                <Select v-model="newVehicle.gearType">
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select gear type..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Manual">Manual</SelectItem>
-                    <SelectItem value="Automatic">Automatic</SelectItem>
-                    <SelectItem value="CVT">CVT</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div class="w-full">
-                <Label class="form-label text-foreground">Mileage (km)</Label>
-                <Input
-                  v-model.number="newVehicle.kilometers"
-                  type="number"
-                  placeholder="0"
-                  :min="0"
-                  class="w-full"
-                />
-              </div>
-              <div class="w-full">
-                <Label class="form-label text-foreground">Registered At</Label>
-                <Input
-                  v-model="newVehicle.registration"
-                  type="text"
-                  placeholder="MM/YYYY (e.g., 01/2024)"
-                  class="w-full"
-                />
-              </div>
-              <div class="w-full">
-                <Label class="form-label text-foreground">Owned Since</Label>
-                <Input
-                  v-model="newVehicle.ownedSince"
-                  type="text"
-                  placeholder="MM/YYYY (e.g., 01/2024)"
-                  class="w-full"
-                />
-              </div>
-              <div class="w-full">
-                <Label class="form-label text-foreground">Owner</Label>
-                <Input
-                  v-model="newVehicle.owner"
-                  type="text"
-                  placeholder="Owner name"
-                  class="w-full"
-                />
-              </div>
-              <div class="w-full">
-                <Label class="form-label text-foreground">Ownership Type</Label>
-                <Select v-model="newVehicle.ownershipType">
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select ownership type..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Private">Private</SelectItem>
-                    <SelectItem value="Company">Company</SelectItem>
-                    <SelectItem value="Lease">Lease</SelectItem>
-                    <SelectItem value="Fleet">Fleet</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div class="w-full md:col-span-2">
-                <Label class="form-label text-foreground">Warranty Info</Label>
-                <Textarea
-                  v-model="newVehicle.warrantyInfo"
-                  :rows="3"
-                  placeholder="Warranty information..."
-                  class="w-full"
-                />
-              </div>
-            </div>
-          </form>
-        </div>
-        <footer class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 border-t border-border px-4 py-3 md:px-6">
-          <Button
-            variant="outline"
-            class="rounded-sm w-full sm:w-auto"
-            @click="handleCloseModal"
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="default"
-            class="rounded-sm w-full sm:w-auto"
-            @click="handleSubmit"
-          >
-            Add Vehicle
-          </Button>
-        </footer>
-      </div>
-    </DrawerContainer>
-
     <AddOfferModal
       v-if="showAddOfferModal"
       :show="showAddOfferModal"
@@ -228,20 +51,22 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount, inject, h } from 'vue'
-import { X, FilePlus } from 'lucide-vue-next'
+import { ref, computed, watch, onMounted, h } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { FilePlus } from 'lucide-vue-next'
 import { useVehiclesStore } from '@/stores/vehicles'
-import { Badge, Button, Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Textarea } from '@motork/component-library/future/primitives'
-import DrawerContainer from '@/components/shared/DrawerContainer.vue'
+import { Badge, Button } from '@motork/component-library/future/primitives'
 import RequestMainTabs from '@/components/requests/RequestMainTabs.vue'
 import VehicleGrid from '@/components/vehicles/VehicleGrid.vue'
 import AddOfferModal from '@/components/modals/AddOfferModal.vue'
 import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
-import { useVehicleDetail } from '@/composables/useVehicleDetail'
 import { useDataTableData } from '@/composables/useDataTableData'
 
-const headerActionsRef = inject('headerActionsRef', null)
+const route = useRoute()
+const router = useRouter()
 const vehiclesStore = useVehiclesStore()
+
+const VALID_INVENTORY_QUERY = ['in-stock', 'customer-vehicles']
 const showAddOfferModal = ref(false)
 const selectedVehicleForOffer = ref(null)
 
@@ -345,20 +170,37 @@ const filterChips = computed(() => {
   const list = vehiclesWithType.value
   const inStock = list.filter((v) => v.inventoryType === 'in-stock').length
   const customerVehicles = list.filter((v) => v.inventoryType === 'customer-vehicles').length
-  const sold = list.filter((v) => v.inventoryType === 'sold').length
   return [
     { key: 'in-stock', label: 'In stock', count: inStock },
-    { key: 'customer-vehicles', label: "Customers' vehicles", count: customerVehicles },
-    { key: 'sold', label: 'Sold', count: sold }
+    { key: 'customer-vehicles', label: "Customers' vehicles", count: customerVehicles }
   ]
 })
 
-watch(selectedInventoryChip, (chip) => {
-  columnFilters.value = replaceInventoryFilter(columnFilters.value, chip)
-}, { immediate: true })
+watch(
+  () => route.query.inventory,
+  () => {
+    const q = route.query.inventory
+    if (q === 'sold' && route.path === '/vehicles') {
+      router.replace({ path: '/vehicles', query: { ...route.query, inventory: 'in-stock' } })
+      return
+    }
+    if (typeof q === 'string' && VALID_INVENTORY_QUERY.includes(q)) {
+      selectedInventoryChip.value = q
+    }
+  },
+  { immediate: true }
+)
 
-// Use composable for vehicle detail modal logic
-const { showAddModal, newVehicle, handleCloseModal, handleSubmit } = useVehicleDetail()
+watch(
+  selectedInventoryChip,
+  (chip) => {
+    columnFilters.value = replaceInventoryFilter(columnFilters.value, chip)
+    if (route.path !== '/vehicles') return
+    if (route.query.inventory === chip) return
+    router.replace({ path: '/vehicles', query: { ...route.query, inventory: chip } })
+  },
+  { immediate: true }
+)
 
 // Filter definitions - dynamic options from vehicles data
 const filterDefinitions = computed(() => {
@@ -402,8 +244,7 @@ const filterDefinitions = computed(() => {
       ],
       options: [
         { value: 'in-stock', label: 'In stock' },
-        { value: 'customer-vehicles', label: "Customers' vehicles" },
-        { value: 'sold', label: 'Sold' }
+        { value: 'customer-vehicles', label: "Customers' vehicles" }
       ],
       aiHint: 'Inventory type: in stock or customer vehicle',
       pinned: true
@@ -490,18 +331,7 @@ const vehicleBrandOptions = computed(() => {
 })
 
 onMounted(() => {
-  if (headerActionsRef) {
-    headerActionsRef.value = {
-      type: 'vehicles',
-      addLabelKey: 'common.actions.newVehicle',
-      onAddNew: () => { showAddModal.value = true }
-    }
-  }
   vehiclesStore.fetchVehicles()
-})
-
-onBeforeUnmount(() => {
-  if (headerActionsRef) headerActionsRef.value = null
 })
 
 // Handle row click - navigate to vehicle detail or show vehicle info

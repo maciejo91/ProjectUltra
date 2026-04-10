@@ -20,7 +20,7 @@ export const SEGMENT_KEYS = {
   OPEN_OPPORTUNITIES: 'openOpportunities',
   IN_NEGOTIATION: 'inNegotiation',
   WON: 'won',
-  LOST: 'lost'
+  ALL_OPPORTUNITIES: 'allOpportunities'
 }
 
 /**
@@ -76,8 +76,8 @@ function isWon(row) {
   return row.type === 'opportunity' && row.displayStage === OPPORTUNITY_STAGES.CLOSED_WON
 }
 
-function isLost(row) {
-  return row.type === 'opportunity' && row.displayStage === OPPORTUNITY_STAGES.CLOSED_LOST
+function isOpportunityRow(row) {
+  return row.type === 'opportunity'
 }
 
 /**
@@ -106,7 +106,7 @@ export function useRequestsList() {
       [SEGMENT_KEYS.OPEN_OPPORTUNITIES]: list.filter(isOpenOpportunity).length,
       [SEGMENT_KEYS.IN_NEGOTIATION]: list.filter(isInNegotiation).length,
       [SEGMENT_KEYS.WON]: list.filter(isWon).length,
-      [SEGMENT_KEYS.LOST]: list.filter(isLost).length
+      [SEGMENT_KEYS.ALL_OPPORTUNITIES]: list.filter(isOpportunityRow).length
     }
   })
 
@@ -118,7 +118,7 @@ export function useRequestsList() {
     if (segment === SEGMENT_KEYS.OPEN_OPPORTUNITIES) return list.filter(isOpenOpportunity)
     if (segment === SEGMENT_KEYS.IN_NEGOTIATION) return list.filter(isInNegotiation)
     if (segment === SEGMENT_KEYS.WON) return list.filter(isWon)
-    if (segment === SEGMENT_KEYS.LOST) return list.filter(isLost)
+    if (segment === SEGMENT_KEYS.ALL_OPPORTUNITIES) return list.filter(isOpportunityRow)
     return list
   })
 

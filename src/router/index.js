@@ -96,7 +96,7 @@ const routes = [
       {
         path: 'settings',
         component: () => import('@/views/SettingsLayout.vue'),
-        redirect: { name: 'settings-prototype' },
+        redirect: { name: SETTINGS_PLACEHOLDER_ROUTE_ITEMS[0].name },
         beforeEnter: (to, from, next) => {
           const userStore = useUserStore()
           if (userStore.canAccessSettings()) {

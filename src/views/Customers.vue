@@ -208,6 +208,7 @@ onMounted(async () => {
     headerActionsRef.value = {
       type: 'customers',
       addLabelKey: 'common.actions.newContact',
+      addButtonVariant: 'outline',
       onAddNew: () => router.push('/add-new')
     }
   }

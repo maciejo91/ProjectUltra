@@ -62,7 +62,7 @@
           </template>
           <template v-else-if="mobileCustomHeaderActions">
             <Button
-              variant="default"
+              :variant="mobileCustomAddButtonVariant"
               size="sm"
               class="size-8 shrink-0 p-0 rounded-sm"
               :aria-label="mobileCustomAddLabel"
@@ -172,6 +172,11 @@ const mobileCustomAddLabel = computed(() => {
   if (!ref) return ''
   if (ref.addLabelKey) return t(ref.addLabelKey)
   return t('common.navigation.addNew')
+})
+
+const mobileCustomAddButtonVariant = computed(() => {
+  const ref = mobileCustomHeaderActions.value
+  return ref?.addButtonVariant === 'outline' ? 'outline' : 'default'
 })
 
 const mobileCalendarHeaderActions = computed(() => {
