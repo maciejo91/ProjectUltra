@@ -17,11 +17,12 @@
       </SidebarMenuButton>
 
       <Teleport to="body">
-        <transition name="dropdown">
+        <transition :name="userMenuTransitionName">
           <div
             v-if="showUserMenu"
             ref="popoverPanelRef"
-            class="sidebar-user-dropdown fixed w-56 overflow-visible rounded-lg border border-border bg-background p-1 shadow-mk-dashboard-card"
+            class="sidebar-user-dropdown fixed overflow-visible rounded-lg border border-border bg-background p-1 shadow-mk-dashboard-card"
+            :class="popoverWidthClass"
             :style="popoverStyle"
             @click.stop
           >
@@ -47,7 +48,7 @@
                   />
                 </button>
 
-                <transition name="dropdown">
+                <transition name="dropdown-nested">
                   <div v-if="profileExpanded" class="mt-1 grid grid-cols-1 gap-1">
                     <button
                       v-for="profile in otherProfiles"
@@ -98,7 +99,7 @@
                   />
                 </button>
 
-                <transition name="dropdown">
+                <transition name="dropdown-nested">
                   <div v-if="languageExpanded" class="mt-1 grid grid-cols-1 gap-1 pl-6">
                     <button
                       v-for="lang in otherLanguages"
@@ -146,13 +147,24 @@ import { useLayoutStore } from '@/stores/layout'
 import { useUserStore } from '@/stores/user'
 import { useSettingsStore } from '@/stores/settings'
 import FloatingSearchModal from '@/components/shared/FloatingSearchModal.vue'
-import { SidebarMenuButton } from '@motork/component-library/future/primitives'
+import { SidebarMenuButton, useSidebar } from '@motork/component-library/future/primitives'
 
 const router = useRouter()
 const { locale, t } = useI18n()
 const layoutStore = useLayoutStore()
 const userStore = useUserStore()
 const settingsStore = useSettingsStore()
+const { state: sidebarState } = useSidebar()
+
+const isSidebarIconMode = computed(() => sidebarState.value !== 'expanded')
+
+const popoverWidthClass = computed(() =>
+  isSidebarIconMode.value ? 'w-56' : 'min-w-56 max-w-none'
+)
+
+const userMenuTransitionName = computed(() =>
+  isSidebarIconMode.value ? 'dropdown-side' : 'dropdown-above'
+)
 
 const navigationVisibility = computed(() => settingsStore.getSetting('navigationVisibility') || {})
 const sidebarProfile = computed(() => settingsStore.getSetting('sidebarProfile') || 'admin')
@@ -187,11 +199,25 @@ function updatePopoverPosition() {
   if (!wrap) return
   const rect = wrap.getBoundingClientRect()
   const gap = 8
+  const zIndex = 100
+
+  if (isSidebarIconMode.value) {
+    popoverStyle.value = {
+      left: `${rect.right + gap}px`,
+      bottom: `${window.innerHeight - rect.bottom}px`,
+      width: '14rem',
+      top: 'auto',
+      zIndex
+    }
+    return
+  }
+
   popoverStyle.value = {
-    left: `${rect.right + gap}px`,
-    bottom: `${window.innerHeight - rect.bottom}px`,
-    width: '14rem',
-    zIndex: 100
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+    bottom: `${window.innerHeight - rect.top + gap}px`,
+    top: 'auto',
+    zIndex
   }
 }
 
@@ -239,6 +265,12 @@ watch(showUserMenu, (open) => {
     window.addEventListener('resize', onScrollOrResize)
     bindOutsideClose()
   })
+})
+
+watch(isSidebarIconMode, () => {
+  if (showUserMenu.value) {
+    nextTick(() => updatePopoverPosition())
+  }
 })
 
 onUnmounted(() => {
@@ -329,15 +361,34 @@ function handleSearch() {
 </script>
 
 <style scoped>
-.dropdown-enter-active,
-.dropdown-leave-active {
+.dropdown-side-enter-active,
+.dropdown-side-leave-active,
+.dropdown-above-enter-active,
+.dropdown-above-leave-active {
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.dropdown-enter-from,
-.dropdown-leave-to {
+.dropdown-side-enter-from,
+.dropdown-side-leave-to {
   opacity: 0;
   transform: translateX(-10px);
+}
+
+.dropdown-above-enter-from,
+.dropdown-above-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.dropdown-nested-enter-active,
+.dropdown-nested-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.dropdown-nested-enter-from,
+.dropdown-nested-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
 .sidebar-user-dropdown {

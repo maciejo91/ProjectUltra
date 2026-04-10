@@ -846,6 +846,20 @@ export const fetchTasksDueToday = async () => {
   })
 }
 
+export const fetchRecentlyCreatedOpportunities = async ({ sinceHours = 48, limit = 10 } = {}) => {
+  await delay()
+  const cutoff = Date.now() - sinceHours * 60 * 60 * 1000
+  const allOpportunitiesResult = await opportunityService.findAll({})
+  const allOpportunities = allOpportunitiesResult.data
+  return allOpportunities
+    .filter((opp) => {
+      if (!opp.createdAt) return false
+      return new Date(opp.createdAt).getTime() >= cutoff
+    })
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, limit)
+}
+
 export const fetchTasksDueUpcoming = async (days = 7) => {
   await delay()
   const today = new Date()

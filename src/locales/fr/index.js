@@ -6,6 +6,7 @@ import forms from './forms.json'
 import messages from './messages.json'
 import requestDetail from './requestDetail.json'
 import customerProfile from './customerProfile.json'
+import home from './home.json'
 
 export default {
   common,
@@ -15,7 +16,8 @@ export default {
   forms,
   messages,
   requestDetail,
-  customerProfile
+  customerProfile,
+  home
 }
 
 

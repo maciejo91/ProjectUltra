@@ -179,18 +179,60 @@ export const mockBDCOperatorMetrics = {
   leadToOpportunityConversionTrend: [20, 21, 23, 24, 24.2, 24.5]
 }
 
+export const mockBDCOperatorMetricsWeek = {
+  slaCompliance: {
+    completed: 33,
+    total: 36,
+    percentage: 91.7,
+    withinSLA: 33,
+    trend: [88, 89, 90, 90.5, 91, 91.5, 91.7]
+  },
+  managedLeadTasks: {
+    total: 48,
+    dailyAvg: 8,
+    target: 10,
+    trend: [6, 7, 7, 8, 8, 8, 8]
+  },
+  handledNoShowTasks: {
+    total: 3,
+    dailyAvg: 0.5,
+    trend: [0, 1, 1, 1, 1, 1, 1]
+  },
+  followUpTasks: {
+    total: 11,
+    dailyAvg: 2,
+    target: 10,
+    trend: [1, 1, 2, 2, 2, 2, 2]
+  },
+  appointmentsReserved: 6,
+  appointmentsReservedTrend: [4, 5, 5, 6, 6, 6, 6],
+  leadToOpportunityConversion: 25.2,
+  leadToOpportunityConversionTrend: [23, 23.5, 24, 24.5, 24.8, 25, 25.2]
+}
+
 export const mockSalespersonMetrics = {
   contractsClosed: {
+    week: 3,
+    weekTrend: [2, 2, 2, 3, 3, 3, 3],
     month: 12,
+    monthTrend: [8, 9, 10, 10, 11, 11, 12],
     quarter: 34,
-    year: 128
+    quarterTrend: [28, 30, 31, 32, 33, 33, 34],
+    year: 128,
+    yearTrend: [118, 120, 122, 124, 125, 126, 128]
   },
   revenue: {
+    week: 290000,
+    weekTrend: [240000, 250000, 260000, 270000, 275000, 282000, 290000],
     month: 1250000,
+    monthTrend: [1080000, 1120000, 1150000, 1180000, 1200000, 1220000, 1250000],
     quarter: 3450000,
-    year: 12800000
+    quarterTrend: [3100000, 3180000, 3220000, 3280000, 3320000, 3380000, 3450000],
+    year: 12800000,
+    yearTrend: [11800000, 12000000, 12200000, 12300000, 12400000, 12600000, 12800000]
   },
   revenueTargets: {
+    week: 350000,
     month: 1500000,
     quarter: 4000000,
     year: 15000000
@@ -200,9 +242,14 @@ export const mockSalespersonMetrics = {
   winRate: 68.5,
   winRateTrend: [64, 65, 66, 67, 68, 68.2, 68.5],
   newOpportunities: {
+    week: 5,
+    weekTrend: [3, 4, 4, 4, 5, 5, 5],
     month: 23,
+    monthTrend: [18, 19, 20, 21, 22, 22, 23],
     quarter: 67,
-    year: 245
+    quarterTrend: [58, 60, 62, 64, 65, 66, 67],
+    year: 245,
+    yearTrend: [220, 225, 230, 235, 238, 242, 245]
   },
   dormantOpportunities: 8,
   dormantOpportunitiesTrend: [10, 9, 9, 8, 8, 8, 8],
@@ -233,5 +280,28 @@ export const mockManagerFunnelMetrics = {
     won: 211,
     lost: 105,
     wonRate: 66.8
+  }
+}
+
+export const mockManagerFunnelMetricsWeek = {
+  stages: [
+    { name: 'Total leads', count: 312, percentage: 100, colorCode: '#eab308', trend: [280, 290, 298, 302, 306, 310, 312] },
+    { name: 'Assigned leads', count: 244, percentage: 78, colorCode: '#b45309', trend: [220, 228, 232, 236, 240, 242, 244] },
+    { name: 'Managed leads', count: 231, percentage: 74, colorCode: '#22c55e', trend: [210, 215, 218, 222, 226, 229, 231] },
+    { name: 'Qualified leads', count: 88, percentage: 28, colorCode: '#16a34a', trend: [78, 80, 82, 84, 85, 86, 88] },
+    { name: 'Managed opportunities', count: 75, percentage: 24, colorCode: '#7e22ce', trend: [68, 70, 71, 72, 73, 74, 75] },
+    { name: 'Won opportunities', count: 50, percentage: 16, colorCode: '#0470e9', trend: [44, 46, 47, 48, 49, 49, 50] }
+  ],
+  conversionRate: 16.2,
+  conversionRateTrend: [15.0, 15.2, 15.4, 15.6, 15.8, 16.0, 16.2],
+  taskCompletion: {
+    completed: 218,
+    total: 252,
+    overdueCount: 12
+  },
+  dealsReport: {
+    won: 50,
+    lost: 24,
+    wonRate: 67.6
   }
 }

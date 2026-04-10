@@ -8,7 +8,7 @@
     <SidebarHeader class="shrink-0 px-2 py-2">
       <template v-if="!isSettingsArea">
         <div
-          class="flex min-w-0 items-center justify-between gap-2 group-data-[collapsible=icon]:hidden"
+          class="flex min-h-10 min-w-0 items-center justify-between gap-2 group-data-[collapsible=icon]:hidden"
         >
           <RouterLink
             to="/home"
@@ -25,6 +25,10 @@
               LeadSparK
             </span>
           </RouterLink>
+          <SidebarTrigger
+            class="size-9 shrink-0 rounded-md text-sidebar-foreground outline-none ring-sidebar-ring transition-colors hover:bg-sidebar-accent focus-visible:ring-2"
+            :aria-label="t('common.layout.toggleSidebar')"
+          />
         </div>
 
         <div
@@ -32,14 +36,19 @@
         >
           <RouterLink
             to="/home"
-            class="flex size-10 items-center justify-center rounded-md outline-none ring-sidebar-ring transition-colors hover:bg-sidebar-accent focus-visible:ring-2"
+            class="absolute inset-0 z-10 flex items-center justify-center rounded-md outline-none ring-sidebar-ring transition-opacity duration-200 hover:bg-sidebar-accent focus-visible:ring-2 group-hover:pointer-events-none group-hover:opacity-0"
+            :aria-label="t('common.navigation.home')"
           >
             <img
               src="@/assets/images/leadspark-logo.png"
-              alt="LeadSparK"
+              alt=""
               class="size-7 rounded-sm object-contain"
             />
           </RouterLink>
+          <SidebarTrigger
+            class="relative z-20 size-10 shrink-0 rounded-md text-sidebar-foreground opacity-0 outline-none ring-sidebar-ring transition-opacity duration-200 pointer-events-none hover:bg-sidebar-accent focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:ring-2 group-hover:pointer-events-auto group-hover:opacity-100"
+            :aria-label="t('common.layout.toggleSidebar')"
+          />
         </div>
       </template>
 
@@ -209,21 +218,7 @@
       </div>
     </SidebarContent>
 
-    <SidebarGroup class="relative shrink-0 border-t border-sidebar-border pt-2">
-      <div
-        v-if="!isSettingsArea"
-        class="absolute right-0 top-0 z-30 -translate-y-1/2 translate-x-1/2"
-      >
-        <button
-          type="button"
-          class="h-7 w-7 rounded-full border border-sidebar-border bg-background text-sidebar-foreground shadow-sm hover:bg-sidebar-accent hover:text-sidebar-foreground flex items-center justify-center"
-          :aria-label="t('common.layout.toggleSidebar')"
-          @click="toggleSidebar"
-        >
-          <ChevronLeft v-if="sidebarState === 'expanded'" class="size-3" />
-          <ChevronRight v-else class="size-3" />
-        </button>
-      </div>
+    <SidebarGroup class="shrink-0 border-t border-sidebar-border pt-2">
       <SidebarMenu>
         <SidebarMenuItem v-if="bottomNavVisibility.settings && !isSettingsArea">
           <SidebarMenuButton
@@ -254,7 +249,7 @@
       </SidebarMenu>
     </SidebarGroup>
 
-    <SidebarRail v-if="!isSettingsArea" />
+    <SidebarRail v-if="!isSettingsArea" class="cursor-col-resize!" />
 
     <ComingSoonModal
       :show="showSupportModal"
@@ -268,7 +263,7 @@
 import { computed, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Plus, Search, LifeBuoy, Settings, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { Plus, Search, LifeBuoy, Settings, ChevronLeft } from 'lucide-vue-next'
 import {
   Sidebar,
   SidebarContent,
@@ -282,7 +277,6 @@ import {
   SidebarRail,
   SidebarTrigger
 } from '@motork/component-library/future/primitives'
-import { useSidebar } from '@motork/component-library/future/primitives'
 import { useLayoutStore } from '@/stores/layout'
 import { useUserStore } from '@/stores/user'
 import { useAppSidebarNavigation } from '@/composables/useAppSidebarNavigation'
@@ -312,7 +306,6 @@ const settingsPath = '/settings'
 const showSupportModal = ref(false)
 
 const isSettingsArea = computed(() => route.path.startsWith('/settings'))
-const { state: sidebarState, toggleSidebar } = useSidebar()
 
 const hasActionsGroup = computed(() => actionsVisibility.value.addNew || actionsVisibility.value.search)
 

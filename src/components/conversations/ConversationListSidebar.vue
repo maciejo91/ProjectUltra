@@ -1,7 +1,7 @@
 <template>
   <div
     ref="scrollContainer"
-    class="flex h-full min-h-0 w-full min-w-0 shrink-0 flex-col overflow-hidden border-border border-r bg-muted lg:max-h-full"
+    class="flex h-full min-h-0 w-full min-w-0 shrink-0 flex-col overflow-hidden bg-muted lg:max-h-full"
   >
     <div class="shrink-0 px-2 py-3">
       <div class="flex min-w-0 flex-1">

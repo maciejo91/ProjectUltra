@@ -223,6 +223,20 @@ export const fetchTasksDueToday = async () => {
   })
 }
 
+export const fetchRecentlyCreatedLeads = async ({ sinceHours = 48, limit = 10 } = {}) => {
+  await delay()
+  const cutoff = Date.now() - sinceHours * 60 * 60 * 1000
+  const allLeadsResult = await leadService.findAll({})
+  const allLeads = allLeadsResult.data
+  return allLeads
+    .filter((lead) => {
+      if (!lead.createdAt || lead.isDisqualified) return false
+      return new Date(lead.createdAt).getTime() >= cutoff
+    })
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, limit)
+}
+
 export const fetchTasksDueUpcoming = async (days = 7) => {
   await delay()
   const today = new Date()

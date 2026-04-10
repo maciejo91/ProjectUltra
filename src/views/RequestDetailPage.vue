@@ -186,6 +186,10 @@ function handleBack() {
     router.push({ path: '/tasks', query: {} })
     return
   }
+  if (from === 'home') {
+    router.push({ path: '/home' })
+    return
+  }
   const query = from === 'requests' && request.value?.compositeId
     ? { highlight: request.value.compositeId }
     : {}

@@ -20,7 +20,7 @@
         class="rounded-lg border border-border bg-muted/50 p-8 text-center"
       >
         <CalendarClock class="mx-auto mb-2 size-10 shrink-0 text-muted-foreground/50" />
-        <p class="text-sm font-medium text-muted-foreground">Nothing scheduled for today</p>
+        <p class="text-sm font-medium text-muted-foreground">{{ emptyTitle }}</p>
       </div>
 
       <div v-else class="relative">
@@ -52,7 +52,7 @@
             <div class="flex min-w-0 flex-1 flex-col gap-1">
               <div class="flex items-center gap-2">
                 <component
-                  :is="item.kind === 'appointment' ? CalendarCheck : ListTodo"
+                  :is="feedIcon(item)"
                   class="size-3.5 shrink-0 text-muted-foreground"
                 />
                 <p class="truncate text-sm font-medium text-foreground">
@@ -86,7 +86,7 @@
 </template>
 
 <script setup>
-import { CalendarClock, CalendarCheck, ListTodo, ChevronRight } from 'lucide-vue-next'
+import { CalendarClock, CalendarCheck, ListTodo, ChevronRight, Inbox } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { Badge } from '@motork/component-library/future/primitives'
 
@@ -98,10 +98,20 @@ defineProps({
   loading: {
     type: Boolean,
     default: false
+  },
+  emptyTitle: {
+    type: String,
+    default: ''
   }
 })
 
 const router = useRouter()
+
+function feedIcon(item) {
+  if (item.kind === 'appointment') return CalendarCheck
+  if (item.kind === 'recent') return Inbox
+  return ListTodo
+}
 
 function getNodeRingClass(item) {
   const now = Date.now()
@@ -115,14 +125,22 @@ function getNodeRingClass(item) {
 function handleClick(item) {
   if (item.kind === 'appointment') {
     if (item.opportunityId) {
-      router.push(`/tasks/${item.opportunityId}?type=opportunity`)
-    } else if (item.leadId) {
-      router.push(`/tasks/${item.leadId}?type=lead`)
-    } else {
-      router.push('/calendar')
+      router.push({ path: `/requests/${item.opportunityId}`, query: { type: 'opportunity', from: 'home' } })
+      return
     }
-  } else {
-    router.push(`/tasks/${item.id}?type=${item.type}`)
+    if (item.leadId) {
+      router.push({ path: `/requests/${item.leadId}`, query: { type: 'lead', from: 'home' } })
+      return
+    }
+    router.push('/calendar')
+    return
   }
+  const entityId = item.entityId
+  const entityType = item.entityType ?? item.type
+  if (entityId != null && entityType) {
+    router.push({ path: `/requests/${entityId}`, query: { type: entityType, from: 'home' } })
+    return
+  }
+  router.push('/requests')
 }
 </script>

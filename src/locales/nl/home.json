@@ -1,0 +1,35 @@
+{
+  "greeting": "Goedendag, {name}",
+  "summary": "{important} prioriteitstaken vandaag · {recent} nieuw · {appointments} in je agenda",
+  "importantToday": {
+    "title": "Belangrijk vandaag",
+    "empty": "Geen urgente taken voor vandaag",
+    "openTasks": "Taken"
+  },
+  "newInbound": {
+    "title": "Nieuwe leads & opportunities",
+    "empty": "Niets nieuws in de laatste 48 uur"
+  },
+  "needsAttention": {
+    "title": "Vereist je aandacht",
+    "viewAll": "Alles bekijken",
+    "caughtUpTitle": "Alles bij!",
+    "caughtUpSubtitle": "Geen acties nodig op dit moment"
+  },
+  "schedule": {
+    "title": "Agenda van vandaag",
+    "emptyTitle": "Niets gepland voor vandaag",
+    "openCalendar": "Agenda",
+    "openTasks": "Taken"
+  },
+  "performance": {
+    "title": "Performance",
+    "periodWeek": "Week",
+    "periodMonth": "Maand",
+    "periodQuarter": "Kwartaal",
+    "periodYear": "Jaar",
+    "weeklyTarget": "Weekdoel",
+    "monthlyTarget": "Maanddoel",
+    "quarterlyTarget": "Kwartaaldoel"
+  }
+}

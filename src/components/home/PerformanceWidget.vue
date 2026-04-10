@@ -1,15 +1,16 @@
 <template>
   <Card class="border border-border flex flex-col overflow-hidden shadow-mk-dashboard-card">
-    <CardHeader class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-      <CardTitle class="text-sm font-medium leading-5">Performance</CardTitle>
+    <CardHeader class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 px-4 md:px-6 py-3 border-b border-border">
+      <CardTitle class="text-sm font-medium leading-5">{{ t('home.performance.title') }}</CardTitle>
       <select
         v-model="selectedPeriod"
-        @change="loadMetrics"
         class="input text-sm w-full sm:w-auto bg-muted/50 border-border rounded-md px-2 py-1 outline-none focus:ring-1 focus:ring-primary/20"
+        @change="loadMetrics"
       >
-        <option value="month">Month</option>
-        <option value="quarter">Quarter</option>
-        <option value="year">Year</option>
+        <option value="week">{{ t('home.performance.periodWeek') }}</option>
+        <option value="month">{{ t('home.performance.periodMonth') }}</option>
+        <option value="quarter">{{ t('home.performance.periodQuarter') }}</option>
+        <option value="year">{{ t('home.performance.periodYear') }}</option>
       </select>
     </CardHeader>
 
@@ -241,9 +242,21 @@
 
         <!-- Revenue Targets -->
         <div class="space-y-3 bg-muted rounded-lg p-4 border border-border">
+          <div v-if="selectedPeriod === 'week'" class="space-y-1">
+            <div class="flex items-center justify-between text-sm font-medium text-muted-foreground tracking-wider">
+              <span>{{ t('home.performance.weeklyTarget') }}</span>
+              <span class="font-bold text-foreground">{{ getRevenueProgress('week') }}%</span>
+            </div>
+            <div class="w-full bg-border rounded-full h-1.5 overflow-hidden">
+              <div
+                class="h-full bg-primary transition-all duration-700"
+                :style="{ width: `${Math.min(getRevenueProgress('week'), 100)}%` }"
+              ></div>
+            </div>
+          </div>
           <div class="space-y-1">
             <div class="flex items-center justify-between text-sm font-medium text-muted-foreground tracking-wider">
-              <span>Monthly Target</span>
+              <span>{{ t('home.performance.monthlyTarget') }}</span>
               <span class="font-bold text-foreground">{{ getRevenueProgress('month') }}%</span>
             </div>
             <div class="w-full bg-border rounded-full h-1.5 overflow-hidden">
@@ -255,7 +268,7 @@
           </div>
           <div class="space-y-1">
             <div class="flex items-center justify-between text-sm font-medium text-muted-foreground tracking-wider">
-              <span>Quarterly Target</span>
+              <span>{{ t('home.performance.quarterlyTarget') }}</span>
               <span class="font-bold text-foreground">{{ getRevenueProgress('quarter') }}%</span>
             </div>
             <div class="w-full bg-border rounded-full h-1.5 overflow-hidden">
@@ -527,18 +540,27 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { LineChart, Lightbulb, Eye } from 'lucide-vue-next'
 import { useUserStore } from '@/stores/user'
 import { fetchBDCOperatorMetrics, fetchSalespersonMetrics, fetchManagerFunnelMetrics } from '@/api/dashboard'
 import { Badge, Button, Card, CardHeader, CardTitle, CardContent } from '@motork/component-library/future/primitives'
 import { SEGMENT_KEYS } from '@/composables/useRequestsList'
 
+const props = defineProps({
+  defaultPeriod: {
+    type: String,
+    default: 'month'
+  }
+})
+
 const router = useRouter()
+const { t } = useI18n()
 const userStore = useUserStore()
 const userRole = computed(() => userStore.userRole())
 const userId = computed(() => userStore.currentUser?.id)
 
-const selectedPeriod = ref('month')
+const selectedPeriod = ref(props.defaultPeriod)
 const loading = ref(true)
 
 const bdcMetrics = ref(null)
@@ -732,10 +754,19 @@ const loadMetrics = async () => {
   }
 }
 
-// Watch for user/role changes and reload metrics
 watch([userId, userRole], () => {
   loadMetrics()
 }, { immediate: false })
+
+watch(
+  () => props.defaultPeriod,
+  (v) => {
+    if (v && v !== selectedPeriod.value) {
+      selectedPeriod.value = v
+      loadMetrics()
+    }
+  }
+)
 
 onMounted(() => {
   loadMetrics()

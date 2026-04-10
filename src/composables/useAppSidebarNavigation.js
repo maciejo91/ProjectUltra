@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
+  House,
   UserSquare,
   CarFront,
   Tag,
@@ -29,7 +30,7 @@ export function useAppSidebarNavigation() {
     if (profile === 'admin') return null
 
     const v = {
-      home: false,
+      home: true,
       tasks: false,
       requests: false,
       afterSales: false,
@@ -77,6 +78,7 @@ export function useAppSidebarNavigation() {
     if (profile === 'externalBdc') {
       return {
         ...v,
+        home: false,
         tasks: true,
         support: true
       }
@@ -110,6 +112,7 @@ export function useAppSidebarNavigation() {
 
   const firstVisibleRoute = computed(() => {
     const nav = navigationVisibility.value
+    if (nav.home !== false) return '/home'
     if (nav.calendar !== false) return '/calendar'
     if (nav.tasks !== false) return '/tasks'
     if (nav.conversations !== false) return '/conversations'
@@ -126,6 +129,13 @@ export function useAppSidebarNavigation() {
   const primaryNavItems = computed(() => {
     const nav = navigationVisibility.value
     const items = []
+    if (nav.home !== false) {
+      items.push({
+        name: t('common.navigation.home'),
+        href: '/home',
+        icon: House
+      })
+    }
     if (nav.tasks !== false) {
       items.push({
         name: t('common.navigation.tasks'),

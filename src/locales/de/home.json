@@ -1,0 +1,35 @@
+{
+  "greeting": "Guten Tag, {name}",
+  "summary": "{important} Prioritätsaufgaben heute · {recent} neu · {appointments} im Kalender",
+  "importantToday": {
+    "title": "Wichtig heute",
+    "empty": "Keine dringenden Aufgaben für heute",
+    "openTasks": "Aufgaben"
+  },
+  "newInbound": {
+    "title": "Neue Leads & Opportunities",
+    "empty": "In den letzten 48 Stunden nichts Neues"
+  },
+  "needsAttention": {
+    "title": "Erfordert Ihre Aufmerksamkeit",
+    "viewAll": "Alle anzeigen",
+    "caughtUpTitle": "Alles erledigt!",
+    "caughtUpSubtitle": "Zurzeit sind keine Aktionen nötig"
+  },
+  "schedule": {
+    "title": "Heutiger Terminplan",
+    "emptyTitle": "Heute nichts geplant",
+    "openCalendar": "Kalender",
+    "openTasks": "Aufgaben"
+  },
+  "performance": {
+    "title": "Performance",
+    "periodWeek": "Woche",
+    "periodMonth": "Monat",
+    "periodQuarter": "Quartal",
+    "periodYear": "Jahr",
+    "weeklyTarget": "Wochenziel",
+    "monthlyTarget": "Monatsziel",
+    "quarterlyTarget": "Quartalsziel"
+  }
+}

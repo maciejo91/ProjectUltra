@@ -1,0 +1,35 @@
+{
+  "greeting": "Good day, {name}",
+  "summary": "{important} priority tasks today · {recent} new · {appointments} on your schedule",
+  "importantToday": {
+    "title": "Important today",
+    "empty": "No urgent tasks due today",
+    "openTasks": "Tasks"
+  },
+  "newInbound": {
+    "title": "New leads & opportunities",
+    "empty": "Nothing new in the last 48 hours"
+  },
+  "needsAttention": {
+    "title": "Needs your attention",
+    "viewAll": "View all",
+    "caughtUpTitle": "All caught up!",
+    "caughtUpSubtitle": "No actions needed right now"
+  },
+  "schedule": {
+    "title": "Today's schedule",
+    "emptyTitle": "Nothing scheduled for today",
+    "openCalendar": "Calendar",
+    "openTasks": "Tasks"
+  },
+  "performance": {
+    "title": "Performance",
+    "periodWeek": "Week",
+    "periodMonth": "Month",
+    "periodQuarter": "Quarter",
+    "periodYear": "Year",
+    "weeklyTarget": "Weekly target",
+    "monthlyTarget": "Monthly target",
+    "quarterlyTarget": "Quarterly target"
+  }
+}
