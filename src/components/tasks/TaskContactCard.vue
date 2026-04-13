@@ -26,10 +26,32 @@
             </TooltipProvider>
             <div class="min-w-0 flex-1">
               <div class="flex min-w-0 items-center justify-between gap-2">
-                <p class="min-w-0 px-1.5 text-base font-medium leading-5 text-foreground wrap-break-word">
+                <p
+                  class="min-w-0 flex flex-wrap items-baseline gap-x-1 gap-y-1 px-1.5 text-base font-medium leading-5 text-foreground wrap-break-word"
+                >
                   <span>{{ nameParts.primary || '—' }}</span>
-                  <span v-if="nameParts.location" class="text-muted-foreground">
-                    {{ ' ' }}{{ nameParts.location }}
+                  <span
+                    v-if="nameParts.location || showContactDuplicateWarning"
+                    class="inline-flex flex-wrap items-center gap-1.5 text-muted-foreground"
+                  >
+                    <span v-if="nameParts.location">{{ ' ' }}{{ nameParts.location }}</span>
+                    <TooltipProvider v-if="showContactDuplicateWarning" :delay-duration="200">
+                      <Tooltip>
+                        <TooltipTrigger as-child>
+                          <button
+                            type="button"
+                            class="inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted text-destructive shadow-sm"
+                            :aria-label="t('requestDetail.contactCard.openDuplicateContactsProfileAria')"
+                            @click.stop="navigateToCustomerDuplicateProfile"
+                          >
+                            <AlertTriangle class="size-3.5 shrink-0 pointer-events-none" aria-hidden />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" align="start" class="max-w-xs">
+                          {{ t('requestDetail.contactCard.possibleContactDuplicates') }}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </span>
                 </p>
 
@@ -272,8 +294,8 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
@@ -281,6 +303,7 @@ import { useCustomersStore } from '@/stores/customers'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useRequestNavigationStore } from '@/stores/requestNavigation'
+import { useCustomerDuplicateDetection } from '@/composables/useCustomerDuplicateDetection'
 import { getCustomerNameParts } from '@/utils/customerDisplay'
 import {
   Badge,
@@ -299,6 +322,7 @@ import {
   TooltipTrigger
 } from '@motork/component-library/future/primitives'
 import {
+  AlertTriangle,
   ChevronDown,
   Mail,
   MessageCircle,
@@ -357,6 +381,7 @@ const emit = defineEmits(['quick-action', 'action', 'add-tag', 'open-activity'])
 const { t } = useI18n()
 const toastStore = useToastStore()
 const userStore = useUserStore()
+const route = useRoute()
 const router = useRouter()
 const customersStore = useCustomersStore()
 const leadsStore = useLeadsStore()
@@ -400,6 +425,19 @@ watch(
 const saveDisabled = computed(() => !(editForm.value.name ?? '').trim())
 
 const nameParts = computed(() => getCustomerNameParts(props.task.customer?.name))
+
+const customerForDuplicateDetection = computed(() => props.task?.customer || null)
+const { potentialDuplicates: potentialContactDuplicates } =
+  useCustomerDuplicateDetection(customerForDuplicateDetection)
+const showContactDuplicateWarning = computed(
+  () => potentialContactDuplicates.value.length > 0
+)
+
+onMounted(() => {
+  if (!customersStore.customers?.length) {
+    customersStore.fetchCustomers().catch(() => {})
+  }
+})
 
 const phoneDisplay = computed(() => props.task.customer?.phone || null)
 const emailDisplay = computed(() => props.task.customer?.email || null)
@@ -569,6 +607,34 @@ function openCustomerProfileInNewTab() {
     const url = router.resolve(`/customer/${customerId}`).href
     window.open(url, '_blank')
   }
+}
+
+function resolveCustomerDuplicateReturnFrom() {
+  const path = route.path || ''
+  if (path.startsWith('/requests')) return 'request'
+  if (path.startsWith('/customer')) {
+    const qFrom = route.query.from
+    if (typeof qFrom === 'string' && qFrom) return qFrom
+    return 'customers'
+  }
+  return 'request'
+}
+
+function navigateToCustomerDuplicateProfile() {
+  const rawId = props.customerId ?? props.task?.customer?.id
+  if (rawId == null || rawId === '') return
+  const id = Number(rawId)
+  if (!Number.isFinite(id)) return
+  const c = props.task?.customer
+  const isAccount = !!(c?.company && String(c.company).trim() !== '')
+  router.push({
+    path: `/customer/${id}`,
+    query: {
+      type: isAccount ? 'account' : 'contact',
+      from: resolveCustomerDuplicateReturnFrom(),
+      highlight: 'duplicates'
+    }
+  })
 }
 
 function startEditing() {

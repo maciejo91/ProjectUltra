@@ -19,6 +19,7 @@ export const VEHICLE_BRANDS = [
   'Mercedes-Benz',
   'MG',
   'Mini',
+  'Mitsubishi',
   'Nissan',
   'Opel',
   'Peugeot',

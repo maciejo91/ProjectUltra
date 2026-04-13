@@ -341,6 +341,8 @@
               :heading="t('requestDetail.vehicleCard.title')"
               :vehicle="request.requestedCar || request.vehicle"
               :request-message="request.requestMessage || request.requestedCar?.requestMessage"
+              :request-context="requestedVehicleRequestContext"
+              :dealership-needs-warning="!!request.dealershipNeedsWarning"
               :source="request.source"
               :source-url="request.requestedCar?.listingUrl || request.sourceUrl || ''"
               :image-url="getCarImageUrl(request.requestedCar || request.vehicle)"
@@ -482,6 +484,18 @@ const loadingCustomerRelatedRequests = ref(false)
 const leadRef = computed(() => (props.request?.type === 'lead' ? props.request : null))
 
 const requestAttribution = computed(() => getRequestAttributionProps(props.request))
+
+const requestedVehicleRequestContext = computed(() => {
+  const r = props.request
+  if (!r) return {}
+  return {
+    channel: r.channel,
+    source: r.source,
+    sourceDetails: r.sourceDetails,
+    fiscalEntity: r.fiscalEntity,
+    requestType: r.requestType
+  }
+})
 
 const showRequestDetailsCard = computed(() => {
   const r = props.request
@@ -864,15 +878,22 @@ onBeforeUnmount(() => {
   }
 })
 
-async function handleRequestedCarSave(carData) {
+async function handleRequestedCarSave(payload) {
   const r = props.request
   if (!r?.id) return
+  let updates
+  if (payload && typeof payload === 'object' && 'requestedCar' in payload) {
+    const { requestedCar, ...rest } = payload
+    updates = { requestedCar, ...rest }
+  } else {
+    updates = { requestedCar: payload }
+  }
   try {
     if (r.type === 'lead') {
-      await leadsStore.updateLead(r.id, { requestedCar: carData })
+      await leadsStore.updateLead(r.id, updates)
       await leadsStore.fetchLeadById(r.id)
     } else {
-      await opportunitiesStore.updateOpportunity(r.id, { requestedCar: carData })
+      await opportunitiesStore.updateOpportunity(r.id, updates)
       await opportunitiesStore.fetchOpportunityById(r.id)
     }
     toastStore.pushToast('success', 'Requested car updated')

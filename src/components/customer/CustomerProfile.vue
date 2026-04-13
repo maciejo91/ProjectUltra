@@ -85,14 +85,23 @@
                   <RequestMainTabs class="shrink-0" v-model="activeTab" :tabs="mainTabs" />
                 </div>
                 <div class="flex min-h-0 flex-1 flex-col gap-4 border-t border-border p-4">
-                  <CustomerDuplicateDetectedCard
+                  <div
                     v-if="customer && potentialDuplicates.length"
-                    :potential-duplicates="potentialDuplicates"
-                    :merge-loading="mergeLoading"
-                    class="shrink-0"
-                    @merge="handleMergeClick"
-                    @customer-navigate="handleDuplicateCustomerNavigate"
-                  />
+                    ref="duplicatesHighlightRef"
+                    class="scroll-mt-8 shrink-0 rounded-lg transition-shadow duration-500"
+                    :class="
+                      duplicateHighlightActive
+                        ? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+                        : ''
+                    "
+                  >
+                    <CustomerDuplicateDetectedCard
+                      :potential-duplicates="potentialDuplicates"
+                      :merge-loading="mergeLoading"
+                      @merge="handleMergeClick"
+                      @customer-navigate="handleDuplicateCustomerNavigate"
+                    />
+                  </div>
                   <CustomerProfileContent
                     :active-tab="activeTab"
                     :summary="customerSummary"
@@ -168,7 +177,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Button } from '@motork/component-library/future/primitives'
 import { X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
@@ -224,6 +234,8 @@ const props = defineProps({
 const emit = defineEmits(['close', 'customer-navigate', 'navigate-to-customer'])
 
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 const customersStore = useCustomersStore()
 const userStore = useUserStore()
 const toastStore = useToastStore()
@@ -248,6 +260,9 @@ const customerCars = ref([])
 const showMergeModal = ref(false)
 const duplicateToMerge = ref(null)
 const mergeLoading = ref(false)
+const duplicatesHighlightRef = ref(null)
+const duplicateHighlightActive = ref(false)
+let duplicatesHighlightClearTimer = null
 
 const showAddModal = ref(false)
 const addModalType = ref('lead')
@@ -507,9 +522,46 @@ function handleDuplicateCustomerNavigate(dupId, dupType) {
   emit('navigate-to-customer', dupId, dupType)
 }
 
+function clearDuplicatesHighlightQuery() {
+  if (route.query.highlight !== 'duplicates') return
+  const query = { ...route.query }
+  delete query.highlight
+  router.replace({ path: route.path, query })
+}
+
+async function applyDuplicatesHighlightFromRoute() {
+  if (route.query.highlight !== 'duplicates') return
+  if (loadingCustomer.value || !customer.value?.id) return
+  if ((customersStore.customers?.length ?? 0) === 0) return
+  await nextTick()
+  if (potentialDuplicates.value.length > 0) {
+    duplicatesHighlightRef.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    duplicateHighlightActive.value = true
+    window.setTimeout(() => {
+      duplicateHighlightActive.value = false
+    }, 2800)
+    clearDuplicatesHighlightQuery()
+    return
+  }
+  if (duplicatesHighlightClearTimer) window.clearTimeout(duplicatesHighlightClearTimer)
+  duplicatesHighlightClearTimer = window.setTimeout(() => {
+    duplicatesHighlightClearTimer = null
+    if (route.query.highlight !== 'duplicates') return
+    if (potentialDuplicates.value.length > 0) {
+      void applyDuplicatesHighlightFromRoute()
+      return
+    }
+    clearDuplicatesHighlightQuery()
+  }, 400)
+}
+
 onMounted(() => {
   customersStore.fetchCustomers()
   loadCustomerData()
+})
+
+onUnmounted(() => {
+  if (duplicatesHighlightClearTimer) window.clearTimeout(duplicatesHighlightClearTimer)
 })
 
 watch(
@@ -518,6 +570,23 @@ watch(
     activeTab.value = 'overview'
     loadCustomerData()
   }
+)
+
+watch(
+  () => ({
+    highlight: route.query.highlight,
+    loading: loadingCustomer.value,
+    customerId: customer.value?.id,
+    dupCount: potentialDuplicates.value.length,
+    customersLen: customersStore.customers?.length ?? 0
+  }),
+  async (s) => {
+    if (s.highlight !== 'duplicates') return
+    if (s.loading || !s.customerId) return
+    if (s.customersLen === 0) return
+    await applyDuplicatesHighlightFromRoute()
+  },
+  { flush: 'post' }
 )
 </script>
 

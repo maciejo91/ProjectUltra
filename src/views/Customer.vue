@@ -31,6 +31,14 @@ const customerRowsFromState = computed(() => {
 })
 
 function handleBack() {
+  if (route.query.from === 'request') {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back()
+      return
+    }
+    router.push({ path: '/requests' })
+    return
+  }
   const query = route.query.from === 'customers' && customerId.value
     ? { highlight: `customer-${customerId.value}` }
     : {}

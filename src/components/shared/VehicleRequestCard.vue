@@ -7,13 +7,13 @@
         {{ displayHeading }}
       </h3>
       <Button
-        v-if="canEditNote && !showNoteEditor"
+        v-if="canEditVehicle && !showEditModal"
         type="button"
         variant="secondary"
         size="icon-sm"
         class="shrink-0"
-        :aria-label="t('requestDetail.vehicleCard.editNoteAria')"
-        @click="openNoteEditor"
+        :aria-label="t('requestDetail.vehicleCard.editAria')"
+        @click="openVehicleEditModal"
       >
         <Pencil class="size-3 opacity-70" />
       </Button>
@@ -75,44 +75,10 @@
       </div>
 
       <div
-        v-if="showNoteEditor || savedStaffNoteText"
+        v-if="savedStaffNoteText"
         class="flex w-full min-w-0 flex-col gap-2 border-t border-border pt-3"
       >
-        <div v-if="showNoteEditor" class="flex w-full min-w-0 flex-col gap-2">
-          <Label class="text-sm font-medium text-muted-foreground">{{
-            t('requestDetail.vehicleCard.staffNoteLabel')
-          }}</Label>
-          <Textarea
-            v-model="noteDraft"
-            rows="3"
-            class="min-h-20 w-full resize-y text-sm"
-            :placeholder="t('requestDetail.vehicleCard.staffNotePlaceholder')"
-          />
-          <div class="flex w-full flex-col gap-2 sm:flex-row sm:justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              class="w-full rounded-sm sm:w-auto"
-              :disabled="noteSaving"
-              @click="cancelNoteEditor"
-            >
-              {{ t('common.buttons.cancel') }}
-            </Button>
-            <Button
-              type="button"
-              variant="default"
-              size="sm"
-              class="w-full rounded-sm sm:w-auto"
-              :disabled="noteSaving"
-              @click="saveNote"
-            >
-              {{ noteSaving ? t('requestDetail.vehicleCard.savingNote') : t('common.buttons.save') }}
-            </Button>
-          </div>
-        </div>
         <div
-          v-else
           class="flex w-full min-w-0 flex-col gap-1.5 rounded-md bg-muted px-3 py-2.5"
           role="note"
         >
@@ -309,14 +275,26 @@
           </div>
         </div>
       </div>
+
+    <EditRequestedVehicleModal
+      :show="showEditModal"
+      :vehicle="vehicle"
+      :request-context="requestContext"
+      :request-message="resolvedRequestMessage"
+      :dealership-needs-warning="dealershipNeedsWarning"
+      :saving="vehicleModalSaving"
+      @update:open="(v) => (showEditModal = v)"
+      @save="handleEditModalSave"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Button, Label, Textarea } from '@motork/component-library/future/primitives'
+import { Button } from '@motork/component-library/future/primitives'
 import { ArrowUpRight, Car, Filter, Pencil, Tag } from 'lucide-vue-next'
+import EditRequestedVehicleModal from '@/components/modals/EditRequestedVehicleModal.vue'
 
 const props = defineProps({
   vehicle: {
@@ -362,6 +340,14 @@ const props = defineProps({
   metricsTagCount: {
     type: Number,
     default: undefined
+  },
+  requestContext: {
+    type: Object,
+    default: () => ({})
+  },
+  dealershipNeedsWarning: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -374,12 +360,15 @@ const displayHeading = computed(
 )
 
 const imageError = ref(false)
-const showNoteEditor = ref(false)
-const noteDraft = ref('')
-const noteSaving = ref(false)
+const showEditModal = ref(false)
+const vehicleModalSaving = ref(false)
 const noteExpanded = ref(false)
 
-const canEditNote = computed(() => typeof props.saveRequestedCar === 'function')
+const canEditVehicle = computed(() => typeof props.saveRequestedCar === 'function')
+
+const resolvedRequestMessage = computed(() =>
+  (props.requestMessage ?? props.vehicle?.requestMessage ?? '').trim()
+)
 
 const savedStaffNoteText = computed(() => (props.vehicle?.staffNote ?? '').trim())
 
@@ -394,9 +383,6 @@ const staffNoteNeedsExpandToggle = computed(() => {
 watch(
   () => [props.vehicle, props.vehicle?.staffNote],
   () => {
-    if (!showNoteEditor.value) {
-      noteDraft.value = savedStaffNoteText.value
-    }
     if (!staffNoteNeedsExpandToggle.value) {
       noteExpanded.value = false
     }
@@ -404,60 +390,27 @@ watch(
   { immediate: true }
 )
 
-function openNoteEditor() {
-  noteDraft.value = savedStaffNoteText.value
+function openVehicleEditModal() {
   noteExpanded.value = false
-  showNoteEditor.value = true
+  showEditModal.value = true
 }
 
-function cancelNoteEditor() {
-  showNoteEditor.value = false
-  noteDraft.value = savedStaffNoteText.value
-}
-
-function buildRequestedCarPayloadForNote() {
-  const v = props.vehicle || {}
-  const customerRequestMessage = (
-    (props.requestMessage ?? '').trim() || (v.requestMessage ?? '').trim()
-  )
-  const carData = {
-    ...v,
-    brand: (v.brand ?? '').trim(),
-    model: (v.model ?? '').trim(),
-    year: v.year ?? new Date().getFullYear(),
-    requestType: v.requestType || 'Quotation',
-    requestMessage: customerRequestMessage,
-    staffNote: (noteDraft.value ?? '').trim()
-  }
-  if (v.price != null && v.price !== '') carData.price = Number(v.price)
-  if (v.image) carData.image = v.image
-  const km = v.kilometers ?? v.mileage
-  const status = (v.status || '').toLowerCase()
-  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'new') {
-    carData.status = 'New'
-    carData.kilometers = 0
-  } else {
-    carData.status = 'Used'
-    carData.kilometers = km != null ? Number(km) : 0
-  }
-  return carData
-}
-
-async function saveNote() {
-  const carData = buildRequestedCarPayloadForNote()
-  noteSaving.value = true
+async function handleEditModalSave(payload) {
+  vehicleModalSaving.value = true
   try {
     if (props.saveRequestedCar) {
-      await props.saveRequestedCar(carData)
-      showNoteEditor.value = false
+      await props.saveRequestedCar(payload)
+      showEditModal.value = false
       noteExpanded.value = false
     } else {
-      emit('save', carData)
-      showNoteEditor.value = false
+      emit('save', payload)
+      showEditModal.value = false
       noteExpanded.value = false
     }
+  } catch {
+    // Parent handler shows error feedback
   } finally {
-    noteSaving.value = false
+    vehicleModalSaving.value = false
   }
 }
 

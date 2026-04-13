@@ -93,6 +93,8 @@
     "editCustomer": "Kunde bearbeiten",
     "addTag": "Tag hinzufügen",
     "privateCustomerTooltip": "Privatkunde",
+    "possibleContactDuplicates": "Mögliche Kontaktduplikate",
+    "openDuplicateContactsProfileAria": "Mögliche Kontaktduplikate im Kundenprofil prüfen",
     "businessTag": "Geschäftlich",
     "saving": "Wird gespeichert…",
     "customerUpdated": "Kunde aktualisiert",
@@ -133,9 +135,88 @@
     "expandNote": "Gesamte Notiz anzeigen",
     "collapseNote": "Weniger anzeigen"
   },
+  "editVehicleModal": {
+    "title": "Angefragtes Fahrzeug bearbeiten",
+    "requestType": "Anfragetyp",
+    "vehicleType": "Fahrzeugtyp",
+    "requestPrice": "Anfragepreis",
+    "quantity": "Menge",
+    "vehicleClass": "Fahrzeugklasse",
+    "vehicleBrand": "Fahrzeugmarke",
+    "model": "Modell",
+    "version": "Version",
+    "channel": "Kanal",
+    "origin": "Herkunft",
+    "originDetail": "Herkunft – Detail",
+    "fiscalEntity": "Steuereinheit",
+    "dealership": "Händler",
+    "dealershipWarningAria": "Händlerzuordnung prüfen",
+    "requestMessage": "Anfragenachricht",
+    "staffNote": "Team-Notiz",
+    "none": "Keine",
+    "back": "Zurück",
+    "save": "Speichern",
+    "saving": "Wird gespeichert…",
+    "noBrandFound": "Keine Marke gefunden.",
+    "noModelFound": "Kein Modell gefunden.",
+    "placeholders": {
+      "select": "Auswählen…",
+      "selectOptional": "Optional",
+      "price": "Betrag",
+      "version": "Ausstattung / Version",
+      "requestMessage": "Kundennachricht zu dieser Anfrage",
+      "staffNote": "Interne Notiz (nicht für den Kunden sichtbar)"
+    },
+    "vehicleTypes": {
+      "new": "Neu",
+      "used": "Gebraucht"
+    },
+    "vehicleClasses": {
+      "car": "PKW",
+      "motorcycle": "Motorrad",
+      "van": "Van",
+      "commercial": "Nutzfahrzeug"
+    },
+    "requestTypes": {
+      "genericSales": "Generic sales",
+      "quotation": "Quotation",
+      "testDrive": "Test drive",
+      "financing": "Financing",
+      "tradeIn": "Trade-in"
+    },
+    "channels": {
+      "manualImport": "Manual import",
+      "web": "Web",
+      "paid": "Paid",
+      "showroom": "Showroom",
+      "organic": "Organic",
+      "email": "Email",
+      "whatsapp": "WhatsApp"
+    },
+    "origins": {
+      "web": "Web",
+      "walkIn": "Walk-in",
+      "googleAds": "Google Ads",
+      "autoscout": "Autoscout24.es",
+      "phone": "Phone",
+      "referral": "Referral"
+    },
+    "originDetails": {
+      "webspark": "Webspark",
+      "showroomVisit": "Showroom visit",
+      "summerCampaign": "Summer Campaign 2024",
+      "organicSearch": "Organic search"
+    },
+    "fiscalEntities": {
+      "motorK": "MotorK",
+      "motorKEu": "MotorK EU",
+      "motorKIberia": "MotorK Iberia"
+    }
+  },
   "messageCard": {
     "title": "Anfragedetails",
     "moreDetails": "Weitere Details",
+    "moreDetailsWithCount": "Weitere Details ({count})",
     "utmSource": "UTM-Quelle",
     "utmTerm": "UTM-Begriff",
     "utmCampaign": "UTM-Kampagne",

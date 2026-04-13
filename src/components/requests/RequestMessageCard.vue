@@ -15,7 +15,7 @@
       </p>
     </div>
     <CollapsibleSection
-      :title="t('requestDetail.messageCard.moreDetails')"
+      :title="moreDetailsSectionTitle"
       title-class="text-sm font-normal leading-5 text-foreground"
       :is-expanded="moreExpanded"
       class="w-full min-w-0"
@@ -145,7 +145,14 @@ const props = defineProps({
 })
 
 const { t } = useI18n()
-const moreExpanded = ref(true)
+
+const MORE_DETAILS_ITEM_COUNT = 6
+
+const moreExpanded = ref(false)
+
+const moreDetailsSectionTitle = computed(() =>
+  t('requestDetail.messageCard.moreDetailsWithCount', { count: MORE_DETAILS_ITEM_COUNT })
+)
 
 const displayBody = computed(() => {
   const m = (props.message || '').trim()
