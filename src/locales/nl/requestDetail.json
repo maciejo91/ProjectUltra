@@ -125,7 +125,13 @@
     "stockNotInStock": "Niet op voorraad",
     "landingPage": "Landingspagina",
     "visit": "Bezoeken",
-    "editAria": "Gevraagde voertuig bewerken"
+    "editAria": "Gevraagde voertuig bewerken",
+    "editNoteAria": "Teamnotitie over dit voertuig toevoegen of bewerken",
+    "staffNoteLabel": "Teamnotitie",
+    "staffNotePlaceholder": "Interne notitie over dit voertuig (los van het klantverzoek).",
+    "savingNote": "Opslaan…",
+    "expandNote": "Volledige notitie tonen",
+    "collapseNote": "Minder tonen"
   },
   "messageCard": {
     "title": "Aanvraagdetails",
@@ -176,6 +182,8 @@
     "callingNameFallback": "Klant",
     "callingWithVehicle": "Gesprek met {name} - {vehicle}",
     "callingWithoutVehicle": "Gesprek met {name}",
+    "emailSessionWithVehicle": "E-mail sturen naar {name} – {vehicle}",
+    "emailSessionWithoutVehicle": "E-mail sturen naar {name}",
     "closeOverlay": "Taakvenster sluiten",
     "minimize": "Taak minimaliseren",
     "back": "Terug",

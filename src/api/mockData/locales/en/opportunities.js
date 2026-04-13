@@ -30,7 +30,8 @@ const baseRequestedCar = (brand, model, year, price, opts = {}) => {
     adCampaign: 'Summer 2024',
     adMedium: 'Display',
     adSource: 'Google',
-    expectedPurchaseDate: createDateString(30)
+    expectedPurchaseDate: createDateString(30),
+    staffNote: ''
   }
   return { brand, model, year, price, ...defaults, ...opts }
 }

@@ -3,7 +3,11 @@
     "title": "Lead",
     "plural": "Lead",
     "new": "Nuovo Lead",
-    "details": "Dettagli Lead"
+    "details": "Dettagli Lead",
+    "sendEmailToVerifyContact": "Invia email a {name}",
+    "sendEmailToVerifyContactNoName": "Invia email per verificare i recapiti di contatto",
+    "beginQualificationSendEmailNamed": "Inizia la qualificazione del lead inviando un'email a {name}.",
+    "beginQualificationSendEmailAnonymous": "Inizia la qualificazione del lead inviando un'email al cliente."
   },
   "opportunity": {
     "title": "Opportunità",

@@ -49,9 +49,13 @@ export function useLeadLqTeaser(leadRef) {
     if (!lead) return ''
     const name = (lead.customer?.name ?? '').trim()
     const phone = (lead.customer?.phone ?? '').trim()
-    if (!name && !phone) return ''
+    const email = (lead.customer?.email ?? '').trim()
+    if (!name && !phone && !email) return ''
     if (name && phone) return `${name} · ${phone}`
-    return name || phone
+    if (!hasPhone.value && leadActions.primaryAction.value?.key === 'call-to-verify') {
+      return email
+    }
+    return name || phone || email
   })
 
   const callNowTelHref = computed(() => {
@@ -67,6 +71,17 @@ export function useLeadLqTeaser(leadRef) {
     const name = (lead.customer?.name ?? '').trim()
     const vehicleLabel = getRequestedVehicleDisplayLabel(lead.requestedCar || lead.vehicle)
     const displayName = name || t('requestDetail.floatingLq.callingNameFallback')
+    const isEmailVerifyFlow =
+      !hasPhone.value && leadActions.primaryAction.value?.key === 'call-to-verify'
+    if (isEmailVerifyFlow) {
+      if (vehicleLabel) {
+        return t('requestDetail.floatingLq.emailSessionWithVehicle', {
+          name: displayName,
+          vehicle: vehicleLabel
+        })
+      }
+      return t('requestDetail.floatingLq.emailSessionWithoutVehicle', { name: displayName })
+    }
     if (vehicleLabel) {
       return t('requestDetail.floatingLq.callingWithVehicle', {
         name: displayName,

@@ -78,7 +78,7 @@ defineEmits(['toggle'])
 
 .expand-enter-to,
 .expand-leave-from {
-  max-height: 1000px;
+  max-height: 75rem;
   opacity: 1;
 }
 </style>

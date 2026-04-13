@@ -86,37 +86,6 @@
       @cancel="showAppointmentModal = false"
     />
 
-    <Dialog :open="showFloatingLqPostpone" @update:open="showFloatingLqPostpone = $event">
-      <DialogPortal>
-        <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-        <DialogContent
-          class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
-          :show-close-button="true"
-        >
-          <DialogHeader class="shrink-0">
-            <DialogTitle>{{ t('requestDetail.lqfTask.nextAttemptTitle') }}</DialogTitle>
-          </DialogHeader>
-          <div class="flex-1 min-h-0 overflow-y-auto py-4 w-full">
-            <PostponeWithAssigneeCard
-              :title="t('requestDetail.lqfTask.nextAttemptTitle')"
-              show-postpone-reason-options
-              :postpone-reason-label="t('requestDetail.lqfTask.postponeReason.label')"
-              :postpone-reason-placeholder="t('requestDetail.lqfTask.postponeReason.placeholder')"
-              :postpone-reason-options="lqfPostponeReasonOptions"
-              :assignee-options="lqfNextAttemptAssigneeOptions"
-              :default-assignee-key="lqfDefaultNextAttemptAssigneeKey"
-              :assignee-placeholder="t('requestDetail.lqfTask.nextAttemptAssigneePlaceholder')"
-              :cancel-label="t('common.buttons.cancel')"
-              :show-quick-time-options="true"
-              :saving="lqfNextAttemptSaving"
-              @confirm="handleFloatingPostponeConfirm"
-              @cancel="showFloatingLqPostpone = false"
-            />
-          </div>
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
-
     <div
       ref="requestDetailBodyRef"
       v-if="showAssociatedTasksOrTimeline"
@@ -227,11 +196,9 @@
                   :teaser-line="lqfTeaserLine"
                   :assignee-initials="lqfAssigneeInitials"
                   :manage-open="lqfInlineManageOpen"
-                  :postpone-open="lqfNotNowNextAttemptOpen"
                   @manage-task="handleLqfManageTask"
                   @open-full-task="handleOpenTaskDrawer()"
-                  @not-now="handleLqfNotNow"
-                  @cancel-action="lqfInlineManageOpen = false; lqfNotNowNextAttemptOpen = false"
+                  @cancel-action="lqfInlineManageOpen = false"
                 >
                   <template v-if="lqfInlineManageOpen" #outcome>
                     <LeadManagementWidget
@@ -242,23 +209,6 @@
                       @reassigned="handleReassigned"
                       @open-purchase-method="handleLqfOpenPurchaseMethod"
                       @open-trade-in="handleLqfOpenTradeIn"
-                    />
-                  </template>
-                  <template v-if="lqfNotNowNextAttemptOpen" #next-attempt>
-                    <PostponeWithAssigneeCard
-                      :title="t('requestDetail.lqfTask.nextAttemptTitle')"
-                      show-postpone-reason-options
-                      :postpone-reason-label="t('requestDetail.lqfTask.postponeReason.label')"
-                      :postpone-reason-placeholder="t('requestDetail.lqfTask.postponeReason.placeholder')"
-                      :postpone-reason-options="lqfPostponeReasonOptions"
-                      :assignee-options="lqfNextAttemptAssigneeOptions"
-                      :default-assignee-key="lqfDefaultNextAttemptAssigneeKey"
-                      :assignee-placeholder="t('requestDetail.lqfTask.nextAttemptAssigneePlaceholder')"
-                      :cancel-label="t('common.buttons.cancel')"
-                      :show-quick-time-options="true"
-                      :saving="lqfNextAttemptSaving"
-                      @confirm="handleLqfNextAttemptConfirm"
-                      @cancel="lqfNotNowNextAttemptOpen = false"
                     />
                   </template>
                 </RequestLeadQualificationTeaser>
@@ -368,7 +318,6 @@
             :teaser-line="lqfTeaserLine"
             :assignee-initials="lqfAssigneeInitials"
             @update:focus-mode="floatingLqFocusMode = $event"
-            @not-now="showFloatingLqPostpone = true"
             @postpone-expected-close="handlePostponeExpectedClose"
             @reassigned="handleReassigned"
             @open-purchase-method="handleLqfOpenPurchaseMethod"
@@ -378,38 +327,44 @@
         </div>
 
         <div
-          :class="[
-            'order-2 flex min-h-0 min-w-0 flex-col gap-4 lg:sticky lg:top-0 lg:w-1/4 lg:shrink-0 lg:self-start lg:max-h-[calc(100vh-4rem)] lg:overscroll-contain',
-            floatingLqFocusMode ? 'lg:overflow-hidden' : 'lg:overflow-y-auto'
-          ]"
+          class="order-2 flex min-h-0 min-w-0 flex-col lg:sticky lg:top-0 lg:w-1/4 lg:shrink-0 lg:self-stretch lg:min-h-0 lg:overscroll-contain"
         >
-          <VehicleRequestCard
-            v-if="request && (request.requestedCar || request.vehicle)"
-            :heading="t('requestDetail.vehicleCard.title')"
-            :vehicle="request.requestedCar || request.vehicle"
-            :request-message="request.requestMessage || request.requestedCar?.requestMessage"
-            :source="request.source"
-            :source-url="request.requestedCar?.listingUrl || request.sourceUrl || ''"
-            :image-url="getCarImageUrl(request.requestedCar || request.vehicle)"
-            :save-requested-car="handleRequestedCarSave"
-            :stock-status="request.carStatus || ''"
-            :metrics-funnel-count="request.listingMetrics?.funnelViews"
-            :metrics-tag-count="request.listingMetrics?.tagCount"
-            hide-request-message
-            @open-ad="handleOpenAd"
-            @more-actions="handleMoreActions"
-          />
-          <RequestMessageCard
-            v-if="request && showRequestDetailsCard"
-            :title="t('requestDetail.messageCard.title')"
-            :message="request.requestMessage || request.requestedCar?.requestMessage || ''"
-            :utm-source="requestAttribution.utmSource"
-            :utm-term="requestAttribution.utmTerm"
-            :utm-campaign="requestAttribution.utmCampaign"
-            :web-spark-campaign="requestAttribution.webSparkCampaign"
-            :advertisement-url="requestAttribution.advertisementUrl"
-            :original-email-url="requestAttribution.originalEmailUrl"
-          />
+          <div
+            :class="[
+              'flex flex-col gap-4 lg:min-h-0 lg:flex-1',
+              floatingLqFocusMode ? 'lg:overflow-hidden' : 'lg:overflow-y-auto lg:overscroll-contain'
+            ]"
+          >
+            <VehicleRequestCard
+              v-if="request && (request.requestedCar || request.vehicle)"
+              class="shrink-0"
+              :heading="t('requestDetail.vehicleCard.title')"
+              :vehicle="request.requestedCar || request.vehicle"
+              :request-message="request.requestMessage || request.requestedCar?.requestMessage"
+              :source="request.source"
+              :source-url="request.requestedCar?.listingUrl || request.sourceUrl || ''"
+              :image-url="getCarImageUrl(request.requestedCar || request.vehicle)"
+              :save-requested-car="handleRequestedCarSave"
+              :stock-status="request.carStatus || ''"
+              :metrics-funnel-count="request.listingMetrics?.funnelViews"
+              :metrics-tag-count="request.listingMetrics?.tagCount"
+              hide-request-message
+              @open-ad="handleOpenAd"
+              @more-actions="handleMoreActions"
+            />
+            <RequestMessageCard
+              v-if="request && showRequestDetailsCard"
+              class="shrink-0"
+              :title="t('requestDetail.messageCard.title')"
+              :message="request.requestMessage || request.requestedCar?.requestMessage || ''"
+              :utm-source="requestAttribution.utmSource"
+              :utm-term="requestAttribution.utmTerm"
+              :utm-campaign="requestAttribution.utmCampaign"
+              :web-spark-campaign="requestAttribution.webSparkCampaign"
+              :advertisement-url="requestAttribution.advertisementUrl"
+              :original-email-url="requestAttribution.originalEmailUrl"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -422,20 +377,11 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Car, CreditCard, Folder } from 'lucide-vue-next'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle
-} from '@motork/component-library/future/primitives'
+import { Button } from '@motork/component-library/future/primitives'
 import { useDuplicateDetection } from '@/composables/useDuplicateDetection'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
-import { useUsersStore } from '@/stores/users'
 import { useToastStore } from '@/stores/toast'
 import { useLeadLqTeaser } from '@/composables/useLeadLqTeaser'
 import { isFloatingLqTaskPrototypeLead } from '@/utils/requestPrototypeFlags'
@@ -465,8 +411,6 @@ import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
 import DuplicateDetectedCard from './DuplicateDetectedCard.vue'
 import LeadManagementWidget from '@/components/tasks/lead/LeadManagementWidget.vue'
-import PostponeWithAssigneeCard from '@/components/tasks/shared/PostponeWithAssigneeCard.vue'
-import { formatDate, formatTime } from '@/utils/formatters'
 import {
   getApiStatus,
   getOpportunityUpdateFromDisplayStage
@@ -498,9 +442,6 @@ const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
 const toastStore = useToastStore()
-const usersStore = useUsersStore()
-
-const LQF_NEXT_ATTEMPT_NONE_KEY = '__none__'
 
 const showPostponeModal = ref(false)
 const showGenericComingSoon = ref(false)
@@ -523,10 +464,7 @@ let compactHeaderRafPending = false
 const mainTab = ref('overview')
 const lqfTeaserDismissed = ref(false)
 const lqfInlineManageOpen = ref(false)
-const lqfNotNowNextAttemptOpen = ref(false)
-const lqfNextAttemptSaving = ref(false)
 const floatingLqFocusMode = ref(false)
-const showFloatingLqPostpone = ref(false)
 const showNoteModal = ref(false)
 const showAttachmentModal = ref(false)
 const showWhatsAppModal = ref(false)
@@ -540,47 +478,6 @@ const activityExpandedSummaries = ref({})
 const customerRelatedLeads = ref([])
 const customerRelatedOpps = ref([])
 const loadingCustomerRelatedRequests = ref(false)
-
-const lqfNextAttemptAssigneeOptions = computed(() => {
-  const noneOption = {
-    _key: LQF_NEXT_ATTEMPT_NONE_KEY,
-    type: 'none',
-    label: 'Unassigned'
-  }
-  const users = (usersStore.assignableUsers || []).map((u) => ({
-    ...u,
-    type: 'user',
-    _key: `user-${u.id}`,
-    label: u.name
-  }))
-  const teams = (usersStore.assignableTeams || []).map((t) => ({
-    ...t,
-    type: 'team',
-    _key: `team-${t.id}`,
-    label: t.name
-  }))
-  return [noneOption, ...users, ...teams]
-})
-
-const lqfDefaultNextAttemptAssigneeKey = computed(() => {
-  const r = props.request
-  if (!r || r.type !== 'lead') return LQF_NEXT_ATTEMPT_NONE_KEY
-  const name = r.assignee
-  if (!name) return LQF_NEXT_ATTEMPT_NONE_KEY
-  const user = usersStore.assignableUsers?.find((u) => u.name === name)
-  if (user) return `user-${user.id}`
-  const team = usersStore.assignableTeams?.find((t) => t.name === name)
-  if (team) return `team-${team.id}`
-  return LQF_NEXT_ATTEMPT_NONE_KEY
-})
-
-const lqfPostponeReasonOptions = computed(() => [
-  { value: 'interrupted_by_other_customers', label: t('requestDetail.lqfTask.postponeReason.options.interruptedByOtherCustomers') },
-  { value: 'in_a_test_drive', label: t('requestDetail.lqfTask.postponeReason.options.inATestDrive') },
-  { value: 'checking_inventory', label: t('requestDetail.lqfTask.postponeReason.options.checkingInventory') },
-  { value: 'reviewing_lead_info', label: t('requestDetail.lqfTask.postponeReason.options.reviewingLeadInfo') },
-  { value: 'scheduled_for_later', label: t('requestDetail.lqfTask.postponeReason.options.scheduledForLater') }
-])
 
 const leadRef = computed(() => (props.request?.type === 'lead' ? props.request : null))
 
@@ -644,7 +541,6 @@ watch(
   (show) => {
     if (!show) {
       lqfInlineManageOpen.value = false
-      lqfNotNowNextAttemptOpen.value = false
     }
   }
 )
@@ -786,9 +682,7 @@ watch(
     duplicateBannerDismissed.value = false
     lqfTeaserDismissed.value = false
     lqfInlineManageOpen.value = false
-    lqfNotNowNextAttemptOpen.value = false
     floatingLqFocusMode.value = false
-    showFloatingLqPostpone.value = false
     mainTab.value = 'overview'
   }
 )
@@ -1028,72 +922,11 @@ function handleOpenTaskDrawer(task) {
 
 async function handleLqfManageTask() {
   if (!props.request?.id || props.request.type !== 'lead') return
-  lqfNotNowNextAttemptOpen.value = false
   lqfInlineManageOpen.value = true
   try {
     await leadsStore.fetchLeadById(props.request.id)
   } catch {
     // LQTask falls back to request payload when store load fails
-  }
-}
-
-function handleLqfNotNow() {
-  lqfInlineManageOpen.value = false
-  lqfNotNowNextAttemptOpen.value = true
-}
-
-function mapNextAttemptAssigneeToLeadUpdates(assignee) {
-  const updates = {}
-  if (!assignee || assignee.type === 'none') return updates
-  if (assignee.type === 'user' && assignee.id != null) {
-    updates.assignee = assignee.name || assignee.label
-    updates.assigneeId = assignee.id
-    updates.assigneeType = 'user'
-    updates.teamId = null
-    updates.team = null
-  } else if (assignee.type === 'team' && assignee.id != null) {
-    updates.assignee = assignee.name || assignee.label
-    updates.assigneeId = null
-    updates.assigneeType = 'team'
-    updates.teamId = assignee.id
-    updates.team = assignee.name || assignee.label
-  }
-  return updates
-}
-
-async function handleLqfNextAttemptConfirm(payload) {
-  const r = props.request
-  if (!r?.id || r.type !== 'lead' || !payload?.dateTime) return
-  lqfNextAttemptSaving.value = true
-  try {
-    const dueDateTime = new Date(payload.dateTime)
-    const isoTimestamp = dueDateTime.toISOString()
-    const assigneeUpdates = mapNextAttemptAssigneeToLeadUpdates(payload.assignee)
-    await leadsStore.updateLead(r.id, {
-      nextActionDue: isoTimestamp,
-      ...assigneeUpdates
-    })
-    let content = `Task postponed to ${formatDate(dueDateTime)} at ${formatTime(dueDateTime)}`
-    if (assigneeUpdates.assignee) {
-      content += ` and reassigned to ${assigneeUpdates.assignee}`
-    }
-    if (payload.noteToAssignee?.trim()) {
-      content += `. ${payload.noteToAssignee.trim()}`
-    }
-    await leadsStore.addActivity(r.id, {
-      type: 'note',
-      user: activityAuthor.value,
-      action: 'postponed lead qualification task',
-      content
-    })
-    await leadsStore.fetchLeadById(r.id)
-    lqfNotNowNextAttemptOpen.value = false
-    lqfTeaserDismissed.value = true
-    toastStore.pushToast('success', t('requestDetail.lqfTask.nextAttemptSaved'))
-  } catch {
-    toastStore.pushToast('error', t('requestDetail.lqfTask.nextAttemptSaveFailed'))
-  } finally {
-    lqfNextAttemptSaving.value = false
   }
 }
 
@@ -1105,11 +938,6 @@ function handleLqfOpenPurchaseMethod() {
 function handleLqfOpenTradeIn() {
   editingTradeIn.value = null
   showTradeInModal.value = true
-}
-
-async function handleFloatingPostponeConfirm(payload) {
-  await handleLqfNextAttemptConfirm(payload)
-  showFloatingLqPostpone.value = false
 }
 
 function handlePrevious() {

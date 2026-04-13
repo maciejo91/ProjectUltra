@@ -26,12 +26,10 @@
             :teaser-line="teaserLine"
             :assignee-initials="assigneeInitials"
             :manage-open="false"
-            :postpone-open="false"
             :internal-timer="false"
             :parent-countdown-label="lqTimer.countdownLabel"
             :parent-timer-running="lqTimer.isTimerRunning"
             @manage-task="openFocus"
-            @not-now="$emit('not-now')"
             @toggle-timer="lqTimer.toggleTimerRunning"
           />
         </div>
@@ -51,7 +49,6 @@
           :teaser-line="teaserLine"
           :assignee-initials="assigneeInitials"
           :manage-open="true"
-          :postpone-open="false"
           :resume-from-collapsed="true"
           :internal-timer="false"
           :parent-countdown-label="lqTimer.countdownLabel"
@@ -154,7 +151,6 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:focus-mode',
-  'not-now',
   'postpone-expected-close',
   'reassigned',
   'open-purchase-method',

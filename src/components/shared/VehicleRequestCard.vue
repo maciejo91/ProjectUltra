@@ -7,20 +7,19 @@
         {{ displayHeading }}
       </h3>
       <Button
-        v-if="!isEditing"
+        v-if="canEditNote && !showNoteEditor"
         type="button"
         variant="secondary"
         size="icon-sm"
         class="shrink-0"
-        :aria-label="t('requestDetail.vehicleCard.editAria')"
-        @click="startEditing"
+        :aria-label="t('requestDetail.vehicleCard.editNoteAria')"
+        @click="openNoteEditor"
       >
         <Pencil class="size-3 opacity-70" />
       </Button>
     </div>
 
-    <template v-if="!isEditing">
-      <div class="flex w-full min-w-0 items-start gap-3">
+    <div class="flex w-full min-w-0 items-start gap-3">
         <div
           class="w-[90px] shrink-0 overflow-hidden rounded-md bg-muted aspect-4/3"
         >
@@ -72,6 +71,74 @@
           >
             {{ trimLine }}
           </p>
+        </div>
+      </div>
+
+      <div
+        v-if="showNoteEditor || savedStaffNoteText"
+        class="flex w-full min-w-0 flex-col gap-2 border-t border-border pt-3"
+      >
+        <div v-if="showNoteEditor" class="flex w-full min-w-0 flex-col gap-2">
+          <Label class="text-sm font-medium text-muted-foreground">{{
+            t('requestDetail.vehicleCard.staffNoteLabel')
+          }}</Label>
+          <Textarea
+            v-model="noteDraft"
+            rows="3"
+            class="min-h-20 w-full resize-y text-sm"
+            :placeholder="t('requestDetail.vehicleCard.staffNotePlaceholder')"
+          />
+          <div class="flex w-full flex-col gap-2 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              class="w-full rounded-sm sm:w-auto"
+              :disabled="noteSaving"
+              @click="cancelNoteEditor"
+            >
+              {{ t('common.buttons.cancel') }}
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              class="w-full rounded-sm sm:w-auto"
+              :disabled="noteSaving"
+              @click="saveNote"
+            >
+              {{ noteSaving ? t('requestDetail.vehicleCard.savingNote') : t('common.buttons.save') }}
+            </Button>
+          </div>
+        </div>
+        <div
+          v-else
+          class="flex w-full min-w-0 flex-col gap-1.5 rounded-md bg-muted px-3 py-2.5"
+          role="note"
+        >
+          <span class="text-sm font-medium text-muted-foreground">{{
+            t('requestDetail.vehicleCard.staffNoteLabel')
+          }}</span>
+          <p
+            class="text-sm leading-snug text-foreground wrap-break-word whitespace-pre-wrap"
+            :class="noteExpanded ? '' : 'line-clamp-2'"
+          >
+            {{ savedStaffNoteText }}
+          </p>
+          <Button
+            v-if="staffNoteNeedsExpandToggle"
+            type="button"
+            variant="link"
+            size="sm"
+            class="h-auto self-start p-0 text-sm font-medium text-primary"
+            @click="noteExpanded = !noteExpanded"
+          >
+            {{
+              noteExpanded
+                ? t('requestDetail.vehicleCard.collapseNote')
+                : t('requestDetail.vehicleCard.expandNote')
+            }}
+          </Button>
         </div>
       </div>
 
@@ -242,109 +309,13 @@
           </div>
         </div>
       </div>
-    </template>
-
-    <div v-else class="flex flex-col gap-3">
-      <div class="grid grid-cols-2 gap-3">
-        <div class="space-y-2">
-          <Label class="text-sm font-medium text-muted-foreground">Brand</Label>
-          <Input
-            v-model="editForm.brand"
-            type="text"
-            placeholder="e.g. BMW"
-            class="h-8 text-sm"
-          />
-        </div>
-        <div class="space-y-2">
-          <Label class="text-sm font-medium text-muted-foreground">Model</Label>
-          <Input
-            v-model="editForm.model"
-            type="text"
-            placeholder="e.g. 3 Series"
-            class="h-8 text-sm"
-          />
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div class="space-y-2">
-          <Label class="text-sm font-medium text-muted-foreground">Year</Label>
-          <Input
-            v-model.number="editForm.year"
-            type="number"
-            min="1900"
-            :max="new Date().getFullYear() + 1"
-            placeholder="2024"
-            class="h-8 text-sm"
-          />
-        </div>
-        <div class="space-y-2">
-          <Label class="text-sm font-medium text-muted-foreground">Price (€)</Label>
-          <Input
-            v-model.number="editForm.price"
-            type="number"
-            min="0"
-            step="1000"
-            placeholder="Optional"
-            class="h-8 text-sm"
-          />
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div class="space-y-2">
-          <Label class="text-sm font-medium text-muted-foreground">Condition</Label>
-          <Select v-model="editForm.condition">
-            <SelectTrigger class="h-8 text-sm">
-              <SelectValue placeholder="Condition" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Km0">Km0</SelectItem>
-              <SelectItem value="New">New</SelectItem>
-              <SelectItem value="Used">Used</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div class="space-y-2">
-          <Label class="text-sm font-medium text-muted-foreground">Mileage (km)</Label>
-          <Input
-            v-model.number="editForm.kilometers"
-            type="number"
-            min="0"
-            placeholder="0"
-            class="h-8 text-sm"
-          />
-        </div>
-      </div>
-      <div class="flex gap-2 pt-1">
-        <Button variant="outline" size="small" class="flex-1" @click="cancelEditing">
-          Cancel
-        </Button>
-        <Button
-          variant="default"
-          size="small"
-          class="flex-1"
-          :disabled="saveDisabled || saving"
-          @click="saveEdit"
-        >
-          {{ saving ? 'Saving…' : 'Save' }}
-        </Button>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  Button,
-  Input,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@motork/component-library/future/primitives'
+import { Button, Label, Textarea } from '@motork/component-library/future/primitives'
 import { ArrowUpRight, Car, Filter, Pencil, Tag } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -394,7 +365,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['open-ad', 'more-actions', 'edit-vehicle', 'remove-vehicle', 'save'])
+const emit = defineEmits(['open-ad', 'more-actions', 'remove-vehicle', 'save'])
 
 const { t } = useI18n()
 
@@ -403,95 +374,90 @@ const displayHeading = computed(
 )
 
 const imageError = ref(false)
-const isEditing = ref(false)
-const saving = ref(false)
-const editForm = ref({
-  brand: '',
-  model: '',
-  year: new Date().getFullYear(),
-  price: null,
-  condition: 'Used',
-  kilometers: null
+const showNoteEditor = ref(false)
+const noteDraft = ref('')
+const noteSaving = ref(false)
+const noteExpanded = ref(false)
+
+const canEditNote = computed(() => typeof props.saveRequestedCar === 'function')
+
+const savedStaffNoteText = computed(() => (props.vehicle?.staffNote ?? '').trim())
+
+const staffNoteNeedsExpandToggle = computed(() => {
+  const s = savedStaffNoteText.value
+  if (!s) return false
+  if (s.length > 140) return true
+  const lines = s.split(/\r?\n/)
+  return lines.length > 2 || (lines.length === 2 && (lines[0].length > 70 || lines[1].length > 70))
 })
 
 watch(
-  () => [props.vehicle, props.requestMessage],
+  () => [props.vehicle, props.vehicle?.staffNote],
   () => {
-    if (!isEditing.value) resetEditForm()
+    if (!showNoteEditor.value) {
+      noteDraft.value = savedStaffNoteText.value
+    }
+    if (!staffNoteNeedsExpandToggle.value) {
+      noteExpanded.value = false
+    }
   },
   { immediate: true }
 )
 
-function getConditionFromVehicle(v) {
-  if (!v) return 'Used'
+function openNoteEditor() {
+  noteDraft.value = savedStaffNoteText.value
+  noteExpanded.value = false
+  showNoteEditor.value = true
+}
+
+function cancelNoteEditor() {
+  showNoteEditor.value = false
+  noteDraft.value = savedStaffNoteText.value
+}
+
+function buildRequestedCarPayloadForNote() {
+  const v = props.vehicle || {}
+  const customerRequestMessage = (
+    (props.requestMessage ?? '').trim() || (v.requestMessage ?? '').trim()
+  )
+  const carData = {
+    ...v,
+    brand: (v.brand ?? '').trim(),
+    model: (v.model ?? '').trim(),
+    year: v.year ?? new Date().getFullYear(),
+    requestType: v.requestType || 'Quotation',
+    requestMessage: customerRequestMessage,
+    staffNote: (noteDraft.value ?? '').trim()
+  }
+  if (v.price != null && v.price !== '') carData.price = Number(v.price)
+  if (v.image) carData.image = v.image
   const km = v.kilometers ?? v.mileage
   const status = (v.status || '').toLowerCase()
-  if (km === 0 || (typeof km === 'number' && km < 1)) return 'Km0'
-  if (status === 'new') return 'New'
-  return 'Used'
-}
-
-function resetEditForm() {
-  const v = props.vehicle
-  editForm.value = {
-    brand: v?.brand || '',
-    model: v?.model || '',
-    year: v?.year ?? new Date().getFullYear(),
-    price: v?.price ?? null,
-    condition: getConditionFromVehicle(v),
-    kilometers: v?.kilometers ?? v?.mileage ?? null
-  }
-}
-
-const saveDisabled = computed(
-  () =>
-    !(editForm.value.brand ?? '').trim() ||
-    !(editForm.value.model ?? '').trim() ||
-    !editForm.value.year ||
-    editForm.value.year < 1900
-)
-
-function startEditing() {
-  resetEditForm()
-  isEditing.value = true
-}
-
-function cancelEditing() {
-  isEditing.value = false
-}
-
-async function saveEdit() {
-  if (saveDisabled.value) return
-  const carData = {
-    brand: (editForm.value.brand ?? '').trim(),
-    model: (editForm.value.model ?? '').trim(),
-    year: editForm.value.year,
-    requestType: props.vehicle?.requestType || 'Quotation'
-  }
-  if (editForm.value.price != null && editForm.value.price !== '') carData.price = Number(editForm.value.price)
-  if (props.vehicle?.requestMessage) carData.requestMessage = props.vehicle.requestMessage
-  if (props.vehicle?.image) carData.image = props.vehicle.image
-  const cond = editForm.value.condition || 'Used'
-  if (cond === 'Km0' || cond === 'New') {
+  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'new') {
     carData.status = 'New'
     carData.kilometers = 0
   } else {
     carData.status = 'Used'
-    carData.kilometers =
-      editForm.value.kilometers != null ? Number(editForm.value.kilometers) : 0
+    carData.kilometers = km != null ? Number(km) : 0
   }
+  return carData
+}
 
-  saving.value = true
+async function saveNote() {
+  const carData = buildRequestedCarPayloadForNote()
+  noteSaving.value = true
   try {
     if (props.saveRequestedCar) {
       await props.saveRequestedCar(carData)
-      isEditing.value = false
+      showNoteEditor.value = false
+      noteExpanded.value = false
     } else {
       emit('save', carData)
-      isEditing.value = false
+      showNoteEditor.value = false
+      noteExpanded.value = false
     }
   } finally {
-    saving.value = false
+    noteSaving.value = false
   }
 }
 

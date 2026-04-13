@@ -49,6 +49,7 @@ export const mockContacts = [
       price: 45000,
       requestType: 'Quotation',
       requestMessage: 'Interested in this model for company fleet',
+      staffNote: '',
       image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500'
     }
   }

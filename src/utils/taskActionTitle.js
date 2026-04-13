@@ -1,9 +1,17 @@
 import { getDisplayStage, getDeliverySubstatus } from '@/utils/stageMapper'
 import { LEAD_STATE_CONFIG } from '@/composables/useLeadStateMachine'
 import { OPPORTUNITY_STATE_CONFIG } from '@/composables/useOpportunityStateMachine'
+import i18n from '@/locales'
 
 const customerName = (item) => item?.customer?.name ?? ''
 const customerPhone = (item) => item?.customer?.phone ?? ''
+
+export function resolveLeadVerifyContactDisplayTitle(lead) {
+  const t = i18n.global.t
+  const name = (lead?.customer?.name ?? '').trim()
+  if (name) return t('entities.lead.sendEmailToVerifyContact', { name })
+  return t('entities.lead.sendEmailToVerifyContactNoName')
+}
 
 /**
  * Merge customer name and phone into a task title in natural language
@@ -65,8 +73,10 @@ export function mergeContactIntoDescription(baseDescription, name, phone) {
  * @returns {string} Description for "send them an email" flow
  */
 export function getNoPhoneContactDescription(name) {
-  const who = name?.trim() ? name : 'the customer'
-  return `Begin lead qualification by sending an email to ${who}.`
+  const t = i18n.global.t
+  const trimmed = (name ?? '').trim()
+  if (trimmed) return t('entities.lead.beginQualificationSendEmailNamed', { name: trimmed })
+  return t('entities.lead.beginQualificationSendEmailAnonymous')
 }
 
 /**
@@ -102,6 +112,10 @@ export function getTaskActionTitle(item) {
           : primaryAction
 
         if (action) {
+          const phone = customerPhone(item).trim()
+          if (action.key === 'call-to-verify' && !phone) {
+            return resolveLeadVerifyContactDisplayTitle(item)
+          }
           const label = typeof action.label === 'function' ? action.label(context) : action.label
           const title = typeof action.title === 'function' ? action.title(context) : action.title
           const resolved = (label || title || '').toString().trim()

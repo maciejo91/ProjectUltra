@@ -37,7 +37,8 @@ const baseRequestedCar = (brand, model, year, price) => ({
   adMedium: 'Display',
   adSource: 'Google',
   expectedPurchaseDate: '2025-04',
-  requestMessage: DEMO_CUSTOMER_REQUEST_MESSAGE
+  requestMessage: DEMO_CUSTOMER_REQUEST_MESSAGE,
+  staffNote: ''
 })
 
 export const mockLeads = [

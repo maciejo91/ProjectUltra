@@ -3,7 +3,11 @@
     "title": "Lead",
     "plural": "Leads",
     "new": "Nieuwe Lead",
-    "details": "Lead Details"
+    "details": "Lead Details",
+    "sendEmailToVerifyContact": "E-mail sturen naar {name}",
+    "sendEmailToVerifyContactNoName": "E-mail sturen om contactgegevens te verifiëren",
+    "beginQualificationSendEmailNamed": "Start de leadkwalificatie door een e-mail te sturen naar {name}.",
+    "beginQualificationSendEmailAnonymous": "Start de leadkwalificatie door een e-mail naar de klant te sturen."
   },
   "opportunity": {
     "title": "Kans",

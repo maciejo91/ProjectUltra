@@ -163,14 +163,6 @@
             >
               {{ primaryActionButtonLabel }}
             </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              class="w-full rounded-sm sm:w-auto"
-              @click="handleNotNowClick"
-            >
-              {{ notNowLabel }}
-            </Button>
           </template>
         </div>
       </div>
@@ -210,10 +202,6 @@ const props = defineProps({
     default: false
   },
   manageOpen: {
-    type: Boolean,
-    default: false
-  },
-  postponeOpen: {
     type: Boolean,
     default: false
   },
@@ -269,7 +257,6 @@ const props = defineProps({
 
 const emit = defineEmits([
   'manage-task',
-  'not-now',
   'open-full-task',
   'cancel-action',
   'resume-collapsed',
@@ -340,7 +327,6 @@ const manageHeaderCallCtaHref = computed(() =>
   activeSessionHeader.value ? '' : props.callNowTelHref
 )
 const manageLabel = computed(() => t('requestDetail.lqfTask.manageTask'))
-const notNowLabel = computed(() => t('requestDetail.lqfTask.notNow'))
 const inProgressLabel = computed(() => t('requestDetail.lqfTask.inProgress'))
 const timerAria = computed(() => t('requestDetail.lqfTask.timerAria'))
 const headerCountdownLabel = computed(() =>
@@ -363,9 +349,8 @@ function onHeaderTimerToggle() {
 }
 
 const isManagingTask = ref(false)
-const isPostponingTask = ref(false)
 const isTaskActionInProgress = computed(
-  () => isManagingTask.value || isPostponingTask.value || props.manageOpen || props.postponeOpen
+  () => isManagingTask.value || props.manageOpen
 )
 
 const expandableCollapsedCard = computed(
@@ -426,19 +411,11 @@ function onCollapsedShellKeydown(e) {
 
 function handleManageClick() {
   isManagingTask.value = true
-  isPostponingTask.value = false
   emit('manage-task')
-}
-
-function handleNotNowClick() {
-  isPostponingTask.value = true
-  isManagingTask.value = false
-  emit('not-now')
 }
 
 function cancelInProgress() {
   isManagingTask.value = false
-  isPostponingTask.value = false
   emit('cancel-action')
 }
 
@@ -446,13 +423,6 @@ watch(
   () => props.manageOpen,
   (open) => {
     if (open) isManagingTask.value = false
-  }
-)
-
-watch(
-  () => props.postponeOpen,
-  (open) => {
-    if (open) isPostponingTask.value = false
   }
 )
 

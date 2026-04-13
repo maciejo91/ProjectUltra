@@ -125,7 +125,13 @@
     "stockNotInStock": "Nicht auf Lager",
     "landingPage": "Landing Page",
     "visit": "Besuchen",
-    "editAria": "Angefragtes Fahrzeug bearbeiten"
+    "editAria": "Angefragtes Fahrzeug bearbeiten",
+    "editNoteAria": "Team-Notiz zu diesem Fahrzeug hinzufügen oder bearbeiten",
+    "staffNoteLabel": "Team-Notiz",
+    "staffNotePlaceholder": "Interne Notiz zu diesem Fahrzeug (getrennt von der Kundenanfrage).",
+    "savingNote": "Wird gespeichert…",
+    "expandNote": "Gesamte Notiz anzeigen",
+    "collapseNote": "Weniger anzeigen"
   },
   "messageCard": {
     "title": "Anfragedetails",
@@ -176,6 +182,8 @@
     "callingNameFallback": "Kunde",
     "callingWithVehicle": "Anruf mit {name} – {vehicle}",
     "callingWithoutVehicle": "Anruf mit {name}",
+    "emailSessionWithVehicle": "E-Mail an {name} – {vehicle}",
+    "emailSessionWithoutVehicle": "E-Mail an {name}",
     "closeOverlay": "Aufgabenbereich schließen",
     "minimize": "Aufgabe minimieren",
     "back": "Zurück",

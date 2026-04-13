@@ -6,15 +6,19 @@
  */
 
 import { computed, toValue } from 'vue'
-import { 
-  getLeadPrimaryAction, 
-  getAvailableLeadSecondaryActions, 
+import {
+  getLeadPrimaryAction,
+  getAvailableLeadSecondaryActions,
   isLeadClosed,
   shouldShowLQWidget,
   shouldShowDeadlineBanner,
   canPostponeLead,
   getLQWidgetMode
 } from '@/utils/leadRules'
+import {
+  resolveLeadVerifyContactDisplayTitle,
+  getNoPhoneContactDescription
+} from '@/utils/taskActionTitle'
 import { getDisplayStage } from '@/utils/stageMapper'
 import { useSettingsStore } from '@/stores/settings'
 
@@ -56,13 +60,26 @@ export function useLeadActions(lead, handlers = {}) {
   const primaryAction = computed(() => {
     const ctx = context.value
     const actionConfig = getLeadPrimaryAction(ctx)
-    
+
     if (!actionConfig) return null
-    
+
     const handler = handlers[actionConfig.key]
-    
+    const phone = (ctx.lead?.customer?.phone ?? '').trim()
+    const emailTitle =
+      actionConfig.key === 'call-to-verify' && !phone
+        ? resolveLeadVerifyContactDisplayTitle(ctx.lead)
+        : null
+    const customerName = ctx.lead?.customer?.name ?? ''
+
     return {
       ...actionConfig,
+      ...(emailTitle
+        ? {
+            label: emailTitle,
+            title: emailTitle,
+            description: getNoPhoneContactDescription(customerName)
+          }
+        : {}),
       handler: handler || (() => {})
     }
   })
