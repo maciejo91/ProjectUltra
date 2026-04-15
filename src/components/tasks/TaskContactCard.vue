@@ -59,18 +59,23 @@
                   v-if="showQuickActions"
                   class="shrink-0 flex flex-wrap items-center justify-end gap-0.5"
                 >
-                  <Button
-                    v-for="item in quickActionItems"
-                    :key="item.key"
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    class="shrink-0 rounded-md"
-                    :aria-label="item.label"
-                    @click="emitQuick(item.key)"
-                  >
-                    <component :is="item.icon" class="size-4 text-muted-foreground" />
-                  </Button>
+                  <template v-for="item in quickActionItems" :key="item.kind || item.key">
+                    <MessagingQuickActionPopover
+                      v-if="item.kind === 'messaging'"
+                      @select="emitQuick($event)"
+                    />
+                    <Button
+                      v-else
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      class="shrink-0 rounded-md"
+                      :aria-label="item.label"
+                      @click="emitQuick(item.key)"
+                    >
+                      <component :is="item.icon" class="size-4 text-muted-foreground" />
+                    </Button>
+                  </template>
                 </div>
               </div>
 
@@ -114,14 +119,33 @@
               >
                 {{ t('requestDetail.contactCard.businessTag') }}
               </span>
-              <span
-                v-for="tag in task.customer?.tags || []"
-                :key="tag"
-                class="badge-ui inline-flex w-fit items-center rounded-md px-2 py-0.5 text-sm font-medium leading-none"
-                :class="tagBadgeClass(tag)"
+              <TagPillWithPopover
+                v-for="(tag, tagIdx) in normalizedCustomerTags"
+                :key="`${tag.name}-${tagIdx}`"
+                :tag="tag"
+                @edit="emit('edit-customer-tag', $event)"
+                @delete="emit('delete-customer-tag', $event)"
               >
-                {{ tag }}
-              </span>
+                <template #trigger>
+                  <button
+                    v-if="tag.color"
+                    type="button"
+                    class="badge-ui inline-flex w-fit max-w-full min-w-0 cursor-pointer items-center truncate rounded-md border-0 px-2 py-0.5 text-sm font-medium leading-none"
+                    :class="isLightTagColor(tag.color) ? 'text-foreground' : 'text-white'"
+                    :style="{ backgroundColor: tag.color }"
+                  >
+                    {{ tag.name }}
+                  </button>
+                  <button
+                    v-else
+                    type="button"
+                    class="badge-ui inline-flex w-fit cursor-pointer items-center rounded-md border-0 px-2 py-0.5 text-sm font-medium leading-none"
+                    :class="tagBadgeClass(tag.name)"
+                  >
+                    {{ tag.name }}
+                  </button>
+                </template>
+              </TagPillWithPopover>
               <Button
                 type="button"
                 variant="ghost"
@@ -325,13 +349,14 @@ import {
   AlertTriangle,
   ChevronDown,
   Mail,
-  MessageCircle,
   Phone,
   PhoneCall,
   Plus,
   StickyNote,
   User
 } from 'lucide-vue-next'
+import TagPillWithPopover from '@/components/shared/TagPillWithPopover.vue'
+import MessagingQuickActionPopover from '@/components/shared/MessagingQuickActionPopover.vue'
 
 const props = defineProps({
   task: {
@@ -376,7 +401,14 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['quick-action', 'action', 'add-tag', 'open-activity'])
+const emit = defineEmits([
+  'quick-action',
+  'action',
+  'add-tag',
+  'open-activity',
+  'edit-customer-tag',
+  'delete-customer-tag'
+])
 
 const { t } = useI18n()
 const toastStore = useToastStore()
@@ -553,18 +585,33 @@ watch(
 const quickActionItems = computed(() => [
   { key: 'phone', icon: PhoneCall, label: t('requestDetail.quickActions.phone') },
   { key: 'email', icon: Mail, label: t('requestDetail.quickActions.email') },
-  { key: 'whatsapp', icon: MessageCircle, label: t('requestDetail.quickActions.whatsapp') },
-  { key: 'document', icon: StickyNote, label: t('requestDetail.quickActions.document') },
-  { key: 'more', icon: Plus, label: t('requestDetail.quickActions.more') }
+  { kind: 'messaging' },
+  { key: 'note', icon: StickyNote, label: t('requestDetail.quickActions.addNote') }
 ])
 
 function emitQuick(key) {
   emit('quick-action', key)
   let actionKey = key
   if (key === 'phone') actionKey = 'call'
-  if (key === 'document') actionKey = 'attachment'
-  if (key === 'more') actionKey = 'note'
   emit('action', actionKey)
+}
+
+const normalizedCustomerTags = computed(() => {
+  const tags = props.task.customer?.tags || []
+  return tags.map((t) =>
+    typeof t === 'string' ? { name: t, color: null } : { name: t.name, color: t.color || null }
+  )
+})
+
+function isLightTagColor(hex) {
+  if (!hex || typeof hex !== 'string') return false
+  const m = hex.replace(/^#/, '').match(/^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
+  if (!m) return false
+  const r = parseInt(m[1], 16) / 255
+  const g = parseInt(m[2], 16) / 255
+  const b = parseInt(m[3], 16) / 255
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+  return luminance > 0.5
 }
 
 function tagBadgeClass(tag) {

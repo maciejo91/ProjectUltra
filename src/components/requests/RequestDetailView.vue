@@ -86,6 +86,15 @@
       @cancel="showAppointmentModal = false"
     />
 
+    <AddTagModal
+      :show="showAddTagModal"
+      :existing-tags="addTagModalExistingNames"
+      :edit-tag="addTagModalEditTag"
+      @close="closeAddTagModal"
+      @add="handleAddTagModalAdd"
+      @update="handleAddTagModalUpdate"
+    />
+
     <div
       ref="requestDetailBodyRef"
       v-if="showAssociatedTasksOrTimeline"
@@ -105,6 +114,9 @@
           @next="handleNext"
           @update-status="handleUpdateStatus"
           @quick-action="handleQuickAction"
+          @add-request-tag="openAddRequestTagModal"
+          @edit-request-tag="onEditRequestTag"
+          @delete-request-tag="onDeleteRequestTag"
         />
         <RequestDetailHeader
           v-else
@@ -117,7 +129,9 @@
           @update-status="handleUpdateStatus"
           @postpone-expected-close="handlePostponeExpectedClose"
           @reassigned="handleReassigned"
-          @add-segment="handleAddSegment"
+          @add-request-tag="openAddRequestTagModal"
+          @edit-request-tag="onEditRequestTag"
+          @delete-request-tag="onDeleteRequestTag"
         />
       </div>
       <div
@@ -153,7 +167,7 @@
           <div class="flex min-w-0 shrink-0 flex-col gap-4">
             <div
               ref="requestCustomerSectionRef"
-              class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg bg-background"
+              class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg border border-border bg-background shadow-mk-dashboard-card"
             >
               <RequestLeadProfileSection
                 v-if="request"
@@ -164,11 +178,14 @@
                 :related-opportunities="customerRelatedOpps"
                 :related-requests-loading="loadingCustomerRelatedRequests"
                 @quick-action="handleQuickAction"
+                @add-tag="openAddCustomerTagModal"
+                @edit-customer-tag="onEditCustomerTag"
+                @delete-customer-tag="onDeleteCustomerTag"
               />
             </div>
 
             <div
-              class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg bg-background"
+              class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg border border-border bg-background shadow-mk-dashboard-card"
             >
               <div class="shrink-0 px-4 pt-2">
                 <RequestMainTabs class="shrink-0" v-model="mainTab" :tabs="mainTabs" />
@@ -192,10 +209,15 @@
                   :header-task-title="lqfHeaderTaskTitle"
                   :header-contact-subline="lqfHeaderContactSubline"
                   :call-now-tel-href="lqfCallNowTelHref"
-                  :session-header-title="lqfInlineManageOpen ? lqfCallingSessionTitle : ''"
+                  :session-header-title="lqfSessionHeaderActive ? lqfCallingSessionTitle : ''"
                   :teaser-line="lqfTeaserLine"
                   :assignee-initials="lqfAssigneeInitials"
                   :manage-open="lqfInlineManageOpen"
+                  :hide-manage-call-now-cta="lqfHideManageCallNowCta"
+                  :outcome-shell-animated="lqfOutcomeShellAnimated"
+                  :contact-attempts="lqfContactAttemptsCount"
+                  :max-contact-attempts="lqfMaxContactAttemptsLimit"
+                  hide-body-subheader
                   @manage-task="handleLqfManageTask"
                   @open-full-task="handleOpenTaskDrawer()"
                   @cancel-action="lqfInlineManageOpen = false"
@@ -205,13 +227,22 @@
                       :lead="request"
                       :activities="requestActivities"
                       embed-outcome-only
+                      :outcome-summary="leadLqOutcomeSummary"
+                      :qualify-inline-success="qualifyInlineSuccessForRequest"
                       @postpone-expected-close="handlePostponeExpectedClose"
                       @reassigned="handleReassigned"
                       @open-purchase-method="handleLqfOpenPurchaseMethod"
                       @open-trade-in="handleLqfOpenTradeIn"
+                      @qualified-inline-success="handleLeadQualifyInlineSuccess"
+                      @lq-outcome-summary="handleLqOutcomeSummary"
                     />
                   </template>
                 </RequestLeadQualificationTeaser>
+                <LeadLqOutcomeSummaryCard
+                  v-if="lqOutcomeOverviewVisible"
+                  v-bind="lqOutcomeOverviewDisplay"
+                  class="w-full min-w-0 shrink-0"
+                />
                 <SuggestedNextActionCard
                   v-if="request && !isClosedLead && request.type === 'opportunity' && (mainTab === 'overview' || mainTab === 'tasks')"
                   :request="request"
@@ -249,14 +280,12 @@
                   @action="editingTradeIn = null; showTradeInModal = true"
                 />
                 <div v-else class="flex flex-col gap-4">
-                  <p class="text-sm text-muted-foreground">{{ tradeInsSummary }}</p>
-                  <Button
-                    variant="default"
-                    class="rounded-sm w-full sm:w-auto"
-                    @click="editingTradeIn = null; showTradeInModal = true"
-                  >
-                    {{ t('forms.modals.addTradeIn') }}
-                  </Button>
+                  <TradeInsCard
+                    :items="request?.tradeIns || []"
+                    :add-loading="tradeInActionLoading"
+                    @open-add="editingTradeIn = null; showTradeInModal = true"
+                    @open-edit="openTradeInEdit"
+                  />
                 </div>
               </template>
 
@@ -270,29 +299,59 @@
                   @action="editingFinancingOption = null; showFinancingModal = true"
                 />
                 <div v-else class="flex flex-col gap-4">
-                  <p class="text-sm text-muted-foreground">{{ financingSummary }}</p>
-                  <Button
-                    variant="default"
-                    class="rounded-sm w-full sm:w-auto"
-                    @click="editingFinancingOption = null; showFinancingModal = true"
-                  >
-                    {{ t('forms.modals.addFinancing') }}
-                  </Button>
+                  <FinancingOptionsCard
+                    :items="request?.financingOptions || []"
+                    @open-add="editingFinancingOption = null; showFinancingModal = true"
+                    @open-edit="openFinancingEdit"
+                  />
                 </div>
               </template>
 
               <template v-else-if="mainTab === 'attachments'">
                 <RequestTabEmptyState
                   v-if="attachmentsCount === 0"
-                  :icon="Folder"
+                  file-drop
+                  :drop-headline="t('requestDetail.emptyStates.attachments.dropZoneHeadline')"
+                  :drop-headline-active="t('requestDetail.emptyStates.attachments.dropZoneActive')"
+                  :drop-hint="t('requestDetail.emptyStates.attachments.dropHint')"
+                  :icon="Upload"
                   :title="t('requestDetail.emptyStates.attachments.title')"
                   :description="t('requestDetail.emptyStates.attachments.description')"
                   :action-label="t('requestDetail.emptyStates.attachments.action')"
                   @action="showAttachmentModal = true"
+                  @files-dropped="handleAttachmentsTabDroppedFiles"
                 />
-                <div v-else class="flex flex-col gap-4">
-                  <p class="text-sm text-muted-foreground">
+                <div
+                  v-else
+                  class="flex min-h-56 flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 text-center transition-colors md:min-h-64"
+                  :class="
+                    attachmentsListDragActive
+                      ? 'border-primary bg-primary/10 shadow-sm'
+                      : 'border-primary/35 bg-muted/50'
+                  "
+                  @dragenter="onAttachmentsListDragEnter"
+                  @dragleave="onAttachmentsListDragLeave"
+                  @dragover="onAttachmentsListDragOver"
+                  @drop="onAttachmentsListDrop"
+                >
+                  <div
+                    class="mb-4 flex size-12 shrink-0 items-center justify-center rounded-full bg-muted"
+                    aria-hidden="true"
+                  >
+                    <Upload class="size-6 text-muted-foreground" />
+                  </div>
+                  <h3 class="mb-1 text-base font-semibold text-foreground">
+                    {{
+                      attachmentsListDragActive
+                        ? t('requestDetail.emptyStates.attachments.dropZoneActive')
+                        : t('requestDetail.emptyStates.attachments.dropZoneHeadline')
+                    }}
+                  </h3>
+                  <p class="max-w-md text-sm text-muted-foreground">
                     {{ t('requestDetail.emptyStates.attachments.hasItems', { count: attachmentsCount }) }}
+                  </p>
+                  <p class="max-w-md text-sm text-muted-foreground">
+                    {{ t('requestDetail.emptyStates.attachments.dropHint') }}
                   </p>
                   <Button
                     variant="outline"
@@ -314,14 +373,20 @@
             :header-task-title="lqfHeaderTaskTitle"
             :header-contact-subline="lqfHeaderContactSubline"
             :call-now-tel-href="lqfCallNowTelHref"
-            :calling-session-title="lqfCallingSessionTitle"
+            :calling-session-title="floatingLqCallingTitle"
+            :outcome-summary="leadLqOutcomeSummary"
+            :qualify-inline-success="qualifyInlineSuccessForRequest"
             :teaser-line="lqfTeaserLine"
             :assignee-initials="lqfAssigneeInitials"
+            :contact-attempts="lqfContactAttemptsCount"
+            :max-contact-attempts="lqfMaxContactAttemptsLimit"
             @update:focus-mode="floatingLqFocusMode = $event"
             @postpone-expected-close="handlePostponeExpectedClose"
             @reassigned="handleReassigned"
             @open-purchase-method="handleLqfOpenPurchaseMethod"
             @open-trade-in="handleLqfOpenTradeIn"
+            @qualified-inline-success="handleLeadQualifyInlineSuccess"
+            @lq-outcome-summary="handleLqOutcomeSummary"
           />
           </div>
         </div>
@@ -378,14 +443,16 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Car, CreditCard, Folder } from 'lucide-vue-next'
+import { Car, CreditCard, Upload } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
 import { useDuplicateDetection } from '@/composables/useDuplicateDetection'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
+import { useCustomersStore } from '@/stores/customers'
 import { useUserStore } from '@/stores/user'
 import { useToastStore } from '@/stores/toast'
 import { useLeadLqTeaser } from '@/composables/useLeadLqTeaser'
+import { useFileDropZone } from '@/composables/useFileDropZone'
 import { isFloatingLqTaskPrototypeLead } from '@/utils/requestPrototypeFlags'
 import RequestFloatingLqTaskBar from './RequestFloatingLqTaskBar.vue'
 import RequestDetailShell from './RequestDetailShell.vue'
@@ -409,12 +476,22 @@ import AddEmailModal from '@/components/modals/AddEmailModal.vue'
 import OfferModal from '@/components/modals/OfferModal.vue'
 import CreateEventModal from '@/components/modals/CreateEventModal.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
+import AddTagModal from '@/components/modals/AddTagModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
 import DuplicateDetectedCard from './DuplicateDetectedCard.vue'
 import LeadManagementWidget from '@/components/tasks/lead/LeadManagementWidget.vue'
+import LeadLqOutcomeSummaryCard from '@/components/tasks/lead/LeadLqOutcomeSummaryCard.vue'
+import {
+  buildLqOutcomeSummaryDisplay,
+  qualifySuccessMatchesOpportunityComposite,
+  resolveStoredQualifyInlineSuccess
+} from '@/utils/lqOutcomeSummaryFormat'
+import TradeInsCard from '@/components/shared/TradeInsCard.vue'
+import FinancingOptionsCard from '@/components/shared/FinancingOptionsCard.vue'
 import {
   getApiStatus,
+  getDisplayStage,
   getOpportunityUpdateFromDisplayStage
 } from '@/utils/stageMapper'
 import { LEAD_STAGES } from '@/utils/stageMapper/constants'
@@ -442,6 +519,7 @@ const emit = defineEmits(['close', 'request-navigate', 'open-task-drawer'])
 const { t } = useI18n()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
+const customersStore = useCustomersStore()
 const userStore = useUserStore()
 const toastStore = useToastStore()
 
@@ -466,7 +544,23 @@ let compactHeaderRafPending = false
 const mainTab = ref('overview')
 const lqfTeaserDismissed = ref(false)
 const lqfInlineManageOpen = ref(false)
+const leadLqOutcomeSummary = ref(null)
 const floatingLqFocusMode = ref(false)
+
+const qualifyInlineSuccessForRequest = computed(() =>
+  resolveStoredQualifyInlineSuccess(props.request, leadsStore.lastInlineLeadQualifySuccess)
+)
+
+function handleLeadQualifyInlineSuccess() {
+  leadLqOutcomeSummary.value = null
+}
+
+function handleLqOutcomeSummary(payload) {
+  leadLqOutcomeSummary.value = payload
+  if (payload) {
+    leadsStore.clearLastInlineLeadQualifySuccess()
+  }
+}
 const showNoteModal = ref(false)
 const showAttachmentModal = ref(false)
 const showWhatsAppModal = ref(false)
@@ -475,6 +569,9 @@ const showEmailModal = ref(false)
 const showCallComingSoonModal = ref(false)
 const showOfferModal = ref(false)
 const showAppointmentModal = ref(false)
+const showAddTagModal = ref(false)
+const addTagModalKind = ref('customer')
+const addTagModalEditTag = ref(null)
 const activityExpandedSummaries = ref({})
 
 const customerRelatedLeads = ref([])
@@ -517,7 +614,9 @@ const {
   headerTaskTitle: lqfHeaderTaskTitle,
   headerContactSubline: lqfHeaderContactSubline,
   callNowTelHref: lqfCallNowTelHref,
-  callingSessionTitle: lqfCallingSessionTitle
+  callingSessionTitle: lqfCallingSessionTitle,
+  contactAttemptsCount: lqfContactAttemptsCount,
+  maxContactAttemptsLimit: lqfMaxContactAttemptsLimit
 } = useLeadLqTeaser(leadRef)
 
 const showFloatingLqOverviewExtras = computed(
@@ -678,26 +777,23 @@ const mainTabs = computed(() => [
   { key: 'activity', label: t('requestDetail.tabs.activity'), count: requestActivities.value.length }
 ])
 
-const tradeInsSummary = computed(() => {
-  const n = tradeInsCount.value
-  if (n === 0) return t('messages.info.noData')
-  return t('requestDetail.tabs.tradeIns')
-})
-
-const financingSummary = computed(() => {
-  const n = financingOptionsCount.value
-  if (n === 0) return t('messages.info.noData')
-  return t('requestDetail.tabs.purchaseMethod')
-})
-
 watch(
   () => props.request?.compositeId,
-  () => {
+  (next, prev) => {
     duplicateBannerDismissed.value = false
-    lqfTeaserDismissed.value = false
-    lqfInlineManageOpen.value = false
-    floatingLqFocusMode.value = false
-    mainTab.value = 'overview'
+    if (prev != null && next != null && prev !== next) {
+      const stored = leadsStore.lastInlineLeadQualifySuccess
+      const successOppId = stored?.opportunityId ?? stored?.opportunity?.id
+      if (qualifySuccessMatchesOpportunityComposite(successOppId, next)) {
+        return
+      }
+      lqfTeaserDismissed.value = false
+      lqfInlineManageOpen.value = false
+      leadsStore.clearLastInlineLeadQualifySuccess()
+      leadLqOutcomeSummary.value = null
+      floatingLqFocusMode.value = false
+      mainTab.value = 'overview'
+    }
   }
 )
 
@@ -708,6 +804,53 @@ const showTimeline = computed(() => !!props.request)
 const isClosedLead = computed(
   () => props.request?.type === 'lead' && props.request?.isDisqualified === true
 )
+
+const lqfSessionHeaderActive = computed(() => {
+  if (!lqfInlineManageOpen.value) return false
+  if (qualifyInlineSuccessForRequest.value) return false
+  if (leadLqOutcomeSummary.value) return false
+  if (isClosedLead.value) return false
+  return true
+})
+
+const floatingLqCallingTitle = computed(() => {
+  if (qualifyInlineSuccessForRequest.value) return ''
+  if (leadLqOutcomeSummary.value) return ''
+  if (isClosedLead.value) return ''
+  return lqfCallingSessionTitle.value
+})
+
+const lqOutcomeOverviewDisplay = computed(() => {
+  if (!leadLqOutcomeSummary.value) {
+    return { title: '', lines: [], reason: null }
+  }
+  return buildLqOutcomeSummaryDisplay(leadLqOutcomeSummary.value, t)
+})
+
+const lqOutcomeOverviewVisible = computed(
+  () =>
+    Boolean(leadLqOutcomeSummary.value) &&
+    !qualifyInlineSuccessForRequest.value &&
+    Boolean(lqOutcomeOverviewDisplay.value.title) &&
+    !lqfInlineManageOpen.value &&
+    !(useFloatingLqBar.value && floatingLqFocusMode.value)
+)
+
+const lqfHideManageCallNowCta = computed(() => {
+  if (qualifyInlineSuccessForRequest.value || leadLqOutcomeSummary.value) return true
+  const r = props.request
+  if (!r || r.type !== 'lead') return false
+  const stage = getDisplayStage(r, 'lead')
+  return stage === LEAD_STAGES.TO_BE_CALLED_BACK || stage === LEAD_STAGES.VALID_TO_BE_CALLED_BACK
+})
+
+const lqfOutcomeShellAnimated = computed(() => !leadLqOutcomeSummary.value)
+
+watch(isClosedLead, (closed, wasClosed) => {
+  if (wasClosed === true && closed === false) {
+    leadLqOutcomeSummary.value = null
+  }
+})
 
 const tasksTabCount = computed(() => {
   const r = props.request
@@ -907,6 +1050,215 @@ function handleOpenAd() {}
 
 function handleMoreActions() {}
 
+function normalizeContactTagList(tags) {
+  return (tags || []).map((t) =>
+    typeof t === 'string' ? { name: t, color: null } : { name: t.name, color: t.color || null }
+  )
+}
+
+const addTagModalExistingNames = computed(() => {
+  if (addTagModalKind.value === 'request') {
+    const tags = props.request?.tags || []
+    return tags.map((x) => (typeof x === 'string' ? x : x.name))
+  }
+  const tags = props.request?.customer?.tags || []
+  return tags.map((x) => (typeof x === 'string' ? x : x.name))
+})
+
+function openAddCustomerTagModal() {
+  addTagModalEditTag.value = null
+  addTagModalKind.value = 'customer'
+  showAddTagModal.value = true
+}
+
+function openAddRequestTagModal() {
+  addTagModalEditTag.value = null
+  addTagModalKind.value = 'request'
+  showAddTagModal.value = true
+}
+
+function closeAddTagModal() {
+  showAddTagModal.value = false
+  addTagModalKind.value = 'customer'
+  addTagModalEditTag.value = null
+}
+
+function onEditRequestTag(tag) {
+  addTagModalEditTag.value = { name: tag.name, color: tag.color }
+  addTagModalKind.value = 'request'
+  showAddTagModal.value = true
+}
+
+function onEditCustomerTag(tag) {
+  addTagModalEditTag.value = { name: tag.name, color: tag.color }
+  addTagModalKind.value = 'customer'
+  showAddTagModal.value = true
+}
+
+async function onDeleteRequestTag(tag) {
+  const r = props.request
+  if (!r?.id) return
+  const current = normalizeContactTagList(r.tags || [])
+  const updatedTags = current.filter((t) => t.name !== tag.name)
+  try {
+    if (r.type === 'lead') {
+      await leadsStore.updateLead(r.id, { tags: updatedTags })
+      await leadsStore.fetchLeadById(r.id)
+    } else if (r.type === 'opportunity') {
+      await opportunitiesStore.updateOpportunity(r.id, { tags: updatedTags })
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+  } catch {
+    toastStore.pushToast('error', t('requestDetail.contactCard.saveFailed'))
+  }
+}
+
+async function onDeleteCustomerTag(tag) {
+  const r = props.request
+  if (!r) return
+  const customerId = r.customer?.id ?? r.customerId
+  if (customerId == null || customerId === '') return
+  const current = normalizeContactTagList(r.customer?.tags || [])
+  const updatedTags = current.filter((t) => t.name !== tag.name)
+  try {
+    await customersStore.updateCustomer(customerId, { tags: updatedTags }, 'contact')
+    if (r.type === 'lead') {
+      await leadsStore.fetchLeadById(r.id)
+    } else if (r.type === 'opportunity') {
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+  } catch {
+    toastStore.pushToast('error', t('requestDetail.contactCard.saveFailed'))
+  }
+}
+
+async function handleAddTagModalAdd(payload) {
+  if (addTagModalKind.value === 'request') {
+    await handleAddRequestTag(payload)
+  } else {
+    await handleAddCustomerTag(payload)
+  }
+}
+
+async function handleAddTagModalUpdate(payload) {
+  const { previousName, name, color } = payload
+  if (addTagModalKind.value === 'request') {
+    await handleUpdateRequestTag({ previousName, name, color })
+  } else {
+    await handleUpdateCustomerTag({ previousName, name, color })
+  }
+}
+
+async function handleUpdateRequestTag({ previousName, name, color }) {
+  const r = props.request
+  if (!r?.id) return
+  const current = normalizeContactTagList(r.tags || [])
+  const idx = current.findIndex((t) => t.name === previousName)
+  if (idx === -1) {
+    closeAddTagModal()
+    return
+  }
+  if (name !== previousName && current.some((t) => t.name === name)) {
+    return
+  }
+  const updatedTags = current.map((t) =>
+    t.name === previousName ? { name, color: color || null } : t
+  )
+  try {
+    if (r.type === 'lead') {
+      await leadsStore.updateLead(r.id, { tags: updatedTags })
+      await leadsStore.fetchLeadById(r.id)
+    } else if (r.type === 'opportunity') {
+      await opportunitiesStore.updateOpportunity(r.id, { tags: updatedTags })
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    closeAddTagModal()
+  } catch {
+    toastStore.pushToast('error', t('requestDetail.contactCard.saveFailed'))
+  }
+}
+
+async function handleUpdateCustomerTag({ previousName, name, color }) {
+  const r = props.request
+  if (!r) return
+  const customerId = r.customer?.id ?? r.customerId
+  if (customerId == null || customerId === '') return
+  const current = normalizeContactTagList(r.customer?.tags || [])
+  const idx = current.findIndex((t) => t.name === previousName)
+  if (idx === -1) {
+    closeAddTagModal()
+    return
+  }
+  if (name !== previousName && current.some((t) => t.name === name)) {
+    return
+  }
+  const updatedTags = current.map((t) =>
+    t.name === previousName ? { name, color: color || null } : t
+  )
+  try {
+    await customersStore.updateCustomer(customerId, { tags: updatedTags }, 'contact')
+    if (r.type === 'lead') {
+      await leadsStore.fetchLeadById(r.id)
+    } else if (r.type === 'opportunity') {
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    closeAddTagModal()
+  } catch {
+    toastStore.pushToast('error', t('requestDetail.contactCard.saveFailed'))
+  }
+}
+
+async function handleAddRequestTag(payload) {
+  const r = props.request
+  if (!r?.id) return
+  const name = typeof payload === 'string' ? payload : payload.name
+  const color = typeof payload === 'object' && payload?.color ? payload.color : null
+  const current = normalizeContactTagList(r.tags || [])
+  if (current.some((t) => t.name === name)) {
+    closeAddTagModal()
+    return
+  }
+  const updatedTags = [...current, { name, color: color || null }]
+  try {
+    if (r.type === 'lead') {
+      await leadsStore.updateLead(r.id, { tags: updatedTags })
+      await leadsStore.fetchLeadById(r.id)
+    } else if (r.type === 'opportunity') {
+      await opportunitiesStore.updateOpportunity(r.id, { tags: updatedTags })
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    closeAddTagModal()
+  } catch {
+    toastStore.pushToast('error', t('requestDetail.contactCard.saveFailed'))
+  }
+}
+
+async function handleAddCustomerTag(payload) {
+  const r = props.request
+  if (!r) return
+  const customerId = r.customer?.id ?? r.customerId
+  if (customerId == null || customerId === '') return
+  const name = typeof payload === 'string' ? payload : payload.name
+  const color = typeof payload === 'object' && payload?.color ? payload.color : null
+  const current = normalizeContactTagList(r.customer?.tags || [])
+  if (current.some((t) => t.name === name)) {
+    closeAddTagModal()
+    return
+  }
+  const updatedTags = [...current, { name, color: color || null }]
+  try {
+    await customersStore.updateCustomer(customerId, { tags: updatedTags }, 'contact')
+    if (r.type === 'lead') {
+      await leadsStore.fetchLeadById(r.id)
+    } else if (r.type === 'opportunity') {
+      await opportunitiesStore.fetchOpportunityById(r.id)
+    }
+    closeAddTagModal()
+  } catch {
+    toastStore.pushToast('error', t('requestDetail.contactCard.saveFailed'))
+  }
+}
+
 function handleQuickAction(key) {
   if (key === 'phone') {
     showCallComingSoonModal.value = true
@@ -916,22 +1268,18 @@ function handleQuickAction(key) {
     showEmailModal.value = true
     return
   }
+  if (key === 'sms') {
+    showSMSModal.value = true
+    return
+  }
   if (key === 'whatsapp') {
     showWhatsAppModal.value = true
     return
   }
-  if (key === 'document') {
-    showAttachmentModal.value = true
-    return
-  }
-  if (key === 'more') {
+  if (key === 'note') {
     showNoteModal.value = true
     return
   }
-  showGenericComingSoon.value = true
-}
-
-function handleAddSegment() {
   showGenericComingSoon.value = true
 }
 
@@ -961,21 +1309,53 @@ function handleLqfOpenTradeIn() {
   showTradeInModal.value = true
 }
 
+function openTradeInEdit(t) {
+  editingTradeIn.value = t
+  nextTick(() => {
+    showTradeInModal.value = true
+  })
+}
+
+function openFinancingEdit(f) {
+  editingFinancingOption.value = f
+  nextTick(() => {
+    showFinancingModal.value = true
+  })
+}
+
+function navigationIndexInRows(rows, req) {
+  if (!req?.compositeId || !rows?.length) return -1
+  const idStr = String(req.compositeId)
+  return rows.findIndex(
+    (r) =>
+      String(r.compositeId) === idStr ||
+      (r.type === req.type && String(r.id) === String(req.id))
+  )
+}
+
+function navigationTargetCompositeId(row) {
+  if (row?.compositeId) return String(row.compositeId)
+  if (row?.type != null && row.id != null) return `${row.type}-${row.id}`
+  return ''
+}
+
 function handlePrevious() {
   if (!props.request?.compositeId || !props.filteredRequests?.length) return
-  const idx = props.filteredRequests.findIndex((r) => r.compositeId === props.request.compositeId)
+  const idx = navigationIndexInRows(props.filteredRequests, props.request)
   if (idx > 0) {
     const prev = props.filteredRequests[idx - 1]
-    emit('request-navigate', prev.compositeId)
+    const targetId = navigationTargetCompositeId(prev)
+    if (targetId) emit('request-navigate', targetId)
   }
 }
 
 function handleNext() {
   if (!props.request?.compositeId || !props.filteredRequests?.length) return
-  const idx = props.filteredRequests.findIndex((r) => r.compositeId === props.request.compositeId)
+  const idx = navigationIndexInRows(props.filteredRequests, props.request)
   if (idx >= 0 && idx < props.filteredRequests.length - 1) {
     const next = props.filteredRequests[idx + 1]
-    emit('request-navigate', next.compositeId)
+    const targetId = navigationTargetCompositeId(next)
+    if (targetId) emit('request-navigate', targetId)
   }
 }
 
@@ -1062,6 +1442,26 @@ async function handleActivityAttachmentSave(attachmentData) {
     console.error('Error saving attachment:', err)
   }
 }
+
+async function handleAttachmentsTabDroppedFiles(files) {
+  if (!files?.length) return
+  for (const file of files) {
+    await handleActivityAttachmentSave({
+      fileName: file.name,
+      file
+    })
+  }
+}
+
+const {
+  isFileDragActive: attachmentsListDragActive,
+  onFileDragEnter: onAttachmentsListDragEnter,
+  onFileDragLeave: onAttachmentsListDragLeave,
+  onFileDragOver: onAttachmentsListDragOver,
+  onFileDrop: onAttachmentsListDrop
+} = useFileDropZone({
+  onFiles: handleAttachmentsTabDroppedFiles
+})
 
 async function handleActivityWhatsAppSave(data) {
   const r = props.request

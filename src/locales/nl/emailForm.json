@@ -1,0 +1,12 @@
+{
+  "attach": {
+    "label": "Bestand bijvoegen",
+    "hint": "Max. 25 MB totaal per verzending.",
+    "browseOrDrop": "Bladeren of bestanden neerzetten",
+    "availableTitle": "Beschikbare bijlagen",
+    "availableEmpty": "Nog geen bijlagen uit de onderhandeling.",
+    "fileFallback": "Bestand",
+    "removeAria": "Bijlage verwijderen",
+    "errorMaxSize": "De totale grootte van de bijlagen mag niet groter zijn dan 25 MB."
+  }
+}

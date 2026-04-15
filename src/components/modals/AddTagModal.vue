@@ -7,23 +7,23 @@
         :show-close-button="true"
       >
         <DialogHeader>
-          <DialogTitle>Add tag</DialogTitle>
+          <DialogTitle>{{ modalTitle }}</DialogTitle>
         </DialogHeader>
 
         <div class="grid gap-4">
           <div class="grid gap-2">
-            <Label class="text-sm font-semibold text-foreground">Tag name</Label>
+            <Label class="text-sm font-semibold text-foreground">{{ t('requestDetail.addTagModal.tagName') }}</Label>
             <Input
               v-model="tagName"
               type="text"
-              placeholder="Tag name"
+              :placeholder="t('requestDetail.addTagModal.tagNamePlaceholder')"
               class="w-full h-10"
               @keyup.enter="handleSave"
             />
           </div>
 
           <div class="grid gap-2">
-            <Label class="text-sm font-semibold text-foreground">Colour</Label>
+            <Label class="text-sm font-semibold text-foreground">{{ t('requestDetail.addTagModal.colour') }}</Label>
             <div class="flex flex-wrap gap-2">
               <button
                 v-for="color in TAG_COLORS"
@@ -49,7 +49,7 @@
             class="rounded-sm w-full sm:w-auto"
             @click="$emit('close')"
           >
-            Cancel
+            {{ t('requestDetail.addTagModal.cancel') }}
           </Button>
           <Button
             variant="default"
@@ -57,7 +57,7 @@
             :disabled="!tagName.trim() || !selectedColor"
             @click="handleSave"
           >
-            Save
+            {{ t('requestDetail.addTagModal.save') }}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -66,7 +66,8 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   Button,
   Input,
@@ -81,6 +82,8 @@ import {
   DialogPortal,
   DialogTitle
 } from '@motork/component-library/future/primitives'
+
+const { t } = useI18n()
 
 // Light/pastel versions of the tag palette (same hues, higher lightness)
 const TAG_COLORS = [
@@ -102,13 +105,24 @@ const props = defineProps({
   existingTags: {
     type: Array,
     default: () => []
+  },
+  editTag: {
+    type: Object,
+    default: null
   }
 })
 
-const emit = defineEmits(['close', 'add'])
+const emit = defineEmits(['close', 'add', 'update'])
 
 const tagName = ref('')
 const selectedColor = ref('')
+const originalEditName = ref('')
+
+const modalTitle = computed(() =>
+  props.editTag?.name
+    ? t('requestDetail.addTagModal.editTitle')
+    : t('requestDetail.addTagModal.title')
+)
 
 const handleOpenChange = (isOpen) => {
   if (!isOpen) {
@@ -116,21 +130,51 @@ const handleOpenChange = (isOpen) => {
   }
 }
 
-watch(() => props.show, (newValue) => {
-  if (newValue) {
-    tagName.value = ''
-    selectedColor.value = TAG_COLORS[0]
-  }
-})
+function resetForm() {
+  tagName.value = ''
+  selectedColor.value = TAG_COLORS[0]
+  originalEditName.value = ''
+}
+
+watch(
+  () => [props.show, props.editTag],
+  () => {
+    if (!props.show) {
+      resetForm()
+      return
+    }
+    if (props.editTag?.name) {
+      tagName.value = props.editTag.name
+      selectedColor.value =
+        props.editTag.color && String(props.editTag.color).trim()
+          ? props.editTag.color
+          : TAG_COLORS[0]
+      originalEditName.value = props.editTag.name
+    } else {
+      tagName.value = ''
+      selectedColor.value = TAG_COLORS[0]
+      originalEditName.value = ''
+    }
+  },
+  { flush: 'post' }
+)
 
 const handleSave = () => {
   const name = tagName.value.trim()
   if (!name || !selectedColor.value) return
   const existing = (props.existingTags || []).map((t) => (typeof t === 'string' ? t : t.name))
-  if (existing.includes(name)) return
-  emit('add', { name, color: selectedColor.value })
+  if (originalEditName.value) {
+    if (name !== originalEditName.value && existing.includes(name)) return
+    emit('update', {
+      previousName: originalEditName.value,
+      name,
+      color: selectedColor.value
+    })
+  } else {
+    if (existing.includes(name)) return
+    emit('add', { name, color: selectedColor.value })
+  }
   emit('close')
-  tagName.value = ''
-  selectedColor.value = TAG_COLORS[0]
+  resetForm()
 }
 </script>

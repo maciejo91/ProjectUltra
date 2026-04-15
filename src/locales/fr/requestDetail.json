@@ -24,6 +24,7 @@
   "headerLifecycleMenuAria": "Modifier l’étape de la demande",
   "statusInProgress": "En cours",
   "created": "Créé",
+  "importedAt": "Importé le",
   "lastUpdated": "Dernière mise à jour",
   "moreMenu": "Autres actions",
   "addSegment": "Ajouter un segment",
@@ -71,18 +72,21 @@
     "openFullTaskView": "Ouvrir la vue tâche complète",
     "taskOptionsAria": "Options de la tâche",
     "timerAria": "Minuterie",
-    "timerTitleRunning": "Cliquer pour mettre en pause",
-    "timerTitlePaused": "Cliquer pour reprendre",
+    "timerTooltip": "Temps restant pour qualifier ce lead",
     "inProgress": "In progress",
     "nextStepQuestion": "Et ensuite ?",
     "backToCallOutcome": "Retour au résultat de l’appel",
-    "backToWhatsNext": "Retour à la suite"
+    "backToWhatsNext": "Retour à la suite",
+    "makeFirstCallAttempt": "Make the first call attempt",
+    "callAttemptsIndicatorAria": "Tentatives d’appel : {current} sur {max}"
   },
   "quickActions": {
     "phone": "Téléphone",
     "email": "E-mail",
-    "whatsapp": "WhatsApp",
-    "document": "Document",
+    "messagingMenuAria": "Envoyer un SMS ou un message WhatsApp",
+    "sendSms": "Envoyer un SMS",
+    "sendWhatsApp": "Envoyer sur WhatsApp",
+    "addNote": "Ajouter une note",
     "more": "Plus"
   },
   "contactCard": {
@@ -111,6 +115,19 @@
       "phone": "+33…",
       "address": "Adresse"
     }
+  },
+  "addTagModal": {
+    "title": "Ajouter un tag",
+    "editTitle": "Modifier le tag",
+    "tagName": "Nom du tag",
+    "colour": "Couleur",
+    "tagNamePlaceholder": "Nom du tag",
+    "cancel": "Annuler",
+    "save": "Enregistrer"
+  },
+  "tagPopover": {
+    "edit": "Modifier",
+    "delete": "Supprimer"
   },
   "vehicleCard": {
     "title": "Véhicule demandé",
@@ -255,10 +272,14 @@
       "title": "Aucune donnée enregistrée",
       "description": "Les notes et pièces jointes de cette demande apparaîtront ici.",
       "action": "Ajouter une pièce jointe",
+      "dropZoneHeadline": "Déposez vos fichiers ici",
+      "dropZoneActive": "Relâchez pour joindre",
+      "dropHint": "Ou cliquez sur le bouton pour choisir des fichiers sur votre appareil.",
       "hasItems": "{count} pièce(s) jointe(s) sur cette demande."
     }
   },
   "floatingLq": {
+    "taskPostponedHeader": "Tâche reportée",
     "callNow": "Appeler maintenant",
     "callingNameFallback": "Client",
     "callingWithVehicle": "Appel avec {name} - {vehicle}",
@@ -298,5 +319,41 @@
     "overdue": "En retard",
     "soon": "Maintenant",
     "minutesLeft": "{count} min restantes"
+  },
+  "qualifySuccess": {
+    "title": "Tâche terminée",
+    "subtitle": "Lead qualifié",
+    "recapVehicle": "Une opportunity a été créée pour {vehicle}.",
+    "recapAppointment": "Premier rendez-vous : {date} à {time}.",
+    "recapMeetingType": "Type de rendez-vous : {type}",
+    "recapMeetingWith": "Avec : {name}",
+    "viewOpportunity": "Voir l'opportunity",
+    "convertingAria": "Conversion en opportunity"
+  },
+  "lqOutcome": {
+    "titleTaskComplete": "Tâche terminée",
+    "titleTaskPostponed": "Tâche reportée",
+    "lineClosedNotInterested": "Ce lead est clos — pas intéressé.",
+    "lineClosedNotValid": "Ce lead est clos — non valide.",
+    "lineClosedNoAnswer": "Ce lead est clos après aucune réponse.",
+    "linePostponedNextAttempt": "Tâche reportée à {when}.",
+    "linePostponedFollowUp": "Canal du message de relance : {channel}.",
+    "lineInterestedPostponed": "La qualification a été reportée. Prochaine étape : recontacter le client le {when}.",
+    "nextCallTomorrow9": "Demain à 9:00",
+    "nextCallMonday": "Lundi prochain à 9:00",
+    "nextCallAiSuggestion": "{date} à {time}",
+    "nextCallCustom": "{date} à {time}",
+    "nextCallSelected": "L'heure sélectionnée",
+    "channelWhatsapp": "WhatsApp",
+    "channelSms": "SMS",
+    "channelEmail": "E-mail",
+    "channelDontSend": "Ne pas envoyer",
+    "reasonLabel": "Motif : {reason}",
+    "reopen": "Rouvrir",
+    "updatedBy": "Mis à jour par {name}",
+    "successDate": "Date :",
+    "successTime": "Heure :",
+    "successType": "Type :",
+    "successAssignedTo": "Assigné à :"
   }
 }

@@ -10,6 +10,16 @@ export const useLeadsStore = defineStore('leads', () => {
   const loading = ref(false)
   const error = ref(null)
 
+  const lastInlineLeadQualifySuccess = ref(null)
+
+  function setLastInlineLeadQualifySuccess(payload) {
+    lastInlineLeadQualifySuccess.value = payload
+  }
+
+  function clearLastInlineLeadQualifySuccess() {
+    lastInlineLeadQualifySuccess.value = null
+  }
+
   // Computed: Hot leads (priority === 'Hot')
   const hotLeads = computed(() => {
     return leads.value.filter(lead => lead.priority === 'Hot' && !lead.isDisqualified)
@@ -53,10 +63,14 @@ export const useLeadsStore = defineStore('leads', () => {
     try {
       const loadedLead = await leadsApi.fetchLeadById(id)
       currentLead.value = loadedLead
-      
-      // Sync back to leads list so computeds (e.g. allTasks → drawerTask) reliably update
+
       const numericId = parseInt(id, 10)
-      leads.value = leads.value.map(l => (l.id === numericId ? loadedLead : l))
+      const ix = leads.value.findIndex((l) => l.id === numericId)
+      if (ix !== -1) {
+        leads.value = leads.value.map((l) => (l.id === numericId ? loadedLead : l))
+      } else {
+        leads.value = [...leads.value, loadedLead]
+      }
       
       // Activities will be loaded via watch on currentLead
       
@@ -235,7 +249,7 @@ export const useLeadsStore = defineStore('leads', () => {
       // so the drawer can find the new opportunity before the lead disappears.
       await leadsApi.updateLead(leadId, { isDisqualified: true, disqualifyReason: 'Converted to opportunity' })
       
-      // Do NOT remove from leads list here – handleQualified removes after router.push
+      // Do NOT remove from leads list here – handleQualified removes after navigation when redirecting
       // to avoid drawer closing (drawerTask = null) before opportunity is shown
       
       return opportunity
@@ -262,6 +276,9 @@ export const useLeadsStore = defineStore('leads', () => {
     addActivity,
     updateActivity,
     deleteActivity,
-    convertLeadToOpportunity
+    convertLeadToOpportunity,
+    lastInlineLeadQualifySuccess,
+    setLastInlineLeadQualifySuccess,
+    clearLastInlineLeadQualifySuccess
   }
 })

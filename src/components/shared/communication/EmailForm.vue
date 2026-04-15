@@ -40,25 +40,32 @@
 
     <!-- Attach File -->
     <div class="space-y-3">
-      <Label class="form-label">Attach File</Label>
-      <p class="text-sm text-muted-foreground">
-        You can select files from LeadSparK negotiations and from your local device. (max size: 25 MB)
-      </p>
-      <div class="flex flex-wrap gap-2">
-        <Button
-          variant="outline"
-          class="rounded-sm"
-          @click="showLeadSparKModal = true"
-        >
-          From LeadSparK
-        </Button>
-        <Button
-          variant="outline"
-          class="rounded-sm"
-          @click="deviceInputRef?.click()"
-        >
-          From device
-        </Button>
+      <Label class="form-label">{{ t('emailForm.attach.label') }}</Label>
+      <div
+        class="rounded-lg border border-dashed flex flex-col items-center justify-center gap-3 min-h-32 p-6 transition-colors"
+        :class="
+          isFileDragActive
+            ? 'border-primary bg-primary/5'
+            : 'border-border bg-muted/30'
+        "
+        @dragenter="onAttachDragEnter"
+        @dragleave="onAttachDragLeave"
+        @dragover.prevent="onAttachDragOver"
+        @drop.prevent="onAttachDrop"
+      >
+        <div class="flex flex-col items-center gap-3 text-center w-full">
+          <Button
+            variant="outline"
+            type="button"
+            class="rounded-sm"
+            @click="openDeviceFilePicker"
+          >
+            {{ t('emailForm.attach.browseOrDrop') }}
+          </Button>
+          <p class="text-sm text-muted-foreground">
+            {{ t('emailForm.attach.hint') }}
+          </p>
+        </div>
         <input
           ref="deviceInputRef"
           type="file"
@@ -67,6 +74,26 @@
           @change="onDeviceFilesSelected"
         />
       </div>
+
+      <div class="space-y-2">
+        <p class="text-sm font-medium text-foreground">
+          {{ t('emailForm.attach.availableTitle') }}
+        </p>
+        <ul v-if="availableAttachmentsPreview.length" class="space-y-2">
+          <li
+            v-for="(item, idx) in availableAttachmentsPreview"
+            :key="item.id || item.fileName || idx"
+            class="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-foreground"
+          >
+            <FileText class="w-4 h-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <span class="truncate min-w-0">{{ attachmentDisplayName(item) }}</span>
+          </li>
+        </ul>
+        <p v-else class="text-sm text-muted-foreground">
+          {{ t('emailForm.attach.availableEmpty') }}
+        </p>
+      </div>
+
       <p v-if="attachmentError" class="text-sm text-destructive">{{ attachmentError }}</p>
       <ul v-if="attachments.length" class="space-y-2">
         <li
@@ -78,7 +105,7 @@
           <button
             type="button"
             class="shrink-0 text-muted-foreground hover:text-foreground p-1"
-            aria-label="Remove attachment"
+            :aria-label="t('emailForm.attach.removeAria')"
             @click="removeAttachment(index)"
           >
             <X class="w-4 h-4" />
@@ -86,13 +113,6 @@
         </li>
       </ul>
     </div>
-
-    <SelectFromLeadSparKModal
-      :show="showLeadSparKModal"
-      :recent-attachments="recentAttachments"
-      @close="showLeadSparKModal = false"
-      @select="onLeadSparKSelected"
-    />
 
     <div v-if="showActions" class="flex justify-end gap-2">
       <Button variant="secondary" @click="$emit('cancel')">
@@ -110,8 +130,9 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-import { X } from 'lucide-vue-next'
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { FileText, X } from 'lucide-vue-next'
 import {
   Button,
   Input,
@@ -123,7 +144,8 @@ import {
   SelectContent,
   SelectItem
 } from '@motork/component-library/future/primitives'
-import SelectFromLeadSparKModal from '@/components/modals/SelectFromLeadSparKModal.vue'
+
+const { t } = useI18n()
 
 const MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024
 
@@ -153,8 +175,16 @@ const subject = ref('')
 const message = ref(props.initialMessage)
 const attachments = ref([])
 const attachmentError = ref('')
-const showLeadSparKModal = ref(false)
 const deviceInputRef = ref(null)
+const isFileDragActive = ref(false)
+
+const availableAttachmentsPreview = computed(() =>
+  props.recentAttachments.slice(0, 3)
+)
+
+function attachmentDisplayName(item) {
+  return item.fileName || item.content?.replace(/^Attachment: /, '') || t('emailForm.attach.fileFallback')
+}
 
 const templateContent = {
   'Follow-up': {
@@ -193,30 +223,59 @@ function totalAttachmentSize() {
   }, 0)
 }
 
-function onDeviceFilesSelected(event) {
+function resetAttachDragState() {
+  isFileDragActive.value = false
+}
+
+function onAttachDragEnter(event) {
+  event.preventDefault()
+  if (!event.dataTransfer?.types?.includes('Files')) return
+  isFileDragActive.value = true
+}
+
+function onAttachDragLeave(event) {
+  const next = event.relatedTarget
+  if (next && event.currentTarget.contains(next)) return
+  isFileDragActive.value = false
+}
+
+function onAttachDragOver(event) {
+  event.preventDefault()
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'copy'
+  }
+}
+
+function onAttachDrop(event) {
+  event.preventDefault()
+  resetAttachDragState()
+  const files = event.dataTransfer?.files
+  if (files?.length) {
+    addDeviceFiles(files)
+  }
+}
+
+function openDeviceFilePicker() {
+  deviceInputRef.value?.click()
+}
+
+function addDeviceFiles(fileList) {
   attachmentError.value = ''
-  const files = Array.from(event.target.files || [])
+  const files = Array.from(fileList || [])
   let sizeSoFar = totalAttachmentSize()
   for (const file of files) {
     if (sizeSoFar + file.size > MAX_ATTACHMENT_BYTES) {
-      attachmentError.value = 'Total attachment size must not exceed 25 MB.'
+      attachmentError.value = t('emailForm.attach.errorMaxSize')
       break
     }
     attachments.value.push({ source: 'device', file, name: file.name })
     sizeSoFar += file.size
   }
-  event.target.value = ''
 }
 
-function onLeadSparKSelected(selected) {
-  for (const item of selected) {
-    const id = item.id ?? item.fileName
-    const fileName = item.fileName || item.content?.replace(/^Attachment: /, '') || 'File'
-    if (!attachments.value.some((a) => a.source === 'leadspark' && (a.id ?? a.fileName) === id)) {
-      attachments.value.push({ source: 'leadspark', id, fileName })
-    }
-  }
-  showLeadSparKModal.value = false
+function onDeviceFilesSelected(event) {
+  addDeviceFiles(event.target.files)
+  event.target.value = ''
 }
 
 function removeAttachment(index) {
@@ -227,7 +286,7 @@ function removeAttachment(index) {
 const handleSend = () => {
   if (!message.value.trim()) return
   if (totalAttachmentSize() > MAX_ATTACHMENT_BYTES) {
-    attachmentError.value = 'Total attachment size must not exceed 25 MB.'
+    attachmentError.value = t('emailForm.attach.errorMaxSize')
     return
   }
   emit('send', {

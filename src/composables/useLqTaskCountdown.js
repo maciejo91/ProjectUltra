@@ -4,7 +4,6 @@ const ONE_HOUR_SECONDS = 60 * 60
 
 export function useLqTaskCountdown() {
   const remainingSeconds = ref(ONE_HOUR_SECONDS)
-  const isTimerRunning = ref(true)
   let intervalId = 0
 
   const countdownLabel = computed(() => {
@@ -18,18 +17,12 @@ export function useLqTaskCountdown() {
   })
 
   function tick() {
-    if (!isTimerRunning.value) return
     if (remainingSeconds.value <= 0) return
     remainingSeconds.value -= 1
   }
 
-  function toggleTimerRunning() {
-    isTimerRunning.value = !isTimerRunning.value
-  }
-
   function reset() {
     remainingSeconds.value = ONE_HOUR_SECONDS
-    isTimerRunning.value = true
   }
 
   onMounted(() => {
@@ -42,8 +35,6 @@ export function useLqTaskCountdown() {
 
   return {
     countdownLabel,
-    isTimerRunning,
-    toggleTimerRunning,
     reset
   }
 }

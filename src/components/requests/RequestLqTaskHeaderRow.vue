@@ -51,21 +51,21 @@
       {{ title }}
     </p>
     <div class="flex shrink-0 items-center gap-2 self-center">
-      <button
-        type="button"
+      <span
+        role="timer"
+        aria-live="polite"
         :class="[
-          'inline-flex h-7 min-h-7 shrink-0 select-none items-center gap-1.5 rounded-full border px-2.5 text-sm font-medium tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'inline-flex h-7 min-h-7 shrink-0 select-none items-center gap-1.5 rounded-full border px-2.5 text-sm font-medium tabular-nums',
           onDarkSurface
-            ? 'border-transparent bg-background text-foreground hover:bg-background/90'
-            : 'border-border bg-background text-foreground hover:bg-muted/50'
+            ? 'border-transparent bg-background text-foreground'
+            : 'border-border bg-background text-foreground'
         ]"
         :aria-label="timerAria"
         :title="timerTitle"
-        @click.stop="$emit('toggle-timer')"
       >
         <Clock class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
         <span class="leading-none">{{ countdownLabel }}</span>
-      </button>
+      </span>
       <div class="flex items-center gap-1.5 shrink-0">
         <span
           class="text-sm leading-none whitespace-nowrap"
@@ -167,7 +167,7 @@ defineProps({
   }
 })
 
-defineEmits(['toggle-timer', 'chevron-click'])
+defineEmits(['chevron-click'])
 
 const titleBlockRef = ref(null)
 

@@ -6,40 +6,34 @@
     </div>
     <div v-if="(stacked || tagsOnly) && !badgesOnly" class="flex items-center gap-2 flex-wrap">
       <template v-for="tag in normalizedTags" :key="tag.name">
-        <span
-          v-if="tag.color"
-          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-sm font-medium shrink-0"
-          :class="isLightColor(tag.color) ? 'text-foreground' : 'text-white'"
-          :style="{ backgroundColor: tag.color }"
+        <TagPillWithPopover
+          :tag="tag"
+          @edit="openEditTag(tag)"
+          @delete="handleDeleteTag(tag)"
         >
-          <span class="min-w-0 truncate">{{ tag.name }}</span>
-          <button
-            type="button"
-            class="tag-remove rounded p-0.5 shrink-0 opacity-70 hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-            :aria-label="`Remove tag ${tag.name}`"
-            @click.stop="openRemoveTagConfirm(tag.name)"
-          >
-            <X :size="12" />
-          </button>
-        </span>
-        <span
-          v-else
-          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-sm font-medium shrink-0 bg-primary/15 text-foreground"
-        >
-          <span class="min-w-0 truncate">{{ tag.name }}</span>
-          <button
-            type="button"
-            class="tag-remove rounded p-0.5 shrink-0 opacity-70 hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-            :aria-label="`Remove tag ${tag.name}`"
-            @click.stop="openRemoveTagConfirm(tag.name)"
-          >
-            <X :size="12" />
-          </button>
-        </span>
+          <template #trigger>
+            <button
+              v-if="tag.color"
+              type="button"
+              class="tag-pill inline-flex max-w-full min-w-0 cursor-pointer items-center gap-1 rounded border-0 py-0.5 pl-1.5 pr-0.5 text-sm font-medium shrink-0"
+              :class="isLightColor(tag.color) ? 'text-foreground' : 'text-white'"
+              :style="{ backgroundColor: tag.color }"
+            >
+              <span class="min-w-0 truncate">{{ tag.name }}</span>
+            </button>
+            <button
+              v-else
+              type="button"
+              class="tag-pill inline-flex cursor-pointer items-center gap-1 rounded border-0 bg-primary/15 py-0.5 pl-1.5 pr-0.5 text-sm font-medium text-foreground shrink-0"
+            >
+              <span class="min-w-0 truncate">{{ tag.name }}</span>
+            </button>
+          </template>
+        </TagPillWithPopover>
       </template>
       <button
         type="button"
-        @click.stop="showAddTagModal = true"
+        @click.stop="openAddTag"
         class="text-sm text-muted-foreground hover:text-primary font-medium hover:underline transition-colors whitespace-nowrap shrink-0"
       >
         + tag
@@ -47,40 +41,34 @@
     </div>
     <template v-else-if="!badgesOnly">
       <template v-for="tag in normalizedTags" :key="tag.name">
-        <span
-          v-if="tag.color"
-          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-sm font-medium shrink-0"
-          :class="isLightColor(tag.color) ? 'text-foreground' : 'text-white'"
-          :style="{ backgroundColor: tag.color }"
+        <TagPillWithPopover
+          :tag="tag"
+          @edit="openEditTag(tag)"
+          @delete="handleDeleteTag(tag)"
         >
-          <span class="min-w-0 truncate">{{ tag.name }}</span>
-          <button
-            type="button"
-            class="tag-remove rounded p-0.5 shrink-0 opacity-70 hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-            :aria-label="`Remove tag ${tag.name}`"
-            @click.stop="openRemoveTagConfirm(tag.name)"
-          >
-            <X :size="12" />
-          </button>
-        </span>
-        <span
-          v-else
-          class="tag-pill inline-flex items-center gap-1 pr-0.5 pl-1.5 py-0.5 rounded text-sm font-medium shrink-0 bg-primary/15 text-foreground"
-        >
-          <span class="min-w-0 truncate">{{ tag.name }}</span>
-          <button
-            type="button"
-            class="tag-remove rounded p-0.5 shrink-0 opacity-70 hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/50"
-            :aria-label="`Remove tag ${tag.name}`"
-            @click.stop="openRemoveTagConfirm(tag.name)"
-          >
-            <X :size="12" />
-          </button>
-        </span>
+          <template #trigger>
+            <button
+              v-if="tag.color"
+              type="button"
+              class="tag-pill inline-flex max-w-full min-w-0 cursor-pointer items-center gap-1 rounded border-0 py-0.5 pl-1.5 pr-0.5 text-sm font-medium shrink-0"
+              :class="isLightColor(tag.color) ? 'text-foreground' : 'text-white'"
+              :style="{ backgroundColor: tag.color }"
+            >
+              <span class="min-w-0 truncate">{{ tag.name }}</span>
+            </button>
+            <button
+              v-else
+              type="button"
+              class="tag-pill inline-flex cursor-pointer items-center gap-1 rounded border-0 bg-primary/15 py-0.5 pl-1.5 pr-0.5 text-sm font-medium text-foreground shrink-0"
+            >
+              <span class="min-w-0 truncate">{{ tag.name }}</span>
+            </button>
+          </template>
+        </TagPillWithPopover>
       </template>
       <button
         type="button"
-        @click.stop="showAddTagModal = true"
+        @click.stop="openAddTag"
         class="text-sm text-muted-foreground hover:text-primary font-medium hover:underline transition-colors whitespace-nowrap shrink-0"
       >
         + tag
@@ -90,78 +78,33 @@
     <AddTagModal
       :show="showAddTagModal"
       :existing-tags="existingTagNames"
-      @close="showAddTagModal = false"
+      :edit-tag="tagBeingEdited"
+      @close="closeAddTagModal"
       @add="handleAddTag"
+      @update="handleUpdateTag"
     />
-
-    <Dialog :open="!!tagToRemove" @update:open="handleRemoveTagConfirmOpenChange">
-      <DialogPortal>
-        <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-        <DialogContent
-          class="w-full sm:max-w-md"
-          :show-close-button="true"
-        >
-          <DialogHeader class="shrink-0">
-            <DialogTitle>Remove tag</DialogTitle>
-            <DialogDescription>
-              Remove "{{ tagToRemove }}" from this task? This cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
-            <Button
-              variant="outline"
-              class="rounded-sm w-full sm:w-auto"
-              @click="closeRemoveTagConfirm"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="default"
-              class="rounded-sm w-full sm:w-auto"
-              @click="confirmRemoveTag"
-            >
-              Remove
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
   </div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle
-} from '@motork/component-library/future/primitives'
-import { X } from 'lucide-vue-next'
 import TaskBadges from './shared/TaskBadges.vue'
 import AddTagModal from '@/components/modals/AddTagModal.vue'
+import TagPillWithPopover from '@/components/shared/TagPillWithPopover.vue'
 
 const props = defineProps({
   task: {
     type: Object,
     default: null
   },
-  /** When true, status/type badges and after-badges slot are on first line, tags on second line */
   stacked: {
     type: Boolean,
     default: false
   },
-  /** When true, only render badges (and after-badges slot); no tags */
   badgesOnly: {
     type: Boolean,
     default: false
   },
-  /** When true, only render tags row (add/remove); no badges */
   tagsOnly: {
     type: Boolean,
     default: false
@@ -171,7 +114,7 @@ const props = defineProps({
 const emit = defineEmits(['tag-updated'])
 
 const showAddTagModal = ref(false)
-const tagToRemove = ref(null)
+const tagBeingEdited = ref(null)
 
 function isLightColor(hex) {
   if (!hex || typeof hex !== 'string') return false
@@ -193,6 +136,21 @@ const normalizedTags = computed(() => {
 
 const existingTagNames = computed(() => normalizedTags.value.map((t) => t.name))
 
+function openAddTag() {
+  tagBeingEdited.value = null
+  showAddTagModal.value = true
+}
+
+function openEditTag(tag) {
+  tagBeingEdited.value = { name: tag.name, color: tag.color }
+  showAddTagModal.value = true
+}
+
+function closeAddTagModal() {
+  showAddTagModal.value = false
+  tagBeingEdited.value = null
+}
+
 function handleAddTag(payload) {
   if (!props.task) return
   const name = typeof payload === 'string' ? payload : payload.name
@@ -201,33 +159,41 @@ function handleAddTag(payload) {
     typeof t === 'string' ? { name: t, color: null } : { name: t.name, color: t.color || null }
   )
   if (current.some((t) => t.name === name)) {
-    showAddTagModal.value = false
+    closeAddTagModal()
     return
   }
   const updatedTags = [...current, { name, color }]
   emit('tag-updated', { taskId: props.task.id, taskType: props.task.type, tags: updatedTags })
-  showAddTagModal.value = false
+  closeAddTagModal()
 }
 
-function openRemoveTagConfirm(tagName) {
-  tagToRemove.value = tagName
-}
-
-function closeRemoveTagConfirm() {
-  tagToRemove.value = null
-}
-
-function handleRemoveTagConfirmOpenChange(open) {
-  if (!open) tagToRemove.value = null
-}
-
-function confirmRemoveTag() {
-  if (!props.task || !tagToRemove.value) return
+function handleUpdateTag(payload) {
+  if (!props.task) return
+  const { previousName, name, color } = payload
   const current = (props.task.tags || []).map((t) =>
     typeof t === 'string' ? { name: t, color: null } : { name: t.name, color: t.color || null }
   )
-  const updatedTags = current.filter((t) => t.name !== tagToRemove.value)
+  const idx = current.findIndex((t) => t.name === previousName)
+  if (idx === -1) {
+    closeAddTagModal()
+    return
+  }
+  if (name !== previousName && current.some((t) => t.name === name)) {
+    return
+  }
+  const updatedTags = current.map((t) =>
+    t.name === previousName ? { name, color: color || null } : t
+  )
   emit('tag-updated', { taskId: props.task.id, taskType: props.task.type, tags: updatedTags })
-  tagToRemove.value = null
+  closeAddTagModal()
+}
+
+function handleDeleteTag(tag) {
+  if (!props.task) return
+  const current = (props.task.tags || []).map((t) =>
+    typeof t === 'string' ? { name: t, color: null } : { name: t.name, color: t.color || null }
+  )
+  const updatedTags = current.filter((t) => t.name !== tag.name)
+  emit('tag-updated', { taskId: props.task.id, taskType: props.task.type, tags: updatedTags })
 }
 </script>

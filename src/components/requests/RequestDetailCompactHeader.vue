@@ -33,22 +33,27 @@
                     <template v-if="nameParts.location">{{ ' · ' }}{{ nameParts.location }}</template>
                     {{ ' · ' }}{{ t('requestDetail.headerDetailLabelSource') }}
                   </span>
-                  <span class="text-sm font-normal text-foreground">{{ ' ' + sourceLabel }}</span>
+                  <span class="text-sm font-normal text-foreground">{{ ' ' + headerDetailSourceLabel }}</span>
                 </p>
               </div>
               <div class="flex shrink-0 flex-wrap items-center justify-end gap-0.5">
-                <Button
-                  v-for="item in quickActionItems"
-                  :key="item.key"
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  class="shrink-0 rounded-md"
-                  :aria-label="item.label"
-                  @click="$emit('quick-action', item.key)"
-                >
-                  <component :is="item.icon" class="size-4 text-muted-foreground" />
-                </Button>
+                <template v-for="item in quickActionItems" :key="item.kind || item.key">
+                  <MessagingQuickActionPopover
+                    v-if="item.kind === 'messaging'"
+                    @select="$emit('quick-action', $event)"
+                  />
+                  <Button
+                    v-else
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    class="shrink-0 rounded-md"
+                    :aria-label="item.label"
+                    @click="$emit('quick-action', item.key)"
+                  >
+                    <component :is="item.icon" class="size-4 text-muted-foreground" />
+                  </Button>
+                </template>
               </div>
             </div>
             <RequestInsightBanner
@@ -125,6 +130,48 @@
           </div>
         </div>
       </div>
+
+      <div
+        class="mt-1 flex w-full min-w-0 flex-wrap items-center gap-1 pl-12"
+      >
+        <TagPillWithPopover
+          v-for="(tag, tagIdx) in headerRequestTags"
+          :key="`${tag.name}-${tagIdx}`"
+          :tag="tag"
+          @edit="emit('edit-request-tag', $event)"
+          @delete="emit('delete-request-tag', $event)"
+        >
+          <template #trigger>
+            <button
+              v-if="tag.color"
+              type="button"
+              class="inline-flex max-w-full min-w-0 cursor-pointer items-center truncate rounded-md border-0 px-2 py-0.5 text-sm font-medium leading-none"
+              :class="isLightTagColor(tag.color) ? 'text-foreground' : 'text-white'"
+              :style="{ backgroundColor: tag.color }"
+            >
+              {{ tag.name }}
+            </button>
+            <button
+              v-else
+              type="button"
+              class="inline-flex cursor-pointer items-center rounded-md border-0 px-2 py-0.5 text-sm font-medium leading-none"
+              :class="headerTagBadgeClass(tag.name)"
+            >
+              {{ tag.name }}
+            </button>
+          </template>
+        </TagPillWithPopover>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          class="size-6 shrink-0 rounded-md text-muted-foreground"
+          :aria-label="t('requestDetail.contactCard.addTag')"
+          @click="emit('add-request-tag')"
+        >
+          <Plus class="size-3" />
+        </Button>
+      </div>
     </template>
   </header>
 </template>
@@ -137,10 +184,9 @@ import {
   ChevronRight,
   X,
   Mail,
-  MessageCircle,
   PhoneCall,
-  Plus,
-  StickyNote
+  StickyNote,
+  Plus
 } from 'lucide-vue-next'
 import {
   Button,
@@ -150,6 +196,8 @@ import {
   DropdownMenuItem
 } from '@motork/component-library/future/primitives'
 import RequestHeaderLifecycleStepper from './RequestHeaderLifecycleStepper.vue'
+import TagPillWithPopover from '@/components/shared/TagPillWithPopover.vue'
+import MessagingQuickActionPopover from '@/components/shared/MessagingQuickActionPopover.vue'
 import RequestInsightBanner from './RequestInsightBanner.vue'
 import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
@@ -182,7 +230,16 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close', 'previous', 'next', 'update-status', 'quick-action'])
+const emit = defineEmits([
+  'close',
+  'previous',
+  'next',
+  'update-status',
+  'quick-action',
+  'add-request-tag',
+  'edit-request-tag',
+  'delete-request-tag'
+])
 
 const { t } = useI18n()
 
@@ -208,11 +265,50 @@ const ariaHidden = computed(() => {
   return !props.show
 })
 
+const headerRequestTags = computed(() => {
+  const tags = props.request?.tags
+  if (!Array.isArray(tags)) return []
+  return tags
+    .filter(Boolean)
+    .slice(0, 6)
+    .map((item) =>
+      typeof item === 'string'
+        ? { name: item, color: null }
+        : { name: item.name, color: item.color || null }
+    )
+})
+
+function isLightTagColor(hex) {
+  if (!hex || typeof hex !== 'string') return false
+  const m = hex.replace(/^#/, '').match(/^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
+  if (!m) return false
+  const r = parseInt(m[1], 16) / 255
+  const g = parseInt(m[2], 16) / 255
+  const b = parseInt(m[3], 16) / 255
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+  return luminance > 0.5
+}
+
+function headerTagBadgeClass(name) {
+  const s = String(name).toLowerCase()
+  if (s.includes('vip')) {
+    return 'bg-purple-100 text-purple-600'
+  }
+  if (s.includes('green') || s.includes('eco') || s.includes('electric')) {
+    return 'bg-green-100 text-green-600'
+  }
+  return 'bg-muted text-muted-foreground'
+}
+
 const nameParts = computed(() => getCustomerNameParts(props.request?.customer?.name))
 
 const customerCityLabel = computed(() => getCustomerCityLabel(props.request?.customer))
 
-const sourceLabel = computed(() => props.request?.source || '—')
+const headerDetailSourceLabel = computed(() => {
+  const r = props.request
+  if (!r) return '—'
+  return r.sourceCategory ?? (r.source || '—')
+})
 
 const showLeadAiSummary = computed(
   () => props.request?.type === 'lead' && Boolean(props.aiSummary?.trim())
@@ -221,9 +317,8 @@ const showLeadAiSummary = computed(
 const quickActionItems = computed(() => [
   { key: 'phone', icon: PhoneCall, label: t('requestDetail.quickActions.phone') },
   { key: 'email', icon: Mail, label: t('requestDetail.quickActions.email') },
-  { key: 'whatsapp', icon: MessageCircle, label: t('requestDetail.quickActions.whatsapp') },
-  { key: 'document', icon: StickyNote, label: t('requestDetail.quickActions.document') },
-  { key: 'more', icon: Plus, label: t('requestDetail.quickActions.more') }
+  { kind: 'messaging' },
+  { key: 'note', icon: StickyNote, label: t('requestDetail.quickActions.addNote') }
 ])
 
 const displayStage = computed(() => {

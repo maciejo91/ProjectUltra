@@ -90,3 +90,15 @@ export function createHourOffset(hours) {
   date.setHours(date.getHours() + hours)
   return date.toISOString()
 }
+
+/**
+ * @param {string} isoString
+ * @param {number} minutes
+ * @returns {string}
+ */
+export function addMinutesToIso(isoString, minutes) {
+  const date = new Date(isoString)
+  if (Number.isNaN(date.getTime())) return isoString
+  date.setMinutes(date.getMinutes() + minutes)
+  return date.toISOString()
+}

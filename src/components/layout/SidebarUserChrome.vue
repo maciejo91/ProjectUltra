@@ -6,13 +6,19 @@
         :aria-label="t('common.layout.userMenu')"
         @click.stop="toggleUserMenu"
       >
-        <div
-          class="rounded-full flex size-4 shrink-0 items-center justify-center text-xs font-medium leading-none bg-orange-50 text-orange-600"
-        >
-          {{ userInitials }}
-        </div>
-        <span class="truncate text-sm group-data-[collapsible=icon]:hidden">
-          {{ userStore.currentUser?.name }}
+        <span class="flex min-w-0 w-full items-center gap-2">
+          <div
+            class="rounded-full flex size-4 shrink-0 items-center justify-center text-xs font-medium leading-none bg-orange-50 text-orange-600"
+          >
+            {{ userInitials }}
+          </div>
+          <span class="min-w-0 truncate text-sm group-data-[collapsible=icon]:hidden">
+            {{ userStore.currentUser?.name }}
+          </span>
+          <ChevronRight
+            class="ml-auto size-4 shrink-0 text-muted-foreground group-data-[collapsible=icon]:hidden"
+            aria-hidden="true"
+          />
         </span>
       </SidebarMenuButton>
 
@@ -142,7 +148,14 @@
 import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { UserRound, Languages, ChevronDown, ChevronUp, LogOut } from 'lucide-vue-next'
+import {
+  UserRound,
+  Languages,
+  ChevronDown,
+  ChevronUp,
+  ChevronRight,
+  LogOut
+} from 'lucide-vue-next'
 import { useLayoutStore } from '@/stores/layout'
 import { useUserStore } from '@/stores/user'
 import { useSettingsStore } from '@/stores/settings'

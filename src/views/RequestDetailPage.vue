@@ -106,7 +106,9 @@ const request = computed(() => {
   const type = requestType.value
   const id = requestId.value
   if (type === 'lead') {
-    const lead = leadsStore.leads.find(l => l.id === id)
+    const lead =
+      leadsStore.leads.find(l => l.id === id) ||
+      (leadsStore.currentLead?.id === id ? leadsStore.currentLead : null)
     if (lead) {
       return {
         ...lead,
@@ -141,7 +143,16 @@ const filteredRequests = computed(() => {
   const fromState = requestRowsFromState.value
   const primary = fromStore?.length ? fromStore : (fromState?.length ? fromState : filteredList.value)
   const currentId = compositeId.value
-  if (primary?.length && currentId && !primary.some((r) => String(r.compositeId) === String(currentId))) {
+  if (!currentId) {
+    return primary?.length ? primary : combinedList.value
+  }
+  const [routeType, routeIdStr] = String(currentId).split('-')
+  const rowMatchesCurrent = (r) => {
+    if (String(r.compositeId) === String(currentId)) return true
+    if (routeType && r.type === routeType && String(r.id) === String(routeIdStr)) return true
+    return false
+  }
+  if (!primary?.length || !primary.some(rowMatchesCurrent)) {
     return combinedList.value
   }
   return primary
@@ -152,7 +163,9 @@ const loading = computed(() => {
   const id = requestId.value
   if (!id) return false
   if (type === 'lead') {
-    const lead = leadsStore.leads.find(l => l.id === id)
+    const lead =
+      leadsStore.leads.find(l => l.id === id) ||
+      (leadsStore.currentLead?.id === id ? leadsStore.currentLead : null)
     return !lead
   }
   const opp = opportunitiesStore.opportunities.find(o => o.id === id)

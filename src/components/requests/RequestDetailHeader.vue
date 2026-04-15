@@ -90,13 +90,14 @@
             :class="isFullPage ? 'pl-8' : ''"
           >
             <span
+              v-if="importedLabel"
               class="inline-flex items-center gap-1 shrink-0 tabular-nums"
-              :aria-label="`${t('requestDetail.created')}: ${createdLabel}`"
+              :aria-label="`${t('requestDetail.importedAt')}: ${importedLabel}`"
             >
               <Upload class="size-4 shrink-0 text-muted-foreground" aria-hidden />
-              <span class="text-foreground">{{ createdLabel }}</span>
+              <span class="text-foreground">{{ importedLabel }}</span>
             </span>
-            <span class="text-muted-foreground shrink-0" aria-hidden>·</span>
+            <span v-if="importedLabel" class="text-muted-foreground shrink-0" aria-hidden>·</span>
             <span
               class="inline-flex items-center gap-1 shrink-0 tabular-nums"
               :aria-label="`${t('requestDetail.lastUpdated')}: ${updatedLabel}`"
@@ -109,7 +110,7 @@
               <span class="text-muted-foreground shrink-0">{{
                 t('requestDetail.headerDetailLabelSource')
               }}</span>
-              <span class="text-foreground min-w-0">{{ sourceLabel }}</span>
+              <span class="text-foreground min-w-0">{{ headerDetailSourceLabel }}</span>
             </span>
             <span class="text-muted-foreground shrink-0" aria-hidden>·</span>
             <span class="inline-flex items-baseline gap-1 min-w-0">
@@ -149,13 +150,33 @@
               >
                 {{ priorityBadge.label }}
               </span>
-              <span
-                v-for="tag in displayTags"
-                :key="tag"
-                class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-sm font-medium leading-none text-muted-foreground"
+              <TagPillWithPopover
+                v-for="(tag, tagIdx) in headerRequestTags"
+                :key="`${tag.name}-${tagIdx}`"
+                :tag="tag"
+                @edit="$emit('edit-request-tag', $event)"
+                @delete="$emit('delete-request-tag', $event)"
               >
-                {{ tag }}
-              </span>
+                <template #trigger>
+                  <button
+                    v-if="tag.color"
+                    type="button"
+                    class="inline-flex max-w-full min-w-0 cursor-pointer items-center truncate rounded-md border-0 px-2 py-0.5 text-sm font-medium leading-none"
+                    :class="isLightTagColor(tag.color) ? 'text-foreground' : 'text-white'"
+                    :style="{ backgroundColor: tag.color }"
+                  >
+                    {{ tag.name }}
+                  </button>
+                  <button
+                    v-else
+                    type="button"
+                    class="inline-flex cursor-pointer items-center rounded-md border-0 px-2 py-0.5 text-sm font-medium leading-none"
+                    :class="headerTagBadgeClass(tag.name)"
+                  >
+                    {{ tag.name }}
+                  </button>
+                </template>
+              </TagPillWithPopover>
               <span
                 v-for="seg in extraSegments"
                 :key="seg"
@@ -169,8 +190,8 @@
               variant="ghost"
               size="icon"
               class="size-6 rounded-md text-muted-foreground"
-              :aria-label="t('requestDetail.addSegment')"
-              @click="$emit('add-segment')"
+              :aria-label="t('requestDetail.contactCard.addTag')"
+              @click="$emit('add-request-tag')"
             >
               <Plus class="size-3" />
             </Button>
@@ -285,6 +306,7 @@ import {
   AvatarFallback
 } from '@motork/component-library/future/primitives'
 import RequestHeaderLifecycleStepper from './RequestHeaderLifecycleStepper.vue'
+import TagPillWithPopover from '@/components/shared/TagPillWithPopover.vue'
 import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 
@@ -310,7 +332,9 @@ const emit = defineEmits([
   'update-status',
   'postpone-expected-close',
   'reassigned',
-  'add-segment'
+  'add-request-tag',
+  'edit-request-tag',
+  'delete-request-tag'
 ])
 
 const { t, locale } = useI18n()
@@ -480,6 +504,11 @@ const hasNext = computed(
 )
 
 const sourceLabel = computed(() => props.request?.source || '—')
+const headerDetailSourceLabel = computed(() => {
+  const r = props.request
+  if (!r) return '—'
+  return r.sourceCategory ?? (r.source || '—')
+})
 const requestTypeLabel = computed(
   () => props.request?.requestType || props.request?.genericSales || '—'
 )
@@ -516,7 +545,13 @@ const titleText = computed(() => {
 })
 
 const createdLabel = computed(() => {
-  const d = props.request?.createdAt || props.request?.importedAt
+  const d = props.request?.createdAt ?? props.request?.importedAt
+  return formatHeaderDateTime(d)
+})
+
+const importedLabel = computed(() => {
+  const d = props.request?.importedAt
+  if (!d) return ''
   return formatHeaderDateTime(d)
 })
 
@@ -538,11 +573,40 @@ const priorityBadge = computed(() => {
   return { label: p, class: 'bg-muted text-muted-foreground' }
 })
 
-const displayTags = computed(() => {
+const headerRequestTags = computed(() => {
   const tags = props.request?.tags
   if (!Array.isArray(tags)) return []
-  return tags.filter(Boolean).slice(0, 6)
+  return tags
+    .filter(Boolean)
+    .slice(0, 6)
+    .map((item) =>
+      typeof item === 'string'
+        ? { name: item, color: null }
+        : { name: item.name, color: item.color || null }
+    )
 })
+
+function isLightTagColor(hex) {
+  if (!hex || typeof hex !== 'string') return false
+  const m = hex.replace(/^#/, '').match(/^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
+  if (!m) return false
+  const r = parseInt(m[1], 16) / 255
+  const g = parseInt(m[2], 16) / 255
+  const b = parseInt(m[3], 16) / 255
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+  return luminance > 0.5
+}
+
+function headerTagBadgeClass(name) {
+  const s = String(name).toLowerCase()
+  if (s.includes('vip')) {
+    return 'bg-purple-100 text-purple-600'
+  }
+  if (s.includes('green') || s.includes('eco') || s.includes('electric')) {
+    return 'bg-green-100 text-green-600'
+  }
+  return 'bg-muted text-muted-foreground'
+}
 
 const extraSegments = computed(() => {
   const r = props.request
@@ -552,7 +616,11 @@ const extraSegments = computed(() => {
   const st = (r.carStatus || '').toLowerCase()
   if (
     st.includes('oem') ||
-    (Array.isArray(r.tags) && r.tags.some((x) => String(x).toUpperCase() === 'OEM'))
+    (Array.isArray(r.tags) &&
+      r.tags.some((x) => {
+        const label = typeof x === 'string' ? x : x?.name
+        return String(label).toUpperCase() === 'OEM'
+      }))
   ) {
     out.push('OEM')
   }

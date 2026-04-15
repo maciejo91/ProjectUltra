@@ -1,0 +1,12 @@
+{
+  "attach": {
+    "label": "Pièce jointe",
+    "hint": "25 Mo maximum au total par envoi.",
+    "browseOrDrop": "Parcourir ou déposer des fichiers",
+    "availableTitle": "Pièces jointes disponibles",
+    "availableEmpty": "Aucune pièce jointe de négociation pour le moment.",
+    "fileFallback": "Fichier",
+    "removeAria": "Retirer la pièce jointe",
+    "errorMaxSize": "La taille totale des pièces jointes ne doit pas dépasser 25 Mo."
+  }
+}

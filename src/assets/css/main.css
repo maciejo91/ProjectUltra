@@ -974,6 +974,43 @@ button[aria-pressed="true"]:hover:not(:disabled) {
   color: var(--foreground);
 }
 
+/* Channel triggers: data-mk-channel-active survives Motork Toggle cn()/tailwind-merge (custom classes can be stripped there) */
+.followup-channel-toggle-group [data-mk-channel-active] {
+  border: 1.5px solid var(--primary) !important;
+  background-color: var(--muted) !important;
+  color: var(--primary) !important;
+  box-shadow: none !important;
+}
+
+@supports (background-color: color-mix(in srgb, red, red)) {
+  .followup-channel-toggle-group [data-mk-channel-active] {
+    background-color: color-mix(in srgb, var(--primary) 8%, var(--background)) !important;
+  }
+}
+
+.followup-channel-toggle-group [data-mk-channel-active] svg {
+  color: var(--primary) !important;
+  stroke: var(--primary) !important;
+}
+
+.followup-channel-toggle-group [data-mk-channel-active]:hover:not(:disabled) {
+  border: 1.5px solid var(--primary) !important;
+  background-color: var(--muted) !important;
+  color: var(--primary) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08) !important;
+}
+
+@supports (background-color: color-mix(in srgb, red, red)) {
+  .followup-channel-toggle-group [data-mk-channel-active]:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--primary) 12%, var(--background)) !important;
+  }
+}
+
+.followup-channel-toggle-group [data-mk-channel-active]:hover:not(:disabled) svg {
+  color: var(--primary) !important;
+  stroke: var(--primary) !important;
+}
+
 .schedule-slot-toggle-item {
   display: inline-flex;
   align-items: center;

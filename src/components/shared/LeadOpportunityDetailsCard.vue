@@ -53,7 +53,9 @@ const genericSales = computed(() => {
   return r?.requestType ?? r?.genericSales ?? null
 })
 
-const source = computed(() => props.request?.source ?? null)
+const source = computed(
+  () => props.request?.sourceCategory ?? props.request?.source ?? null
+)
 
 const channel = computed(() => props.request?.channel ?? null)
 

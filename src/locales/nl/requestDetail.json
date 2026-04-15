@@ -24,6 +24,7 @@
   "headerLifecycleMenuAria": "Fase van de aanvraag wijzigen",
   "statusInProgress": "Bezig",
   "created": "Aangemaakt",
+  "importedAt": "Geïmporteerd op",
   "lastUpdated": "Laatst bijgewerkt",
   "moreMenu": "Meer acties",
   "addSegment": "Segment toevoegen",
@@ -71,18 +72,21 @@
     "openFullTaskView": "Volledige taakweergave openen",
     "taskOptionsAria": "Taakopties",
     "timerAria": "Afteltimer",
-    "timerTitleRunning": "Klik om te pauzeren",
-    "timerTitlePaused": "Klik om te hervatten",
+    "timerTooltip": "Resterende tijd om deze lead te kwalificeren",
     "inProgress": "In progress",
     "nextStepQuestion": "Wat nu?",
     "backToCallOutcome": "Terug naar uitkomst oproep",
-    "backToWhatsNext": "Terug naar wat nu"
+    "backToWhatsNext": "Terug naar wat nu",
+    "makeFirstCallAttempt": "Make the first call attempt",
+    "callAttemptsIndicatorAria": "Belpogingen: {current} van {max}"
   },
   "quickActions": {
     "phone": "Telefoon",
     "email": "E-mail",
-    "whatsapp": "WhatsApp",
-    "document": "Document",
+    "messagingMenuAria": "SMS of WhatsApp versturen",
+    "sendSms": "SMS versturen",
+    "sendWhatsApp": "WhatsApp versturen",
+    "addNote": "Notitie toevoegen",
     "more": "Meer"
   },
   "contactCard": {
@@ -111,6 +115,19 @@
       "phone": "+31…",
       "address": "Adres"
     }
+  },
+  "addTagModal": {
+    "title": "Tag toevoegen",
+    "editTitle": "Tag bewerken",
+    "tagName": "Tagnaam",
+    "colour": "Kleur",
+    "tagNamePlaceholder": "Tagnaam",
+    "cancel": "Annuleren",
+    "save": "Opslaan"
+  },
+  "tagPopover": {
+    "edit": "Bewerken",
+    "delete": "Verwijderen"
   },
   "vehicleCard": {
     "title": "Gevraagde voertuig",
@@ -255,10 +272,14 @@
       "title": "Geen gegevens opgeslagen",
       "description": "Notities en bijlagen voor deze aanvraag verschijnen hier.",
       "action": "Bijlage toevoegen",
+      "dropZoneHeadline": "Sleep bestanden hierheen",
+      "dropZoneActive": "Laat los om toe te voegen",
+      "dropHint": "Of klik op de knop om bestanden op uw apparaat te kiezen.",
       "hasItems": "{count} bijlage(n) bij deze aanvraag."
     }
   },
   "floatingLq": {
+    "taskPostponedHeader": "Taak uitgesteld",
     "callNow": "Nu bellen",
     "callingNameFallback": "Klant",
     "callingWithVehicle": "Gesprek met {name} - {vehicle}",
@@ -298,5 +319,41 @@
     "overdue": "Te laat",
     "soon": "Nu",
     "minutesLeft": "{count} min over"
+  },
+  "qualifySuccess": {
+    "title": "Taak afgerond",
+    "subtitle": "Lead gekwalificeerd",
+    "recapVehicle": "Er is een opportunity aangemaakt voor {vehicle}.",
+    "recapAppointment": "Eerste afspraak: {date} om {time}.",
+    "recapMeetingType": "Type afspraak: {type}",
+    "recapMeetingWith": "Met: {name}",
+    "viewOpportunity": "Opportunity bekijken",
+    "convertingAria": "Bezig met omzetten naar opportunity"
+  },
+  "lqOutcome": {
+    "titleTaskComplete": "Taak afgerond",
+    "titleTaskPostponed": "Taak uitgesteld",
+    "lineClosedNotInterested": "Deze lead is gesloten — geen interesse.",
+    "lineClosedNotValid": "Deze lead is gesloten — niet geldig.",
+    "lineClosedNoAnswer": "Deze lead is gesloten na geen antwoord.",
+    "linePostponedNextAttempt": "Taak uitgesteld tot {when}.",
+    "linePostponedFollowUp": "Kanaal voor vervolgbericht: {channel}.",
+    "lineInterestedPostponed": "Kwalificatie is uitgesteld. Volgende stap: klant opnieuw contacteren op {when}.",
+    "nextCallTomorrow9": "Morgen om 9:00",
+    "nextCallMonday": "Volgende maandag om 9:00",
+    "nextCallAiSuggestion": "{date} om {time}",
+    "nextCallCustom": "{date} om {time}",
+    "nextCallSelected": "De gekozen tijd",
+    "channelWhatsapp": "WhatsApp",
+    "channelSms": "SMS",
+    "channelEmail": "E-mail",
+    "channelDontSend": "Niet verzenden",
+    "reasonLabel": "Reden: {reason}",
+    "reopen": "Heropenen",
+    "updatedBy": "Bijgewerkt door {name}",
+    "successDate": "Datum:",
+    "successTime": "Tijd:",
+    "successType": "Type:",
+    "successAssignedTo": "Toegewezen aan:"
   }
 }

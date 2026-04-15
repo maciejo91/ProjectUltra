@@ -13,7 +13,6 @@
         @previous="handlePrevious"
         @next="handleNext"
         @close="$emit('close')"
-        @tag-updated="handleTagUpdated"
         @postpone-expected-close="handlePostponeExpectedClose"
         @reassigned="handleReassigned"
       />
@@ -34,11 +33,12 @@
               <TaskManagementCard
                 v-if="managementWidget && storeAdapter"
                 ref="managementCardRef"
+                v-bind="$attrs"
                 :task="displayTask"
                 :type="displayTask.type"
                 :management-widget="managementWidget"
                 :activities="allActivities"
-                v-bind="$attrs"
+                :qualify-inline-success="qualifyInlineSuccessEffective"
                 @postpone-expected-close="handlePostponeExpectedClose"
                 @reassigned="handleReassigned"
               />
@@ -167,6 +167,9 @@
                   :task-type="displayTask.type"
                   :customer-id="displayTask.customerId || displayTask.customer?.id"
                   @action="handleContactAction"
+                  @add-tag="openAddCustomerTagModal"
+                  @edit-customer-tag="onEditCustomerTag"
+                  @delete-customer-tag="onDeleteCustomerTag"
                 />
                 <TradeInsCard
                   :items="displayTask?.tradeIns ?? []"
@@ -293,12 +296,21 @@
       @create="handleAppointmentSave"
       @cancel="showAppointmentModal = false"
     />
+
+    <AddTagModal
+      :show="showAddCustomerTagModal"
+      :existing-tags="contactAddTagExistingNames"
+      :edit-tag="contactTagModalEditTag"
+      @close="closeCustomerTagModal"
+      @add="handleAddCustomerTag"
+      @update="handleUpdateCustomerTag"
+    />
   </div>
 </template>
 
 <script setup>
 import { ListTodo, Phone, ExternalLink } from 'lucide-vue-next'
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-library/future/primitives'
@@ -306,6 +318,7 @@ import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
 import { useToastStore } from '@/stores/toast'
+import { useCustomersStore } from '@/stores/customers'
 import { useSettingsStore } from '@/stores/settings'
 import { getDisplayStage } from '@/utils/stageMapper'
 import TaskDetailHeader from './TaskDetailHeader.vue'
@@ -330,7 +343,12 @@ import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
 import OfferModal from '@/components/modals/OfferModal.vue'
 import CreateEventModal from '@/components/modals/CreateEventModal.vue'
+import AddTagModal from '@/components/modals/AddTagModal.vue'
 import { getRequestAttributionProps } from '@/utils/requestAttribution'
+import {
+  qualifySuccessMatchesOpportunityComposite,
+  resolveStoredQualifyInlineSuccess
+} from '@/utils/lqOutcomeSummaryFormat'
 
 const props = defineProps({
   task: {
@@ -365,6 +383,7 @@ const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const userStore = useUserStore()
 const toastStore = useToastStore()
+const customersStore = useCustomersStore()
 const settingsStore = useSettingsStore()
 const router = useRouter()
 const { t } = useI18n()
@@ -373,18 +392,26 @@ const { t } = useI18n()
 const displayTask = computed(() => {
   const t = props.task
   if (!t) return null
-  if (t.type === 'lead' && leadsStore.currentLead?.id === t.id) {
-    const lead = leadsStore.currentLead
+  if (t.type === 'lead') {
+    const fromList = leadsStore.leads.find((l) => l.id === t.id)
+    const lead =
+      leadsStore.currentLead?.id === t.id ? leadsStore.currentLead : fromList || t
     return {
+      ...t,
       ...lead,
       type: 'lead',
       compositeId: `lead-${lead.id}`,
       displayStage: getDisplayStage(lead, 'lead')
     }
   }
-  if (t.type === 'opportunity' && opportunitiesStore.currentOpportunity?.id === t.id) {
-    const opp = opportunitiesStore.currentOpportunity
+  if (t.type === 'opportunity') {
+    const fromList = opportunitiesStore.opportunities.find((o) => o.id === t.id)
+    const opp =
+      opportunitiesStore.currentOpportunity?.id === t.id
+        ? opportunitiesStore.currentOpportunity
+        : fromList || t
     return {
+      ...t,
       ...opp,
       type: 'opportunity',
       compositeId: `opportunity-${opp.id}`,
@@ -394,7 +421,30 @@ const displayTask = computed(() => {
   return t
 })
 
+const qualifyInlineSuccessEffective = computed(() =>
+  resolveStoredQualifyInlineSuccess(displayTask.value, leadsStore.lastInlineLeadQualifySuccess)
+)
+
+watch(
+  () => displayTask.value?.compositeId,
+  (next, prev) => {
+    if (prev != null && next != null && prev !== next) {
+      const stored = leadsStore.lastInlineLeadQualifySuccess
+      const successOppId = stored?.opportunityId ?? stored?.opportunity?.id
+      if (qualifySuccessMatchesOpportunityComposite(successOppId, next)) {
+        return
+      }
+      leadsStore.clearLastInlineLeadQualifySuccess()
+    }
+  }
+)
+
 const taskAttribution = computed(() => getRequestAttributionProps(displayTask.value))
+
+const contactAddTagExistingNames = computed(() => {
+  const tags = displayTask.value?.customer?.tags || []
+  return tags.map((x) => (typeof x === 'string' ? x : x.name))
+})
 
 const showRequestMessageCard = computed(() => {
   const r = displayTask.value
@@ -441,6 +491,8 @@ const editingTradeIn = ref(null)
 const editingFinancingOption = ref(null)
 const showOfferModal = ref(false)
 const showAppointmentModal = ref(false)
+const showAddCustomerTagModal = ref(false)
+const contactTagModalEditTag = ref(null)
 const managementCardRef = ref(null)
 
 // Handle postpone expected close (opportunity) or due date (lead) from header's TaskAssigneeDateBar
@@ -458,7 +510,19 @@ function handlePostponeExpectedClose() {
 // Activities
 const allActivities = computed(() => {
   if (!props.storeAdapter) return []
-  return props.storeAdapter.currentActivities?.value || []
+  const task = displayTask.value
+  if (!task) return []
+  const storeActs = props.storeAdapter.currentActivities?.value || []
+  if (task.type === 'lead' && leadsStore.currentLead?.id === task.id) {
+    return storeActs
+  }
+  if (task.type === 'opportunity' && opportunitiesStore.currentOpportunity?.id === task.id) {
+    return storeActs
+  }
+  if (Array.isArray(task.activities) && task.activities.length) {
+    return task.activities
+  }
+  return []
 })
 
 // Badge counts
@@ -546,8 +610,8 @@ const handleMoreActions = () => {
   // TODO: more actions menu
 }
 
-const handleContactAction = () => {
-  // TODO: contact action
+const handleContactAction = (activityType) => {
+  handleAddActivity(activityType)
 }
 
 function openTradeInEdit(t) {
@@ -836,6 +900,103 @@ const handleAppointmentSave = async (data) => {
     showAppointmentModal.value = false
   } catch (error) {
     console.error('Error saving appointment:', error)
+  }
+}
+
+function normalizeContactTagListForModal(tags) {
+  return (tags || []).map((item) =>
+    typeof item === 'string' ? { name: item, color: null } : { name: item.name, color: item.color || null }
+  )
+}
+
+function openAddCustomerTagModal() {
+  contactTagModalEditTag.value = null
+  showAddCustomerTagModal.value = true
+}
+
+function closeCustomerTagModal() {
+  showAddCustomerTagModal.value = false
+  contactTagModalEditTag.value = null
+}
+
+function onEditCustomerTag(tag) {
+  contactTagModalEditTag.value = { name: tag.name, color: tag.color }
+  showAddCustomerTagModal.value = true
+}
+
+async function onDeleteCustomerTag(tag) {
+  const task = displayTask.value
+  if (!task) return
+  const customerId = task.customer?.id ?? task.customerId
+  if (customerId == null || customerId === '') return
+  const current = normalizeContactTagListForModal(task.customer?.tags || [])
+  const updatedTags = current.filter((item) => item.name !== tag.name)
+  try {
+    await customersStore.updateCustomer(customerId, { tags: updatedTags }, 'contact')
+    if (task.type === 'lead' && props.storeAdapter?.loadLeadById) {
+      await props.storeAdapter.loadLeadById(task.id)
+    } else if (task.type === 'opportunity' && props.storeAdapter?.loadOpportunityById) {
+      await props.storeAdapter.loadOpportunityById(task.id)
+    }
+  } catch {
+    toastStore.pushToast('error', t('requestDetail.contactCard.saveFailed'))
+  }
+}
+
+const handleAddCustomerTag = async (payload) => {
+  const task = displayTask.value
+  if (!task) return
+  const customerId = task.customer?.id ?? task.customerId
+  if (customerId == null || customerId === '') return
+  const name = typeof payload === 'string' ? payload : payload.name
+  const color = typeof payload === 'object' && payload?.color ? payload.color : null
+  const current = normalizeContactTagListForModal(task.customer?.tags || [])
+  if (current.some((item) => item.name === name)) {
+    closeCustomerTagModal()
+    return
+  }
+  const updatedTags = [...current, { name, color: color || null }]
+  try {
+    await customersStore.updateCustomer(customerId, { tags: updatedTags }, 'contact')
+    if (task.type === 'lead' && props.storeAdapter?.loadLeadById) {
+      await props.storeAdapter.loadLeadById(task.id)
+    } else if (task.type === 'opportunity' && props.storeAdapter?.loadOpportunityById) {
+      await props.storeAdapter.loadOpportunityById(task.id)
+    }
+    closeCustomerTagModal()
+  } catch {
+    toastStore.pushToast('error', t('requestDetail.contactCard.saveFailed'))
+  }
+}
+
+const handleUpdateCustomerTag = async (payload) => {
+  const { previousName, name, color } = payload
+  const task = displayTask.value
+  if (!task) return
+  const customerId = task.customer?.id ?? task.customerId
+  if (customerId == null || customerId === '') return
+  const current = normalizeContactTagListForModal(task.customer?.tags || [])
+  const idx = current.findIndex((item) => item.name === previousName)
+  if (idx === -1) {
+    closeCustomerTagModal()
+    return
+  }
+  if (name !== previousName && current.some((item) => item.name === name)) {
+    return
+  }
+  const updatedTags = current.map((item) =>
+    item.name === previousName ? { name, color: color || null } : item
+  )
+  try {
+    await customersStore.updateCustomer(customerId, { tags: updatedTags }, 'contact')
+    if (task.type === 'lead' && props.storeAdapter?.loadLeadById) {
+      await props.storeAdapter.loadLeadById(task.id)
+    } else if (task.type === 'opportunity' && props.storeAdapter?.loadOpportunityById) {
+      await props.storeAdapter.loadOpportunityById(task.id)
+    }
+    closeCustomerTagModal()
+  } catch {
+    toastStore.pushToast('error', t('requestDetail.contactCard.saveFailed'))
   }
 }
 

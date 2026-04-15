@@ -1,0 +1,12 @@
+{
+  "attach": {
+    "label": "Datei anhängen",
+    "hint": "Max. 25 MB gesamt pro Versand.",
+    "browseOrDrop": "Durchsuchen oder Dateien ablegen",
+    "availableTitle": "Verfügbare Anhänge",
+    "availableEmpty": "Noch keine Anhänge aus der Verhandlung.",
+    "fileFallback": "Datei",
+    "removeAria": "Anhang entfernen",
+    "errorMaxSize": "Die Gesamtgröße der Anhänge darf 25 MB nicht überschreiten."
+  }
+}

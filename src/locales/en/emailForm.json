@@ -1,0 +1,12 @@
+{
+  "attach": {
+    "label": "Attach File",
+    "hint": "Max 25 MB total per send.",
+    "browseOrDrop": "Browse or drop files",
+    "availableTitle": "Available attachments",
+    "availableEmpty": "No negotiation attachments yet.",
+    "fileFallback": "File",
+    "removeAria": "Remove attachment",
+    "errorMaxSize": "Total attachment size must not exceed 25 MB."
+  }
+}

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col gap-3 overflow-hidden rounded-lg bg-background p-4"
+    class="flex flex-col gap-3 overflow-hidden rounded-lg border border-border bg-background p-4 shadow-mk-dashboard-card"
   >
     <h3 class="min-w-0 text-base font-medium leading-6 text-foreground">
       {{ title }}

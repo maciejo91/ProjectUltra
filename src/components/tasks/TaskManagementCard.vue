@@ -7,11 +7,13 @@
       :lead="type === 'lead' ? task : undefined"
       :opportunity="type === 'opportunity' ? task : undefined"
       :activities="activities"
+      :qualify-inline-success="qualifyInlineSuccess"
       v-bind="filteredAttrs"
       @postpone-expected-close="$emit('postpone-expected-close')"
       @reassigned="$emit('reassigned', $event)"
       @open-purchase-method="$emit('open-purchase-method')"
       @open-trade-in="$emit('open-trade-in')"
+      @qualified-inline-success="$emit('qualified-inline-success', $event)"
     />
   </div>
 </template>
@@ -38,6 +40,10 @@ const props = defineProps({
   activities: {
     type: Array,
     default: () => []
+  },
+  qualifyInlineSuccess: {
+    type: Object,
+    default: null
   }
 })
 
@@ -46,6 +52,8 @@ const attrs = useAttrs()
 // Filter out 'lead' attribute when type is 'opportunity' to avoid warnings
 const filteredAttrs = computed(() => {
   const filtered = { ...attrs }
+  delete filtered.qualifyInlineSuccess
+  delete filtered['qualify-inline-success']
   if (props.type === 'opportunity' && 'lead' in filtered) {
     delete filtered.lead
   }

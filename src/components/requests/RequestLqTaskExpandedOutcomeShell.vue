@@ -8,13 +8,15 @@
   >
     <div
       :class="[
-        'relative flex flex-col rounded-lg border-2 border-transparent bg-background',
+        'relative flex flex-col rounded-lg bg-background',
+        showAnimatedBorder ? 'border-2 border-transparent' : 'border border-border',
         shellOverflowClass,
         useShellScroll ? 'min-h-0' : 'h-auto max-h-none shrink-0',
         flexFill && useShellScroll && 'flex-1'
       ]"
     >
       <svg
+        v-if="showAnimatedBorder"
         class="pointer-events-none absolute inset-0 z-10 h-full w-full"
         aria-hidden="true"
       >
@@ -87,6 +89,10 @@ const props = defineProps({
   useShellScroll: {
     type: Boolean,
     default: true
+  },
+  showAnimatedBorder: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -121,7 +127,7 @@ let orbitStart = 0
 let stopped = false
 
 function runStrokeOrbit(now) {
-  if (stopped || !props.active) return
+  if (stopped || !props.active || !props.showAnimatedBorder) return
   const el = strokeGradientRef.value
   if (!el) {
     rafId = requestAnimationFrame(runStrokeOrbit)
@@ -140,7 +146,7 @@ function runStrokeOrbit(now) {
 function startOrbit() {
   stopped = false
   nextTick(() => {
-    if (stopped || !props.active || prefersReducedMotion()) return
+    if (stopped || !props.active || !props.showAnimatedBorder || prefersReducedMotion()) return
     orbitStart = performance.now()
     rafId = requestAnimationFrame(runStrokeOrbit)
   })
@@ -153,9 +159,9 @@ function stopOrbit() {
 }
 
 watch(
-  () => props.active,
-  (v) => {
-    if (v) {
+  () => [props.active, props.showAnimatedBorder],
+  ([active, animated]) => {
+    if (active && animated) {
       startOrbit()
     } else {
       stopOrbit()
@@ -164,7 +170,7 @@ watch(
 )
 
 onMounted(() => {
-  if (props.active) startOrbit()
+  if (props.active && props.showAnimatedBorder) startOrbit()
 })
 
 onUnmounted(() => {

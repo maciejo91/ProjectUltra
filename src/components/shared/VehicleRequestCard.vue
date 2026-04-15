@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col gap-4 overflow-hidden rounded-lg bg-background p-4"
+    class="flex flex-col gap-4 overflow-hidden rounded-lg border border-border bg-background p-4 shadow-mk-dashboard-card"
   >
     <div class="flex w-full min-w-0 items-center gap-2">
       <h3 class="min-w-0 flex-1 text-base font-medium leading-6 text-foreground">

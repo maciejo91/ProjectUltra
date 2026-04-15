@@ -133,6 +133,33 @@ export class LeadRepository extends BaseRepository {
   }
 
   /**
+   * Backfill tradeIns / financingOptions from current mock when stored lead has none (demo data updates).
+   */
+  _ensureTradeInsFinancingFromMock(leads) {
+    if (!Array.isArray(leads)) return
+    const mockLeads = getMockData().mockLeads || []
+    const mockById = new Map(mockLeads.map((l) => [l.id, l]))
+    let changed = false
+    for (const lead of leads) {
+      const mock = mockById.get(lead.id)
+      if (!mock) continue
+      const noTradeIns = !lead.tradeIns || lead.tradeIns.length === 0
+      const mockTradeIns = mock.tradeIns
+      if (noTradeIns && Array.isArray(mockTradeIns) && mockTradeIns.length > 0) {
+        lead.tradeIns = JSON.parse(JSON.stringify(mockTradeIns))
+        changed = true
+      }
+      const noFinancing = !lead.financingOptions || lead.financingOptions.length === 0
+      const mockFin = mock.financingOptions
+      if (noFinancing && Array.isArray(mockFin) && mockFin.length > 0) {
+        lead.financingOptions = JSON.parse(JSON.stringify(mockFin))
+        changed = true
+      }
+    }
+    if (changed) this._persist()
+  }
+
+  /**
    * Merge mock leads that don't exist in stored data (e.g. new demo leads).
    * Ensures new mock leads appear even when user has existing localStorage.
    */
@@ -161,11 +188,13 @@ export class LeadRepository extends BaseRepository {
           this._ensureCarImages(this._leadsCache)
           this._ensureRequestedCarPlates(this._leadsCache)
           this._ensureLeadAttributionFromMock(this._leadsCache)
+          this._ensureTradeInsFinancingFromMock(this._leadsCache)
           const merged = this._mergeNewMockLeads(this._leadsCache)
           if (merged.length > this._leadsCache.length) {
             this._leadsCache = merged
             this._ensureRequestedCarPlates(this._leadsCache)
             this._ensureLeadAttributionFromMock(this._leadsCache)
+            this._ensureTradeInsFinancingFromMock(this._leadsCache)
             this._persist()
           }
         }
@@ -175,6 +204,7 @@ export class LeadRepository extends BaseRepository {
         this._leadsCache = JSON.parse(JSON.stringify(mock || []))
         this._ensureRequestedCarPlates(this._leadsCache)
         this._ensureLeadAttributionFromMock(this._leadsCache)
+        this._ensureTradeInsFinancingFromMock(this._leadsCache)
         this._persist()
         try {
           localStorage.setItem(`${STORAGE_KEY}-version`, String(DATA_VERSION))
@@ -251,6 +281,9 @@ export class LeadRepository extends BaseRepository {
       carStatus: data.carStatus || null,
       requestType: data.requestType || 'Generic Sales',
       source: data.source || 'Direct',
+      ...(data.sourceCategory != null && String(data.sourceCategory).trim() !== ''
+        ? { sourceCategory: data.sourceCategory }
+        : {}),
       fiscalEntity: data.fiscalEntity || '',
       sourceDetails: data.sourceDetails || '',
       assignee: data.assignee || null,

@@ -104,8 +104,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
   const surveyResponses = ref(null)
   const showSurvey = ref(true) // Show by default when Interested selected
 
-  // Success state (post qualify/disqualify/no-answer)
-  const successState = ref(null) // { kind: 'qualified'|'no-answer'|'not-interested', statusText, meeting? }
+  const successState = ref(null)
   const successPerformedAt = ref(null) // Date
 
   const qualificationMethod = ref('assign-and-schedule')
@@ -343,10 +342,11 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
 
   const selectOutcome = (outcome) => {
     selectedOutcome.value = outcome
-    // Reset next step; default no-answer to postpone so content shows
-    if (outcome === 'no-answer') {
-      selectedNextStep.value = 'postpone'
-    } else if (outcome === 'answer' || outcome === 'not-valid') {
+    if (!outcome) {
+      selectedNextStep.value = null
+      return
+    }
+    if (outcome === 'no-answer' || outcome === 'answer' || outcome === 'not-valid') {
       selectedNextStep.value = null
     }
 

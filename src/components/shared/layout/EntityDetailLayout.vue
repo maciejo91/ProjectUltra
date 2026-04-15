@@ -17,7 +17,7 @@
       email-label="Email"
       phone-label="Phone"
       third-field-label="Address"
-      @add-tag="showAddTagModal = true"
+      @add-tag="openAddTagForTask"
       @close="$emit('close')"
     >
       <template #name-action>
@@ -287,7 +287,9 @@
               :task-type="type"
               :customer-id="task.customer?.id || task.customerId || task.id"
               @action="handleContactInfoAction"
-              @add-tag="showAddTagModal = true"
+              @add-tag="openAddTagForCustomer"
+              @edit-customer-tag="onEditCustomerTagFromCard"
+              @delete-customer-tag="onDeleteCustomerTagFromCard"
             />
 
             <!-- Request Card -->
@@ -610,9 +612,11 @@
     <!-- Add Tag Modal -->
     <AddTagModal
       :show="showAddTagModal"
-      :existing-tags="task.tags || []"
-      @close="showAddTagModal = false"
+      :existing-tags="addTagModalExistingNames"
+      :edit-tag="addTagModalEditTag"
+      @close="closeAddTagModal"
       @add="handleAddTag"
+      @update="handleUpdateTag"
     />
 
     <!-- Call Transcript Dialog -->
@@ -726,6 +730,15 @@ const taskId = computed(() => props.task.id)
 // Check if we're on the tasks view (not the customer view)
 const isTasksView = computed(() => {
   return route.path.startsWith('/tasks') && !route.path.startsWith('/customer')
+})
+
+const addTagModalExistingNames = computed(() => {
+  if (addTagTarget.value === 'customer') {
+    const tags = props.task.customer?.tags || []
+    return tags.map((x) => (typeof x === 'string' ? x : x.name))
+  }
+  const tags = props.task.tags || []
+  return tags.map((x) => (typeof x === 'string' ? x : x.name))
 })
 
 // Grid view main tabs state
@@ -1137,6 +1150,68 @@ const showCreateAppointmentModal = ref(false)
 const showInlineAppointmentForm = ref(false)
 const showReassignModal = ref(false)
 const showAddTagModal = ref(false)
+const addTagTarget = ref('task')
+const addTagModalEditTag = ref(null)
+
+function openAddTagForTask() {
+  addTagModalEditTag.value = null
+  addTagTarget.value = 'task'
+  showAddTagModal.value = true
+}
+
+function openAddTagForCustomer() {
+  addTagModalEditTag.value = null
+  addTagTarget.value = 'customer'
+  showAddTagModal.value = true
+}
+
+function onEditCustomerTagFromCard(tag) {
+  addTagModalEditTag.value = { name: tag.name, color: tag.color }
+  addTagTarget.value = 'customer'
+  showAddTagModal.value = true
+}
+
+async function onDeleteCustomerTagFromCard(tag) {
+  if (props.type === 'contact') {
+    const customerType = route.query.type === 'account' ? 'account' : 'contact'
+    const normalized = normalizeEntityTagList(props.task.tags || [])
+    const updatedTags = normalized.filter((item) => item.name !== tag.name)
+    try {
+      await customersStore.updateCustomer(props.task.id, { tags: updatedTags }, customerType)
+      await customersStore.fetchCustomerById(props.task.id, customerType)
+      emit('tag-updated')
+    } catch (error) {
+      console.error('Error deleting tag:', error)
+    }
+    return
+  }
+  const customerId = props.task.customerId || props.task.customer?.id
+  if (!customerId) return
+  const normalized = normalizeEntityTagList(props.task.customer?.tags || [])
+  const updatedTags = normalized.filter((item) => item.name !== tag.name)
+  try {
+    await customersStore.updateCustomer(customerId, { tags: updatedTags }, 'contact')
+    if (props.type === 'lead' && props.storeAdapter.loadLeadById) {
+      await props.storeAdapter.loadLeadById(props.task.id)
+    } else if (props.type === 'opportunity' && props.storeAdapter.loadOpportunityById) {
+      await props.storeAdapter.loadOpportunityById(props.task.id)
+    }
+  } catch (error) {
+    console.error('Error deleting tag:', error)
+  }
+}
+
+function closeAddTagModal() {
+  showAddTagModal.value = false
+  addTagTarget.value = 'task'
+  addTagModalEditTag.value = null
+}
+
+function normalizeEntityTagList(tags) {
+  return (tags || []).map((item) =>
+    typeof item === 'string' ? { name: item, color: null } : { name: item.name, color: item.color || null }
+  )
+}
 const showAddRequestedCarModal = ref(false)
 const dealerships = ref([])
 
@@ -1604,45 +1679,134 @@ const handleCreateOffer = async (data) => {
   }
 }
 
-// Handle tag addition
 const handleAddTag = async (payload) => {
   const tagName = typeof payload === 'string' ? payload : payload.name
-  const currentTags = props.task.tags || []
-  
-  if (currentTags.includes(tagName)) {
-    showAddTagModal.value = false
-    return
-  }
-  
-  const updatedTags = [...currentTags, tagName]
-  
+  const color = typeof payload === 'object' && payload?.color ? payload.color : null
+  const newEntry = { name: tagName, color: color || null }
+
   try {
-    if (props.type === 'lead') {
-      await props.storeAdapter.updateLead?.(props.task.id, { tags: updatedTags })
-      // Reload the task to get updated data
-      if (props.storeAdapter.loadLeadById) {
-        await props.storeAdapter.loadLeadById(props.task.id)
+    if (props.type === 'contact') {
+      const customerType = route.query.type === 'account' ? 'account' : 'contact'
+      const normalized = normalizeEntityTagList(props.task.tags || [])
+      if (normalized.some((item) => item.name === tagName)) {
+        closeAddTagModal()
+        return
       }
-    } else if (props.type === 'opportunity') {
-      await props.storeAdapter.updateOpportunity?.(props.task.id, { tags: updatedTags })
-      // Reload the task to get updated data
-      if (props.storeAdapter.loadOpportunityById) {
+      const updatedTags = [...normalized, newEntry]
+      await customersStore.updateCustomer(props.task.id, { tags: updatedTags }, customerType)
+      await customersStore.fetchCustomerById(props.task.id, customerType)
+      emit('tag-updated')
+    } else if (addTagTarget.value === 'customer') {
+      const customerId = props.task.customerId || props.task.customer?.id
+      if (!customerId) return
+      const normalized = normalizeEntityTagList(props.task.customer?.tags || [])
+      if (normalized.some((item) => item.name === tagName)) {
+        closeAddTagModal()
+        return
+      }
+      const updatedTags = [...normalized, newEntry]
+      await customersStore.updateCustomer(customerId, { tags: updatedTags }, 'contact')
+      if (props.type === 'lead' && props.storeAdapter.loadLeadById) {
+        await props.storeAdapter.loadLeadById(props.task.id)
+      } else if (props.type === 'opportunity' && props.storeAdapter.loadOpportunityById) {
         await props.storeAdapter.loadOpportunityById(props.task.id)
       }
-    } else if (props.type === 'contact') {
-      // Handle contact/customer tag updates
-      // Determine customer type from route query or default to 'contact'
-      const customerType = route.query.type === 'account' ? 'account' : 'contact'
-      await customersStore.updateCustomer(props.task.id, { tags: updatedTags }, customerType)
-      // Reload customer data
-      await customersStore.fetchCustomerById(props.task.id, customerType)
-      // Emit event to notify parent (Customer.vue) to reload its local customerData
-      emit('tag-updated')
+    } else {
+      const normalized = normalizeEntityTagList(props.task.tags || [])
+      if (normalized.some((item) => item.name === tagName)) {
+        closeAddTagModal()
+        return
+      }
+      const updatedTags = [...normalized, newEntry]
+      if (props.type === 'lead') {
+        await props.storeAdapter.updateLead?.(props.task.id, { tags: updatedTags })
+        if (props.storeAdapter.loadLeadById) {
+          await props.storeAdapter.loadLeadById(props.task.id)
+        }
+      } else if (props.type === 'opportunity') {
+        await props.storeAdapter.updateOpportunity?.(props.task.id, { tags: updatedTags })
+        if (props.storeAdapter.loadOpportunityById) {
+          await props.storeAdapter.loadOpportunityById(props.task.id)
+        }
+      }
     }
-    
-    showAddTagModal.value = false
+    closeAddTagModal()
   } catch (error) {
     console.error('Error adding tag:', error)
+  }
+}
+
+const handleUpdateTag = async (payload) => {
+  const { previousName, name, color } = payload
+  const newEntry = { name, color: color || null }
+
+  try {
+    if (props.type === 'contact') {
+      const customerType = route.query.type === 'account' ? 'account' : 'contact'
+      const normalized = normalizeEntityTagList(props.task.tags || [])
+      const idx = normalized.findIndex((item) => item.name === previousName)
+      if (idx === -1) {
+        closeAddTagModal()
+        return
+      }
+      if (name !== previousName && normalized.some((item) => item.name === name)) {
+        return
+      }
+      const updatedTags = normalized.map((item) =>
+        item.name === previousName ? newEntry : item
+      )
+      await customersStore.updateCustomer(props.task.id, { tags: updatedTags }, customerType)
+      await customersStore.fetchCustomerById(props.task.id, customerType)
+      emit('tag-updated')
+    } else if (addTagTarget.value === 'customer') {
+      const customerId = props.task.customerId || props.task.customer?.id
+      if (!customerId) return
+      const normalized = normalizeEntityTagList(props.task.customer?.tags || [])
+      const idx = normalized.findIndex((item) => item.name === previousName)
+      if (idx === -1) {
+        closeAddTagModal()
+        return
+      }
+      if (name !== previousName && normalized.some((item) => item.name === name)) {
+        return
+      }
+      const updatedTags = normalized.map((item) =>
+        item.name === previousName ? newEntry : item
+      )
+      await customersStore.updateCustomer(customerId, { tags: updatedTags }, 'contact')
+      if (props.type === 'lead' && props.storeAdapter.loadLeadById) {
+        await props.storeAdapter.loadLeadById(props.task.id)
+      } else if (props.type === 'opportunity' && props.storeAdapter.loadOpportunityById) {
+        await props.storeAdapter.loadOpportunityById(props.task.id)
+      }
+    } else {
+      const normalized = normalizeEntityTagList(props.task.tags || [])
+      const idx = normalized.findIndex((item) => item.name === previousName)
+      if (idx === -1) {
+        closeAddTagModal()
+        return
+      }
+      if (name !== previousName && normalized.some((item) => item.name === name)) {
+        return
+      }
+      const updatedTags = normalized.map((item) =>
+        item.name === previousName ? newEntry : item
+      )
+      if (props.type === 'lead') {
+        await props.storeAdapter.updateLead?.(props.task.id, { tags: updatedTags })
+        if (props.storeAdapter.loadLeadById) {
+          await props.storeAdapter.loadLeadById(props.task.id)
+        }
+      } else if (props.type === 'opportunity') {
+        await props.storeAdapter.updateOpportunity?.(props.task.id, { tags: updatedTags })
+        if (props.storeAdapter.loadOpportunityById) {
+          await props.storeAdapter.loadOpportunityById(props.task.id)
+        }
+      }
+    }
+    closeAddTagModal()
+  } catch (error) {
+    console.error('Error updating tag:', error)
   }
 }
 

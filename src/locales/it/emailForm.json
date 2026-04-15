@@ -1,0 +1,12 @@
+{
+  "attach": {
+    "label": "Allega file",
+    "hint": "Massimo 25 MB totali per invio.",
+    "browseOrDrop": "Sfoglia o trascina i file",
+    "availableTitle": "Allegati disponibili",
+    "availableEmpty": "Nessun allegato dalla trattativa.",
+    "fileFallback": "File",
+    "removeAria": "Rimuovi allegato",
+    "errorMaxSize": "La dimensione totale degli allegati non deve superare 25 MB."
+  }
+}

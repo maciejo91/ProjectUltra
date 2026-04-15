@@ -28,9 +28,10 @@
             :manage-open="false"
             :internal-timer="false"
             :parent-countdown-label="lqTimer.countdownLabel"
-            :parent-timer-running="lqTimer.isTimerRunning"
+            hide-body-subheader
+            :contact-attempts="contactAttempts"
+            :max-contact-attempts="maxContactAttempts"
             @manage-task="openFocus"
-            @toggle-timer="lqTimer.toggleTimerRunning"
           />
         </div>
 
@@ -51,11 +52,12 @@
           :manage-open="true"
           :resume-from-collapsed="true"
           :internal-timer="false"
-          :parent-countdown-label="lqTimer.countdownLabel"
-          :parent-timer-running="lqTimer.isTimerRunning"
-          @resume-collapsed="expandFromMinimized"
-          @toggle-timer="lqTimer.toggleTimerRunning"
-          @cancel-action="handleFloatingTeaserCancel"
+            :parent-countdown-label="lqTimer.countdownLabel"
+          hide-body-subheader
+            :contact-attempts="contactAttempts"
+            :max-contact-attempts="maxContactAttempts"
+            @resume-collapsed="expandFromMinimized"
+            @cancel-action="handleFloatingTeaserCancel"
         />
 
         <div
@@ -73,12 +75,11 @@
             :assignee-initials="assigneeInitials"
             :countdown-label="lqTimer.countdownLabel"
             :timer-aria="t('requestDetail.lqfTask.timerAria')"
-            :timer-title="expandedTimerTitle"
+            :timer-title="t('requestDetail.lqfTask.timerTooltip')"
             :show-chevron="true"
             chevron-direction="down"
             :chevron-aria-label="t('requestDetail.floatingLq.minimize')"
             on-dark-surface
-            @toggle-timer="lqTimer.toggleTimerRunning"
             @chevron-click="collapseToMinimized"
           />
 
@@ -86,15 +87,20 @@
             :active="view === 'expanded'"
             :flex-fill="false"
             :use-shell-scroll="false"
+            :show-animated-border="!outcomeSummary"
           >
             <LeadManagementWidget
               :lead="request"
               :activities="activities"
               embed-outcome-only
+              :outcome-summary="outcomeSummary"
+              :qualify-inline-success="qualifyInlineSuccess"
               @postpone-expected-close="$emit('postpone-expected-close')"
               @reassigned="$emit('reassigned', $event)"
               @open-purchase-method="$emit('open-purchase-method')"
               @open-trade-in="$emit('open-trade-in')"
+              @qualified-inline-success="$emit('qualified-inline-success', $event)"
+              @lq-outcome-summary="$emit('lq-outcome-summary', $event)"
             />
           </RequestLqTaskExpandedOutcomeShell>
         </div>
@@ -109,6 +115,7 @@ import { useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLeadsStore } from '@/stores/leads'
 import { useLqTaskCountdown } from '@/composables/useLqTaskCountdown'
+import { getDisplayStage, LEAD_STAGES } from '@/utils/stageMapper'
 import RequestLeadQualificationTeaser from './RequestLeadQualificationTeaser.vue'
 import RequestLqTaskExpandedOutcomeShell from './RequestLqTaskExpandedOutcomeShell.vue'
 import RequestLqTaskHeaderRow from './RequestLqTaskHeaderRow.vue'
@@ -146,6 +153,22 @@ const props = defineProps({
   callingSessionTitle: {
     type: String,
     default: ''
+  },
+  outcomeSummary: {
+    type: Object,
+    default: null
+  },
+  qualifyInlineSuccess: {
+    type: Object,
+    default: null
+  },
+  contactAttempts: {
+    type: Number,
+    default: 0
+  },
+  maxContactAttempts: {
+    type: Number,
+    default: 5
   }
 })
 
@@ -154,7 +177,9 @@ const emit = defineEmits([
   'postpone-expected-close',
   'reassigned',
   'open-purchase-method',
-  'open-trade-in'
+  'open-trade-in',
+  'qualified-inline-success',
+  'lq-outcome-summary'
 ])
 
 const { t } = useI18n()
@@ -162,12 +187,6 @@ const leadsStore = useLeadsStore()
 const lqTimer = useLqTaskCountdown()
 
 const view = ref('peek')
-
-const expandedTimerTitle = computed(() =>
-  lqTimer.isTimerRunning.value
-    ? t('requestDetail.lqfTask.timerTitleRunning')
-    : t('requestDetail.lqfTask.timerTitlePaused')
-)
 
 const teaserSessionHeaderTitle = computed(() =>
   view.value === 'peek' ? '' : (props.callingSessionTitle || '').trim()
@@ -182,18 +201,30 @@ const expandedHeaderTitle = computed(() => {
 
 const expandedHeaderIsCallingSession = computed(() => !!(props.callingSessionTitle || '').trim())
 
+const isAwaitingScheduledCallback = computed(() => {
+  const r = props.request
+  if (!r || r.type !== 'lead') return false
+  const stage = getDisplayStage(r, 'lead')
+  return stage === LEAD_STAGES.TO_BE_CALLED_BACK || stage === LEAD_STAGES.VALID_TO_BE_CALLED_BACK
+})
+
 const expandedHeaderSubtitle = computed(() =>
   expandedHeaderIsCallingSession.value ? '' : (props.headerContactSubline || '')
 )
 
 const expandedHeaderCallCtaLabel = computed(() =>
-  expandedHeaderIsCallingSession.value || !props.callNowTelHref
+  expandedHeaderIsCallingSession.value ||
+  !props.callNowTelHref ||
+  props.outcomeSummary ||
+  isAwaitingScheduledCallback.value
     ? ''
     : t('requestDetail.floatingLq.callNow')
 )
 
 const expandedHeaderCallCtaHref = computed(() =>
-  expandedHeaderIsCallingSession.value ? '' : props.callNowTelHref
+  expandedHeaderIsCallingSession.value || props.outcomeSummary || isAwaitingScheduledCallback.value
+    ? ''
+    : props.callNowTelHref
 )
 
 const focusTitleId = useId()

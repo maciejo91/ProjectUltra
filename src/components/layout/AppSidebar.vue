@@ -218,6 +218,54 @@
       </div>
     </SidebarContent>
 
+    <SidebarGroup v-if="!isSettingsArea" class="shrink-0 px-2 pb-2">
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <Popover v-model:open="pbxPopoverOpen">
+            <PopoverTrigger as-child>
+              <SidebarMenuButton :tooltip="t('common.navigation.pbx.connected')">
+                <span class="flex min-w-0 w-full items-center gap-2">
+                  <span class="relative inline-flex shrink-0">
+                    <Phone class="size-4 shrink-0" />
+                    <span
+                      class="pointer-events-none absolute -right-0.5 -top-0.5 hidden size-2 rounded-full bg-emerald-500 ring-2 ring-sidebar group-data-[collapsible=icon]:block"
+                      aria-hidden="true"
+                    />
+                  </span>
+                  <span class="min-w-0 truncate group-data-[collapsible=icon]:hidden">
+                    <span class="inline-flex items-center gap-2">
+                      <span>{{ t('common.navigation.pbx.label') }}</span>
+                      <span class="size-2 rounded-full bg-emerald-500" aria-hidden="true" />
+                    </span>
+                  </span>
+                  <ChevronRight
+                    class="ml-auto size-4 shrink-0 text-muted-foreground group-data-[collapsible=icon]:hidden"
+                    aria-hidden="true"
+                  />
+                </span>
+              </SidebarMenuButton>
+            </PopoverTrigger>
+            <PopoverContent
+              class="z-50 w-auto min-w-36 rounded-md border border-border bg-background p-1 shadow-md"
+              align="center"
+              side="top"
+              :side-offset="8"
+            >
+              <Button
+                type="button"
+                variant="ghost"
+                class="h-9 w-full justify-start gap-2 rounded-sm px-2 text-sm font-normal text-destructive hover:text-destructive"
+                @click="onPbxDisconnect"
+              >
+                <PhoneOff class="size-3.5 shrink-0" />
+                {{ t('common.navigation.pbx.disconnect') }}
+              </Button>
+            </PopoverContent>
+          </Popover>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarGroup>
+
     <SidebarGroup class="shrink-0 border-t border-sidebar-border pt-2">
       <SidebarMenu>
         <SidebarMenuItem v-if="bottomNavVisibility.settings && !isSettingsArea">
@@ -270,8 +318,21 @@
 import { computed, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Plus, Search, LifeBuoy, Settings, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import {
+  Plus,
+  Search,
+  LifeBuoy,
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  Phone,
+  PhoneOff
+} from 'lucide-vue-next'
+import {
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Sidebar,
   SidebarContent,
   SidebarGroup,
@@ -294,6 +355,7 @@ import {
 } from '@/constants/settingsNavRoutes'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
 import SidebarUserChrome from './SidebarUserChrome.vue'
+import { useToastStore } from '@/stores/toast'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -310,6 +372,13 @@ const {
 
 const settingsPath = '/settings'
 const showSupportModal = ref(false)
+const pbxPopoverOpen = ref(false)
+const toastStore = useToastStore()
+
+function onPbxDisconnect() {
+  pbxPopoverOpen.value = false
+  toastStore.pushToast('success', t('common.navigation.pbx.disconnected'))
+}
 
 const isSettingsArea = computed(() => route.path.startsWith('/settings'))
 

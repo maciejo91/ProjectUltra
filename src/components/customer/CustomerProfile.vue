@@ -73,7 +73,9 @@
                   :task="taskForContactCard"
                   task-type="contact"
                   :customer-id="customerId"
-                  @add-tag="showAddTagModal = true"
+                  @add-tag="openCustomerTagModal"
+                  @edit-customer-tag="onEditCustomerTag"
+                  @delete-customer-tag="onDeleteCustomerTag"
                   @quick-action="handleContactQuickAction"
                   @action="handleContactQuickAction"
                 />
@@ -153,9 +155,11 @@
 
     <AddTagModal
       :show="showAddTagModal"
-      :existing-tags="customerData?.tags || []"
-      @close="showAddTagModal = false"
+      :existing-tags="customerTagExistingNames"
+      :edit-tag="customerTagModalEditTag"
+      @close="closeCustomerTagModal"
       @add="handleAddTag"
+      @update="handleUpdateCustomerTag"
     />
 
     <ComingSoonModal
@@ -268,6 +272,7 @@ const showAddModal = ref(false)
 const addModalType = ref('lead')
 const showCreateAppointmentModal = ref(false)
 const showAddTagModal = ref(false)
+const customerTagModalEditTag = ref(null)
 const showComingSoonModal = ref(false)
 const comingSoonTitle = ref('')
 
@@ -288,6 +293,34 @@ const taskForContactCard = computed(() => {
     activities: customerActivities.value || []
   }
 })
+
+const customerTagExistingNames = computed(() => {
+  const tags = customerData.value?.tags || []
+  return tags.map((x) => (typeof x === 'string' ? x : x.name))
+})
+
+function normalizeCustomerProfileTags(tags) {
+  return (tags || []).map((item) =>
+    typeof item === 'string'
+      ? { name: item, color: null }
+      : { name: item.name, color: item.color || null }
+  )
+}
+
+function openCustomerTagModal() {
+  customerTagModalEditTag.value = null
+  showAddTagModal.value = true
+}
+
+function onEditCustomerTag(tag) {
+  customerTagModalEditTag.value = { name: tag.name, color: tag.color }
+  showAddTagModal.value = true
+}
+
+function closeCustomerTagModal() {
+  showAddTagModal.value = false
+  customerTagModalEditTag.value = null
+}
 
 const hideTabCounts = computed(() => !!(props.showCloseButton || props.from))
 
@@ -470,18 +503,55 @@ const handleAppointmentCreated = async (eventData) => {
 }
 
 const handleAddTag = async (tag) => {
-  const tagName = typeof tag === 'string' ? tag : tag.name
-  const currentTags = customerData.value?.tags || []
-  if (!currentTags.includes(tagName)) {
-    const newTags = [...currentTags, tagName]
-    try {
-      await customersStore.updateCustomer(props.customerId, { tags: newTags }, props.customerType)
-      await loadCustomerData()
-    } catch (e) {
-      console.error(e)
-    }
+  const name = typeof tag === 'string' ? tag : tag.name
+  const color = typeof tag === 'object' && tag?.color ? tag.color : null
+  const current = normalizeCustomerProfileTags(customerData.value?.tags || [])
+  if (current.some((t) => t.name === name)) {
+    closeCustomerTagModal()
+    return
   }
-  showAddTagModal.value = false
+  const newTags = [...current, { name, color: color || null }]
+  try {
+    await customersStore.updateCustomer(props.customerId, { tags: newTags }, props.customerType)
+    await loadCustomerData()
+  } catch (e) {
+    console.error(e)
+  }
+  closeCustomerTagModal()
+}
+
+const handleUpdateCustomerTag = async (payload) => {
+  const { previousName, name, color } = payload
+  const current = normalizeCustomerProfileTags(customerData.value?.tags || [])
+  const idx = current.findIndex((t) => t.name === previousName)
+  if (idx === -1) {
+    closeCustomerTagModal()
+    return
+  }
+  if (name !== previousName && current.some((t) => t.name === name)) {
+    return
+  }
+  const newTags = current.map((t) =>
+    t.name === previousName ? { name, color: color || null } : t
+  )
+  try {
+    await customersStore.updateCustomer(props.customerId, { tags: newTags }, props.customerType)
+    await loadCustomerData()
+  } catch (e) {
+    console.error(e)
+  }
+  closeCustomerTagModal()
+}
+
+const onDeleteCustomerTag = async (tag) => {
+  const current = normalizeCustomerProfileTags(customerData.value?.tags || [])
+  const newTags = current.filter((t) => t.name !== tag.name)
+  try {
+    await customersStore.updateCustomer(props.customerId, { tags: newTags }, props.customerType)
+    await loadCustomerData()
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 const handleAddModalSave = async () => {

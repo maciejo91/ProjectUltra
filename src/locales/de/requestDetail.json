@@ -24,6 +24,7 @@
   "headerLifecycleMenuAria": "Phase der Anfrage ändern",
   "statusInProgress": "In Bearbeitung",
   "created": "Erstellt",
+  "importedAt": "Importiert am",
   "lastUpdated": "Zuletzt aktualisiert",
   "moreMenu": "Weitere Aktionen",
   "addSegment": "Segment hinzufügen",
@@ -71,18 +72,21 @@
     "openFullTaskView": "Vollständige Aufgabenansicht öffnen",
     "taskOptionsAria": "Aufgabenoptionen",
     "timerAria": "Countdown-Timer",
-    "timerTitleRunning": "Klicken, um den Timer zu pausieren",
-    "timerTitlePaused": "Klicken, um den Timer fortzusetzen",
+    "timerTooltip": "Verbleibende Zeit zur Lead-Qualifizierung",
     "inProgress": "In progress",
     "nextStepQuestion": "Wie geht es weiter?",
     "backToCallOutcome": "Zurück zur Anrufauswertung",
-    "backToWhatsNext": "Zurück zu „Wie geht es weiter?“"
+    "backToWhatsNext": "Zurück zu „Wie geht es weiter?“",
+    "makeFirstCallAttempt": "Make the first call attempt",
+    "callAttemptsIndicatorAria": "Anrufversuche: {current} von {max}"
   },
   "quickActions": {
     "phone": "Telefon",
     "email": "E-Mail",
-    "whatsapp": "WhatsApp",
-    "document": "Dokument",
+    "messagingMenuAria": "SMS oder WhatsApp senden",
+    "sendSms": "SMS senden",
+    "sendWhatsApp": "WhatsApp senden",
+    "addNote": "Notiz hinzufügen",
     "more": "Mehr"
   },
   "contactCard": {
@@ -111,6 +115,19 @@
       "phone": "+49…",
       "address": "Adresse"
     }
+  },
+  "addTagModal": {
+    "title": "Tag hinzufügen",
+    "editTitle": "Tag bearbeiten",
+    "tagName": "Tag-Name",
+    "colour": "Farbe",
+    "tagNamePlaceholder": "Tag-Name",
+    "cancel": "Abbrechen",
+    "save": "Speichern"
+  },
+  "tagPopover": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen"
   },
   "vehicleCard": {
     "title": "Angefragtes Fahrzeug",
@@ -255,10 +272,14 @@
       "title": "Keine Daten gespeichert",
       "description": "Notizen und Anhänge zu dieser Anfrage erscheinen hier.",
       "action": "Anhang hinzufügen",
+      "dropZoneHeadline": "Dateien hier ablegen",
+      "dropZoneActive": "Loslassen zum Anhängen",
+      "dropHint": "Oder klicken Sie auf die Schaltfläche, um Dateien auszuwählen.",
       "hasItems": "{count} Anhänge zu dieser Anfrage."
     }
   },
   "floatingLq": {
+    "taskPostponedHeader": "Aufgabe verschoben",
     "callNow": "Jetzt anrufen",
     "callingNameFallback": "Kunde",
     "callingWithVehicle": "Anruf mit {name} – {vehicle}",
@@ -298,5 +319,41 @@
     "overdue": "Überfällig",
     "soon": "Jetzt fällig",
     "minutesLeft": "{count} Min. übrig"
+  },
+  "qualifySuccess": {
+    "title": "Aufgabe erledigt",
+    "subtitle": "Lead qualifiziert",
+    "recapVehicle": "Es wurde eine Opportunity für {vehicle} erstellt.",
+    "recapAppointment": "Erster Termin: {date} um {time}.",
+    "recapMeetingType": "Terminart: {type}",
+    "recapMeetingWith": "Mit: {name}",
+    "viewOpportunity": "Opportunity anzeigen",
+    "convertingAria": "Wird in eine Opportunity umgewandelt"
+  },
+  "lqOutcome": {
+    "titleTaskComplete": "Aufgabe erledigt",
+    "titleTaskPostponed": "Aufgabe verschoben",
+    "lineClosedNotInterested": "Dieser Lead ist geschlossen — nicht interessiert.",
+    "lineClosedNotValid": "Dieser Lead ist geschlossen — nicht gültig.",
+    "lineClosedNoAnswer": "Dieser Lead wurde nach „Keine Antwort“ geschlossen.",
+    "linePostponedNextAttempt": "Aufgabe verschoben auf {when}.",
+    "linePostponedFollowUp": "Kanal für Follow-up-Nachricht: {channel}.",
+    "lineInterestedPostponed": "Qualifizierung wurde verschoben. Nächster Schritt: Kunde am {when} erneut kontaktieren.",
+    "nextCallTomorrow9": "Morgen um 9:00",
+    "nextCallMonday": "Nächsten Montag um 9:00",
+    "nextCallAiSuggestion": "{date} um {time}",
+    "nextCallCustom": "{date} um {time}",
+    "nextCallSelected": "Die gewählte Zeit",
+    "channelWhatsapp": "WhatsApp",
+    "channelSms": "SMS",
+    "channelEmail": "E-Mail",
+    "channelDontSend": "Nicht senden",
+    "reasonLabel": "Grund: {reason}",
+    "reopen": "Wieder öffnen",
+    "updatedBy": "Aktualisiert von {name}",
+    "successDate": "Datum:",
+    "successTime": "Uhrzeit:",
+    "successType": "Art:",
+    "successAssignedTo": "Zugewiesen an:"
   }
 }

@@ -9,62 +9,16 @@
 
     <!-- Success state (post qualify / disqualify / no-answer) -->
     <template v-else-if="successState">
-      <div class="pt-1">
-        <div
-          class="bg-white rounded-lg p-4 shadow-nsc-card flex flex-col relative"
-        >
-        <div class="flex items-center gap-3">
-          <div class="size-8 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
-            <Check :size="16" class="text-green-600" />
-          </div>
-          <div class="flex-1 pr-10 min-w-0">
-            <p class="text-sm font-medium text-foreground">
-              {{ successState.statusText }}
-            </p>
-            <p v-if="successState.reason" class="text-sm text-muted-foreground mt-1">
-              {{ successState.reason }}
-            </p>
-          </div>
-        </div>
-        <div
-          v-if="successState.meeting"
-          class="mt-4 bg-white rounded-lg shadow-nsc-card overflow-hidden"        >
-          <div class="grid grid-cols-2 gap-3 p-4 text-sm">
-            <div>
-              <span class="text-muted-foreground">Date:</span>
-              <span class="ml-2 font-medium text-foreground">{{ successState.meeting.date }}</span>
-            </div>
-            <div>
-              <span class="text-muted-foreground">Time:</span>
-              <span class="ml-2 font-medium text-foreground">{{ successState.meeting.time }}</span>
-            </div>
-            <div>
-              <span class="text-muted-foreground">Type:</span>
-              <span class="ml-2 font-medium text-foreground capitalize">{{ successState.meeting.title }}</span>
-            </div>
-            <div>
-              <span class="text-muted-foreground">Assigned to:</span>
-              <span class="ml-2 font-medium text-foreground">{{ successState.meeting.location }}</span>
-            </div>
-          </div>
-        </div>
-        <div v-if="successState.kind === 'not-interested'" class="flex justify-end mt-4">
-          <Button
-            variant="outline"
-            size="small"
-            class="flex items-center gap-2 cursor-pointer"
-            @click="handleReopen"
-          >
-            <RotateCcw :size="14" />
-            Re-open
-          </Button>
-        </div>
-        </div>
-      </div>
-      <div class="py-2 flex items-center justify-between text-sm text-muted-foreground">
-        <span>Updated by {{ successState.actorName || 'Unknown' }}</span>
-        <span class="tabular-nums">{{ successPerformedAtLabel }}</span>
-      </div>
+      <LeadLqOutcomeSummaryCard
+        class="pt-1"
+        :title="successCardDisplay.title"
+        :lines="successCardDisplay.lines"
+        :reason="successCardDisplay.reason"
+        :actor-name="successState.actorName || ''"
+        :performed-at-label="successPerformedAtLabel"
+        :show-reopen="successShowReopen"
+        @reopen="handleReopen"
+      />
     </template>
 
     <template v-else>
@@ -100,7 +54,22 @@
         />
         <div class="p-4">
           <div class="flex flex-wrap items-center justify-between gap-3">
-            <p class="text-base leading-normal font-medium text-foreground min-w-0 flex-1">{{ contactDescription }}</p>
+            <div class="flex min-w-0 flex-1 items-center gap-2">
+              <CallAttemptsProgressRing
+                v-if="hasPhone"
+                :attempts="contactAttempts"
+                :max="callAttemptsMaxDisplay"
+                :aria-label="
+                  t('requestDetail.lqfTask.callAttemptsIndicatorAria', {
+                    current: contactAttempts,
+                    max: callAttemptsMaxDisplay
+                  })
+                "
+              />
+              <p class="min-w-0 flex-1 text-base font-medium leading-normal text-foreground">
+                {{ contactDescription }}
+              </p>
+            </div>
             <!-- Call Interface when lead has phone; otherwise email card -->
             <CallInterface
               v-if="hasPhone"
@@ -113,7 +82,7 @@
               :formatted-call-duration="formattedCallDuration"
               :mock-transcription="mockTranscription"
               :contact-attempts="contactAttempts"
-              :max-contact-attempts="maxContactAttempts"
+              :max-contact-attempts="callAttemptsMaxDisplay"
               :lead-summary="leadSummary"
               :caller-name="callerName"
               :assigned-person-name="currentUser?.name ?? ''"
@@ -301,6 +270,7 @@
                   :model-value="followupChannel === 'whatsapp'"
                   @update:model-value="(p) => p && setFollowupChannel('whatsapp')"
                   class="followup-toggle-item"
+                  :data-mk-channel-active="followupChannel === 'whatsapp' || undefined"
                 >
                   <MessageCircle class="w-3 h-3 shrink-0" />
                   <span>WhatsApp</span>
@@ -310,6 +280,7 @@
                   :model-value="followupChannel === 'sms'"
                   @update:model-value="(p) => p && setFollowupChannel('sms')"
                   class="followup-toggle-item"
+                  :data-mk-channel-active="followupChannel === 'sms' || undefined"
                 >
                   <MessageCircle class="w-3 h-3 shrink-0" />
                   <span>SMS</span>
@@ -319,6 +290,7 @@
                   :model-value="followupChannel === 'email'"
                   @update:model-value="(p) => p && setFollowupChannel('email')"
                   class="followup-toggle-item"
+                  :data-mk-channel-active="followupChannel === 'email' || undefined"
                 >
                   <Mail class="w-3 h-3 shrink-0" />
                   <span>Email</span>
@@ -328,6 +300,7 @@
                   :model-value="followupChannel === 'dont-send'"
                   @update:model-value="(p) => p && setFollowupChannel('dont-send')"
                   class="followup-toggle-item"
+                  :data-mk-channel-active="followupChannel === 'dont-send' || undefined"
                 >
                   <X class="w-3 h-3 shrink-0" />
                   <span>Don't send</span>
@@ -1205,7 +1178,7 @@
 </template>
 
 <script setup>
-import { ref, computed, toRef, watch, nextTick, useId } from 'vue'
+import { ref, computed, toRef, watch, nextTick, onMounted, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { 
   Button,
@@ -1236,7 +1209,7 @@ import {
   PopoverTrigger,
   PopoverContent
 } from '@motork/component-library/future/primitives'
-import { Check, PhoneOff, ThumbsUp, ThumbsDown, Clock, RotateCcw, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, Plus, Users, Pencil, ArrowLeft } from 'lucide-vue-next'
+import { PhoneOff, ThumbsUp, ThumbsDown, Clock, CalendarCheck, Phone, AlertTriangle, MessageCircle, Mail, X, Sparkles, Lightbulb, Plus, Users, Pencil, ArrowLeft } from 'lucide-vue-next'
 import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
@@ -1257,6 +1230,7 @@ import { useLQWidgetCall } from '@/composables/useLQWidgetCall'
 import { useLQWidgetOutcomes } from '@/composables/useLQWidgetOutcomes'
 import { useLQWidgetHandlers } from '@/composables/useLQWidgetHandlers'
 import CallInterface from '@/components/tasks/lead/CallInterface.vue'
+import CallAttemptsProgressRing from '@/components/tasks/shared/CallAttemptsProgressRing.vue'
 
 const LQTaskSendEmailCard = defineAsyncComponent(() =>
   import('@/components/tasks/lead/LQTaskSendEmailCard.vue')
@@ -1269,6 +1243,8 @@ import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
 import RequestConversationsTabContent from '@/components/requests/RequestConversationsTabContent.vue'
 import { getAvailabilityForAssignee } from '@/services/availabilityService'
 import { simulateCallExtraction } from '@/simulation/callExtractionSimulation'
+import { buildLqOutcomeSummaryDisplay, formatLqPerformedAtLabel } from '@/utils/lqOutcomeSummaryFormat'
+import LeadLqOutcomeSummaryCard from '@/components/tasks/lead/LeadLqOutcomeSummaryCard.vue'
 
 const props = defineProps({
   lead: {
@@ -1293,7 +1269,23 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['postponed', 'validated', 'qualified', 'disqualified', 'call-attempt-logged', 'note-saved', 'open-purchase-method', 'appointment-scheduled', 'survey-completed', 'survey-refused', 'not-responding', 'update:outcomeSaving', 'postpone-expected-close', 'reassigned'])
+const emit = defineEmits([
+  'postponed',
+  'validated',
+  'qualified',
+  'disqualified',
+  'call-attempt-logged',
+  'note-saved',
+  'open-purchase-method',
+  'appointment-scheduled',
+  'survey-completed',
+  'survey-refused',
+  'not-responding',
+  'update:outcomeSaving',
+  'postpone-expected-close',
+  'reassigned',
+  'lq-outcome-summary'
+])
 
 const usersStore = useUsersStore()
 const userStore = useUserStore()
@@ -1426,7 +1418,17 @@ const isTaskAssigned = computed(() => {
 
 const currentTaskOutcome = computed(() => {
   if (successState.value) {
-    return successState.value.statusText
+    const s = successState.value
+    const d = buildLqOutcomeSummaryDisplay(
+      {
+        kind: s.kind,
+        reason: s.reason,
+        followUpChannel: s.followUpChannel,
+        postponeMeta: s.postponeMeta
+      },
+      t
+    )
+    return [d.title, ...d.lines].filter(Boolean).join(' — ')
   }
   // Check if there's a recent activity with outcome
   const recentActivity = props.activities
@@ -1625,6 +1627,8 @@ const recentAttachmentsForEmail = computed(() =>
 const contactAttempts = leadState.contactAttempts
 const maxContactAttempts = leadState.maxContactAttempts
 
+const callAttemptsMaxDisplay = computed(() => maxContactAttempts.value ?? 5)
+
 // Use outcome composable
 const outcomeState = useLQWidgetOutcomes(
   toRef(props, 'lead'),
@@ -1694,22 +1698,29 @@ const {
   restorePostponedInterestedState
 } = outcomeState
 
-// Restore postponed interested form when opening a lead that was postponed from interested flow
-watch(
-  () => props.lead?.postponedInterestedState,
-  (draft) => {
-    if (!draft) return
-    restorePostponedInterestedState(draft)
-    if (draft.enrichLeadData && typeof draft.enrichLeadData === 'object') {
-      enrichLeadData.value = {
-        interestLevel: draft.enrichLeadData.interestLevel ?? '',
-        purchaseTimeline: draft.enrichLeadData.purchaseTimeline ?? '',
-        budgetRange: draft.enrichLeadData.budgetRange ?? '',
-        additionalNotes: draft.enrichLeadData.additionalNotes ?? ''
-      }
+function applyPostponedInterestedDraftFromLead() {
+  const draft = props.lead?.postponedInterestedState
+  if (!draft) return
+  restorePostponedInterestedState(draft)
+  if (draft.enrichLeadData && typeof draft.enrichLeadData === 'object') {
+    enrichLeadData.value = {
+      interestLevel: draft.enrichLeadData.interestLevel ?? '',
+      purchaseTimeline: draft.enrichLeadData.purchaseTimeline ?? '',
+      budgetRange: draft.enrichLeadData.budgetRange ?? '',
+      additionalNotes: draft.enrichLeadData.additionalNotes ?? ''
     }
-  },
-  { immediate: true }
+  }
+}
+
+onMounted(() => {
+  applyPostponedInterestedDraftFromLead()
+})
+
+watch(
+  () => props.lead?.id,
+  () => {
+    applyPostponedInterestedDraftFromLead()
+  }
 )
 
 function setFollowupChannel(v) {
@@ -2531,6 +2542,34 @@ const canCloseAsNotValid = computed(() => {
   return !!disqualifyReason.value
 })
 
+const handlers = useLQWidgetHandlers(
+  emit,
+  callState,
+  outcomeState,
+  toRef(props, 'lead'),
+  contactAttempts,
+  maxContactAttempts,
+  leadsStore,
+  currentUser,
+  enrichLeadData,
+  qualificationScheduleInternalNote
+)
+
+const {
+  logManualCall,
+  handleQualify,
+  handleDisqualifyFromInterested,
+  handleNoAnswerConfirm,
+  handleNoAnswerCloseLead,
+  handlePostponeFromInterested,
+  handleNotValidConfirm,
+  handleNoteSave,
+  handleSurveyCompleted,
+  handleSurveyRefused,
+  handleNotResponding,
+  handleReopen
+} = handlers
+
 // Handle close from CloseAsLostForm (Not valid / Answer + Not interested)
 function handleCloseFromForm(reason) {
   disqualifyReason.value = reason
@@ -2592,51 +2631,45 @@ const handleConfirmAction = async () => {
     emit('update:outcomeSaving', true)
     handleNotValidConfirm()
   } else if (selectedOutcome.value === 'answer' && selectedNextStep.value === 'interested') {
-    handleQualify()
+    await handleQualify()
   } else if (selectedOutcome.value === 'answer' && selectedNextStep.value === 'postpone') {
-    await onConfirmPostpone()
+    emit('update:outcomeSaving', true)
+    try {
+      await onConfirmPostpone()
+    } finally {
+      emit('update:outcomeSaving', false)
+    }
   }
 }
 
-const handlers = useLQWidgetHandlers(
-  emit,
-  callState,
-  outcomeState,
-  toRef(props, 'lead'),
-  contactAttempts,
-  maxContactAttempts,
-  leadsStore,
-  currentUser,
-  enrichLeadData,
-  qualificationScheduleInternalNote
+const successPerformedAtLabel = computed(() =>
+  formatLqPerformedAtLabel(successPerformedAt.value)
 )
 
-const {
-  logManualCall,
-  handleQualify,
-  handleDisqualifyFromInterested,
-  handleNoAnswerConfirm,
-  handleNoAnswerCloseLead,
-  handlePostponeFromInterested,
-  handleNotValidConfirm,
-  handleNoteSave,
-  handleSurveyCompleted,
-  handleSurveyRefused,
-  handleNotResponding,
-  handleReopen
-} = handlers
-
-const successPerformedAtLabel = computed(() => {
-  if (!successPerformedAt.value) return ''
-  const d = successPerformedAt.value
-  const day = String(d.getDate()).padStart(2, '0')
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  const year = String(d.getFullYear())
-  const hours = String(d.getHours()).padStart(2, '0')
-  const minutes = String(d.getMinutes()).padStart(2, '0')
-  return `${day}/${month}/${year} ${hours}:${minutes}`
+const successCardDisplay = computed(() => {
+  if (!successState.value) {
+    return { title: '', lines: [], reason: null }
+  }
+  const s = successState.value
+  return buildLqOutcomeSummaryDisplay(
+    {
+      kind: s.kind,
+      reason: s.reason,
+      followUpChannel: s.followUpChannel,
+      postponeMeta: s.postponeMeta
+    },
+    t
+  )
 })
 
+const successShowReopen = computed(() => {
+  const k = successState.value?.kind
+  return (
+    k === 'not-interested' ||
+    k === 'not-valid' ||
+    k === 'no-answer-closed'
+  )
+})
 
 // Trade-in handler
 const { saveTradeInVehicle } = useTradeInVehicle()

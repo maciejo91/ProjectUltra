@@ -29,7 +29,12 @@ export function useTaskShell(task) {
     
     if (task.value.type === 'lead') {
       return {
-        currentActivities: computed(() => leadsStore.currentLeadActivities),
+        currentActivities: computed(() => {
+          if (leadsStore.currentLead?.id !== task.value.id) {
+            return []
+          }
+          return leadsStore.currentLeadActivities
+        }),
         addActivity: (taskId, activity) => leadsStore.addActivity(taskId, activity),
         updateActivity: (taskId, activityId, updates) => leadsStore.updateActivity(taskId, activityId, updates),
         deleteActivity: (taskId, activityId) => leadsStore.deleteActivity(taskId, activityId),
@@ -38,7 +43,12 @@ export function useTaskShell(task) {
       }
     } else {
       return {
-        currentActivities: computed(() => opportunitiesStore.currentOpportunityActivities),
+        currentActivities: computed(() => {
+          if (opportunitiesStore.currentOpportunity?.id !== task.value.id) {
+            return []
+          }
+          return opportunitiesStore.currentOpportunityActivities
+        }),
         addActivity: (taskId, activity) => opportunitiesStore.addActivity(taskId, activity),
         updateActivity: (taskId, activityId, updates) => opportunitiesStore.updateActivity(taskId, activityId, updates),
         deleteActivity: (taskId, activityId) => opportunitiesStore.deleteActivity(taskId, activityId),

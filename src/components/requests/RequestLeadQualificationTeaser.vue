@@ -40,11 +40,14 @@
         chevron-direction="down"
         :chevron-aria-label="t('requestDetail.floatingLq.minimize')"
         :on-dark-surface="floatingInverse"
-        @toggle-timer="onHeaderTimerToggle"
         @chevron-click="$emit('cancel-action')"
       />
       <div class="w-full min-w-0 shrink-0">
-        <RequestLqTaskExpandedOutcomeShell :active="true" :flex-fill="false">
+        <RequestLqTaskExpandedOutcomeShell
+          :active="true"
+          :flex-fill="false"
+          :show-animated-border="outcomeShellAnimated"
+        >
           <slot name="outcome" />
         </RequestLqTaskExpandedOutcomeShell>
       </div>
@@ -63,7 +66,6 @@
       chevron-direction="up"
       :chevron-aria-label="t('requestDetail.floatingLq.continue')"
       :on-dark-surface="floatingInverse"
-      @toggle-timer="onHeaderTimerToggle"
       @chevron-click="resumeCollapsedTask"
     />
     <div
@@ -123,16 +125,29 @@
       <div
         class="relative z-20 flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-2"
       >
-        <div class="min-w-0 flex-1 flex flex-col gap-1">
-          <p class="text-base font-semibold leading-snug text-foreground">
-            {{ bodyTaskTitle }}
-          </p>
-          <p
-            v-if="bodyTaskSubheader"
-            class="text-sm leading-normal text-muted-foreground"
-          >
-            {{ bodyTaskSubheader }}
-          </p>
+        <div class="flex min-w-0 flex-1 items-center gap-2">
+          <CallAttemptsProgressRing
+            v-if="showBodyAttemptsRing"
+            :attempts="bodyContactAttempts"
+            :max="bodyMaxContactAttempts"
+            :aria-label="
+              t('requestDetail.lqfTask.callAttemptsIndicatorAria', {
+                current: bodyContactAttempts,
+                max: bodyMaxContactAttempts
+              })
+            "
+          />
+          <div class="min-w-0 flex-1 flex flex-col gap-1">
+            <p class="text-base font-semibold leading-snug text-foreground">
+              {{ bodyTaskTitle }}
+            </p>
+            <p
+              v-if="bodyTaskSubheader && !hideBodySubheader"
+              class="text-sm leading-normal text-muted-foreground"
+            >
+              {{ bodyTaskSubheader }}
+            </p>
+          </div>
         </div>
         <div class="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <div
@@ -189,6 +204,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, useId, useSlots, watch
 import { useI18n } from 'vue-i18n'
 import { LoaderCircle, X } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
+import CallAttemptsProgressRing from '@/components/tasks/shared/CallAttemptsProgressRing.vue'
 import RequestLqTaskExpandedOutcomeShell from './RequestLqTaskExpandedOutcomeShell.vue'
 import RequestLqTaskHeaderRow from './RequestLqTaskHeaderRow.vue'
 
@@ -225,10 +241,6 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  parentTimerRunning: {
-    type: Boolean,
-    default: true
-  },
   floatingElevated: {
     type: Boolean,
     default: false
@@ -252,6 +264,26 @@ const props = defineProps({
   sessionHeaderTitle: {
     type: String,
     default: ''
+  },
+  hideManageCallNowCta: {
+    type: Boolean,
+    default: false
+  },
+  outcomeShellAnimated: {
+    type: Boolean,
+    default: true
+  },
+  hideBodySubheader: {
+    type: Boolean,
+    default: false
+  },
+  contactAttempts: {
+    type: Number,
+    default: 0
+  },
+  maxContactAttempts: {
+    type: Number,
+    default: 5
   }
 })
 
@@ -259,8 +291,7 @@ const emit = defineEmits([
   'manage-task',
   'open-full-task',
   'cancel-action',
-  'resume-collapsed',
-  'toggle-timer'
+  'resume-collapsed'
 ])
 
 const { t } = useI18n()
@@ -273,7 +304,6 @@ const manageExpandedMode = computed(
 
 const ONE_HOUR_SECONDS = 60 * 60
 const remainingSeconds = ref(ONE_HOUR_SECONDS)
-const isTimerRunning = ref(true)
 let intervalId = 0
 
 const countdownLabelInternal = computed(() => {
@@ -287,13 +317,8 @@ const countdownLabelInternal = computed(() => {
 })
 
 function tickCountdown() {
-  if (!isTimerRunning.value) return
   if (remainingSeconds.value <= 0) return
   remainingSeconds.value -= 1
-}
-
-function toggleTimerRunning() {
-  isTimerRunning.value = !isTimerRunning.value
 }
 
 const showCard = computed(() => {
@@ -320,11 +345,13 @@ const manageHeaderSubtitle = computed(() =>
 )
 
 const manageHeaderCallCtaLabel = computed(() =>
-  activeSessionHeader.value || !props.callNowTelHref ? '' : callNowCtaLabel.value
+  props.hideManageCallNowCta || activeSessionHeader.value || !props.callNowTelHref
+    ? ''
+    : callNowCtaLabel.value
 )
 
 const manageHeaderCallCtaHref = computed(() =>
-  activeSessionHeader.value ? '' : props.callNowTelHref
+  props.hideManageCallNowCta || activeSessionHeader.value ? '' : props.callNowTelHref
 )
 const manageLabel = computed(() => t('requestDetail.lqfTask.manageTask'))
 const inProgressLabel = computed(() => t('requestDetail.lqfTask.inProgress'))
@@ -333,20 +360,7 @@ const headerCountdownLabel = computed(() =>
   props.internalTimer ? countdownLabelInternal.value : props.parentCountdownLabel
 )
 
-const effectiveTimerRunning = computed(() =>
-  props.internalTimer ? isTimerRunning.value : props.parentTimerRunning
-)
-
-const timerTitle = computed(() =>
-  effectiveTimerRunning.value
-    ? t('requestDetail.lqfTask.timerTitleRunning')
-    : t('requestDetail.lqfTask.timerTitlePaused')
-)
-
-function onHeaderTimerToggle() {
-  if (props.internalTimer) toggleTimerRunning()
-  else emit('toggle-timer')
-}
+const timerTitle = computed(() => t('requestDetail.lqfTask.timerTooltip'))
 
 const isManagingTask = ref(false)
 const isTaskActionInProgress = computed(
@@ -387,6 +401,15 @@ const bodyTaskTitle = computed(() => {
 
 const bodyTaskSubheader = computed(() => (props.headerContactSubline || '').trim())
 
+const showBodyAttemptsRing = computed(
+  () => !!(props.callNowTelHref || '').trim() && !activeSessionHeader.value
+)
+
+const bodyContactAttempts = computed(() => props.contactAttempts ?? 0)
+const bodyMaxContactAttempts = computed(() =>
+  props.maxContactAttempts > 0 ? props.maxContactAttempts : 5
+)
+
 const primaryActionButtonLabel = computed(() =>
   props.callNowTelHref ? callNowCtaLabel.value : manageLabel.value
 )
@@ -397,7 +420,7 @@ function resumeCollapsedTask() {
 
 function onCollapsedShellClick(e) {
   if (!expandableCollapsedCard.value) return
-  if (e.target.closest('button')) return
+  if (e.target.closest('button, [role="timer"]')) return
   resumeCollapsedTask()
 }
 

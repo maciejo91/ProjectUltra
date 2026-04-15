@@ -12,6 +12,9 @@
     :exclude-request-type="request.type"
     :embedded-in-card="embeddedInCard"
     @quick-action="emit('quick-action', $event)"
+    @add-tag="emit('add-tag')"
+    @edit-customer-tag="emit('edit-customer-tag', $event)"
+    @delete-customer-tag="emit('delete-customer-tag', $event)"
   />
 </template>
 
@@ -46,7 +49,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['quick-action'])
+const emit = defineEmits(['quick-action', 'add-tag', 'edit-customer-tag', 'delete-customer-tag'])
 
 const taskForCard = computed(() => {
   const r = props.request

@@ -67,6 +67,7 @@
               :model-value="negotiationChannel === 'call'"
               @update:model-value="(p) => p && $emit('update:negotiation-channel', 'call')"
               class="followup-toggle-item"
+              :data-mk-channel-active="negotiationChannel === 'call' || undefined"
             >
               <Phone class="w-3 h-3 shrink-0" />
               <span>Call</span>
@@ -76,6 +77,7 @@
               :model-value="negotiationChannel === 'whatsapp'"
               @update:model-value="(p) => p && $emit('update:negotiation-channel', 'whatsapp')"
               class="followup-toggle-item"
+              :data-mk-channel-active="negotiationChannel === 'whatsapp' || undefined"
             >
               <MessageCircle class="w-3 h-3 shrink-0" />
               <span>WhatsApp</span>
@@ -85,6 +87,7 @@
               :model-value="negotiationChannel === 'sms'"
               @update:model-value="(p) => p && $emit('update:negotiation-channel', 'sms')"
               class="followup-toggle-item"
+              :data-mk-channel-active="negotiationChannel === 'sms' || undefined"
             >
               <MessageSquare class="w-3 h-3 shrink-0" />
               <span>SMS</span>
@@ -94,6 +97,7 @@
               :model-value="negotiationChannel === 'email'"
               @update:model-value="(p) => p && $emit('update:negotiation-channel', 'email')"
               class="followup-toggle-item"
+              :data-mk-channel-active="negotiationChannel === 'email' || undefined"
             >
               <Mail class="w-3 h-3 shrink-0" />
               <span>Email</span>

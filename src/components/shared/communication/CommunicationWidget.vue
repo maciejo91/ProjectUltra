@@ -9,6 +9,10 @@
         :model-value="channel.id === 'call' ? (selectedChannel === 'call' && !outboundCallActive) : selectedChannel === channel.id"
         @update:model-value="(p) => p && setSelectedChannel(channel.id)"
         :class="['followup-toggle-item', channel.id === 'call' ? 'order-1' : 'order-3']"
+        :data-mk-channel-active="
+          (channel.id === 'call' ? (selectedChannel === 'call' && !outboundCallActive) : selectedChannel === channel.id) ||
+          undefined
+        "
       >
         <component :is="getLucideIcon(channel.icon)" class="w-3 h-3 shrink-0" />
         <span>{{ channel.label }}</span>
@@ -18,7 +22,8 @@
         variant="outline"
         :model-value="outboundCallActive"
         @update:model-value="(p) => p && onInitiateCallClick()"
-        class="followup-toggle-item order-2 inline-flex items-center gap-2"
+        :class="['followup-toggle-item', 'order-2', 'inline-flex', 'items-center', 'gap-2']"
+        :data-mk-channel-active="outboundCallActive || undefined"
       >
         <Phone class="w-3 h-3 shrink-0" />
         <span>Outbound call</span>
@@ -82,6 +87,10 @@
           :model-value="channel.id === 'call' ? (selectedChannel === 'call' && !outboundCallActive) : selectedChannel === channel.id"
           @update:model-value="(p) => p && setSelectedChannel(channel.id)"
           :class="['followup-toggle-item', channel.id === 'call' ? 'order-1' : 'order-3']"
+          :data-mk-channel-active="
+            (channel.id === 'call' ? (selectedChannel === 'call' && !outboundCallActive) : selectedChannel === channel.id) ||
+            undefined
+          "
         >
           <component :is="getLucideIcon(channel.icon)" class="w-3 h-3 shrink-0" />
           <span>{{ channel.label }}</span>
@@ -91,7 +100,8 @@
           variant="outline"
           :model-value="outboundCallActive"
           @update:model-value="(p) => p && onInitiateCallClick()"
-          class="followup-toggle-item order-2 inline-flex items-center gap-2"
+          :class="['followup-toggle-item', 'order-2', 'inline-flex', 'items-center', 'gap-2']"
+          :data-mk-channel-active="outboundCallActive || undefined"
         >
           <Phone class="w-3 h-3 shrink-0" />
           <span>Outbound call</span>

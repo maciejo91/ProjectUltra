@@ -25,6 +25,12 @@
     "addNewCustomer": "Add New Customer",
     "marketing": "Marketing",
     "support": "Support",
+    "pbx": {
+      "label": "PBX",
+      "connected": "PBX Connected",
+      "disconnect": "Disconnect",
+      "disconnected": "PBX disconnected"
+    },
     "groups": {
       "data": "Data",
       "actions": "Actions",

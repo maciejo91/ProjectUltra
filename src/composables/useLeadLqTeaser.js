@@ -1,5 +1,6 @@
 import { computed, toValue } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useSettingsStore } from '@/stores/settings'
 import { useLeadActions } from '@/composables/useLeadActions'
 import {
   mergeContactIntoDescription,
@@ -7,13 +8,22 @@ import {
   getTaskDisplayTitle
 } from '@/utils/taskActionTitle'
 import { getRequestedVehicleDisplayLabel } from '@/utils/vehicleHelpers'
+import { getDisplayStage, LEAD_STAGES } from '@/utils/stageMapper'
 
 /**
  * Teaser copy for request detail Overview (matches LQTask contact line without mounting LQTask).
  */
 export function useLeadLqTeaser(leadRef) {
   const { t } = useI18n()
+  const settingsStore = useSettingsStore()
   const leadActions = useLeadActions(leadRef, {})
+
+  const isAwaitingScheduledCallback = computed(() => {
+    const lead = toValue(leadRef)
+    if (!lead) return false
+    const stage = getDisplayStage(lead, 'lead')
+    return stage === LEAD_STAGES.TO_BE_CALLED_BACK || stage === LEAD_STAGES.VALID_TO_BE_CALLED_BACK
+  })
 
   const hasPhone = computed(() => {
     const lead = toValue(leadRef)
@@ -41,6 +51,9 @@ export function useLeadLqTeaser(leadRef) {
   const headerTaskTitle = computed(() => {
     const lead = toValue(leadRef)
     if (!lead) return ''
+    if (leadActions.primaryAction.value?.key === 'call-to-verify') {
+      return t('requestDetail.lqfTask.makeFirstCallAttempt')
+    }
     return getTaskDisplayTitle(lead) || ''
   })
 
@@ -65,9 +78,19 @@ export function useLeadLqTeaser(leadRef) {
     return `tel:${phone}`
   })
 
+  const contactAttemptsCount = computed(() => {
+    const lead = toValue(leadRef)
+    return lead?.contactAttempts?.length ?? 0
+  })
+
+  const maxContactAttemptsLimit = computed(
+    () => settingsStore.getSetting('maxContactAttempts') ?? 5
+  )
+
   const callingSessionTitle = computed(() => {
     const lead = toValue(leadRef)
     if (!lead) return ''
+    if (isAwaitingScheduledCallback.value) return ''
     const name = (lead.customer?.name ?? '').trim()
     const vehicleLabel = getRequestedVehicleDisplayLabel(lead.requestedCar || lead.vehicle)
     const displayName = name || t('requestDetail.floatingLq.callingNameFallback')
@@ -98,6 +121,8 @@ export function useLeadLqTeaser(leadRef) {
     headerTaskTitle,
     headerContactSubline,
     callNowTelHref,
-    callingSessionTitle
+    callingSessionTitle,
+    contactAttemptsCount,
+    maxContactAttemptsLimit
   }
 }

@@ -25,6 +25,12 @@
     "addNewCustomer": "Nieuwe Klant Toevoegen",
     "marketing": "Marketing",
     "support": "Support",
+    "pbx": {
+      "label": "PBX",
+      "connected": "PBX verbonden",
+      "disconnect": "Verbinding verbreken",
+      "disconnected": "PBX-verbinding verbroken"
+    },
     "groups": {
       "data": "Gegevens",
       "actions": "Acties",

@@ -1,6 +1,14 @@
 <template>
   <TaskManagementWidget :task="opportunity" hide-title hide-border>
     <template #primary-action>
+      <LeadQualifySuccessCard
+        v-if="qualifyInlineSuccessResolved"
+        :opportunity="qualifyInlineSuccessResolved.opportunity"
+        :actor-name="qualifyInlineSuccessResolved.actorName"
+        :performed-at="qualifyInlineSuccessResolved.performedAt"
+        class="w-full min-w-0 shrink-0"
+      />
+      <template v-else>
       <!-- One next action card with due badge inside (like LQTask); sentence style to match leads -->
       <PrimaryActionWidget
         v-if="nextActionCard"
@@ -283,6 +291,7 @@
           @collect-esignatures="handleCollectESignaturesFromContract"
         />
       </div>
+      </template>
     </template>
 
     <template #task-widgets>
@@ -1116,6 +1125,7 @@ import { useI18n } from 'vue-i18n'
 import { Button, Label, Textarea, Input, Toggle, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@motork/component-library/future/primitives'
 import { SelectMenu } from '@motork/component-library/future/components'
 import { useOpportunitiesStore } from '@/stores/opportunities'
+import { useLeadsStore } from '@/stores/leads'
 import { useUsersStore } from '@/stores/users'
 import { useUserStore } from '@/stores/user'
 import { useSettingsStore } from '@/stores/settings'
@@ -1166,9 +1176,11 @@ import NFUTask from '@/components/tasks/opportunity/NFUTask.vue'
 import CFBTask from '@/components/tasks/opportunity/CFBTask.vue'
 import DFBTask from '@/components/tasks/opportunity/DFBTask.vue'
 import SetDeliveryDateForm from '@/components/tasks/opportunity/SetDeliveryDateForm.vue'
+import LeadQualifySuccessCard from '@/components/tasks/lead/LeadQualifySuccessCard.vue'
 import CreateContractModal from '@/components/modals/CreateContractModal.vue'
 import AddOfferModal from '@/components/modals/AddOfferModal.vue'
 import VehicleConflictModal from '@/components/modals/VehicleConflictModal.vue'
+import { resolveStoredQualifyInlineSuccess } from '@/utils/lqOutcomeSummaryFormat'
 
 const props = defineProps({
   opportunity: {
@@ -1182,6 +1194,10 @@ const props = defineProps({
   activities: {
     type: Array,
     default: () => []
+  },
+  qualifyInlineSuccess: {
+    type: Object,
+    default: null
   }
 })
 
@@ -1189,6 +1205,7 @@ const emit = defineEmits(['vehicle-selected', 'offer-created', 'appointment-sche
 
 const router = useRouter()
 const opportunitiesStore = useOpportunitiesStore()
+const leadsStore = useLeadsStore()
 const usersStore = useUsersStore()
 const userStore = useUserStore()
 const settingsStore = useSettingsStore()
@@ -1202,6 +1219,16 @@ const getCurrentOpportunity = () => {
 
 // Computed opportunity for template use (uses store if available, otherwise props)
 const opportunity = computed(() => getCurrentOpportunity())
+
+const qualifyInlineSuccessResolved = computed(() => {
+  if (props.qualifyInlineSuccess) return props.qualifyInlineSuccess
+  const opp = opportunity.value
+  if (!opp) return null
+  return resolveStoredQualifyInlineSuccess(
+    { type: 'opportunity', id: opp.id },
+    leadsStore.lastInlineLeadQualifySuccess
+  )
+})
 
 // Use scheduledAppointment from prop if provided, otherwise from opportunity object
 const scheduledAppointment = computed(() => {

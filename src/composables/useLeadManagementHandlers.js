@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
-import { LEAD_STAGES } from '@/utils/stageMapper'
+import { LEAD_STAGES, getDisplayStage } from '@/utils/stageMapper'
 import { getTransitionHandler } from '@/composables/useLeadStateMachine'
 import { formatDate, formatTime } from '@/utils/formatters'
 
@@ -97,15 +97,22 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
     }
   }
 
-  async function handleQualified(data) {
+  async function handleQualified(data, options = {}) {
     const lead = getLead()
-    if (!lead) return
+    if (!lead) return null
 
-    const displayStage = leadState.displayStage.value
-    if (displayStage !== LEAD_STAGES.VALID_TO_BE_CALLED_BACK && displayStage !== LEAD_STAGES.TO_BE_CALLED_BACK) {
-      return
+    const displayStage = getDisplayStage(lead, 'lead')
+    const canQualifyFromStage =
+      displayStage === LEAD_STAGES.NEW ||
+      displayStage === LEAD_STAGES.TO_BE_CALLED_BACK ||
+      displayStage === LEAD_STAGES.VALID_TO_BE_CALLED_BACK
+    if (!canQualifyFromStage) {
+      return null
     }
 
+    const skipRedirect = options.skipRedirect === true
+    const onOpportunityCreated = options.onOpportunityCreated
+    const canOpp = userStore.canAccessOpportunities()
     isConvertingToOpportunity.value = true
     try {
       // Update lead with assignment before converting to opportunity
@@ -147,36 +154,44 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
       
       const opportunity = await leadsStore.convertLeadToOpportunity(lead.id, data)
 
-      if (userStore.canAccessOpportunities()) {
-        // Add opportunity to list so drawer can show it (do NOT refetch opportunities here –
-        // background fetch would overwrite the list and can race with navigation)
+      if (typeof onOpportunityCreated === 'function') {
+        onOpportunityCreated(opportunity)
+      }
+
+      if (canOpp) {
         opportunitiesStore.addOpportunityToList(opportunity)
-        
-        // Wait for Vue to apply the new list so allTasks includes the opportunity
-        await nextTick()
-        await new Promise(resolve => setTimeout(resolve, 80))
-        
-        // Navigate BEFORE removing the lead – otherwise drawerTask becomes null when the lead disappears,
-        // the drawer closes, and we never transition to the opportunity. By navigating first, the drawer
-        // can find the opportunity in allTasks and stay open.
-        router.push({ path: `/tasks/${opportunity.id}`, query: { type: 'opportunity' } })
-        
-        // Remove converted lead from list (convertLeadToOpportunity no longer does this)
-        leadsStore.leads = leadsStore.leads.filter(l => l.id !== lead.id)
-        
-        // Refresh leads so list stays in sync
-        await leadsStore.fetchLeads()
-        
-        // Refresh opportunities in background after a short delay so we don't overwrite before drawer opens
+      }
+
+      await nextTick()
+
+      if (!skipRedirect) {
+        if (canOpp) {
+          router.push({
+            path: `/requests/${opportunity.id}`,
+            query: { type: 'opportunity', from: 'tasks' }
+          })
+          leadsStore.leads = leadsStore.leads.filter(l => l.id !== lead.id)
+        } else {
+          router.push('/tasks')
+        }
+      } else {
+        await leadsStore.updateLead(lead.id, { opportunityId: opportunity.id })
+        await leadsStore.fetchLeadById(lead.id)
+      }
+
+      await leadsStore.fetchLeads()
+
+      if (canOpp) {
         setTimeout(() => {
           opportunitiesStore.fetchOpportunities().catch(() => {})
         }, 500)
-      } else {
-        router.push('/tasks')
       }
+
+      return { opportunity }
     } catch (err) {
       console.error('Failed to qualify lead:', err)
       alert(`Failed to qualify lead: ${err.message || 'Unknown error'}`)
+      return null
     } finally {
       isConvertingToOpportunity.value = false
     }
@@ -370,7 +385,10 @@ export function useLeadManagementHandlers({ getLead, leadState, emit }) {
     if (!lead) return
 
     if (lead.opportunityId) {
-      router.push({ path: `/tasks/${lead.opportunityId}`, query: { type: 'opportunity' } })
+      router.push({
+        path: `/requests/${lead.opportunityId}`,
+        query: { type: 'opportunity' }
+      })
     }
   }
 

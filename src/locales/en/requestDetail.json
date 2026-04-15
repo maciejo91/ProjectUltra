@@ -23,6 +23,7 @@
   "headerLifecycleMenuAria": "Change request stage",
   "statusInProgress": "In progress",
   "created": "Created",
+  "importedAt": "Imported at",
   "lastUpdated": "Last updated",
   "moreMenu": "More actions",
   "moreMenuShare": "Share",
@@ -71,18 +72,21 @@
     "openFullTaskView": "Open full task view",
     "taskOptionsAria": "Task options",
     "timerAria": "Countdown timer",
-    "timerTitleRunning": "Click to pause timer",
-    "timerTitlePaused": "Click to resume timer",
+    "timerTooltip": "Time remaining to qualify this lead",
     "inProgress": "In progress",
     "nextStepQuestion": "What's next?",
     "backToCallOutcome": "Back to call outcome",
-    "backToWhatsNext": "Back to what's next"
+    "backToWhatsNext": "Back to what's next",
+    "makeFirstCallAttempt": "Make the first call attempt",
+    "callAttemptsIndicatorAria": "Call attempts: {current} of {max}"
   },
   "quickActions": {
     "phone": "Phone",
     "email": "Email",
-    "whatsapp": "WhatsApp",
-    "document": "Document",
+    "messagingMenuAria": "Send SMS or WhatsApp",
+    "sendSms": "Send SMS",
+    "sendWhatsApp": "Send WhatsApp",
+    "addNote": "Add a note",
     "more": "More"
   },
   "contactCard": {
@@ -111,6 +115,19 @@
       "phone": "+49…",
       "address": "Address"
     }
+  },
+  "addTagModal": {
+    "title": "Add tag",
+    "editTitle": "Edit tag",
+    "tagName": "Tag name",
+    "colour": "Colour",
+    "tagNamePlaceholder": "Tag name",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "tagPopover": {
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "vehicleCard": {
     "title": "Requested vehicle",
@@ -255,10 +272,14 @@
       "title": "No data stored",
       "description": "Notes and attachments for this request will appear here.",
       "action": "Add attachment",
+      "dropZoneHeadline": "Drop files here",
+      "dropZoneActive": "Release to attach",
+      "dropHint": "Or click the button to choose files from your device.",
       "hasItems": "{count} attachment(s) on this request."
     }
   },
   "floatingLq": {
+    "taskPostponedHeader": "Task postponed",
     "callNow": "Call now",
     "callingNameFallback": "Customer",
     "callingWithVehicle": "Calling {name} - {vehicle}",
@@ -298,5 +319,41 @@
     "overdue": "Overdue",
     "soon": "Due now",
     "minutesLeft": "{count}m left"
+  },
+  "qualifySuccess": {
+    "title": "Task complete",
+    "subtitle": "Lead qualified",
+    "recapVehicle": "An opportunity was created for {vehicle}.",
+    "recapAppointment": "First appointment: {date} at {time}.",
+    "recapMeetingType": "Meeting type: {type}",
+    "recapMeetingWith": "With: {name}",
+    "viewOpportunity": "View opportunity",
+    "convertingAria": "Converting to opportunity"
+  },
+  "lqOutcome": {
+    "titleTaskComplete": "Task complete",
+    "titleTaskPostponed": "Task postponed",
+    "lineClosedNotInterested": "This lead is closed — not interested.",
+    "lineClosedNotValid": "This lead is closed — not valid.",
+    "lineClosedNoAnswer": "This lead is closed after no answer.",
+    "linePostponedNextAttempt": "Task postponed to {when}.",
+    "linePostponedFollowUp": "Follow-up message channel: {channel}.",
+    "lineInterestedPostponed": "Qualification was postponed. Next step: contact the customer again on {when}.",
+    "nextCallTomorrow9": "Tomorrow at 9:00",
+    "nextCallMonday": "Next Monday at 9:00",
+    "nextCallAiSuggestion": "{date} at {time}",
+    "nextCallCustom": "{date} at {time}",
+    "nextCallSelected": "The selected time",
+    "channelWhatsapp": "WhatsApp",
+    "channelSms": "SMS",
+    "channelEmail": "Email",
+    "channelDontSend": "Don't send",
+    "reasonLabel": "Reason: {reason}",
+    "reopen": "Re-open",
+    "updatedBy": "Updated by {name}",
+    "successDate": "Date:",
+    "successTime": "Time:",
+    "successType": "Type:",
+    "successAssignedTo": "Assigned to:"
   }
 }

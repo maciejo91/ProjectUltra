@@ -65,18 +65,6 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
 
   const actorName = () => (currentUserRef?.value?.name) || 'Unknown'
 
-  const getNextCallLabel = () => {
-    if (rescheduleTime.value === 'tomorrow-9am') return 'Tomorrow 9:00 AM'
-    if (rescheduleTime.value === 'monday' && aiSuggestionData.value) {
-      return `${aiSuggestionData.value.formattedDate} at ${aiSuggestionData.value.time}`
-    }
-    if (rescheduleTime.value === 'monday') return 'Monday'
-    if (rescheduleTime.value === 'custom' && customDate.value && customTime.value) {
-      return `${customDate.value} ${customTime.value}`
-    }
-    return 'selected time'
-  }
-
   const logManualCall = () => {
     callData.value = {
       channel: 'external',
@@ -341,37 +329,68 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
   const handleNoAnswerConfirm = async () => {
     const attempt = buildAttempt('no-answer')
     emit('call-attempt-logged', attempt)
-    
+
+    const postponeMeta = {
+      rescheduleTime: rescheduleTime.value,
+      customDate: customDate.value,
+      customTime: customTime.value,
+      aiSuggestionData: aiSuggestionData.value
+        ? { ...aiSuggestionData.value }
+        : null
+    }
+
     const nextCallDate = calculateNextCallDate()
     const appointmentDate = nextCallDate.split('T')[0]
     const appointmentTime = new Date(nextCallDate).toTimeString().slice(0, 5)
-    
+
     if (leadsStore && lead.value?.id) {
       try {
         await leadsStore.updateLead(lead.value.id, {
           nextActionDue: nextCallDate,
-          status: 'Pending'
+          status: 'Pending',
+          callbackDate: nextCallDate
         })
       } catch (error) {
         console.error('Failed to update lead status to "to be called back":', error)
       }
     }
-    
+
     emit('postponed', {
       date: appointmentDate,
       time: appointmentTime,
       createAppointment: true
     })
-    
-    if (contactAttemptsRef?.value + 1 >= maxContactAttemptsRef?.value) {
+
+    const maxedOut =
+      contactAttemptsRef?.value + 1 >= maxContactAttemptsRef?.value
+    if (maxedOut) {
       emit('disqualified', {
         category: 'Not Interested',
         reason: 'Unreachable'
       })
+      emit('lq-outcome-summary', {
+        kind: 'no-answer-closed',
+        reason: 'Unreachable',
+        category: 'Not Interested'
+      })
+      successState.value = {
+        kind: 'no-answer-closed',
+        reason: 'Unreachable',
+        actorName: actorName()
+      }
+    } else {
+      emit('lq-outcome-summary', {
+        kind: 'no-answer-postponed',
+        followUpChannel: followupChannel.value,
+        postponeMeta
+      })
+      successState.value = {
+        kind: 'no-answer-postponed',
+        actorName: actorName(),
+        followUpChannel: followupChannel.value,
+        postponeMeta
+      }
     }
-
-    const nextLabel = getNextCallLabel()
-    successState.value = { kind: 'no-answer', statusText: `Message sent - Rescheduled to ${nextLabel}`, actorName: actorName() }
     successPerformedAt.value = new Date()
     cancelOutcome()
   }
@@ -381,8 +400,17 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
     emit('call-attempt-logged', attempt)
     const reason = outcomeState.disqualifyReason.value || 'Unreachable'
     const category = outcomeState.disqualifyCategory.value || 'Not Interested'
+    emit('lq-outcome-summary', {
+      kind: 'no-answer-closed',
+      reason,
+      category
+    })
     emit('disqualified', { category, reason })
-    successState.value = { kind: 'no-answer', statusText: `Closed - ${reason}`, reason, actorName: actorName() }
+    successState.value = {
+      kind: 'no-answer-closed',
+      reason,
+      actorName: actorName()
+    }
     successPerformedAt.value = new Date()
     cancelOutcome()
   }
@@ -421,6 +449,15 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
         : null
     }
 
+    const postponeMeta = {
+      rescheduleTime: rescheduleTime.value,
+      customDate: customDate.value,
+      customTime: customTime.value,
+      aiSuggestionData: aiSuggestionData.value
+        ? { ...aiSuggestionData.value }
+        : null
+    }
+
     if (leadsStore && lead.value?.id) {
       try {
         await leadsStore.updateLead(lead.value.id, leadUpdates)
@@ -440,22 +477,39 @@ export function useLQWidgetHandlers(emit, callState, outcomeState, lead, contact
     }
     emit('postponed', postponedPayload)
 
-    // Keep form visible with filled data (status is Valid - to be called back, not closed)
-    // Do not set successState or cancelOutcome so the user still sees the form
+    emit('lq-outcome-summary', {
+      kind: 'interested-postponed',
+      postponeMeta
+    })
+    successState.value = {
+      kind: 'interested-postponed',
+      actorName: actorName(),
+      postponeMeta
+    }
+    successPerformedAt.value = new Date()
+    cancelOutcome()
   }
 
   const handleNotValidConfirm = () => {
-    const attempt = buildAttempt('not-valid')
+    const fromNotValidPath = selectedOutcome.value === 'not-valid'
+    const attempt = fromNotValidPath
+      ? buildAttempt('not-valid')
+      : buildAttempt('answer', { nextStep: 'Not interested' })
     emit('call-attempt-logged', attempt)
+
+    const category = outcomeState.disqualifyCategory.value
+    const reason = outcomeState.disqualifyReason.value || null
+    const kind = fromNotValidPath ? 'not-valid' : 'not-interested'
+
+    emit('lq-outcome-summary', { kind, reason, category })
     emit('disqualified', {
-      category: outcomeState.disqualifyCategory.value,
+      category,
       reason: outcomeState.disqualifyReason.value
     })
 
     successState.value = {
-      kind: 'not-interested',
-      statusText: 'Closed - Not interested',
-      reason: outcomeState.disqualifyReason.value || null,
+      kind,
+      reason,
       actorName: actorName()
     }
     successPerformedAt.value = new Date()
