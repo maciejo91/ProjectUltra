@@ -125,6 +125,7 @@
             :activities="customerActivities"
             :leads="customerLeads"
             :opportunities="customerOpportunities"
+            :services="customerServices"
             :requests-loading="loadingLeads || loadingOpportunities"
             :loading="loadingCustomer"
             @add-appointment="showCreateAppointmentModal = true"
@@ -201,7 +202,13 @@ import CustomerDuplicateDetectedCard from '@/components/customer/CustomerDuplica
 import MergeCustomerConfirmModal from '@/components/modals/MergeCustomerConfirmModal.vue'
 import { useCustomerDuplicateDetection } from '@/composables/useCustomerDuplicateDetection'
 import { getCustomerSummary } from '@/api/mergeCustomer'
-import { fetchLeadsByCustomerId, fetchOpportunitiesByCustomerId, fetchCustomerCars, fetchTasksByCustomerId } from '@/api/contacts'
+import {
+  fetchLeadsByCustomerId,
+  fetchOpportunitiesByCustomerId,
+  fetchServiceHistoryByCustomerId,
+  fetchCustomerCars,
+  fetchTasksByCustomerId
+} from '@/api/contacts'
 import { fetchAccountById } from '@/api/accounts'
 import { fetchLeadActivities } from '@/api/leads'
 import { fetchOpportunityActivities } from '@/api/opportunities'
@@ -256,6 +263,7 @@ const customerData = ref(null)
 const accountData = ref(null)
 const customerLeads = ref([])
 const customerOpportunities = ref([])
+const customerServices = ref([])
 const customerActivities = ref([])
 const customerAppointments = ref([])
 const customerTasks = ref([])
@@ -415,16 +423,19 @@ const loadCustomerData = async () => {
 
     const accountId = customerData.value?.accountId || customerData.value?.account_id
 
-    const [leadsResult, oppsResult, tasksResult, appointmentsResult, carsResult] = await Promise.all([
-      fetchLeadsByCustomerId(props.customerId, accountId),
-      fetchOpportunitiesByCustomerId(props.customerId, accountId),
-      fetchTasksByCustomerId(props.customerId),
-      fetchAppointmentsByCustomerId(props.customerId),
-      fetchCustomerCars(accountId || props.customerId)
-    ])
+    const [leadsResult, oppsResult, servicesResult, tasksResult, appointmentsResult, carsResult] =
+      await Promise.all([
+        fetchLeadsByCustomerId(props.customerId, accountId),
+        fetchOpportunitiesByCustomerId(props.customerId, accountId),
+        fetchServiceHistoryByCustomerId(props.customerId, accountId),
+        fetchTasksByCustomerId(props.customerId),
+        fetchAppointmentsByCustomerId(props.customerId),
+        fetchCustomerCars(accountId || props.customerId)
+      ])
 
     customerLeads.value = leadsResult.data || []
     customerOpportunities.value = oppsResult.data || []
+    customerServices.value = servicesResult.data || []
     customerTasks.value = tasksResult.data || []
     customerAppointments.value = appointmentsResult || []
     customerCars.value = carsResult.data || []

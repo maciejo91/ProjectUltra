@@ -7,6 +7,7 @@
     :show-quick-actions="showQuickActions"
     :related-leads="relatedLeads"
     :related-opportunities="relatedOpportunities"
+    :related-services="relatedServices"
     :related-requests-loading="relatedRequestsLoading"
     :exclude-request-id="request.id"
     :exclude-request-type="request.type"
@@ -36,6 +37,10 @@ const props = defineProps({
     default: () => []
   },
   relatedOpportunities: {
+    type: Array,
+    default: () => []
+  },
+  relatedServices: {
     type: Array,
     default: () => []
   },

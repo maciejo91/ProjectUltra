@@ -70,38 +70,10 @@
             role="region"
             :aria-label="t('customerProfile.rightColumn.otherInteractionsRegion')"
           >
-            <button
-              v-for="item in otherInteractionRows"
-              :key="item.compositeId"
-              type="button"
-              class="flex w-full min-w-0 items-start justify-between gap-2 rounded-md border border-border bg-muted/20 p-2 text-left transition-colors hover:bg-muted/40"
-              @click="handleInteractionClick(item)"
-            >
-              <div class="min-w-0 flex-1">
-                <span class="text-sm font-medium leading-tight text-foreground">{{ item.title }}</span>
-                <span v-if="item.subtitle" class="mt-0.5 block text-sm text-muted-foreground">{{
-                  item.subtitle
-                }}</span>
-              </div>
-              <div class="flex shrink-0 flex-col items-end gap-0.5 text-right">
-                <Badge
-                  variant="secondary"
-                  class="h-5 px-1.5 py-0 text-sm font-medium leading-none"
-                  :class="
-                    item.type === 'lead'
-                      ? 'bg-badge-green text-emerald-700'
-                      : 'bg-purple-50 text-purple-700'
-                  "
-                >
-                  {{
-                    item.type === 'lead'
-                      ? t('customerProfile.rightColumn.typeLead')
-                      : t('customerProfile.rightColumn.typeOpportunity')
-                  }}
-                </Badge>
-                <span class="text-sm leading-none text-muted-foreground">{{ item.stage }}</span>
-              </div>
-            </button>
+            <ContactHistoryGroupedList
+              :rows="otherInteractionRows"
+              @select="handleHistorySelect"
+            />
           </div>
         </Transition>
       </div>
@@ -114,9 +86,10 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { Copy, ChevronDown } from 'lucide-vue-next'
-import { Button, Badge } from '@motork/component-library/future/primitives'
+import { Button } from '@motork/component-library/future/primitives'
 import { useToastStore } from '@/stores/toast'
 import { useRequestNavigationStore } from '@/stores/requestNavigation'
+import ContactHistoryGroupedList from '@/components/shared/ContactHistoryGroupedList.vue'
 
 const props = defineProps({
   customer: { type: Object, default: null },
@@ -124,6 +97,7 @@ const props = defineProps({
   cars: { type: Array, default: () => [] },
   leads: { type: Array, default: () => [] },
   opportunities: { type: Array, default: () => [] },
+  services: { type: Array, default: () => [] },
   requestsLoading: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
   showOtherInteractions: { type: Boolean, default: true }
@@ -172,7 +146,19 @@ const otherInteractionRows = computed(() => {
       customer: o.customer || o
     })
   })
-  return rows.sort((a, b) => b.sortTime - a.sortTime)
+  ;(props.services || []).forEach((s) => {
+    rows.push({
+      id: s.id,
+      type: 'service',
+      compositeId: `service-${s.id}`,
+      stage: s.stage || 'Open',
+      title: s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
+      subtitle: (s.subtitle && String(s.subtitle).trim()) || '',
+      sortTime: interactionSortTime(s),
+      customer: props.customer || null
+    })
+  })
+  return rows
 })
 
 const showOtherInteractionsBlock = computed(
@@ -183,14 +169,24 @@ const showOtherInteractionsBlock = computed(
 )
 
 const navigationRows = computed(() =>
-  otherInteractionRows.value.map((r) => ({
-    id: r.id,
-    type: r.type,
-    compositeId: r.compositeId,
-    displayStage: r.stage,
-    customer: r.customer
-  }))
+  otherInteractionRows.value
+    .filter((r) => r.type !== 'service')
+    .map((r) => ({
+      id: r.id,
+      type: r.type,
+      compositeId: r.compositeId,
+      displayStage: r.stage,
+      customer: r.customer
+    }))
 )
+
+function handleHistorySelect(item) {
+  if (item.type === 'service') {
+    toastStore.pushToast('info', t('customerProfile.rightColumn.serviceDetailDemo'))
+    return
+  }
+  handleInteractionClick(item)
+}
 
 function handleInteractionClick(item) {
   const rows = navigationRows.value

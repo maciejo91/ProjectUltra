@@ -8,6 +8,7 @@
       :cars="cars"
       :leads="leads"
       :opportunities="opportunities"
+      :services="services"
       :requests-loading="requestsLoading"
       :loading="loading"
     />
@@ -85,6 +86,7 @@ const props = defineProps({
   activities: { type: Array, default: () => [] },
   leads: { type: Array, default: () => [] },
   opportunities: { type: Array, default: () => [] },
+  services: { type: Array, default: () => [] },
   requestsLoading: { type: Boolean, default: false },
   loading: { type: Boolean, default: false }
 })

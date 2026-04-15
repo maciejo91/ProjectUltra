@@ -107,7 +107,7 @@
   },
   "contactCard": {
     "activityMenu": "Activiteit ({count})",
-    "otherInteractions": "Overige interacties ({count})",
+    "otherInteractions": "Contactgeschiedenis ({count})",
     "openProfile": "Klantprofiel openen",
     "cardMenu": "Klantkaartmenu",
     "editCustomer": "Klant bewerken",
@@ -130,6 +130,27 @@
       "email": "email@example.com",
       "phone": "+31…",
       "address": "Adres"
+    }
+  },
+  "editCustomerModal": {
+    "title": "Klantgegevens bewerken",
+    "firstName": "Voornaam",
+    "surname": "Achternaam",
+    "location": "Locatie",
+    "address": "Adres",
+    "email": "E-mail",
+    "phone": "Telefoon",
+    "tags": "Tags",
+    "tagsHint": "Scheid meerdere tags met komma’s.",
+    "saving": "Opslaan…",
+    "placeholders": {
+      "firstName": "Voornaam",
+      "surname": "Achternaam",
+      "location": "Stad of regio",
+      "address": "Straat, postcode, plaats",
+      "email": "email@example.com",
+      "phone": "+31…",
+      "tags": "VIP, Premium"
     }
   },
   "addTagModal": {

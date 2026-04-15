@@ -3,8 +3,7 @@
     class="overflow-hidden"
     :class="embeddedInCard ? '' : 'rounded-lg bg-background'"
   >
-    <template v-if="!isEditing">
-      <div class="flex flex-col gap-2 px-4 py-4">
+    <div class="group/card flex flex-col gap-2 px-4 py-4">
         <div class="flex w-full min-w-0 items-start justify-between gap-3">
           <div class="flex min-w-0 flex-1 gap-2">
             <TooltipProvider :delay-duration="200">
@@ -27,14 +26,14 @@
             <div class="min-w-0 flex-1">
               <div class="flex min-w-0 items-center justify-between gap-2">
                 <p
-                  class="min-w-0 flex flex-wrap items-baseline gap-x-1 gap-y-1 px-1.5 text-base font-medium leading-5 text-foreground wrap-break-word"
+                  class="min-w-0 flex flex-1 flex-wrap items-baseline gap-x-1 gap-y-1 px-1.5 text-base font-medium leading-5 text-foreground wrap-break-word"
                 >
                   <span>{{ nameParts.primary || '—' }}</span>
-                  <span
-                    v-if="nameParts.location || showContactDuplicateWarning"
-                    class="inline-flex flex-wrap items-center gap-1.5 text-muted-foreground"
-                  >
-                    <span v-if="nameParts.location">{{ ' ' }}{{ nameParts.location }}</span>
+                  <span class="inline-flex flex-wrap items-center gap-1.5">
+                    <span
+                      v-if="nameParts.location"
+                      class="text-muted-foreground"
+                    >{{ ' ' }}{{ nameParts.location }}</span>
                     <TooltipProvider v-if="showContactDuplicateWarning" :delay-duration="200">
                       <Tooltip>
                         <TooltipTrigger as-child>
@@ -52,6 +51,17 @@
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
+                    <Button
+                      v-if="task.customer && !showEditCustomerModal"
+                      type="button"
+                      variant="secondary"
+                      size="icon-sm"
+                      class="shrink-0 opacity-0 transition-opacity group-hover/card:opacity-100 focus-visible:opacity-100"
+                      :aria-label="t('requestDetail.contactCard.editCustomer')"
+                      @click.stop="showEditCustomerModal = true"
+                    >
+                      <Pencil class="size-3 opacity-70" />
+                    </Button>
                   </span>
                 </p>
 
@@ -214,106 +224,22 @@
               role="region"
               :aria-label="t('customerProfile.rightColumn.otherInteractionsRegion')"
             >
-              <button
-                v-for="item in pastRequestRows"
-                :key="item.compositeId"
-                type="button"
-                class="flex w-full min-w-0 items-start justify-between gap-2 rounded-md border border-border bg-muted/20 p-2 text-left transition-colors hover:bg-muted/40"
-                @click="handlePastRequestClick(item)"
-              >
-                <div class="min-w-0 flex-1">
-                  <span class="text-sm font-medium leading-tight text-foreground">{{ item.title }}</span>
-                  <span v-if="item.subtitle" class="mt-0.5 block text-sm text-muted-foreground">{{
-                    item.subtitle
-                  }}</span>
-                </div>
-                <div class="flex shrink-0 flex-col items-end gap-0.5 text-right">
-                  <Badge
-                    variant="secondary"
-                    class="h-5 px-1.5 py-0 text-sm font-medium leading-none"
-                    :class="
-                      item.type === 'lead'
-                        ? 'bg-badge-green text-emerald-700'
-                        : 'bg-purple-50 text-purple-700'
-                    "
-                  >
-                    {{
-                      item.type === 'lead'
-                        ? t('customerProfile.rightColumn.typeLead')
-                        : t('customerProfile.rightColumn.typeOpportunity')
-                    }}
-                  </Badge>
-                  <span class="text-sm leading-none text-muted-foreground">{{ item.stage }}</span>
-                </div>
-              </button>
+              <ContactHistoryGroupedList
+                :rows="pastRequestRows"
+                @select="handleContactHistorySelect"
+              />
             </div>
           </Transition>
         </div>
       </div>
-    </template>
 
-    <div v-else class="flex flex-col gap-3">
-      <div class="space-y-2">
-        <Label class="text-sm font-medium text-muted-foreground">{{
-          t('requestDetail.contactCard.fields.name')
-        }}</Label>
-        <Input
-          v-model="editForm.name"
-          type="text"
-          class="h-8 text-sm"
-          :placeholder="t('requestDetail.contactCard.placeholders.name')"
-        />
-      </div>
-      <div class="space-y-2">
-        <Label class="text-sm font-medium text-muted-foreground">{{
-          t('requestDetail.contactCard.fields.email')
-        }}</Label>
-        <Input
-          v-model="editForm.email"
-          type="email"
-          class="h-8 text-sm"
-          :placeholder="t('requestDetail.contactCard.placeholders.email')"
-          autocomplete="email"
-        />
-      </div>
-      <div class="space-y-2">
-        <Label class="text-sm font-medium text-muted-foreground">{{
-          t('requestDetail.contactCard.fields.phone')
-        }}</Label>
-        <Input
-          v-model="editForm.phone"
-          type="tel"
-          class="h-8 text-sm"
-          :placeholder="t('requestDetail.contactCard.placeholders.phone')"
-          autocomplete="tel"
-        />
-      </div>
-      <div class="space-y-2">
-        <Label class="text-sm font-medium text-muted-foreground">{{
-          t('requestDetail.contactCard.fields.address')
-        }}</Label>
-        <Input
-          v-model="editForm.address"
-          type="text"
-          class="h-8 text-sm"
-          :placeholder="t('requestDetail.contactCard.placeholders.address')"
-        />
-      </div>
-      <div class="flex gap-2 pt-1">
-        <Button variant="outline" size="small" class="flex-1" @click="cancelEditing">
-          {{ t('common.buttons.cancel') }}
-        </Button>
-        <Button
-          variant="default"
-          size="small"
-          class="flex-1"
-          :disabled="saveDisabled || saving"
-          @click="saveEdit"
-        >
-          {{ saving ? t('requestDetail.contactCard.saving') : t('common.buttons.save') }}
-        </Button>
-      </div>
-    </div>
+    <EditCustomerDetailsModal
+      :show="showEditCustomerModal"
+      :customer="task.customer"
+      :saving="savingCustomerModal"
+      @update:open="(v) => (showEditCustomerModal = v)"
+      @save="handleSaveCustomerDetails"
+    />
   </div>
 </template>
 
@@ -332,8 +258,6 @@ import { getCustomerNameParts } from '@/utils/customerDisplay'
 import {
   Badge,
   Button,
-  Input,
-  Label,
   Avatar,
   AvatarFallback,
   DropdownMenu,
@@ -349,6 +273,7 @@ import {
   AlertTriangle,
   ChevronDown,
   Mail,
+  Pencil,
   Phone,
   PhoneCall,
   Plus,
@@ -357,6 +282,8 @@ import {
 } from 'lucide-vue-next'
 import TagPillWithPopover from '@/components/shared/TagPillWithPopover.vue'
 import MessagingQuickActionPopover from '@/components/shared/MessagingQuickActionPopover.vue'
+import EditCustomerDetailsModal from '@/components/modals/EditCustomerDetailsModal.vue'
+import ContactHistoryGroupedList from '@/components/shared/ContactHistoryGroupedList.vue'
 
 const props = defineProps({
   task: {
@@ -380,6 +307,10 @@ const props = defineProps({
     default: () => []
   },
   relatedOpportunities: {
+    type: Array,
+    default: () => []
+  },
+  relatedServices: {
     type: Array,
     default: () => []
   },
@@ -419,42 +350,10 @@ const customersStore = useCustomersStore()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const requestNavigationStore = useRequestNavigationStore()
-const isEditing = ref(false)
+const showEditCustomerModal = ref(false)
+const savingCustomerModal = ref(false)
 const pastRequestsOpen = ref(false)
 const pastRequestsPanelId = 'task-contact-past-requests-panel'
-const saving = ref(false)
-const editForm = ref({ name: '', phone: '', email: '', address: '' })
-
-watch(
-  () => props.task.customer,
-  (customer) => {
-    if (customer && !isEditing.value) {
-      const addr = customer.address
-      const addressStr =
-        typeof addr === 'string'
-          ? addr
-          : addr
-            ? [
-                addr.streetLine1 || addr.streetAddress || addr.street,
-                addr.streetLine2,
-                [addr.city, addr.region, addr.postalCode].filter(Boolean).join(', '),
-                addr.country
-              ]
-                .filter(Boolean)
-                .join(', ')
-            : ''
-      editForm.value = {
-        name: customer.name || '',
-        phone: customer.phone || '',
-        email: customer.email || '',
-        address: addressStr
-      }
-    }
-  },
-  { immediate: true }
-)
-
-const saveDisabled = computed(() => !(editForm.value.name ?? '').trim())
 
 const nameParts = computed(() => getCustomerNameParts(props.task.customer?.name))
 
@@ -531,7 +430,19 @@ const pastRequestRows = computed(() => {
       customer: o.customer || o
     })
   })
-  return rows.sort((a, b) => b.sortTime - a.sortTime)
+  ;(props.relatedServices || []).forEach((s) => {
+    rows.push({
+      id: s.id,
+      type: 'service',
+      compositeId: `service-${s.id}`,
+      stage: s.stage || 'Open',
+      title: s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
+      subtitle: (s.subtitle && String(s.subtitle).trim()) || '',
+      sortTime: interactionSortTime(s),
+      customer: props.task.customer || null
+    })
+  })
+  return rows
 })
 
 const showPastRequestsSection = computed(
@@ -564,6 +475,14 @@ const allRelatedRequestNavigationRows = computed(() => {
   })
   return rows
 })
+
+function handleContactHistorySelect(item) {
+  if (item.type === 'service') {
+    toastStore.pushToast('info', t('customerProfile.rightColumn.serviceDetailDemo'))
+    return
+  }
+  handlePastRequestClick(item)
+}
 
 function handlePastRequestClick(item) {
   const rows = allRelatedRequestNavigationRows.value
@@ -648,14 +567,6 @@ function formatActivityLine(act) {
   return time ? `${type} · ${time}` : String(type)
 }
 
-function openCustomerProfileInNewTab() {
-  const customerId = props.task.customer?.id || props.customerId
-  if (customerId) {
-    const url = router.resolve(`/customer/${customerId}`).href
-    window.open(url, '_blank')
-  }
-}
-
 function resolveCustomerDuplicateReturnFrom() {
   const path = route.path || ''
   if (path.startsWith('/requests')) return 'request'
@@ -684,50 +595,21 @@ function navigateToCustomerDuplicateProfile() {
   })
 }
 
-function startEditing() {
-  const c = props.task.customer
-  if (!c) return
-  const addr = c.address
-  const addressStr =
-    typeof addr === 'string'
-      ? addr
-      : addr
-        ? [
-            addr.streetLine1 || addr.streetAddress || addr.street,
-            addr.streetLine2,
-            [addr.city, addr.region, addr.postalCode].filter(Boolean).join(', '),
-            addr.country
-          ]
-            .filter(Boolean)
-            .join(', ')
-        : ''
-  editForm.value = {
-    name: c.name || '',
-    phone: c.phone || '',
-    email: c.email || '',
-    address: addressStr
-  }
-  isEditing.value = true
-}
-
-function cancelEditing() {
-  isEditing.value = false
-}
-
-async function saveEdit() {
+async function handleSaveCustomerDetails(payload) {
   const customerId = props.task.customer?.id || props.customerId
   const leadId = props.task.id
-  if (!customerId || saveDisabled.value) return
+  if (!customerId || !payload?.name?.trim()) return
   const hadNoPhone =
     props.taskType === 'lead' && !(props.task.customer?.phone ?? '').trim()
-  const phoneAdded = !!(editForm.value.phone ?? '').trim()
-  saving.value = true
+  const phoneAdded = !!(payload.phone ?? '').trim()
+  savingCustomerModal.value = true
   try {
     await customersStore.modifyContact(customerId, {
-      name: (editForm.value.name ?? '').trim(),
-      phone: (editForm.value.phone ?? '').trim() || null,
-      email: (editForm.value.email ?? '').trim() || null,
-      address: (editForm.value.address ?? '').trim() || null
+      name: payload.name.trim(),
+      phone: payload.phone,
+      email: payload.email,
+      address: payload.address,
+      tags: payload.tags
     })
     if (leadId) {
       if (props.taskType === 'lead') {
@@ -745,12 +627,12 @@ async function saveEdit() {
         await opportunitiesStore.fetchOpportunityById(leadId)
       }
     }
-    isEditing.value = false
+    showEditCustomerModal.value = false
     toastStore.pushToast('success', t('requestDetail.contactCard.customerUpdated'))
   } catch {
     toastStore.pushToast('error', t('requestDetail.contactCard.saveFailed'))
   } finally {
-    saving.value = false
+    savingCustomerModal.value = false
   }
 }
 </script>

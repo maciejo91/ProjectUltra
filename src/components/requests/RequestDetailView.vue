@@ -176,6 +176,7 @@
                 :request="request"
                 :related-leads="customerRelatedLeads"
                 :related-opportunities="customerRelatedOpps"
+                :related-services="customerRelatedServices"
                 :related-requests-loading="loadingCustomerRelatedRequests"
                 @quick-action="handleQuickAction"
                 @add-tag="openAddCustomerTagModal"
@@ -499,7 +500,11 @@ import {
 import { LEAD_STAGES } from '@/utils/stageMapper/constants'
 import { getCarImageUrl } from '@/utils/vehicleHelpers'
 import { getRequestAttributionProps } from '@/utils/requestAttribution'
-import { fetchLeadsByCustomerId, fetchOpportunitiesByCustomerId } from '@/api/contacts'
+import {
+  fetchLeadsByCustomerId,
+  fetchOpportunitiesByCustomerId,
+  fetchServiceHistoryByCustomerId
+} from '@/api/contacts'
 
 const props = defineProps({
   request: {
@@ -578,6 +583,7 @@ const activityExpandedSummaries = ref({})
 
 const customerRelatedLeads = ref([])
 const customerRelatedOpps = ref([])
+const customerRelatedServices = ref([])
 const loadingCustomerRelatedRequests = ref(false)
 
 const leadRef = computed(() => (props.request?.type === 'lead' ? props.request : null))
@@ -671,24 +677,28 @@ watch(
     if (!r) {
       customerRelatedLeads.value = []
       customerRelatedOpps.value = []
+      customerRelatedServices.value = []
       return
     }
     const cid = r.customerId || r.customer?.id
     if (cid == null || cid === '') {
       customerRelatedLeads.value = []
       customerRelatedOpps.value = []
+      customerRelatedServices.value = []
       return
     }
     loadingCustomerRelatedRequests.value = true
     try {
       const accountId =
         r.customer?.accountId || r.customer?.account_id || r.accountId || r.account_id
-      const [leadsRes, oppsRes] = await Promise.all([
+      const [leadsRes, oppsRes, servicesRes] = await Promise.all([
         fetchLeadsByCustomerId(cid, accountId),
-        fetchOpportunitiesByCustomerId(cid, accountId)
+        fetchOpportunitiesByCustomerId(cid, accountId),
+        fetchServiceHistoryByCustomerId(cid, accountId)
       ])
       customerRelatedLeads.value = leadsRes.data || []
       customerRelatedOpps.value = oppsRes.data || []
+      customerRelatedServices.value = servicesRes.data || []
     } finally {
       loadingCustomerRelatedRequests.value = false
     }

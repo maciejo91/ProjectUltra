@@ -107,7 +107,7 @@
   },
   "contactCard": {
     "activityMenu": "Attività ({count})",
-    "otherInteractions": "Altre interazioni ({count})",
+    "otherInteractions": "Cronologia contatto ({count})",
     "openProfile": "Apri profilo cliente",
     "cardMenu": "Menu scheda cliente",
     "editCustomer": "Modifica cliente",
@@ -130,6 +130,27 @@
       "email": "email@example.com",
       "phone": "+39…",
       "address": "Indirizzo"
+    }
+  },
+  "editCustomerModal": {
+    "title": "Modifica dati cliente",
+    "firstName": "Nome",
+    "surname": "Cognome",
+    "location": "Località",
+    "address": "Indirizzo",
+    "email": "Email",
+    "phone": "Telefono",
+    "tags": "Tag",
+    "tagsHint": "Separa più tag con virgole.",
+    "saving": "Salvataggio…",
+    "placeholders": {
+      "firstName": "Nome",
+      "surname": "Cognome",
+      "location": "Città o regione",
+      "address": "Via, CAP, città",
+      "email": "email@example.com",
+      "phone": "+39…",
+      "tags": "VIP, Premium"
     }
   },
   "addTagModal": {

@@ -7,7 +7,7 @@ import {
 } from '@/utils/mockDataHelpers'
 
 const STORAGE_KEY = 'project-ultra-leads'
-const DATA_VERSION = 3
+const DATA_VERSION = 4
 
 /**
  * Lead Repository
@@ -66,6 +66,33 @@ export class LeadRepository extends BaseRepository {
         lead.requestedCar.image = DEFAULT_CAR_IMAGE
         changed = true
       }
+    }
+    if (changed) this._persist()
+  }
+
+  /**
+   * Replace demo placeholder car images in localStorage with current mock URLs (e.g. bundled lead photos).
+   */
+  _syncDemoRequestedCarImagesFromMock(leads) {
+    if (!Array.isArray(leads)) return
+    const mockLeads = getMockData().mockLeads || []
+    const mockById = new Map(mockLeads.map((l) => [l.id, l]))
+    let changed = false
+    for (const lead of leads) {
+      const rc = lead.requestedCar
+      const mock = mockById.get(lead.id)
+      const mrc = mock?.requestedCar
+      if (!rc || !mrc?.image) continue
+      const stored = rc.image || ''
+      const fromMock = mrc.image
+      if (stored === fromMock) continue
+      const isDemoPlaceholder =
+        !stored ||
+        stored === DEFAULT_CAR_IMAGE ||
+        stored.includes('images.unsplash.com')
+      if (!isDemoPlaceholder) continue
+      rc.image = fromMock
+      changed = true
     }
     if (changed) this._persist()
   }
@@ -186,6 +213,7 @@ export class LeadRepository extends BaseRepository {
           this._leadsCache = Array.isArray(parsed) ? parsed : []
           this._ensureNextActionDue(this._leadsCache)
           this._ensureCarImages(this._leadsCache)
+          this._syncDemoRequestedCarImagesFromMock(this._leadsCache)
           this._ensureRequestedCarPlates(this._leadsCache)
           this._ensureLeadAttributionFromMock(this._leadsCache)
           this._ensureTradeInsFinancingFromMock(this._leadsCache)

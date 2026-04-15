@@ -191,6 +191,56 @@ export const fetchOpportunitiesByCustomerId = async (customerId, accountId = nul
   return { data: enrichedOpportunities, total: enrichedOpportunities.length }
 }
 
+const mockServiceHistoryByCustomerId = {
+  1: [
+    {
+      id: 1001,
+      title: 'Annual inspection',
+      subtitle: 'Apr 2026',
+      stage: 'Scheduled',
+      lastActivity: '2026-04-10T10:00:00.000Z'
+    },
+    {
+      id: 1002,
+      title: 'Brake service',
+      subtitle: 'Jan 2026',
+      stage: 'Completed',
+      lastActivity: '2026-01-15T14:00:00.000Z'
+    },
+    {
+      id: 1003,
+      title: 'Oil change',
+      subtitle: 'Oct 2025',
+      stage: 'Completed',
+      lastActivity: '2025-10-08T09:00:00.000Z'
+    },
+    {
+      id: 1004,
+      title: 'Winter tyres',
+      subtitle: 'Nov 2025',
+      stage: 'Completed',
+      lastActivity: '2025-11-20T11:00:00.000Z'
+    }
+  ],
+  2: [
+    {
+      id: 2001,
+      title: 'AC system check',
+      subtitle: 'Mar 2026',
+      stage: 'Open',
+      lastActivity: '2026-03-01T08:00:00.000Z'
+    }
+  ]
+}
+
+export const fetchServiceHistoryByCustomerId = async (customerId, _accountId = null) => {
+  await delay()
+  const cid =
+    customerId != null && customerId !== '' ? parseInt(String(customerId), 10) : NaN
+  const rows = Number.isFinite(cid) ? mockServiceHistoryByCustomerId[cid] || [] : []
+  return { data: rows, total: rows.length }
+}
+
 // Fetch leads by account ID
 export const fetchLeadsByAccountId = async (accountId) => {
   return await fetchLeadsByCustomerId(null, accountId)

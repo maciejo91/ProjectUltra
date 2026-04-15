@@ -6,6 +6,7 @@ import {
   DEMO_CUSTOMER_REQUEST_MESSAGE,
   demoPlateNumber
 } from '@/utils/mockDataHelpers'
+import audiA6Allroad40TdiImage from '@/assets/images/mock-vehicles/audi-a6-allroad-40-tdi.png'
 
 const lqfDemoCreatedAt = createHourOffset(-2)
 const lead2CreatedAt = createHourOffset(-3)
@@ -54,6 +55,7 @@ export const mockLeads = [
     priority: 'Hot',
     requestedCar: {
       ...baseRequestedCar('Audi', 'A6 Allroad', 2023, 19000),
+      image: audiA6Allroad40TdiImage,
       plateNumber: 'FZ131FG',
       variant: '40 TDI 2.0 quattro S tronic Business Advanced',
       kilometers: 10237,
@@ -295,6 +297,7 @@ export const mockLeads = [
     priority: 'Normal',
     requestedCar: {
       ...baseRequestedCar('Audi', 'A6 Allroad', 2023, 19000),
+      image: audiA6Allroad40TdiImage,
       listingUrl: demoListingUrl('audi-a6-allroad-dup')
     },
     ...demoRequestAttribution,
