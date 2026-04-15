@@ -77,8 +77,24 @@
     "nextStepQuestion": "Wat nu?",
     "backToCallOutcome": "Terug naar uitkomst oproep",
     "backToWhatsNext": "Terug naar wat nu",
-    "makeFirstCallAttempt": "Make the first call attempt",
-    "callAttemptsIndicatorAria": "Belpogingen: {current} van {max}"
+    "makeOrdinalCallAttempt": "Doe de {ordinal} belpoging",
+    "callAttemptOrdinal": {
+      "first": "eerste",
+      "second": "tweede",
+      "third": "derde",
+      "fourth": "vierde",
+      "fifth": "vijfde",
+      "sixth": "zesde",
+      "seventh": "zevende",
+      "eighth": "achtste",
+      "ninth": "negende",
+      "tenth": "tiende"
+    },
+    "callAttemptsIndicatorAria": "Belpogingen: {current} van {max}",
+    "assignTaskTitle": "Taak toewijzen",
+    "assigneeSelectPlaceholder": "Selecteer assignee",
+    "applyAssignment": "Toewijzing toepassen",
+    "assignWholeTeam": "Hele team"
   },
   "quickActions": {
     "phone": "Telefoon",

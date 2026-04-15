@@ -25,6 +25,7 @@
             :session-header-title="teaserSessionHeaderTitle"
             :teaser-line="teaserLine"
             :assignee-initials="assigneeInitials"
+            :assignment-lead-id="request.id"
             :manage-open="false"
             :internal-timer="false"
             :parent-countdown-label="lqTimer.countdownLabel"
@@ -32,6 +33,7 @@
             :contact-attempts="contactAttempts"
             :max-contact-attempts="maxContactAttempts"
             @manage-task="openFocus"
+            @reassigned="$emit('reassigned')"
           />
         </div>
 
@@ -49,6 +51,7 @@
           :session-header-title="teaserSessionHeaderTitle"
           :teaser-line="teaserLine"
           :assignee-initials="assigneeInitials"
+          :assignment-lead-id="request.id"
           :manage-open="true"
           :resume-from-collapsed="true"
           :internal-timer="false"
@@ -58,6 +61,7 @@
             :max-contact-attempts="maxContactAttempts"
             @resume-collapsed="expandFromMinimized"
             @cancel-action="handleFloatingTeaserCancel"
+            @reassigned="$emit('reassigned')"
         />
 
         <div
@@ -73,6 +77,7 @@
             :title-cta-href="expandedHeaderCallCtaHref"
             :title-id="focusTitleId"
             :assignee-initials="assigneeInitials"
+            :assignment-lead-id="request.id"
             :countdown-label="lqTimer.countdownLabel"
             :timer-aria="t('requestDetail.lqfTask.timerAria')"
             :timer-title="t('requestDetail.lqfTask.timerTooltip')"
@@ -81,6 +86,7 @@
             :chevron-aria-label="t('requestDetail.floatingLq.minimize')"
             on-dark-surface
             @chevron-click="collapseToMinimized"
+            @reassigned="$emit('reassigned')"
           />
 
           <RequestLqTaskExpandedOutcomeShell

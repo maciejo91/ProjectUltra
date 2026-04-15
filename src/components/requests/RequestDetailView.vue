@@ -212,6 +212,7 @@
                   :session-header-title="lqfSessionHeaderActive ? lqfCallingSessionTitle : ''"
                   :teaser-line="lqfTeaserLine"
                   :assignee-initials="lqfAssigneeInitials"
+                  :assignment-lead-id="request?.id"
                   :manage-open="lqfInlineManageOpen"
                   :hide-manage-call-now-cta="lqfHideManageCallNowCta"
                   :outcome-shell-animated="lqfOutcomeShellAnimated"
@@ -221,6 +222,7 @@
                   @manage-task="handleLqfManageTask"
                   @open-full-task="handleOpenTaskDrawer()"
                   @cancel-action="lqfInlineManageOpen = false"
+                  @reassigned="handleReassigned"
                 >
                   <template v-if="lqfInlineManageOpen" #outcome>
                     <LeadManagementWidget

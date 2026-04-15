@@ -77,8 +77,24 @@
     "nextStepQuestion": "Qual è il passo successivo?",
     "backToCallOutcome": "Torna all’esito della chiamata",
     "backToWhatsNext": "Torna a cosa succede dopo",
-    "makeFirstCallAttempt": "Make the first call attempt",
-    "callAttemptsIndicatorAria": "Tentativi di chiamata: {current} di {max}"
+    "makeOrdinalCallAttempt": "Effettua il {ordinal} tentativo di chiamata",
+    "callAttemptOrdinal": {
+      "first": "primo",
+      "second": "secondo",
+      "third": "terzo",
+      "fourth": "quarto",
+      "fifth": "quinto",
+      "sixth": "sesto",
+      "seventh": "settimo",
+      "eighth": "ottavo",
+      "ninth": "nono",
+      "tenth": "decimo"
+    },
+    "callAttemptsIndicatorAria": "Tentativi di chiamata: {current} di {max}",
+    "assignTaskTitle": "Assegna attività",
+    "assigneeSelectPlaceholder": "Seleziona assegnatario",
+    "applyAssignment": "Applica assegnazione",
+    "assignWholeTeam": "Team intero"
   },
   "quickActions": {
     "phone": "Telefono",

@@ -33,6 +33,7 @@
         :title-cta-label="manageHeaderCallCtaLabel"
         :title-cta-href="manageHeaderCallCtaHref"
         :assignee-initials="assigneeInitials"
+        :assignment-lead-id="assignmentLeadId"
         :countdown-label="headerCountdownLabel"
         :timer-aria="timerAria"
         :timer-title="timerTitle"
@@ -40,7 +41,8 @@
         chevron-direction="down"
         :chevron-aria-label="t('requestDetail.floatingLq.minimize')"
         :on-dark-surface="floatingInverse"
-        @chevron-click="$emit('cancel-action')"
+        @chevron-click="emit('cancel-action')"
+        @reassigned="emit('reassigned')"
       />
       <div class="w-full min-w-0 shrink-0">
         <RequestLqTaskExpandedOutcomeShell
@@ -59,6 +61,7 @@
       :title-cta-label="peekHeaderCallCtaLabel"
       :title-cta-href="peekHeaderCallCtaHref"
       :assignee-initials="assigneeInitials"
+      :assignment-lead-id="assignmentLeadId"
       :countdown-label="headerCountdownLabel"
       :timer-aria="timerAria"
       :timer-title="timerTitle"
@@ -67,6 +70,7 @@
       :chevron-aria-label="t('requestDetail.floatingLq.continue')"
       :on-dark-surface="floatingInverse"
       @chevron-click="resumeCollapsedTask"
+      @reassigned="emit('reassigned')"
     />
     <div
       :class="[
@@ -127,7 +131,6 @@
       >
         <div class="flex min-w-0 flex-1 items-center gap-2">
           <CallAttemptsProgressRing
-            v-if="showBodyAttemptsRing"
             :attempts="bodyContactAttempts"
             :max="bodyMaxContactAttempts"
             :aria-label="
@@ -284,6 +287,10 @@ const props = defineProps({
   maxContactAttempts: {
     type: Number,
     default: 5
+  },
+  assignmentLeadId: {
+    type: [String, Number],
+    default: null
   }
 })
 
@@ -291,7 +298,8 @@ const emit = defineEmits([
   'manage-task',
   'open-full-task',
   'cancel-action',
-  'resume-collapsed'
+  'resume-collapsed',
+  'reassigned'
 ])
 
 const { t } = useI18n()
@@ -400,10 +408,6 @@ const bodyTaskTitle = computed(() => {
 })
 
 const bodyTaskSubheader = computed(() => (props.headerContactSubline || '').trim())
-
-const showBodyAttemptsRing = computed(
-  () => !!(props.callNowTelHref || '').trim() && !activeSessionHeader.value
-)
 
 const bodyContactAttempts = computed(() => props.contactAttempts ?? 0)
 const bodyMaxContactAttempts = computed(() =>

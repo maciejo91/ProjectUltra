@@ -77,8 +77,24 @@
     "nextStepQuestion": "Wie geht es weiter?",
     "backToCallOutcome": "Zurück zur Anrufauswertung",
     "backToWhatsNext": "Zurück zu „Wie geht es weiter?“",
-    "makeFirstCallAttempt": "Make the first call attempt",
-    "callAttemptsIndicatorAria": "Anrufversuche: {current} von {max}"
+    "makeOrdinalCallAttempt": "Führen Sie den {ordinal} Anrufversuch durch",
+    "callAttemptOrdinal": {
+      "first": "ersten",
+      "second": "zweiten",
+      "third": "dritten",
+      "fourth": "vierten",
+      "fifth": "fünften",
+      "sixth": "sechsten",
+      "seventh": "siebten",
+      "eighth": "achten",
+      "ninth": "neunten",
+      "tenth": "zehnten"
+    },
+    "callAttemptsIndicatorAria": "Anrufversuche: {current} von {max}",
+    "assignTaskTitle": "Aufgabe zuweisen",
+    "assigneeSelectPlaceholder": "Bearbeiter auswählen",
+    "applyAssignment": "Zuweisung übernehmen",
+    "assignWholeTeam": "Gesamtes Team"
   },
   "quickActions": {
     "phone": "Telefon",

@@ -66,7 +66,53 @@
         <Clock class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
         <span class="leading-none">{{ countdownLabel }}</span>
       </span>
-      <div class="flex items-center gap-1.5 shrink-0">
+      <Popover
+        v-if="assignmentLeadId != null && assignmentLeadId !== ''"
+        :open="assignPopoverOpen"
+        @update:open="(v) => (assignPopoverOpen = v)"
+      >
+        <PopoverTrigger as-child>
+          <button
+            type="button"
+            class="flex items-center gap-1.5 shrink-0 rounded-sm text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            :class="
+              onDarkSurface
+                ? 'text-background/80 hover:text-background'
+                : 'text-muted-foreground hover:text-foreground'
+            "
+            :aria-label="t('requestDetail.lqfTask.assignTaskTitle')"
+            @click.stop
+          >
+            <span class="text-sm leading-none whitespace-nowrap">
+              {{ t('common.assignee.assignedTo') }}
+            </span>
+            <span
+              :class="[
+                'inline-flex size-7 items-center justify-center rounded-full text-sm font-normal leading-none',
+                onDarkSurface
+                  ? 'bg-background text-foreground'
+                  : 'bg-green-100 text-green-600'
+              ]"
+              aria-hidden="true"
+            >
+              {{ assigneeInitials }}
+            </span>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          class="z-50 w-full min-w-80 max-w-md overflow-hidden border border-border bg-background p-0 shadow-nsc-card rounded-xl"
+          side="bottom"
+          align="end"
+          :side-offset="6"
+          @click.stop
+        >
+          <LqTeaserAssignTaskPopoverContent
+            :lead-id="assignmentLeadId"
+            @assigned="onAssignTaskCompleted"
+          />
+        </PopoverContent>
+      </Popover>
+      <div v-else class="flex items-center gap-1.5 shrink-0">
         <span
           class="text-sm leading-none whitespace-nowrap"
           :class="onDarkSurface ? 'text-background/80' : 'text-muted-foreground'"
@@ -80,7 +126,7 @@
               ? 'bg-background text-foreground'
               : 'bg-green-100 text-green-600'
           ]"
-          aria-hidden
+          aria-hidden="true"
         >
           {{ assigneeInitials }}
         </span>
@@ -95,10 +141,10 @@
           onDarkSurface && 'text-background hover:bg-background/10 hover:text-background'
         ]"
         :aria-label="chevronAriaLabel"
-        @click.stop="$emit('chevron-click')"
+        @click.stop="emit('chevron-click')"
       >
         <ChevronUp v-if="chevronDirection === 'up'" class="size-4" />
-        <ChevronDown v-else class="size-4" />
+        <X v-else class="size-4" />
       </Button>
     </div>
   </div>
@@ -107,10 +153,18 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ChevronDown, ChevronUp, Clock } from 'lucide-vue-next'
-import { Button } from '@motork/component-library/future/primitives'
+import { ChevronUp, Clock, X } from 'lucide-vue-next'
+import {
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@motork/component-library/future/primitives'
+import LqTeaserAssignTaskPopoverContent from './LqTeaserAssignTaskPopoverContent.vue'
 
 const { t } = useI18n()
+
+const assignPopoverOpen = ref(false)
 
 defineProps({
   title: {
@@ -164,10 +218,14 @@ defineProps({
   titleCtaHref: {
     type: String,
     default: ''
+  },
+  assignmentLeadId: {
+    type: [String, Number],
+    default: null
   }
 })
 
-defineEmits(['chevron-click'])
+const emit = defineEmits(['chevron-click', 'reassigned'])
 
 const titleBlockRef = ref(null)
 
@@ -176,6 +234,11 @@ function focusForPanelTrap() {
   if (!el || typeof el.focus !== 'function') return
   el.setAttribute('tabindex', '-1')
   el.focus()
+}
+
+function onAssignTaskCompleted() {
+  assignPopoverOpen.value = false
+  emit('reassigned')
 }
 
 defineExpose({ focusForPanelTrap })

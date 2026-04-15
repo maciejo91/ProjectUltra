@@ -48,11 +48,46 @@ export function useLeadLqTeaser(leadRef) {
     return leadActions.showLQWidget.value && !leadActions.isClosed.value
   })
 
+  const contactAttemptsCount = computed(() => {
+    const lead = toValue(leadRef)
+    return lead?.contactAttempts?.length ?? 0
+  })
+
+  const maxContactAttemptsLimit = computed(
+    () => settingsStore.getSetting('maxContactAttempts') ?? 5
+  )
+
+  const CALL_ATTEMPT_ORDINAL_KEYS = [
+    'first',
+    'second',
+    'third',
+    'fourth',
+    'fifth',
+    'sixth',
+    'seventh',
+    'eighth',
+    'ninth',
+    'tenth'
+  ]
+
+  function callAttemptOrdinalKey(nextAttemptNumber) {
+    const n = Math.floor(Number(nextAttemptNumber)) || 1
+    const clamped = Math.min(Math.max(n, 1), CALL_ATTEMPT_ORDINAL_KEYS.length)
+    return CALL_ATTEMPT_ORDINAL_KEYS[clamped - 1]
+  }
+
+  const primaryActionKeysWithCallAttemptTitle = ['call-to-verify', 'call-prospect']
+
   const headerTaskTitle = computed(() => {
     const lead = toValue(leadRef)
     if (!lead) return ''
-    if (leadActions.primaryAction.value?.key === 'call-to-verify') {
-      return t('requestDetail.lqfTask.makeFirstCallAttempt')
+    const actionKey = leadActions.primaryAction.value?.key
+    if (primaryActionKeysWithCallAttemptTitle.includes(actionKey)) {
+      const nextAttempt = contactAttemptsCount.value + 1
+      const ordinalKey = callAttemptOrdinalKey(nextAttempt)
+      return t('requestDetail.lqfTask.makeOrdinalCallAttempt', {
+        ordinal: t(`requestDetail.lqfTask.callAttemptOrdinal.${ordinalKey}`)
+      })
     }
     return getTaskDisplayTitle(lead) || ''
   })
@@ -77,15 +112,6 @@ export function useLeadLqTeaser(leadRef) {
     if (!phone) return ''
     return `tel:${phone}`
   })
-
-  const contactAttemptsCount = computed(() => {
-    const lead = toValue(leadRef)
-    return lead?.contactAttempts?.length ?? 0
-  })
-
-  const maxContactAttemptsLimit = computed(
-    () => settingsStore.getSetting('maxContactAttempts') ?? 5
-  )
 
   const callingSessionTitle = computed(() => {
     const lead = toValue(leadRef)

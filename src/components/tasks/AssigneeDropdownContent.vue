@@ -1,5 +1,10 @@
 <template>
-  <div class="flex flex-col min-w-64 max-w-sm w-full bg-background rounded-lg shadow-nsc-card overflow-hidden">
+  <div
+    :class="[
+      'flex flex-col min-w-64 max-w-sm w-full bg-background overflow-hidden',
+      embedded ? 'min-h-0 min-w-0 max-w-none flex-1' : 'rounded-lg shadow-nsc-card'
+    ]"
+  >
     <div v-if="showRemoveAssignee" class="p-2 shrink-0 border-b border-border">
       <button
         type="button"
@@ -10,7 +15,7 @@
         <span class="text-sm font-medium">{{ t('common.assignee.removeAssignee') }}</span>
       </button>
     </div>
-    <div class="p-2 shrink-0">
+    <div :class="embedded ? 'shrink-0 px-4 pt-3 pb-2' : 'shrink-0 p-2'">
       <Input
         v-model="searchQuery"
         type="text"
@@ -18,14 +23,25 @@
         class="w-full h-10 min-h-10"
       />
     </div>
-    <div class="max-h-96 overflow-y-auto p-2">
+    <div
+      :class="
+        embedded
+          ? 'min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-4 pt-0'
+          : 'max-h-96 overflow-y-auto p-2'
+      "
+    >
       <template v-if="hasAnyResults">
         <div
           v-for="section in filteredSections"
           :key="section.key"
-          class="mb-3 last:mb-0"
+          :class="embedded ? 'mb-2 last:mb-0' : 'mb-3 last:mb-0'"
         >
-          <p class="text-sm font-medium text-muted-foreground normal-case px-2 py-1 mb-1">
+          <p
+            :class="[
+              'text-sm font-medium text-muted-foreground normal-case px-2 mb-1',
+              embedded ? 'py-0.5' : 'py-1'
+            ]"
+          >
             {{ section.key === 'teams' ? t('common.assignee.teamsLabel') : section.label }}
           </p>
           <div class="space-y-0.5">
@@ -71,6 +87,10 @@ import { getTeamAvatarClass } from '@/composables/useTeamAvatarColor'
 
 const props = defineProps({
   showRemoveAssignee: {
+    type: Boolean,
+    default: false
+  },
+  embedded: {
     type: Boolean,
     default: false
   }

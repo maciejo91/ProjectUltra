@@ -77,8 +77,24 @@
     "nextStepQuestion": "What's next?",
     "backToCallOutcome": "Back to call outcome",
     "backToWhatsNext": "Back to what's next",
-    "makeFirstCallAttempt": "Make the first call attempt",
-    "callAttemptsIndicatorAria": "Call attempts: {current} of {max}"
+    "makeOrdinalCallAttempt": "Make the {ordinal} call attempt",
+    "callAttemptOrdinal": {
+      "first": "first",
+      "second": "second",
+      "third": "third",
+      "fourth": "fourth",
+      "fifth": "fifth",
+      "sixth": "sixth",
+      "seventh": "seventh",
+      "eighth": "eighth",
+      "ninth": "ninth",
+      "tenth": "tenth"
+    },
+    "callAttemptsIndicatorAria": "Call attempts: {current} of {max}",
+    "assignTaskTitle": "Assign task",
+    "assigneeSelectPlaceholder": "Select assignee",
+    "applyAssignment": "Apply assignment",
+    "assignWholeTeam": "Entire team"
   },
   "quickActions": {
     "phone": "Phone",
