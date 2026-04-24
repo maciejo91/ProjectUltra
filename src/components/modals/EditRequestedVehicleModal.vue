@@ -386,22 +386,23 @@ const REQUEST_TYPE_VALUES = [
 const ORIGIN_DETAIL_NONE = '__none__'
 
 const CHANNEL_VALUES = [
-  'Manual import',
-  'Web',
-  'Paid',
-  'Showroom',
-  'Organic',
-  'Email',
-  'WhatsApp'
+  'automation',
+  'email',
+  'integration',
+  'manual_import',
+  'other',
+  'phone',
+  'walk_in',
+  'whatsapp',
 ]
 
 const ORIGIN_VALUES = [
-  'Web',
-  'Walk-in',
-  'Google Ads',
-  'Autoscout24.es',
-  'Phone',
-  'Referral'
+  'marketing',
+  'marketing_automation',
+  'other',
+  'social',
+  'third_parties',
+  'web',
 ]
 
 const ORIGIN_DETAIL_VALUES = ['Webspark', 'Showroom visit', 'Summer Campaign 2024', 'Organic search']
@@ -421,7 +422,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open', 'save'])
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 
 const brandOpen = ref(false)
 const modelOpen = ref(false)
@@ -491,30 +492,13 @@ function requestTypeLabel(value) {
 }
 
 function channelLabel(value) {
-  const keys = {
-    'Manual import': 'requestDetail.editVehicleModal.channels.manualImport',
-    Web: 'requestDetail.editVehicleModal.channels.web',
-    Paid: 'requestDetail.editVehicleModal.channels.paid',
-    Showroom: 'requestDetail.editVehicleModal.channels.showroom',
-    Organic: 'requestDetail.editVehicleModal.channels.organic',
-    Email: 'requestDetail.editVehicleModal.channels.email',
-    WhatsApp: 'requestDetail.editVehicleModal.channels.whatsapp'
-  }
-  const k = keys[value]
-  return k ? t(k) : value
+  const k = `forms.addNew.leadDetails.options.channel.${value}`
+  return te(k) ? t(k) : value
 }
 
 function originLabel(value) {
-  const keys = {
-    Web: 'requestDetail.editVehicleModal.origins.web',
-    'Walk-in': 'requestDetail.editVehicleModal.origins.walkIn',
-    'Google Ads': 'requestDetail.editVehicleModal.origins.googleAds',
-    'Autoscout24.es': 'requestDetail.editVehicleModal.origins.autoscout',
-    Phone: 'requestDetail.editVehicleModal.origins.phone',
-    Referral: 'requestDetail.editVehicleModal.origins.referral'
-  }
-  const k = keys[value]
-  return k ? t(k) : value
+  const k = `forms.addNew.leadDetails.options.source.${value}`
+  return te(k) ? t(k) : value
 }
 
 function originDetailLabel(value) {

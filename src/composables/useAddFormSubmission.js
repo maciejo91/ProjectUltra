@@ -8,6 +8,7 @@ import { ref, computed } from 'vue'
  * @param {import('vue').Ref<Object|null>} params.selectedContact - Selected existing contact
  * @param {Object} params.contactFormData - Contact form data (reactive)
  * @param {Object} params.vehicleFormData - Vehicle form data (reactive)
+ * @param {Object} [params.leadDetailsForm] - Lead details block (reactive)
  * @param {import('vue').Ref<boolean>} params.markAsLead - Mark as lead flag
  * @param {import('vue').Ref<boolean>} params.markAsOpportunity - Mark as opportunity flag
  * @param {Function} params.validateContactForm - Validation function
@@ -19,12 +20,35 @@ export function useAddFormSubmission({
   selectedContact,
   contactFormData,
   vehicleFormData,
+  leadDetailsForm,
   markAsLead,
   markAsOpportunity,
+  submitIntent,
   validateContactForm,
   onSubmit
 }) {
   const isSubmitting = ref(false)
+
+  const buildMoreDetailsFromStructured = () => {
+    const lines = []
+    const push = (label, value) => {
+      const v = (value || '').toString().trim()
+      if (!v) return
+      lines.push(`${label}: ${v}`)
+    }
+    push('Address', contactFormData.detailsAddress)
+    push('Address additional info', contactFormData.detailsAddressAdditionalInfo)
+    push('State/Province', contactFormData.detailsStateProvince)
+    push('Country', contactFormData.detailsCountry)
+    push('Tax code', contactFormData.detailsTaxCode)
+    push('Language', contactFormData.detailsLanguage)
+    push('Date of birth', contactFormData.detailsDateOfBirth)
+    push('Place of birth', contactFormData.detailsPlaceOfBirth)
+    push('Gender', contactFormData.detailsGender)
+    push('Job title', contactFormData.detailsJobTitle)
+    push('Favorite contact method', contactFormData.detailsFavoriteContactMethod)
+    return lines.join('\n').trim()
+  }
 
   /**
    * Cleans vehicle data by removing empty values
@@ -32,16 +56,46 @@ export function useAddFormSubmission({
    * @returns {Object} Cleaned vehicle data
    */
   const cleanVehicleData = (vehicleData) => {
-    return Object.entries(vehicleData).reduce((acc, [key, value]) => {
-      if (value !== null && value !== '' && value !== undefined) {
-        // Don't include default year if not modified
-        if (key === 'year' && value === new Date().getFullYear()) {
-          return acc
-        }
-        acc[key] = value
+    if (!vehicleData || typeof vehicleData !== 'object') return {}
+
+    // Mutual exclusivity: submit either stock selection or manual insert fields.
+    const hasStock = vehicleData.stockVehicleId != null
+    const isManual = vehicleData.manualOpen === true
+
+    if (hasStock) {
+      const out = {
+        stockVehicleId: vehicleData.stockVehicleId,
+        brand: vehicleData.brand,
+        model: vehicleData.model,
+        vin: vehicleData.vin,
+        plateNumber: vehicleData.plateNumber,
+        label: vehicleData.label,
+        summary: vehicleData.summary,
       }
-      return acc
-    }, {})
+      return Object.entries(out).reduce((acc, [key, value]) => {
+        if (value !== null && value !== '' && value !== undefined) acc[key] = value
+        return acc
+      }, {})
+    }
+
+    if (isManual) {
+      const out = {
+        manualVehicleClass: vehicleData.manualVehicleClass,
+        manualVehicleType: vehicleData.manualVehicleType,
+        manualBrand: vehicleData.manualBrand,
+        manualModel: vehicleData.manualModel,
+        manualVersion: vehicleData.manualVersion,
+        manualFuelType: vehicleData.manualFuelType,
+        manualQuantity: vehicleData.manualQuantity,
+        manualVehiclePrice: vehicleData.manualVehiclePrice,
+      }
+      return Object.entries(out).reduce((acc, [key, value]) => {
+        if (value !== null && value !== '' && value !== undefined) acc[key] = value
+        return acc
+      }, {})
+    }
+
+    return {}
   }
 
   /**
@@ -50,11 +104,41 @@ export function useAddFormSubmission({
    */
   const prepareContactData = () => {
     if (contactMode.value === 'new') {
+      const name =
+        [contactFormData.firstName, contactFormData.lastName]
+          .map((s) => (s || '').trim())
+          .filter(Boolean)
+          .join(' ')
+          .trim() || (contactFormData.name || '').trim()
+      const companyTrim = (contactFormData.company || '').trim()
       return {
-        name: contactFormData.name.trim(),
-        email: contactFormData.email.trim(),
-        phone: contactFormData.phone.trim(),
-        company: contactFormData.company.trim()
+        name,
+        firstName: (contactFormData.firstName || '').trim(),
+        lastName: (contactFormData.lastName || '').trim(),
+        email: (contactFormData.email || '').trim(),
+        phone: (contactFormData.phone || '').trim(),
+        company: companyTrim,
+        accountType: contactFormData.accountType || 'private',
+        companyAccountMode: contactFormData.companyAccountMode || 'link',
+        linkedAccountId:
+          contactFormData.linkedAccount && contactFormData.linkedAccount.id != null
+            ? contactFormData.linkedAccount.id
+            : null,
+        linkedAccount: contactFormData.linkedAccount
+          ? JSON.parse(JSON.stringify(contactFormData.linkedAccount))
+          : null,
+        companyVat: (contactFormData.companyVat || '').trim(),
+        companyEmployeeCount: (contactFormData.companyEmployeeCount || '').toString().trim(),
+        companyIsDealer: !!contactFormData.companyIsDealer,
+        fiscalEntityIds: Array.isArray(contactFormData.fiscalEntityIds) ? [...contactFormData.fiscalEntityIds] : [],
+        secondaryPhones: (contactFormData.secondaryPhones || []).map((p) => (p || '').trim()).filter(Boolean),
+        secondaryEmails: (contactFormData.secondaryEmails || []).map((e) => (e || '').trim()).filter(Boolean),
+        town: (contactFormData.town || '').trim(),
+        zip: (contactFormData.zip || '').trim(),
+        moreDetails: buildMoreDetailsFromStructured() || (contactFormData.moreDetails || '').trim(),
+        privacyConsents: contactFormData.privacyConsents
+          ? JSON.parse(JSON.stringify(contactFormData.privacyConsents))
+          : {}
       }
     }
     return null
@@ -77,12 +161,19 @@ export function useAddFormSubmission({
     // Prepare contact data
     const contactData = prepareContactData()
 
+    const leadDetails =
+      leadDetailsForm && typeof leadDetailsForm === 'object'
+        ? JSON.parse(JSON.stringify(leadDetailsForm))
+        : null
+
     // Prepare submission data
     const submissionData = {
+      intent: submitIntent?.value || 'save_and_close',
       contactMode: contactMode.value,
       selectedContact: selectedContact.value,
       contactData,
       vehicleData: Object.keys(cleanedVehicleData).length > 0 ? cleanedVehicleData : null,
+      leadDetails,
       markAsLead: markAsLead.value,
       markAsOpportunity: markAsOpportunity.value
     }

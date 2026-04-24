@@ -1,102 +1,27 @@
 <template>
-  <form v-click-outside="() => (showResults = false)" @submit.prevent="handleSubmit" class="w-full">
-    <!-- Customer Section -->
-    <Card class="mb-6">
-      <CardHeader>
-        <CardTitle>Customer Information</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-8">
-        
-        <!-- Toggle and Search (hidden if hideContactSelection is true) -->
-        <div v-if="!hideContactSelection" class="space-y-8">
-          <!-- Radio: Existing vs New -->
-          <div class="space-y-3">
-            <Label class="block text-sm font-semibold text-foreground">Customer Type</Label>
-            <div class="flex gap-6">
-              <Label class="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  v-model="contactMode"
-                  value="new"
-                  class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-gray-300"
-                />
-                <span class="text-sm text-muted-foreground">New Customer</span>
-              </Label>
-              <Label class="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  v-model="contactMode"
-                  value="existing"
-                  class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-gray-300"
-                />
-                <span class="text-sm text-muted-foreground">Existing Customer</span>
-              </Label>
-            </div>
-          </div>
-        
-          <!-- Contact Search (if existing) -->
-          <div v-if="contactMode === 'existing'" class="space-y-6">
-            <CustomerSearchSelect
+  <form @submit.prevent="submitHandler" class="flex min-h-0 w-full min-w-0 flex-1 flex-col">
+    <!-- Own scrollport so the footer is not "sticky" over content (avoids overlap). -->
+    <div
+      ref="manualFormScrollRef"
+      class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain -mx-6 px-6 [scrollbar-gutter:stable]"
+    >
+      <div class="mb-6 space-y-6">
+        <div v-if="!hideContactSelection" class="space-y-6">
+          <template v-if="!isCreatingContact">
+            <SelectContactBox
               v-model="selectedContact"
-              label="Search Customer"
+              :duplicate-count="duplicateCount"
+              @create-contact="startCreateContact"
             />
-          </div>
-        
-          <!-- Customer Form Fields (if new) -->
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-3 w-full">
-              <Label class="block text-sm font-semibold text-foreground">
-                Customer Name <span class="text-brand-red">*</span>
-              </Label>
-              <Input 
-                v-model="contactFormData.name"
-                type="text" 
-                placeholder="Enter customer name..."
-                class="w-full h-10"
-                :required="contactMode === 'new'"
-                :error="errors.name"
-              />
-              <p v-if="errors.name" class="text-brand-red text-sm mt-1">{{ errors.name }}</p>
-            </div>
-            
-            <div class="space-y-3 w-full">
-              <Label class="block text-sm font-semibold text-foreground">Company (optional)</Label>
-              <Input 
-                v-model="contactFormData.company"
-                type="text" 
-                placeholder="Company name..."
-                class="w-full h-10"
-              />
-            </div>
-            
-            <div class="space-y-3 w-full">
-              <Label class="block text-sm font-semibold text-foreground">
-                Email <span class="text-brand-red">*</span>
-              </Label>
-              <Input 
-                v-model="contactFormData.email"
-                type="email" 
-                placeholder="customer@example.com"
-                class="w-full h-10"
-                :required="contactMode === 'new'"
-                :error="errors.email"
-              />
-              <p v-if="errors.email" class="text-brand-red text-sm mt-1">{{ errors.email }}</p>
-            </div>
-            
-            <div class="space-y-3 w-full">
-              <Label class="block text-sm font-semibold text-foreground">Phone</Label>
-              <Input 
-                v-model="contactFormData.phone"
-                type="tel" 
-                placeholder="+49..."
-                class="w-full h-10"
-              />
-            </div>
-          </div>
+          </template>
+          <ManualContactCreationPanel
+            v-else
+            :contact-form-data="contactFormData"
+            :errors="errors"
+            @request-close="onRequestCloseCreate"
+          />
         </div>
 
-        <!-- Read-only Selected Customer Display (shown if selection is hidden) -->
         <Card v-else-if="selectedContact" class="bg-muted border-border">
           <CardContent class="p-4">
             <div class="flex items-center gap-3">
@@ -110,239 +35,95 @@
             </div>
           </CardContent>
         </Card>
-      </CardContent>
-    </Card>
-    
-    <!-- Vehicle Details Section (Optional) -->
-    <Card class="mb-6">
-      <CardHeader>
-        <CardTitle>
-          Vehicle Details 
-          <span class="text-sm font-normal text-muted-foreground">(Optional)</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-8">
-        <div class="space-y-5">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-3 w-full">
-              <Label class="block text-sm font-semibold text-foreground">Brand</Label>
-              <Input 
-                v-model="vehicleFormData.brand"
-                type="text" 
-                placeholder="e.g., VW"
-                class="w-full h-10"
-              />
-            </div>
-            
-            <div class="space-y-3 w-full">
-              <Label class="block text-sm font-semibold text-foreground">Model</Label>
-              <Input 
-                v-model="vehicleFormData.model"
-                type="text" 
-                placeholder="e.g., ID.4"
-                class="w-full h-10"
-              />
-            </div>
-            
-            <div class="space-y-3 w-full">
-              <Label class="block text-sm font-semibold text-foreground">Year</Label>
-              <Input 
-                v-model="vehicleFormData.year"
-                type="number" 
-                :min="1900"
-                :max="new Date().getFullYear() + 1"
-                placeholder="2024"
-                class="w-full h-10"
-              />
-            </div>
-            
-            <div class="space-y-3 w-full">
-              <Label class="block text-sm font-semibold text-foreground">Price</Label>
-              <Input 
-                v-model="vehicleFormData.price"
-                type="number" 
-                :min="0"
-                placeholder="45000"
-                class="w-full h-10"
-              />
-            </div>
-          </div>
-        </div>
-      
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Request Details -->
-          <div class="space-y-3 w-full">
-            <Label class="block text-sm font-semibold text-foreground">Request Type</Label>
-            <Select v-model="vehicleFormData.requestType">
-              <SelectTrigger class="w-full h-10">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Quotation">Quotation</SelectItem>
-                <SelectItem value="Test Drive">Test Drive</SelectItem>
-                <SelectItem value="Information">Information</SelectItem>
-                <SelectItem value="Purchase">Purchase</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div class="space-y-3 w-full">
-            <Label class="block text-sm font-semibold text-foreground">Source</Label>
-            <Select v-model="vehicleFormData.source">
-              <SelectTrigger class="w-full h-10">
-                <SelectValue placeholder="Select source" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Marketing">Marketing</SelectItem>
-                <SelectItem value="Website">Website</SelectItem>
-                <SelectItem value="Phone">Phone</SelectItem>
-                <SelectItem value="Walk-in">Walk-in</SelectItem>
-                <SelectItem value="Referral">Referral</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <!-- Vehicle Specs -->
-          <div class="space-y-3 w-full">
-            <Label class="block text-sm font-semibold text-foreground">Fuel Type</Label>
-            <Select v-model="vehicleFormData.fuelType">
-              <SelectTrigger class="w-full h-10">
-                <SelectValue placeholder="Select fuel" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Petrol">Petrol</SelectItem>
-                <SelectItem value="Diesel">Diesel</SelectItem>
-                <SelectItem value="Electric">Electric</SelectItem>
-                <SelectItem value="Hybrid">Hybrid</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div class="space-y-3 w-full">
-            <Label class="block text-sm font-semibold text-foreground">Gear Type</Label>
-            <Select v-model="vehicleFormData.gearType">
-              <SelectTrigger class="w-full h-10">
-                <SelectValue placeholder="Select gear" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Manual">Manual</SelectItem>
-                <SelectItem value="Automatic">Automatic</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
 
-        <div class="space-y-3">
-          <Label class="block text-sm font-semibold text-foreground">Request Message</Label>
-          <Textarea 
-            v-model="vehicleFormData.requestMessage"
-            :rows="3"
-            placeholder="Customer's message or notes..."
-            class="w-full"
-          />
-        </div>
-      </CardContent>
-    </Card>
-    
-    <!-- Task Creation Checkboxes -->
-    <Card class="bg-muted border-border mb-6">
-      <CardHeader>
-        <CardTitle>Create Task (Optional)</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-5">
-        <p class="text-sm text-muted-foreground">
-          Convert this customer to a lead or opportunity. 
-          <span class="font-semibold text-muted-foreground">Requires vehicle details.</span>
-        </p>
-        
-        <div v-if="!forceType" class="flex flex-col md:flex-row gap-4">
-          <Card 
-            class="flex-1 border-border"
-            :class="hasVehicleData ? 'cursor-pointer hover:border-primary/30' : 'cursor-not-allowed opacity-60'"
-          >
-            <CardContent class="flex items-center gap-3">
-              <Checkbox
-                v-model="markAsLead"
-                :disabled="!hasVehicleData"
-                label=""
-              />
-              <div>
-                <span 
-                  class="text-sm font-semibold"
-                  :class="hasVehicleData ? 'text-foreground' : 'text-muted-foreground'"
-                >
-                  Mark as Lead
-                </span>
-                <p class="text-sm text-muted-foreground mt-0.5">New lead task</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            class="flex-1 border-border"
-            :class="hasVehicleData ? 'cursor-pointer hover:border-primary/30' : 'cursor-not-allowed opacity-60'"
-          >
-            <CardContent class="flex items-center gap-3">
-              <Checkbox
-                v-model="markAsOpportunity"
-                :disabled="!hasVehicleData"
-                label=""
-              />
-              <div>
-                <span 
-                  class="text-sm font-semibold"
-                  :class="hasVehicleData ? 'text-foreground' : 'text-muted-foreground'"
-                >
-                  Mark as Opportunity
-                </span>
-                <p class="text-sm text-muted-foreground mt-0.5">New opportunity</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <!-- If forceType is set, just show confirmation -->
-        <Card v-else class="bg-white border-border">
-          <CardContent class="flex items-center gap-3">
-            <Info class="w-4 h-4 shrink-0 text-primary" />
-            <div>
-              <p class="text-sm font-semibold text-foreground">
-                Converting to {{ forceType === 'lead' ? 'Lead' : 'Opportunity' }}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card v-if="!hasVehicleData && !forceType" class="bg-orange-50 border-orange-200">
-          <CardContent class="flex items-start gap-2">
-            <AlertTriangle class="w-4 h-4 shrink-0 text-orange-600 mt-0.5" />
-            <span class="text-sm text-orange-700">Fill in vehicle details to enable lead/opportunity creation</span>
-          </CardContent>
-        </Card>
-      </CardContent>
-    </Card>
-
-    <div class="flex justify-end pt-4">
-      <Button
-        type="submit"
-        variant="default"
-        :disabled="!canSubmit || isSubmitting"
-        class="rounded-sm w-full sm:w-auto"
-      >
-        {{ isSubmitting ? 'Saving...' : 'Save' }}
-      </Button>
+        <LeadDetailsSection
+          v-if="showLeadDetails"
+          :key="leadDetailsRemountKey"
+          :lead-form="leadDetailsForm"
+          :vehicle-form-data="vehicleFormData"
+          :errors="errors"
+        />
+      </div>
     </div>
+
+    <div
+      class="shrink-0 z-20 -mx-6 border-t border-border bg-background/95 px-6 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur supports-[backdrop-filter]:bg-background/80"
+    >
+      <div class="flex items-center justify-end gap-4">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          :disabled="!canSubmit || isSubmitting"
+          class="h-8 rounded-md w-full sm:w-auto"
+          @click="submitSaveAndClose"
+        >
+          Save and close
+        </Button>
+        <Button
+          type="submit"
+          variant="default"
+          size="sm"
+          :disabled="!canSubmit || isSubmitting"
+          class="h-8 rounded-md w-full sm:w-auto"
+          @click="submitProceedToQualification"
+        >
+          Proceed to qualification
+        </Button>
+      </div>
+    </div>
+
+    <Dialog :open="showCloseCreateConfirm" @update:open="(o) => (showCloseCreateConfirm = o)">
+      <DialogPortal>
+        <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
+        <DialogContent class="w-full sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{{ t('forms.addNew.manualContact.discardTitle') }}</DialogTitle>
+            <p class="text-sm text-muted-foreground pt-1">{{ t('forms.addNew.manualContact.discardMessage') }}</p>
+          </DialogHeader>
+          <DialogFooter class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button variant="outline" class="w-full sm:w-auto" @click="showCloseCreateConfirm = false">
+              {{ t('common.buttons.cancel') }}
+            </Button>
+            <Button variant="default" class="w-full sm:w-auto" @click="confirmDiscardCreate">
+              {{ t('forms.addNew.manualContact.discardConfirm') }}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   </form>
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, onMounted } from 'vue'
-import { Info, AlertTriangle } from 'lucide-vue-next'
-import { Button, Checkbox, Input, Toggle, Card, CardHeader, CardTitle, CardContent, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Label } from '@motork/component-library/future/primitives'
-import CustomerSearchSelect from '@/components/shared/CustomerSearchSelect.vue'
+import { ref, reactive, watch, onMounted, computed, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
+import {
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+} from '@motork/component-library/future/primitives'
+import SelectContactBox from '@/components/addnew/SelectContactBox.vue'
+import ManualContactCreationPanel from '@/components/addnew/ManualContactCreationPanel.vue'
+import LeadDetailsSection from '@/components/addnew/LeadDetailsSection.vue'
 import { useCustomersStore } from '@/stores/customers'
+import { useUserStore } from '@/stores/user'
+import {
+  FISCAL_ENTITY_COMPANY_A,
+  FISCAL_ENTITY_COMPANY_B,
+  isKnownFiscalEntityId,
+} from '@/constants/fiscalEntities'
 import { useAddFormValidation } from '@/composables/useAddFormValidation'
 import { useAddFormSubmission } from '@/composables/useAddFormSubmission'
+
+const { t } = useI18n()
 
 const props = defineProps({
   initialContact: {
@@ -352,74 +133,336 @@ const props = defineProps({
   hideContactSelection: {
     type: Boolean,
     default: false
-  },
-  forceType: {
-    type: String, // 'lead' | 'opportunity'
-    default: ''
   }
 })
 
 const emit = defineEmits(['submit'])
 
 const customersStore = useCustomersStore()
+const userStore = useUserStore()
 
-// Contact Mode
-const contactMode = ref(props.initialContact ? 'existing' : 'new') // 'existing' or 'new'
+function defaultFiscalEntityIdsForCreator() {
+  const id = userStore.currentUser?.fiscalEntityId
+  if (id && isKnownFiscalEntityId(id)) return [id]
+  return [FISCAL_ENTITY_COMPANY_A]
+}
 
+function defaultLeadFiscalEntityId() {
+  const id = userStore.currentUser?.fiscalEntityId
+  if (id && isKnownFiscalEntityId(id)) return id
+  return FISCAL_ENTITY_COMPANY_A
+}
+
+function createDefaultLeadDetailsForm() {
+  return {
+    department: 'sales',
+    recordType: 'lead',
+    requestType: '',
+    channel: '',
+    source: '',
+    sourceDetail: '',
+    fiscalEntity: defaultLeadFiscalEntityId(),
+    dealership: '',
+    requestMessage: '',
+    notesToSellers: '',
+    serviceName: '',
+    serviceDescription: '',
+    servicePrice: '',
+    serviceOppNotes: '',
+    assigneeId: '',
+    assigneesFromRelationshipOnly: false,
+  }
+}
+
+const contactMode = ref(props.initialContact ? 'existing' : 'new')
 const selectedContact = ref(props.initialContact || null)
+const isCreatingContact = ref(false)
+const duplicateCount = 150
+const showCloseCreateConfirm = ref(false)
 
-// Contact Form Data (for new)
+function defaultPrivacyConsents() {
+  const row = {
+    dataProcessing: true,
+    profiling: false,
+    thirdParty: false,
+    marketing: false,
+    marketingChannels: {
+      callPrimary: false,
+      callSecondary: false,
+      smsPrimary: false,
+      smsSecondary: false,
+      whatsappPrimary: false,
+      whatsappSecondary: false,
+      emailPrimary: false,
+      emailSecondary: false,
+      mailAddress: false,
+    },
+  }
+  return {
+    [FISCAL_ENTITY_COMPANY_A]: { ...row },
+    [FISCAL_ENTITY_COMPANY_B]: { ...row },
+  }
+}
+
 const contactFormData = reactive({
   name: '',
+  firstName: '',
+  lastName: '',
   email: '',
   phone: '',
-  company: ''
+  company: '',
+  /** When accountType === 'company': create new company vs link to existing account */
+  companyAccountMode: 'link',
+  /** Set when companyAccountMode is 'link': full account object from `fetchAccounts` */
+  linkedAccount: null,
+  companyVat: '',
+  companyEmployeeCount: '',
+  companyIsDealer: false,
+  accountType: 'private',
+  fiscalEntityIds: defaultFiscalEntityIdsForCreator(),
+  secondaryPhones: [],
+  secondaryEmails: [],
+  town: '',
+  zip: '',
+  // "More details" accordion (structured) — submitted as a string via useAddFormSubmission
+  detailsAddress: '',
+  detailsAddressAdditionalInfo: '',
+  detailsStateProvince: '',
+  detailsCountry: 'IT',
+  detailsTaxCode: '',
+  detailsLanguage: '',
+  detailsDateOfBirth: '',
+  detailsPlaceOfBirth: '',
+  detailsGender: '',
+  detailsJobTitle: '',
+  detailsFavoriteContactMethod: '',
+  moreDetails: '',
+  privacyConsents: defaultPrivacyConsents()
 })
 
-// Vehicle Form Data
-const vehicleFormData = reactive({
-  brand: '',
-  model: '',
-  year: new Date().getFullYear(),
-  price: null,
-  requestMessage: '',
-  requestType: '',
-  source: '',
-  dealership: '',
-  channel: 'Email',
-  fuelType: '',
-  gearType: '',
-  kilometers: null,
-  stockDays: null
-})
+function createDefaultVehicleFormState() {
+  return {
+    stockVehicleId: null,
+    /** Full selected vehicle object from inventory table (in-stock) */
+    stockVehicle: null,
+    label: '',
+    summary: '',
+    vin: '',
+    plateNumber: '',
+    brand: '',
+    model: '',
+    manualOpen: false,
+    configureOpen: false,
 
-// Task Marking
-const markAsLead = ref(props.forceType === 'lead')
-const markAsOpportunity = ref(props.forceType === 'opportunity')
-
-// Update marking when forceType changes
-watch(() => props.forceType, (newType) => {
-  if (newType === 'lead') {
-    markAsLead.value = true
-    markAsOpportunity.value = false
-  } else if (newType === 'opportunity') {
-    markAsLead.value = false
-    markAsOpportunity.value = true
+    // Manual insert (Figma 1710:68242)
+    manualVehicleClass: '',
+    manualVehicleType: '',
+    manualBrand: '',
+    manualModel: '',
+    manualVersion: '',
+    manualFuelType: '',
+    manualQuantity: '1',
+    manualVehiclePrice: '',
   }
-})
+}
 
-watch(() => props.initialContact, (newContact) => {
-  if (newContact) {
-    selectedContact.value = newContact
-    contactMode.value = 'existing'
+const vehicleFormData = reactive(createDefaultVehicleFormState())
+
+const leadDetailsForm = reactive(createDefaultLeadDetailsForm())
+
+const markAsLead = ref(false)
+const markAsOpportunity = ref(false)
+const lastContactKeyForAssignee = ref(null)
+
+/** Lead details block is always visible in the scroll area (not gated on contact selection). */
+const showLeadDetails = computed(() => true)
+
+function resolveDefaultAssigneeId() {
+  const c = selectedContact.value
+  if (c?.accountOwner?.id != null) return String(c.accountOwner.id)
+  if (isCreatingContact.value) return String(userStore.currentUser?.id ?? '')
+  return ''
+}
+
+function syncAssigneeFromContact() {
+  leadDetailsForm.assigneeId = resolveDefaultAssigneeId()
+}
+
+watch(
+  () => leadDetailsForm.recordType,
+  (r) => {
+    markAsLead.value = r === 'lead'
+    markAsOpportunity.value = r === 'opportunity'
+  },
+  { immediate: true }
+)
+
+watch(
+  [selectedContact, isCreatingContact, () => userStore.currentUser?.id],
+  () => {
+    let key = null
+    if (selectedContact.value) {
+      key = `c-${selectedContact.value.id}`
+    } else if (isCreatingContact.value) {
+      key = 'new'
+    }
+    if (key == null) return
+    if (key !== lastContactKeyForAssignee.value) {
+      lastContactKeyForAssignee.value = key
+      syncAssigneeFromContact()
+    }
+  },
+  { immediate: true }
+)
+const submitIntent = ref('save_and_close')
+/** Bumps on full reset so LeadDetailsSection remounts (modal + local UI). */
+const leadDetailsRemountKey = ref(0)
+const manualFormScrollRef = ref(null)
+
+watch(
+  () => [contactFormData.firstName, contactFormData.lastName],
+  () => {
+    const n = [contactFormData.firstName, contactFormData.lastName]
+      .map((s) => (s || '').trim())
+      .filter(Boolean)
+      .join(' ')
+      .trim()
+    contactFormData.name = n
   }
-}, { immediate: true })
+)
 
-// Use validation composable
+watch(
+  () => props.initialContact,
+  (newContact) => {
+    if (newContact) {
+      selectedContact.value = newContact
+      contactMode.value = 'existing'
+      isCreatingContact.value = false
+    }
+  },
+  { immediate: true }
+)
+
+function clearCompanyAccountSubstate() {
+  contactFormData.companyAccountMode = 'link'
+  contactFormData.linkedAccount = null
+  contactFormData.companyVat = ''
+  contactFormData.companyEmployeeCount = ''
+  contactFormData.companyIsDealer = false
+  contactFormData.company = ''
+}
+
+watch(
+  () => contactFormData.accountType,
+  (t) => {
+    if (t !== 'company') {
+      clearCompanyAccountSubstate()
+    } else {
+      contactFormData.companyAccountMode = 'link'
+    }
+  }
+)
+
+watch(
+  () => contactFormData.companyAccountMode,
+  (mode, prev) => {
+    if (mode === prev || prev === undefined) return
+    if (mode === 'link') {
+      contactFormData.linkedAccount = null
+      contactFormData.company = ''
+      contactFormData.companyVat = ''
+      contactFormData.companyEmployeeCount = ''
+      contactFormData.companyIsDealer = false
+    } else {
+      contactFormData.linkedAccount = null
+      contactFormData.company = ''
+    }
+  }
+)
+
+function serializeForDirty() {
+  return JSON.stringify({
+    firstName: contactFormData.firstName,
+    lastName: contactFormData.lastName,
+    email: contactFormData.email,
+    phone: contactFormData.phone,
+    company: contactFormData.company,
+    companyAccountMode: contactFormData.companyAccountMode,
+    linkedAccount: contactFormData.linkedAccount ? { ...contactFormData.linkedAccount } : null,
+    companyVat: contactFormData.companyVat,
+    companyEmployeeCount: contactFormData.companyEmployeeCount,
+    companyIsDealer: contactFormData.companyIsDealer,
+    accountType: contactFormData.accountType,
+    fiscalEntityIds: [...(contactFormData.fiscalEntityIds || [])].sort(),
+    secondaryPhones: [...(contactFormData.secondaryPhones || [])],
+    secondaryEmails: [...(contactFormData.secondaryEmails || [])],
+    town: contactFormData.town,
+    zip: contactFormData.zip,
+    detailsAddress: contactFormData.detailsAddress,
+    detailsAddressAdditionalInfo: contactFormData.detailsAddressAdditionalInfo,
+    detailsStateProvince: contactFormData.detailsStateProvince,
+    detailsCountry: contactFormData.detailsCountry,
+    detailsTaxCode: contactFormData.detailsTaxCode,
+    detailsLanguage: contactFormData.detailsLanguage,
+    detailsDateOfBirth: contactFormData.detailsDateOfBirth,
+    detailsPlaceOfBirth: contactFormData.detailsPlaceOfBirth,
+    detailsGender: contactFormData.detailsGender,
+    detailsJobTitle: contactFormData.detailsJobTitle,
+    detailsFavoriteContactMethod: contactFormData.detailsFavoriteContactMethod,
+    moreDetails: contactFormData.moreDetails,
+    privacyConsents: JSON.parse(JSON.stringify(contactFormData.privacyConsents || {}))
+  })
+}
+
+const createFormSnapshot = ref(serializeForDirty())
+
+function resetContactFormData() {
+  contactFormData.name = ''
+  contactFormData.firstName = ''
+  contactFormData.lastName = ''
+  contactFormData.email = ''
+  contactFormData.phone = ''
+  contactFormData.company = ''
+  contactFormData.companyAccountMode = 'link'
+  contactFormData.linkedAccount = null
+  contactFormData.companyVat = ''
+  contactFormData.companyEmployeeCount = ''
+  contactFormData.companyIsDealer = false
+  contactFormData.accountType = 'private'
+  contactFormData.fiscalEntityIds = defaultFiscalEntityIdsForCreator()
+  contactFormData.secondaryPhones = []
+  contactFormData.secondaryEmails = []
+  contactFormData.town = ''
+  contactFormData.zip = ''
+  contactFormData.detailsAddress = ''
+  contactFormData.detailsAddressAdditionalInfo = ''
+  contactFormData.detailsStateProvince = ''
+  contactFormData.detailsCountry = 'IT'
+  contactFormData.detailsTaxCode = ''
+  contactFormData.detailsLanguage = ''
+  contactFormData.detailsDateOfBirth = ''
+  contactFormData.detailsPlaceOfBirth = ''
+  contactFormData.detailsGender = ''
+  contactFormData.detailsJobTitle = ''
+  contactFormData.detailsFavoriteContactMethod = ''
+  contactFormData.moreDetails = ''
+  contactFormData.privacyConsents = defaultPrivacyConsents()
+  createFormSnapshot.value = serializeForDirty()
+}
+
+function isCreateDirty() {
+  return serializeForDirty() !== createFormSnapshot.value
+}
+
 const { errors, canSubmit, validateContactForm, clearErrors } = useAddFormValidation({
   contactMode,
   selectedContact,
-  contactFormData
+  isCreatingContact,
+  contactFormData,
+  hideContactSelection: computed(() => props.hideContactSelection),
+  leadDetailsForm,
+  vehicleFormData,
+  showLeadDetailsBlock: showLeadDetails,
 })
 
 onMounted(() => {
@@ -428,68 +471,96 @@ onMounted(() => {
   }
 })
 
-const hasVehicleData = computed(() => {
-  return !!(
-    vehicleFormData.brand ||
-    vehicleFormData.model ||
-    vehicleFormData.year !== new Date().getFullYear() ||
-    vehicleFormData.price ||
-    vehicleFormData.requestMessage ||
-    vehicleFormData.requestType ||
-    vehicleFormData.source ||
-    vehicleFormData.dealership ||
-    vehicleFormData.fuelType ||
-    vehicleFormData.gearType ||
-    vehicleFormData.kilometers ||
-    vehicleFormData.stockDays
-  )
+watch(selectedContact, (v) => {
+  if (v) {
+    contactMode.value = 'existing'
+    isCreatingContact.value = false
+  }
 })
 
-// Use submission composable
+function startCreateContact() {
+  selectedContact.value = null
+  contactMode.value = 'new'
+  resetContactFormData()
+  resetLeadDetailsForm()
+  isCreatingContact.value = true
+  syncAssigneeFromContact()
+}
+
+function exitCreateMode() {
+  isCreatingContact.value = false
+  resetContactFormData()
+  resetLeadDetailsForm()
+  clearErrors()
+}
+
+function onRequestCloseCreate() {
+  if (!isCreateDirty()) {
+    exitCreateMode()
+    return
+  }
+  showCloseCreateConfirm.value = true
+}
+
+function confirmDiscardCreate() {
+  showCloseCreateConfirm.value = false
+  exitCreateMode()
+}
+
 const { isSubmitting, handleSubmit: submitHandler, resetSubmitting } = useAddFormSubmission({
   contactMode,
   selectedContact,
   contactFormData,
   vehicleFormData,
+  leadDetailsForm,
   markAsLead,
   markAsOpportunity,
+  submitIntent,
   validateContactForm,
   onSubmit: (submissionData) => {
     emit('submit', submissionData)
   }
 })
 
-const handleClear = () => {
-  // Reset contact mode to new
-  contactMode.value = 'new'
-  
-  selectedContact.value = null
+function submitSaveAndClose() {
+  submitIntent.value = 'save_and_close'
+  submitHandler()
+}
 
-  // Clear contact form
-  contactFormData.name = ''
-  contactFormData.email = ''
-  contactFormData.phone = ''
-  contactFormData.company = ''
-  
-  // Clear vehicle form
-  Object.keys(vehicleFormData).forEach(key => {
-    if (key === 'year') {
-      vehicleFormData[key] = new Date().getFullYear()
-    } else if (key === 'channel') {
-      vehicleFormData[key] = 'Email'
-    } else if (typeof vehicleFormData[key] === 'number') {
-      vehicleFormData[key] = null
-    } else {
-      vehicleFormData[key] = ''
-    }
+function submitProceedToQualification() {
+  submitIntent.value = 'proceed_to_qualification'
+  submitHandler()
+}
+
+function resetVehicleFormData() {
+  Object.assign(vehicleFormData, createDefaultVehicleFormState())
+}
+
+function resetLeadDetailsForm() {
+  const d = createDefaultLeadDetailsForm()
+  Object.keys(d).forEach((k) => {
+    leadDetailsForm[k] = d[k]
   })
-  
-  // Clear task marking
-  markAsLead.value = false
-  markAsOpportunity.value = false
-  
-  // Clear errors
+  markAsLead.value = leadDetailsForm.recordType === 'lead'
+  markAsOpportunity.value = leadDetailsForm.recordType === 'opportunity'
+  lastContactKeyForAssignee.value = null
+  resetVehicleFormData()
+}
+
+const handleClear = async () => {
+  contactMode.value = 'new'
+  selectedContact.value = null
+  isCreatingContact.value = false
+  submitIntent.value = 'save_and_close'
+  leadDetailsRemountKey.value += 1
+  resetContactFormData()
+  resetLeadDetailsForm()
   clearErrors()
+  await nextTick()
+  const el = manualFormScrollRef.value
+  if (el) {
+    el.scrollTop = 0
+  }
 }
 
 defineExpose({

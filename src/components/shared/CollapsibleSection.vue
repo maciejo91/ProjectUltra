@@ -1,5 +1,8 @@
 <template>
-  <div class="border border-border rounded-lg overflow-hidden">
+  <div
+    class="overflow-hidden border border-border rounded-lg"
+    :class="cardStyle ? 'bg-white' : ''"
+  >
     <!-- Section Header -->
     <button
       type="button"

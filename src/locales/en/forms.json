@@ -51,6 +51,261 @@
     "minLength": "Minimum {min} characters required",
     "maxLength": "Maximum {max} characters allowed"
   },
+  "addNew": {
+    "selectContact": {
+      "title": "Select a contact",
+      "banner": {
+        "before": "Save time and keep data clean. We found ",
+        "duplicates": "duplicates",
+        "after": ", search first to see if the contact is already here."
+      },
+      "searchPlaceholder": "Search by name, email, phone or company...",
+      "createContact": "Create contact",
+      "noMatches": "No matches",
+      "clearSearchAria": "Clear search",
+      "clearSelectionAria": "Clear selection"
+    },
+    "selectAccount": {
+      "searchPlaceholder": "Search company…",
+      "createCompany": "Create new company",
+      "noMatches": "No companies match your search.",
+      "clearSearchAria": "Clear search",
+      "clearSelectionAria": "Clear selection"
+    },
+    "manualContact": {
+      "closeAria": "Close contact creation",
+      "expandAria": "Expand contact information",
+      "collapseAria": "Collapse contact information",
+      "sections": {
+        "contactInfo": "Contact information",
+        "privacy": "Privacy consents"
+      },
+      "accountType": "Account type",
+      "private": "Private",
+      "company": "Company",
+      "companyName": "Company name",
+      "companyNamePlaceholder": "Enter company name",
+      "fiscalEntityVisibility": "Fiscal entity visibility",
+      "fiscalEntityHint": "Select at least one company whose data this contact is visible to.",
+      "removeFiscalEntityAria": "Remove",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "insertPlaceholder": "Type here",
+      "phonePlaceholder": "+39 …",
+      "phoneNationalPlaceholder": "320 123 4567",
+      "phoneCountrySelectAria": "Select country code",
+      "phoneCountrySearchPlaceholder": "Search…",
+      "phoneCountryEmpty": "No country found",
+      "phoneEmailRule": "At least one of phone or email is required.",
+      "addSecondaryPhone": "Add secondary phone",
+      "addSecondaryEmail": "Add secondary email",
+      "secondaryPhoneLabel": "Secondary phone",
+      "secondaryEmailLabel": "Secondary email",
+      "secondaryPhones": "Additional phone numbers",
+      "secondaryEmails": "Additional email addresses",
+      "town": "Town",
+      "zip": "ZIP / Postal code",
+      "moreDetails": "More details",
+      "moreDetailsPlaceholder": "Address notes, company details…",
+      "moreDetailsFields": {
+        "address": "Address",
+        "addressAdditionalInfo": "Address additional info",
+        "stateProvince": "State/Province",
+        "country": "Country",
+        "taxCode": "Tax code",
+        "language": "Language",
+        "dateOfBirth": "Date of birth",
+        "placeOfBirth": "Place of birth",
+        "gender": "Gender",
+        "jobTitle": "Job title",
+        "favoriteContactMethod": "Favorite contact method",
+        "placeholders": {
+          "insert": "Insert..."
+        }
+      },
+      "privacyNeedEntities": "Select a fiscal entity above to configure consents per company.",
+      "discardTitle": "Discard unsaved changes?",
+      "discardMessage": "You have unsaved information. If you close now, your edits will be lost.",
+      "discardConfirm": "Discard and close",
+      "companyAccount": {
+        "vat": "VAT number",
+        "employees": "Number of employees",
+        "dealer": "Dealer?",
+        "linkExisting": "Link to existing company",
+        "createNew": "Create new company",
+        "errors": {
+          "selectAccount": "Select an existing company account",
+          "employeesInvalid": "Enter a positive whole number or leave empty"
+        }
+      },
+      "errors": {
+        "companyRequired": "Company name is required",
+        "phoneOrEmailRequired": "Enter a phone number or an email",
+        "phoneInvalid": "Enter a valid number: 8–15 digits, optional + and country code (e.g. +39 320 123 4567).",
+        "secondaryPhoneInvalid": "Check the extra phone number (same format as above).",
+        "emailInvalid": "Please enter a valid email address",
+        "secondaryEmailInvalid": "Please enter a valid email address for all secondary emails"
+      },
+      "entities": {
+        "companyA": "Company A",
+        "companyB": "Company B"
+      },
+      "consents": {
+        "dataProcessing": "Data processing",
+        "profiling": "Profiling / analytics",
+        "thirdParty": "Third-party assignment",
+        "marketing": "Marketing communications"
+      },
+      "marketingChannels": {
+        "call": "Call",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp",
+        "email": "Email",
+        "mail": "Mail",
+        "phone": "Phone",
+        "phoneSecondary": "Phone (secondary)",
+        "emailPrimary": "Email",
+        "emailSecondary": "Email (secondary)",
+        "address": "Address"
+      }
+    },
+    "leadDetails": {
+      "title": "Lead details",
+      "department": {
+        "label": "Department",
+        "sales": "Sales",
+        "service": "Service"
+      },
+      "recordType": {
+        "label": "What do you want to create?",
+        "lead": "Lead",
+        "opportunity": "Opportunity"
+      },
+      "tooltips": {
+        "infoAria": "More information about {type}",
+        "lead": {
+          "sales": "Create a \"Valid\" lead, ready for qualification.",
+          "service": "Create a \"Valid\" lead, ready for qualification."
+        },
+        "opportunity": {
+          "sales": "Create an \"Open\" opportunity with an offer, ready to be managed.",
+          "service": "Create an \"Open\" opportunity with a service, ready to be managed."
+        }
+      },
+      "fields": {
+        "requestType": "Request type",
+        "channel": "Channel",
+        "source": "Source",
+        "sourceDetail": "Source detail",
+        "fiscalEntity": "Fiscal entity",
+        "dealership": "Dealership",
+        "requestMessage": "Request message",
+        "notesToSellers": "Notes to sellers",
+        "service": "Service",
+        "price": "Price",
+        "assigneesRelationshipOnly": "Show only assignees from the selected relationship"
+      },
+      "placeholders": {
+        "select": "Select",
+        "selectType": "Select type",
+        "selectAssignee": "Select assignee",
+        "insert": "Type here",
+        "message": "Enter the customer request…",
+        "startTyping": "Start typing...",
+        "notes": "Add notes for your team…",
+        "price": "0.00"
+      },
+      "options": {
+        "requestType": {
+          "expiring_financing": "Expiring financing",
+          "expiring_guarantee": "Expiring guarantee",
+          "generic_aftersales": "Generic aftersales",
+          "spare_parts": "Spare parts",
+          "workshop": "Workshop",
+          "financing_early_payoff": "Financing early payoff",
+          "financing_expiration": "Financing expiration",
+          "fleet": "Fleet",
+          "generic_sales": "Generic sales",
+          "livespark": "Livespark",
+          "long_term_rent": "Long term rent",
+          "online_sales": "Online sales",
+          "quotation": "Quotation",
+          "sellspark": "Sellspark",
+          "short_term_rent": "Short term rent",
+          "trade_in": "Trade in"
+        },
+        "channel": {
+          "automation": "Automation",
+          "email": "Email",
+          "integration": "Integration",
+          "manual_import": "Manual import",
+          "other": "Other",
+          "phone": "Phone",
+          "walk_in": "Walk-in",
+          "whatsapp": "WhatsApp"
+        },
+        "source": {
+          "marketing": "Marketing",
+          "marketing_automation": "Marketing automation",
+          "other": "Other",
+          "social": "Social",
+          "third_parties": "Third parties",
+          "web": "Web"
+        },
+        "dealership": {
+          "milano": "Milano",
+          "firenze": "Firenze",
+          "roma": "Roma",
+          "bari": "Bari",
+          "trento": "Trento"
+        }
+      },
+      "vehicle": {
+        "searchPlaceholder": "Search in stock…",
+        "searchHint": "Click the bar or use the keyboard shortcut to search vehicles.",
+        "searchModalTitle": "Search in stock",
+        "searchInStockPlaceholder": "Filter by brand, model, VIN, plate…",
+        "noVehicles": "No vehicles match your search.",
+        "sectionVehicleRequested": "Vehicle requested",
+        "sectionVehicleInfo": "Vehicle information",
+        "sectionOwnedVehicle": "Owned vehicle",
+        "configure": "Configure",
+        "insertManually": "Insert manually",
+        "configurePlaceholder": "Configuration options will be available in a next iteration.",
+        "manualPlaceholder": "You can add manual vehicle details here in a next iteration.",
+        "manual": {
+          "fields": {
+            "vehicleClass": "Vehicle class",
+            "vehicleType": "Vehicle type",
+            "brand": "Brand",
+            "model": "Model",
+            "version": "Version",
+            "fuelType": "Fuel type",
+            "quantity": "Quantity",
+            "vehiclePrice": "Vehicle price"
+          },
+          "placeholders": {
+            "quantity": "1",
+            "selectBrand": "Select brand",
+            "selectModel": "Select model",
+            "selectBrandFirst": "Select a brand first"
+          }
+        }
+      },
+      "errors": {
+        "requestType": "Request type is required",
+        "channel": "Channel is required",
+        "source": "Source is required",
+        "fiscalEntity": "Fiscal entity is required",
+        "dealership": "Dealership is required",
+        "assignee": "Assignee is required",
+        "serviceName": "Service is required",
+        "serviceDescription": "Description is required",
+        "servicePrice": "Price is required",
+        "vehicle": "Vehicle information is required"
+      }
+    }
+  },
   "modals": {
     "addLead": "Add Lead",
     "addOpportunity": "Add Opportunity",

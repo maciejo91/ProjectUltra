@@ -51,6 +51,261 @@
     "minLength": "Minimaal {min} tekens vereist",
     "maxLength": "Maximaal {max} tekens toegestaan"
   },
+  "addNew": {
+    "selectContact": {
+      "title": "Selecteer een contact",
+      "banner": {
+        "before": "Bespaar tijd en houd gegevens schoon. We hebben ",
+        "duplicates": "duplicaten gevonden",
+        "after": ", zoek eerst of het contact al bestaat."
+      },
+      "searchPlaceholder": "Zoek op naam, e-mail, telefoon of bedrijf...",
+      "createContact": "Contact aanmaken",
+      "noMatches": "Geen resultaten",
+      "clearSearchAria": "Zoekopdracht wissen",
+      "clearSelectionAria": "Selectie wissen"
+    },
+    "selectAccount": {
+      "searchPlaceholder": "Zoek bedrijf…",
+      "createCompany": "Nieuw bedrijf aanmaken",
+      "noMatches": "Geen bedrijven gevonden die overeenkomen met uw zoekopdracht.",
+      "clearSearchAria": "Zoekopdracht wissen",
+      "clearSelectionAria": "Selectie wissen"
+    },
+    "manualContact": {
+      "closeAria": "Contact aanmaken sluiten",
+      "expandAria": "Contactgegevens uitklappen",
+      "collapseAria": "Contactgegevens inklappen",
+      "sections": {
+        "contactInfo": "Contactgegevens",
+        "privacy": "Privacytoestemmingen"
+      },
+      "accountType": "Soort account",
+      "private": "Particulier",
+      "company": "Bedrijf",
+      "companyName": "Bedrijfsnaam",
+      "companyNamePlaceholder": "Voer de bedrijfsnaam in",
+      "fiscalEntityVisibility": "Zichtbaarheid fiscale entiteit",
+      "fiscalEntityHint": "Selecteer minstens één bedrijf waarvoor dit contact zichtbaar is.",
+      "removeFiscalEntityAria": "Verwijderen",
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "insertPlaceholder": "Typ hier",
+      "phonePlaceholder": "+39 …",
+      "phoneNationalPlaceholder": "320 123 4567",
+      "phoneCountrySelectAria": "Landcode kiezen",
+      "phoneCountrySearchPlaceholder": "Zoeken…",
+      "phoneCountryEmpty": "Geen land gevonden",
+      "phoneEmailRule": "Minstens telefoonnummer of e-mailadres is verplicht.",
+      "addSecondaryPhone": "Secundair telefoon toevoegen",
+      "addSecondaryEmail": "Secundair e-mail toevoegen",
+      "secondaryPhoneLabel": "Secundair telefoonnummer",
+      "secondaryEmailLabel": "Secundair e-mailadres",
+      "secondaryPhones": "Extra telefoonnummers",
+      "secondaryEmails": "Extra e-mailadressen",
+      "town": "Plaats",
+      "zip": "Postcode",
+      "moreDetails": "Meer details",
+      "moreDetailsPlaceholder": "Adresnotities, bedrijfsdetails…",
+      "moreDetailsFields": {
+        "address": "Adres",
+        "addressAdditionalInfo": "Aanvullende adresinfo",
+        "stateProvince": "Staat / Provincie",
+        "country": "Land",
+        "taxCode": "Fiscaal nummer",
+        "language": "Taal",
+        "dateOfBirth": "Geboortedatum",
+        "placeOfBirth": "Geboorteplaats",
+        "gender": "Geslacht",
+        "jobTitle": "Functietitel",
+        "favoriteContactMethod": "Voorkeur contactmethode",
+        "placeholders": {
+          "insert": "Invoeren…"
+        }
+      },
+      "privacyNeedEntities": "Selecteer hierboven een fiscale entiteit om toestemmingen per bedrijf in te stellen.",
+      "discardTitle": "Niet-opgeslagen wijzigingen negeren?",
+      "discardMessage": "U heeft niet-opgeslagen gegevens. Als u nu sluit, gaan uw wijzigingen verloren.",
+      "discardConfirm": "Negeren en sluiten",
+      "companyAccount": {
+        "vat": "BTW-nummer",
+        "employees": "Aantal werknemers",
+        "dealer": "Dealer?",
+        "linkExisting": "Koppelen aan bestaand bedrijf",
+        "createNew": "Nieuw bedrijf aanmaken",
+        "errors": {
+          "selectAccount": "Selecteer een bestaand bedrijfsaccount",
+          "employeesInvalid": "Voer een positief geheel getal in of laat leeg"
+        }
+      },
+      "errors": {
+        "companyRequired": "Bedrijfsnaam is verplicht",
+        "phoneOrEmailRequired": "Voer een telefoonnummer of e-mailadres in",
+        "phoneInvalid": "Ongeldig nummer: 8–15 cijfers, optioneel + en landcode (bijv. +39 320 123 4567).",
+        "secondaryPhoneInvalid": "Controleer het extra telefoonnummer (zelfde formaat).",
+        "emailInvalid": "Voer een geldig e-mailadres in",
+        "secondaryEmailInvalid": "Voer geldige e-mailadressen in voor alle extra velden"
+      },
+      "entities": {
+        "companyA": "Bedrijf A",
+        "companyB": "Bedrijf B"
+      },
+      "consents": {
+        "dataProcessing": "Gegevensverwerking",
+        "profiling": "Profileren / analyses",
+        "thirdParty": "Overdracht aan derden",
+        "marketing": "Marketingcommunicatie"
+      },
+      "marketingChannels": {
+        "call": "Bellen",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp",
+        "email": "E-mail",
+        "mail": "Post",
+        "phone": "Telefoon",
+        "phoneSecondary": "Telefoon (secundair)",
+        "emailPrimary": "E-mail",
+        "emailSecondary": "E-mail (secundair)",
+        "address": "Adres"
+      }
+    },
+    "leadDetails": {
+      "title": "Leaddetails",
+      "department": {
+        "label": "Afdeling",
+        "sales": "Sales",
+        "service": "Service"
+      },
+      "recordType": {
+        "label": "Wat wil je aanmaken?",
+        "lead": "Lead",
+        "opportunity": "Opportunity"
+      },
+      "tooltips": {
+        "infoAria": "Meer informatie over {type}",
+        "lead": {
+          "sales": "Maak een \"Valid\"-lead aan, klaar voor kwalificatie.",
+          "service": "Maak een \"Valid\"-lead aan, klaar voor kwalificatie."
+        },
+        "opportunity": {
+          "sales": "Maak een \"Open\"-opportunity met een offerte aan, klaar om opgevolgd te worden.",
+          "service": "Maak een \"Open\"-opportunity met een service aan, klaar om opgevolgd te worden."
+        }
+      },
+      "fields": {
+        "requestType": "Aanvraagtype",
+        "channel": "Kanaal",
+        "source": "Bron",
+        "sourceDetail": "Brondetail",
+        "fiscalEntity": "Fiscale entiteit",
+        "dealership": "Dealer",
+        "requestMessage": "Bericht bij aanvraag",
+        "notesToSellers": "Notities voor verkopers",
+        "service": "Service",
+        "price": "Prijs",
+        "assigneesRelationshipOnly": "Toon alleen toegewezen personen van de geselecteerde relatie"
+      },
+      "placeholders": {
+        "select": "Selecteer",
+        "selectType": "Type selecteren",
+        "selectAssignee": "Toegewezen persoon kiezen",
+        "insert": "Typ hier",
+        "message": "Vul de klantaanvraag in…",
+        "startTyping": "Begin met typen…",
+        "notes": "Notities voor je team…",
+        "price": "0,00"
+      },
+      "options": {
+        "requestType": {
+          "expiring_financing": "Aflopende financiering",
+          "expiring_guarantee": "Aflopende garantie",
+          "generic_aftersales": "Generieke aftersales",
+          "spare_parts": "Onderdelen",
+          "workshop": "Werkplaats",
+          "financing_early_payoff": "Vroegtijdige aflossing financiering",
+          "financing_expiration": "Aflopen financiering",
+          "fleet": "Vloot",
+          "generic_sales": "Generieke verkoop",
+          "livespark": "Livespark",
+          "long_term_rent": "Langere huur",
+          "online_sales": "Online verkoop",
+          "quotation": "Offerte",
+          "sellspark": "Sellspark",
+          "short_term_rent": "Korte huur",
+          "trade_in": "Inruil"
+        },
+        "channel": {
+          "automation": "Automatisering",
+          "email": "E-mail",
+          "integration": "Integratie",
+          "manual_import": "Handmatige import",
+          "other": "Overig",
+          "phone": "Telefoon",
+          "walk_in": "Binnenlopen",
+          "whatsapp": "WhatsApp"
+        },
+        "source": {
+          "marketing": "Marketing",
+          "marketing_automation": "Marketingautomatisering",
+          "other": "Overig",
+          "social": "Social",
+          "third_parties": "Derde partijen",
+          "web": "Web"
+        },
+        "dealership": {
+          "milano": "Milaan",
+          "firenze": "Florence",
+          "roma": "Rome",
+          "bari": "Bari",
+          "trento": "Trente"
+        }
+      },
+      "vehicle": {
+        "searchPlaceholder": "Zoek in voorraad…",
+        "searchHint": "Klik op de balk of gebruik de sneltoets.",
+        "searchModalTitle": "Zoek in voorraad",
+        "searchInStockPlaceholder": "Merk, model, VIN, kenteken…",
+        "noVehicles": "Geen voertuigen komen overeen met je zoekopdracht.",
+        "sectionVehicleRequested": "Gevraagd voertuig",
+        "sectionVehicleInfo": "Voertuiginformatie",
+        "sectionOwnedVehicle": "Eigen voertuig",
+        "configure": "Configureren",
+        "insertManually": "Handmatig invoeren",
+        "configurePlaceholder": "Configuratieopties volgen in een volgende versie.",
+        "manualPlaceholder": "Handmatige voertuiggegevens kunnen in een volgende versie worden toegevoegd.",
+        "manual": {
+          "fields": {
+            "vehicleClass": "Voertuigklasse",
+            "vehicleType": "Voertuigtype",
+            "brand": "Merk",
+            "model": "Model",
+            "version": "Versie",
+            "fuelType": "Brandstof",
+            "quantity": "Aantal",
+            "vehiclePrice": "Voertuigprijs"
+          },
+          "placeholders": {
+            "quantity": "1",
+            "selectBrand": "Selecteer merk",
+            "selectModel": "Selecteer model",
+            "selectBrandFirst": "Selecteer eerst een merk"
+          }
+        }
+      },
+      "errors": {
+        "requestType": "Aanvraagtype is verplicht",
+        "channel": "Kanaal is verplicht",
+        "source": "Bron is verplicht",
+        "fiscalEntity": "Fiscale entiteit is verplicht",
+        "dealership": "Dealer is verplicht",
+        "assignee": "Toegewezen persoon is verplicht",
+        "serviceName": "Service is verplicht",
+        "serviceDescription": "Beschrijving is verplicht",
+        "servicePrice": "Prijs is verplicht",
+        "vehicle": "Voertuiginformatie is verplicht"
+      }
+    }
+  },
   "modals": {
     "addLead": "Lead Toevoegen",
     "addOpportunity": "Kans Toevoegen",

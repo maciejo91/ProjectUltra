@@ -7,9 +7,10 @@
           <DialogTitle>{{ modalTitle }}</DialogTitle>
         </DialogHeader>
 
-        <div class="flex-1 overflow-y-auto px-6 py-4 w-full">
+        <div class="flex min-h-0 flex-1 flex-col overflow-hidden px-6 py-4 w-full">
           <UnifiedAddForm
             ref="formRef"
+            class="min-h-0 flex-1"
             :initial-contact="contact"
             :hide-contact-selection="true"
             :force-type="type"

@@ -10,7 +10,9 @@ export const useUserStore = defineStore('user', () => {
     name: 'Maciej Ogonowski',
     email: 'maciej.ogonowski@example.com',
     role: 'manager',
-    initials: 'MO'
+    initials: 'MO',
+    /** Default fiscal entity for create-contact flows (mock; API would supply this) */
+    fiscalEntityId: 'company-a',
   })
   const isAuthenticated = ref(true)
   

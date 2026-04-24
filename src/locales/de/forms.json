@@ -51,6 +51,261 @@
     "minLength": "Mindestens {min} Zeichen erforderlich",
     "maxLength": "Maximal {max} Zeichen erlaubt"
   },
+  "addNew": {
+    "selectContact": {
+      "title": "Kontakt auswählen",
+      "banner": {
+        "before": "Spare Zeit und halte die Daten sauber. Wir haben ",
+        "duplicates": "Duplikate gefunden",
+        "after": " – suche zuerst, ob der Kontakt bereits vorhanden ist."
+      },
+      "searchPlaceholder": "Suche nach Name, E-Mail, Telefon oder Firma...",
+      "createContact": "Kontakt erstellen",
+      "noMatches": "Keine Treffer",
+      "clearSearchAria": "Suche leeren",
+      "clearSelectionAria": "Auswahl löschen"
+    },
+    "selectAccount": {
+      "searchPlaceholder": "Unternehmen suchen…",
+      "createCompany": "Neue Firma anlegen",
+      "noMatches": "Keine passenden Unternehmen gefunden.",
+      "clearSearchAria": "Suche leeren",
+      "clearSelectionAria": "Auswahl löschen"
+    },
+    "manualContact": {
+      "closeAria": "Kontakterstellung schließen",
+      "expandAria": "Kontaktinformationen einblenden",
+      "collapseAria": "Kontaktinformationen ausblenden",
+      "sections": {
+        "contactInfo": "Kontaktinformationen",
+        "privacy": "Datenschutzeinwilligungen"
+      },
+      "accountType": "Kontotyp",
+      "private": "Privat",
+      "company": "Unternehmen",
+      "companyName": "Firmenname",
+      "companyNamePlaceholder": "Firmenname eingeben",
+      "fiscalEntityVisibility": "Sichtbarkeit der steuerlichen Einheit",
+      "fiscalEntityHint": "Wähle mindestens ein Unternehmen, für das dieser Kontakt sichtbar ist.",
+      "removeFiscalEntityAria": "Entfernen",
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "insertPlaceholder": "Hier eingeben",
+      "phonePlaceholder": "+39 …",
+      "phoneNationalPlaceholder": "320 123 4567",
+      "phoneCountrySelectAria": "Ländercode wählen",
+      "phoneCountrySearchPlaceholder": "Suchen…",
+      "phoneCountryEmpty": "Kein Land gefunden",
+      "phoneEmailRule": "Mindestens Telefonnummer oder E-Mail ist erforderlich.",
+      "addSecondaryPhone": "Zweittelefon hinzufügen",
+      "addSecondaryEmail": "Zweit-E-Mail hinzufügen",
+      "secondaryPhoneLabel": "Zweittelefon",
+      "secondaryEmailLabel": "Zweit-E-Mail",
+      "secondaryPhones": "Weitere Telefonnummern",
+      "secondaryEmails": "Weitere E-Mail-Adressen",
+      "town": "Ort",
+      "zip": "PLZ",
+      "moreDetails": "Weitere Angaben",
+      "moreDetailsPlaceholder": "Adresshinweise, Firmendetails…",
+      "moreDetailsFields": {
+        "address": "Adresse",
+        "addressAdditionalInfo": "Adresszusatz",
+        "stateProvince": "Bundesland / Region",
+        "country": "Land",
+        "taxCode": "Steuernummer",
+        "language": "Sprache",
+        "dateOfBirth": "Geburtsdatum",
+        "placeOfBirth": "Geburtsort",
+        "gender": "Geschlecht",
+        "jobTitle": "Beruf",
+        "favoriteContactMethod": "Bevorzugter Kontaktweg",
+        "placeholders": {
+          "insert": "Eingeben…"
+        }
+      },
+      "privacyNeedEntities": "Wähle oben eine steuerliche Einheit, um die Einwilligungen pro Unternehmen zu bearbeiten.",
+      "discardTitle": "Nicht gespeicherte Änderungen verwerfen?",
+      "discardMessage": "Du hast ungespeicherte Informationen. Beim Schließen gehen deine Eingaben verloren.",
+      "discardConfirm": "Verwerfen und schließen",
+      "companyAccount": {
+        "vat": "USt-IdNr.",
+        "employees": "Mitarbeiteranzahl",
+        "dealer": "Händler?",
+        "linkExisting": "Mit bestehender Firma verknüpfen",
+        "createNew": "Neue Firma anlegen",
+        "errors": {
+          "selectAccount": "Wähle ein bestehendes Unternehmenskonto",
+          "employeesInvalid": "Gib eine positive ganze Zahl ein oder leer lassen"
+        }
+      },
+      "errors": {
+        "companyRequired": "Firmenname ist erforderlich",
+        "phoneOrEmailRequired": "Gib eine Telefonnummer oder E-Mail ein",
+        "phoneInvalid": "Ungültige Nummer: 8–15 Ziffern, optional + und Ländervorwahl (z. B. +39 320 123 4567).",
+        "secondaryPhoneInvalid": "Zweitnummer prüfen (gleiches Format).",
+        "emailInvalid": "Bitte gib eine gültige E-Mail-Adresse ein",
+        "secondaryEmailInvalid": "Bitte gültige E-Mails für alle Zusatzfelder eingeben"
+      },
+      "entities": {
+        "companyA": "Unternehmen A",
+        "companyB": "Unternehmen B"
+      },
+      "consents": {
+        "dataProcessing": "Datenverarbeitung",
+        "profiling": "Profiling / Analyse",
+        "thirdParty": "Weitergabe / Zuweisung an Dritte",
+        "marketing": "Marketing-Kommunikation"
+      },
+      "marketingChannels": {
+        "call": "Anruf",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp",
+        "email": "E-Mail",
+        "mail": "Post",
+        "phone": "Telefon",
+        "phoneSecondary": "Telefon (Zweitnummer)",
+        "emailPrimary": "E-Mail",
+        "emailSecondary": "E-Mail (zusätzlich)",
+        "address": "Adresse"
+      }
+    },
+    "leadDetails": {
+      "title": "Lead-Details",
+      "department": {
+        "label": "Abteilung",
+        "sales": "Vertrieb",
+        "service": "Service"
+      },
+      "recordType": {
+        "label": "Was möchten Sie anlegen?",
+        "lead": "Lead",
+        "opportunity": "Opportunity"
+      },
+      "tooltips": {
+        "infoAria": "Weitere Informationen zu {type}",
+        "lead": {
+          "sales": "Einen „Valid“-Lead anlegen, bereit zur Qualifizierung.",
+          "service": "Einen „Valid“-Lead anlegen, bereit zur Qualifizierung."
+        },
+        "opportunity": {
+          "sales": "Eine „Open“-Opportunity mit Angebot anlegen, bereit für die Bearbeitung.",
+          "service": "Eine „Open“-Opportunity mit Service anlegen, bereit für die Bearbeitung."
+        }
+      },
+      "fields": {
+        "requestType": "Anfragetyp",
+        "channel": "Kanal",
+        "source": "Quelle",
+        "sourceDetail": "Quellendetail",
+        "fiscalEntity": "Rechtliche Einheit",
+        "dealership": "Händlerstandort",
+        "requestMessage": "Anfragenachricht",
+        "notesToSellers": "Hinweise für Verkäufer",
+        "service": "Service",
+        "price": "Preis",
+        "assigneesRelationshipOnly": "Nur Zuständige aus der ausgewählten Beziehung anzeigen"
+      },
+      "placeholders": {
+        "select": "Auswählen",
+        "selectType": "Typ wählen",
+        "selectAssignee": "Zuständigen wählen",
+        "insert": "Hier eingeben",
+        "message": "Kundenanfrage eingeben…",
+        "startTyping": "Hier tippen…",
+        "notes": "Notizen für Ihr Team…",
+        "price": "0,00"
+      },
+      "options": {
+        "requestType": {
+          "expiring_financing": "Auslaufende Finanzierung",
+          "expiring_guarantee": "Auslaufende Garantie",
+          "generic_aftersales": "Generischer Aftersales",
+          "spare_parts": "Ersatzteile",
+          "workshop": "Werkstatt",
+          "financing_early_payoff": "Vorzeitige Finanzierungsablösung",
+          "financing_expiration": "Ende der Finanzierung",
+          "fleet": "Flotte",
+          "generic_sales": "Generischer Verkauf",
+          "livespark": "Livespark",
+          "long_term_rent": "Langzeitmiete",
+          "online_sales": "Online-Verkauf",
+          "quotation": "Angebot",
+          "sellspark": "Sellspark",
+          "short_term_rent": "Kurzzeitmiete",
+          "trade_in": "Inzahlungnahme"
+        },
+        "channel": {
+          "automation": "Automation",
+          "email": "E-Mail",
+          "integration": "Integration",
+          "manual_import": "Manueller Import",
+          "other": "Sonstiges",
+          "phone": "Telefon",
+          "walk_in": "Laufkundschaft",
+          "whatsapp": "WhatsApp"
+        },
+        "source": {
+          "marketing": "Marketing",
+          "marketing_automation": "Marketing-Automatisierung",
+          "other": "Sonstiges",
+          "social": "Social Media",
+          "third_parties": "Drittanbieter",
+          "web": "Web"
+        },
+        "dealership": {
+          "milano": "Mailand",
+          "firenze": "Florenz",
+          "roma": "Rom",
+          "bari": "Bari",
+          "trento": "Trient"
+        }
+      },
+      "vehicle": {
+        "searchPlaceholder": "Im Bestand suchen…",
+        "searchHint": "Klicken Sie auf die Leiste oder nutzen Sie die Tastenkombination.",
+        "searchModalTitle": "Im Bestand suchen",
+        "searchInStockPlaceholder": "Marke, Modell, FIN, Kennzeichen…",
+        "noVehicles": "Keine passenden Fahrzeuge.",
+        "sectionVehicleRequested": "Gewünschtes Fahrzeug",
+        "sectionVehicleInfo": "Fahrzeuginformationen",
+        "sectionOwnedVehicle": "Bestandenes Fahrzeug",
+        "configure": "Konfigurieren",
+        "insertManually": "Manuell eingeben",
+        "configurePlaceholder": "Konfigurationsoptionen folgen in einer späteren Version.",
+        "manualPlaceholder": "Manuelle Fahrzeugdaten können in einer späteren Version ergänzt werden.",
+        "manual": {
+          "fields": {
+            "vehicleClass": "Fahrzeugklasse",
+            "vehicleType": "Fahrzeugtyp",
+            "brand": "Marke",
+            "model": "Modell",
+            "version": "Version",
+            "fuelType": "Kraftstoffart",
+            "quantity": "Menge",
+            "vehiclePrice": "Fahrzeugpreis"
+          },
+          "placeholders": {
+            "quantity": "1",
+            "selectBrand": "Marke wählen",
+            "selectModel": "Modell wählen",
+            "selectBrandFirst": "Zuerst eine Marke wählen"
+          }
+        }
+      },
+      "errors": {
+        "requestType": "Anfragetyp ist erforderlich",
+        "channel": "Kanal ist erforderlich",
+        "source": "Quelle ist erforderlich",
+        "fiscalEntity": "Rechtliche Einheit ist erforderlich",
+        "dealership": "Händlerstandort ist erforderlich",
+        "assignee": "Zuständiger ist erforderlich",
+        "serviceName": "Service ist erforderlich",
+        "serviceDescription": "Beschreibung ist erforderlich",
+        "servicePrice": "Preis ist erforderlich",
+        "vehicle": "Fahrzeuginformationen sind erforderlich"
+      }
+    }
+  },
   "modals": {
     "addLead": "Lead Hinzufügen",
     "addOpportunity": "Chance Hinzufügen",

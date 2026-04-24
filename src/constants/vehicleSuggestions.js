@@ -63,7 +63,9 @@ export const VEHICLE_MODELS_BY_BRAND = {
   'Mini': ['Hatch', 'Clubman', 'Countryman', 'Electric', 'Aceman'],
   'Alfa Romeo': ['MiTo', 'Giulietta', 'Giulia', 'Stelvio', 'Tonale'],
   'DS': ['DS 3', 'DS 4', 'DS 7', 'DS 9'],
-  'MG': ['MG4', 'MG5', 'ZS', 'HS', 'Marvel R']
+  'MG': ['MG4', 'MG5', 'ZS', 'HS', 'Marvel R'],
+  Jaguar: ['E-Pace', 'F-Pace', 'I-Pace', 'XE', 'XF', 'F-Type'],
+  Mitsubishi: ['Space Star', 'ASX', 'Eclipse Cross', 'Outlander', 'L200']
 }
 
 export function getModelsForBrand(brand) {
