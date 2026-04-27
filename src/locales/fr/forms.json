@@ -171,6 +171,7 @@
     },
     "leadDetails": {
       "title": "Détails du lead",
+      "titleOpportunity": "Détails de l'opportunité",
       "department": {
         "label": "Département",
         "sales": "Ventes",
@@ -262,9 +263,15 @@
       },
       "vehicle": {
         "searchPlaceholder": "Rechercher en stock…",
+        "searchCustomerVehiclesPlaceholder": "Rechercher des véhicules...",
         "searchHint": "Cliquez sur la barre ou utilisez le raccourci clavier.",
         "searchModalTitle": "Recherche en stock",
+        "searchModalTitleCustomerVehicles": "Rechercher les véhicules clients",
         "searchInStockPlaceholder": "Marque, modèle, VIN, plaque…",
+        "searchCustomerVehiclesModalPlaceholder": "Marque, modèle, VIN, plaque…",
+        "filterCustomersVehicles": "Véhicules clients",
+        "filterOwner": "Propriétaire",
+        "inventoryCustomerVehicles": "Véhicule client",
         "noVehicles": "Aucun véhicule ne correspond à votre recherche.",
         "sectionVehicleRequested": "Véhicule demandé",
         "sectionVehicleInfo": "Informations véhicule",

@@ -2,7 +2,7 @@
   <Card class="border-0 gap-4 shadow-none">
     <CardHeader class="space-y-4 pb-2">
       <CardTitle class="text-base font-medium text-foreground">
-        {{ t('forms.addNew.leadDetails.title') }}
+        {{ leadDetailsSectionTitle }}
       </CardTitle>
       <LeadDepartmentSegment
         v-model="form.department"
@@ -445,10 +445,16 @@
 
       <!-- Vehicle (Figma Sales+Lead: h-8 search + ⌘K + secondary Insert manually) -->
       <div class="space-y-2">
-        <p v-if="!hasSelectedStockVehicle && !vehicle.manualOpen" class="text-sm font-medium leading-5 text-foreground">
+        <p
+          v-if="!hasSelectedStockVehicle && !vehicle.manualOpen && !vehicle.configureOpen"
+          class="text-sm font-medium leading-5 text-foreground"
+        >
           <span v-if="vehicleTitleShowAsterisk" class="text-destructive">* </span>{{ vehicleSectionTitle }}
         </p>
-        <div v-if="hasSelectedStockVehicle || vehicle.manualOpen" class="rounded-lg border border-border bg-card overflow-hidden shadow-mk-dashboard-card">
+        <div
+          v-if="hasSelectedStockVehicle || vehicle.manualOpen || vehicle.configureOpen"
+          class="rounded-lg border border-border bg-card overflow-hidden shadow-mk-dashboard-card"
+        >
           <div class="relative flex flex-col gap-4 p-4">
             <Button
               type="button"
@@ -491,7 +497,7 @@
                         <ArrowUpRight class="size-4 shrink-0 opacity-80" aria-hidden="true" />
                       </Button>
                       <span
-                        v-if="stockConditionBadge"
+                        v-if="!isService && stockConditionBadge"
                         class="inline-flex shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-sm font-normal leading-5 text-foreground"
                         :class="stockConditionBadgeClass"
                       >
@@ -508,93 +514,145 @@
                 </div>
               </div>
 
-              <!-- Figma: 5×2 grid, 8px gap; row2 = registration | interactions | identity -->
-              <div
-                class="grid w-full grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-5"
-              >
-                <div class="flex flex-col gap-0 text-sm leading-5">
-                  <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.status') }}</p>
-                  <p class="text-foreground">{{ selectedStockVehicle?.inventoryType === 'in-stock' ? t('requestDetail.vehicleCard.stockInStock') : '—' }}</p>
-                </div>
-                <div class="flex flex-col gap-0 text-sm leading-5">
-                  <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.dealership') }}</p>
-                  <p class="text-foreground">{{ selectedStockVehicle?.dealership || '—' }}</p>
-                </div>
-                <div class="flex flex-col gap-0 text-sm leading-5">
-                  <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.price') }}</p>
-                  <p class="text-foreground">{{ selectedStockVehicle?.price != null ? `${selectedStockVehicle.price.toLocaleString()}€` : '—' }}</p>
-                </div>
-                <div class="flex flex-col gap-0 text-sm leading-5">
-                  <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.specification') }}</p>
-                  <p class="text-foreground">{{ specText }}</p>
-                </div>
-                <div class="flex flex-col gap-1 text-sm leading-5 lg:gap-0">
-                  <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.mileage') }}</p>
-                  <p class="text-foreground">{{ selectedStockVehicle?.kilometers != null ? `${selectedStockVehicle.kilometers.toLocaleString()} km` : '—' }}</p>
-                </div>
+              <template v-if="isService">
+                <!-- Owned vehicle (Service): compact preview per Figma -->
+                <div class="grid w-full grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-5">
+                  <div class="flex flex-col gap-0 text-sm leading-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.registrationDate') }}</p>
+                    <p class="text-foreground">{{ selectedStockVehicle?.registration || '—' }}</p>
+                  </div>
+                  <div class="flex flex-col gap-0 text-sm leading-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.mileage') }}</p>
+                    <p class="text-foreground">
+                      {{ selectedStockVehicle?.kilometers != null ? `${selectedStockVehicle.kilometers.toLocaleString()} km` : '—' }}
+                    </p>
+                  </div>
+                  <div class="flex flex-col gap-0 text-sm leading-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.ownership') }}</p>
+                    <p class="text-foreground">{{ ownedVehicleOwnershipLabel }}</p>
+                  </div>
+                  <div class="flex flex-col gap-0 text-sm leading-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.ownershipStartingDate') }}</p>
+                    <p class="text-foreground">{{ ownedVehicleOwnershipStartingDate }}</p>
+                  </div>
+                  <div v-if="stockPlateDisplay || stockVinDisplay" class="flex min-w-0 flex-col gap-1 text-sm leading-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.identity') }}</p>
+                    <div class="flex min-w-0 flex-wrap items-center gap-2">
+                      <div
+                        v-if="stockPlateDisplay"
+                        class="inline-flex max-w-full items-center gap-1 overflow-hidden rounded-[2px] border border-border bg-background py-0.5 pl-0.5 pr-1 shadow-[0px_0px_0px_1px_rgba(14,63,126,0.04),0px_1px_1px_-0.5px_rgba(42,51,69,0.04)]"
+                      >
+                        <span
+                          class="h-4 w-1.5 shrink-0 rounded-bl-[1px] rounded-tl-[1px] bg-primary"
+                          aria-hidden="true"
+                        />
+                        <span class="whitespace-nowrap text-sm font-normal leading-5 text-muted-foreground">
+                          {{ stockPlateDisplay }}
+                        </span>
+                      </div>
+                      <div
+                        v-if="stockVinDisplay"
+                        class="inline-flex min-w-0 max-w-full items-center overflow-hidden rounded-[2px] border border-border bg-background px-1 py-0.5 shadow-[0px_0px_0px_1px_rgba(14,63,126,0.04),0px_1px_1px_-0.5px_rgba(42,51,69,0.04)]"
+                      >
+                        <span class="truncate font-mono text-sm font-normal leading-5 text-muted-foreground">{{ stockVinDisplay }}</span>
+                      </div>
+                    </div>
+                  </div>
 
-                <div class="flex flex-col gap-0 text-sm leading-5">
-                  <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.registrationDate') }}</p>
-                  <p class="text-foreground">{{ selectedStockVehicle?.registration || '—' }}</p>
-                </div>
-                <div
-                  v-if="hasStockInteractionMetrics"
-                  class="flex flex-col gap-0 text-sm leading-5"
-                >
-                  <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.interactions') }}</p>
-                  <div class="flex flex-wrap items-center gap-3">
-                    <span
-                      v-if="stockMetricsFunnel != null"
-                      class="inline-flex items-center gap-1 text-foreground"
-                    >
-                      <Filter class="size-4 shrink-0 opacity-80 text-muted-foreground" aria-hidden="true" />
-                      {{ stockMetricsFunnel }}
-                    </span>
-                    <span
-                      v-if="stockMetricsTag != null"
-                      class="inline-flex items-center gap-1 text-foreground"
-                    >
-                      <LucideTag class="size-4 shrink-0 opacity-80 text-muted-foreground" aria-hidden="true" />
-                      {{ stockMetricsTag }}
-                    </span>
+                  <div class="flex flex-col gap-0 text-sm leading-5 lg:col-span-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.specification') }}</p>
+                    <p class="text-foreground">{{ specText }}</p>
                   </div>
                 </div>
-                <div
-                  v-if="stockPlateDisplay || stockVinDisplay"
-                  class="flex min-w-0 flex-col gap-1 text-sm leading-5 lg:col-span-1"
-                  :class="{ 'lg:col-start-3': !hasStockInteractionMetrics }"
-                >
-                  <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.identity') }}</p>
-                  <div class="flex min-w-0 flex-wrap items-center gap-2">
-                    <div
-                      v-if="stockPlateDisplay"
-                      class="inline-flex max-w-full items-center gap-1 overflow-hidden rounded-[2px] border border-border bg-background py-0.5 pl-0.5 pr-1 shadow-[0px_0px_0px_1px_rgba(14,63,126,0.04),0px_1px_1px_-0.5px_rgba(42,51,69,0.04)]"
-                    >
-                      <span
-                        class="h-4 w-1.5 shrink-0 rounded-bl-[1px] rounded-tl-[1px] bg-primary"
-                        aria-hidden="true"
-                      />
-                      <span class="whitespace-nowrap text-sm font-normal leading-5 text-muted-foreground">
-                        {{ stockPlateDisplay }}
+              </template>
+              <template v-else>
+                <!-- Figma: 5×2 grid, 8px gap; row2 = registration | interactions | identity -->
+                <div class="grid w-full grid-cols-1 gap-x-2 gap-y-2 lg:grid-cols-5">
+                  <div class="flex flex-col gap-0 text-sm leading-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.status') }}</p>
+                    <p class="text-foreground">{{ stockVehicleInventoryTypeLabel }}</p>
+                  </div>
+                  <div class="flex flex-col gap-0 text-sm leading-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.dealership') }}</p>
+                    <p class="text-foreground">{{ selectedStockVehicle?.dealership || '—' }}</p>
+                  </div>
+                  <div class="flex flex-col gap-0 text-sm leading-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.price') }}</p>
+                    <p class="text-foreground">
+                      {{ selectedStockVehicle?.price != null ? `${selectedStockVehicle.price.toLocaleString()}€` : '—' }}
+                    </p>
+                  </div>
+                  <div class="flex flex-col gap-0 text-sm leading-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.specification') }}</p>
+                    <p class="text-foreground">{{ specText }}</p>
+                  </div>
+                  <div class="flex flex-col gap-1 text-sm leading-5 lg:gap-0">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.mileage') }}</p>
+                    <p class="text-foreground">
+                      {{ selectedStockVehicle?.kilometers != null ? `${selectedStockVehicle.kilometers.toLocaleString()} km` : '—' }}
+                    </p>
+                  </div>
+
+                  <div class="flex flex-col gap-0 text-sm leading-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.registrationDate') }}</p>
+                    <p class="text-foreground">{{ selectedStockVehicle?.registration || '—' }}</p>
+                  </div>
+                  <div v-if="hasStockInteractionMetrics" class="flex flex-col gap-0 text-sm leading-5">
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.interactions') }}</p>
+                    <div class="flex flex-wrap items-center gap-3">
+                      <span v-if="stockMetricsFunnel != null" class="inline-flex items-center gap-1 text-foreground">
+                        <Filter class="size-4 shrink-0 opacity-80 text-muted-foreground" aria-hidden="true" />
+                        {{ stockMetricsFunnel }}
+                      </span>
+                      <span v-if="stockMetricsTag != null" class="inline-flex items-center gap-1 text-foreground">
+                        <LucideTag class="size-4 shrink-0 opacity-80 text-muted-foreground" aria-hidden="true" />
+                        {{ stockMetricsTag }}
                       </span>
                     </div>
-                    <div
-                      v-if="stockVinDisplay"
-                      class="inline-flex min-w-0 max-w-full items-center overflow-hidden rounded-[2px] border border-border bg-background px-1 py-0.5 shadow-[0px_0px_0px_1px_rgba(14,63,126,0.04),0px_1px_1px_-0.5px_rgba(42,51,69,0.04)]"
-                    >
-                      <span class="truncate font-mono text-sm font-normal leading-5 text-muted-foreground">{{
-                        stockVinDisplay
-                      }}</span>
+                  </div>
+                  <div
+                    v-if="stockPlateDisplay || stockVinDisplay"
+                    class="flex min-w-0 flex-col gap-1 text-sm leading-5 lg:col-span-1"
+                    :class="{ 'lg:col-start-3': !hasStockInteractionMetrics }"
+                  >
+                    <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.identity') }}</p>
+                    <div class="flex min-w-0 flex-wrap items-center gap-2">
+                      <div
+                        v-if="stockPlateDisplay"
+                        class="inline-flex max-w-full items-center gap-1 overflow-hidden rounded-[2px] border border-border bg-background py-0.5 pl-0.5 pr-1 shadow-[0px_0px_0px_1px_rgba(14,63,126,0.04),0px_1px_1px_-0.5px_rgba(42,51,69,0.04)]"
+                      >
+                        <span
+                          class="h-4 w-1.5 shrink-0 rounded-bl-[1px] rounded-tl-[1px] bg-primary"
+                          aria-hidden="true"
+                        />
+                        <span class="whitespace-nowrap text-sm font-normal leading-5 text-muted-foreground">
+                          {{ stockPlateDisplay }}
+                        </span>
+                      </div>
+                      <div
+                        v-if="stockVinDisplay"
+                        class="inline-flex min-w-0 max-w-full items-center overflow-hidden rounded-[2px] border border-border bg-background px-1 py-0.5 shadow-[0px_0px_0px_1px_rgba(14,63,126,0.04),0px_1px_1px_-0.5px_rgba(42,51,69,0.04)]"
+                      >
+                        <span class="truncate font-mono text-sm font-normal leading-5 text-muted-foreground">{{ stockVinDisplay }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </template>
             </template>
 
             <!-- Manual insert: title (dismiss = corner control, same as manual contact card) -->
-            <template v-else>
+            <template v-else-if="vehicle.manualOpen">
               <p class="pr-10 text-sm font-medium leading-5 text-foreground">
                 {{ vehicleSectionTitle }}
+              </p>
+            </template>
+            <template v-else-if="vehicle.configureOpen">
+              <p class="pr-10 text-sm font-medium leading-5 text-foreground">
+                {{ vehicleSectionTitle }}
+              </p>
+              <p class="text-sm leading-5 text-muted-foreground">
+                {{ t('forms.addNew.leadDetails.vehicle.configurePlaceholder') }}
               </p>
             </template>
 
@@ -738,6 +796,15 @@
 
           <div class="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
             <Button
+              v-if="showConfigureVehicle"
+              type="button"
+              variant="secondary"
+              class="h-8 rounded-md px-2.5 text-sm"
+              @click="onConfigure"
+            >
+              {{ t('forms.addNew.leadDetails.vehicle.configure') }}
+            </Button>
+            <Button
               type="button"
               variant="secondary"
               class="h-8 rounded-md px-2.5 text-sm"
@@ -754,7 +821,13 @@
     </CardContent>
   </Card>
 
-  <VehicleFromStockModal v-model:open="vehicleModalOpen" @select="onVehiclePicked" />
+  <VehicleFromStockModal
+    v-model:open="vehicleModalOpen"
+    :inventory-mode="vehiclePickerInventoryMode"
+    :prefill-search="vehicleModalPrefillSearch"
+    @select="onVehiclePicked"
+    @insert-manually="onInsertManuallyFromVehicleModal"
+  />
 
   <Dialog :open="showDiscardManualVehicleConfirm" @update:open="(o) => (showDiscardManualVehicleConfirm = o)">
     <DialogPortal>
@@ -813,12 +886,15 @@ import {
 import { FISCAL_ENTITY_COMPANY_A, FISCAL_ENTITY_COMPANY_B } from '@/constants/fiscalEntities'
 import { VEHICLE_BRANDS, getModelsForBrand } from '@/constants/vehicleSuggestions'
 import { fetchUsers } from '@/api/users'
+import { getVehicleTableOwnerLabel } from '@/utils/vehicleInventoryTable'
 import LeadDepartmentSegment from '@/components/addnew/LeadDepartmentSegment.vue'
 import VehicleFromStockModal from '@/components/addnew/VehicleFromStockModal.vue'
 
 const props = defineProps({
   leadForm: { type: Object, required: true },
   vehicleFormData: { type: Object, required: true },
+  /** Display name of contact chosen in SelectContactBox (not manual create). */
+  existingContactName: { type: String, default: '' },
   errors: { type: Object, default: () => ({}) },
 })
 
@@ -836,6 +912,12 @@ const oppTipId = `ld-tip-opp-${tipUid}`
 const isService = computed(() => form.department === 'service')
 const isOpp = computed(() => form.recordType === 'opportunity')
 const isLead = computed(() => form.recordType === 'lead')
+
+const leadDetailsSectionTitle = computed(() =>
+  isOpp.value
+    ? t('forms.addNew.leadDetails.titleOpportunity')
+    : t('forms.addNew.leadDetails.title'),
+)
 
 const showServiceOppTop = computed(() => isService.value && isOpp.value)
 const showStandardRequestGrid = computed(() => !showServiceOppTop.value)
@@ -928,6 +1010,15 @@ watch(
   { immediate: true },
 )
 
+watch(
+  () => [form.department, form.recordType],
+  () => {
+    if (form.department !== 'sales' || form.recordType !== 'opportunity') {
+      vehicle.configureOpen = false
+    }
+  },
+)
+
 /** Source detail is editable only after a source is selected (all department / record-type layouts). */
 const isSourceDetailDisabled = computed(
   () => form.source == null || String(form.source).trim() === '',
@@ -968,20 +1059,41 @@ const vehicleSectionTitle = computed(() => {
   return t('forms.addNew.leadDetails.vehicle.sectionOwnedVehicle')
 })
 
-// Vehicle section in Creation-flow doesn't use Configure in this iteration
-const showConfigure = computed(() => false)
+/** Sales + Opportunity: extra “Configure” path before “Insert manually”. */
+const showConfigureVehicle = computed(() => !isService.value && isOpp.value)
 
 /** Required: Sales + Lead ("Vehicle requested") and Sales + Opportunity ("Vehicle information") */
 const vehicleTitleShowAsterisk = computed(() => !isService.value && (isLead.value || isOpp.value))
 
+const vehiclePickerInventoryMode = computed(() =>
+  isService.value && (isLead.value || isOpp.value) ? 'customer-vehicles' : 'in-stock',
+)
+
+const vehicleModalPrefillSearch = computed(() => {
+  if (vehiclePickerInventoryMode.value !== 'customer-vehicles') return ''
+  return String(props.existingContactName || '').trim()
+})
+
 const vehicleDisplayText = computed(() => {
   const label = (vehicle.label || vehicle.summary || '').trim()
   if (label) return label
+  if (isService.value && isLead.value) {
+    return t('forms.addNew.leadDetails.vehicle.searchCustomerVehiclesPlaceholder')
+  }
   return t('forms.addNew.leadDetails.vehicle.searchPlaceholder')
 })
 
 const selectedStockVehicle = computed(() => vehicle.stockVehicle || null)
 const hasSelectedStockVehicle = computed(() => selectedStockVehicle.value && selectedStockVehicle.value.id != null)
+
+const stockVehicleInventoryTypeLabel = computed(() => {
+  const v = selectedStockVehicle.value
+  if (!v) return '—'
+  const inv = v.inventoryType
+  if (inv === 'in-stock') return t('requestDetail.vehicleCard.stockInStock')
+  if (inv === 'customer-vehicles') return t('forms.addNew.leadDetails.vehicle.inventoryCustomerVehicles')
+  return '—'
+})
 
 const specText = computed(() => {
   const v = selectedStockVehicle.value
@@ -1042,6 +1154,31 @@ const stockVinDisplay = computed(() => {
   const v = selectedStockVehicle.value
   if (!v) return ''
   return (v.vin || '').toString().trim()
+})
+
+const ownedVehicleOwnershipLabel = computed(() => {
+  const v = selectedStockVehicle.value
+  if (!v) return '—'
+  const label = getVehicleTableOwnerLabel(v)
+  return label || '—'
+})
+
+const formatRegistration = (registration) => {
+  if (!registration) return '—'
+  if (typeof registration === 'string' && registration.includes('/')) return registration
+  const d = new Date(String(registration))
+  if (Number.isNaN(d.getTime())) return String(registration)
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const yyyy = String(d.getFullYear())
+  return `${mm}/${yyyy}`
+}
+
+const ownedVehicleOwnershipStartingDate = computed(() => {
+  const v = selectedStockVehicle.value
+  if (!v) return '—'
+  const raw = v.ownedSince || v.soldAt || v.registration
+  if (!raw) return '—'
+  return formatRegistration(raw)
 })
 
 const isMac = ref(typeof navigator !== 'undefined' && /Mac|iPhone|iPod|iPad/i.test(navigator.platform))
@@ -1128,7 +1265,15 @@ function onInsertManually() {
   vehicle.configureOpen = false
 }
 
-function onConfigure() {}
+function onInsertManuallyFromVehicleModal() {
+  vehicleModalOpen.value = false
+  onInsertManually()
+}
+
+function onConfigure() {
+  clearVehicleSelection()
+  vehicle.configureOpen = true
+}
 
 function clearVehicleSelection() {
   vehicle.stockVehicleId = null

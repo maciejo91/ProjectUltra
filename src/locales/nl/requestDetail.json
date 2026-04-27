@@ -121,6 +121,8 @@
     "registrationDate": "Registratiedatum",
     "carLocation": "Locatie voertuig",
     "mileage": "Kilometerstand",
+    "ownership": "Eigendom (accountnaam)",
+    "ownershipStartingDate": "Start eigendom",
     "interactions": "Interacties",
     "identity": "Identiteit",
     "stockInStock": "Op voorraad",

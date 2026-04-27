@@ -8,6 +8,7 @@
       <UnifiedSearchBar
         :active-tab="activeTab"
         :placeholder="placeholder"
+        :global-filter="globalFilter"
         :pagination="pagination"
         :assignee-options="assigneeOptions"
         :volvo-model-options="volvoModelOptions"
@@ -52,7 +53,9 @@ defineProps({
   typeOptions: { type: Array, default: () => [] },
   requestedCarBrandOptions: { type: Array, default: () => [] },
   accountTypeOptions: { type: Array, default: () => [] },
-  includeMarginBottom: { type: Boolean, default: true }
+  includeMarginBottom: { type: Boolean, default: true },
+  /** Pass through to UnifiedSearchBar so the query input matches parent state. */
+  globalFilter: { type: String, default: undefined },
 })
 
 const emit = defineEmits(['update:globalFilter', 'update:columnFilters', 'update:pagination', 'wrapperClick'])

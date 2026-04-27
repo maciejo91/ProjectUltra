@@ -171,6 +171,7 @@
     },
     "leadDetails": {
       "title": "Lead details",
+      "titleOpportunity": "Opportunity details",
       "department": {
         "label": "Department",
         "sales": "Sales",
@@ -262,9 +263,15 @@
       },
       "vehicle": {
         "searchPlaceholder": "Search in stock…",
+        "searchCustomerVehiclesPlaceholder": "Search vehicles...",
         "searchHint": "Click the bar or use the keyboard shortcut to search vehicles.",
         "searchModalTitle": "Search in stock",
+        "searchModalTitleCustomerVehicles": "Search customers' vehicles",
         "searchInStockPlaceholder": "Filter by brand, model, VIN, plate…",
+        "searchCustomerVehiclesModalPlaceholder": "Filter by brand, model, VIN, plate…",
+        "filterCustomersVehicles": "Customers' vehicles",
+        "filterOwner": "Owner",
+        "inventoryCustomerVehicles": "Customer vehicle",
         "noVehicles": "No vehicles match your search.",
         "sectionVehicleRequested": "Vehicle requested",
         "sectionVehicleInfo": "Vehicle information",

@@ -178,6 +178,7 @@ import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Info, Mail, Phone, Search, User, X } from 'lucide-vue-next'
 import { useCustomersStore } from '@/stores/customers'
+import { dedupeCustomersForPicker } from '@/utils/dedupeCustomersForPicker'
 import {
   Avatar,
   AvatarFallback,
@@ -275,7 +276,7 @@ onUnmounted(() => {
 })
 
 const localResults = computed(() => {
-  const list = customersStore.customers || []
+  const list = dedupeCustomersForPicker(customersStore.customers || [])
   const q = query.value.trim().toLowerCase()
   if (!q) return list.slice(0, 8)
   return list

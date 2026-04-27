@@ -41,6 +41,7 @@
           :key="leadDetailsRemountKey"
           :lead-form="leadDetailsForm"
           :vehicle-form-data="vehicleFormData"
+          :existing-contact-name="existingContactNameForVehicleSearch"
           :errors="errors"
         />
       </div>
@@ -276,6 +277,12 @@ const lastContactKeyForAssignee = ref(null)
 
 /** Lead details block is always visible in the scroll area (not gated on contact selection). */
 const showLeadDetails = computed(() => true)
+
+/** Existing picker contact only — used to prefill customer-vehicles search in Service + Lead modal. */
+const existingContactNameForVehicleSearch = computed(() => {
+  if (isCreatingContact.value) return ''
+  return String(selectedContact.value?.name ?? '').trim()
+})
 
 function resolveDefaultAssigneeId() {
   const c = selectedContact.value

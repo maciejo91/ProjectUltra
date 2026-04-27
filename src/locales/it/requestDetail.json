@@ -121,6 +121,8 @@
     "registrationDate": "Data di immatricolazione",
     "carLocation": "Posizione veicolo",
     "mileage": "Chilometraggio",
+    "ownership": "Intestazione (Nome account)",
+    "ownershipStartingDate": "Data inizio intestazione",
     "interactions": "Interazioni",
     "identity": "Identità",
     "stockInStock": "Disponibile",

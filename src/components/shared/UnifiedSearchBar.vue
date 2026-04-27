@@ -72,6 +72,8 @@ const props = defineProps({
   requestedCarBrandOptions: { type: Array, default: () => [] },
   accountTypeOptions: { type: Array, default: () => [] },
   pagination: { type: Object, default: () => ({ pageIndex: 0, pageSize: 10 }) },
+  /** When set, keeps the input in sync with parent `globalFilter` (e.g. programmatic clear). */
+  globalFilter: { type: String, default: undefined },
 })
 
 const emit = defineEmits([
@@ -133,6 +135,19 @@ const computedPlaceholder = computed(() => {
   }
   return props.activeTab === 'opportunities' ? 'Search opportunities...' : 'Search leads...'
 })
+
+// Parent-driven global filter (modal prefill / reset) → input stays aligned
+watch(
+  () => props.globalFilter,
+  (v) => {
+    if (v === undefined) return
+    if (isAIMode.value) return
+    const next = v ?? ''
+    if (searchQuery.value !== next) {
+      searchQuery.value = next
+    }
+  },
+)
 
 // Keep input and filter in sync: typing (including clearing) updates filter; never clear input on Enter
 watch(searchQuery, (newValue) => {

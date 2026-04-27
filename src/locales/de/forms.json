@@ -171,6 +171,7 @@
     },
     "leadDetails": {
       "title": "Lead-Details",
+      "titleOpportunity": "Opportunity-Details",
       "department": {
         "label": "Abteilung",
         "sales": "Vertrieb",
@@ -262,9 +263,15 @@
       },
       "vehicle": {
         "searchPlaceholder": "Im Bestand suchen…",
+        "searchCustomerVehiclesPlaceholder": "Fahrzeuge suchen...",
         "searchHint": "Klicken Sie auf die Leiste oder nutzen Sie die Tastenkombination.",
         "searchModalTitle": "Im Bestand suchen",
+        "searchModalTitleCustomerVehicles": "Kundenfahrzeuge suchen",
         "searchInStockPlaceholder": "Marke, Modell, FIN, Kennzeichen…",
+        "searchCustomerVehiclesModalPlaceholder": "Marke, Modell, FIN, Kennzeichen…",
+        "filterCustomersVehicles": "Kundenfahrzeuge",
+        "filterOwner": "Besitzer",
+        "inventoryCustomerVehicles": "Kundenfahrzeug",
         "noVehicles": "Keine passenden Fahrzeuge.",
         "sectionVehicleRequested": "Gewünschtes Fahrzeug",
         "sectionVehicleInfo": "Fahrzeuginformationen",

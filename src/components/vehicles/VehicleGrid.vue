@@ -29,10 +29,12 @@
       </template>
 
       <template #empty-state>
-        <div class="empty-state">
-          <Car class="empty-state-icon w-8 h-8 shrink-0" />
-          <p class="empty-state-text">No vehicles found</p>
-        </div>
+        <slot name="empty-state">
+          <div class="empty-state">
+            <Car class="empty-state-icon w-8 h-8 shrink-0" />
+            <p class="empty-state-text">No vehicles found</p>
+          </div>
+        </slot>
       </template>
       <template #batch-action-bar>
         <div v-if="hasSelection" class="flex items-center gap-2">
@@ -86,10 +88,12 @@
       </template>
 
       <template #empty-state>
-        <div class="empty-state">
-          <Car class="empty-state-icon w-8 h-8 shrink-0" />
-          <p class="empty-state-text">No vehicles found</p>
-        </div>
+        <slot name="empty-state">
+          <div class="empty-state">
+            <Car class="empty-state-icon w-8 h-8 shrink-0" />
+            <p class="empty-state-text">No vehicles found</p>
+          </div>
+        </slot>
       </template>
     </DataTable>
 </template>

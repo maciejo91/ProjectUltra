@@ -104,9 +104,10 @@ export const mockVehicles = [
     fuelType: 'Petrol',
     gearType: 'Automatic',
     dealership: 'Firenze',
-    inventoryType: 'sold',
+    inventoryType: 'customer-vehicles',
     soldAt: '2024-11-15',
-    soldTo: 'Marco Rossi'
+    soldTo: 'Josh Adams',
+    ownerContactId: 1,
   },
   {
     id: 7,

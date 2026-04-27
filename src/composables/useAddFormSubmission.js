@@ -58,9 +58,10 @@ export function useAddFormSubmission({
   const cleanVehicleData = (vehicleData) => {
     if (!vehicleData || typeof vehicleData !== 'object') return {}
 
-    // Mutual exclusivity: submit either stock selection or manual insert fields.
+    // Mutual exclusivity: stock, manual insert, or opportunity “Configure” placeholder.
     const hasStock = vehicleData.stockVehicleId != null
     const isManual = vehicleData.manualOpen === true
+    const isConfigure = vehicleData.configureOpen === true
 
     if (hasStock) {
       const out = {
@@ -76,6 +77,10 @@ export function useAddFormSubmission({
         if (value !== null && value !== '' && value !== undefined) acc[key] = value
         return acc
       }, {})
+    }
+
+    if (isConfigure) {
+      return { configureOpen: true }
     }
 
     if (isManual) {

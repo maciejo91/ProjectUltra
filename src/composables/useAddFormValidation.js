@@ -15,9 +15,10 @@ const LEAD_ERROR_KEYS = [
   'vehicle',
 ]
 
-/** Sales + Opportunity: stock pick, or label/summary, or brand+model */
+/** Sales + Opportunity: stock pick, or label/summary, or brand+model, or Configure flow */
 function hasRequiredVehicleInfo(v) {
   if (!v) return false
+  if (v.configureOpen === true) return true
   if (v.stockVehicleId != null) return true
   if ((v.label || v.summary || '').toString().trim()) return true
   const b = (v.brand || '').toString().trim()
@@ -388,6 +389,11 @@ export function useAddFormValidation({
         vehicleFormData.summary,
         vehicleFormData.brand,
         vehicleFormData.model,
+        vehicleFormData.manualOpen,
+        vehicleFormData.configureOpen,
+        vehicleFormData.manualBrand,
+        vehicleFormData.manualModel,
+        vehicleFormData.manualQuantity,
       ],
       () => {
         if (errors.vehicle) errors.vehicle = ''

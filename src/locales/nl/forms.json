@@ -171,6 +171,7 @@
     },
     "leadDetails": {
       "title": "Leaddetails",
+      "titleOpportunity": "Opportunitydetails",
       "department": {
         "label": "Afdeling",
         "sales": "Sales",
@@ -262,9 +263,15 @@
       },
       "vehicle": {
         "searchPlaceholder": "Zoek in voorraad…",
+        "searchCustomerVehiclesPlaceholder": "Zoek voertuigen...",
         "searchHint": "Klik op de balk of gebruik de sneltoets.",
         "searchModalTitle": "Zoek in voorraad",
+        "searchModalTitleCustomerVehicles": "Zoek voertuigen van klanten",
         "searchInStockPlaceholder": "Merk, model, VIN, kenteken…",
+        "searchCustomerVehiclesModalPlaceholder": "Merk, model, VIN, kenteken…",
+        "filterCustomersVehicles": "Voertuigen van klanten",
+        "filterOwner": "Eigenaar",
+        "inventoryCustomerVehicles": "Klantvoertuig",
         "noVehicles": "Geen voertuigen komen overeen met je zoekopdracht.",
         "sectionVehicleRequested": "Gevraagd voertuig",
         "sectionVehicleInfo": "Voertuiginformatie",
