@@ -33,7 +33,16 @@
                 role="option"
                 @click="selectVehicle(v)"
               >
-                <div class="font-medium text-foreground">{{ v.brand }} {{ v.model }}</div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span
+                    v-if="rowConditionLabel(v)"
+                    class="inline-flex shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-xs font-medium leading-none text-foreground"
+                    :class="rowConditionClass(v)"
+                  >
+                    {{ rowConditionLabel(v) }}
+                  </span>
+                  <div class="font-medium text-foreground">{{ v.brand }} {{ v.model }}</div>
+                </div>
                 <div class="text-xs text-muted-foreground">
                   {{ v.year }} · {{ v.vin || '—' }} · {{ v.plateNumber || '—' }}
                 </div>
@@ -72,6 +81,18 @@ import {
   InputGroupInput,
 } from '@motork/component-library/future/primitives'
 import { fetchVehicles } from '@/api/vehicles'
+import {
+  getVehicleConditionBadgeClass,
+  getVehicleConditionLabel,
+} from '@/utils/vehicleHelpers'
+
+function rowConditionLabel(v) {
+  return getVehicleConditionLabel(v)
+}
+
+function rowConditionClass(v) {
+  return getVehicleConditionBadgeClass(getVehicleConditionLabel(v))
+}
 
 const props = defineProps({
   open: { type: Boolean, default: false },

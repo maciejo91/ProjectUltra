@@ -27,6 +27,14 @@
 
     <!-- Details -->
     <div class="flex flex-col p-2">
+      <div v-if="conditionLabel" class="mb-1 flex flex-wrap items-center gap-1.5">
+        <span
+          class="inline-flex items-center justify-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold leading-none text-foreground uppercase tracking-wide"
+          :class="conditionBadgeClass"
+        >
+          {{ conditionLabel }}
+        </span>
+      </div>
       <h4 class="font-bold text-foreground leading-tight line-clamp-2 text-sm">
         {{ vehicle.brand }} {{ vehicle.model }} ({{ vehicle.year }})
       </h4>
@@ -65,6 +73,7 @@
 import { computed } from 'vue'
 import { Car, CheckCircle2, Clock } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
+import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 
 const props = defineProps({
   vehicle: { type: Object, required: true },
@@ -85,6 +94,10 @@ const badgeBgClass = computed(() => {
   }
   return m[props.badge] || 'bg-gray-600'
 })
+
+const conditionLabel = computed(() => getVehicleConditionLabel(props.vehicle))
+
+const conditionBadgeClass = computed(() => getVehicleConditionBadgeClass(conditionLabel.value))
 
 function formatPrice(price) {
   if (!price) return '0'

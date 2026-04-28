@@ -36,6 +36,13 @@
         </div>
         <div class="flex min-w-0 flex-1 flex-col gap-1">
           <div class="flex min-w-0 flex-wrap items-center gap-2">
+            <span
+              v-if="conditionBadge"
+              class="inline-flex shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-sm leading-5 text-foreground"
+              :class="conditionBadgeClass"
+            >
+              {{ conditionBadge }}
+            </span>
             <a
               v-if="listingHref"
               :href="listingHref"
@@ -57,13 +64,6 @@
             >
               {{ titleLine }}
             </p>
-            <span
-              v-if="conditionBadge"
-              class="inline-flex items-center justify-center rounded-md px-2 py-0.5 text-sm leading-5 text-foreground"
-              :class="conditionBadgeClass"
-            >
-              {{ conditionBadge }}
-            </span>
           </div>
           <p
             v-if="trimLine"
@@ -295,6 +295,7 @@ import { useI18n } from 'vue-i18n'
 import { Button } from '@motork/component-library/future/primitives'
 import { ArrowUpRight, Car, Filter, Pencil, Tag } from 'lucide-vue-next'
 import EditRequestedVehicleModal from '@/components/modals/EditRequestedVehicleModal.vue'
+import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 
 const props = defineProps({
   vehicle: {
@@ -491,25 +492,11 @@ const mileageDetailLine = computed(() => {
   return `${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(Number(km))} km`
 })
 
-const vehicleCondition = computed(() => {
-  const v = props.vehicle
-  if (!v) return null
-  const status = (v.status || '').toLowerCase()
-  const km = v.kilometers ?? v.mileage
-  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'new') {
-    return status === 'new' || km === 0 ? 'Km0' : 'New'
-  }
-  return status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Used'
-})
+const conditionBadge = computed(() => getVehicleConditionLabel(props.vehicle))
 
-const conditionBadge = computed(() => vehicleCondition.value)
-
-const conditionBadgeClass = computed(() => {
-  const c = (conditionBadge.value || '').toLowerCase()
-  if (c === 'used') return 'bg-yellow-400 text-foreground'
-  if (c === 'km0' || c === 'new') return 'bg-emerald-100 text-emerald-900'
-  return 'bg-muted text-muted-foreground'
-})
+const conditionBadgeClass = computed(() =>
+  getVehicleConditionBadgeClass(conditionBadge.value)
+)
 
 const handleImageError = () => {
   imageError.value = true

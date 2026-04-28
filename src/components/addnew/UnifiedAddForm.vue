@@ -77,7 +77,7 @@
     <Dialog :open="showCloseCreateConfirm" @update:open="(o) => (showCloseCreateConfirm = o)">
       <DialogPortal>
         <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-        <DialogContent class="w-[90vw] max-w-none">
+        <DialogContent class="w-full sm:max-w-md max-h-[calc(100vh-4rem)] flex flex-col">
           <DialogHeader>
             <DialogTitle>{{ t('forms.addNew.manualContact.discardTitle') }}</DialogTitle>
             <p class="text-sm text-muted-foreground pt-1">{{ t('forms.addNew.manualContact.discardMessage') }}</p>

@@ -23,3 +23,35 @@ export function getRequestedVehicleDisplayLabel(vehicle) {
   const parts = [brand, model].filter(Boolean)
   return parts.join(' ')
 }
+
+/**
+ * Condition label for vehicle cards (Km0, New, Used, or capitalized status).
+ * Aligns with VehicleRequestCard / Request / task overview.
+ *
+ * @param {Object|null|undefined} vehicle
+ * @returns {string|null}
+ */
+export function getVehicleConditionLabel(vehicle) {
+  if (!vehicle || typeof vehicle !== 'object') return null
+  const raw = vehicle.status || ''
+  const status = raw.toLowerCase()
+  const km = vehicle.kilometers ?? vehicle.mileage
+  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'new') {
+    return status === 'new' || km === 0 ? 'Km0' : 'New'
+  }
+  if (raw) {
+    return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase()
+  }
+  return 'Used'
+}
+
+/**
+ * @param {string|null|undefined} label
+ * @returns {string} Tailwind classes for condition pill
+ */
+export function getVehicleConditionBadgeClass(label) {
+  const c = (label || '').toLowerCase()
+  if (c === 'used') return 'bg-yellow-400 text-foreground'
+  if (c === 'km0' || c === 'new') return 'bg-emerald-100 text-emerald-900'
+  return 'bg-muted text-muted-foreground'
+}

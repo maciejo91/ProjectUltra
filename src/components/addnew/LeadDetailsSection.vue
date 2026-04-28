@@ -487,6 +487,13 @@
                 <div class="flex min-h-[72px] min-w-0 flex-1 flex-col gap-0.5">
                   <div class="flex w-full min-w-0 items-center gap-2">
                     <div class="flex min-w-0 flex-1 items-center gap-2">
+                      <span
+                        v-if="!isService && stockConditionBadge"
+                        class="inline-flex shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-sm font-normal leading-5 text-foreground"
+                        :class="stockConditionBadgeClass"
+                      >
+                        {{ stockConditionBadge }}
+                      </span>
                       <Button
                         type="button"
                         variant="link"
@@ -496,13 +503,6 @@
                         <span class="min-w-0 truncate leading-5">{{ stockVehicleTitleLine }}</span>
                         <ArrowUpRight class="size-4 shrink-0 opacity-80" aria-hidden="true" />
                       </Button>
-                      <span
-                        v-if="!isService && stockConditionBadge"
-                        class="inline-flex shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-sm font-normal leading-5 text-foreground"
-                        :class="stockConditionBadgeClass"
-                      >
-                        {{ stockConditionBadge }}
-                      </span>
                     </div>
                   </div>
                   <p
@@ -878,7 +878,7 @@
   <Dialog :open="showDiscardManualVehicleConfirm" @update:open="(o) => (showDiscardManualVehicleConfirm = o)">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="w-[90vw] max-w-none">
+      <DialogContent class="w-full sm:max-w-md max-h-[calc(100vh-4rem)] flex flex-col">
         <DialogHeader>
           <DialogTitle>{{ t('forms.addNew.manualContact.discardTitle') }}</DialogTitle>
           <p class="pt-1 text-sm text-muted-foreground">{{ t('forms.addNew.manualContact.discardMessage') }}</p>
@@ -933,6 +933,7 @@ import { FISCAL_ENTITY_COMPANY_A, FISCAL_ENTITY_COMPANY_B } from '@/constants/fi
 import { VEHICLE_BRANDS, getModelsForBrand } from '@/constants/vehicleSuggestions'
 import { fetchUsers } from '@/api/users'
 import { getVehicleTableOwnerLabel } from '@/utils/vehicleInventoryTable'
+import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 import LeadDepartmentSegment from '@/components/addnew/LeadDepartmentSegment.vue'
 import VehicleFromStockModal from '@/components/addnew/VehicleFromStockModal.vue'
 import VehicleConfiguratorModal from '@/components/addnew/VehicleConfiguratorModal.vue'
@@ -1167,23 +1168,11 @@ const stockVehicleTrimLine = computed(() => {
   return (v.summary || vehicle.label || '').toString().trim()
 })
 
-const stockConditionBadge = computed(() => {
-  const v = selectedStockVehicle.value
-  if (!v) return null
-  const status = (v.status || '').toLowerCase()
-  const km = v.kilometers ?? v.mileage
-  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'new') {
-    return status === 'new' || km === 0 ? 'Km0' : 'New'
-  }
-  return status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Used'
-})
+const stockConditionBadge = computed(() => getVehicleConditionLabel(selectedStockVehicle.value))
 
-const stockConditionBadgeClass = computed(() => {
-  const c = (stockConditionBadge.value || '').toLowerCase()
-  if (c === 'used') return 'bg-yellow-400 text-foreground'
-  if (c === 'km0' || c === 'new') return 'bg-emerald-100 text-emerald-900'
-  return 'bg-muted text-muted-foreground'
-})
+const stockConditionBadgeClass = computed(() =>
+  getVehicleConditionBadgeClass(stockConditionBadge.value)
+)
 
 const stockMetricsFunnel = computed(() => selectedStockVehicle.value?.listingMetrics?.funnelViews)
 const stockMetricsTag = computed(() => selectedStockVehicle.value?.listingMetrics?.tagCount)

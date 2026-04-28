@@ -23,9 +23,18 @@
       <!-- Vehicle Details -->
       <div class="flex-1 p-4 flex flex-col gap-3 min-w-0 min-h-0">
         <div class="flex items-start justify-between gap-4">
-          <h2 class="text-base font-semibold text-foreground leading-tight shrink-0">
-            {{ vehicleDisplayName }}
-          </h2>
+          <div class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+            <span
+              v-if="hasVehicle && vehicleConditionLabel"
+              class="inline-flex shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-sm font-medium leading-5 text-foreground"
+              :class="vehicleConditionBadgeClass"
+            >
+              {{ vehicleConditionLabel }}
+            </span>
+            <h2 class="min-w-0 text-base font-semibold text-foreground leading-tight">
+              {{ vehicleDisplayName }}
+            </h2>
+          </div>
           <p v-if="vehicle.price" class="text-base font-semibold text-foreground shrink-0 pt-1 pr-2">
             €{{ formatPrice(vehicle.price) }}
           </p>
@@ -82,6 +91,7 @@ import { ref, computed, watch } from 'vue'
 import { Car, Plus } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
 import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
+import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 
 const props = defineProps({
   request: {
@@ -113,6 +123,12 @@ const vehicleDisplayName = computed(() => {
   const parts = [v.brand, v.model, v.variant].filter(Boolean)
   return parts.join(' ') || 'Vehicle Details'
 })
+
+const vehicleConditionLabel = computed(() => getVehicleConditionLabel(vehicle.value))
+
+const vehicleConditionBadgeClass = computed(() =>
+  getVehicleConditionBadgeClass(vehicleConditionLabel.value)
+)
 
 const requestMessage = computed(() => {
   return props.request?.requestMessage || vehicle.value?.requestMessage || ''
