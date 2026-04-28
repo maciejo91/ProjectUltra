@@ -2,7 +2,7 @@
   <Dialog :open="open" @update:open="(v) => emit('update:open', v)">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="flex max-h-[min(90vh,640px)] w-full flex-col sm:max-w-lg">
+      <DialogContent class="flex max-h-[min(90vh,640px)] w-[90vw] max-w-none flex-col">
         <DialogHeader>
           <DialogTitle>{{ t('forms.addNew.leadDetails.vehicle.searchModalTitle') }}</DialogTitle>
         </DialogHeader>

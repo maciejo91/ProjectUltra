@@ -97,6 +97,7 @@ const handleSubmit = async (formData) => {
     if (intent === 'proceed_to_qualification') {
       // Proceed to qualification: create lead and redirect to its detail page
       const leadData = {
+        customerId: contact.id,
         customer: {
           id: contact.id,
           name: contact.name,

@@ -55,10 +55,27 @@ export function useAddFormSubmission({
    * @param {Object} vehicleData - Vehicle form data
    * @returns {Object} Cleaned vehicle data
    */
+  const pickNonEmpty = (obj) =>
+    Object.entries(obj).reduce((acc, [key, value]) => {
+      if (value !== null && value !== '' && value !== undefined) acc[key] = value
+      return acc
+    }, {})
+
+  const parseManualPrice = (raw) => {
+    const s = String(raw ?? '')
+      .trim()
+      .replace(/€/g, '')
+      .replace(/\s/g, '')
+      .replace(',', '.')
+    if (!s) return null
+    const n = Number.parseFloat(s)
+    return Number.isFinite(n) ? n : null
+  }
+
   const cleanVehicleData = (vehicleData) => {
     if (!vehicleData || typeof vehicleData !== 'object') return {}
 
-    // Mutual exclusivity: stock, manual insert, or opportunity “Configure” placeholder.
+    // Mutual exclusivity: stock, manual insert, or opportunity “Configure” flow.
     const hasStock = vehicleData.stockVehicleId != null
     const isManual = vehicleData.manualOpen === true
     const isConfigure = vehicleData.configureOpen === true
@@ -73,31 +90,51 @@ export function useAddFormSubmission({
         label: vehicleData.label,
         summary: vehicleData.summary,
       }
-      return Object.entries(out).reduce((acc, [key, value]) => {
-        if (value !== null && value !== '' && value !== undefined) acc[key] = value
-        return acc
-      }, {})
+      return pickNonEmpty(out)
     }
 
     if (isConfigure) {
-      return { configureOpen: true }
+      const summary = String(vehicleData.summary || '').trim()
+      const spec = String(vehicleData.configSpecification || '').trim()
+      const purchase = String(vehicleData.configPurchaseMethod || '').trim()
+      const msgParts = [summary, spec, purchase ? `Purchase: ${purchase}` : ''].filter(Boolean)
+      const requestMessage = msgParts.join('\n\n').trim() || undefined
+      const priceRaw = vehicleData.configPrice
+      const price =
+        priceRaw != null && priceRaw !== '' && Number.isFinite(Number(priceRaw)) ? Number(priceRaw) : undefined
+      const image = String(vehicleData.configImageUrl || '').trim() || undefined
+      const out = {
+        brand: String(vehicleData.brand || '').trim(),
+        model: String(vehicleData.model || '').trim(),
+        label: String(vehicleData.label || '').trim(),
+        summary: summary || undefined,
+        image,
+        price,
+        requestMessage,
+      }
+      return pickNonEmpty(out)
     }
 
     if (isManual) {
+      const brand = String(vehicleData.manualBrand || '').trim()
+      const modelLine = [vehicleData.manualModel, vehicleData.manualVersion]
+        .map((s) => String(s || '').trim())
+        .filter(Boolean)
+        .join(' ')
+      const fuelType = String(vehicleData.manualFuelType || '').trim()
+      const price = parseManualPrice(vehicleData.manualVehiclePrice)
+      const cls = String(vehicleData.manualVehicleClass || '').trim()
+      const vtype = String(vehicleData.manualVehicleType || '').trim()
+      const metaParts = [cls, vtype].filter(Boolean)
+      const requestMessage = metaParts.length ? metaParts.join(' · ') : undefined
       const out = {
-        manualVehicleClass: vehicleData.manualVehicleClass,
-        manualVehicleType: vehicleData.manualVehicleType,
-        manualBrand: vehicleData.manualBrand,
-        manualModel: vehicleData.manualModel,
-        manualVersion: vehicleData.manualVersion,
-        manualFuelType: vehicleData.manualFuelType,
-        manualQuantity: vehicleData.manualQuantity,
-        manualVehiclePrice: vehicleData.manualVehiclePrice,
+        brand,
+        model: modelLine,
+        fuelType: fuelType || undefined,
+        price: price != null ? price : undefined,
+        requestMessage,
       }
-      return Object.entries(out).reduce((acc, [key, value]) => {
-        if (value !== null && value !== '' && value !== undefined) acc[key] = value
-        return acc
-      }, {})
+      return pickNonEmpty(out)
     }
 
     return {}

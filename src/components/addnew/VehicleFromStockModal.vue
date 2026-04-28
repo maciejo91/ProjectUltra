@@ -2,15 +2,15 @@
   <!-- DialogContent already includes DialogPortal + DialogOverlay (Motork primitives). Do not nest another portal/overlay. -->
   <Dialog :open="open" @update:open="(v) => emit('update:open', v)">
     <DialogContent
-      class="flex max-h-[calc(100vh-4rem)] w-[90vw] max-w-[1440px] flex-col overflow-hidden p-0"
+      class="w-[90vw] max-w-[1440px] h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col p-0"
       :show-close-button="true"
     >
       <DialogHeader class="shrink-0 px-6 pt-5">
         <DialogTitle>{{ modalTitle }}</DialogTitle>
       </DialogHeader>
 
-      <div class="min-h-0 flex-1 overflow-hidden px-6 pb-6">
-        <div class="h-full min-h-0 overflow-hidden rounded-lg bg-background">
+      <div class="flex-1 min-h-0 overflow-y-auto px-6 pb-6">
+        <div class="min-h-0 overflow-hidden rounded-lg bg-background">
           <DataTableWithUnifiedSearch
             active-tab="vehicles"
             :placeholder="searchBarPlaceholder"

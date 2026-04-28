@@ -77,7 +77,7 @@
     <Dialog :open="showCloseCreateConfirm" @update:open="(o) => (showCloseCreateConfirm = o)">
       <DialogPortal>
         <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-        <DialogContent class="w-full sm:max-w-md">
+        <DialogContent class="w-[90vw] max-w-none">
           <DialogHeader>
             <DialogTitle>{{ t('forms.addNew.manualContact.discardTitle') }}</DialogTitle>
             <p class="text-sm text-muted-foreground pt-1">{{ t('forms.addNew.manualContact.discardMessage') }}</p>
@@ -254,6 +254,13 @@ function createDefaultVehicleFormState() {
     model: '',
     manualOpen: false,
     configureOpen: false,
+
+    // Vehicle configurator (saved payload mirrored in useAddFormSubmission.cleanVehicleData)
+    configImageUrl: '',
+    configQuantity: null,
+    configPrice: null,
+    configSpecification: '',
+    configPurchaseMethod: '',
 
     // Manual insert (Figma 1710:68242)
     manualVehicleClass: '',

@@ -2,12 +2,12 @@
   <Dialog :open="show" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="w-full sm:max-w-6xl max-h-[90vh] flex flex-col">
+      <DialogContent class="w-[90vw] max-w-none h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col">
         <DialogHeader class="flex-shrink-0 px-6 pt-6 pb-4 border-b border-border">
           <DialogTitle class="text-foreground">Select Vehicle</DialogTitle>
         </DialogHeader>
 
-        <div class="flex-1 overflow-y-auto px-6 py-4 w-full space-y-6">
+        <div class="flex-1 min-h-0 overflow-y-auto px-6 py-4 w-full space-y-6">
           <!-- Stock mode: Recommended + Browse Stock -->
           <template v-if="showStockSection">
             <div v-if="allRecommendedVehicles.length" class="space-y-3">

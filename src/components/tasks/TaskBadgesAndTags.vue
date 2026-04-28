@@ -98,7 +98,7 @@
       <DialogPortal>
         <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
         <DialogContent
-          class="w-full sm:max-w-md"
+          class="w-[90vw] max-w-none"
           :show-close-button="true"
         >
           <DialogHeader class="shrink-0">

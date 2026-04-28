@@ -41,7 +41,7 @@ const handleOpenChange = (isOpen) => {
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
       <DialogContent
-        class="w-full max-w-full sm:max-w-lg max-h-[calc(100vh-4rem)] flex flex-col"
+        class="w-[90vw] max-w-none max-h-[calc(100vh-4rem)] flex flex-col"
         :show-close-button="true"
       >
         <DialogHeader class="shrink-0">

@@ -649,11 +649,55 @@
             </template>
             <template v-else-if="vehicle.configureOpen">
               <p class="pr-10 text-sm font-medium leading-5 text-foreground">
-                {{ vehicleSectionTitle }}
+                Vehicle information
               </p>
-              <p class="text-sm leading-5 text-muted-foreground">
-                {{ t('forms.addNew.leadDetails.vehicle.configurePlaceholder') }}
-              </p>
+
+              <div class="flex w-full items-start gap-3">
+                <div class="h-14 w-20 shrink-0 overflow-hidden rounded-md bg-muted">
+                  <img
+                    v-if="vehicle.configImageUrl"
+                    :src="vehicle.configImageUrl"
+                    alt=""
+                    class="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div class="flex min-h-14 min-w-0 flex-1 flex-col gap-0.5">
+                  <div class="flex w-full min-w-0 items-center gap-2">
+                    <span class="inline-flex shrink-0 items-center justify-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium leading-none text-secondary-foreground">
+                      New
+                    </span>
+                    <p class="min-w-0 truncate text-sm font-medium leading-5 text-foreground">
+                      {{ vehicle.label || '—' }}
+                    </p>
+                  </div>
+                  <p class="w-full text-sm leading-5 text-muted-foreground">
+                    {{ vehicle.summary || '—' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="grid w-full grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="flex flex-col gap-0 text-sm leading-5">
+                  <p class="text-muted-foreground">Quantity</p>
+                  <p class="text-foreground">{{ vehicle.configQuantity ?? '—' }}</p>
+                </div>
+                <div class="flex flex-col gap-0 text-sm leading-5">
+                  <p class="text-muted-foreground">Price</p>
+                  <p class="text-foreground">
+                    {{ vehicle.configPrice != null ? `${Number(vehicle.configPrice).toLocaleString()}€` : '—' }}
+                  </p>
+                </div>
+                <div class="flex flex-col gap-0 text-sm leading-5">
+                  <p class="text-muted-foreground">Specification</p>
+                  <p class="text-foreground">{{ vehicle.configSpecification || '—' }}</p>
+                </div>
+                <div class="flex flex-col gap-0 text-sm leading-5">
+                  <p class="text-muted-foreground">Purchase method</p>
+                  <p class="text-foreground">{{ vehicle.configPurchaseMethod || '—' }}</p>
+                </div>
+              </div>
             </template>
 
             <!-- Manual insert fields (Figma 1710:68242) -->
@@ -829,10 +873,12 @@
     @insert-manually="onInsertManuallyFromVehicleModal"
   />
 
+  <VehicleConfiguratorModal v-model:open="vehicleConfiguratorOpen" @save="onVehicleConfigured" />
+
   <Dialog :open="showDiscardManualVehicleConfirm" @update:open="(o) => (showDiscardManualVehicleConfirm = o)">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="w-full sm:max-w-md">
+      <DialogContent class="w-[90vw] max-w-none">
         <DialogHeader>
           <DialogTitle>{{ t('forms.addNew.manualContact.discardTitle') }}</DialogTitle>
           <p class="pt-1 text-sm text-muted-foreground">{{ t('forms.addNew.manualContact.discardMessage') }}</p>
@@ -889,6 +935,7 @@ import { fetchUsers } from '@/api/users'
 import { getVehicleTableOwnerLabel } from '@/utils/vehicleInventoryTable'
 import LeadDepartmentSegment from '@/components/addnew/LeadDepartmentSegment.vue'
 import VehicleFromStockModal from '@/components/addnew/VehicleFromStockModal.vue'
+import VehicleConfiguratorModal from '@/components/addnew/VehicleConfiguratorModal.vue'
 
 const props = defineProps({
   leadForm: { type: Object, required: true },
@@ -1062,7 +1109,7 @@ const vehicleSectionTitle = computed(() => {
 /** Sales + Opportunity: extra “Configure” path before “Insert manually”. */
 const showConfigureVehicle = computed(() => !isService.value && isOpp.value)
 
-/** Required: Sales + Lead ("Vehicle requested") and Sales + Opportunity ("Vehicle information") */
+/** Required: Sales + Lead ("Requested vehicle") and Sales + Opportunity ("Vehicle information") */
 const vehicleTitleShowAsterisk = computed(() => !isService.value && (isLead.value || isOpp.value))
 
 const vehiclePickerInventoryMode = computed(() =>
@@ -1185,6 +1232,7 @@ const isMac = ref(typeof navigator !== 'undefined' && /Mac|iPhone|iPod|iPad/i.te
 const keyboardShortcutLabel = computed(() => (isMac.value ? '⌘K' : 'Ctrl+K'))
 
 const vehicleModalOpen = ref(false)
+const vehicleConfiguratorOpen = ref(false)
 const showDiscardManualVehicleConfirm = ref(false)
 
 const manualBrandOptions = VEHICLE_BRANDS
@@ -1272,7 +1320,24 @@ function onInsertManuallyFromVehicleModal() {
 
 function onConfigure() {
   clearVehicleSelection()
+  vehicle.configureOpen = false
+  vehicleConfiguratorOpen.value = true
+}
+
+function onVehicleConfigured(payload) {
+  clearVehicleSelection()
   vehicle.configureOpen = true
+
+  vehicle.label = String(payload?.label || '').trim()
+  vehicle.summary = String(payload?.summary || '').trim()
+  vehicle.brand = String(payload?.brand || '').trim()
+  vehicle.model = String(payload?.model || '').trim()
+
+  vehicle.configImageUrl = String(payload?.imageUrl || '').trim()
+  vehicle.configQuantity = payload?.quantity != null ? Number(payload.quantity) : 1
+  vehicle.configPrice = payload?.price != null ? Number(payload.price) : null
+  vehicle.configSpecification = String(payload?.specification || '').trim()
+  vehicle.configPurchaseMethod = String(payload?.purchaseMethod || '').trim()
 }
 
 function clearVehicleSelection() {
@@ -1295,6 +1360,12 @@ function clearVehicleSelection() {
   vehicle.manualFuelType = ''
   vehicle.manualQuantity = '1'
   vehicle.manualVehiclePrice = ''
+
+  vehicle.configImageUrl = ''
+  vehicle.configQuantity = null
+  vehicle.configPrice = null
+  vehicle.configSpecification = ''
+  vehicle.configPurchaseMethod = ''
 }
 
 function onGlobalKey(e) {
