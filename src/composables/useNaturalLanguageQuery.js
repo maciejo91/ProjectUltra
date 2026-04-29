@@ -1,6 +1,6 @@
 /**
  * Composable for parsing natural language queries into structured column filters.
- * Used by UnifiedSearchBar in AI mode.
+ * Used by UnifiedSearchBar for natural-language (Ask AI) queries.
  *
  * @param {Object} options - Optional filter options (arrays of { value, label })
  * @param {string} [options.context] - 'vehicles' | 'leads' | 'opportunities' | 'tasks' | 'requests' | 'customers' | 'reports'

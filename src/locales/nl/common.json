@@ -185,6 +185,9 @@
     "optional": "Optioneel",
     "required": "Verplicht"
   },
+  "notes": {
+    "placeholder": "Typ hier een notitie en gebruik @ om iemand te vermelden"
+  },
   "tasks": {
     "filterAria": "Taken filteren",
     "sortAria": "Taken sorteren",
@@ -206,6 +209,22 @@
     }
   },
   "call": {
+    "startAria": "Gesprek starten",
+    "callCustomer": "Klant bellen",
+    "logCallManually": "Gesprek handmatig loggen",
+    "loggedCallSuccess": "Gesprek gelogd",
+    "direction": "Richting van het gesprek",
+    "directionInbound": "Inkomend",
+    "directionOutbound": "Uitgaand",
+    "time": "Tijd van het gesprek",
+    "timePlaceholder": "Selecteer tijd",
+    "outcome": "Uitkomst",
+    "outcomePlaceholder": "Selecteer uitkomst",
+    "outcomeAnswer": "Antwoord",
+    "outcomeNoAnswer": "Geen antwoord",
+    "outcomeNotInterested": "Niet geïnteresseerd",
+    "notes": "Gespreksnotities",
+    "notesPlaceholder": "Typ hier een notitie en gebruik @ om iemand te vermelden",
     "inProgress": "Gesprek bezig",
     "ended": "Gesprek beëindigd",
     "endCall": "Ophangen",

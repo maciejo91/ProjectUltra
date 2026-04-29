@@ -116,7 +116,7 @@
           </div>
         </div>
         <!-- Inline Outcome Selection (when lead has phone) -->
-        <div v-else-if="!successState" class="space-y-4">
+        <div v-else-if="!successState" class="relative space-y-4">
             <div v-if="!selectedOutcome">
             <p class="text-sm font-medium text-foreground leading-normal mb-3">{{ t('requestDetail.floatingLq.outcomeQuestion') }}</p>
             <div class="outcome-toggle-group grid grid-cols-3 gap-3">
@@ -156,21 +156,21 @@
             </div>
           </div>
 
-          <!-- What's next? (when outcome is no-answer or answer) -->
-          <div v-if="selectedOutcome === 'no-answer'" class="space-y-2">
-            <div class="space-y-2 mb-2">
-              <div>
-                <button
-                  type="button"
-                  class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  :aria-label="t('requestDetail.lqfTask.backToCallOutcome')"
-                  @click="handleBackToCallOutcome"
-                >
-                  <ArrowLeft class="size-4" aria-hidden="true" />
-                </button>
-              </div>
-              <p class="text-sm font-medium text-foreground leading-normal">{{ t('requestDetail.lqfTask.nextStepQuestion') }}</p>
+          <!-- What's next? after No answer -->
+          <div v-if="selectedOutcome === 'no-answer' && !selectedNextStep" class="space-y-2">
+            <div class="mb-2">
+              <button
+                type="button"
+                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                :aria-label="t('requestDetail.lqfTask.backToCallOutcome')"
+                @click="handleBackToCallOutcome"
+              >
+                <ArrowLeft class="size-4" aria-hidden="true" />
+              </button>
             </div>
+            <p class="text-sm font-medium text-foreground leading-normal mb-2">
+              {{ t('requestDetail.lqfTask.nextStepQuestion') }}
+            </p>
             <div class="outcome-toggle-group grid grid-cols-2 gap-3 w-4/5">
               <Toggle
                 variant="outline"
@@ -193,19 +193,19 @@
             </div>
           </div>
           <div v-if="selectedOutcome === 'answer' && !selectedNextStep" class="space-y-2 w-full">
-            <div class="space-y-2 mb-2">
-              <div>
-                <button
-                  type="button"
-                  class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  :aria-label="t('requestDetail.lqfTask.backToCallOutcome')"
-                  @click="handleBackToCallOutcome"
-                >
-                  <ArrowLeft class="size-4" aria-hidden="true" />
-                </button>
-              </div>
-              <p class="text-sm font-medium text-foreground leading-normal">{{ t('requestDetail.lqfTask.nextStepQuestion') }}</p>
+            <div class="mb-2">
+              <button
+                type="button"
+                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                :aria-label="t('requestDetail.lqfTask.backToCallOutcome')"
+                @click="handleBackToCallOutcome"
+              >
+                <ArrowLeft class="size-4" aria-hidden="true" />
+              </button>
             </div>
+            <p class="text-sm font-medium text-foreground leading-normal mb-2">
+              {{ t('requestDetail.lqfTask.nextStepQuestion') }}
+            </p>
             <div class="outcome-toggle-group grid grid-cols-3 gap-3 w-4/5">
               <Toggle
                 variant="outline"
@@ -237,9 +237,157 @@
             </div>
           </div>
 
+          <div
+            v-if="selectedOutcome === 'answer' && selectedNextStep === 'postpone'"
+            ref="expandedOutcomeRef"
+            class="space-y-4"
+          >
+            <div class="flex flex-col gap-2">
+              <div>
+                <button
+                  type="button"
+                  class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  :aria-label="t('requestDetail.lqfTask.backToWhatsNext')"
+                  @click="handleBackToWhatsNextChoices"
+                >
+                  <ArrowLeft class="size-4" aria-hidden="true" />
+                </button>
+              </div>
+              <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
+                <h5 class="font-semibold text-foreground text-sm mb-3">Next call attempt</h5>
+                <div class="reschedule-toggle-group flex flex-wrap gap-2">
+                  <Toggle
+                    variant="outline"
+                    :model-value="rescheduleTime === 'tomorrow-9am'"
+                    @update:model-value="(p) => p && setRescheduleTime('tomorrow-9am')"
+                    class="followup-toggle-item"
+                  >
+                    Tomorrow 9:00 AM
+                  </Toggle>
+                  <Toggle
+                    variant="outline"
+                    :model-value="rescheduleTime === 'monday'"
+                    @update:model-value="(p) => p && setRescheduleTime('monday')"
+                    class="followup-toggle-item mk-ai-mode-active-toggle"
+                  >
+                    <Sparkles
+                      :size="14"
+                      class="mk-sparkles-icon shrink-0"
+                      :fill="rescheduleTime === 'monday' ? 'url(#sparkles-gradient)' : 'currentColor'"
+                      :stroke="rescheduleTime === 'monday' ? 'none' : 'currentColor'"
+                      :stroke-width="rescheduleTime === 'monday' ? 0 : 1.5"
+                    />
+                    Suggest AI time
+                  </Toggle>
+                  <Toggle
+                    variant="outline"
+                    :model-value="rescheduleTime === 'custom'"
+                    @update:model-value="(p) => p && setRescheduleTime('custom')"
+                    class="followup-toggle-item"
+                  >
+                    Select time
+                  </Toggle>
+                </div>
+                <div v-if="rescheduleTime === 'monday' && aiSuggestionData" class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div class="flex items-start gap-2">
+                    <Lightbulb class="w-4 h-4 shrink-0 text-blue-600 mt-0.5" />
+                    <div class="flex-1">
+                      <p class="text-sm font-semibold text-foreground mb-1">
+                        {{ aiSuggestionData.formattedDate }} at {{ aiSuggestionData.time }}
+                      </p>
+                      <p class="text-sm text-muted-foreground">
+                        {{ aiSuggestionData.reason }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div v-if="rescheduleTime === 'custom'" class="mt-3 grid grid-cols-2 gap-3">
+                  <div>
+                    <Label class="form-label">Date</Label>
+                    <Input type="date" v-model="customDate" class="w-full" />
+                  </div>
+                  <div>
+                    <Label class="form-label">Time</Label>
+                    <Input type="time" v-model="customTime" class="w-full" />
+                  </div>
+                </div>
+                <div v-if="rescheduleTime" class="mt-3 flex items-center gap-2">
+                  <Checkbox
+                    :id="`mark-recall-answer-${lead.id}`"
+                    v-model:checked="markAsScheduledRecall"
+                    class="rounded border-border"
+                  />
+                  <Label :for="`mark-recall-answer-${lead.id}`" class="text-sm font-normal text-foreground cursor-pointer">
+                    Mark as scheduled recall appointment
+                  </Label>
+                </div>
+                <div class="mt-4">
+                  <Label class="form-label">Assigned to</Label>
+                  <SelectMenu
+                    v-model="selectedNextAttemptKey"
+                    :items="nextAttemptAssigneeOptions"
+                    value-key="_key"
+                    placeholder="Assign next attempt to..."
+                    class="w-full"
+                  >
+                    <template #item="{ item }">
+                      <div class="flex items-center gap-2">
+                        <div
+                          v-if="item.type === 'user'"
+                          class="w-6 h-6 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
+                          :class="getRoleAvatarClass(item.role)"
+                        >
+                          {{ getInitials(item.name) }}
+                        </div>
+                        <Users v-else-if="item.type === 'team'" class="w-4 h-4 shrink-0 text-muted-foreground" />
+                        <span class="font-medium text-foreground">{{ item.label }}</span>
+                      </div>
+                    </template>
+                  </SelectMenu>
+                </div>
+                <div class="mt-4">
+                  <Label class="form-label">Note to assignee</Label>
+                  <Textarea
+                    v-model="noteForNextAttemptAssignee"
+                    rows="3"
+                    class="w-full resize-none border-border bg-background text-foreground"
+                    placeholder="Add any notes or instructions for the assignee..."
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <Label class="form-label" :for="outcomeFlowNotesPostponeId">{{ t('requestDetail.lqfTask.outcomeFlowNotes') }}</Label>
+              <Textarea
+                :id="outcomeFlowNotesPostponeId"
+                v-model="outcomeFlowNotes"
+                rows="3"
+                class="w-full min-h-20 resize-y border-border bg-background text-foreground"
+                :placeholder="t('requestDetail.lqfTask.outcomeFlowNotesPlaceholder')"
+                :aria-label="t('requestDetail.lqfTask.outcomeFlowNotes')"
+              />
+            </div>
+            <div
+              v-if="!successState"
+              class="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end"
+            >
+              <Button variant="secondary" class="w-full rounded-sm sm:w-auto" @click="cancelOutcome">
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                :disabled="!canPostponeFromInterested"
+                class="w-full rounded-sm bg-primary text-white sm:w-auto"
+                @click="onConfirmPostpone"
+              >
+                Postpone
+              </Button>
+            </div>
+          </div>
+
           <!-- No Answer + Postpone: follow-up and next call attempt -->
           <div v-if="selectedOutcome === 'no-answer' && selectedNextStep === 'postpone'" ref="expandedOutcomeRef" class="space-y-4">
-            <div>
+            <div class="flex items-center justify-between gap-3 min-w-0">
               <button
                 type="button"
                 class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -248,15 +396,39 @@
               >
                 <ArrowLeft class="size-4" aria-hidden="true" />
               </button>
-            </div>
-            <!-- When did you call field -->
-            <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
-              <Label class="form-label">When did you call?</Label>
-              <Input
-                type="datetime-local"
-                v-model="callLogDateTime"
-                class="w-full"
-              />
+
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="text-sm text-muted-foreground shrink-0">{{ t('requestDetail.lqfTask.calledAt') }}</span>
+                <span class="text-sm font-medium text-foreground truncate">{{ calledAtDisplay }}</span>
+                <Popover
+                  :open="callLogDateTimePopoverKey === 'na-postpone'"
+                  @update:open="(open) => onCallLogDateTimePopoverOpenChange('na-postpone', open)"
+                >
+                  <PopoverTrigger as-child>
+                    <button
+                      type="button"
+                      class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      :aria-label="t('requestDetail.lqfTask.editCalledAt')"
+                    >
+                      <Pencil class="size-4" aria-hidden="true" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    class="w-auto min-w-48 p-3 rounded-lg border border-border bg-background shadow-lg"
+                    side="bottom"
+                    align="end"
+                    @open-auto-focus.prevent
+                  >
+                    <input
+                      v-model="callLogDateTime"
+                      type="datetime-local"
+                      class="h-10 min-h-10 w-full min-w-48 rounded-md border border-border bg-background px-3 text-sm text-foreground"
+                      :aria-label="t('requestDetail.lqfTask.editCalledAt')"
+                      :ref="(el) => setCallLogDateTimePopoverInputRef('na-postpone', el)"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
             
             <!-- Send follow-up message -->
@@ -438,7 +610,7 @@
 
           <!-- No Answer + Close lead: reuse close reason card -->
           <div v-if="selectedOutcome === 'no-answer' && selectedNextStep === 'close-lead'" ref="expandedOutcomeRef" class="space-y-4">
-            <div>
+            <div class="flex items-center justify-between gap-3 min-w-0">
               <button
                 type="button"
                 class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -447,14 +619,39 @@
               >
                 <ArrowLeft class="size-4" aria-hidden="true" />
               </button>
-            </div>
-            <div class="bg-white rounded-lg p-4 shadow-nsc-card">
-              <Label class="form-label">When did you call?</Label>
-              <Input
-                type="datetime-local"
-                v-model="callLogDateTime"
-                class="w-full"
-              />
+
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="text-sm text-muted-foreground shrink-0">{{ t('requestDetail.lqfTask.calledAt') }}</span>
+                <span class="text-sm font-medium text-foreground truncate">{{ calledAtDisplay }}</span>
+                <Popover
+                  :open="callLogDateTimePopoverKey === 'na-close'"
+                  @update:open="(open) => onCallLogDateTimePopoverOpenChange('na-close', open)"
+                >
+                  <PopoverTrigger as-child>
+                    <button
+                      type="button"
+                      class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      :aria-label="t('requestDetail.lqfTask.editCalledAt')"
+                    >
+                      <Pencil class="size-4" aria-hidden="true" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    class="w-auto min-w-48 p-3 rounded-lg border border-border bg-background shadow-lg"
+                    side="bottom"
+                    align="end"
+                    @open-auto-focus.prevent
+                  >
+                    <input
+                      v-model="callLogDateTime"
+                      type="datetime-local"
+                      class="h-10 min-h-10 w-full min-w-48 rounded-md border border-border bg-background px-3 text-sm text-foreground"
+                      :aria-label="t('requestDetail.lqfTask.editCalledAt')"
+                      :ref="(el) => setCallLogDateTimePopoverInputRef('na-close', el)"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
             <CloseAsLostForm
               :preselected-reason="disqualifyReason"
@@ -467,8 +664,9 @@
 
           <!-- Not Valid (or Answer + Not interested): close as lost -->
           <div v-if="(selectedOutcome === 'not-valid') || (selectedOutcome === 'answer' && selectedNextStep === 'not-interested')" ref="expandedOutcomeRef" class="space-y-4">
-            <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'not-interested'">
+            <div class="flex items-center justify-between gap-3 min-w-0">
               <button
+                v-if="selectedOutcome === 'answer' && selectedNextStep === 'not-interested'"
                 type="button"
                 class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 :aria-label="t('requestDetail.lqfTask.backToWhatsNext')"
@@ -476,23 +674,66 @@
               >
                 <ArrowLeft class="size-4" aria-hidden="true" />
               </button>
+              <button
+                v-else-if="selectedOutcome === 'not-valid'"
+                type="button"
+                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                :aria-label="t('requestDetail.lqfTask.backToCallOutcome')"
+                @click="handleBackToCallOutcome"
+              >
+                <ArrowLeft class="size-4" aria-hidden="true" />
+              </button>
+
+              <div class="flex shrink-0 items-center gap-2 min-w-0">
+                <span class="text-sm text-muted-foreground shrink-0">{{ t('requestDetail.lqfTask.calledAt') }}</span>
+                <span class="text-sm font-medium text-foreground truncate">{{ calledAtDisplay }}</span>
+                <Popover
+                  :open="callLogDateTimePopoverKey === 'not-valid'"
+                  @update:open="(open) => onCallLogDateTimePopoverOpenChange('not-valid', open)"
+                >
+                  <PopoverTrigger as-child>
+                    <button
+                      type="button"
+                      class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      :aria-label="t('requestDetail.lqfTask.editCalledAt')"
+                    >
+                      <Pencil class="size-4" aria-hidden="true" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    class="w-auto min-w-48 p-3 rounded-lg border border-border bg-background shadow-lg"
+                    side="bottom"
+                    align="end"
+                    @open-auto-focus.prevent
+                  >
+                    <input
+                      v-model="callLogDateTime"
+                      type="datetime-local"
+                      class="h-10 min-h-10 w-full min-w-48 rounded-md border border-border bg-background px-3 text-sm text-foreground"
+                      :aria-label="t('requestDetail.lqfTask.editCalledAt')"
+                      :ref="(el) => setCallLogDateTimePopoverInputRef('not-valid', el)"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
             <p
               v-if="selectedOutcome === 'not-valid'"
-              class="text-sm font-medium text-foreground leading-normal mb-2"
+              class="text-sm font-medium text-foreground leading-normal mb-0"
             >
               {{ t('requestDetail.lqfTask.nextStepQuestion') }}
             </p>
-            <!-- When did you call field -->
-            <div class="bg-white rounded-lg p-4 shadow-nsc-card">
-              <Label class="form-label">When did you call?</Label>
-              <Input
-                type="datetime-local"
-                v-model="callLogDateTime"
-                class="w-full"
-              />
-            </div>
             <CloseAsLostForm
+              v-if="selectedOutcome === 'not-valid'"
+              class="mt-2"
+              :preselected-reason="disqualifyReason"
+              close-button-label="Close"
+              @close="handleCloseFromForm"
+              @cancel="cancelOutcome"
+              @update:reason="setDisqualifyReason"
+            />
+            <CloseAsLostForm
+              v-else
               :preselected-reason="disqualifyReason"
               close-button-label="Close"
               @close="handleCloseFromForm"
@@ -503,7 +744,7 @@
 
       <!-- Answer + Interested (Inline) -->
           <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'interested'" ref="expandedOutcomeRef" class="space-y-4">
-            <div>
+            <div class="flex items-center justify-between gap-3 min-w-0">
               <button
                 type="button"
                 class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -512,19 +753,56 @@
               >
                 <ArrowLeft class="size-4" aria-hidden="true" />
               </button>
+
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="text-sm text-muted-foreground shrink-0">{{ t('requestDetail.lqfTask.calledAt') }}</span>
+                <span class="text-sm font-medium text-foreground truncate">{{ calledAtDisplay }}</span>
+                <Popover
+                  :open="callLogDateTimePopoverKey === 'interested'"
+                  @update:open="(open) => onCallLogDateTimePopoverOpenChange('interested', open)"
+                >
+                  <PopoverTrigger as-child>
+                    <button
+                      type="button"
+                      class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      :aria-label="t('requestDetail.lqfTask.editCalledAt')"
+                    >
+                      <Pencil class="size-4" aria-hidden="true" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    class="w-auto min-w-48 p-3 rounded-lg border border-border bg-background shadow-lg"
+                    side="bottom"
+                    align="end"
+                    @open-auto-focus.prevent
+                  >
+                    <input
+                      v-model="callLogDateTime"
+                      type="datetime-local"
+                      class="h-10 min-h-10 w-full min-w-48 rounded-md border border-border bg-background px-3 text-sm text-foreground"
+                      :aria-label="t('requestDetail.lqfTask.editCalledAt')"
+                      :ref="(el) => setCallLogDateTimePopoverInputRef('interested', el)"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
             <!-- Info note -->
             <div class="text-sm text-muted-foreground">
               <span class="text-red-600">*</span> Required fields
             </div>
-            
-            <!-- When did you call field -->
-            <div class="bg-white rounded-lg p-4 shadow-nsc-card">
-              <Label class="form-label">When did you call?</Label>
-              <Input
-                type="datetime-local"
-                v-model="callLogDateTime"
-                class="w-full"
+            <div
+              v-if="!(selectedOutcome === 'answer' && selectedNextStep === 'postpone')"
+              class="space-y-2"
+            >
+              <Label class="form-label" :for="outcomeFlowNotesId">{{ t('requestDetail.lqfTask.outcomeFlowNotes') }}</Label>
+              <Textarea
+                :id="outcomeFlowNotesId"
+                v-model="outcomeFlowNotes"
+                rows="3"
+                class="w-full min-h-20 resize-y border-border bg-background text-foreground"
+                :placeholder="t('requestDetail.lqfTask.outcomeFlowNotesPlaceholder')"
+                :aria-label="t('requestDetail.lqfTask.outcomeFlowNotes')"
               />
             </div>
             <!-- Enrich Lead Card (collapsible, collapsed by default) -->
@@ -962,7 +1240,25 @@
             </div>
           </div>
         </div>
-        
+
+        <div
+          v-if="
+            !(selectedOutcome === 'answer' && selectedNextStep === 'postpone') &&
+            !(selectedOutcome === 'answer' && selectedNextStep === 'interested')
+          "
+          class="space-y-2"
+        >
+          <Label class="form-label" :for="outcomeFlowNotesId">{{ t('requestDetail.lqfTask.outcomeFlowNotes') }}</Label>
+          <Textarea
+            :id="outcomeFlowNotesId"
+            v-model="outcomeFlowNotes"
+            rows="3"
+            class="w-full min-h-20 resize-y border-border bg-background text-foreground"
+            :placeholder="t('requestDetail.lqfTask.outcomeFlowNotesPlaceholder')"
+            :aria-label="t('requestDetail.lqfTask.outcomeFlowNotes')"
+          />
+        </div>
+
         <!-- Unified Action Buttons at Bottom Right of Gray Wrapper (hidden for Answer + Postpone; buttons appear below postpone card) -->
         <div v-if="hasActiveOutcomeSelection && !successState && !(selectedOutcome === 'answer' && selectedNextStep === 'postpone')" class="flex justify-end gap-2 pt-3 flex-wrap">
           <Button
@@ -981,144 +1277,6 @@
           </Button>
         </div>
 
-        <!-- Next call attempt: when Answer + Postpone -->
-        <div v-if="selectedOutcome === 'answer' && selectedNextStep === 'postpone'" ref="postponeBlockRef">
-          <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4 w-full">
-            <div class="space-y-2 mb-4">
-              <div>
-                <button
-                  type="button"
-                  class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  :aria-label="t('requestDetail.lqfTask.backToWhatsNext')"
-                  @click="handleBackToWhatsNextChoices"
-                >
-                  <ArrowLeft class="size-4" aria-hidden="true" />
-                </button>
-              </div>
-              <h5 class="font-semibold text-foreground text-sm">Next call attempt</h5>
-            </div>
-            <div class="reschedule-toggle-group flex flex-wrap gap-2">
-              <Toggle
-                variant="outline"
-                :model-value="rescheduleTime === 'tomorrow-9am'"
-                @update:model-value="(p) => p && setRescheduleTime('tomorrow-9am')"
-                class="followup-toggle-item"
-              >
-                Tomorrow 9:00 AM
-              </Toggle>
-              <Toggle
-                variant="outline"
-                :model-value="rescheduleTime === 'monday'"
-                @update:model-value="(p) => p && setRescheduleTime('monday')"
-                class="followup-toggle-item mk-ai-mode-active-toggle"
-              >
-                <Sparkles
-                  :size="14"
-                  class="mk-sparkles-icon shrink-0"
-                  :fill="rescheduleTime === 'monday' ? 'url(#sparkles-gradient)' : 'currentColor'"
-                  :stroke="rescheduleTime === 'monday' ? 'none' : 'currentColor'"
-                  :stroke-width="rescheduleTime === 'monday' ? 0 : 1.5"
-                />
-                Suggest AI time
-              </Toggle>
-              <Toggle
-                variant="outline"
-                :model-value="rescheduleTime === 'custom'"
-                @update:model-value="(p) => p && setRescheduleTime('custom')"
-                class="followup-toggle-item"
-              >
-                Select time
-              </Toggle>
-            </div>
-            <div v-if="rescheduleTime === 'monday' && aiSuggestionData" class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <div class="flex items-start gap-2">
-                <Lightbulb class="w-4 h-4 shrink-0 text-blue-600 mt-0.5" />
-                <div class="flex-1">
-                  <p class="text-sm font-semibold text-foreground mb-1">
-                    {{ aiSuggestionData.formattedDate }} at {{ aiSuggestionData.time }}
-                  </p>
-                  <p class="text-sm text-muted-foreground">
-                    {{ aiSuggestionData.reason }}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div v-if="rescheduleTime === 'custom'" class="mt-3 grid grid-cols-2 gap-3">
-              <div>
-                <Label class="form-label">Date</Label>
-                <Input type="date" v-model="customDate" class="w-full" />
-              </div>
-              <div>
-                <Label class="form-label">Time</Label>
-                <Input type="time" v-model="customTime" class="w-full" />
-              </div>
-            </div>
-            <!-- Mark as scheduled recall appointment -->
-            <div v-if="rescheduleTime" class="mt-3 flex items-center gap-2">
-              <Checkbox
-                :id="`mark-recall-answer-${lead.id}`"
-                v-model:checked="markAsScheduledRecall"
-                class="rounded border-border"
-              />
-              <Label :for="`mark-recall-answer-${lead.id}`" class="text-sm font-normal text-foreground cursor-pointer">
-                Mark as scheduled recall appointment
-              </Label>
-            </div>
-            <!-- Assigned to (next attempt) -->
-            <div class="mt-4">
-              <Label class="form-label">Assigned to</Label>
-              <SelectMenu
-                v-model="selectedNextAttemptKey"
-                :items="nextAttemptAssigneeOptions"
-                value-key="_key"
-                placeholder="Assign next attempt to..."
-                class="w-full"
-              >
-                <template #item="{ item }">
-                  <div class="flex items-center gap-2">
-                    <div
-                      v-if="item.type === 'user'"
-                      class="w-6 h-6 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
-                      :class="getRoleAvatarClass(item.role)"
-                    >
-                      {{ getInitials(item.name) }}
-                    </div>
-                    <Users v-else-if="item.type === 'team'" class="w-4 h-4 shrink-0 text-muted-foreground" />
-                    <span class="font-medium text-foreground">{{ item.label }}</span>
-                  </div>
-                </template>
-              </SelectMenu>
-            </div>
-            <!-- Note to assignee (answer + postpone) -->
-            <div class="mt-4">
-              <Label class="form-label">Note to assignee</Label>
-              <Textarea
-                v-model="noteForNextAttemptAssignee"
-                rows="3"
-                class="w-full resize-none border-border bg-background text-foreground"
-                placeholder="Add any notes or instructions for the assignee..."
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Cancel + Confirm postpone below the card (Answer + Postpone only) -->
-        <div
-          v-if="selectedOutcome === 'answer' && selectedNextStep === 'postpone' && !successState"
-          class="flex w-full flex-col gap-2 pt-3 sm:flex-row sm:flex-wrap sm:justify-end"
-        >
-          <Button variant="secondary" class="w-full rounded-sm sm:w-auto" @click="cancelOutcome">
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            :disabled="!canPostponeFromInterested"
-            class="w-full rounded-sm bg-primary text-white sm:w-auto"
-            @click="onConfirmPostpone"
-          >
-            Postpone
-          </Button>
-        </div>
       </div>
       </template>
     </template>
@@ -1318,7 +1476,6 @@ const {
 // State that stays in component
 const noteWidgetRef = ref(null)
 const expandedOutcomeRef = ref(null)
-const postponeBlockRef = ref(null)
 const eventTypeExpandedRef = ref(null)
 const showAssignmentModal = ref(false)
 const showFinancingModal = ref(false)
@@ -1330,6 +1487,8 @@ const editingTradeIn = ref(null)
 const editingFinancingOption = ref(null)
 const tradeInActionLoading = ref(false)
 const financingActionLoading = ref(false)
+const callLogDateTimePopoverKey = ref(null)
+const callLogDateTimePopoverInputRefs = new Map()
 
 // Static data that stays in component
 const assignableUsers = computed(() => usersStore.assignableUsers)
@@ -1676,6 +1835,7 @@ const {
   initCallLogForm,
   successState,
   successPerformedAt,
+  outcomeFlowNotes,
   qualificationEventType,
   qualificationDurationMinutes,
   qualificationCustomDuration,
@@ -1929,6 +2089,50 @@ const scheduleFiltersSyncFromSlotPopover = ref(false)
 const qualificationScheduleEditing = ref(true)
 const qualificationScheduleInternalNote = ref('')
 const qualificationScheduleInternalNoteId = useId()
+const outcomeFlowNotesId = useId()
+const outcomeFlowNotesPostponeId = useId()
+
+const calledAtDisplay = computed(() => {
+  const raw = callLogDateTime.value
+  if (!raw) return '—'
+  const d = new Date(raw)
+  if (Number.isNaN(d.getTime())) return raw
+  return `${formatDate(d)} ${formatTime(d)}`
+})
+
+function setCallLogDateTimePopoverInputRef(key, el) {
+  if (el) callLogDateTimePopoverInputRefs.set(key, el)
+  else callLogDateTimePopoverInputRefs.delete(key)
+}
+
+function triggerNativePickerForCallAtKey(key) {
+  const el = callLogDateTimePopoverInputRefs.get(key)
+  if (!el) return
+  if (typeof el.showPicker === 'function') {
+    try {
+      el.showPicker()
+    } catch {
+      el.focus()
+      el.click()
+    }
+  } else {
+    el.focus()
+    el.click()
+  }
+}
+
+function onCallLogDateTimePopoverOpenChange(key, open) {
+  if (open) {
+    callLogDateTimePopoverKey.value = key
+    nextTick(() => {
+      requestAnimationFrame(() => {
+        triggerNativePickerForCallAtKey(key)
+      })
+    })
+  } else if (callLogDateTimePopoverKey.value === key) {
+    callLogDateTimePopoverKey.value = null
+  }
+}
 
 function resolveAssignableTeamForScheduleUser(user) {
   if (!user) return null

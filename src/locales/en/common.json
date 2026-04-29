@@ -185,6 +185,9 @@
     "optional": "Optional",
     "required": "Required"
   },
+  "notes": {
+    "placeholder": "Type a note here and use @ to mention someone"
+  },
   "tasks": {
     "filterAria": "Filter tasks",
     "sortAria": "Sort tasks",
@@ -206,6 +209,22 @@
     }
   },
   "call": {
+    "startAria": "Start call",
+    "callCustomer": "Call customer",
+    "logCallManually": "Log a call manually",
+    "loggedCallSuccess": "Call logged",
+    "direction": "Direction of the call",
+    "directionInbound": "Inbound",
+    "directionOutbound": "Outbound",
+    "time": "Time of the call",
+    "timePlaceholder": "Select time",
+    "outcome": "Outcome",
+    "outcomePlaceholder": "Select outcome",
+    "outcomeAnswer": "Answer",
+    "outcomeNoAnswer": "No answer",
+    "outcomeNotInterested": "Not interested",
+    "notes": "Call notes",
+    "notesPlaceholder": "Type a note here and use @ to mention someone",
     "inProgress": "Call in progress",
     "ended": "Call ended",
     "endCall": "End call",

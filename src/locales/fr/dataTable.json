@@ -1,3 +1,92 @@
 {
-  "search": "Rechercher ou poser une question"
+  "search": "Rechercher ou poser une question",
+  "searchTasks": "Rechercher des tâches...",
+  "searchLeads": "Rechercher des leads...",
+  "searchOpportunities": "Rechercher des opportunités...",
+  "searchVehicles": "Rechercher des véhicules...",
+  "searchCustomers": "Rechercher des clients...",
+  "searchRequests": "Rechercher des demandes...",
+  "searchReports": "Rechercher des rapports...",
+  "searchCampaigns": "Rechercher des campagnes...",
+  "askAI": "Demander à l'IA",
+  "aiMode": "Mode IA",
+  "aiModeOff": "Mode IA désactivé",
+  "aiModeOn": "Mode IA activé",
+  "go": "OK",
+  "enterHint": "Entrée",
+  "closeAiOverlay": "Fermer",
+  "aiExampleTasks1": "Leads BMW non assignés de cette semaine",
+  "aiExampleTasks2": "Leads pour des voitures à plus de 48 000 €",
+  "aiExampleTasks3": "Leads gérés par Sarah",
+  "aiExampleGeneric1": "Posez une question… (ex. assignés à moi, échéance cette semaine)",
+  "aiExampleGeneric2": "Posez une question… (ex. leads chauds, essais routiers)",
+  "aiExampleGeneric3": "Posez une question… (ex. par source, par statut)",
+  "sortingColon": "Tri",
+  "sortSelectAriaLabel": "Trier le tableau",
+  "sortOptions": {
+    "default": {
+      "menu": "Ordre par défaut",
+      "summary": "Ordre par défaut"
+    },
+    "custom": {
+      "menu": "Ordre personnalisé",
+      "summary": "En-tête de colonne"
+    },
+    "createdNewest": {
+      "menu": "Création · plus récent d'abord",
+      "summary": "Plus récent d'abord"
+    },
+    "createdOldest": {
+      "menu": "Création · plus ancien d'abord",
+      "summary": "Plus ancien d'abord"
+    },
+    "dueSoonest": {
+      "menu": "Échéance · le plus proche d'abord",
+      "summary": "Échéance la plus proche"
+    },
+    "dueLatest": {
+      "menu": "Échéance · la plus tardive d'abord",
+      "summary": "Échéance la plus tardive"
+    },
+    "taskAz": {
+      "menu": "Tâche · A à Z",
+      "summary": "Tâche A à Z"
+    },
+    "taskZa": {
+      "menu": "Tâche · Z à A",
+      "summary": "Tâche Z à A"
+    },
+    "customerAz": {
+      "menu": "Client · A à Z",
+      "summary": "Client A à Z"
+    },
+    "customerZa": {
+      "menu": "Client · Z à A",
+      "summary": "Client Z à A"
+    },
+    "assigneeAz": {
+      "menu": "Assigné · A à Z",
+      "summary": "Assigné A à Z"
+    },
+    "assigneeZa": {
+      "menu": "Assigné · Z à A",
+      "summary": "Assigné Z à A"
+    },
+    "attemptsLowHigh": {
+      "menu": "Tentatives · croissant",
+      "summary": "Tentatives croissant"
+    },
+    "attemptsHighLow": {
+      "menu": "Tentatives · décroissant",
+      "summary": "Tentatives décroissant"
+    },
+    "vehicleAz": {
+      "menu": "Véhicule · A à Z",
+      "summary": "Véhicule A à Z"
+    },
+    "vehicleZa": {
+      "menu": "Véhicule · Z à A",
+      "summary": "Véhicule Z à A"
+    }
+  }
 }

@@ -28,7 +28,6 @@
         :data="paginatedData"
         :columns="columns"
         v-model:pagination="pagination"
-        v-model:global-filter="globalFilter"
         v-model:sorting="sorting"
         v-model:column-filters="columnFilters"
         :column-filters-options="{

@@ -34,6 +34,7 @@
     "language": "Language",
     "fiscalEntities": "Fiscal entities",
     "drivenVehicle": "Driven vehicle",
+    "callAria": "Start call",
     "copyPhoneAria": "Copy phone number",
     "phoneCopied": "Phone number copied to clipboard",
     "phoneCopyFailed": "Failed to copy phone number"

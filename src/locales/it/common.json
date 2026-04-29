@@ -185,6 +185,9 @@
     "optional": "Opzionale",
     "required": "Obbligatorio"
   },
+  "notes": {
+    "placeholder": "Scrivi una nota qui e usa @ per menzionare qualcuno"
+  },
   "tasks": {
     "filterAria": "Filtra attività",
     "sortAria": "Ordina attività",
@@ -206,6 +209,22 @@
     }
   },
   "call": {
+    "startAria": "Avvia chiamata",
+    "callCustomer": "Chiama il cliente",
+    "logCallManually": "Registra una chiamata manualmente",
+    "loggedCallSuccess": "Chiamata registrata",
+    "direction": "Direzione della chiamata",
+    "directionInbound": "In entrata",
+    "directionOutbound": "In uscita",
+    "time": "Orario della chiamata",
+    "timePlaceholder": "Seleziona orario",
+    "outcome": "Esito",
+    "outcomePlaceholder": "Seleziona esito",
+    "outcomeAnswer": "Risposta",
+    "outcomeNoAnswer": "Nessuna risposta",
+    "outcomeNotInterested": "Non interessato",
+    "notes": "Note della chiamata",
+    "notesPlaceholder": "Scrivi una nota qui e usa @ per menzionare qualcuno",
     "inProgress": "Chiamata in corso",
     "ended": "Chiamata terminata",
     "endCall": "Termina chiamata",

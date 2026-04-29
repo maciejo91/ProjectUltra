@@ -11,6 +11,30 @@
       <div v-for="n in 6" :key="n" class="h-4 rounded bg-muted" />
     </div>
     <div v-else class="flex flex-col gap-3 text-sm">
+      <CallInterface
+        v-if="showCallPanel"
+        :hide-button="true"
+        :show-mute-button="false"
+        :is-call-active="isCallActive"
+        :call-ended="callEnded"
+        :call-duration="callDuration"
+        :call-notes="callNotes"
+        :formatted-call-duration="formattedCallDuration"
+        :mock-transcription="mockTranscription"
+        :contact-attempts="0"
+        :max-contact-attempts="3"
+        :lead-summary="''"
+        :caller-name="displayName"
+        :assigned-person-name="assignedPersonName"
+        :is-muted="isMuted"
+        @start-call="startCall"
+        @end-call="endCall"
+        @close="onCallClose"
+        @toggle-mute="toggleMute"
+        @extract-information="() => {}"
+        @update:call-notes="updateCallNotes"
+        @copy-number="copyPhone"
+      />
       <div
         v-for="row in detailRows"
         :key="row.key"
@@ -28,6 +52,41 @@
                 phone
               }}</a>
               <span v-else>—</span>
+              <Popover v-if="phone" :open="callActionsOpen" @update:open="(v) => (callActionsOpen = v)">
+                <PopoverTrigger as-child>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    class="shrink-0 rounded-md text-muted-foreground"
+                    :aria-label="t('customerProfile.details.callAria')"
+                  >
+                    <Phone class="size-3.5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" class="w-56 p-1">
+                  <div class="flex flex-col">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      class="w-full justify-start"
+                      @click="handleCallCustomerClick"
+                    >
+                      {{ t('common.call.callCustomer') }}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      class="w-full justify-start"
+                      @click="handleLogCallManuallyClick"
+                    >
+                      {{ t('common.call.logCallManually') }}
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
               <Button
                 v-if="phone"
                 variant="ghost"
@@ -43,6 +102,29 @@
           <span v-else class="wrap-break-word">{{ row.value }}</span>
         </div>
       </div>
+
+      <Dialog :open="logCallDialogOpen" @update:open="(v) => (logCallDialogOpen = v)">
+        <DialogPortal>
+          <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
+          <DialogContent
+            class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
+            :show-close-button="true"
+          >
+            <DialogHeader class="shrink-0">
+              <DialogTitle>{{ t('common.call.logCallManually') }}</DialogTitle>
+            </DialogHeader>
+            <div class="flex-1 overflow-y-auto py-4 w-full">
+              <CallForm
+                v-if="phone"
+                :phone-number="phone"
+                :contact-name="displayName"
+                @call="handleManualCallLogged"
+                @cancel="logCallDialogOpen = false"
+              />
+            </div>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
 
       <div v-if="showOtherInteractionsBlock" class="flex flex-col gap-1.5 border-t border-border pt-2">
         <Button
@@ -85,11 +167,26 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { Copy, ChevronDown } from 'lucide-vue-next'
-import { Button } from '@motork/component-library/future/primitives'
+import { Copy, ChevronDown, Phone } from 'lucide-vue-next'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@motork/component-library/future/primitives'
 import { useToastStore } from '@/stores/toast'
 import { useRequestNavigationStore } from '@/stores/requestNavigation'
+import { useUserStore } from '@/stores/user'
 import ContactHistoryGroupedList from '@/components/shared/ContactHistoryGroupedList.vue'
+import CallInterface from '@/components/tasks/lead/CallInterface.vue'
+import CallForm from '@/components/shared/communication/CallForm.vue'
+import { useLQWidgetCall } from '@/composables/useLQWidgetCall'
 
 const props = defineProps({
   customer: { type: Object, default: null },
@@ -107,6 +204,27 @@ const { t } = useI18n()
 const router = useRouter()
 const toastStore = useToastStore()
 const requestNavigationStore = useRequestNavigationStore()
+const userStore = useUserStore()
+
+const showCallPanel = ref(false)
+const callActionsOpen = ref(false)
+const logCallDialogOpen = ref(false)
+const assignedPersonName = computed(() => userStore.currentUser?.name ?? '')
+
+const callState = useLQWidgetCall()
+const {
+  isCallActive,
+  callEnded,
+  callDuration,
+  callNotes,
+  isMuted,
+  mockTranscription,
+  formattedCallDuration,
+  startCall,
+  endCall,
+  toggleMute,
+  resetCall
+} = callState
 
 const otherInteractionsOpen = ref(false)
 const otherInteractionsPanelId = 'customer-contact-details-other-interactions'
@@ -260,10 +378,43 @@ async function copyPhone() {
   }
 }
 
+function openCallWidget() {
+  if (!phone.value) return
+  showCallPanel.value = true
+  startCall()
+}
+
+function handleCallCustomerClick() {
+  callActionsOpen.value = false
+  openCallWidget()
+}
+
+function handleLogCallManuallyClick() {
+  callActionsOpen.value = false
+  logCallDialogOpen.value = true
+}
+
+function handleManualCallLogged() {
+  logCallDialogOpen.value = false
+  toastStore.pushToast('success', t('common.call.loggedCallSuccess'))
+}
+
+function updateCallNotes(value) {
+  callNotes.value = value
+}
+
+function onCallClose() {
+  resetCall()
+  showCallPanel.value = false
+}
+
 watch(
   () => props.customer?.id,
   () => {
     otherInteractionsOpen.value = false
+    onCallClose()
+    callActionsOpen.value = false
+    logCallDialogOpen.value = false
   }
 )
 </script>

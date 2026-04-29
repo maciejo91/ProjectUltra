@@ -34,6 +34,7 @@
     "language": "Langue",
     "fiscalEntities": "Entités fiscales",
     "drivenVehicle": "Véhicule conduit",
+    "callAria": "Démarrer l’appel",
     "copyPhoneAria": "Copier le numéro de téléphone",
     "phoneCopied": "Numéro copié dans le presse-papiers",
     "phoneCopyFailed": "Échec de la copie du numéro"

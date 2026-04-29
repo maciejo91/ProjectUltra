@@ -223,7 +223,10 @@ body,
 
 .mk-ai-insight-banner .mk-sparkles-icon,
 .mk-ai-insight-banner .mk-sparkles-icon path,
-.mk-ai-insight-banner .mk-sparkles-icon circle {
+.mk-ai-insight-banner .mk-sparkles-icon circle,
+.unified-search-bar .mk-sparkles-icon,
+.unified-search-bar .mk-sparkles-icon path,
+.unified-search-bar .mk-sparkles-icon circle {
   stroke: none !important;
   stroke-width: 0 !important;
 }
@@ -300,23 +303,27 @@ body,
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .mk-ai-insight-banner .mk-sparkles-icon-wrap--ambient {
+  .mk-ai-insight-banner .mk-sparkles-icon-wrap--ambient,
+  .unified-search-bar .mk-sparkles-icon-wrap--ambient {
     animation: mk-ai-sparkles-round 4.25s linear infinite;
     backface-visibility: hidden;
     will-change: transform;
   }
 
-  .mk-ai-insight-banner .mk-sparkles-icon-wrap--ambient .mk-sparkles-icon {
+  .mk-ai-insight-banner .mk-sparkles-icon-wrap--ambient .mk-sparkles-icon,
+  .unified-search-bar .mk-sparkles-icon-wrap--ambient .mk-sparkles-icon {
     animation: mk-ai-sparkles-round-glow 4.25s linear infinite;
   }
 
-  .mk-ai-insight-banner .mk-sparkles-icon-wrap--generating {
+  .mk-ai-insight-banner .mk-sparkles-icon-wrap--generating,
+  .unified-search-bar .mk-sparkles-icon-wrap--generating {
     animation: mk-ai-sparkles-round 2.6s linear infinite;
     backface-visibility: hidden;
     will-change: transform;
   }
 
-  .mk-ai-insight-banner .mk-sparkles-icon-wrap--generating .mk-sparkles-icon {
+  .mk-ai-insight-banner .mk-sparkles-icon-wrap--generating .mk-sparkles-icon,
+  .unified-search-bar .mk-sparkles-icon-wrap--generating .mk-sparkles-icon {
     animation: mk-ai-sparkles-round-glow 2.6s linear infinite;
   }
 }

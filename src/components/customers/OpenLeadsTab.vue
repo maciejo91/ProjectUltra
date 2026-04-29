@@ -22,15 +22,10 @@
           filterDefs: filterDefinitions
         }"
         v-model:pagination="pagination"
-        v-model:globalFilter="globalFilter"
         v-model:sorting="sorting"
         v-model:columnFilters="columnFilters"
         :paginationOptions="{
           rowCount: totalFilteredCount
-        }"
-        :globalFilterOptions="{
-          debounce: 300,
-          show: true
         }"
         class="h-full"
       >

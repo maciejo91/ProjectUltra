@@ -1,3 +1,92 @@
 {
-  "search": "Cerca o fai una domanda"
+  "search": "Cerca o fai una domanda",
+  "searchTasks": "Cerca attività...",
+  "searchLeads": "Cerca lead...",
+  "searchOpportunities": "Cerca opportunità...",
+  "searchVehicles": "Cerca veicoli...",
+  "searchCustomers": "Cerca clienti...",
+  "searchRequests": "Cerca richieste...",
+  "searchReports": "Cerca report...",
+  "searchCampaigns": "Cerca campagne...",
+  "askAI": "Chiedi all'IA",
+  "aiMode": "Modalità IA",
+  "aiModeOff": "Modalità IA disattivata",
+  "aiModeOn": "Modalità IA attiva",
+  "go": "Vai",
+  "enterHint": "Invio",
+  "closeAiOverlay": "Chiudi",
+  "aiExampleTasks1": "Lead BMW non assegnati di questa settimana",
+  "aiExampleTasks2": "Lead per auto oltre €48.000",
+  "aiExampleTasks3": "Lead gestiti da Sarah",
+  "aiExampleGeneric1": "Chiedi qualsiasi cosa… (es. assegnati a me, in scadenza questa settimana)",
+  "aiExampleGeneric2": "Chiedi qualsiasi cosa… (es. lead caldi, test drive)",
+  "aiExampleGeneric3": "Chiedi qualsiasi cosa… (es. per fonte, per stato)",
+  "sortingColon": "Ordinamento",
+  "sortSelectAriaLabel": "Ordina tabella",
+  "sortOptions": {
+    "default": {
+      "menu": "Ordine predefinito",
+      "summary": "Ordine predefinito"
+    },
+    "custom": {
+      "menu": "Ordine personalizzato",
+      "summary": "Intestazione colonna"
+    },
+    "createdNewest": {
+      "menu": "Creato · più recente prima",
+      "summary": "Più recente prima"
+    },
+    "createdOldest": {
+      "menu": "Creato · più vecchio prima",
+      "summary": "Più vecchio prima"
+    },
+    "dueSoonest": {
+      "menu": "Scadenza · prima la più vicina",
+      "summary": "Scadenza più vicina"
+    },
+    "dueLatest": {
+      "menu": "Scadenza · prima la più lontana",
+      "summary": "Scadenza più lontana"
+    },
+    "taskAz": {
+      "menu": "Task · A-Z",
+      "summary": "Task A-Z"
+    },
+    "taskZa": {
+      "menu": "Task · Z-A",
+      "summary": "Task Z-A"
+    },
+    "customerAz": {
+      "menu": "Cliente · A-Z",
+      "summary": "Cliente A-Z"
+    },
+    "customerZa": {
+      "menu": "Cliente · Z-A",
+      "summary": "Cliente Z-A"
+    },
+    "assigneeAz": {
+      "menu": "Assegnatario · A-Z",
+      "summary": "Assegnatario A-Z"
+    },
+    "assigneeZa": {
+      "menu": "Assegnatario · Z-A",
+      "summary": "Assegnatario Z-A"
+    },
+    "attemptsLowHigh": {
+      "menu": "Tentativi · dal basso all'alto",
+      "summary": "Tentativi crescenti"
+    },
+    "attemptsHighLow": {
+      "menu": "Tentativi · dall'alto al basso",
+      "summary": "Tentativi decrescenti"
+    },
+    "vehicleAz": {
+      "menu": "Veicolo · A-Z",
+      "summary": "Veicolo A-Z"
+    },
+    "vehicleZa": {
+      "menu": "Veicolo · Z-A",
+      "summary": "Veicolo Z-A"
+    }
+  }
 }

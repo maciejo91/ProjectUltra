@@ -2,12 +2,12 @@
   <Dialog :open="show" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="w-full sm:max-w-lg max-h-[calc(100vh-4rem)] flex flex-col">
-        <DialogHeader class="flex-shrink-0">
+      <DialogContent class="w-full sm:max-w-lg flex flex-col">
+        <DialogHeader class="shrink-0">
           <DialogTitle>Create New Event</DialogTitle>
         </DialogHeader>
 
-        <div class="flex-1 overflow-y-auto px-6 py-4 w-full">
+        <div class="px-6 py-4 w-full">
           <CreateEventForm
             :key="formKey"
             :customer="customer"

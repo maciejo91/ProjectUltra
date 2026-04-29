@@ -107,6 +107,8 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
   const successState = ref(null)
   const successPerformedAt = ref(null) // Date
 
+  const outcomeFlowNotes = ref('')
+
   const qualificationMethod = ref('assign-and-schedule')
   const qualificationEventType = ref('')
   const qualificationDurationMinutes = ref(null) // 30 | 60 | null
@@ -406,6 +408,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     selectedOutcome.value = null
     selectedNextStep.value = null
     showCallLogForm.value = false
+    outcomeFlowNotes.value = ''
   }
 
   const resetOutcomeState = () => {
@@ -445,6 +448,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     qualificationSelectedSalesman.value = null
     qualificationDurationMinutes.value = null
     qualificationCustomDuration.value = ''
+    outcomeFlowNotes.value = ''
   }
 
   const clearSuccessState = () => {
@@ -588,6 +592,7 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
     restorePostponedInterestedState,
     successState,
     successPerformedAt,
+    outcomeFlowNotes,
     qualificationMethod,
     qualificationEventType,
     qualificationDurationMinutes,

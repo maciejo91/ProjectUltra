@@ -43,12 +43,45 @@
           <Mail class="size-4 shrink-0 text-muted-foreground" />
           <span class="truncate">{{ email }}</span>
         </a>
+        <CallInterface
+          v-if="showCallPanel"
+          :hide-button="true"
+          :show-mute-button="false"
+          :is-call-active="isCallActive"
+          :call-ended="callEnded"
+          :call-duration="callDuration"
+          :call-notes="callNotes"
+          :formatted-call-duration="formattedCallDuration"
+          :mock-transcription="mockTranscription"
+          :contact-attempts="0"
+          :max-contact-attempts="3"
+          :lead-summary="''"
+          :caller-name="customerName"
+          :assigned-person-name="assignedPersonName"
+          :is-muted="isMuted"
+          @start-call="startCall"
+          @end-call="endCall"
+          @close="onCallClose"
+          @toggle-mute="toggleMute"
+          @extract-information="() => {}"
+          @update:call-notes="updateCallNotes"
+          @copy-number="copyPhone"
+        />
         <div v-if="phone" class="flex items-center gap-2 min-w-0">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            class="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+            :aria-label="t('common.call.startAria')"
+            @click="openCallWidget"
+          >
+            <Phone class="size-4" />
+          </Button>
           <a
             :href="`tel:${phone}`"
             class="text-sm text-foreground hover:text-primary hover:underline truncate flex items-center gap-2 min-w-0"
           >
-            <Phone class="size-4 shrink-0 text-muted-foreground" />
             <span class="truncate">{{ phone }}</span>
           </a>
           <Button
@@ -74,11 +107,15 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { Button } from '@motork/component-library/future/primitives'
 import { Copy, ExternalLink, Mail, Phone } from 'lucide-vue-next'
 import { useToastStore } from '@/stores/toast'
+import { useUserStore } from '@/stores/user'
+import CallInterface from '@/components/tasks/lead/CallInterface.vue'
+import { useLQWidgetCall } from '@/composables/useLQWidgetCall'
 
 const props = defineProps({
   request: {
@@ -87,8 +124,10 @@ const props = defineProps({
   }
 })
 
+const { t } = useI18n()
 const router = useRouter()
 const toastStore = useToastStore()
+const userStore = useUserStore()
 
 const customer = computed(() => props.request?.customer || null)
 
@@ -143,6 +182,39 @@ async function copyPhone() {
   } catch {
     toastStore.pushToast('error', 'Failed to copy')
   }
+}
+
+const showCallPanel = ref(false)
+const assignedPersonName = computed(() => userStore.currentUser?.name ?? '')
+
+const callState = useLQWidgetCall()
+const {
+  isCallActive,
+  callEnded,
+  callDuration,
+  callNotes,
+  isMuted,
+  mockTranscription,
+  formattedCallDuration,
+  startCall,
+  endCall,
+  toggleMute,
+  resetCall
+} = callState
+
+function openCallWidget() {
+  if (!phone.value) return
+  showCallPanel.value = true
+  startCall()
+}
+
+function updateCallNotes(value) {
+  callNotes.value = value
+}
+
+function onCallClose() {
+  resetCall()
+  showCallPanel.value = false
 }
 
 function openProfile() {

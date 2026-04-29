@@ -185,6 +185,9 @@
     "optional": "Optional",
     "required": "Erforderlich"
   },
+  "notes": {
+    "placeholder": "Notiz hier eingeben und @ verwenden, um jemanden zu erwähnen"
+  },
   "tasks": {
     "filterAria": "Aufgaben filtern",
     "sortAria": "Aufgaben sortieren",
@@ -206,6 +209,22 @@
     }
   },
   "call": {
+    "startAria": "Anruf starten",
+    "callCustomer": "Kunden anrufen",
+    "logCallManually": "Anruf manuell protokollieren",
+    "loggedCallSuccess": "Anruf protokolliert",
+    "direction": "Richtung des Anrufs",
+    "directionInbound": "Eingehend",
+    "directionOutbound": "Ausgehend",
+    "time": "Anrufzeit",
+    "timePlaceholder": "Zeit auswählen",
+    "outcome": "Ergebnis",
+    "outcomePlaceholder": "Ergebnis auswählen",
+    "outcomeAnswer": "Antwort",
+    "outcomeNoAnswer": "Keine Antwort",
+    "outcomeNotInterested": "Nicht interessiert",
+    "notes": "Notizen zum Anruf",
+    "notesPlaceholder": "Notiz hier eingeben und @ verwenden, um jemanden zu erwähnen",
     "inProgress": "Anruf läuft",
     "ended": "Anruf beendet",
     "endCall": "Anruf beenden",

@@ -1,3 +1,92 @@
 {
-  "search": "Zoeken of een vraag stellen"
+  "search": "Zoeken of een vraag stellen",
+  "searchTasks": "Taken zoeken...",
+  "searchLeads": "Leads zoeken...",
+  "searchOpportunities": "Opportunities zoeken...",
+  "searchVehicles": "Voertuigen zoeken...",
+  "searchCustomers": "Klanten zoeken...",
+  "searchRequests": "Aanvragen zoeken...",
+  "searchReports": "Rapporten zoeken...",
+  "searchCampaigns": "Campagnes zoeken...",
+  "askAI": "Vraag AI",
+  "aiMode": "AI-modus",
+  "aiModeOff": "AI-modus uit",
+  "aiModeOn": "AI-modus aan",
+  "go": "Ga",
+  "enterHint": "Enter",
+  "closeAiOverlay": "Sluiten",
+  "aiExampleTasks1": "Niet-toegewezen BMW-leads van deze week",
+  "aiExampleTasks2": "Leads voor auto's boven € 48.000",
+  "aiExampleTasks3": "Leads beheerd door Sarah",
+  "aiExampleGeneric1": "Vraag wat je wilt… (bijv. aan mij toegewezen, deze week vervallen)",
+  "aiExampleGeneric2": "Vraag wat je wilt… (bijv. warme leads, proefritten)",
+  "aiExampleGeneric3": "Vraag wat je wilt… (bijv. per bron, per status)",
+  "sortingColon": "Sortering",
+  "sortSelectAriaLabel": "Tabel sorteren",
+  "sortOptions": {
+    "default": {
+      "menu": "Standaardvolgorde",
+      "summary": "Standaardvolgorde"
+    },
+    "custom": {
+      "menu": "Aangepaste volgorde",
+      "summary": "Kolomkop"
+    },
+    "createdNewest": {
+      "menu": "Aangemaakt · nieuwste eerst",
+      "summary": "Nieuwste eerst"
+    },
+    "createdOldest": {
+      "menu": "Aangemaakt · oudste eerst",
+      "summary": "Oudste eerst"
+    },
+    "dueSoonest": {
+      "menu": "Deadline · eerst de vroegste",
+      "summary": "Deadline vroegste eerst"
+    },
+    "dueLatest": {
+      "menu": "Deadline · eerst de laatste",
+      "summary": "Deadline laatste eerst"
+    },
+    "taskAz": {
+      "menu": "Taak · A tot Z",
+      "summary": "Taak A tot Z"
+    },
+    "taskZa": {
+      "menu": "Taak · Z tot A",
+      "summary": "Taak Z tot A"
+    },
+    "customerAz": {
+      "menu": "Klant · A tot Z",
+      "summary": "Klant A tot Z"
+    },
+    "customerZa": {
+      "menu": "Klant · Z tot A",
+      "summary": "Klant Z tot A"
+    },
+    "assigneeAz": {
+      "menu": "Toegewezen · A tot Z",
+      "summary": "Toegewezen A tot Z"
+    },
+    "assigneeZa": {
+      "menu": "Toegewezen · Z tot A",
+      "summary": "Toegewezen Z tot A"
+    },
+    "attemptsLowHigh": {
+      "menu": "Pogingen · laag naar hoog",
+      "summary": "Pogingen laag naar hoog"
+    },
+    "attemptsHighLow": {
+      "menu": "Pogingen · hoog naar laag",
+      "summary": "Pogingen hoog naar laag"
+    },
+    "vehicleAz": {
+      "menu": "Voertuig · A tot Z",
+      "summary": "Voertuig A tot Z"
+    },
+    "vehicleZa": {
+      "menu": "Voertuig · Z tot A",
+      "summary": "Voertuig Z tot A"
+    }
+  }
 }

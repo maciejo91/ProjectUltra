@@ -4,8 +4,9 @@
     <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide min-h-0">
       <DataTableWithUnifiedSearch
         ref="datatableShellRef"
+        v-model:sorting="sorting"
         active-tab="tasks"
-        placeholder="Search tasks..."
+        :placeholder="t('dataTable.searchTasks')"
         :pagination="pagination"
         :assignee-options="assigneeOptions"
         :request-type-options="requestTypeOptions"
@@ -13,6 +14,7 @@
         :source-options="tasksSourceOptions"
         :priority-options="tasksPriorityOptions"
         :requested-car-brand-options="tasksRequestedCarBrandOptions"
+        :sort-menu-items="taskSortMenuItems"
         @update:global-filter="globalFilter = $event"
         @update:column-filters="columnFilters = $event"
         @update:pagination="pagination = $event"
@@ -28,18 +30,12 @@
               filterDefs: filterDefinitions
             }"
             v-model:pagination="pagination"
-            v-model:globalFilter="globalFilter"
             v-model:sorting="sorting"
             v-model:columnFilters="columnFilters"
             v-model:columnVisibility="columnVisibility"
             v-model:rowSelection="rowSelection"
             :paginationOptions="{
               rowCount: totalFilteredCount
-            }"
-            :globalFilterOptions="{
-              debounce: 300,
-              placeholder: 'Q Search or ask a question',
-              show: true
             }"
             class="h-full"
           >
@@ -84,6 +80,7 @@
 
 <script setup>
 import { ref, computed, h, watch, nextTick, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ListTodo, Trash2, X, Triangle, Circle } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
@@ -102,6 +99,8 @@ import { useTaskHelpers } from '@/composables/useTaskHelpers'
 import { getTaskActionTitle, getTaskDisplayTitle } from '@/utils/taskActionTitle'
 import { getDisplayStage } from '@/utils/stageMapper'
 import { getTaskStatus } from '@/utils/taskStatus'
+
+const { t } = useI18n()
 
 const props = defineProps({
   tasks: { type: Array, required: true },
@@ -166,6 +165,25 @@ const pagination = ref({
 
 const globalFilter = ref(props.initialGlobalFilter || '')
 const sorting = ref([])
+
+const taskSortMenuItems = computed(() => [
+  { value: 'default', sorting: [], optionId: 'default' },
+  { value: 'createdAt-desc', sorting: [{ id: 'createdAt', desc: true }], optionId: 'createdNewest' },
+  { value: 'createdAt-asc', sorting: [{ id: 'createdAt', desc: false }], optionId: 'createdOldest' },
+  { value: 'dueDate-asc', sorting: [{ id: 'dueDate', desc: false }], optionId: 'dueSoonest' },
+  { value: 'dueDate-desc', sorting: [{ id: 'dueDate', desc: true }], optionId: 'dueLatest' },
+  { value: 'taskTitle-asc', sorting: [{ id: 'taskTitle', desc: false }], optionId: 'taskAz' },
+  { value: 'taskTitle-desc', sorting: [{ id: 'taskTitle', desc: true }], optionId: 'taskZa' },
+  { value: 'customer-asc', sorting: [{ id: 'customer', desc: false }], optionId: 'customerAz' },
+  { value: 'customer-desc', sorting: [{ id: 'customer', desc: true }], optionId: 'customerZa' },
+  { value: 'assignee-asc', sorting: [{ id: 'assignee', desc: false }], optionId: 'assigneeAz' },
+  { value: 'assignee-desc', sorting: [{ id: 'assignee', desc: true }], optionId: 'assigneeZa' },
+  { value: 'contactAttempts-asc', sorting: [{ id: 'contactAttempts', desc: false }], optionId: 'attemptsLowHigh' },
+  { value: 'contactAttempts-desc', sorting: [{ id: 'contactAttempts', desc: true }], optionId: 'attemptsHighLow' },
+  { value: 'vehicle-asc', sorting: [{ id: 'vehicle', desc: false }], optionId: 'vehicleAz' },
+  { value: 'vehicle-desc', sorting: [{ id: 'vehicle', desc: true }], optionId: 'vehicleZa' },
+])
+
 const columnFilters = ref([
   { id: 'showClosed-1', field: 'showClosed', value: props.showClosed ? 'yes' : '', operator: 'eq', pinned: true },
   { id: 'type-1', field: 'type', value: '', operator: 'eq', pinned: true },

@@ -74,6 +74,45 @@
                       v-if="item.kind === 'messaging'"
                       @select="emitQuick($event)"
                     />
+                    <Popover
+                      v-else-if="item.kind === 'phone-actions'"
+                      :open="callActionsOpen"
+                      @update:open="(v) => (callActionsOpen = v)"
+                    >
+                      <PopoverTrigger as-child>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          class="shrink-0 rounded-md"
+                          :aria-label="item.label"
+                        >
+                          <component :is="item.icon" class="size-4 text-muted-foreground" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent align="end" class="w-56 p-1">
+                        <div class="flex flex-col">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            class="w-full justify-start"
+                            @click="handleCallCustomerClick"
+                          >
+                            {{ t('common.call.callCustomer') }}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            class="w-full justify-start"
+                            @click="handleLogCallManuallyClick"
+                          >
+                            {{ t('common.call.logCallManually') }}
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                     <Button
                       v-else
                       type="button"
@@ -240,6 +279,29 @@
       @update:open="(v) => (showEditCustomerModal = v)"
       @save="handleSaveCustomerDetails"
     />
+
+    <Dialog :open="logCallDialogOpen" @update:open="(v) => (logCallDialogOpen = v)">
+      <DialogPortal>
+        <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
+        <DialogContent
+          class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
+          :show-close-button="true"
+        >
+          <DialogHeader class="shrink-0">
+            <DialogTitle>{{ t('common.call.logCallManually') }}</DialogTitle>
+          </DialogHeader>
+          <div class="flex-1 overflow-y-auto py-4 w-full">
+            <CallForm
+              v-if="phoneDisplay"
+              :phone-number="phoneDisplay"
+              :contact-name="props.task.customer?.name || ''"
+              @call="handleManualCallLogged"
+              @cancel="logCallDialogOpen = false"
+            />
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   </div>
 </template>
 
@@ -258,6 +320,15 @@ import { getCustomerNameParts } from '@/utils/customerDisplay'
 import {
   Badge,
   Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Avatar,
   AvatarFallback,
   DropdownMenu,
@@ -284,6 +355,7 @@ import TagPillWithPopover from '@/components/shared/TagPillWithPopover.vue'
 import MessagingQuickActionPopover from '@/components/shared/MessagingQuickActionPopover.vue'
 import EditCustomerDetailsModal from '@/components/modals/EditCustomerDetailsModal.vue'
 import ContactHistoryGroupedList from '@/components/shared/ContactHistoryGroupedList.vue'
+import CallForm from '@/components/shared/communication/CallForm.vue'
 
 const props = defineProps({
   task: {
@@ -354,6 +426,8 @@ const showEditCustomerModal = ref(false)
 const savingCustomerModal = ref(false)
 const pastRequestsOpen = ref(false)
 const pastRequestsPanelId = 'task-contact-past-requests-panel'
+const callActionsOpen = ref(false)
+const logCallDialogOpen = ref(false)
 
 const nameParts = computed(() => getCustomerNameParts(props.task.customer?.name))
 
@@ -498,11 +572,13 @@ watch(
   () => [props.task?.customer?.id, props.customerId, props.excludeRequestId],
   () => {
     pastRequestsOpen.value = false
+    callActionsOpen.value = false
+    logCallDialogOpen.value = false
   }
 )
 
 const quickActionItems = computed(() => [
-  { key: 'phone', icon: PhoneCall, label: t('requestDetail.quickActions.phone') },
+  { kind: 'phone-actions', icon: PhoneCall, label: t('requestDetail.quickActions.phone') },
   { key: 'email', icon: Mail, label: t('requestDetail.quickActions.email') },
   { kind: 'messaging' },
   { key: 'note', icon: StickyNote, label: t('requestDetail.quickActions.addNote') }
@@ -513,6 +589,22 @@ function emitQuick(key) {
   let actionKey = key
   if (key === 'phone') actionKey = 'call'
   emit('action', actionKey)
+}
+
+function handleCallCustomerClick() {
+  callActionsOpen.value = false
+  if (!phoneDisplay.value) return
+  window.location.href = `tel:${phoneDisplay.value}`
+}
+
+function handleLogCallManuallyClick() {
+  callActionsOpen.value = false
+  logCallDialogOpen.value = true
+}
+
+function handleManualCallLogged() {
+  logCallDialogOpen.value = false
+  toastStore.pushToast('success', t('common.call.loggedCallSuccess'))
 }
 
 const normalizedCustomerTags = computed(() => {

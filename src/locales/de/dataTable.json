@@ -1,3 +1,92 @@
 {
-  "search": "Suchen oder eine Frage stellen"
+  "search": "Suchen oder eine Frage stellen",
+  "searchTasks": "Aufgaben suchen...",
+  "searchLeads": "Leads suchen...",
+  "searchOpportunities": "Opportunities suchen...",
+  "searchVehicles": "Fahrzeuge suchen...",
+  "searchCustomers": "Kunden suchen...",
+  "searchRequests": "Anfragen suchen...",
+  "searchReports": "Berichte suchen...",
+  "searchCampaigns": "Kampagnen suchen...",
+  "askAI": "KI fragen",
+  "aiMode": "KI-Modus",
+  "aiModeOff": "KI-Modus aus",
+  "aiModeOn": "KI-Modus an",
+  "go": "Los",
+  "enterHint": "Enter",
+  "closeAiOverlay": "Schließen",
+  "aiExampleTasks1": "Nicht zugewiesene BMW-Leads dieser Woche",
+  "aiExampleTasks2": "Leads für Fahrzeuge über 48.000 €",
+  "aiExampleTasks3": "Leads, die von Sarah betreut werden",
+  "aiExampleGeneric1": "Frag etwas… (z. B. mir zugewiesen, fällig diese Woche)",
+  "aiExampleGeneric2": "Frag etwas… (z. B. heiße Leads, Probefahrten)",
+  "aiExampleGeneric3": "Frag etwas… (z. B. nach Quelle, nach Status)",
+  "sortingColon": "Sortierung",
+  "sortSelectAriaLabel": "Tabelle sortieren",
+  "sortOptions": {
+    "default": {
+      "menu": "Standardreihenfolge",
+      "summary": "Standardreihenfolge"
+    },
+    "custom": {
+      "menu": "Benutzerdefiniert",
+      "summary": "Spaltenüberschrift"
+    },
+    "createdNewest": {
+      "menu": "Erstellt · neueste zuerst",
+      "summary": "Neueste zuerst"
+    },
+    "createdOldest": {
+      "menu": "Erstellt · älteste zuerst",
+      "summary": "Älteste zuerst"
+    },
+    "dueSoonest": {
+      "menu": "Fälligkeit · früheste zuerst",
+      "summary": "Fälligkeit früheste zuerst"
+    },
+    "dueLatest": {
+      "menu": "Fälligkeit · späteste zuerst",
+      "summary": "Fälligkeit späteste zuerst"
+    },
+    "taskAz": {
+      "menu": "Aufgabe · A bis Z",
+      "summary": "Aufgabe A bis Z"
+    },
+    "taskZa": {
+      "menu": "Aufgabe · Z bis A",
+      "summary": "Aufgabe Z bis A"
+    },
+    "customerAz": {
+      "menu": "Kunde · A bis Z",
+      "summary": "Kunde A bis Z"
+    },
+    "customerZa": {
+      "menu": "Kunde · Z bis A",
+      "summary": "Kunde Z bis A"
+    },
+    "assigneeAz": {
+      "menu": "Zugewiesen · A bis Z",
+      "summary": "Zugewiesen A bis Z"
+    },
+    "assigneeZa": {
+      "menu": "Zugewiesen · Z bis A",
+      "summary": "Zugewiesen Z bis A"
+    },
+    "attemptsLowHigh": {
+      "menu": "Versuche · niedrig bis hoch",
+      "summary": "Versuche niedrig bis hoch"
+    },
+    "attemptsHighLow": {
+      "menu": "Versuche · hoch bis niedrig",
+      "summary": "Versuche hoch bis niedrig"
+    },
+    "vehicleAz": {
+      "menu": "Fahrzeug · A bis Z",
+      "summary": "Fahrzeug A bis Z"
+    },
+    "vehicleZa": {
+      "menu": "Fahrzeug · Z bis A",
+      "summary": "Fahrzeug Z bis A"
+    }
+  }
 }

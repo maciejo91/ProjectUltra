@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-4">
     <!-- Step 1: Event Type Selection (same as LQTask) -->
-    <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+    <div class="bg-white rounded-lg shadow-nsc-card overflow-visible p-6">
       <Label class="form-label mb-2">Event type <span class="text-red-600">*</span></Label>
       <SelectMenu
         v-model="eventType"
@@ -17,7 +17,7 @@
     </div>
 
     <!-- Step 2: Assign appointment to (show when event type selected) -->
-    <div v-if="eventType" class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-6">
+    <div v-if="eventType" class="bg-white rounded-lg shadow-nsc-card overflow-visible p-6">
       <h5 class="font-semibold text-foreground text-sm mb-4">Assign appointment to</h5>
       <div class="grid grid-cols-2 gap-4">
         <div>

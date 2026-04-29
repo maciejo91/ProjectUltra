@@ -42,9 +42,11 @@
     "conversations": "Gespräche",
     "tradeIns": "Inzahlungnahmen",
     "purchaseMethod": "Kaufmethode",
+    "financingTradeIns": "Finanzierung & Inzahlungnahmen",
     "attachments": "Anhänge",
     "tasks": "Aufgaben",
-    "activity": "Aktivität"
+    "activity": "Aktivität",
+    "timeline": "Timeline"
   },
   "insight": {
     "highPaidStock": "Dieser Lead stammt aus einer stark bezahlten Quelle und interessiert sich für ein Fahrzeug, das seit {days} Tagen auf Lager ist."
@@ -94,7 +96,11 @@
     "assignTaskTitle": "Aufgabe zuweisen",
     "assigneeSelectPlaceholder": "Bearbeiter auswählen",
     "applyAssignment": "Zuweisung übernehmen",
-    "assignWholeTeam": "Gesamtes Team"
+    "assignWholeTeam": "Gesamtes Team",
+    "outcomeFlowNotes": "Anrufnotizen",
+    "outcomeFlowNotesPlaceholder": "Notizen zu diesem Anrufversuch hinzufügen…",
+    "calledAt": "Anrufzeit:",
+    "editCalledAt": "Anrufzeit bearbeiten"
   },
   "quickActions": {
     "phone": "Telefon",

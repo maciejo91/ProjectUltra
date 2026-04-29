@@ -42,9 +42,11 @@
     "conversations": "Conversazioni",
     "tradeIns": "Permute",
     "purchaseMethod": "Metodo di acquisto",
+    "financingTradeIns": "Finanziamento & Permute",
     "attachments": "Allegati",
     "tasks": "Attività",
-    "activity": "Attività"
+    "activity": "Attività",
+    "timeline": "Timeline"
   },
   "insight": {
     "highPaidStock": "Questo lead proviene da una fonte a pagamento elevata ed è interessato a un'auto in stock da {days} giorni."
@@ -94,7 +96,11 @@
     "assignTaskTitle": "Assegna attività",
     "assigneeSelectPlaceholder": "Seleziona assegnatario",
     "applyAssignment": "Applica assegnazione",
-    "assignWholeTeam": "Team intero"
+    "assignWholeTeam": "Team intero",
+    "outcomeFlowNotes": "Note di chiamata",
+    "outcomeFlowNotesPlaceholder": "Aggiungi note per questo tentativo di chiamata…",
+    "calledAt": "Chiamato alle:",
+    "editCalledAt": "Modifica l’ora della chiamata"
   },
   "quickActions": {
     "phone": "Telefono",

@@ -42,9 +42,11 @@
     "conversations": "Conversations",
     "tradeIns": "Trade-ins",
     "purchaseMethod": "Purchase method",
+    "financingTradeIns": "Financing & Trade-ins",
     "attachments": "Attachments",
     "tasks": "Tasks",
-    "activity": "Activity"
+    "activity": "Activity",
+    "timeline": "Timeline"
   },
   "insight": {
     "highPaidStock": "This lead comes from a highly paid source and is interested in a car that has been in stock for {days} days."
@@ -94,7 +96,11 @@
     "assignTaskTitle": "Assign task",
     "assigneeSelectPlaceholder": "Select assignee",
     "applyAssignment": "Apply assignment",
-    "assignWholeTeam": "Entire team"
+    "assignWholeTeam": "Entire team",
+    "outcomeFlowNotes": "Call notes",
+    "outcomeFlowNotesPlaceholder": "Add notes for this call attempt...",
+    "calledAt": "Called at:",
+    "editCalledAt": "Edit called at"
   },
   "quickActions": {
     "phone": "Phone",

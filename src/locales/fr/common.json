@@ -185,6 +185,9 @@
     "optional": "Optionnel",
     "required": "Requis"
   },
+  "notes": {
+    "placeholder": "Saisissez une note ici et utilisez @ pour mentionner quelqu’un"
+  },
   "tasks": {
     "filterAria": "Filtrer les tâches",
     "sortAria": "Trier les tâches",
@@ -206,6 +209,22 @@
     }
   },
   "call": {
+    "startAria": "Démarrer l’appel",
+    "callCustomer": "Appeler le client",
+    "logCallManually": "Enregistrer un appel manuellement",
+    "loggedCallSuccess": "Appel enregistré",
+    "direction": "Direction de l’appel",
+    "directionInbound": "Entrant",
+    "directionOutbound": "Sortant",
+    "time": "Heure de l’appel",
+    "timePlaceholder": "Sélectionner une heure",
+    "outcome": "Résultat",
+    "outcomePlaceholder": "Sélectionner un résultat",
+    "outcomeAnswer": "Réponse",
+    "outcomeNoAnswer": "Pas de réponse",
+    "outcomeNotInterested": "Pas intéressé",
+    "notes": "Notes d’appel",
+    "notesPlaceholder": "Saisissez une note ici et utilisez @ pour mentionner quelqu’un",
     "inProgress": "Appel en cours",
     "ended": "Appel terminé",
     "endCall": "Raccrocher",

@@ -19,7 +19,7 @@
             <Textarea 
               v-model="noteText"
               rows="8" 
-              placeholder="Type your note here..."
+              :placeholder="t('common.notes.placeholder')"
               required
               class="w-full min-h-[200px] resize-none"
             />
@@ -66,7 +66,7 @@
         v-model="noteText"
         rows="4"
         class="w-full resize-none min-h-[120px]"
-        placeholder="Type your note here..."
+        :placeholder="t('common.notes.placeholder')"
       />
     </div>
     <div v-if="!hideActions" class="flex justify-end gap-2 mt-6 pt-4 border-t border-border">
@@ -86,6 +86,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { X } from 'lucide-vue-next'
 import { 
   Button,
@@ -101,6 +102,8 @@ import {
   DialogPortal,
   DialogTitle
 } from '@motork/component-library/future/primitives'
+
+const { t } = useI18n()
 
 const props = defineProps({
   // Modal mode props

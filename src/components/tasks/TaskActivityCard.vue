@@ -1,352 +1,145 @@
 <template>
-  <div
-    class="flex w-full min-w-0 flex-col rounded-lg bg-white p-4 shadow-nsc-card"
-    style="border-radius: var(--border-radius-rounded-lg, 10px);"
-  >
-    <div class="mb-4">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-base font-medium text-foreground leading-6">{{ t('entities.activity.title') }}</h3>
-        
-        <!-- Filter Dropdown, Add Activity Button, and Chips (Right side of title) -->
-        <div class="flex items-center gap-2 flex-wrap">
-          <!-- Filter Dropdown -->
-          <DropdownMenu :modal="false">
-            <DropdownMenuTrigger as-child>
-              <Button
-                variant="outline"
-                size="icon"
-                class="relative w-8 h-8"
-                aria-label="Filter activity"
-              >
-                <Filter class="w-4 h-4 shrink-0" />
-<span 
-                v-if="hasActiveFilters"
-                class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-primary"
-              ></span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="w-56" align="end">
-              <DropdownMenuItem
-                v-for="filter in activityFilters"
-                :key="filter.value"
-                @select="(e) => { e.preventDefault(); toggleFilter(filter.value); }"
-                class="flex items-center gap-2 cursor-pointer"
-              >
-                <Check
-                  v-if="selectedFilters.includes(filter.value)"
-                  class="w-4 h-4 shrink-0"
-                />
-                <span v-else class="w-4 h-4 shrink-0" aria-hidden="true"></span>
-                <span>{{ filter.label }}</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
-          <!-- Add Activity Button: same DropdownMenu as Filter for consistent popover -->
-          <DropdownMenu :modal="false">
-            <DropdownMenuTrigger as-child>
-              <Button
-                variant="default"
-                size="icon"
-                class="relative w-8 h-8"
-                aria-label="Add activity"
-              >
-                <Plus class="w-4 h-4 shrink-0" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="w-48" align="end">
-              <DropdownMenuItem
-                v-for="item in addActivityCommunicationItems"
-                :key="item.type"
-                @select="(e) => { e.preventDefault(); handleAddActivity(item.type); }"
-                class="flex items-center gap-2 cursor-pointer"
-              >
-                <component :is="item.icon" class="w-4 h-4 shrink-0" :class="item.iconClass" />
-                <span>{{ item.label }}</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                v-for="item in addActivityOtherItems"
-                :key="item.type"
-                @select="(e) => { e.preventDefault(); handleAddActivity(item.type); }"
-                class="flex items-center gap-2 cursor-pointer"
-              >
-                <component :is="item.icon" class="w-4 h-4 shrink-0" :class="item.iconClass" />
-                <span>{{ item.label }}</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                v-if="showAddAppointment"
-                @select="(e) => { e.preventDefault(); handleAddAppointment(); }"
-                class="flex items-center gap-2 cursor-pointer"
-              >
-                <Calendar class="w-4 h-4 shrink-0 text-purple-600" />
-                <span>Schedule appointment</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        </div> <!-- Close flex items-center justify-between mb-2 -->
-      </div> <!-- Close mb-4 -->
-    
+  <div class="flex w-full min-w-0 flex-col bg-background p-4">
+    <div
+      class="outcome-toggle-group mb-4 flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto pb-1 scrollbar-hide md:flex-wrap"
+    >
+      <Toggle
+        variant="outline"
+        class="outcome-toggle-item h-9 shrink-0 rounded-full border-border px-3 text-sm font-medium"
+        :model-value="selectedPill === 'all'"
+        @update:model-value="(on) => onPillToggle('all', on)"
+      >
+        {{ t('entities.activity.pills.all') }}
+      </Toggle>
+      <Toggle
+        variant="outline"
+        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
+        :model-value="selectedPill === 'notes'"
+        @update:model-value="(on) => onPillToggle('notes', on)"
+      >
+        <FileText class="size-4 shrink-0 text-muted-foreground" />
+        <span>{{ t('entities.activity.pills.notes') }}</span>
+        <span
+          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
+          >{{ pillCounts.notes }}</span
+        >
+      </Toggle>
+      <Toggle
+        variant="outline"
+        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
+        :model-value="selectedPill === 'calls'"
+        @update:model-value="(on) => onPillToggle('calls', on)"
+      >
+        <Phone class="size-4 shrink-0 text-muted-foreground" />
+        <span>{{ t('entities.activity.pills.calls') }}</span>
+        <span
+          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
+          >{{ pillCounts.calls }}</span
+        >
+      </Toggle>
+      <Toggle
+        variant="outline"
+        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
+        :model-value="selectedPill === 'emails'"
+        @update:model-value="(on) => onPillToggle('emails', on)"
+      >
+        <Mail class="size-4 shrink-0 text-muted-foreground" />
+        <span>{{ t('entities.activity.pills.emails') }}</span>
+        <span
+          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
+          >{{ pillCounts.emails }}</span
+        >
+      </Toggle>
+      <Toggle
+        variant="outline"
+        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
+        :model-value="selectedPill === 'tasks'"
+        @update:model-value="(on) => onPillToggle('tasks', on)"
+      >
+        <CalendarCheck class="size-4 shrink-0 text-muted-foreground" />
+        <span>{{ t('entities.activity.pills.tasks') }}</span>
+        <span
+          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
+          >{{ pillCounts.tasks }}</span
+        >
+      </Toggle>
+      <Toggle
+        variant="outline"
+        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
+        :model-value="selectedPill === 'messages'"
+        @update:model-value="(on) => onPillToggle('messages', on)"
+      >
+        <MessageCircle class="size-4 shrink-0 text-muted-foreground" />
+        <span>{{ t('entities.activity.pills.messages') }}</span>
+        <span
+          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
+          >{{ pillCounts.messages }}</span
+        >
+      </Toggle>
+      <Toggle
+        variant="outline"
+        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
+        :model-value="selectedPill === 'system'"
+        @update:model-value="(on) => onPillToggle('system', on)"
+      >
+        <Info class="size-4 shrink-0 text-muted-foreground" />
+        <span>{{ t('entities.activity.pills.system') }}</span>
+        <span
+          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
+          >{{ pillCounts.system }}</span
+        >
+      </Toggle>
+    </div>
+
     <div class="flex min-w-0 flex-col">
-      <div v-if="sortedActivities.length > 0" class="flex min-w-0 flex-col overflow-x-hidden">
-        <div class="flex flex-col items-start gap-1 mb-4">
-          <h3
-            class="text-sm font-normal text-muted-foreground leading-normal"
-          >
-            {{ getActivityDateHeader(sortedActivities) }}
-          </h3>
-        </div>
-        <div class="space-y-4 pb-2">
-          <div
-            v-for="activity in sortedActivities"
-            :key="activity.id"
-            class="space-y-2"
-          >
-            <div
-              class="flex flex-col"
-              :class="{
-                'cursor-pointer hover:opacity-95 transition-opacity':
-                  activity.type === 'note' ||
-                  activity.type === 'email' ||
-                  activity.type === 'whatsapp' ||
-                  activity.type === 'customer-email' ||
-                  activity.type === 'customer-whatsapp',
-              }"
-              @click="handleActivityClick(activity)"
-            >
-              <div class="flex items-center gap-2 flex-nowrap">
-                <div
-                  :class="[
-                    'size-8 rounded-md flex items-center justify-center shrink-0',
-                    activity.type === 'note'
-                      ? 'bg-orange-100'
-                      : activity.type === 'call'
-                        ? 'bg-green-100'
-                        : activity.type === 'ai-summary'
-                          ? 'bg-purple-100'
-                          : activity.type === 'email' || activity.type === 'customer-email'
-                            ? 'bg-blue-100'
-                            :                     activity.type === 'whatsapp' || activity.type === 'customer-whatsapp'
-                              ? 'bg-green-100'
-                              : activity.type === 'appointment'
-                                ? 'bg-purple-100'
-                                : 'bg-muted',
-                  ]"
-                >
-                  <StickyNote
-                    v-if="activity.type === 'note'"
-                    :size="16"
-                    class="text-orange-600"
-                  />
-                  <Phone
-                    v-else-if="activity.type === 'call'"
-                    :size="16"
-                    class="text-green-600"
-                  />
-                  <Sparkles
-                    v-else-if="activity.type === 'ai-summary'"
-                    :size="16"
-                    class="text-purple-600"
-                  />
-                  <Mail
-                    v-else-if="activity.type === 'email' || activity.type === 'customer-email'"
-                    :size="16"
-                    class="text-blue-600"
-                  />
-                  <MessageCircle
-                    v-else-if="activity.type === 'whatsapp' || activity.type === 'customer-whatsapp'"
-                    :size="16"
-                    class="text-green-600"
-                  />
-                  <Calendar
-                    v-else-if="activity.type === 'appointment'"
-                    :size="16"
-                    class="text-purple-600"
-                  />
-                  <FileText v-else :size="16" class="text-foreground" />
-                </div>
-                <div class="flex items-center justify-between gap-2 min-w-0 flex-1 flex-nowrap">
-                  <p
-                    class="text-sm text-foreground min-w-0 truncate leading-normal"
-                  >
-                    <span
-                      :class="[
-                        'font-normal',
-                        activity.type === 'ai-summary' ? 'font-medium' : '',
-                      ]"
-                    >
-                      {{ activity.type === 'ai-summary' ? 'MotorKAI' : activity.user }}
-                    </span>
-                    <span v-if="activity.type === 'note'" class="text-muted-foreground">
-                      added a note</span
-                    >
-                    <span
-                      v-else-if="activity.type === 'created'"
-                      class="text-muted-foreground"
-                    >
-                      {{ activity.message || activity.action }}</span
-                    >
-                    <span v-else-if="activity.type === 'call'" class="text-muted-foreground">
-                      {{ ' ' + (activity.message || activity.action) }}</span
-                    >
-                    <span
-                      v-else-if="activity.type === 'ai-summary'"
-                      class="text-muted-foreground"
-                    >
-                      summary</span
-                    >
-                    <span v-else-if="activity.type === 'email' || activity.type === 'customer-email'" class="text-muted-foreground">
-                      {{ ' sent an email' }}</span
-                    >
-                    <span
-                      v-else-if="activity.type === 'whatsapp' || activity.type === 'customer-whatsapp'"
-                      class="text-muted-foreground"
-                    >
-                      {{ ' sent a WhatsApp message' }}</span
-                    >
-                    <span v-else-if="activity.type === 'appointment'" class="text-muted-foreground">
-                      {{ ' ' + (activity.message || activity.title || 'Appointment') }}</span
-                    >
-                    <span v-else class="text-muted-foreground">
-                      {{ ' ' + (activity.message || activity.action) }}</span
-                    >
-                  </p>
-                  <span
-                    class="text-sm text-muted-foreground shrink-0 whitespace-nowrap leading-normal"
-                  >
-                    {{ formatActivityTime(activity) }}
-                  </span>
-                </div>
-              </div>
-              <div class="flex-1 min-w-0 pl-10">
-                <div
-                  v-if="activity.type === 'note' && (activity.message || activity.content)"
-                  class="mt-2 bg-amber-50 rounded-lg p-4 backdrop-blur-sm"
-                >
-                  <p
-                    class="text-sm text-foreground wrap-break-word leading-normal"
-                  >
-                    {{ activity.message || activity.content }}
-                  </p>
-                </div>
-                <div
-                  v-if="(activity.type === 'email' || activity.type === 'customer-email') && activity.content"
-                  class="mt-2 relative group rounded-lg"
-                >
-                  <div class="bg-blue-50 rounded-lg p-4">
-                    <p
-                      class="text-sm text-foreground wrap-break-word leading-normal"
-                    >
-                      {{ activity.content }}
-                    </p>
-                  </div>
-                  <Button
-                    v-if="activity.type === 'customer-email'"
-                    variant="outline"
-                    size="sm"
-                    class="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 hover:!opacity-100 hover:!bg-background hover:!text-foreground hover:!border-border transition-opacity rounded-sm"
-                    @click.stop="handleAddActivity('email')"
-                  >
-                    <Reply class="w-3.5 h-3.5 shrink-0" />
-                    {{ t('entities.activity.reply') }}
-                  </Button>
-                </div>
-                <div
-                  v-if="(activity.type === 'whatsapp' || activity.type === 'customer-whatsapp') && activity.content"
-                  class="mt-2 relative group rounded-lg"
-                >
-                  <div class="bg-green-50 rounded-lg p-4">
-                    <p
-                      class="text-sm text-foreground wrap-break-word leading-normal"
-                    >
-                      {{ activity.content }}
-                    </p>
-                  </div>
-                  <Button
-                    v-if="activity.type === 'customer-whatsapp'"
-                    variant="outline"
-                    size="sm"
-                    class="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 hover:!opacity-100 hover:!bg-background hover:!text-foreground hover:!border-border transition-opacity rounded-sm"
-                    @click.stop="handleAddActivity('whatsapp')"
-                  >
-                    <Reply class="w-3.5 h-3.5 shrink-0" />
-                    {{ t('entities.activity.reply') }}
-                  </Button>
-                </div>
-                <div
-                  v-if="activity.type === 'ai-summary' && (activity.message || activity.content)"
-                  class="mt-2 bg-purple-50 rounded-lg p-4"
-                >
-                  <p
-                    class="text-sm text-foreground wrap-break-word leading-normal"
-                  >
-                    {{ activity.message || activity.content }}
-                  </p>
-                </div>
-                <div
-                  v-if="activity.type === 'call'"
-                  class="mt-2 bg-muted rounded-lg p-4"
-                >
-                  <p
-                    class="text-sm text-foreground wrap-break-word leading-normal"
-                  >
-                    {{ getCallSummary(activity) }}
-                  </p>
-                  <Button
-                    v-if="getCallTranscriptLines(activity).length > 0"
-                    variant="outline"
-                    size="sm"
-                    class="mt-3 rounded-sm"
-                    @click.stop="openTranscriptDialog(activity)"
-                  >
-                    {{ t('common.call.showTranscript') }}
-                  </Button>
-                </div>
-                <div
-                  v-if="activity.type === 'appointment'"
-                  class="mt-2 bg-purple-50 rounded-lg p-4"
-                >
-                  <p class="text-sm font-medium text-foreground">{{ activity.title || activity.message || 'Appointment' }}</p>
-                  <p v-if="activity.location" class="text-sm text-muted-foreground mt-1">{{ activity.location }}</p>
-                  <p v-if="activity.customerName" class="text-sm text-muted-foreground">{{ activity.customerName }}</p>
-                  <p v-if="activity.vehicle" class="text-sm text-muted-foreground">{{ activity.vehicle }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
+      <ActivityTimeline
+        v-if="sortedActivities.length > 0"
+        :activities="sortedActivities"
+        :date-label="getActivityTimelineDateLabel(sortedActivities, t)"
+        @activity-click="handleActivityClick"
+        @open-transcript="openTranscriptDialog"
+        @add-activity="handleAddActivity"
+      />
+      <div v-else-if="hasAnyActivities" class="flex flex-col justify-center py-10">
+        <div class="text-center">
+          <Filter class="mx-auto mb-2 size-8 text-muted-foreground/60" />
+          <p class="text-sm text-muted-foreground">{{ t('entities.activity.pills.emptyFiltered') }}</p>
         </div>
       </div>
-      
-      <!-- Empty State -->
       <div v-else class="flex flex-col justify-center py-8">
         <div class="text-center">
-          <Clock :size="32" class="mx-auto text-muted-foreground mb-2" />
-          <p class="text-sm text-muted-foreground">No activity yet</p>
+          <Clock :size="32" class="mx-auto mb-2 text-muted-foreground" />
+          <p class="text-sm text-muted-foreground">{{ t('entities.activity.timeline.emptyState') }}</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Transcript dialog -->
   <Dialog :open="!!transcriptDialogActivity" @update:open="(open) => !open && (transcriptDialogActivity = null)">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
       <DialogContent
-        class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
+        class="flex max-h-[calc(100vh-4rem)] w-full flex-col sm:max-w-2xl"
         :show-close-button="true"
       >
         <DialogHeader class="shrink-0">
           <DialogTitle>{{ t('common.call.transcript') }}</DialogTitle>
         </DialogHeader>
-        <div class="flex-1 overflow-y-auto py-4 w-full space-y-3">
+        <div class="flex-1 w-full space-y-3 overflow-y-auto py-4">
           <div
             v-for="(line, idx) in transcriptDialogLines"
             :key="idx"
-            class="flex gap-2 text-sm font-mono"
+            class="flex gap-2 font-mono text-sm"
           >
-            <span :class="line.speaker === 'Lead' ? 'text-emerald-700 font-semibold shrink-0' : 'text-green-600 font-semibold shrink-0'">{{ line.speaker }}:</span>
-            <span class="text-foreground wrap-break-word">{{ line.text }}</span>
+            <span
+              :class="
+                line.speaker === 'Lead'
+                  ? 'shrink-0 font-semibold text-emerald-700'
+                  : 'shrink-0 font-semibold text-green-600'
+              "
+              >{{ line.speaker }}:</span
+            >
+            <span class="wrap-break-word text-foreground">{{ line.text }}</span>
           </div>
         </div>
       </DialogContent>
@@ -356,29 +149,18 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Button } from '@motork/component-library/future/primitives'
-import { 
-  StickyNote, 
-  Mail, 
-  MessageCircle, 
-  Phone,
+import { Toggle } from '@motork/component-library/future/primitives'
+import {
   FileText,
+  Mail,
+  Phone,
   Clock,
-  Sparkles,
-  Paperclip,
-  Filter,
-  Plus,
-  X,
-  Reply,
-  Check,
-  Calendar
+  CalendarCheck,
+  MessageCircle,
+  Info,
+  Filter
 } from 'lucide-vue-next'
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -387,15 +169,13 @@ import {
   DialogTitle
 } from '@motork/component-library/future/primitives'
 import { useI18n } from 'vue-i18n'
-import { formatTime } from '@/utils/formatters'
+import {
+  getActivityTimelineDateLabel,
+  getCallTranscriptLines
+} from '@/composables/useActivityTimelinePresentation'
+import ActivityTimeline from '@/components/tasks/activity-timeline/ActivityTimeline.vue'
 
 const { t } = useI18n()
-
-function formatActivityTime(activity) {
-  if (activity?.time) return activity.time
-  const ts = activity?.timestamp || activity?.createdAt
-  return ts ? formatTime(ts) : ''
-}
 
 const props = defineProps({
   activities: {
@@ -414,99 +194,86 @@ const props = defineProps({
 
 const emit = defineEmits(['activity-click', 'toggle-summary-expanded', 'add-activity', 'add-appointment'])
 
-const addActivityCommunicationItems = [
-  { type: 'email', label: 'Email', icon: Mail, iconClass: 'text-primary' },
-  { type: 'sms', label: 'SMS', icon: MessageCircle, iconClass: 'text-purple-600' },
-  { type: 'whatsapp', label: 'WhatsApp', icon: MessageCircle, iconClass: 'text-green-600' },
-  { type: 'call', label: 'Call', icon: Phone, iconClass: 'text-green-600' }
-]
-const addActivityOtherItems = [
-  { type: 'note', label: 'Note', icon: StickyNote, iconClass: 'text-orange-600' },
-  { type: 'attachment', label: 'Attachment', icon: Paperclip, iconClass: 'text-muted-foreground' }
-]
-
-const activityFilters = computed(() => {
-  const filters = [
-    { label: t('entities.activity.filterAll'), value: 'all' },
-    { label: t('entities.activity.filterCommunication'), value: 'communication' },
-    { label: t('entities.activity.filterNotes'), value: 'notes' },
-    { label: t('entities.activity.filterSystemUpdates'), value: 'system-updates' }
-  ]
-  if (props.showAddAppointment) {
-    filters.splice(3, 0, { label: 'Appointments', value: 'appointments' })
-  }
-  return filters
-})
-
-const selectedFilters = ref(['all'])
+const selectedPill = ref(
+  /** @type {'all' | 'notes' | 'calls' | 'emails' | 'tasks' | 'messages' | 'system'} */ ('all')
+)
 const transcriptDialogActivity = ref(null)
-
-function getCallTranscriptLines(activity) {
-  const transcription = activity?.data?.transcription || activity?.transcription
-  if (!transcription?.leadLines?.length && !transcription?.salesLines?.length) return []
-  const lead = transcription.leadLines ?? []
-  const sales = transcription.salesLines ?? []
-  const lines = []
-  const maxLen = Math.max(lead.length, sales.length)
-  for (let i = 0; i < maxLen; i++) {
-    if (lead[i]) lines.push({ speaker: 'Lead', text: lead[i] })
-    if (sales[i]) lines.push({ speaker: 'Sales', text: sales[i] })
-  }
-  return lines
-}
 
 const transcriptDialogLines = computed(() =>
   transcriptDialogActivity.value ? getCallTranscriptLines(transcriptDialogActivity.value) : []
 )
 
-function getCallSummary(activity) {
-  return activity?.data?.summary || activity?.content || 'Call completed.'
-}
+const activityList = computed(() => (Array.isArray(props.activities) ? props.activities : []))
 
-function openTranscriptDialog(activity) {
-  transcriptDialogActivity.value = activity
-}
-
-const toggleFilter = (filterValue) => {
-  if (filterValue === 'all') {
-    selectedFilters.value = ['all']
-  } else {
-    const current = selectedFilters.value.filter(v => v !== 'all')
-    const index = current.indexOf(filterValue)
-    if (index > -1) {
-      current.splice(index, 1)
-    } else {
-      current.push(filterValue)
-    }
-    selectedFilters.value = current.length > 0 ? current : ['all']
-  }
-}
-
-const hasActiveFilters = computed(() =>
-  selectedFilters.value.length > 0 &&
-  !(selectedFilters.value.length === 1 && selectedFilters.value[0] === 'all')
-)
+const hasAnyActivities = computed(() => activityList.value.length > 0)
 
 function getActivityFilterCategory(activity) {
-  if (['email', 'sms', 'whatsapp', 'call', 'customer-email', 'customer-whatsapp'].includes(activity.type)) return 'communication'
+  if (
+    ['email', 'sms', 'whatsapp', 'call', 'customer-email', 'customer-whatsapp', 'customer-sms'].includes(
+      activity.type
+    )
+  ) {
+    return 'communication'
+  }
   if (activity.type === 'note') return 'notes'
   if (activity.type === 'appointment') return 'appointments'
   if (activity.type === 'transcription' || activity.transcription) return 'system-updates'
-  if (activity.type === 'system' || activity.type === 'created' || activity.type === 'status') return 'system-updates'
+  if (
+    activity.type === 'system' ||
+    activity.type === 'created' ||
+    activity.type === 'status' ||
+    activity.type === 'lead-created' ||
+    activity.type === 'lead-assigned' ||
+    activity.type === 'lead-updated'
+  ) {
+    return 'system-updates'
+  }
+  if (activity.type === 'opportunity-created') return 'system-updates'
   if (activity.type === 'ai-summary') return 'notes'
   return null
 }
 
-const sortedActivities = computed(() => {
-  let filtered = [...props.activities]
-  const selected = selectedFilters.value
-  const showAll = selected.length === 0 || selected.includes('all')
-  if (!showAll) {
-    filtered = filtered.filter(activity => {
-      const category = getActivityFilterCategory(activity)
-      return category && selected.includes(category)
-    })
+function activityMatchesPill(activity, pill) {
+  if (pill === 'all') return true
+  if (pill === 'notes') return ['note', 'ai-summary'].includes(activity.type)
+  if (pill === 'calls') return activity.type === 'call'
+  if (pill === 'emails') return ['email', 'customer-email'].includes(activity.type)
+  if (pill === 'tasks') return activity.type === 'appointment'
+  if (pill === 'messages') {
+    return ['sms', 'customer-sms', 'whatsapp', 'customer-whatsapp'].includes(activity.type)
   }
+  if (pill === 'system') return getActivityFilterCategory(activity) === 'system-updates'
+  return true
+}
+
+const pillCounts = computed(() => {
+  const list = activityList.value
+  const count = (pred) => list.filter(pred).length
+  return {
+    notes: count((a) => ['note', 'ai-summary'].includes(a.type)),
+    calls: count((a) => a.type === 'call'),
+    emails: count((a) => ['email', 'customer-email'].includes(a.type)),
+    tasks: count((a) => a.type === 'appointment'),
+    messages: count((a) =>
+      ['sms', 'customer-sms', 'whatsapp', 'customer-whatsapp'].includes(a.type)
+    ),
+    system: count((a) => getActivityFilterCategory(a) === 'system-updates')
+  }
+})
+
+function onPillToggle(pill, on) {
+  if (on) {
+    selectedPill.value = pill
+    return
+  }
+  if (selectedPill.value === pill) {
+    selectedPill.value = 'all'
+  }
+}
+
+const sortedActivities = computed(() => {
+  const pill = selectedPill.value
+  let filtered = activityList.value.filter((a) => activityMatchesPill(a, pill))
   return filtered.sort((a, b) => {
     const timeA = new Date(a.timestamp || a.createdAt || 0).getTime()
     const timeB = new Date(b.timestamp || b.createdAt || 0).getTime()
@@ -514,32 +281,8 @@ const sortedActivities = computed(() => {
   })
 })
 
-const getActivityDateHeader = (activities) => {
-  if (!activities || activities.length === 0) return ''
-  
-  const mostRecent = activities[0]
-  const timestamp = mostRecent.timestamp || mostRecent.createdAt
-  
-  if (!timestamp) return 'Recent Activity'
-  
-  const date = new Date(timestamp)
-  const today = new Date()
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
-  
-  if (date.toDateString() === today.toDateString()) {
-    return 'Today'
-  }
-  
-  if (date.toDateString() === yesterday.toDateString()) {
-    return 'Yesterday'
-  }
-  
-  return date.toLocaleDateString('en-US', { 
-    month: 'long', 
-    day: 'numeric',
-    year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
-  })
+function openTranscriptDialog(activity) {
+  transcriptDialogActivity.value = activity
 }
 
 const handleActivityClick = (activity) => {
@@ -551,22 +294,12 @@ const handleActivityClick = (activity) => {
 const handleAddActivity = (action) => {
   emit('add-activity', action)
 }
-
-function handleAddAppointment() {
-  emit('add-appointment')
-}
 </script>
 
 <style scoped>
-.size-8 {
-  width: 2rem;
-  height: 2rem;
-}
-
 .wrap-break-word {
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
 }
-
 </style>

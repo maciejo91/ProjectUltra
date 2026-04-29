@@ -149,7 +149,7 @@
         :class="[
           'flex min-h-0 flex-1 flex-col gap-4 overflow-x-hidden overscroll-contain lg:flex-row lg:items-stretch lg:gap-4 lg:min-h-0',
           'max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto',
-          'lg:overflow-hidden',
+          'lg:overflow-y-auto lg:overflow-x-hidden lg:overscroll-contain',
           requestFloatingBarScrollPadding.row
         ]"
       >
@@ -160,7 +160,7 @@
             ref="requestMainColumnScrollRef"
             :class="[
               'flex min-h-0 min-w-0 flex-1 flex-col gap-4 max-lg:overflow-visible',
-              'lg:overflow-y-auto lg:overflow-x-hidden lg:overscroll-contain lg:min-h-0',
+              'lg:overflow-visible lg:min-h-0',
               requestFloatingBarScrollPadding.main
             ]"
           >
@@ -186,14 +186,14 @@
             </div>
 
             <div
-              class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg border border-border bg-background shadow-mk-dashboard-card"
+              class="flex min-w-0 shrink-0 flex-col rounded-lg border border-border bg-background shadow-mk-dashboard-card"
             >
-              <div class="shrink-0 px-4 pt-2">
+              <div class="sticky top-0 z-20 shrink-0 rounded-t-lg bg-background px-4 pt-2">
                 <RequestMainTabs class="shrink-0" v-model="mainTab" :tabs="mainTabs" />
               </div>
 
               <div class="flex shrink-0 flex-col gap-4 border-t border-border p-4">
-              <template v-if="mainTab === 'overview' || mainTab === 'tasks'">
+              <template v-if="mainTab === 'overview'">
                 <div class="flex flex-col gap-4">
                 <RequestInsightBanner
                   v-if="mainTab === 'overview' && overviewAiInsightMessage"
@@ -247,7 +247,7 @@
                   class="w-full min-w-0 shrink-0"
                 />
                 <SuggestedNextActionCard
-                  v-if="request && !isClosedLead && request.type === 'opportunity' && (mainTab === 'overview' || mainTab === 'tasks')"
+                  v-if="request && !isClosedLead && request.type === 'opportunity' && mainTab === 'overview'"
                   :request="request"
                   class="shrink-0"
                 />
@@ -266,46 +266,37 @@
                 </div>
               </template>
 
-              <template v-else-if="mainTab === 'conversations'">
-                <RequestConversationsTabContent
-                  :activities="conversationActivitiesForRequest"
-                  @send-message="showEmailModal = true"
-                />
-              </template>
+              <template v-else-if="mainTab === 'financingTradeIns'">
+                <div class="flex flex-col gap-4">
+                  <RequestTabEmptyState
+                    v-if="financingOptionsCount === 0"
+                    :icon="CreditCard"
+                    :title="t('requestDetail.emptyStates.purchaseMethod.title')"
+                    :description="t('requestDetail.emptyStates.purchaseMethod.description')"
+                    :action-label="t('requestDetail.emptyStates.purchaseMethod.action')"
+                    @action="editingFinancingOption = null; showFinancingModal = true"
+                  />
+                  <FinancingOptionsCard
+                    v-else
+                    :items="request?.financingOptions || []"
+                    @open-add="editingFinancingOption = null; showFinancingModal = true"
+                    @open-edit="openFinancingEdit"
+                  />
 
-              <template v-else-if="mainTab === 'tradeIns'">
-                <RequestTabEmptyState
-                  v-if="tradeInsCount === 0"
-                  :icon="Car"
-                  :title="t('requestDetail.emptyStates.tradeIns.title')"
-                  :description="t('requestDetail.emptyStates.tradeIns.description')"
-                  :action-label="t('requestDetail.emptyStates.tradeIns.action')"
-                  @action="editingTradeIn = null; showTradeInModal = true"
-                />
-                <div v-else class="flex flex-col gap-4">
+                  <RequestTabEmptyState
+                    v-if="tradeInsCount === 0"
+                    :icon="Car"
+                    :title="t('requestDetail.emptyStates.tradeIns.title')"
+                    :description="t('requestDetail.emptyStates.tradeIns.description')"
+                    :action-label="t('requestDetail.emptyStates.tradeIns.action')"
+                    @action="editingTradeIn = null; showTradeInModal = true"
+                  />
                   <TradeInsCard
+                    v-else
                     :items="request?.tradeIns || []"
                     :add-loading="tradeInActionLoading"
                     @open-add="editingTradeIn = null; showTradeInModal = true"
                     @open-edit="openTradeInEdit"
-                  />
-                </div>
-              </template>
-
-              <template v-else-if="mainTab === 'purchaseMethod'">
-                <RequestTabEmptyState
-                  v-if="financingOptionsCount === 0"
-                  :icon="CreditCard"
-                  :title="t('requestDetail.emptyStates.purchaseMethod.title')"
-                  :description="t('requestDetail.emptyStates.purchaseMethod.description')"
-                  :action-label="t('requestDetail.emptyStates.purchaseMethod.action')"
-                  @action="editingFinancingOption = null; showFinancingModal = true"
-                />
-                <div v-else class="flex flex-col gap-4">
-                  <FinancingOptionsCard
-                    :items="request?.financingOptions || []"
-                    @open-add="editingFinancingOption = null; showFinancingModal = true"
-                    @open-edit="openFinancingEdit"
                   />
                 </div>
               </template>
@@ -463,7 +454,6 @@ import RequestDetailHeader from './RequestDetailHeader.vue'
 import RequestDetailCompactHeader from './RequestDetailCompactHeader.vue'
 import VehicleRequestCard from '@/components/shared/VehicleRequestCard.vue'
 import RequestMainTabs from './RequestMainTabs.vue'
-import RequestConversationsTabContent from './RequestConversationsTabContent.vue'
 import RequestTabEmptyState from './RequestTabEmptyState.vue'
 import RequestLeadProfileSection from './RequestLeadProfileSection.vue'
 import RequestInsightBanner from './RequestInsightBanner.vue'
@@ -746,19 +736,6 @@ const requestActivities = computed(() => {
   })
 })
 
-const conversationActivitiesForRequest = computed(() => {
-  const list = requestActivities.value.filter(
-    (a) =>
-      a.type === 'customer-email' ||
-      a.type === 'customer-whatsapp' ||
-      a.type === 'email' ||
-      a.type === 'whatsapp'
-  )
-  return [...list].sort(
-    (a, b) => new Date(a.timestamp || 0).getTime() - new Date(b.timestamp || 0).getTime()
-  )
-})
-
 const showAssociatedTasks = computed(() => {
   const r = props.request
   return !!(r?.customer || r?.customerId)
@@ -781,12 +758,13 @@ const overviewTabCount = computed(() => {
 
 const mainTabs = computed(() => [
   { key: 'overview', label: t('requestDetail.tabs.overview'), count: overviewTabCount.value },
-  { key: 'conversations', label: t('requestDetail.tabs.conversations') },
-  { key: 'tradeIns', label: t('requestDetail.tabs.tradeIns'), count: tradeInsCount.value },
-  { key: 'purchaseMethod', label: t('requestDetail.tabs.purchaseMethod'), count: financingOptionsCount.value },
+  { key: 'activity', label: t('requestDetail.tabs.timeline'), count: requestActivities.value.length },
+  {
+    key: 'financingTradeIns',
+    label: t('requestDetail.tabs.financingTradeIns'),
+    count: tradeInsCount.value + financingOptionsCount.value
+  },
   { key: 'attachments', label: t('requestDetail.tabs.attachments'), count: attachmentsCount.value },
-  { key: 'tasks', label: t('requestDetail.tabs.tasks'), count: tasksTabCount.value },
-  { key: 'activity', label: t('requestDetail.tabs.activity'), count: requestActivities.value.length }
 ])
 
 watch(
@@ -864,17 +842,6 @@ watch(isClosedLead, (closed, wasClosed) => {
   }
 })
 
-const tasksTabCount = computed(() => {
-  const r = props.request
-  if (!r) return 0
-  if (r.type === 'lead') {
-    return lqfShowTeaser.value && !lqfTeaserDismissed.value ? 1 : 0
-  }
-  if (r.type === 'opportunity' && !isClosedLead.value) {
-    return 1
-  }
-  return 0
-})
 
 const showAssociatedTasksOrTimeline = computed(
   () => showAssociatedTasks.value || showTimeline.value

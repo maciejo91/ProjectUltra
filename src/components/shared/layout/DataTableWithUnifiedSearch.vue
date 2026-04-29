@@ -22,7 +22,26 @@
         @update:global-filter="emit('update:globalFilter', $event)"
         @update:column-filters="emit('update:columnFilters', $event)"
         @update:pagination="emit('update:pagination', $event)"
-      />
+      >
+        <template v-if="sortMenuItems.length > 0" #trailing>
+          <Select v-model="sortSelectModel">
+            <SelectTrigger :aria-label="t('dataTable.sortSelectAriaLabel')">
+              <SelectValue :placeholder="t('dataTable.sortOptions.custom.summary')">
+                {{ currentSortSummary }}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent position="popper" side="bottom" align="end" :side-offset="4">
+              <SelectItem
+                v-for="item in sortMenuItems"
+                :key="item.value"
+                :value="item.value"
+              >
+                {{ t(`dataTable.sortOptions.${item.optionId}.menu`) }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </template>
+      </UnifiedSearchBar>
     </div>
     <div
       ref="tableScrollContainer"
@@ -35,10 +54,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@motork/component-library/future/primitives'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
 
-defineProps({
+const { t } = useI18n()
+
+const props = defineProps({
   activeTab: { type: String, default: 'opportunities' },
   placeholder: { type: String, default: '' },
   pagination: { type: Object, default: () => ({ pageIndex: 0, pageSize: 10 }) },
@@ -52,105 +81,45 @@ defineProps({
   typeOptions: { type: Array, default: () => [] },
   requestedCarBrandOptions: { type: Array, default: () => [] },
   accountTypeOptions: { type: Array, default: () => [] },
-  includeMarginBottom: { type: Boolean, default: true }
+  includeMarginBottom: { type: Boolean, default: true },
+  sortMenuItems: { type: Array, default: () => [] },
 })
 
+const sorting = defineModel('sorting', { type: Array, default: () => [] })
+
 const emit = defineEmits(['update:globalFilter', 'update:columnFilters', 'update:pagination', 'wrapperClick'])
+
+function normalizeSort (sort) {
+  return (sort ?? []).map((s) => ({
+    id: s.id,
+    desc: Boolean(s.desc),
+  }))
+}
+
+function sortsEqual (a, b) {
+  return JSON.stringify(normalizeSort(a)) === JSON.stringify(normalizeSort(b))
+}
+
+const currentSortSummary = computed(() => {
+  const match = props.sortMenuItems.find((it) => sortsEqual(it.sorting, sorting.value))
+  if (match) return t(`dataTable.sortOptions.${match.optionId}.summary`)
+  return t('dataTable.sortOptions.custom.summary')
+})
+
+const sortSelectModel = computed({
+  get () {
+    const match = props.sortMenuItems.find((it) => sortsEqual(it.sorting, sorting.value))
+    return match?.value ?? undefined
+  },
+  set (value) {
+    if (value == null || value === '') return
+    const item = props.sortMenuItems.find((it) => it.value === value)
+    if (item) sorting.value = normalizeSort(item.sorting)
+  },
+})
 
 const tableScrollContainer = ref(null)
 defineExpose({ tableScrollContainer })
 </script>
 
-<style scoped>
-:deep([data-radix-avatar-fallback]),
-:deep(.avatar-fallback),
-:deep(span[class*='AvatarFallback']) {
-  background-color: #d4d4d4 !important;
-}
 
-:deep(tbody tr) {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-}
-
-:deep(tbody tr:last-child) {
-  border-bottom: none !important;
-}
-
-.data-table-inner.table-search-wrapper :deep([data-slot='table-search']),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[placeholder*='Search'])),
-.data-table-inner.table-search-wrapper :deep(div:has(> input[type='search'])) {
-  display: none !important;
-}
-
-:deep([data-slot='table-container']),
-:deep(.table-wrapper) {
-  border: none !important;
-}
-
-:deep(footer select),
-:deep(footer button[role='combobox']) {
-  background-color: transparent !important;
-  border: none !important;
-}
-
-/*
- * Motork DataTable filter strip (no data-slot="table-filter" in current library):
- * data-table.vue uses div.bg-muted.flex.flex-wrap.items-center.justify-between.gap-2.rounded-lg.p-1
- */
-.data-table-inner.table-search-wrapper
-  :deep(div.bg-muted.flex.flex-wrap.items-center.justify-between.gap-2.rounded-lg.p-1) {
-  align-items: center;
-}
-
-.data-table-inner.table-search-wrapper
-  :deep(
-    div.bg-muted.flex.flex-wrap.items-center.justify-between.gap-2.rounded-lg.p-1
-      > div.flex.flex-wrap.items-center.gap-2:first-child
-      > div.flex.flex-wrap.gap-2
-  ) {
-  align-items: center;
-}
-
-/*
- * Filter chip: zero flex gap, 1px overlap between wrappers (removes hairline seams), no wrapper chrome.
- * Scoped to this strip only so other ButtonGroups stay unchanged.
- */
-.data-table-inner.table-search-wrapper
-  :deep(
-    div.bg-muted.flex.flex-wrap.items-center.justify-between.gap-2.rounded-lg.p-1
-      [data-slot='button-group'][data-orientation='horizontal']
-  ) {
-  isolation: isolate;
-  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.06));
-  gap: 0 !important;
-  column-gap: 0 !important;
-  row-gap: 0 !important;
-}
-
-.data-table-inner.table-search-wrapper
-  :deep(
-    div.bg-muted.flex.flex-wrap.items-center.justify-between.gap-2.rounded-lg.p-1
-      [data-slot='button-group'][data-orientation='horizontal'] > *:not(:first-child)
-  ) {
-  margin-top: 0 !important;
-  margin-right: 0 !important;
-  margin-bottom: 0 !important;
-  margin-left: -1px !important;
-  padding: 0 !important;
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  display: flex !important;
-  align-items: stretch !important;
-}
-
-:deep([data-slot='table-container']) {
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  max-height: 600px !important;
-}
-
-:deep(table) {
-  min-width: 100% !important;
-}
-</style>

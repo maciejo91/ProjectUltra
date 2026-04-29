@@ -29,18 +29,12 @@
                 filterDefs: filterDefinitions
               }"
               v-model:pagination="pagination"
-              v-model:globalFilter="globalFilter"
               v-model:sorting="sorting"
               v-model:columnFilters="columnFilters"
               v-model:columnVisibility="columnVisibility"
               v-model:rowSelection="rowSelection"
               :paginationOptions="{
                 rowCount: totalFilteredCount
-              }"
-              :globalFilterOptions="{
-                debounce: 300,
-                placeholder: 'Search requests...',
-                show: true
               }"
               class="h-full"
             >

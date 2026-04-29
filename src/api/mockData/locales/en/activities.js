@@ -158,20 +158,15 @@ export const mockActivities = [
   },
   // Lead activities (ids 1-7)
   {
-    id: 18,
-    type: 'customer-email',
-    user: 'Josh Adams',
-    action: 'sent an email',
-    content: 'Hi, I am interested in the Audi A6. Can we schedule a test drive?',
-    timestamp: createHourOffset(-2),
-    leadId: 1
-  },
-  {
     id: 19,
     type: 'customer-whatsapp',
     user: 'Emma Watson',
     action: 'sent a WhatsApp message',
     content: 'I am still interested in the ID.4. Can we schedule a callback after 2 PM?',
+    data: {
+      fromPhone: '+49 170 555 0142',
+      toPhone: '+49 89 555 0199'
+    },
     timestamp: createHourOffset(-1),
     leadId: 2
   },
@@ -181,6 +176,10 @@ export const mockActivities = [
     user: 'Liam Johnson',
     action: 'sent an email',
     content: 'When can I visit the Munich dealership to see the BMW iX?',
+    data: {
+      from: 'liam.johnson@example.com',
+      to: 'munich@motork.io'
+    },
     timestamp: createHourOffset(-3),
     leadId: 3
   },
@@ -190,6 +189,10 @@ export const mockActivities = [
     user: 'Sophie Mueller',
     action: 'sent an email',
     content: 'Thanks for the C-Class info. I would like to see it this week.',
+    data: {
+      from: 'sophie.mueller@example.com',
+      to: 'sales@motork.io'
+    },
     timestamp: createHourOffset(-4),
     leadId: 4
   },
@@ -200,6 +203,10 @@ export const mockActivities = [
     user: 'John Smith',
     action: 'sent an email',
     content: 'I received the quote. Can we confirm the black exterior is still available?',
+    data: {
+      from: 'john.smith@example.com',
+      to: 'sarah.jenkins@motork.io'
+    },
     timestamp: createHourOffset(-5),
     opportunityId: 1
   },
@@ -209,6 +216,10 @@ export const mockActivities = [
     user: 'David Miller',
     action: 'sent a WhatsApp message',
     content: 'Happy to proceed with the counter-offer. When can we sign?',
+    data: {
+      fromPhone: '+49 151 555 0288',
+      toPhone: '+49 89 555 0277'
+    },
     timestamp: createHourOffset(-2),
     opportunityId: 3
   },
@@ -219,6 +230,10 @@ export const mockActivities = [
     user: 'Sarah Jenkins',
     action: 'sent an email',
     content: 'Here is the quote for the Audi A6 you requested. Let me know if you have questions.',
+    data: {
+      from: 'sarah.jenkins@motork.io',
+      to: 'john.smith@example.com'
+    },
     timestamp: createHourOffset(-6),
     opportunityId: 1
   },
@@ -228,17 +243,12 @@ export const mockActivities = [
     user: 'David Miller',
     action: 'sent a WhatsApp message',
     content: 'I have prepared a counter-offer with a 5% discount. Sending it now.',
+    data: {
+      fromPhone: '+49 89 555 0277',
+      toPhone: '+49 151 555 0288'
+    },
     timestamp: createHourOffset(-3),
     opportunityId: 3
-  },
-  {
-    id: 26,
-    type: 'email',
-    user: 'Josh Adams',
-    action: 'sent an email',
-    content: 'Thanks for your interest! We have a test drive slot available tomorrow at 10 AM.',
-    timestamp: createHourOffset(-1),
-    leadId: 1
   },
   {
     id: 27,
@@ -246,6 +256,10 @@ export const mockActivities = [
     user: 'Emma Watson',
     action: 'sent a WhatsApp message',
     content: 'Hi Emma, I tried calling you. I will call again after 2 PM as requested.',
+    data: {
+      fromPhone: '+49 89 555 0199',
+      toPhone: '+49 170 555 0142'
+    },
     timestamp: createHourOffset(-0.5),
     leadId: 2
   },
@@ -267,6 +281,10 @@ export const mockActivities = [
     user: 'Liam Johnson',
     action: 'sent an SMS',
     content: 'Can you confirm the BMW iX is still available for a test drive this Saturday?',
+    data: {
+      fromPhone: '+49 170 555 0311',
+      toPhone: '+49 89 555 0200'
+    },
     timestamp: createHourOffset(-2.5),
     leadId: 3
   },
@@ -276,6 +294,10 @@ export const mockActivities = [
     user: 'Sarah Jenkins',
     action: 'sent an SMS',
     content: 'Yes, Saturday works. I will reserve the iX for 11:00. See you at the Munich showroom.',
+    data: {
+      fromPhone: '+49 89 555 0200',
+      toPhone: '+49 170 555 0311'
+    },
     timestamp: createHourOffset(-2.2),
     leadId: 3
   },
@@ -285,6 +307,10 @@ export const mockActivities = [
     user: 'Salsabeel Khaleel',
     action: 'sent an SMS',
     content: 'Running 10 min late for the appointment — still OK?',
+    data: {
+      fromPhone: '+49 89 555 0188',
+      toPhone: '+49 151 555 0299'
+    },
     timestamp: createHourOffset(-8),
     opportunityId: 2
   },
@@ -294,7 +320,66 @@ export const mockActivities = [
     user: 'David Miller',
     action: 'sent an SMS',
     content: 'No problem, we will hold the bay. Drive safe.',
+    data: {
+      fromPhone: '+49 151 555 0299',
+      toPhone: '+49 89 555 0188'
+    },
     timestamp: createHourOffset(-7.5),
     opportunityId: 2
+  },
+  // Lead 1 (Josh Adams) – system logs + inbound email, unsuccessful call, follow-up note
+  {
+    id: 33,
+    type: 'note',
+    user: 'Sarah Jenkins',
+    action: 'added a note',
+    message: 'After call attempt: no answer, left VM with Wed / Thu test drive options.',
+    content: 'After call attempt: no answer, left VM with Wed / Thu test drive options.',
+    timestamp: createHourOffset(-1),
+    leadId: 1
+  },
+  {
+    id: 34,
+    type: 'call',
+    user: 'Sarah Jenkins',
+    action: 'attempted call',
+    message: 'No answer · voicemail left',
+    content: 'No answer · voicemail left',
+    data: {
+      summary: 'No answer · voicemail left'
+    },
+    timestamp: createHourOffset(-2),
+    leadId: 1
+  },
+  {
+    id: 35,
+    type: 'customer-email',
+    user: 'Josh Adams',
+    action: 'sent an email',
+    content: 'Hi, I am interested in the Audi A6. Can we schedule a test drive?',
+    data: {
+      from: 'josh.adams@example.com',
+      to: 'inbox@madrid.motork.io'
+    },
+    timestamp: createHourOffset(-6),
+    leadId: 1
+  },
+  {
+    id: 36,
+    type: 'lead-created',
+    user: 'System',
+    action: 'Lead was created from Autoscout24.es (Web)',
+    message: 'Lead was created from Autoscout24.es (Web)',
+    timestamp: createHourOffset(-72),
+    leadId: 1
+  },
+  {
+    id: 37,
+    type: 'lead-assigned',
+    user: 'System',
+    action: 'Lead was assigned to Sarah Jenkins',
+    message: 'Lead was assigned to Sarah Jenkins',
+    timestamp: createHourOffset(-71.5),
+    leadId: 1
   }
 ]

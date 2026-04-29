@@ -1,3 +1,92 @@
 {
-  "search": "Search or ask a question"
+  "search": "Search or ask a question",
+  "searchTasks": "Search tasks...",
+  "searchLeads": "Search leads...",
+  "searchOpportunities": "Search opportunities...",
+  "searchVehicles": "Search vehicles...",
+  "searchCustomers": "Search customers...",
+  "searchRequests": "Search requests...",
+  "searchReports": "Search reports...",
+  "searchCampaigns": "Search campaigns...",
+  "askAI": "Ask AI",
+  "aiMode": "AI mode",
+  "aiModeOff": "AI mode off",
+  "aiModeOn": "AI mode on",
+  "go": "Go",
+  "enterHint": "Enter",
+  "closeAiOverlay": "Close",
+  "aiExampleTasks1": "Unassigned BMW leads from this week",
+  "aiExampleTasks2": "Leads for cars over €48,000",
+  "aiExampleTasks3": "Leads managed by Sarah",
+  "aiExampleGeneric1": "Ask anything… (e.g. assigned to me, due this week)",
+  "aiExampleGeneric2": "Ask anything… (e.g. hot leads, test drives)",
+  "aiExampleGeneric3": "Ask anything… (e.g. by source, by status)",
+  "sortingColon": "Sorting",
+  "sortSelectAriaLabel": "Sort table",
+  "sortOptions": {
+    "default": {
+      "menu": "Default order",
+      "summary": "Default order"
+    },
+    "custom": {
+      "menu": "Custom order",
+      "summary": "Column header order"
+    },
+    "createdNewest": {
+      "menu": "Created · newest first",
+      "summary": "Newest first"
+    },
+    "createdOldest": {
+      "menu": "Created · oldest first",
+      "summary": "Oldest first"
+    },
+    "dueSoonest": {
+      "menu": "Due time · soonest first",
+      "summary": "Due soonest first"
+    },
+    "dueLatest": {
+      "menu": "Due time · latest first",
+      "summary": "Due latest first"
+    },
+    "taskAz": {
+      "menu": "Task · A to Z",
+      "summary": "Task A to Z"
+    },
+    "taskZa": {
+      "menu": "Task · Z to A",
+      "summary": "Task Z to A"
+    },
+    "customerAz": {
+      "menu": "Customer · A to Z",
+      "summary": "Customer A to Z"
+    },
+    "customerZa": {
+      "menu": "Customer · Z to A",
+      "summary": "Customer Z to A"
+    },
+    "assigneeAz": {
+      "menu": "Assignee · A to Z",
+      "summary": "Assignee A to Z"
+    },
+    "assigneeZa": {
+      "menu": "Assignee · Z to A",
+      "summary": "Assignee Z to A"
+    },
+    "attemptsLowHigh": {
+      "menu": "Attempts · low to high",
+      "summary": "Attempts low to high"
+    },
+    "attemptsHighLow": {
+      "menu": "Attempts · high to low",
+      "summary": "Attempts high to low"
+    },
+    "vehicleAz": {
+      "menu": "Vehicle · A to Z",
+      "summary": "Vehicle A to Z"
+    },
+    "vehicleZa": {
+      "menu": "Vehicle · Z to A",
+      "summary": "Vehicle Z to A"
+    }
+  }
 }

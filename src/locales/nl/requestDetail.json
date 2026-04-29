@@ -42,9 +42,11 @@
     "conversations": "Gesprekken",
     "tradeIns": "Inruil",
     "purchaseMethod": "Aankoopmethode",
+    "financingTradeIns": "Financiering & Inruil",
     "attachments": "Bijlagen",
     "tasks": "Taken",
-    "activity": "Activiteit"
+    "activity": "Activiteit",
+    "timeline": "Timeline"
   },
   "insight": {
     "highPaidStock": "Deze lead komt uit een betalende bron met hoge kosten en gaat over een auto die al {days} dagen op voorraad is."
@@ -94,7 +96,11 @@
     "assignTaskTitle": "Taak toewijzen",
     "assigneeSelectPlaceholder": "Selecteer assignee",
     "applyAssignment": "Toewijzing toepassen",
-    "assignWholeTeam": "Hele team"
+    "assignWholeTeam": "Hele team",
+    "outcomeFlowNotes": "Belnotities",
+    "outcomeFlowNotesPlaceholder": "Voeg notities toe voor deze belpoging…",
+    "calledAt": "Gebeld om:",
+    "editCalledAt": "Beltijd bewerken"
   },
   "quickActions": {
     "phone": "Telefoon",
