@@ -128,16 +128,17 @@
           <Label class="text-sm font-medium text-foreground">
             {{ t('forms.addNew.leadDetails.fields.requestType') }} <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.requestType">
-            <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.requestType">
-              <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.selectType')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="opt in requestTypeValues" :key="opt" :value="opt">
-                {{ t(`forms.addNew.leadDetails.options.requestType.${opt}`) }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <SelectMenu
+            v-model="form.requestType"
+            :items="requestTypeSelectItems"
+            value-key="value"
+            :placeholder="t('forms.addNew.leadDetails.placeholders.selectType')"
+            :class="leadDetailsSelectMenuClass"
+          >
+            <template #item="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+          </SelectMenu>
           <p v-if="errors.requestType" class="text-sm text-destructive">{{ errors.requestType }}</p>
         </div>
         <div class="space-y-2">
@@ -187,32 +188,34 @@
           <Label class="text-sm font-medium text-foreground">
             {{ t('forms.addNew.leadDetails.fields.channel') }} <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.channel">
-            <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.channel">
-              <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.select')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="opt in channelValues" :key="opt" :value="opt">
-                {{ t(`forms.addNew.leadDetails.options.channel.${opt}`) }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <SelectMenu
+            v-model="form.channel"
+            :items="channelSelectItems"
+            value-key="value"
+            :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
+            :class="leadDetailsSelectMenuClass"
+          >
+            <template #item="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+          </SelectMenu>
           <p v-if="errors.channel" class="text-sm text-destructive">{{ errors.channel }}</p>
         </div>
         <div class="space-y-2">
           <Label class="text-sm font-medium text-foreground">
             {{ t('forms.addNew.leadDetails.fields.source') }} <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.source">
-            <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.source">
-              <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.select')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="opt in sourceValues" :key="opt" :value="opt">
-                {{ t(`forms.addNew.leadDetails.options.source.${opt}`) }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <SelectMenu
+            v-model="form.source"
+            :items="sourceSelectItems"
+            value-key="value"
+            :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
+            :class="leadDetailsSelectMenuClass"
+          >
+            <template #item="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+          </SelectMenu>
           <p v-if="errors.source" class="text-sm text-destructive">{{ errors.source }}</p>
         </div>
         <div class="space-y-2">
@@ -230,32 +233,34 @@
           <Label class="text-sm font-medium text-foreground">
             {{ t('forms.addNew.leadDetails.fields.fiscalEntity') }} <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.fiscalEntity">
-            <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.fiscalEntity">
-              <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.select')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="opt in fiscalEntityOptions" :key="opt.id" :value="opt.id">
-                {{ t(opt.labelKey) }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <SelectMenu
+            v-model="form.fiscalEntity"
+            :items="fiscalEntitySelectItems"
+            value-key="value"
+            :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
+            :class="leadDetailsSelectMenuClass"
+          >
+            <template #item="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+          </SelectMenu>
           <p v-if="errors.fiscalEntity" class="text-sm text-destructive">{{ errors.fiscalEntity }}</p>
         </div>
         <div class="space-y-2">
           <Label class="text-sm font-medium text-foreground">
             {{ t('forms.addNew.leadDetails.fields.dealership') }} <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.dealership">
-            <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.dealership">
-              <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.select')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="opt in dealershipValues" :key="opt" :value="opt">
-                {{ t(`forms.addNew.leadDetails.options.dealership.${opt}`) }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <SelectMenu
+            v-model="form.dealership"
+            :items="dealershipSelectItems"
+            value-key="value"
+            :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
+            :class="leadDetailsSelectMenuClass"
+          >
+            <template #item="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+          </SelectMenu>
           <p v-if="errors.dealership" class="text-sm text-destructive">{{ errors.dealership }}</p>
         </div>
         <div class="space-y-2 sm:col-span-2 lg:col-span-1">
@@ -263,16 +268,17 @@
             <Label class="text-sm font-medium text-foreground">
               {{ t('forms.labels.assignee') }} <span class="text-destructive">*</span>
             </Label>
-            <Select v-model="form.assigneeId">
-              <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.assigneeId">
-                <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.selectAssignee')" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem v-for="u in assigneeUsers" :key="u.id" :value="String(u.id)">
-                  {{ u.name }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <SelectMenu
+              v-model="form.assigneeId"
+              :items="assigneeSelectItems"
+              value-key="value"
+              :placeholder="t('forms.addNew.leadDetails.placeholders.selectAssignee')"
+              :class="leadDetailsSelectMenuClass"
+            >
+              <template #item="{ item }">
+                <span>{{ item.label }}</span>
+              </template>
+            </SelectMenu>
             <p v-if="errors.assigneeId" class="text-sm text-destructive">{{ errors.assigneeId }}</p>
           </div>
           <div class="flex w-full min-w-0 items-center gap-2.5">
@@ -296,48 +302,51 @@
           <Label class="text-sm font-medium text-foreground">
             {{ t('forms.addNew.leadDetails.fields.requestType') }} <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.requestType">
-            <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.requestType">
-              <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.selectType')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="opt in requestTypeValues" :key="opt" :value="opt">
-                {{ t(`forms.addNew.leadDetails.options.requestType.${opt}`) }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <SelectMenu
+            v-model="form.requestType"
+            :items="requestTypeSelectItems"
+            value-key="value"
+            :placeholder="t('forms.addNew.leadDetails.placeholders.selectType')"
+            :class="leadDetailsSelectMenuClass"
+          >
+            <template #item="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+          </SelectMenu>
           <p v-if="errors.requestType" class="text-sm text-destructive">{{ errors.requestType }}</p>
         </div>
         <div class="space-y-2">
           <Label class="text-sm font-medium text-foreground">
             {{ t('forms.addNew.leadDetails.fields.channel') }} <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.channel">
-            <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.channel">
-              <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.select')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="opt in channelValues" :key="opt" :value="opt">
-                {{ t(`forms.addNew.leadDetails.options.channel.${opt}`) }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <SelectMenu
+            v-model="form.channel"
+            :items="channelSelectItems"
+            value-key="value"
+            :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
+            :class="leadDetailsSelectMenuClass"
+          >
+            <template #item="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+          </SelectMenu>
           <p v-if="errors.channel" class="text-sm text-destructive">{{ errors.channel }}</p>
         </div>
         <div class="space-y-2">
           <Label class="text-sm font-medium text-foreground">
             {{ t('forms.addNew.leadDetails.fields.source') }} <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.source">
-            <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.source">
-              <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.select')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="opt in sourceValues" :key="opt" :value="opt">
-                {{ t(`forms.addNew.leadDetails.options.source.${opt}`) }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <SelectMenu
+            v-model="form.source"
+            :items="sourceSelectItems"
+            value-key="value"
+            :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
+            :class="leadDetailsSelectMenuClass"
+          >
+            <template #item="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+          </SelectMenu>
           <p v-if="errors.source" class="text-sm text-destructive">{{ errors.source }}</p>
         </div>
         <div class="space-y-2">
@@ -355,32 +364,34 @@
           <Label class="text-sm font-medium text-foreground">
             {{ t('forms.addNew.leadDetails.fields.fiscalEntity') }} <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.fiscalEntity">
-            <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.fiscalEntity">
-              <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.select')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="opt in fiscalEntityOptions" :key="opt.id" :value="opt.id">
-                {{ t(opt.labelKey) }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <SelectMenu
+            v-model="form.fiscalEntity"
+            :items="fiscalEntitySelectItems"
+            value-key="value"
+            :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
+            :class="leadDetailsSelectMenuClass"
+          >
+            <template #item="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+          </SelectMenu>
           <p v-if="errors.fiscalEntity" class="text-sm text-destructive">{{ errors.fiscalEntity }}</p>
         </div>
         <div class="space-y-2">
           <Label class="text-sm font-medium text-foreground">
             {{ t('forms.addNew.leadDetails.fields.dealership') }} <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.dealership">
-            <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.dealership">
-              <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.select')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="opt in dealershipValues" :key="opt" :value="opt">
-                {{ t(`forms.addNew.leadDetails.options.dealership.${opt}`) }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <SelectMenu
+            v-model="form.dealership"
+            :items="dealershipSelectItems"
+            value-key="value"
+            :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
+            :class="leadDetailsSelectMenuClass"
+          >
+            <template #item="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+          </SelectMenu>
           <p v-if="errors.dealership" class="text-sm text-destructive">{{ errors.dealership }}</p>
         </div>
       </div>
@@ -392,16 +403,17 @@
             <Label class="text-sm font-medium text-foreground">
               {{ t('forms.labels.assignee') }} <span class="text-destructive">*</span>
             </Label>
-            <Select v-model="form.assigneeId">
-              <SelectTrigger class="h-8 w-full rounded-[10px] text-sm" :error="!!errors.assigneeId">
-                <SelectValue :placeholder="t('forms.addNew.leadDetails.placeholders.selectAssignee')" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem v-for="u in assigneeUsers" :key="u.id" :value="String(u.id)">
-                  {{ u.name }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <SelectMenu
+              v-model="form.assigneeId"
+              :items="assigneeSelectItems"
+              value-key="value"
+              :placeholder="t('forms.addNew.leadDetails.placeholders.selectAssignee')"
+              :class="leadDetailsSelectMenuClass"
+            >
+              <template #item="{ item }">
+                <span>{{ item.label }}</span>
+              </template>
+            </SelectMenu>
             <p v-if="errors.assigneeId" class="text-sm text-destructive">{{ errors.assigneeId }}</p>
           </div>
         </div>
@@ -731,38 +743,35 @@
               <Label class="text-sm font-medium text-foreground">
                 {{ t('forms.addNew.leadDetails.vehicle.manual.fields.brand') }} <span class="text-destructive">*</span>
               </Label>
-              <Select v-model="vehicle.manualBrand">
-                <SelectTrigger class="h-8 w-full rounded-[10px] text-sm">
-                  <SelectValue :placeholder="t('forms.addNew.leadDetails.vehicle.manual.placeholders.selectBrand')" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem v-for="b in manualBrandOptions" :key="b" :value="b">
-                    {{ b }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <SelectMenu
+                v-model="vehicle.manualBrand"
+                :items="manualBrandSelectItems"
+                value-key="value"
+                :placeholder="t('forms.addNew.leadDetails.vehicle.manual.placeholders.selectBrand')"
+                :class="leadDetailsSelectMenuClass"
+              >
+                <template #item="{ item }">
+                  <span>{{ item.label }}</span>
+                </template>
+              </SelectMenu>
             </div>
 
             <div class="space-y-2">
               <Label class="text-sm font-medium text-foreground">
                 {{ t('forms.addNew.leadDetails.vehicle.manual.fields.model') }} <span class="text-destructive">*</span>
               </Label>
-              <Select
+              <SelectMenu
                 v-model="vehicle.manualModel"
+                :items="manualModelSelectItems"
+                value-key="value"
                 :disabled="!manualModelSelectEnabled"
+                :placeholder="manualModelPlaceholder"
+                :class="leadDetailsSelectMenuClass"
               >
-                <SelectTrigger
-                  class="h-8 w-full rounded-[10px] text-sm"
-                  :disabled="!manualModelSelectEnabled"
-                >
-                  <SelectValue :placeholder="manualModelPlaceholder" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem v-for="m in manualModelOptions" :key="m" :value="m">
-                    {{ m }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                <template #item="{ item }">
+                  <span>{{ item.label }}</span>
+                </template>
+              </SelectMenu>
             </div>
 
             <div class="space-y-2">
@@ -900,6 +909,7 @@
 import { computed, onMounted, onUnmounted, ref, useId, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowUpRight, CircleHelp, Filter, Search, Tag as LucideTag, Tag, Wrench, X } from 'lucide-vue-next'
+import { SelectMenu } from '@motork/component-library/future/components'
 import {
   Button,
   Card,
@@ -917,11 +927,6 @@ import {
   Label,
   RadioGroup,
   RadioGroupItem,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Switch,
   Textarea,
   Tooltip,
@@ -1088,6 +1093,50 @@ onMounted(async () => {
   }
 })
 
+const leadDetailsSelectMenuClass = 'h-8 min-h-8 w-full rounded-[10px] text-sm'
+
+const requestTypeSelectItems = computed(() =>
+  requestTypeValues.value.map((opt) => ({
+    value: opt,
+    label: t(`forms.addNew.leadDetails.options.requestType.${opt}`),
+  })),
+)
+
+const channelSelectItems = computed(() =>
+  channelValues.map((opt) => ({
+    value: opt,
+    label: t(`forms.addNew.leadDetails.options.channel.${opt}`),
+  })),
+)
+
+const sourceSelectItems = computed(() =>
+  sourceValues.map((opt) => ({
+    value: opt,
+    label: t(`forms.addNew.leadDetails.options.source.${opt}`),
+  })),
+)
+
+const dealershipSelectItems = computed(() =>
+  dealershipValues.map((opt) => ({
+    value: opt,
+    label: t(`forms.addNew.leadDetails.options.dealership.${opt}`),
+  })),
+)
+
+const fiscalEntitySelectItems = computed(() =>
+  fiscalEntityOptions.map((opt) => ({
+    value: opt.id,
+    label: t(opt.labelKey),
+  })),
+)
+
+const assigneeSelectItems = computed(() =>
+  assigneeUsers.value.map((u) => ({
+    value: String(u.id),
+    label: u.team ? `${u.name} · ${u.team}` : u.name,
+  })),
+)
+
 /** "?" on Lead row: copy depends on Sales vs Service department */
 const leadCardTooltip = computed(() =>
   t(`forms.addNew.leadDetails.tooltips.lead.${form.department}`),
@@ -1227,6 +1276,14 @@ const showDiscardManualVehicleConfirm = ref(false)
 const manualBrandOptions = VEHICLE_BRANDS
 
 const manualModelOptions = computed(() => getModelsForBrand(vehicle.manualBrand))
+
+const manualBrandSelectItems = computed(() =>
+  manualBrandOptions.map((b) => ({ value: b, label: b })),
+)
+
+const manualModelSelectItems = computed(() =>
+  manualModelOptions.value.map((m) => ({ value: m, label: m })),
+)
 
 const manualModelSelectEnabled = computed(() => String(vehicle.manualBrand ?? '').trim() !== '')
 

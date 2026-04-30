@@ -1,4 +1,4 @@
-/* ProjectUltra Main CSS - Exceptions only: card shadow, floating LQ chrome, toggle selected, DataTable filter ButtonGroup, layout vars */
+/* ProjectUltra Main CSS - Exceptions only: card shadow, floating LQ chrome, toggle selected, DataTable filter ButtonGroup, layout vars, sidebar notification bell ring */
 
 /* ========================================
    Core Imports
@@ -185,6 +185,44 @@ body,
 
 .mk-dashboard-card {
   box-shadow: var(--mk-dashboard-card-shadow);
+}
+
+/* ========================================
+   Exception: Collapsed sidebar notification bell swing
+   ======================================== */
+
+@keyframes mk-sidebar-bell-ring {
+  0%,
+  70% {
+    transform: rotate(0deg);
+  }
+  73% {
+    transform: rotate(10deg);
+  }
+  76% {
+    transform: rotate(-8deg);
+  }
+  79% {
+    transform: rotate(5deg);
+  }
+  82% {
+    transform: rotate(-3deg);
+  }
+  85%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.mk-sidebar-bell-ring {
+  transform-origin: top center;
+  animation: mk-sidebar-bell-ring 4.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-sidebar-bell-ring {
+    animation: none;
+  }
 }
 
 /* Vue Cal theme overrides - match ProjectUltra screenshot */

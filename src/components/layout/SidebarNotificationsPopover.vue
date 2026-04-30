@@ -3,15 +3,16 @@
     <PopoverTrigger as-child>
       <SidebarMenuButton :tooltip="t('common.navigation.notifications')">
         <span class="flex min-w-0 w-full items-center gap-2">
-          <span class="relative inline-flex shrink-0">
-            <Bell class="size-4 shrink-0" />
+          <span class="relative inline-flex size-4 shrink-0 items-center justify-center">
+            <Bell
+              class="relative z-10 size-4 shrink-0 origin-top"
+              :class="{ 'mk-sidebar-bell-ring': showBellRingMotion }"
+            />
             <span
               v-if="notificationCount > 0"
-              class="pointer-events-none absolute -right-1 -top-1 hidden min-w-4 h-4 items-center justify-center rounded-full bg-destructive px-1 text-xs font-semibold leading-none text-destructive-foreground ring-2 ring-sidebar group-data-[collapsible=icon]:inline-flex"
+              class="pointer-events-none absolute right-px top-px z-20 hidden size-1.5 rounded-full bg-destructive group-data-[collapsible=icon]:block"
               aria-hidden="true"
-            >
-              {{ notificationCount > 99 ? '99+' : notificationCount }}
-            </span>
+            />
           </span>
           <span class="truncate group-data-[collapsible=icon]:hidden">
             {{ t('common.navigation.notifications') }}
@@ -109,7 +110,8 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  SidebarMenuButton
+  SidebarMenuButton,
+  useSidebar
 } from '@motork/component-library/future/primitives'
 import { useNotificationsStore } from '@/stores/notifications'
 
@@ -118,10 +120,15 @@ const { t, locale } = useI18n()
 const store = useNotificationsStore()
 
 const open = ref(false)
+const { state: sidebarState } = useSidebar()
 
 const notifications = computed(() => store.notifications)
 const loading = computed(() => store.loading)
 const notificationCount = computed(() => store.notificationCount)
+
+const showBellRingMotion = computed(
+  () => notificationCount.value > 0 && sidebarState.value !== 'expanded'
+)
 
 async function loadNotificationsIfNeeded() {
   if (store.notifications.length > 0 || store.loading) return
