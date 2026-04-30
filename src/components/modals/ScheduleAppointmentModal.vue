@@ -2,7 +2,7 @@
   <Dialog :open="show" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="w-full sm:max-w-4xl max-h-[calc(100vh-4rem)] flex flex-col bg-muted">
+      <DialogContent class="w-[90vw] max-w-none max-h-[calc(100vh-4rem)] flex flex-col bg-muted">
         <DialogHeader class="flex-shrink-0">
           <DialogTitle>Schedule Appointment</DialogTitle>
         </DialogHeader>

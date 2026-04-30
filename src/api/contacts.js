@@ -35,10 +35,21 @@ export const fetchContactById = async (id) => {
 
 export const createContact = async (contactData) => {
   await delay()
+  const name = (contactData.name || '').trim() || '—'
+  const initials =
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || '?'
   const newContact = {
     id: mockCustomers.length + 1,
     ...contactData,
-    company: null, // Ensure no company field for contacts
+    name,
+    initials,
+    company: null, // contacts API: no company
     createdAt: new Date().toISOString(),
     lastContact: new Date().toISOString()
   }

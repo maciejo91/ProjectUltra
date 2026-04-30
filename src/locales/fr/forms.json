@@ -51,6 +51,268 @@
     "minLength": "Minimum {min} caractères requis",
     "maxLength": "Maximum {max} caractères autorisés"
   },
+  "addNew": {
+    "selectContact": {
+      "title": "Sélectionner un contact",
+      "banner": {
+        "before": "Gagnez du temps et gardez des données propres. Nous avons trouvé ",
+        "duplicates": "doublons",
+        "after": ", recherchez d'abord pour vérifier si le contact existe déjà."
+      },
+      "searchPlaceholder": "Rechercher par nom, e-mail, téléphone ou entreprise...",
+      "createContact": "Créer un contact",
+      "noMatches": "Aucun résultat",
+      "clearSearchAria": "Effacer la recherche",
+      "clearSelectionAria": "Effacer la sélection"
+    },
+    "selectAccount": {
+      "searchPlaceholder": "Rechercher une entreprise…",
+      "createCompany": "Créer une nouvelle entreprise",
+      "noMatches": "Aucune entreprise ne correspond à votre recherche.",
+      "clearSearchAria": "Effacer la recherche",
+      "clearSelectionAria": "Effacer la sélection"
+    },
+    "manualContact": {
+      "closeAria": "Fermer la création de contact",
+      "expandAria": "Développer les informations de contact",
+      "collapseAria": "Réduire les informations de contact",
+      "sections": {
+        "contactInfo": "Informations de contact",
+        "privacy": "Consentements privacy"
+      },
+      "accountType": "Type de compte",
+      "private": "Particulier",
+      "company": "Entreprise",
+      "companyName": "Raison sociale",
+      "companyNamePlaceholder": "Saisir la raison sociale",
+      "fiscalEntityVisibility": "Visibilité de l'entité fiscale",
+      "fiscalEntityHint": "Sélectionnez au moins une entreprise pour laquelle ce contact est visible.",
+      "removeFiscalEntityAria": "Retirer",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "insertPlaceholder": "Saisir ici",
+      "phonePlaceholder": "+39 …",
+      "phoneNationalPlaceholder": "320 123 4567",
+      "phoneCountrySelectAria": "Choisir l’indicatif pays",
+      "phoneCountrySearchPlaceholder": "Rechercher…",
+      "phoneCountryEmpty": "Aucun pays trouvé",
+      "phoneEmailRule": "Au moins un numéro de téléphone ou une adresse e-mail est requis.",
+      "addSecondaryPhone": "Ajouter un téléphone secondaire",
+      "addSecondaryEmail": "Ajouter un e-mail secondaire",
+      "secondaryPhoneLabel": "Téléphone secondaire",
+      "secondaryEmailLabel": "E-mail secondaire",
+      "secondaryPhones": "Téléphones supplémentaires",
+      "secondaryEmails": "E-mails supplémentaires",
+      "town": "Ville",
+      "zip": "Code postal",
+      "moreDetails": "Plus de détails",
+      "moreDetailsPlaceholder": "Notes d'adresse, détails entreprise…",
+      "moreDetailsFields": {
+        "address": "Adresse",
+        "addressAdditionalInfo": "Complément d’adresse",
+        "stateProvince": "État / Province",
+        "country": "Pays",
+        "taxCode": "Code fiscal",
+        "language": "Langue",
+        "dateOfBirth": "Date de naissance",
+        "placeOfBirth": "Lieu de naissance",
+        "gender": "Genre",
+        "jobTitle": "Profession",
+        "favoriteContactMethod": "Moyen de contact préféré",
+        "placeholders": {
+          "insert": "Saisir…"
+        }
+      },
+      "privacyNeedEntities": "Sélectionnez une entité fiscale ci-dessus pour configurer les consentements par entreprise.",
+      "discardTitle": "Abandonner les modifications non enregistrées ?",
+      "discardMessage": "Vous avez des informations non enregistrées. Si vous fermez, vos modifications seront perdues.",
+      "discardConfirm": "Abandonner et fermer",
+      "companyAccount": {
+        "vat": "Numéro de TVA",
+        "employees": "Nombre d’employés",
+        "dealer": "Concessionnaire ?",
+        "linkExisting": "Lier à une entreprise existante",
+        "createNew": "Créer une nouvelle entreprise",
+        "errors": {
+          "selectAccount": "Sélectionne un compte entreprise existant",
+          "employeesInvalid": "Saisis un entier strictement positif ou laisse vide"
+        }
+      },
+      "errors": {
+        "companyRequired": "La raison sociale est obligatoire",
+        "phoneOrEmailRequired": "Saisis un numéro de téléphone ou un e-mail",
+        "phoneInvalid": "Numéro invalide : 8–15 chiffres, + et indicatif optionnels (ex. +39 320 123 4567).",
+        "secondaryPhoneInvalid": "Vérifie le téléphone supplémentaire (même format).",
+        "emailInvalid": "Saisis une adresse e-mail valide",
+        "secondaryEmailInvalid": "Saisis des e-mails valides pour tous les champs supplémentaires"
+      },
+      "entities": {
+        "companyA": "Entreprise A",
+        "companyB": "Entreprise B"
+      },
+      "consents": {
+        "dataProcessing": "Traitement des données",
+        "profiling": "Profilage / analyses",
+        "thirdParty": "Cession à des tiers",
+        "marketing": "Communications marketing"
+      },
+      "marketingChannels": {
+        "call": "Appel",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp",
+        "email": "E-mail",
+        "mail": "Courrier",
+        "phone": "Téléphone",
+        "phoneSecondary": "Téléphone (secondaire)",
+        "emailPrimary": "E-mail",
+        "emailSecondary": "E-mail (secondaire)",
+        "address": "Adresse"
+      }
+    },
+    "leadDetails": {
+      "title": "Détails du lead",
+      "titleOpportunity": "Détails de l'opportunité",
+      "department": {
+        "label": "Département",
+        "sales": "Ventes",
+        "service": "Service"
+      },
+      "recordType": {
+        "label": "Que souhaitez-vous créer ?",
+        "lead": "Lead",
+        "opportunity": "Opportunité"
+      },
+      "tooltips": {
+        "infoAria": "Plus d’informations sur {type}",
+        "lead": {
+          "sales": "Créer un lead « Valid », prêt pour la qualification.",
+          "service": "Créer un lead « Valid », prêt pour la qualification."
+        },
+        "opportunity": {
+          "sales": "Créer une opportunité « Open » avec une offre, prête à être gérée.",
+          "service": "Créer une opportunité « Open » avec un service, prête à être gérée."
+        }
+      },
+      "fields": {
+        "requestType": "Type de demande",
+        "channel": "Canal",
+        "source": "Source",
+        "sourceDetail": "Détail de la source",
+        "fiscalEntity": "Entité fiscale",
+        "dealership": "Concession",
+        "requestMessage": "Message de la demande",
+        "notesToSellers": "Notes aux vendeurs",
+        "service": "Service",
+        "price": "Prix",
+        "assigneesRelationshipOnly": "Afficher uniquement les responsables de la relation sélectionnée"
+      },
+      "placeholders": {
+        "select": "Sélectionner",
+        "selectType": "Choisir le type",
+        "selectAssignee": "Choisir un responsable",
+        "insert": "Saisir ici",
+        "message": "Saisir la demande client…",
+        "startTyping": "Commencez à saisir…",
+        "notes": "Notes pour l’équipe…",
+        "price": "0,00"
+      },
+      "options": {
+        "requestType": {
+          "expiring_financing": "Financement arrivant à échéance",
+          "expiring_guarantee": "Garantie arrivant à échéance",
+          "generic_aftersales": "Après-vente générique",
+          "spare_parts": "Pièces détachées",
+          "workshop": "Atelier",
+          "financing_early_payoff": "Rachat anticipé du financement",
+          "financing_expiration": "Fin d’échéance du financement",
+          "fleet": "Flotte",
+          "generic_sales": "Vente générique",
+          "livespark": "Livespark",
+          "long_term_rent": "Location longue durée",
+          "online_sales": "Vente en ligne",
+          "quotation": "Devis",
+          "sellspark": "Sellspark",
+          "short_term_rent": "Location courte durée",
+          "trade_in": "Reprise"
+        },
+        "channel": {
+          "automation": "Automatisation",
+          "email": "E-mail",
+          "integration": "Intégration",
+          "manual_import": "Import manuel",
+          "other": "Autre",
+          "phone": "Téléphone",
+          "walk_in": "Visite en showroom",
+          "whatsapp": "WhatsApp"
+        },
+        "source": {
+          "marketing": "Marketing",
+          "marketing_automation": "Automatisation marketing",
+          "other": "Autre",
+          "social": "Réseaux sociaux",
+          "third_parties": "Tiers",
+          "web": "Web"
+        },
+        "dealership": {
+          "milano": "Milan",
+          "firenze": "Florence",
+          "roma": "Rome",
+          "bari": "Bari",
+          "trento": "Trente"
+        }
+      },
+      "vehicle": {
+        "searchPlaceholder": "Rechercher en stock…",
+        "searchCustomerVehiclesPlaceholder": "Rechercher des véhicules...",
+        "searchHint": "Cliquez sur la barre ou utilisez le raccourci clavier.",
+        "searchModalTitle": "Recherche en stock",
+        "searchModalTitleCustomerVehicles": "Rechercher les véhicules clients",
+        "searchInStockPlaceholder": "Marque, modèle, VIN, plaque…",
+        "searchCustomerVehiclesModalPlaceholder": "Marque, modèle, VIN, plaque…",
+        "filterCustomersVehicles": "Véhicules clients",
+        "filterOwner": "Propriétaire",
+        "inventoryCustomerVehicles": "Véhicule client",
+        "noVehicles": "Aucun véhicule ne correspond à votre recherche.",
+        "sectionVehicleRequested": "Véhicule demandé",
+        "sectionVehicleInfo": "Informations véhicule",
+        "sectionOwnedVehicle": "Véhicule possédé",
+        "configure": "Configurer",
+        "insertManually": "Saisir manuellement",
+        "configurePlaceholder": "Les options de configuration seront disponibles dans une prochaine itération.",
+        "manualPlaceholder": "Les détails véhicule manuels pourront être ajoutés dans une prochaine itération.",
+        "manual": {
+          "fields": {
+            "vehicleClass": "Classe du véhicule",
+            "vehicleType": "Type de véhicule",
+            "brand": "Marque",
+            "model": "Modèle",
+            "version": "Version",
+            "fuelType": "Carburant",
+            "quantity": "Quantité",
+            "vehiclePrice": "Prix du véhicule"
+          },
+          "placeholders": {
+            "quantity": "1",
+            "selectBrand": "Sélectionner la marque",
+            "selectModel": "Sélectionner le modèle",
+            "selectBrandFirst": "Sélectionnez d’abord une marque"
+          }
+        }
+      },
+      "errors": {
+        "requestType": "Le type de demande est requis",
+        "channel": "Le canal est requis",
+        "source": "La source est requise",
+        "fiscalEntity": "L’entité fiscale est requise",
+        "dealership": "La concession est requise",
+        "assignee": "Un responsable est requis",
+        "serviceName": "Le service est requis",
+        "serviceDescription": "La description est requise",
+        "servicePrice": "Le prix est requis",
+        "vehicle": "Les informations sur le véhicule sont requises"
+      }
+    }
+  },
   "modals": {
     "addLead": "Ajouter Lead",
     "addOpportunity": "Ajouter Opportunité",

@@ -59,13 +59,14 @@
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex flex-wrap items-center gap-2 mb-1">
-              <span class="font-bold text-foreground text-sm">{{ carBrand }} {{ carModel }} ({{ carYear }})</span>
               <span
                 v-if="carCondition"
-                class="inline-flex px-2 py-0.5 rounded text-sm font-medium bg-muted text-muted-foreground"
+                class="inline-flex items-center justify-center rounded-md px-2 py-0.5 text-sm font-medium leading-5 text-foreground"
+                :class="carConditionBadgeClass"
               >
                 {{ carCondition }}
               </span>
+              <span class="font-bold text-foreground text-sm">{{ carBrand }} {{ carModel }} ({{ carYear }})</span>
             </div>
             <div class="flex items-center gap-2 flex-wrap">
               <div 
@@ -148,6 +149,7 @@ import { Badge, Button } from '@motork/component-library/future/primitives'
 import LeadOpportunityDetailsCard from '@/components/shared/LeadOpportunityDetailsCard.vue'
 import RequestMessageCard from '@/components/requests/RequestMessageCard.vue'
 import { getRequestAttributionProps } from '@/utils/requestAttribution'
+import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 import { getStageColor } from '@/utils/stageMapper'
 import { calculateDaysSince } from '@/utils/formatters'
 import { getLatestOffer } from '@/utils/activityHelpers'
@@ -205,17 +207,9 @@ const carMileage = computed(() => {
   return val !== undefined && val !== null ? val : null
 })
 
-// Condition (New/Km0/Used) - aligned with tasks table
-const carCondition = computed(() => {
-  const v = props.task.requestedCar
-  if (!v) return null
-  const status = v.status || ''
-  const km = v.kilometers ?? v.mileage
-  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'New') {
-    return (status && status.toLowerCase() === 'new') || km === 0 ? 'Km0' : 'New'
-  }
-  return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Used'
-})
+const carCondition = computed(() => getVehicleConditionLabel(props.task.requestedCar))
+
+const carConditionBadgeClass = computed(() => getVehicleConditionBadgeClass(carCondition.value))
 
 const carFuelType = computed(() => props.task.requestedCar?.fuelType || '')
 const carGearType = computed(() => props.task.requestedCar?.gearType || '')

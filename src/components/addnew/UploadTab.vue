@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full space-y-4">
+  <div class="w-full min-h-0 flex-1 space-y-4 overflow-y-auto overflow-x-hidden overscroll-contain [scrollbar-gutter:stable]">
     <!-- Source Selection -->
     <Card class="border-border">
       <CardHeader>

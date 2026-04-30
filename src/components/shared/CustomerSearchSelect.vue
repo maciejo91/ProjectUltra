@@ -77,6 +77,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { Search, ChevronRight, X } from 'lucide-vue-next'
 import { Button, Card, CardContent, Input, Label } from '@motork/component-library/future/primitives'
 import { useCustomersStore } from '@/stores/customers'
+import { dedupeCustomersForPicker } from '@/utils/dedupeCustomersForPicker'
 
 const props = defineProps({
   modelValue: { type: Object, default: null },
@@ -100,7 +101,7 @@ const sourceList = computed(() =>
 )
 
 const filteredOptions = computed(() => {
-  const list = sourceList.value
+  const list = dedupeCustomersForPicker(sourceList.value)
   if (!searchQuery.value.trim()) return list.slice(0, 10)
   const q = searchQuery.value.toLowerCase()
   return list

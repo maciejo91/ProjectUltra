@@ -1,6 +1,10 @@
 <template>
-  <div>
-    <UnifiedAddForm ref="formRef" @submit="$emit('submit', $event)" />
+  <div class="flex flex-1 flex-col min-h-0">
+    <UnifiedAddForm
+      ref="formRef"
+      class="min-h-0 w-full min-w-0 flex-1 flex flex-col"
+      @submit="$emit('submit', $event)"
+    />
   </div>
 </template>
 

@@ -122,6 +122,8 @@ const props = defineProps({
   requestedCarBrandOptions: { type: Array, default: () => [] },
   accountTypeOptions: { type: Array, default: () => [] },
   pagination: { type: Object, default: () => ({ pageIndex: 0, pageSize: 10 }) },
+  /** When set, keeps the input in sync with parent `globalFilter` (e.g. programmatic clear). */
+  globalFilter: { type: String, default: undefined },
 })
 
 const emit = defineEmits([
@@ -205,6 +207,18 @@ const rotationExamples = computed(() => {
   ]
 })
 
+watch(
+  () => props.globalFilter,
+  (v) => {
+    if (v === undefined) return
+    if (showAiOverlay.value) return
+    const next = v ?? ''
+    if (searchQuery.value !== next) {
+      searchQuery.value = next
+    }
+  },
+)
+
 const currentRotationExample = computed(() => {
   const list = rotationExamples.value
   if (!list.length) return ''
@@ -265,7 +279,13 @@ watch(
 )
 
 watch(searchQuery, (newValue) => {
-  emit('update:globalFilter', newValue)
+  if (!showAiOverlay.value) {
+    emit('update:globalFilter', newValue)
+  } else if (!newValue?.trim()) {
+    emit('update:globalFilter', '')
+    emit('update:columnFilters', [])
+    emit('update:pagination', { ...props.pagination, pageIndex: 0 })
+  }
 })
 
 watch(aiQuery, (val) => {

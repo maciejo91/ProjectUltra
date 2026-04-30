@@ -624,7 +624,7 @@
       <DialogPortal>
         <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
         <DialogContent
-          class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
+          class="w-[90vw] max-w-none max-h-[calc(100vh-4rem)] flex flex-col"
           :show-close-button="true"
         >
           <DialogHeader class="shrink-0">

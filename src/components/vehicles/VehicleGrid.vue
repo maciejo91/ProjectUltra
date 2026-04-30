@@ -1,5 +1,6 @@
 <template>
     <DataTable
+      v-if="enableRowSelection"
       :data="filteredVehicles"
       :columns="columns"
       :loading="loading"
@@ -28,10 +29,12 @@
       </template>
 
       <template #empty-state>
-        <div class="empty-state">
-          <Car class="empty-state-icon w-8 h-8 shrink-0" />
-          <p class="empty-state-text">No vehicles found</p>
-        </div>
+        <slot name="empty-state">
+          <div class="empty-state">
+            <Car class="empty-state-icon w-8 h-8 shrink-0" />
+            <p class="empty-state-text">No vehicles found</p>
+          </div>
+        </slot>
       </template>
       <template #batch-action-bar>
         <div v-if="hasSelection" class="flex items-center gap-2">
@@ -55,6 +58,44 @@
         </div>
       </template>
     </DataTable>
+
+    <DataTable
+      v-else
+      :data="filteredVehicles"
+      :columns="columns"
+      :loading="loading"
+      :meta="tableMeta"
+      @row-click="$emit('row-click', $event)"
+      :columnFiltersOptions="{
+        filterDefs: filterDefinitions
+      }"
+      v-model:pagination="paginationModel"
+      v-model:globalFilter="globalFilterModel"
+      v-model:sorting="sortingModel"
+      v-model:columnFilters="columnFiltersModel"
+      v-model:columnVisibility="columnVisibilityModel"
+      :paginationOptions="{
+        rowCount: rowCount ?? filteredVehicles.length
+      }"
+      :globalFilterOptions="{
+        debounce: 300,
+        show: true
+      }"
+      class="h-full"
+    >
+      <template #toolbar>
+        <slot name="toolbar" />
+      </template>
+
+      <template #empty-state>
+        <slot name="empty-state">
+          <div class="empty-state">
+            <Car class="empty-state-icon w-8 h-8 shrink-0" />
+            <p class="empty-state-text">No vehicles found</p>
+          </div>
+        </slot>
+      </template>
+    </DataTable>
 </template>
 
 <script setup>
@@ -66,6 +107,10 @@ import { useTableRowSelection } from '@/composables/useTableRowSelection'
 import { useVehiclesStore } from '@/stores/vehicles'
 
 const props = defineProps({
+  enableRowSelection: {
+    type: Boolean,
+    default: true
+  },
   filteredVehicles: {
     type: Array,
     required: true

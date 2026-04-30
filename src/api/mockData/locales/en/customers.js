@@ -970,6 +970,7 @@ export const mockCustomers = [
     description: 'Premium automotive dealership group specializing in luxury vehicles. Established 1995. Multiple locations across Italy. High-value corporate client with fleet purchasing capabilities.',
     notes: 'Corporate fleet buyer - prefers email communication. Requires detailed proposals with TCO analysis. Decision-making involves board approval process.',
     numberOfEmployees: 150,
+    isDealer: true,
     // Account-owned vehicles
     vehicles: [
       {
@@ -1196,6 +1197,7 @@ export const mockCustomers = [
     description: 'Technology consulting firm requiring executive fleet vehicles for client meetings and business travel.',
     notes: 'Fleet buyer - requires detailed proposals with TCO analysis. Decision involves procurement department.',
     numberOfEmployees: 75,
+    isDealer: false,
     vehicles: [
       {
         id: 'account-vehicle-3',

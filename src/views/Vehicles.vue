@@ -60,7 +60,12 @@ import RequestMainTabs from '@/components/requests/RequestMainTabs.vue'
 import VehicleGrid from '@/components/vehicles/VehicleGrid.vue'
 import AddOfferModal from '@/components/modals/AddOfferModal.vue'
 import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
-import { useDataTableData } from '@/composables/useDataTableData'
+import { getNestedProperty, useDataTableData } from '@/composables/useDataTableData'
+import {
+  normalizeVehicleInventoryType,
+  getInventoryTypeColumnFilters,
+  getVehicleInventoryTypeFilterValue,
+} from '@/utils/vehicleInventoryTable'
 
 const route = useRoute()
 const router = useRouter()
@@ -131,19 +136,15 @@ const globalFilter = ref('')
 const sorting = ref([])
 const selectedInventoryChip = ref('in-stock')
 
-function getInventoryTypeFilter(chip) {
-  return [{ id: 'inventoryType-1', field: 'inventoryType', value: chip, operator: 'eq', pinned: true }]
-}
-
 function replaceInventoryFilter(filters, chip) {
   const without = (Array.isArray(filters) ? filters : []).filter(
     f => (f.key || f.field || f.id) !== 'inventoryType'
   )
-  return [...getInventoryTypeFilter(chip), ...without]
+  return [...getInventoryTypeColumnFilters(chip), ...without]
 }
 
 const defaultColumnFilters = () => [
-  ...getInventoryTypeFilter(selectedInventoryChip.value),
+  ...getInventoryTypeColumnFilters(selectedInventoryChip.value),
   { id: 'status-1', field: 'status', value: '', operator: 'eq', pinned: true }
 ]
 const columnFilters = ref(defaultColumnFilters())
@@ -160,16 +161,16 @@ const columnVisibility = ref({
 
 // All vehicles with inventoryType for filtering (one merged table)
 const vehiclesWithType = computed(() =>
-  vehiclesStore.vehicles.map((v) => ({
+  (vehiclesStore.vehicles || []).map((v) => ({
     ...v,
-    inventoryType: v.inventoryType ?? (v.stockDays !== null && v.stockDays !== undefined ? 'in-stock' : 'customer-vehicles')
+    inventoryType: normalizeVehicleInventoryType(v),
   }))
 )
 
 const filterChips = computed(() => {
   const list = vehiclesWithType.value
-  const inStock = list.filter((v) => v.inventoryType === 'in-stock').length
-  const customerVehicles = list.filter((v) => v.inventoryType === 'customer-vehicles').length
+  const inStock = list.filter((v) => getVehicleInventoryTypeFilterValue(v) === 'in-stock').length
+  const customerVehicles = list.filter((v) => getVehicleInventoryTypeFilterValue(v) === 'customer-vehicles').length
   return [
     { key: 'in-stock', label: 'In stock', count: inStock },
     { key: 'customer-vehicles', label: "Customers' vehicles", count: customerVehicles }
@@ -566,6 +567,8 @@ const { paginatedData, totalFilteredCount } = useDataTableData({
   sorting,
   pagination,
   filterDefs: filterDefsRef,
+  getFilterValue: (row, key) =>
+    key === 'inventoryType' ? getVehicleInventoryTypeFilterValue(row) : getNestedProperty(row, key),
   searchableFields: (row) => [
     row.inventoryType,
     row.soldTo,

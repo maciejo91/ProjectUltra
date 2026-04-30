@@ -181,6 +181,8 @@
     "registrationDate": "Date d’immatriculation",
     "carLocation": "Localisation du véhicule",
     "mileage": "Kilométrage",
+    "ownership": "Propriété (nom du compte)",
+    "ownershipStartingDate": "Début de propriété",
     "interactions": "Interactions",
     "identity": "Identité",
     "stockInStock": "En stock",

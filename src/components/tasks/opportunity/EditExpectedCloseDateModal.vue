@@ -2,7 +2,7 @@
   <Dialog :open="show" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay />
-      <DialogContent class="flex flex-col max-h-screen w-full sm:max-w-md">
+      <DialogContent class="flex flex-col max-h-screen w-[90vw] max-w-none">
         <DialogHeader class="flex-shrink-0">
           <DialogTitle>Extend Expected Close Date</DialogTitle>
         </DialogHeader>

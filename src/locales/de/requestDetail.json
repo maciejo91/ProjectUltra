@@ -181,6 +181,8 @@
     "registrationDate": "Erstzulassung",
     "carLocation": "Standort Fahrzeug",
     "mileage": "Kilometerstand",
+    "ownership": "Halter (Accountname)",
+    "ownershipStartingDate": "Beginn Halterschaft",
     "interactions": "Interaktionen",
     "identity": "Identität",
     "stockInStock": "Auf Lager",

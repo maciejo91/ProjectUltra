@@ -15,7 +15,8 @@ export const mockVehicles = [
     dealership: 'Firenze',
     stockDays: 15,
     color: 'Blue',
-    requestedBy: ['Josh Adams']
+    requestedBy: ['Josh Adams'],
+    listingMetrics: { funnelViews: 6, tagCount: 21 }
   },
   {
     id: 2,
@@ -32,7 +33,8 @@ export const mockVehicles = [
     dealership: 'Berlin Mitte',
     stockDays: 42,
     color: 'Black',
-    requestedBy: ['Emma Watson']
+    requestedBy: ['Emma Watson'],
+    listingMetrics: { funnelViews: 12, tagCount: 8 }
   },
   {
     id: 3,
@@ -49,7 +51,8 @@ export const mockVehicles = [
     dealership: 'Firenze',
     stockDays: 412,
     color: 'Silver',
-    requestedBy: []
+    requestedBy: [],
+    listingMetrics: { funnelViews: 24, tagCount: 15 }
   },
   {
     id: 4,
@@ -66,7 +69,8 @@ export const mockVehicles = [
     dealership: 'Milano',
     stockDays: 8,
     color: 'Black',
-    requestedBy: []
+    requestedBy: [],
+    listingMetrics: { funnelViews: 3, tagCount: 5 }
   },
   {
     id: 5,
@@ -83,7 +87,8 @@ export const mockVehicles = [
     dealership: 'Roma',
     stockDays: 15,
     color: 'White',
-    requestedBy: []
+    requestedBy: [],
+    listingMetrics: { funnelViews: 9, tagCount: 11 }
   },
   {
     id: 6,
@@ -99,9 +104,10 @@ export const mockVehicles = [
     fuelType: 'Petrol',
     gearType: 'Automatic',
     dealership: 'Firenze',
-    inventoryType: 'sold',
+    inventoryType: 'customer-vehicles',
     soldAt: '2024-11-15',
-    soldTo: 'Marco Rossi'
+    soldTo: 'Josh Adams',
+    ownerContactId: 1,
   },
   {
     id: 7,

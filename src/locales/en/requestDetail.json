@@ -181,6 +181,8 @@
     "registrationDate": "Registration date",
     "carLocation": "Car location",
     "mileage": "Mileage",
+    "ownership": "Ownership (Account name)",
+    "ownershipStartingDate": "Ownership starting date",
     "interactions": "Interactions",
     "identity": "Identity",
     "stockInStock": "In stock",

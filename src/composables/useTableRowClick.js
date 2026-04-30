@@ -10,8 +10,10 @@
 export function useTableRowClick(dataRef, onRowClick) {
   function onTableContainerClick(e) {
     if (!onRowClick || !dataRef?.value?.length) return
+    // Motork DataTable uses role="button" widely (cells, wrappers). Treating it as interactive
+    // prevents row-click entirely. Only exclude true interactive controls.
     const interactive = e.target.closest(
-      'button, [role="button"], input[type="checkbox"], a, [data-slot="table-filter"]'
+      'button, input, select, textarea, a, [data-slot="table-filter"]'
     )
     if (interactive) return
     const tr = e.target.closest('tbody tr')

@@ -8,6 +8,7 @@
       <UnifiedSearchBar
         :active-tab="activeTab"
         :placeholder="placeholder"
+        :global-filter="globalFilter"
         :pagination="pagination"
         :assignee-options="assigneeOptions"
         :volvo-model-options="volvoModelOptions"
@@ -83,6 +84,7 @@ const props = defineProps({
   accountTypeOptions: { type: Array, default: () => [] },
   includeMarginBottom: { type: Boolean, default: true },
   sortMenuItems: { type: Array, default: () => [] },
+  globalFilter: { type: String, default: undefined },
 })
 
 const sorting = defineModel('sorting', { type: Array, default: () => [] })

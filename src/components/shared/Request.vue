@@ -65,7 +65,18 @@
                 <Car v-else class="w-8 h-8 shrink-0 text-muted-foreground" />
               </div>
               <div>
-                <div class="font-bold text-foreground text-base md:text-lg mb-2">{{ carBrand }} {{ carModel }} ({{ carYear }})</div>
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                  <div
+                    v-if="vehicleCondition"
+                    class="inline-flex items-center justify-center rounded-md px-2 py-0.5 text-sm font-semibold leading-5 text-foreground"
+                    :class="vehicleConditionBadgeClass"
+                  >
+                    {{ vehicleCondition }}
+                  </div>
+                  <div class="font-bold text-foreground text-base md:text-lg">
+                    {{ carBrand }} {{ carModel }} ({{ carYear }})
+                  </div>
+                </div>
                 <div class="flex items-center gap-2 flex-wrap">
                   <div 
                     v-if="stockDays !== undefined && stockDays !== null"
@@ -78,12 +89,6 @@
                     class="inline-flex items-center gap-1.5 px-2 py-1 bg-orange-50 text-orange-700 text-sm font-semibold rounded-md"
                   >
                     <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> Out of stock
-                  </div>
-                  <div
-                    v-if="vehicleCondition"
-                    class="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-sm font-semibold rounded-md"
-                  >
-                    {{ vehicleCondition }}
                   </div>
                   <div
                     v-if="vin"
@@ -198,6 +203,7 @@ import { Badge, Button, Card, CardHeader, CardContent } from '@motork/component-
 import LeadOpportunityDetailsCard from '@/components/shared/LeadOpportunityDetailsCard.vue'
 import { getDeliverySubstatusColor, getStageColor } from '@/utils/stageMapper'
 import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
+import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 import { calculateDaysSince } from '@/utils/formatters'
 import { getLatestOffer } from '@/utils/activityHelpers'
 
@@ -345,17 +351,11 @@ const vin = computed(() => {
   return props.requestedCar?.vin || ''
 })
 
-// Vehicle condition display (same logic as TasksTableView: Km0, New, or Used)
-const vehicleCondition = computed(() => {
-  const v = props.requestedCar
-  if (!v) return null
-  const status = v.status || ''
-  const km = v.kilometers
-  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'New') {
-    return (status && status.toLowerCase() === 'new') || km === 0 ? 'Km0' : 'New'
-  }
-  return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Used'
-})
+const vehicleCondition = computed(() => getVehicleConditionLabel(props.requestedCar))
+
+const vehicleConditionBadgeClass = computed(() =>
+  getVehicleConditionBadgeClass(vehicleCondition.value)
+)
 
 const showOpenAd = computed(() => {
   return true
