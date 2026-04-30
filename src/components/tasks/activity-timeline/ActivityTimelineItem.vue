@@ -8,32 +8,49 @@
     }"
     @click="onRowClick"
   >
-    <div class="flex items-center gap-3">
-      <div class="relative flex w-6 shrink-0 justify-center">
-        <ActivityTimelineIcon :activity="activity" />
-      </div>
-      <p class="min-w-0 flex-1 text-sm leading-snug wrap-break-word">
-        <span class="inline-flex min-w-0 flex-wrap items-baseline gap-x-1">
-          <span
-            :class="
-              systemHeadline ? 'font-normal text-muted-foreground' : 'font-medium text-foreground'
-            "
+    <div
+      class="flex min-w-0 items-center"
+      :class="isCommunicationActivity && !isInboundCommunication ? 'justify-end' : 'justify-start'"
+    >
+      <div :class="isCommunicationActivity ? 'w-full sm:w-2/3' : 'w-full'">
+        <div
+          class="flex min-w-0 items-center gap-3"
+          :class="isCommunicationActivity && !isInboundCommunication ? 'justify-end' : 'justify-start'"
+        >
+          <div class="relative flex w-6 shrink-0 justify-center">
+            <ActivityTimelineIcon :activity="activity" />
+          </div>
+          <p
+            class="min-w-0 text-sm leading-snug wrap-break-word"
+            :class="isCommunicationActivity && !isInboundCommunication ? 'text-right' : 'text-left'"
           >
-            {{ headlineParts.primary }}
-          </span>
-          <span v-if="headlineParts.secondary" class="font-normal text-muted-foreground">{{
-            headlineParts.secondary
-          }}</span>
-        </span>
-        <span v-if="timeLabel" class="text-xs font-normal tabular-nums text-muted-foreground">
-          · {{ timeLabel }}
-        </span>
-      </p>
+            <span class="inline-flex min-w-0 flex-wrap items-baseline gap-x-1">
+              <span
+                :class="
+                  systemHeadline ? 'font-normal text-muted-foreground' : 'font-medium text-foreground'
+                "
+              >
+                {{ headlineParts.primary }}
+              </span>
+              <span v-if="headlineParts.secondary" class="font-normal text-muted-foreground">{{
+                headlineParts.secondary
+              }}</span>
+            </span>
+            <span v-if="timeLabel" class="text-xs font-normal tabular-nums text-muted-foreground">
+              · {{ timeLabel }}
+            </span>
+          </p>
+        </div>
+      </div>
     </div>
 
-    <div v-if="showCard" class="ml-9 min-w-0">
+    <div
+      v-if="showCard"
+      class="ml-9 min-w-0"
+      :class="isCommunicationActivity && !isInboundCommunication ? 'flex justify-end' : ''"
+    >
       <template v-if="type === 'note' || type === 'ai-summary'">
-        <ActivityTimelineCard :accent="cardAccent">
+        <ActivityTimelineCard :accent="cardAccent" surface="background">
           <p class="text-sm leading-relaxed text-foreground wrap-break-word">
             {{ noteOrAiBody }}
           </p>
@@ -41,25 +58,38 @@
       </template>
 
       <template v-else-if="type === 'email' || type === 'customer-email'">
-        <ActivityTimelineCard :accent="cardAccent">
+        <ActivityTimelineCard
+          :accent="cardAccent"
+          :surface="isInboundCommunication ? 'muted' : 'background'"
+          class="w-full sm:w-2/3"
+        >
           <p
             v-if="metadataLine"
-            class="mb-2 text-xs leading-snug text-muted-foreground wrap-break-word"
+            class="mb-2 text-xs leading-snug text-muted-foreground wrap-break-word text-left"
           >
             {{ metadataLine }}
           </p>
-          <p class="text-sm leading-relaxed text-foreground wrap-break-word">
+          <p
+            class="text-sm leading-relaxed text-foreground wrap-break-word text-left"
+          >
             {{ activity.content }}
           </p>
-          <div v-if="type === 'customer-email'" class="mt-3 flex justify-start">
+          <div
+            v-if="type === 'customer-email' || (showThreadAction && threadId)"
+            class="mt-3 flex flex-wrap gap-2"
+          >
             <Button
+              v-if="showThreadAction && threadId"
               variant="outline"
               size="sm"
               class="rounded-sm"
-              @click.stop="emit('add-activity', 'email')"
+              @click.stop="emit('open-thread', { threadId, kind: threadKind })"
             >
-              <Reply class="size-3.5 shrink-0" />
-              {{ t('entities.activity.reply') }}
+              {{
+                threadKind === 'thread'
+                  ? t('entities.activity.timeline.viewThread', { count: threadCount })
+                  : t('entities.activity.timeline.viewConversation', { count: threadCount })
+              }}
             </Button>
           </div>
         </ActivityTimelineCard>
@@ -70,32 +100,45 @@
           type === 'whatsapp' || type === 'customer-whatsapp' || type === 'sms' || type === 'customer-sms'
         "
       >
-        <ActivityTimelineCard accent="messageGreen">
+        <ActivityTimelineCard
+          :accent="cardAccent"
+          :surface="isInboundCommunication ? 'muted' : 'background'"
+          class="w-full sm:w-2/3"
+        >
           <p
             v-if="metadataLine"
-            class="mb-2 text-xs leading-snug text-muted-foreground wrap-break-word"
+            class="mb-2 text-xs leading-snug text-muted-foreground wrap-break-word text-left"
           >
             {{ metadataLine }}
           </p>
-          <p class="text-sm leading-relaxed text-foreground wrap-break-word">
+          <p
+            class="text-sm leading-relaxed text-foreground wrap-break-word text-left"
+          >
             {{ activity.content }}
           </p>
-          <div v-if="type === 'customer-whatsapp'" class="mt-3 flex justify-start">
+          <div
+            v-if="type === 'customer-whatsapp' || (showThreadAction && threadId)"
+            class="mt-3 flex flex-wrap gap-2"
+          >
             <Button
+              v-if="showThreadAction && threadId"
               variant="outline"
               size="sm"
               class="rounded-sm"
-              @click.stop="emit('add-activity', 'whatsapp')"
+              @click.stop="emit('open-thread', { threadId, kind: threadKind })"
             >
-              <Reply class="size-3.5 shrink-0" />
-              {{ t('entities.activity.reply') }}
+              {{
+                threadKind === 'thread'
+                  ? t('entities.activity.timeline.viewThread', { count: threadCount })
+                  : t('entities.activity.timeline.viewConversation', { count: threadCount })
+              }}
             </Button>
           </div>
         </ActivityTimelineCard>
       </template>
 
       <template v-else-if="type === 'call'">
-        <ActivityTimelineCard accent="call">
+        <ActivityTimelineCard accent="call" :show-accent="false">
           <p class="text-sm leading-relaxed text-foreground wrap-break-word">
             {{ callSummary }}
           </p>
@@ -134,7 +177,6 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Button } from '@motork/component-library/future/primitives'
-import { Reply } from 'lucide-vue-next'
 import { formatTime } from '@/utils/formatters'
 import {
   buildActivityHeadlineParts,
@@ -154,6 +196,14 @@ const props = defineProps({
     type: Object,
     required: true
   },
+  allActivities: {
+    type: Array,
+    default: () => []
+  },
+  showThreadAction: {
+    type: Boolean,
+    default: true
+  },
   isLast: {
     type: Boolean,
     default: false
@@ -164,7 +214,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['activity-click', 'open-transcript', 'add-activity'])
+const emit = defineEmits(['activity-click', 'open-transcript', 'add-activity', 'open-thread'])
 
 const { t } = useI18n()
 
@@ -192,6 +242,27 @@ const metadataLine = computed(() => getActivityMetadataLine(props.activity, t))
 const callSummary = computed(() => getCallSummaryText(props.activity, t))
 
 const noteOrAiBody = computed(() => props.activity.message || props.activity.content || '')
+
+const isCommunicationActivity = computed(() =>
+  ['email', 'customer-email', 'whatsapp', 'customer-whatsapp', 'sms', 'customer-sms'].includes(type.value)
+)
+
+const isInboundCommunication = computed(() =>
+  ['customer-email', 'customer-whatsapp', 'customer-sms'].includes(type.value)
+)
+
+const threadId = computed(() => props.activity?.data?.threadId || props.activity?.threadId || null)
+
+const threadKind = computed(() => {
+  if (!threadId.value) return null
+  return ['email', 'customer-email'].includes(type.value) ? 'thread' : 'conversation'
+})
+
+const threadCount = computed(() => {
+  if (!threadId.value) return 0
+  const list = Array.isArray(props.allActivities) ? props.allActivities : []
+  return list.filter((a) => (a?.data?.threadId || a?.threadId) === threadId.value).length
+})
 
 const clickable = computed(() => isActivityClickable(props.activity))
 

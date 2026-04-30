@@ -6,20 +6,19 @@
       </h3>
     </div>
     <div class="relative">
-      <div
-        class="pointer-events-none absolute bottom-4 left-3 top-4 z-0 w-px -translate-x-1/2 bg-muted-foreground/35"
-        aria-hidden="true"
-      />
       <div class="relative z-10 flex flex-col">
         <ActivityTimelineItem
           v-for="(activity, index) in activities"
           :key="activity.id ?? `activity-${activity.timestamp ?? activity.createdAt ?? ''}`"
           :activity="activity"
+          :all-activities="activities"
+          :show-thread-action="showThreadAction"
           :is-last="index === activities.length - 1"
           :compact-bottom-spacing="pairwiseSystemCompact(activities, index)"
           @activity-click="(a) => emit('activity-click', a)"
           @open-transcript="(a) => emit('open-transcript', a)"
           @add-activity="(action) => emit('add-activity', action)"
+          @open-thread="(payload) => emit('open-thread', payload)"
         />
       </div>
     </div>
@@ -46,8 +45,12 @@ defineProps({
   dateLabel: {
     type: String,
     default: ''
+  },
+  showThreadAction: {
+    type: Boolean,
+    default: true
   }
 })
 
-const emit = defineEmits(['activity-click', 'open-transcript', 'add-activity'])
+const emit = defineEmits(['activity-click', 'open-transcript', 'add-activity', 'open-thread'])
 </script>

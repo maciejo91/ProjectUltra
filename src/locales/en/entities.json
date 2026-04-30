@@ -47,13 +47,15 @@
     "scheduleAppointment": "Schedule appointment",
     "pills": {
       "all": "All",
+      "interactions": "Interactions",
       "notes": "Notes",
       "calls": "Calls",
       "emails": "Emails",
       "tasks": "Tasks",
       "messages": "Messages",
       "system": "System",
-      "emptyFiltered": "No activities match this filter."
+      "emptyFilteredTitle": "No matching activities",
+      "emptyFilteredDescription": "Try another filter above, or select All to see every activity."
     },
     "timeline": {
       "you": "You",
@@ -83,7 +85,12 @@
       "today": "Today",
       "yesterday": "Yesterday",
       "recentActivity": "Recent activity",
-      "emptyState": "No activity yet"
+      "emptyState": "No activity yet",
+      "emptyStateDescription": "Notes, calls, messages, and other events will appear here as they happen.",
+      "viewThread": "View thread ({count})",
+      "threadTitle": "Thread",
+      "viewConversation": "View conversation ({count})",
+      "conversationTitle": "Conversation"
     }
   },
   "appointment": {

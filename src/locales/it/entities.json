@@ -47,13 +47,15 @@
     "scheduleAppointment": "Programma appuntamento",
     "pills": {
       "all": "Tutte",
+      "interactions": "Interazioni",
       "notes": "Note",
       "calls": "Chiamate",
       "emails": "Email",
       "tasks": "Attività",
       "messages": "Messaggi",
       "system": "Sistema",
-      "emptyFiltered": "Nessuna attività corrisponde a questo filtro."
+      "emptyFilteredTitle": "Nessuna attività corrispondente",
+      "emptyFilteredDescription": "Prova un altro filtro sopra oppure seleziona Tutte per vedere tutte le attività."
     },
     "timeline": {
       "you": "Tu",
@@ -83,7 +85,12 @@
       "today": "Oggi",
       "yesterday": "Ieri",
       "recentActivity": "Attività recente",
-      "emptyState": "Nessuna attività"
+      "emptyState": "Nessuna attività",
+      "emptyStateDescription": "Note, chiamate, messaggi e altri eventi compariranno qui.",
+      "viewThread": "Vedi thread ({count})",
+      "threadTitle": "Thread",
+      "viewConversation": "Vedi conversazione ({count})",
+      "conversationTitle": "Conversazione"
     }
   },
   "appointment": {

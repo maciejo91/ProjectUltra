@@ -25,6 +25,7 @@
     "addNewCustomer": "Aggiungi Nuovo Cliente",
     "marketing": "Marketing",
     "support": "Supporto",
+    "notifications": "Notifiche",
     "pbx": {
       "label": "PBX",
       "connected": "PBX connesso",
@@ -170,6 +171,109 @@
     "days": "giorni",
     "weeks": "settimane",
     "months": "mesi"
+  },
+  "notifications": {
+    "pageTitle": "Notifiche",
+    "subtitle": "Messaggi, update e stato del sistema",
+    "seeMore": "Vedi di più",
+    "markAllAsRead": "Segna tutto come letto",
+    "read": "Letto",
+    "sections": {
+      "unread": "Non letto",
+      "read": "Letto"
+    },
+    "emptyTitle": "Sei aggiornato",
+    "emptySubtitle": "Nessuna nuova notifica al momento.",
+    "items": {
+      "mention": {
+        "title": "Sei stato menzionato in un commento",
+        "body": "Apri la conversazione per vedere il contesto."
+      },
+      "whatsapp": {
+        "title": "Nuovo messaggio WhatsApp",
+        "body": "Un cliente ha inviato un messaggio su WhatsApp."
+      },
+      "email": {
+        "title": "Nuova email",
+        "body": "Hai ricevuto una nuova email da un cliente."
+      },
+      "update": {
+        "title": "Update del prodotto disponibile",
+        "body": "Nuovi miglioramenti sono pronti per la tua area di lavoro."
+      },
+      "system": {
+        "title": "Avviso sullo stato del sistema",
+        "body": "Tutti i servizi funzionano normalmente."
+      }
+    }
+  },
+  "settingsNotifications": {
+    "subtitle": "Abilita o disabilita ogni evento e scegli come riceverlo.",
+    "columns": {
+      "notification": "Notification"
+    },
+    "channels": {
+      "email": "E-mail",
+      "inApp": "In-app",
+      "mobileApp": "App mobile"
+    },
+    "toggleEmailAria": "Attiva/disattiva notifica e-mail",
+    "toggleInAppAria": "Attiva/disattiva notifica in-app",
+    "toggleMobileAppAria": "Attiva/disattiva notifica app mobile",
+    "infoAria": "Mostra dettagli notifica",
+    "groups": {
+      "leads": "Leads",
+      "integrations": "Integrazioni",
+      "opportunities": "Opportunities",
+      "tasks": "Tasks",
+      "contacts": "Contacts"
+    },
+    "items": {
+      "oemInstanceReceivedNewLead": {
+        "title": "OEM Instance - Received New Lead",
+        "description": "Triggered when a new lead is received."
+      },
+      "integrationUserSyncFailed": {
+        "title": "Integration - User Sync Failed",
+        "description": "Triggered when user sync fails for an integration."
+      },
+      "qualifiedLead": {
+        "title": "Qualified lead",
+        "description": "Triggered when a lead becomes qualified."
+      },
+      "opportunityAssigned": {
+        "title": "Opportunity assigned",
+        "description": "Triggered when an opportunity is assigned."
+      },
+      "opportunityEnteredPool": {
+        "title": "Opportunity entered pool",
+        "description": "Triggered when an opportunity enters the pool."
+      },
+      "opportunityReEnteredPool": {
+        "title": "Opportunity re entered pool",
+        "description": "Triggered when an opportunity re-enters the pool."
+      },
+      "taskAssigned": {
+        "title": "Task assigned",
+        "description": "Triggered when a task is assigned."
+      },
+      "taskDueDatePassed": {
+        "title": "Task due date passed",
+        "description": "Triggered when a task due date has passed."
+      },
+      "taskEnteredPool": {
+        "title": "Task entered pool",
+        "description": "Triggered when a task enters the pool."
+      },
+      "taskReEnteredPool": {
+        "title": "Task re entered pool",
+        "description": "Triggered when a task re-enters the pool."
+      },
+      "contactOnline": {
+        "title": "Contact online",
+        "description": "Triggered when a contact is online."
+      }
+    }
   },
   "common": {
     "loading": "Caricamento...",

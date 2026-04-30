@@ -53,9 +53,9 @@ export function getActivityIconKind(activity: ActivityRecord): ActivityTimelineI
   const type = activity.type
   if (type === 'note') return 'note'
   if (type === 'call') return 'call'
-  if (type === 'email') return 'email'
-  if (type === 'customer-email') return 'message'
-  if (type === 'whatsapp' || type === 'customer-whatsapp' || type === 'sms') return 'messageGreen'
+  if (type === 'email' || type === 'customer-email') return 'email'
+  if (type === 'whatsapp' || type === 'customer-whatsapp' || type === 'sms' || type === 'customer-sms')
+    return 'messageGreen'
   if (type === 'ai-summary') return 'ai'
   if (type === 'appointment') return 'appointment'
   if (
@@ -70,7 +70,6 @@ export function getActivityIconKind(activity: ActivityRecord): ActivityTimelineI
   ) {
     return 'system'
   }
-  if (type === 'customer-sms') return 'messageGreen'
   return 'file'
 }
 
@@ -217,7 +216,10 @@ export function shouldShowActivityCard(
   if (type === 'call') {
     const hasTranscript = linesForTranscript.length > 0
     const summary = (activity.data?.summary || activity.content || '').trim()
-    return hasTranscript || summary.length > 0
+    const headlineLike = (activity.message || activity.action || '').trim()
+    if (hasTranscript) return true
+    if (!summary) return false
+    return summary !== headlineLike
   }
   return false
 }

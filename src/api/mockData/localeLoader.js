@@ -22,6 +22,7 @@ import {
   mockSalespersonMetrics,
   mockManagerFunnelMetrics
 } from './dashboard.js'
+import { mockNotifications } from './notifications.js'
 
 // Import locale-specific data (English as default)
 import { mockLeads as enLeads } from './locales/en/leads.js'
@@ -117,6 +118,7 @@ export function getMockData() {
 
   return {
     mockUsers, // Users don't need localization
+    mockNotifications,
     mockCustomers,
     mockLeads: data.leads,
     mockOpportunities: data.opportunities,

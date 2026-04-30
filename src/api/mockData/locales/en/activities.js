@@ -358,6 +358,7 @@ export const mockActivities = [
     action: 'sent an email',
     content: 'Hi, I am interested in the Audi A6. Can we schedule a test drive?',
     data: {
+      threadId: 'lead-1-email',
       from: 'josh.adams@example.com',
       to: 'inbox@madrid.motork.io'
     },
@@ -380,6 +381,35 @@ export const mockActivities = [
     action: 'Lead was assigned to Sarah Jenkins',
     message: 'Lead was assigned to Sarah Jenkins',
     timestamp: createHourOffset(-71.5),
+    leadId: 1
+  },
+  // Lead 1 – inbound + outbound WhatsApp pair (shows left/right chat pattern)
+  {
+    id: 38,
+    type: 'customer-whatsapp',
+    user: 'Josh Adams',
+    action: 'sent a WhatsApp message',
+    content: 'Hi, I can do Wed after 16:00 or Thu morning. What works best for a test drive?',
+    data: {
+      threadId: 'lead-1-whatsapp',
+      fromPhone: '+34 600 555 0101',
+      toPhone: '+34 910 555 0199'
+    },
+    timestamp: createHourOffset(-1.8),
+    leadId: 1
+  },
+  {
+    id: 39,
+    type: 'whatsapp',
+    user: 'Sarah Jenkins',
+    action: 'sent a WhatsApp message',
+    content: 'Thu 11:00 is available. Shall I book the Audi A6 for you at 11:00 at Madrid showroom?',
+    data: {
+      threadId: 'lead-1-whatsapp',
+      fromPhone: '+34 910 555 0199',
+      toPhone: '+34 600 555 0101'
+    },
+    timestamp: createHourOffset(-1.6),
     leadId: 1
   }
 ]

@@ -34,6 +34,8 @@ export interface ActivityData {
   fromPhone?: string
   toPhone?: string
   contactName?: string
+  /** Optional thread identifier for grouping messages */
+  threadId?: string
 }
 
 export interface ActivityRecord {

@@ -14,66 +14,14 @@
       <Toggle
         variant="outline"
         class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
-        :model-value="selectedPill === 'notes'"
-        @update:model-value="(on) => onPillToggle('notes', on)"
+        :model-value="selectedPill === 'interactions'"
+        @update:model-value="(on) => onPillToggle('interactions', on)"
       >
-        <FileText class="size-4 shrink-0 text-muted-foreground" />
-        <span>{{ t('entities.activity.pills.notes') }}</span>
+        <MessagesSquare class="size-4 shrink-0 text-muted-foreground" />
+        <span>{{ t('entities.activity.pills.interactions') }}</span>
         <span
           class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
-          >{{ pillCounts.notes }}</span
-        >
-      </Toggle>
-      <Toggle
-        variant="outline"
-        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
-        :model-value="selectedPill === 'calls'"
-        @update:model-value="(on) => onPillToggle('calls', on)"
-      >
-        <Phone class="size-4 shrink-0 text-muted-foreground" />
-        <span>{{ t('entities.activity.pills.calls') }}</span>
-        <span
-          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
-          >{{ pillCounts.calls }}</span
-        >
-      </Toggle>
-      <Toggle
-        variant="outline"
-        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
-        :model-value="selectedPill === 'emails'"
-        @update:model-value="(on) => onPillToggle('emails', on)"
-      >
-        <Mail class="size-4 shrink-0 text-muted-foreground" />
-        <span>{{ t('entities.activity.pills.emails') }}</span>
-        <span
-          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
-          >{{ pillCounts.emails }}</span
-        >
-      </Toggle>
-      <Toggle
-        variant="outline"
-        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
-        :model-value="selectedPill === 'tasks'"
-        @update:model-value="(on) => onPillToggle('tasks', on)"
-      >
-        <CalendarCheck class="size-4 shrink-0 text-muted-foreground" />
-        <span>{{ t('entities.activity.pills.tasks') }}</span>
-        <span
-          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
-          >{{ pillCounts.tasks }}</span
-        >
-      </Toggle>
-      <Toggle
-        variant="outline"
-        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
-        :model-value="selectedPill === 'messages'"
-        @update:model-value="(on) => onPillToggle('messages', on)"
-      >
-        <MessageCircle class="size-4 shrink-0 text-muted-foreground" />
-        <span>{{ t('entities.activity.pills.messages') }}</span>
-        <span
-          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
-          >{{ pillCounts.messages }}</span
+          >{{ pillCounts.interactions }}</span
         >
       </Toggle>
       <Toggle
@@ -96,22 +44,24 @@
         v-if="sortedActivities.length > 0"
         :activities="sortedActivities"
         :date-label="getActivityTimelineDateLabel(sortedActivities, t)"
+        :show-thread-action="true"
         @activity-click="handleActivityClick"
         @open-transcript="openTranscriptDialog"
+        @open-thread="openThreadDialog"
         @add-activity="handleAddActivity"
       />
-      <div v-else-if="hasAnyActivities" class="flex flex-col justify-center py-10">
-        <div class="text-center">
-          <Filter class="mx-auto mb-2 size-8 text-muted-foreground/60" />
-          <p class="text-sm text-muted-foreground">{{ t('entities.activity.pills.emptyFiltered') }}</p>
-        </div>
-      </div>
-      <div v-else class="flex flex-col justify-center py-8">
-        <div class="text-center">
-          <Clock :size="32" class="mx-auto mb-2 text-muted-foreground" />
-          <p class="text-sm text-muted-foreground">{{ t('entities.activity.timeline.emptyState') }}</p>
-        </div>
-      </div>
+      <RequestTabEmptyState
+        v-else-if="hasAnyActivities"
+        :icon="Filter"
+        :title="t('entities.activity.pills.emptyFilteredTitle')"
+        :description="t('entities.activity.pills.emptyFilteredDescription')"
+      />
+      <RequestTabEmptyState
+        v-else
+        :icon="Clock"
+        :title="t('entities.activity.timeline.emptyState')"
+        :description="t('entities.activity.timeline.emptyStateDescription')"
+      />
     </div>
   </div>
 
@@ -145,18 +95,49 @@
       </DialogContent>
     </DialogPortal>
   </Dialog>
+
+  <Dialog
+    :open="!!threadDialogId"
+    @update:open="handleThreadDialogOpenChange"
+  >
+    <DialogPortal>
+      <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
+      <DialogContent
+        class="flex max-h-[calc(100vh-4rem)] w-full flex-col sm:max-w-2xl"
+        :show-close-button="true"
+      >
+        <DialogHeader class="shrink-0">
+          <DialogTitle>
+            {{
+              threadDialogKind === 'conversation'
+                ? t('entities.activity.timeline.conversationTitle')
+                : t('entities.activity.timeline.threadTitle')
+            }}
+          </DialogTitle>
+        </DialogHeader>
+        <div class="flex-1 w-full overflow-y-auto py-4">
+          <ActivityTimeline
+            v-if="threadDialogActivities.length > 0"
+            :activities="threadDialogActivities"
+            :date-label="''"
+            :show-thread-action="false"
+            @activity-click="handleActivityClick"
+            @open-transcript="openTranscriptDialog"
+            @add-activity="handleAddActivity"
+            @open-thread="() => {}"
+          />
+        </div>
+      </DialogContent>
+    </DialogPortal>
+  </Dialog>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { Toggle } from '@motork/component-library/future/primitives'
 import {
-  FileText,
-  Mail,
-  Phone,
+  MessagesSquare,
   Clock,
-  CalendarCheck,
-  MessageCircle,
   Info,
   Filter
 } from 'lucide-vue-next'
@@ -174,6 +155,7 @@ import {
   getCallTranscriptLines
 } from '@/composables/useActivityTimelinePresentation'
 import ActivityTimeline from '@/components/tasks/activity-timeline/ActivityTimeline.vue'
+import RequestTabEmptyState from '@/components/requests/RequestTabEmptyState.vue'
 
 const { t } = useI18n()
 
@@ -195,13 +177,33 @@ const props = defineProps({
 const emit = defineEmits(['activity-click', 'toggle-summary-expanded', 'add-activity', 'add-appointment'])
 
 const selectedPill = ref(
-  /** @type {'all' | 'notes' | 'calls' | 'emails' | 'tasks' | 'messages' | 'system'} */ ('all')
+  /** @type {'all' | 'interactions' | 'system'} */ ('all')
 )
 const transcriptDialogActivity = ref(null)
+const threadDialogId = ref(null)
+const threadDialogKind = ref(/** @type {null | 'thread' | 'conversation'} */ (null))
 
 const transcriptDialogLines = computed(() =>
   transcriptDialogActivity.value ? getCallTranscriptLines(transcriptDialogActivity.value) : []
 )
+
+function handleThreadDialogOpenChange(open) {
+  if (open) return
+  threadDialogId.value = null
+  threadDialogKind.value = null
+}
+
+const threadDialogActivities = computed(() => {
+  if (!threadDialogId.value) return []
+  return activityList.value
+    .filter((a) => (a?.data?.threadId || a?.threadId) === threadDialogId.value)
+    .slice()
+    .sort((a, b) => {
+      const timeA = new Date(a.timestamp || a.createdAt || 0).getTime()
+      const timeB = new Date(b.timestamp || b.createdAt || 0).getTime()
+      return timeB - timeA
+    })
+})
 
 const activityList = computed(() => (Array.isArray(props.activities) ? props.activities : []))
 
@@ -235,14 +237,8 @@ function getActivityFilterCategory(activity) {
 
 function activityMatchesPill(activity, pill) {
   if (pill === 'all') return true
-  if (pill === 'notes') return ['note', 'ai-summary'].includes(activity.type)
-  if (pill === 'calls') return activity.type === 'call'
-  if (pill === 'emails') return ['email', 'customer-email'].includes(activity.type)
-  if (pill === 'tasks') return activity.type === 'appointment'
-  if (pill === 'messages') {
-    return ['sms', 'customer-sms', 'whatsapp', 'customer-whatsapp'].includes(activity.type)
-  }
   if (pill === 'system') return getActivityFilterCategory(activity) === 'system-updates'
+  if (pill === 'interactions') return getActivityFilterCategory(activity) !== 'system-updates'
   return true
 }
 
@@ -250,13 +246,7 @@ const pillCounts = computed(() => {
   const list = activityList.value
   const count = (pred) => list.filter(pred).length
   return {
-    notes: count((a) => ['note', 'ai-summary'].includes(a.type)),
-    calls: count((a) => a.type === 'call'),
-    emails: count((a) => ['email', 'customer-email'].includes(a.type)),
-    tasks: count((a) => a.type === 'appointment'),
-    messages: count((a) =>
-      ['sms', 'customer-sms', 'whatsapp', 'customer-whatsapp'].includes(a.type)
-    ),
+    interactions: count((a) => getActivityFilterCategory(a) !== 'system-updates'),
     system: count((a) => getActivityFilterCategory(a) === 'system-updates')
   }
 })
@@ -283,6 +273,11 @@ const sortedActivities = computed(() => {
 
 function openTranscriptDialog(activity) {
   transcriptDialogActivity.value = activity
+}
+
+function openThreadDialog(payload) {
+  threadDialogId.value = payload?.threadId || null
+  threadDialogKind.value = payload?.kind || null
 }
 
 const handleActivityClick = (activity) => {

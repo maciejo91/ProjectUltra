@@ -3,6 +3,8 @@ import MainLayout from '@/components/layout/MainLayout.vue'
 import { useUserStore } from '@/stores/user'
 import { SETTINGS_PLACEHOLDER_ROUTE_ITEMS } from '@/constants/settingsNavRoutes'
 
+const SETTINGS_REAL_ROUTE_REL_PATHS = new Set(['operations/notifications'])
+
 const routes = [
   {
     path: '/',
@@ -94,6 +96,12 @@ const routes = [
         meta: { titleKey: 'common.navigation.marketing', showPageTitle: false }
       },
       {
+        path: 'notifications',
+        name: 'notifications',
+        component: () => import('@/views/Notifications.vue'),
+        meta: { titleKey: 'common.navigation.notifications', mutedPageChrome: true }
+      },
+      {
         path: 'settings',
         component: () => import('@/views/SettingsLayout.vue'),
         redirect: { name: SETTINGS_PLACEHOLDER_ROUTE_ITEMS[0].name },
@@ -112,7 +120,18 @@ const routes = [
             component: () => import('@/views/Settings.vue'),
             meta: { titleKey: 'common.navigation.settingsPrototype' }
           },
-          ...SETTINGS_PLACEHOLDER_ROUTE_ITEMS.map((r) => ({
+          {
+            path: 'operations/notifications',
+            name: 'settings-ops-notifications',
+            component: () => import('@/views/settings/SettingsNotifications.vue'),
+            meta: {
+              titleKey: 'common.navigation.settingsOpsNotifications',
+              mutedPageChrome: true
+            }
+          },
+          ...SETTINGS_PLACEHOLDER_ROUTE_ITEMS.filter(
+            (r) => !SETTINGS_REAL_ROUTE_REL_PATHS.has(r.relPath)
+          ).map((r) => ({
             path: r.relPath,
             name: r.name,
             component: () => import('@/views/settings/SettingsAdminPlaceholder.vue'),

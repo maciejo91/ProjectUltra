@@ -47,13 +47,15 @@
     "scheduleAppointment": "Afspraak plannen",
     "pills": {
       "all": "Alles",
+      "interactions": "Interacties",
       "notes": "Notities",
       "calls": "Gesprekken",
       "emails": "E-mails",
       "tasks": "Taken",
       "messages": "Berichten",
       "system": "Systeem",
-      "emptyFiltered": "Geen activiteiten komen overeen met dit filter."
+      "emptyFilteredTitle": "Geen overeenkomende activiteiten",
+      "emptyFilteredDescription": "Kies hierboven een ander filter of Alle om alle activiteiten te zien."
     },
     "timeline": {
       "you": "U",
@@ -83,7 +85,12 @@
       "today": "Vandaag",
       "yesterday": "Gisteren",
       "recentActivity": "Recente activiteit",
-      "emptyState": "Nog geen activiteit"
+      "emptyState": "Nog geen activiteit",
+      "emptyStateDescription": "Notities, oproepen, berichten en andere gebeurtenissen verschijnen hier.",
+      "viewThread": "Thread bekijken ({count})",
+      "threadTitle": "Thread",
+      "viewConversation": "Conversatie bekijken ({count})",
+      "conversationTitle": "Conversatie"
     }
   },
   "appointment": {

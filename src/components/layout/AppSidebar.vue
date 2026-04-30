@@ -101,6 +101,9 @@
                 </button>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarNotificationsPopover />
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
 
@@ -355,6 +358,7 @@ import {
 } from '@/constants/settingsNavRoutes'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
 import SidebarUserChrome from './SidebarUserChrome.vue'
+import SidebarNotificationsPopover from './SidebarNotificationsPopover.vue'
 import { useToastStore } from '@/stores/toast'
 
 const route = useRoute()
@@ -387,7 +391,7 @@ function expandSidebarFromIconMode() {
   else if (sidebarUiState.value === 'collapsed') setOpen(true)
 }
 
-const hasActionsGroup = computed(() => actionsVisibility.value.addNew || actionsVisibility.value.search)
+const hasActionsGroup = computed(() => true)
 
 function dataItemKey(item) {
   return item.href

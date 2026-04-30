@@ -13,6 +13,7 @@ const mockData = getMockData()
 
 export const {
   mockUsers,
+  mockNotifications,
   mockCustomers,
   mockLeads,
   mockOpportunities,
