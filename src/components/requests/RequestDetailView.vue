@@ -37,7 +37,7 @@
     />
 
     <NoteComposerDock
-      v-if="request?.type === 'lead' && Number(request?.id) === 4"
+      v-if="request?.type === 'lead'"
       :open="showSophieNoteComposer"
       :initial-from="userStore.currentUser?.email || ''"
       :initial-to="request?.customer?.email || ''"
@@ -67,7 +67,7 @@
     />
 
     <SMSComposerDock
-      v-if="request?.type === 'lead' && Number(request?.id) === 4"
+      v-if="request?.type === 'lead'"
       :open="showSophieSMSComposer"
       :initial-channel="sophieMessageChannel"
       :initial-from="userStore.currentUser?.phone || userStore.currentUser?.mobile || ''"
@@ -86,7 +86,7 @@
     />
 
     <EmailComposerDock
-      v-if="request?.type === 'lead' && Number(request?.id) === 4"
+      v-if="request?.type === 'lead'"
       :open="showSophieEmailComposer"
       :initial-from="userStore.currentUser?.email || ''"
       :initial-to="request?.customer?.email || ''"
@@ -309,9 +309,7 @@
                   <TaskActivityCard
                     v-if="showTimeline && request"
                     :activities="requestActivities"
-                    :timeline-variant="
-                      request?.type === 'lead' && Number(request?.id) === 4 ? 'sophieAnchored' : ''
-                    "
+                    :timeline-variant="request?.type === 'lead' ? 'sophieAnchored' : ''"
                     :expanded-summaries="activityExpandedSummaries"
                     @toggle-summary-expanded="handleActivitySummaryToggle"
                     @add-activity="handleTaskAddActivity"
@@ -1349,7 +1347,7 @@ function handleQuickAction(key) {
     return
   }
   if (key === 'email') {
-    if (props.request?.type === 'lead' && Number(props.request?.id) === 4) {
+    if (props.request?.type === 'lead') {
       showSophieEmailComposer.value = true
     } else {
       showEmailModal.value = true
@@ -1357,7 +1355,7 @@ function handleQuickAction(key) {
     return
   }
   if (key === 'sms') {
-    if (props.request?.type === 'lead' && Number(props.request?.id) === 4) {
+    if (props.request?.type === 'lead') {
       sophieMessageChannel.value = 'sms'
       showSophieSMSComposer.value = true
     } else {
@@ -1366,7 +1364,7 @@ function handleQuickAction(key) {
     return
   }
   if (key === 'whatsapp') {
-    if (props.request?.type === 'lead' && Number(props.request?.id) === 4) {
+    if (props.request?.type === 'lead') {
       sophieMessageChannel.value = 'whatsapp'
       showSophieSMSComposer.value = true
     } else {
@@ -1375,7 +1373,7 @@ function handleQuickAction(key) {
     return
   }
   if (key === 'note') {
-    if (props.request?.type === 'lead' && Number(props.request?.id) === 4) {
+    if (props.request?.type === 'lead') {
       showSophieNoteComposer.value = true
     } else {
       showNoteModal.value = true
@@ -1470,7 +1468,7 @@ function handleActivitySummaryToggle(activityId) {
 
 function handleTaskAddActivity(activityType) {
   if (activityType === 'note') {
-    if (props.request?.type === 'lead' && Number(props.request?.id) === 4) {
+    if (props.request?.type === 'lead') {
       showSophieNoteComposer.value = true
     } else {
       showNoteModal.value = true
@@ -1480,13 +1478,13 @@ function handleTaskAddActivity(activityType) {
   } else if (activityType === 'whatsapp') {
     showWhatsAppModal.value = true
   } else if (activityType === 'sms') {
-    if (props.request?.type === 'lead' && Number(props.request?.id) === 4) {
+    if (props.request?.type === 'lead') {
       showSophieSMSComposer.value = true
     } else {
       showSMSModal.value = true
     }
   } else if (activityType === 'email') {
-    if (props.request?.type === 'lead' && Number(props.request?.id) === 4) {
+    if (props.request?.type === 'lead') {
       showSophieEmailComposer.value = true
     } else {
       showEmailModal.value = true

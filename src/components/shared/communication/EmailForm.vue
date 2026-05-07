@@ -295,11 +295,11 @@ function emitDraftUpdate() {
 
 function syncComposerParticipants() {
   if (props.draft?.from) {
-    from.value = props.draft.from
+    from.value = String(props.draft.from || '').trim().replace(/@{2,}/g, '@')
     return
   }
-  const nextFrom = String(props.initialFrom || '').trim() || currentUser.value?.email || ''
-  from.value = nextFrom
+  const nextFromRaw = String(props.initialFrom || '').trim() || currentUser.value?.email || ''
+  from.value = String(nextFromRaw || '').trim().replace(/@{2,}/g, '@')
 }
 
 watch(

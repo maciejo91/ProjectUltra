@@ -12,7 +12,7 @@
     "template": "Template"
   },
   "placeholders": {
-    "from": "maciej@@motork.io",
+    "from": "Sender email",
     "to": "Add recipients",
     "cc": "Add Cc",
     "bcc": "Add Bcc",

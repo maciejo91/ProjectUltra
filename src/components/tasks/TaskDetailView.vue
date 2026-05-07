@@ -225,7 +225,7 @@
     />
 
     <NoteComposerDock
-      v-if="displayTask?.type === 'lead' && Number(displayTask?.id) === 4"
+      v-if="displayTask?.type === 'lead'"
       :open="showSophieNoteComposer"
       :initial-from="userStore.currentUser?.email || ''"
       :initial-to="displayTask?.customer?.email || ''"
@@ -255,7 +255,7 @@
     />
 
     <SMSComposerDock
-      v-if="displayTask?.type === 'lead' && Number(displayTask?.id) === 4"
+      v-if="displayTask?.type === 'lead'"
       :open="showSophieSMSComposer"
       :initial-channel="sophieMessageChannel"
       :initial-from="userStore.currentUser?.phone || userStore.currentUser?.mobile || ''"
@@ -274,7 +274,7 @@
     />
 
     <EmailComposerDock
-      v-if="displayTask?.type === 'lead' && Number(displayTask?.id) === 4"
+      v-if="displayTask?.type === 'lead'"
       :open="showSophieEmailComposer"
       :initial-from="userStore.currentUser?.email || ''"
       :initial-to="displayTask?.customer?.email || ''"
@@ -689,7 +689,7 @@ function openFinancingEdit(f) {
 // Handle add activity from TaskActivityCard
 const handleAddActivity = (activityType) => {
   if (activityType === 'note') {
-    if (displayTask.value?.type === 'lead' && Number(displayTask.value?.id) === 4) {
+    if (displayTask.value?.type === 'lead') {
       showSophieNoteComposer.value = true
     } else {
       showNoteModal.value = true
@@ -697,21 +697,21 @@ const handleAddActivity = (activityType) => {
   } else if (activityType === 'attachment') {
     showAttachmentModal.value = true
   } else if (activityType === 'whatsapp') {
-    if (displayTask.value?.type === 'lead' && Number(displayTask.value?.id) === 4) {
+    if (displayTask.value?.type === 'lead') {
       sophieMessageChannel.value = 'whatsapp'
       showSophieSMSComposer.value = true
     } else {
       showWhatsAppModal.value = true
     }
   } else if (activityType === 'sms') {
-    if (displayTask.value?.type === 'lead' && Number(displayTask.value?.id) === 4) {
+    if (displayTask.value?.type === 'lead') {
       sophieMessageChannel.value = 'sms'
       showSophieSMSComposer.value = true
     } else {
       showSMSModal.value = true
     }
   } else if (activityType === 'email') {
-    if (displayTask.value?.type === 'lead' && Number(displayTask.value?.id) === 4) {
+    if (displayTask.value?.type === 'lead') {
       showSophieEmailComposer.value = true
     } else {
       showEmailModal.value = true

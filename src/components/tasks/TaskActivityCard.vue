@@ -108,6 +108,7 @@
             v-if="threadDialogActivities.length > 0"
             :activities="threadDialogActivities"
             :date-label="''"
+            :timeline-variant="timelineVariant"
             :show-thread-action="false"
             @activity-click="handleActivityClick"
             @open-transcript="openTranscriptDialog"

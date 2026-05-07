@@ -217,7 +217,7 @@
       <div class="hidden h-full min-h-0 w-80 shrink-0 flex-col overflow-y-auto border-l border-border lg:flex">
         <TaskActivityCard
           :activities="allActivities"
-          :timeline-variant="type === 'lead' && Number(task?.id) === 4 ? 'sophieAnchored' : ''"
+          :timeline-variant="type === 'lead' ? 'sophieAnchored' : ''"
           :expanded-summaries="expandedSummaries"
           @activity-click="handleActivityClick"
           @toggle-summary-expanded="toggleSummaryExpanded"
@@ -565,7 +565,7 @@
     />
 
     <NoteComposerDock
-      v-if="type === 'lead' && Number(task?.id) === 4"
+      v-if="type === 'lead'"
       :open="showSophieNoteComposer"
       :initial-from="userStore.currentUser?.email || ''"
       :initial-to="task?.customer?.email || ''"
@@ -595,7 +595,7 @@
     />
 
     <SMSComposerDock
-      v-if="type === 'lead' && Number(task?.id) === 4"
+      v-if="type === 'lead'"
       :open="showSophieSMSComposer"
       :initial-channel="sophieMessageChannel"
       :initial-from="userStore.currentUser?.phone || userStore.currentUser?.mobile || ''"
@@ -615,7 +615,7 @@
     />
 
     <EmailComposerDock
-      v-if="type === 'lead' && Number(task?.id) === 4"
+      v-if="type === 'lead'"
       :open="showSophieEmailComposer"
       :initial-from="userStore.currentUser?.email || ''"
       :initial-to="task?.customer?.email || ''"
@@ -1365,7 +1365,7 @@ const handleContactInfoAction = (action) => {
   
   // Open modals for activity types
   if (action === 'note') {
-    if (props.type === 'lead' && Number(props.task?.id) === 4) {
+    if (props.type === 'lead') {
       showSophieNoteComposer.value = true
     } else {
       showNoteModal.value = true
@@ -1377,7 +1377,7 @@ const handleContactInfoAction = (action) => {
     return
   }
   if (action === 'whatsapp') {
-    if (props.type === 'lead' && Number(props.task?.id) === 4) {
+    if (props.type === 'lead') {
       sophieMessageChannel.value = 'whatsapp'
       showSophieSMSComposer.value = true
     } else {
@@ -1386,7 +1386,7 @@ const handleContactInfoAction = (action) => {
     return
   }
   if (action === 'sms') {
-    if (props.type === 'lead' && Number(props.task?.id) === 4) {
+    if (props.type === 'lead') {
       sophieMessageChannel.value = 'sms'
       showSophieSMSComposer.value = true
     } else {
@@ -1395,7 +1395,7 @@ const handleContactInfoAction = (action) => {
     return
   }
   if (action === 'email') {
-    if (props.type === 'lead' && Number(props.task?.id) === 4) {
+    if (props.type === 'lead') {
       showSophieEmailComposer.value = true
     } else {
       showEmailModal.value = true
