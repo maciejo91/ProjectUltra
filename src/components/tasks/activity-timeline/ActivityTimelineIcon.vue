@@ -12,7 +12,7 @@
 import { computed } from 'vue'
 import {
   StickyNote,
-  PhoneOutgoing,
+  Phone,
   Mail,
   MessageCircle,
   Sparkles,
@@ -36,7 +36,9 @@ const icon = computed(() => {
     case 'note':
       return StickyNote
     case 'call':
-      return PhoneOutgoing
+      return Phone
+    case 'callMissed':
+      return Phone
     case 'email':
       return Mail
     case 'message':
@@ -57,13 +59,15 @@ const icon = computed(() => {
 const badgeClass = computed(() => {
   switch (kind.value) {
     case 'note':
-      return 'bg-orange-50'
+      return 'bg-amber-50'
     case 'call':
-      return 'bg-green-50'
+      return 'bg-blue-50/60'
+    case 'callMissed':
+      return 'bg-blue-50/60'
     case 'email':
-      return 'bg-blue-50'
+      return 'bg-purple-50'
     case 'message':
-      return 'bg-blue-50'
+      return 'bg-green-50'
     case 'messageGreen':
       return 'bg-green-50'
     case 'ai':
@@ -80,13 +84,15 @@ const badgeClass = computed(() => {
 const iconClass = computed(() => {
   switch (kind.value) {
     case 'note':
-      return 'text-orange-600'
+      return 'text-amber-700'
     case 'call':
-      return 'text-green-600'
+      return 'text-blue-600'
+    case 'callMissed':
+      return 'text-blue-600'
     case 'email':
-      return 'text-blue-600'
+      return 'text-purple-600'
     case 'message':
-      return 'text-blue-600'
+      return 'text-green-600'
     case 'messageGreen':
       return 'text-green-600'
     case 'ai':

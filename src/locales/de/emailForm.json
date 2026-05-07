@@ -1,5 +1,27 @@
 {
+  "actions": {
+    "cancel": "Abbrechen",
+    "send": "Senden"
+  },
+  "fields": {
+    "from": "Von",
+    "to": "An",
+    "cc": "Cc",
+    "bcc": "Bcc",
+    "subject": "Betreff",
+    "template": "Vorlage"
+  },
+  "placeholders": {
+    "from": "email@unternehmen.com",
+    "to": "Empfänger hinzufügen",
+    "cc": "Cc hinzufügen",
+    "bcc": "Bcc hinzufügen",
+    "subject": "E-Mail-Betreff…",
+    "message": "Nachricht schreiben…",
+    "template": "Vorlage auswählen…"
+  },
   "attach": {
+    "addButton": "Anhänge hinzufügen",
     "label": "Datei anhängen",
     "hint": "Max. 25 MB gesamt pro Versand.",
     "browseOrDrop": "Durchsuchen oder Dateien ablegen",
@@ -8,5 +30,14 @@
     "fileFallback": "Datei",
     "removeAria": "Anhang entfernen",
     "errorMaxSize": "Die Gesamtgröße der Anhänge darf 25 MB nicht überschreiten."
+  },
+  "composer": {
+    "title": "Neue E-Mail",
+    "aria": {
+      "minimize": "Editor minimieren",
+      "restore": "Editor wiederherstellen",
+      "expand": "Editor im Dialog öffnen",
+      "close": "Editor schließen"
+    }
   }
 }

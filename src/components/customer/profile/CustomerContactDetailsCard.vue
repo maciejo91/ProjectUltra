@@ -43,7 +43,15 @@
         <span class="shrink-0 text-muted-foreground">{{ row.label }}</span>
         <div class="flex min-w-0 flex-1 justify-end text-right font-medium text-foreground">
           <template v-if="row.key === 'email'">
-            <a v-if="email" :href="`mailto:${email}`" class="hover:underline">{{ email }}</a>
+            <button
+              v-if="email"
+              type="button"
+              class="min-w-0 truncate text-right font-medium text-foreground hover:underline"
+              :aria-label="t('customerProfile.details.email')"
+              @click="openEmailComposer"
+            >
+              {{ email }}
+            </button>
             <span v-else>—</span>
           </template>
           <template v-else-if="row.key === 'phone'">
@@ -126,6 +134,15 @@
         </DialogPortal>
       </Dialog>
 
+      <AddEmailModal
+        :show="showEmailModal"
+        :initial-from="userStore.currentUser?.email || ''"
+        :initial-to="email"
+        :recipient-customer-id="props.customer?.id ?? null"
+        @save="handleEmailSaved"
+        @close="showEmailModal = false"
+      />
+
       <div v-if="showOtherInteractionsBlock" class="flex flex-col gap-1.5 border-t border-border pt-2">
         <Button
           type="button"
@@ -183,9 +200,11 @@ import {
 import { useToastStore } from '@/stores/toast'
 import { useRequestNavigationStore } from '@/stores/requestNavigation'
 import { useUserStore } from '@/stores/user'
+import { useUsersStore } from '@/stores/users'
 import ContactHistoryGroupedList from '@/components/shared/ContactHistoryGroupedList.vue'
 import CallInterface from '@/components/tasks/lead/CallInterface.vue'
 import CallForm from '@/components/shared/communication/CallForm.vue'
+import AddEmailModal from '@/components/modals/AddEmailModal.vue'
 import { useLQWidgetCall } from '@/composables/useLQWidgetCall'
 
 const props = defineProps({
@@ -205,10 +224,12 @@ const router = useRouter()
 const toastStore = useToastStore()
 const requestNavigationStore = useRequestNavigationStore()
 const userStore = useUserStore()
+const usersStore = useUsersStore()
 
 const showCallPanel = ref(false)
 const callActionsOpen = ref(false)
 const logCallDialogOpen = ref(false)
+const showEmailModal = ref(false)
 const assignedPersonName = computed(() => userStore.currentUser?.name ?? '')
 
 const callState = useLQWidgetCall()
@@ -234,32 +255,59 @@ function interactionSortTime(raw) {
   return t1 ? new Date(t1).getTime() : 0
 }
 
+function getAssigneeDisplay(assigneeName, original) {
+  if (!assigneeName) return 'Unassigned'
+  const user = usersStore.users.find((u) => u.name === assigneeName)
+  if (!user) return assigneeName
+  const line2 = [user.team, user.dealership].filter(Boolean).join(' - ')
+  if (line2) return `${assigneeName} (${line2})`
+  const fallbackLine2 = [original?.assigneeTeam, original?.assigneeDealership].filter(Boolean).join(' - ')
+  return fallbackLine2 ? `${assigneeName} (${fallbackLine2})` : assigneeName
+}
+
+function buildVehicleLine(original, fallbackTitle) {
+  const r = original || {}
+  const car = r.requestedCar || r.vehicle || {}
+  const vehicleTitle =
+    [car.brand, car.model].filter(Boolean).join(' ') ||
+    (typeof fallbackTitle === 'string' ? fallbackTitle : '') ||
+    '—'
+  const year = car.year != null && car.year !== '' ? String(car.year) : ''
+  const dealership = car.dealership || r.dealership || ''
+  const assignee = getAssigneeDisplay(r.assignee, r)
+  return [vehicleTitle, year, dealership, assignee].filter(Boolean).join(' · ')
+}
+
 const otherInteractionRows = computed(() => {
   const rows = []
   ;(props.leads || []).forEach((l) => {
+    const fallbackTitle = l.requestedCar
+      ? `${l.requestedCar.brand} ${l.requestedCar.model}`
+      : t('customerProfile.rightColumn.fallbackLeadTitle')
     rows.push({
       id: l.id,
       type: 'lead',
       compositeId: `lead-${l.id}`,
       stage: l.stage || 'Open',
-      title: l.requestedCar
-        ? `${l.requestedCar.brand} ${l.requestedCar.model}`
-        : t('customerProfile.rightColumn.fallbackLeadTitle'),
+      title: fallbackTitle,
       subtitle: l.requestedCar?.year ? String(l.requestedCar.year) : '',
+      displayLine: buildVehicleLine(l, fallbackTitle),
       sortTime: interactionSortTime(l),
       customer: l.customer || l
     })
   })
   ;(props.opportunities || []).forEach((o) => {
+    const fallbackTitle = o.requestedCar
+      ? `${o.requestedCar.brand} ${o.requestedCar.model}`
+      : t('customerProfile.rightColumn.fallbackOpportunityTitle')
     rows.push({
       id: o.id,
       type: 'opportunity',
       compositeId: `opportunity-${o.id}`,
       stage: o.stage || 'Open',
-      title: o.requestedCar
-        ? `${o.requestedCar.brand} ${o.requestedCar.model}`
-        : t('customerProfile.rightColumn.fallbackOpportunityTitle'),
+      title: fallbackTitle,
       subtitle: o.requestedCar?.year ? String(o.requestedCar.year) : '',
+      displayLine: buildVehicleLine(o, fallbackTitle),
       sortTime: interactionSortTime(o),
       customer: o.customer || o
     })
@@ -272,6 +320,7 @@ const otherInteractionRows = computed(() => {
       stage: s.stage || 'Open',
       title: s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
       subtitle: (s.subtitle && String(s.subtitle).trim()) || '',
+      displayLine: s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
       sortTime: interactionSortTime(s),
       customer: props.customer || null
     })
@@ -376,6 +425,16 @@ async function copyPhone() {
   } catch {
     toastStore.pushToast('error', t('customerProfile.details.phoneCopyFailed'))
   }
+}
+
+function openEmailComposer() {
+  if (!email.value) return
+  showEmailModal.value = true
+}
+
+function handleEmailSaved() {
+  showEmailModal.value = false
+  toastStore.pushToast('success', t('emailForm.actions.send'))
 }
 
 function openCallWidget() {

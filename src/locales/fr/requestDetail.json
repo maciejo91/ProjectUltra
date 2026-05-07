@@ -43,10 +43,14 @@
     "tradeIns": "Reprises",
     "purchaseMethod": "Mode d’achat",
     "financingTradeIns": "Détails d’achat",
+    "insights": "Insights",
     "attachments": "Pièces jointes",
     "tasks": "Tâches",
     "activity": "Activité",
     "timeline": "Timeline"
+  },
+  "insights": {
+    "empty": "Aucun insight disponible pour le moment."
   },
   "insight": {
     "highPaidStock": "Ce lead provient d’une source payante importante et concerne un véhicule en stock depuis {days} jours."

@@ -3,8 +3,8 @@
   <Dialog v-if="modal" :open="show" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="w-[90vw] max-w-none max-h-[calc(100vh-4rem)] flex flex-col">
-        <DialogHeader class="flex-shrink-0">
+      <DialogContent class="w-full sm:max-w-lg max-h-[calc(100vh-4rem)] flex flex-col">
+        <DialogHeader class="shrink-0">
           <DialogTitle>{{ item ? 'Edit Attachment' : 'Add Attachment' }}</DialogTitle>
         </DialogHeader>
 
@@ -34,7 +34,7 @@
           </div>
         </div>
 
-        <DialogFooter class="flex-shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
+        <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
           <Button
             label="Cancel"
             variant="outline"
@@ -46,7 +46,7 @@
             :label="saving ? 'Saving...' : (item ? 'Update Attachment' : 'Save Attachment')"
             variant="primary"
             size="small"
-            class="rounded-sm w-full sm:w-auto !bg-brand-red !hover:bg-brand-red-dark !text-white !border-brand-red"
+            class="rounded-sm w-full sm:w-auto bg-brand-red! hover:bg-brand-red-dark! text-white! border-brand-red!"
             :disabled="!selectedFile || saving"
             @click="handleSave"
           />

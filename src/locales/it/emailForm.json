@@ -1,5 +1,27 @@
 {
+  "actions": {
+    "cancel": "Annulla",
+    "send": "Invia"
+  },
+  "fields": {
+    "from": "Da",
+    "to": "A",
+    "cc": "Cc",
+    "bcc": "Ccn",
+    "subject": "Oggetto",
+    "template": "Modello"
+  },
+  "placeholders": {
+    "from": "email@azienda.com",
+    "to": "Aggiungi destinatari",
+    "cc": "Aggiungi Cc",
+    "bcc": "Aggiungi Ccn",
+    "subject": "Oggetto dell’email…",
+    "message": "Scrivi il tuo messaggio…",
+    "template": "Seleziona un modello…"
+  },
   "attach": {
+    "addButton": "Aggiungi allegati",
     "label": "Allega file",
     "hint": "Massimo 25 MB totali per invio.",
     "browseOrDrop": "Sfoglia o trascina i file",
@@ -8,5 +30,14 @@
     "fileFallback": "File",
     "removeAria": "Rimuovi allegato",
     "errorMaxSize": "La dimensione totale degli allegati non deve superare 25 MB."
+  },
+  "composer": {
+    "title": "Nuova email",
+    "aria": {
+      "minimize": "Riduci il compositore",
+      "restore": "Ripristina il compositore",
+      "expand": "Apri il compositore in una finestra di dialogo",
+      "close": "Chiudi il compositore"
+    }
   }
 }

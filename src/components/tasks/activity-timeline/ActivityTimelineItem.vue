@@ -1,28 +1,33 @@
 <template>
   <div
-    class="flex flex-col gap-3"
+    class="flex flex-col gap-2"
     :class="{
       'cursor-pointer transition-opacity hover:opacity-90': clickable,
-      'mb-2': !isLast && compactBottomSpacing,
-      'mb-8': !isLast && !compactBottomSpacing
+      'border-b border-border': showRowSeparator,
+      'py-2': !isLast && compactBottomSpacing,
+      'py-4': !isLast && !compactBottomSpacing,
+      'gap-1': isSophieCondensedCommunication
     }"
     @click="onRowClick"
   >
-    <div
+      <div
       class="flex min-w-0 items-center"
-      :class="isCommunicationActivity && !isInboundCommunication ? 'justify-end' : 'justify-start'"
+      :class="isRightAlignedEffective ? 'justify-end' : 'justify-start'"
     >
-      <div :class="isCommunicationActivity ? 'w-full sm:w-2/3' : 'w-full'">
+      <div :class="isCommunicationActivity || isCallActivity ? 'w-full sm:w-2/3' : 'w-full'">
         <div
           class="flex min-w-0 items-center gap-3"
-          :class="isCommunicationActivity && !isInboundCommunication ? 'justify-end' : 'justify-start'"
+          :class="isRightAlignedEffective ? 'justify-end' : 'justify-start'"
         >
           <div class="relative flex w-6 shrink-0 justify-center">
             <ActivityTimelineIcon :activity="activity" />
           </div>
           <p
             class="min-w-0 text-sm leading-snug wrap-break-word"
-            :class="isCommunicationActivity && !isInboundCommunication ? 'text-right' : 'text-left'"
+            :class="[
+              isRightAlignedEffective ? 'text-right' : 'text-left',
+              ''
+            ]"
           >
             <span class="inline-flex min-w-0 flex-wrap items-baseline gap-x-1">
               <span
@@ -32,9 +37,37 @@
               >
                 {{ headlineParts.primary }}
               </span>
-              <span v-if="headlineParts.secondary" class="font-normal text-muted-foreground">{{
-                headlineParts.secondary
-              }}</span>
+              <template v-if="type === 'call'">
+                <span class="inline-flex flex-wrap items-center gap-1.5">
+                  <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
+                    {{ t('entities.activity.timeline.callPills.outbound') }}
+                  </span>
+                  <span
+                    v-if="callStatusPill.label"
+                    class="rounded-full px-2 py-0.5 text-xs font-medium"
+                    :class="callStatusPill.className"
+                  >
+                    {{ callStatusPill.label }}
+                  </span>
+                </span>
+              </template>
+              <template v-else-if="showMessagePills">
+                <span class="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
+                  <component
+                    :is="isInboundCommunication ? ArrowDownLeft : ArrowUpRight"
+                    class="size-3 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  {{ communicationChannelPillLabel }}
+                </span>
+              </template>
+              <span
+                v-else-if="headlineParts.secondary"
+                class="font-normal"
+                :class="secondaryToneClass"
+              >
+                {{ headlineParts.secondary }}
+              </span>
             </span>
             <span v-if="timeLabel" class="text-xs font-normal tabular-nums text-muted-foreground">
               · {{ timeLabel }}
@@ -47,10 +80,30 @@
     <div
       v-if="showCard"
       class="ml-9 min-w-0"
-      :class="isCommunicationActivity && !isInboundCommunication ? 'flex justify-end' : ''"
+      :class="[
+        isRightAlignedEffective ? 'flex justify-end' : '',
+        outboundCardShiftClass,
+        isSophieCondensedCommunication ? 'mt-1' : ''
+      ]"
     >
-      <template v-if="type === 'note' || type === 'ai-summary'">
-        <ActivityTimelineCard :accent="cardAccent" surface="background">
+      <template v-if="type === 'note'">
+        <ActivityTimelineCard
+          :accent="cardAccent"
+          surface="background"
+          class="border-transparent bg-amber-50"
+        >
+          <p class="text-sm leading-relaxed text-foreground wrap-break-word">
+            {{ noteOrAiBody }}
+          </p>
+        </ActivityTimelineCard>
+      </template>
+
+      <template v-else-if="type === 'ai-summary'">
+        <ActivityTimelineCard
+          :accent="cardAccent"
+          surface="background"
+          class="border-foreground/12"
+        >
           <p class="text-sm leading-relaxed text-foreground wrap-break-word">
             {{ noteOrAiBody }}
           </p>
@@ -60,36 +113,45 @@
       <template v-else-if="type === 'email' || type === 'customer-email'">
         <ActivityTimelineCard
           :accent="cardAccent"
-          :surface="isInboundCommunication ? 'muted' : 'background'"
+          :surface="isInboundCommunication ? 'background' : 'muted'"
+          :show-accent="!(isSophieAnchoredVariant && !isInboundCommunication)"
+          :class="[
+            isSophieAnchoredVariant && !isInboundCommunication
+              ? 'border-transparent bg-muted shadow-none py-3 pl-3 pr-3'
+              : isInboundCommunication
+                ? isSophieAnchoredVariant
+                  ? 'border-foreground/5 shadow-mk-dashboard-card'
+                  : 'border-foreground/12'
+                : 'border-transparent',
+            !(isSophieAnchoredVariant && !isInboundCommunication) && isSophieCondensedCommunication ? 'py-2' : ''
+          ]"
           class="w-full sm:w-2/3"
         >
           <p
-            v-if="metadataLine"
-            class="mb-2 text-xs leading-snug text-muted-foreground wrap-break-word text-left"
-          >
-            {{ metadataLine }}
-          </p>
-          <p
-            class="text-sm leading-relaxed text-foreground wrap-break-word text-left"
+            class="text-sm leading-relaxed wrap-break-word text-left"
+            :class="isSophieAnchoredVariant && !isInboundCommunication ? 'text-muted-foreground' : 'text-foreground'"
           >
             {{ activity.content }}
           </p>
           <div
             v-if="type === 'customer-email' || (showThreadAction && threadId)"
-            class="mt-3 flex flex-wrap gap-2"
+            class="flex flex-wrap gap-2"
+            :class="isSophieCondensedCommunication ? 'mt-2' : 'mt-3'"
           >
             <Button
               v-if="showThreadAction && threadId"
-              variant="outline"
+              variant="link"
               size="sm"
-              class="rounded-sm"
+              class="h-auto gap-2 px-0 py-0 font-medium text-primary"
               @click.stop="emit('open-thread', { threadId, kind: threadKind })"
             >
-              {{
-                threadKind === 'thread'
-                  ? t('entities.activity.timeline.viewThread', { count: threadCount })
-                  : t('entities.activity.timeline.viewConversation', { count: threadCount })
-              }}
+              <span>
+                {{
+                  threadKind === 'thread'
+                    ? t('entities.activity.timeline.viewThreadShort')
+                    : t('entities.activity.timeline.viewConversationShort')
+                }}
+              </span>
             </Button>
           </div>
         </ActivityTimelineCard>
@@ -102,36 +164,45 @@
       >
         <ActivityTimelineCard
           :accent="cardAccent"
-          :surface="isInboundCommunication ? 'muted' : 'background'"
+          :surface="isInboundCommunication ? 'background' : 'muted'"
+          :show-accent="!(isSophieAnchoredVariant && !isInboundCommunication)"
+          :class="[
+            isSophieAnchoredVariant && !isInboundCommunication
+              ? 'border-transparent bg-muted shadow-none py-3 pl-3 pr-3'
+              : isInboundCommunication
+                ? isSophieAnchoredVariant
+                  ? 'border-foreground/5 shadow-mk-dashboard-card'
+                  : 'border-foreground/12'
+                : 'border-transparent',
+            !(isSophieAnchoredVariant && !isInboundCommunication) && isSophieCondensedCommunication ? 'py-2' : ''
+          ]"
           class="w-full sm:w-2/3"
         >
           <p
-            v-if="metadataLine"
-            class="mb-2 text-xs leading-snug text-muted-foreground wrap-break-word text-left"
-          >
-            {{ metadataLine }}
-          </p>
-          <p
-            class="text-sm leading-relaxed text-foreground wrap-break-word text-left"
+            class="text-sm leading-relaxed wrap-break-word text-left"
+            :class="isSophieAnchoredVariant && !isInboundCommunication ? 'text-muted-foreground' : 'text-foreground'"
           >
             {{ activity.content }}
           </p>
           <div
             v-if="type === 'customer-whatsapp' || (showThreadAction && threadId)"
-            class="mt-3 flex flex-wrap gap-2"
+            class="flex flex-wrap gap-2"
+            :class="isSophieCondensedCommunication ? 'mt-2' : 'mt-3'"
           >
             <Button
               v-if="showThreadAction && threadId"
-              variant="outline"
+              variant="link"
               size="sm"
-              class="rounded-sm"
+              class="h-auto gap-2 px-0 py-0 font-medium text-primary"
               @click.stop="emit('open-thread', { threadId, kind: threadKind })"
             >
-              {{
-                threadKind === 'thread'
-                  ? t('entities.activity.timeline.viewThread', { count: threadCount })
-                  : t('entities.activity.timeline.viewConversation', { count: threadCount })
-              }}
+              <span>
+                {{
+                  threadKind === 'thread'
+                    ? t('entities.activity.timeline.viewThreadShort')
+                    : t('entities.activity.timeline.viewConversationShort')
+                }}
+              </span>
             </Button>
           </div>
         </ActivityTimelineCard>
@@ -176,17 +247,18 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { ArrowDownLeft, ArrowUpRight } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
 import { formatTime } from '@/utils/formatters'
 import {
   buildActivityHeadlineParts,
   isActivityTimelineSystemHeadline,
   getActivityCardAccent,
-  getActivityMetadataLine,
   getCallSummaryText,
   getCallTranscriptLines,
   isActivityClickable,
-  shouldShowActivityCard
+  shouldShowActivityCard,
+  getActivityIconKind
 } from '@/composables/useActivityTimelinePresentation'
 import ActivityTimelineIcon from './ActivityTimelineIcon.vue'
 import ActivityTimelineCard from './ActivityTimelineCard.vue'
@@ -199,6 +271,10 @@ const props = defineProps({
   allActivities: {
     type: Array,
     default: () => []
+  },
+  timelineVariant: {
+    type: String,
+    default: ''
   },
   showThreadAction: {
     type: Boolean,
@@ -228,16 +304,37 @@ const timeLabel = computed(() => {
 })
 
 const headlineParts = computed(() => buildActivityHeadlineParts(props.activity, t))
+const secondaryToneClass = computed(() => {
+  const secondary = headlineParts.value.secondary || ''
+  if (type.value !== 'call') return 'text-muted-foreground'
+  const v = secondary.toLowerCase()
+  if (v.includes('no answer')) return 'text-destructive'
+  if (v.includes('answered')) return 'text-emerald-700'
+  return 'text-muted-foreground'
+})
+const iconKind = computed(() => getActivityIconKind(props.activity))
 
 const systemHeadline = computed(() => isActivityTimelineSystemHeadline(props.activity))
+
+const callStatusPill = computed(() => {
+  const raw = (props.activity?.message || props.activity?.content || props.activity?.data?.summary || '').toLowerCase()
+  if (raw.includes('no answer')) {
+    return { label: t('entities.activity.timeline.callPills.noAnswer'), className: 'bg-destructive/15 text-destructive' }
+  }
+  if (raw.includes('answered')) {
+    const original = String(props.activity?.message || props.activity?.content || props.activity?.data?.summary || '')
+    const durationMatch =
+      original.match(/(\d+\s*m\s*\d+\s*s|\d+\s*s|\d+:\d{2})/i)?.[1] ?? ''
+    return { label: durationMatch.trim(), className: 'bg-muted text-muted-foreground' }
+  }
+  return { label: '', className: '' }
+})
 
 const transcriptLines = computed(() => getCallTranscriptLines(props.activity))
 
 const showCard = computed(() => shouldShowActivityCard(props.activity, transcriptLines.value))
 
 const cardAccent = computed(() => getActivityCardAccent(props.activity))
-
-const metadataLine = computed(() => getActivityMetadataLine(props.activity, t))
 
 const callSummary = computed(() => getCallSummaryText(props.activity, t))
 
@@ -250,6 +347,65 @@ const isCommunicationActivity = computed(() =>
 const isInboundCommunication = computed(() =>
   ['customer-email', 'customer-whatsapp', 'customer-sms'].includes(type.value)
 )
+
+const isCallActivity = computed(() => type.value === 'call')
+
+const isInboundCall = computed(() => {
+  const a = props.activity
+  const explicit = String(a?.data?.direction || '').toLowerCase()
+  if (explicit === 'inbound') return true
+  if (explicit === 'outbound') return false
+  const action = `${a?.action ?? ''} ${a?.message ?? ''} ${a?.content ?? ''}`.toLowerCase()
+  if (action.includes('inbound')) return true
+  return false
+})
+
+const isRightAligned = computed(() => {
+  if (isCommunicationActivity.value) return !isInboundCommunication.value
+  if (isCallActivity.value) return !isInboundCall.value
+  return false
+})
+
+const isSophieAnchoredVariant = computed(() => props.timelineVariant === 'sophieAnchored')
+
+const isRightAlignedEffective = computed(() => {
+  if (isSophieAnchoredVariant.value) return false
+  return isRightAligned.value
+})
+
+const showRowSeparator = computed(() => {
+  if (isSophieAnchoredVariant.value) return false
+  return !props.isLast && !(systemHeadline.value && props.compactBottomSpacing)
+})
+
+const isOutboundCommunication = computed(() => {
+  if (!isCommunicationActivity.value) return false
+  return !isInboundCommunication.value
+})
+
+const outboundCardShiftClass = computed(() => {
+  if (!isSophieAnchoredVariant.value) return ''
+  if (!isOutboundCommunication.value) return ''
+  return 'translate-x-6'
+})
+
+const showMessagePills = computed(() => {
+  if (!isSophieAnchoredVariant.value) return false
+  return isCommunicationActivity.value
+})
+
+const isSophieCondensedCommunication = computed(() => {
+  if (!isSophieAnchoredVariant.value) return false
+  return isCommunicationActivity.value
+})
+
+const communicationChannelPillLabel = computed(() => {
+  if (!isCommunicationActivity.value) return ''
+  if (['email', 'customer-email'].includes(type.value)) return t('entities.activity.timeline.channels.email')
+  if (['sms', 'customer-sms'].includes(type.value)) return t('entities.activity.timeline.channels.sms')
+  if (['whatsapp', 'customer-whatsapp'].includes(type.value)) return t('entities.activity.timeline.channels.whatsapp')
+  return ''
+})
 
 const threadId = computed(() => props.activity?.data?.threadId || props.activity?.threadId || null)
 

@@ -3,15 +3,14 @@
     <!-- Template Selection -->
     <div class="space-y-2">
       <Label class="form-label">Template</Label>
-      <Select v-model="selectedTemplate" @update:model-value="onTemplateChange">
-        <SelectTrigger class="w-full h-10">
+      <Select :model-value="selectedTemplate" @update:model-value="selectTemplate">
+        <SelectTrigger class="w-full">
           <SelectValue placeholder="Select a template..." />
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="Follow-up">Follow-up</SelectItem>
-          <SelectItem value="Meeting Confirmation">Meeting Confirmation</SelectItem>
-          <SelectItem value="Quote Proposal">Quote Proposal</SelectItem>
-          <SelectItem value="Unable to Reach">Unable to Reach</SelectItem>
+        <SelectContent align="start">
+          <SelectItem v-for="template in templates" :key="template" :value="template">
+            {{ template }}
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>
@@ -49,10 +48,10 @@ import {
   Textarea,
   Label,
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
-  SelectItem
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@motork/component-library/future/primitives'
 
 const props = defineProps({
@@ -82,10 +81,24 @@ const templateContent = {
   'Unable to Reach': 'I tried reaching you but wasn\'t able to connect. Please let me know a good time to call you back, or feel free to reach out at your convenience.'
 }
 
-const onTemplateChange = () => {
-  if (selectedTemplate.value && templateContent[selectedTemplate.value]) {
-    message.value = templateContent[selectedTemplate.value]
+const templates = Object.keys(templateContent)
+
+const onTemplateChange = (nextTemplate) => {
+  if (typeof nextTemplate === 'string') selectedTemplate.value = nextTemplate
+  const key = selectedTemplate.value
+  if (key && templateContent[key]) {
+    message.value = templateContent[key]
   }
+}
+
+watch(selectedTemplate, (next) => {
+  if (!next) return
+  const content = templateContent[next]
+  if (content) message.value = content
+})
+
+function selectTemplate(nextTemplate) {
+  onTemplateChange(nextTemplate)
 }
 
 function canSubmit() {

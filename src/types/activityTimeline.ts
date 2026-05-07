@@ -60,6 +60,7 @@ export type ActivityTimelineCardAccent =
   | 'note'
   | 'message'
   | 'messageGreen'
+  | 'email'
   | 'call'
   | 'ai'
   | 'appointment'
@@ -73,6 +74,7 @@ export interface ActivityTimelineHeadlineParts {
 export type ActivityTimelineIconKind =
   | 'note'
   | 'call'
+  | 'callMissed'
   | 'email'
   | 'message'
   | 'messageGreen'

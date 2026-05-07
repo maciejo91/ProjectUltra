@@ -13,7 +13,6 @@
     </div>
   </div>
   
-  <!-- Actual Content -->
   <div v-else>
     <DataTableWithUnifiedSearch
       active-tab="reports"

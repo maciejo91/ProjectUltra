@@ -1,5 +1,27 @@
 {
+  "actions": {
+    "cancel": "Cancel",
+    "send": "Send"
+  },
+  "fields": {
+    "from": "From",
+    "to": "To",
+    "cc": "Cc",
+    "bcc": "Bcc",
+    "subject": "Subject",
+    "template": "Template"
+  },
+  "placeholders": {
+    "from": "email@company.com",
+    "to": "Add recipients",
+    "cc": "Add Cc",
+    "bcc": "Add Bcc",
+    "subject": "Email subject…",
+    "message": "Write your message…",
+    "template": "Select a template…"
+  },
   "attach": {
+    "addButton": "Add attachments",
     "label": "Attach File",
     "hint": "Max 25 MB total per send.",
     "browseOrDrop": "Browse or drop files",
@@ -8,5 +30,14 @@
     "fileFallback": "File",
     "removeAria": "Remove attachment",
     "errorMaxSize": "Total attachment size must not exceed 25 MB."
+  },
+  "composer": {
+    "title": "New email",
+    "aria": {
+      "minimize": "Minimize composer",
+      "restore": "Restore composer",
+      "expand": "Open composer in dialog",
+      "close": "Close composer"
+    }
   }
 }

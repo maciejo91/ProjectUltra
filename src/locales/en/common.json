@@ -133,7 +133,17 @@
     "lightMode": "Light Mode",
     "darkMode": "Dark Mode",
     "newContact": "New Contact",
-    "newVehicle": "New Vehicle"
+    "newVehicle": "New Vehicle",
+    "newSms": "New SMS",
+    "newWhatsApp": "New WhatsApp",
+    "newNote": "New note",
+    "template": "Template",
+    "selectTemplate": "Select a template…",
+    "message": "Message",
+    "typeSms": "Type your SMS message here…",
+    "smsFromPlaceholder": "Your phone number",
+    "smsToPlaceholder": "Add phone number",
+    "smsCharacters": "{count}/160 characters"
   },
   "status": {
     "hot": "Hot",

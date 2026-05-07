@@ -133,7 +133,17 @@
     "lightMode": "Lichte Modus",
     "darkMode": "Donkere Modus",
     "newContact": "Nieuw contact",
-    "newVehicle": "Nieuw voertuig"
+    "newVehicle": "Nieuw voertuig",
+    "newSms": "Nieuwe SMS",
+    "newWhatsApp": "Nieuwe WhatsApp",
+    "newNote": "Nieuwe notitie",
+    "template": "Sjabloon",
+    "selectTemplate": "Selecteer een sjabloon…",
+    "message": "Bericht",
+    "typeSms": "Typ hier je SMS…",
+    "smsFromPlaceholder": "Jouw telefoonnummer",
+    "smsToPlaceholder": "Telefoonnummer toevoegen",
+    "smsCharacters": "{count}/160 tekens"
   },
   "status": {
     "hot": "Hot",

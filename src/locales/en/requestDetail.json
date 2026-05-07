@@ -43,10 +43,14 @@
     "tradeIns": "Trade-ins",
     "purchaseMethod": "Purchase method",
     "financingTradeIns": "Purchase details",
+    "insights": "Insights",
     "attachments": "Attachments",
     "tasks": "Tasks",
     "activity": "Activity",
     "timeline": "Timeline"
+  },
+  "insights": {
+    "empty": "No insights available yet."
   },
   "insight": {
     "highPaidStock": "This lead comes from a highly paid source and is interested in a car that has been in stock for {days} days."

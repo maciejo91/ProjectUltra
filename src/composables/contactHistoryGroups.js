@@ -1,16 +1,22 @@
-const GROUP_ORDER = ['lead', 'opportunity', 'service']
+const GROUP_ORDER = ['sales', 'service']
 
 export function buildContactHistoryGroups(rows) {
   const list = Array.isArray(rows) ? rows : []
-  const byType = { lead: [], opportunity: [], service: [] }
+  const byType = { sales: [], service: [] }
+  const salesLeads = []
+  const salesOpps = []
   for (const r of list) {
-    const t =
-      r.type === 'lead' ? 'lead' : r.type === 'service' ? 'service' : 'opportunity'
-    byType[t].push(r)
+    if (r?.type === 'service') {
+      byType.service.push(r)
+      continue
+    }
+    if (r?.type === 'lead') salesLeads.push(r)
+    else salesOpps.push(r)
   }
-  for (const key of GROUP_ORDER) {
-    byType[key].sort((a, b) => (b.sortTime || 0) - (a.sortTime || 0))
-  }
+  salesLeads.sort((a, b) => (b.sortTime || 0) - (a.sortTime || 0))
+  salesOpps.sort((a, b) => (b.sortTime || 0) - (a.sortTime || 0))
+  byType.sales = [...salesLeads, ...salesOpps]
+  byType.service.sort((a, b) => (b.sortTime || 0) - (a.sortTime || 0))
   return GROUP_ORDER.map((key) => ({ key, items: byType[key] })).filter(
     (g) => g.items.length > 0
   )

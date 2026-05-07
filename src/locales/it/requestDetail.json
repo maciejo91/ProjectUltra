@@ -43,10 +43,14 @@
     "tradeIns": "Permute",
     "purchaseMethod": "Metodo di acquisto",
     "financingTradeIns": "Dettagli acquisto",
+    "insights": "Insights",
     "attachments": "Allegati",
     "tasks": "Attività",
     "activity": "Attività",
     "timeline": "Timeline"
+  },
+  "insights": {
+    "empty": "Nessun insight disponibile al momento."
   },
   "insight": {
     "highPaidStock": "Questo lead proviene da una fonte a pagamento elevata ed è interessato a un'auto in stock da {days} giorni."

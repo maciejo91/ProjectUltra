@@ -43,10 +43,14 @@
     "tradeIns": "Inzahlungnahmen",
     "purchaseMethod": "Kaufmethode",
     "financingTradeIns": "Kaufdetails",
+    "insights": "Insights",
     "attachments": "Anhänge",
     "tasks": "Aufgaben",
     "activity": "Aktivität",
     "timeline": "Timeline"
+  },
+  "insights": {
+    "empty": "Noch keine Insights verfügbar."
   },
   "insight": {
     "highPaidStock": "Dieser Lead stammt aus einer stark bezahlten Quelle und interessiert sich für ein Fahrzeug, das seit {days} Tagen auf Lager ist."

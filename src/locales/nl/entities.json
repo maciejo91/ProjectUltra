@@ -88,9 +88,25 @@
       "emptyState": "Nog geen activiteit",
       "emptyStateDescription": "Notities, oproepen, berichten en andere gebeurtenissen verschijnen hier.",
       "viewThread": "Thread bekijken ({count})",
+      "viewThreadShort": "Thread bekijken",
       "threadTitle": "Thread",
       "viewConversation": "Conversatie bekijken ({count})",
-      "conversationTitle": "Conversatie"
+      "viewConversationShort": "Conversatie bekijken",
+      "conversationTitle": "Conversatie",
+      "callPills": {
+        "outbound": "Outbound call",
+        "noAnswer": "No answer",
+        "answered": "Answered"
+      },
+      "messagePills": {
+        "outbound": "Outbound message",
+        "inbound": "Inbound message / email"
+      },
+      "channels": {
+        "email": "Email",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp"
+      }
     }
   },
   "appointment": {

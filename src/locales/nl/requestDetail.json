@@ -43,10 +43,14 @@
     "tradeIns": "Inruil",
     "purchaseMethod": "Aankoopmethode",
     "financingTradeIns": "Aankoopdetails",
+    "insights": "Insights",
     "attachments": "Bijlagen",
     "tasks": "Taken",
     "activity": "Activiteit",
     "timeline": "Timeline"
+  },
+  "insights": {
+    "empty": "Nog geen insights beschikbaar."
   },
   "insight": {
     "highPaidStock": "Deze lead komt uit een betalende bron met hoge kosten en gaat over een auto die al {days} dagen op voorraad is."

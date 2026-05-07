@@ -22,14 +22,21 @@
         </div>
 
         <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <Badge variant="secondary" :class="item.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'">
+          <div class="flex items-center gap-2 min-w-0">
+            <Badge
+              variant="secondary"
+              class="shrink-0"
+              :class="item.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'"
+            >
               {{ item.type === 'lead' ? 'Lead' : 'Opportunity' }}
             </Badge>
-            <Badge variant="secondary" :class="getStatusClass(item.status)">{{ item.status }}</Badge>
+            <Badge variant="secondary" class="shrink-0" :class="getStatusClass(item.status)">
+              {{ item.status }}
+            </Badge>
+            <p class="min-w-0 flex-1 truncate text-sm text-foreground">
+              {{ item.displayLine }}
+            </p>
           </div>
-          <h4 class="font-medium text-foreground truncate">{{ item.title }}</h4>
-          <div class="text-sm text-muted-foreground mt-1">{{ item.subtitle }}</div>
         </div>
       </div>
     </div>
@@ -42,6 +49,7 @@ import { Badge } from '@motork/component-library/future/primitives'
 import RequestMainTabs from '@/components/requests/RequestMainTabs.vue'
 import { Car } from 'lucide-vue-next'
 import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
+import { useUsersStore } from '@/stores/users'
 
 const FILTER_LEADS = 'leads'
 const FILTER_OPPORTUNITIES = 'opportunities'
@@ -54,6 +62,30 @@ const props = defineProps({
 defineEmits(['click'])
 
 const selectedFilter = ref(FILTER_OPPORTUNITIES)
+const usersStore = useUsersStore()
+
+function getAssigneeDisplay(assigneeName, original) {
+  if (!assigneeName) return 'Unassigned'
+  const user = usersStore.users.find((u) => u.name === assigneeName)
+  if (!user) return assigneeName
+  const line2 = [user.team, user.dealership].filter(Boolean).join(' - ')
+  if (line2) return `${assigneeName} (${line2})`
+  const fallbackLine2 = [original?.assigneeTeam, original?.assigneeDealership].filter(Boolean).join(' - ')
+  return fallbackLine2 ? `${assigneeName} (${fallbackLine2})` : assigneeName
+}
+
+function buildVehicleLine(original, fallbackTitle) {
+  const r = original || {}
+  const car = r.requestedCar || r.vehicle || {}
+  const vehicleTitle =
+    [car.brand, car.model].filter(Boolean).join(' ') ||
+    (typeof fallbackTitle === 'string' ? fallbackTitle : '') ||
+    '—'
+  const year = car.year != null && car.year !== '' ? String(car.year) : ''
+  const dealership = car.dealership || r.dealership || ''
+  const assignee = getAssigneeDisplay(r.assignee, r)
+  return [vehicleTitle, year, dealership, assignee].filter(Boolean).join(' · ')
+}
 
 const allItems = computed(() => {
   const list = []
@@ -66,6 +98,7 @@ const allItems = computed(() => {
       title: l.requestedCar ? `${l.requestedCar.brand} ${l.requestedCar.model}` : 'New Lead',
       subtitle: l.requestedCar?.year || '',
       image: l.requestedCar?.image || (l.requestedCar ? DEFAULT_CAR_IMAGE : null),
+      displayLine: buildVehicleLine(l, l.requestedCar ? `${l.requestedCar.brand} ${l.requestedCar.model}` : 'New Lead'),
       original: l
     })
   })
@@ -78,6 +111,7 @@ const allItems = computed(() => {
       title: o.requestedCar ? `${o.requestedCar.brand} ${o.requestedCar.model}` : 'Opportunity',
       subtitle: o.requestedCar?.year || '',
       image: o.requestedCar?.image || (o.requestedCar ? DEFAULT_CAR_IMAGE : null),
+      displayLine: buildVehicleLine(o, o.requestedCar ? `${o.requestedCar.brand} ${o.requestedCar.model}` : 'Opportunity'),
       original: o
     })
   })

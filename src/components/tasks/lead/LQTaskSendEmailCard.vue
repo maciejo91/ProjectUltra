@@ -1,6 +1,9 @@
 <template>
   <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
     <EmailForm
+      :initial-from="userStore.currentUser?.email || ''"
+      :initial-to="lead.customer?.email || ''"
+      :recipient-customer-id="lead.customerId ?? lead.customer?.id ?? null"
       :initial-template="initialTemplate"
       :initial-message="initialMessage"
       :recent-attachments="recentAttachments"

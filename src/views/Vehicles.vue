@@ -6,7 +6,7 @@
           <div class="shrink-0 overflow-visible pb-2 pt-1">
             <RequestMainTabs v-model="selectedInventoryChip" :tabs="filterChips" />
           </div>
-          <div class="bg-background min-w-0 w-full">
+          <div class="min-w-0 w-full bg-background">
             <DataTableWithUnifiedSearch
               active-tab="vehicles"
               placeholder="Search vehicles..."

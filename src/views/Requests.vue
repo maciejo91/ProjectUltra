@@ -2,7 +2,7 @@
   <div class="page-container relative flex flex-col overflow-hidden h-full bg-surface">
     <div class="flex-1 flex flex-col overflow-hidden">
       <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide min-h-0">
-        <div class="bg-background mb-8">
+        <div class="mb-8 bg-background">
           <div class="shrink-0 overflow-visible pb-2 pt-1 mb-2">
             <RequestMainTabs v-model="selectedSegment" :tabs="filterChips" />
           </div>

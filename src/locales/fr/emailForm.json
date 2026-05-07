@@ -1,5 +1,27 @@
 {
+  "actions": {
+    "cancel": "Annuler",
+    "send": "Envoyer"
+  },
+  "fields": {
+    "from": "De",
+    "to": "À",
+    "cc": "Cc",
+    "bcc": "Cci",
+    "subject": "Objet",
+    "template": "Modèle"
+  },
+  "placeholders": {
+    "from": "email@entreprise.com",
+    "to": "Ajouter des destinataires",
+    "cc": "Ajouter Cc",
+    "bcc": "Ajouter Cci",
+    "subject": "Objet de l’e-mail…",
+    "message": "Écrivez votre message…",
+    "template": "Sélectionner un modèle…"
+  },
   "attach": {
+    "addButton": "Ajouter des pièces jointes",
     "label": "Pièce jointe",
     "hint": "25 Mo maximum au total par envoi.",
     "browseOrDrop": "Parcourir ou déposer des fichiers",
@@ -8,5 +30,14 @@
     "fileFallback": "Fichier",
     "removeAria": "Retirer la pièce jointe",
     "errorMaxSize": "La taille totale des pièces jointes ne doit pas dépasser 25 Mo."
+  },
+  "composer": {
+    "title": "Nouvel e-mail",
+    "aria": {
+      "minimize": "Réduire le rédacteur",
+      "restore": "Rétablir le rédacteur",
+      "expand": "Ouvrir le rédacteur en boîte de dialogue",
+      "close": "Fermer le rédacteur"
+    }
   }
 }

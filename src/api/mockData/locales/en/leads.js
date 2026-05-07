@@ -34,7 +34,7 @@ const baseRequestedCar = (brand, model, year, price) => ({
   status: 'New',
   fuelType: 'Petrol',
   gearType: 'Automatic',
-  dealership: 'Munich',
+  dealership: 'Munich Downtown',
   stockDays: 5,
   registration: '01/2024',
   requestType: 'Quotation',
@@ -62,7 +62,7 @@ export const mockLeads = [
       status: 'Used',
       fuelType: 'Petrol',
       vin: '1FADP34A59K123456',
-      dealership: 'Madrid',
+      dealership: 'Madrid Centro',
       registration: '22/12/2015',
       listingUrl: 'https://www.autoscout24.es',
       stockDistanceKm: 10,
@@ -106,6 +106,7 @@ export const mockLeads = [
     priority: 'Hot',
     requestedCar: {
       ...baseRequestedCar('Volkswagen', 'ID.4', 2024, 45000),
+      dealership: 'Westside Auto Group – Volkswagen Dealer (Munich)',
       listingUrl: demoListingUrl('vw-id4-2024')
     },
     ...demoRequestAttribution,
@@ -145,6 +146,7 @@ export const mockLeads = [
     priority: 'Warm',
     requestedCar: {
       ...baseRequestedCar('BMW', 'iX xDrive50', 2024, 105000),
+      dealership: 'BMW Certified Dealer • Munich Airport',
       listingUrl: demoListingUrl('bmw-ix-2024')
     },
     ...demoRequestAttribution,
@@ -195,6 +197,7 @@ export const mockLeads = [
     priority: 'Warm',
     requestedCar: {
       ...baseRequestedCar('Mercedes-Benz', 'C-Class', 2024, 48000),
+      dealership: 'Mercedes-Benz Niederlassung München – Zentrum',
       listingUrl: demoListingUrl('mb-c-class-2024')
     },
     ...demoRequestAttribution,

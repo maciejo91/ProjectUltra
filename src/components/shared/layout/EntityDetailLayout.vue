@@ -109,7 +109,7 @@
             <div v-else-if="type === 'contact' && activeTab === 'appointments'">
               <!-- + Add appointment row (same pattern as AddNewButton on other tabs) -->
               <div class="relative flex items-center py-1 mb-4">
-                <div class="flex-grow border-t border"></div>
+                <div class="grow border-t border"></div>
                 <div class="relative mx-4">
                   <button
                     v-if="!showInlineAppointmentForm"
@@ -120,7 +120,7 @@
                     <span class="ml-1.5 text-muted-foreground">add appointment</span>
                   </button>
                 </div>
-                <div class="flex-grow border-t border"></div>
+                <div class="grow border-t border"></div>
               </div>
 
               <!-- Inline Add Appointment form (same form as modal, inline wrapper like NoteWidget) -->
@@ -217,6 +217,7 @@
       <div class="hidden h-full min-h-0 w-80 shrink-0 flex-col overflow-y-auto border-l border-border lg:flex">
         <TaskActivityCard
           :activities="allActivities"
+          :timeline-variant="type === 'lead' && Number(task?.id) === 4 ? 'sophieAnchored' : ''"
           :expanded-summaries="expandedSummaries"
           @activity-click="handleActivityClick"
           @toggle-summary-expanded="toggleSummaryExpanded"
@@ -562,6 +563,15 @@
       @save="handleNoteSave"
       @close="showNoteModal = false"
     />
+
+    <NoteComposerDock
+      v-if="type === 'lead' && Number(task?.id) === 4"
+      :open="showSophieNoteComposer"
+      :initial-from="userStore.currentUser?.email || ''"
+      :initial-to="task?.customer?.email || ''"
+      @update:open="setSophieNoteComposerOpen"
+      @save="handleNoteSave"
+    />
     
     <AttachmentWidget
       modal
@@ -583,12 +593,36 @@
       @save="handleSMSSave"
       @close="showSMSModal = false"
     />
+
+    <SMSComposerDock
+      v-if="type === 'lead' && Number(task?.id) === 4"
+      :open="showSophieSMSComposer"
+      :initial-channel="sophieMessageChannel"
+      :initial-from="userStore.currentUser?.phone || userStore.currentUser?.mobile || ''"
+      :initial-to="task?.customer?.phone || task?.customer?.mobile || ''"
+      @update:open="setSophieSMSComposerOpen"
+      @save="handleSMSSave"
+    />
     
     <AddEmailModal
       :show="showEmailModal"
+      :initial-from="userStore.currentUser?.email || ''"
+      :initial-to="task?.customer?.email || ''"
+      :recipient-customer-id="task?.customerId ?? task?.customer?.id ?? null"
       :recent-attachments="gridAttachments"
       @save="handleEmailSave"
       @close="showEmailModal = false"
+    />
+
+    <EmailComposerDock
+      v-if="type === 'lead' && Number(task?.id) === 4"
+      :open="showSophieEmailComposer"
+      :initial-from="userStore.currentUser?.email || ''"
+      :initial-to="task?.customer?.email || ''"
+      :recipient-customer-id="task?.customerId ?? task?.customer?.id ?? null"
+      :recent-attachments="gridAttachments"
+      @update:open="setSophieEmailComposerOpen"
+      @save="handleEmailSave"
     />
     
     <ComingSoonModal
@@ -688,6 +722,9 @@ import AddWhatsAppModal from '@/components/modals/AddWhatsAppModal.vue'
 import AddSMSModal from '@/components/modals/AddSMSModal.vue'
 import AddEmailModal from '@/components/modals/AddEmailModal.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
+import EmailComposerDock from '@/components/shared/communication/EmailComposerDock.vue'
+import SMSComposerDock from '@/components/shared/communication/SMSComposerDock.vue'
+import NoteComposerDock from '@/components/shared/feed/NoteComposerDock.vue'
 import { useTradeInVehicle } from '@/composables/useTradeInVehicle'
 import { getTabForItemTypeDefault as getTabForItemType } from '@/composables/useTaskTabs'
 import { useTaskInlineWidgets } from '@/composables/useTaskInlineWidgets'
@@ -1221,7 +1258,23 @@ const showAttachmentModal = ref(false)
 const showWhatsAppModal = ref(false)
 const showSMSModal = ref(false)
 const showEmailModal = ref(false)
+const showSophieEmailComposer = ref(false)
+const showSophieSMSComposer = ref(false)
+const sophieMessageChannel = ref('sms')
+const showSophieNoteComposer = ref(false)
 const showComingSoonModal = ref(false)
+
+function setSophieEmailComposerOpen(open) {
+  showSophieEmailComposer.value = !!open
+}
+
+function setSophieSMSComposerOpen(open) {
+  showSophieSMSComposer.value = !!open
+}
+
+function setSophieNoteComposerOpen(open) {
+  showSophieNoteComposer.value = !!open
+}
 
 // Activity card state
 const expandedSummaries = ref({})
@@ -1312,7 +1365,11 @@ const handleContactInfoAction = (action) => {
   
   // Open modals for activity types
   if (action === 'note') {
-    showNoteModal.value = true
+    if (props.type === 'lead' && Number(props.task?.id) === 4) {
+      showSophieNoteComposer.value = true
+    } else {
+      showNoteModal.value = true
+    }
     return
   }
   if (action === 'attachment') {
@@ -1320,15 +1377,29 @@ const handleContactInfoAction = (action) => {
     return
   }
   if (action === 'whatsapp') {
-    showWhatsAppModal.value = true
+    if (props.type === 'lead' && Number(props.task?.id) === 4) {
+      sophieMessageChannel.value = 'whatsapp'
+      showSophieSMSComposer.value = true
+    } else {
+      showWhatsAppModal.value = true
+    }
     return
   }
   if (action === 'sms') {
-    showSMSModal.value = true
+    if (props.type === 'lead' && Number(props.task?.id) === 4) {
+      sophieMessageChannel.value = 'sms'
+      showSophieSMSComposer.value = true
+    } else {
+      showSMSModal.value = true
+    }
     return
   }
   if (action === 'email') {
-    showEmailModal.value = true
+    if (props.type === 'lead' && Number(props.task?.id) === 4) {
+      showSophieEmailComposer.value = true
+    } else {
+      showEmailModal.value = true
+    }
     return
   }
   
@@ -1565,6 +1636,10 @@ const handleWhatsAppSave = async (data) => {
 }
 
 const handleSMSSave = async (data) => {
+  if (data?.type === 'whatsapp') {
+    await handleWhatsAppSave(data)
+    return
+  }
   try {
     await props.storeAdapter.addActivity(props.task.id, {
       type: 'sms',

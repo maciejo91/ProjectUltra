@@ -31,9 +31,9 @@
                   <span>{{ nameParts.primary || '—' }}</span>
                   <span class="inline-flex flex-wrap items-center gap-1.5">
                     <span
-                      v-if="nameParts.location"
+                      v-if="customerLocationSuffix"
                       class="text-muted-foreground"
-                    >{{ ' ' }}{{ nameParts.location }}</span>
+                    >{{ ' ' }}{{ customerLocationSuffix }}</span>
                     <TooltipProvider v-if="showContactDuplicateWarning" :delay-duration="200">
                       <Tooltip>
                         <TooltipTrigger as-child>
@@ -311,12 +311,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
+import { useUsersStore } from '@/stores/users'
 import { useCustomersStore } from '@/stores/customers'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useRequestNavigationStore } from '@/stores/requestNavigation'
 import { useCustomerDuplicateDetection } from '@/composables/useCustomerDuplicateDetection'
-import { getCustomerNameParts } from '@/utils/customerDisplay'
+import { getCustomerCityLabel, getCustomerNameParts } from '@/utils/customerDisplay'
 import {
   Badge,
   Button,
@@ -422,6 +423,7 @@ const customersStore = useCustomersStore()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
 const requestNavigationStore = useRequestNavigationStore()
+const usersStore = useUsersStore()
 const showEditCustomerModal = ref(false)
 const savingCustomerModal = ref(false)
 const pastRequestsOpen = ref(false)
@@ -430,6 +432,10 @@ const callActionsOpen = ref(false)
 const logCallDialogOpen = ref(false)
 
 const nameParts = computed(() => getCustomerNameParts(props.task.customer?.name))
+const customerCityLabel = computed(() => getCustomerCityLabel(props.task.customer))
+const customerLocationSuffix = computed(() =>
+  customerCityLabel.value ? `(${customerCityLabel.value})` : ''
+)
 
 const customerForDuplicateDetection = computed(() => props.task?.customer || null)
 const { potentialDuplicates: potentialContactDuplicates } =
@@ -466,6 +472,50 @@ function interactionSortTime(raw) {
   return t1 ? new Date(t1).getTime() : 0
 }
 
+function getAssigneeDisplay(assigneeName, original) {
+  if (!assigneeName) return 'Unassigned'
+  const user = usersStore.users.find((u) => u.name === assigneeName)
+  if (!user) return assigneeName
+  const line2 = [user.team, user.dealership].filter(Boolean).join(' - ')
+  if (line2) return `${assigneeName} (${line2})`
+  const fallbackLine2 = [original?.assigneeTeam, original?.assigneeDealership].filter(Boolean).join(' - ')
+  return fallbackLine2 ? `${assigneeName} (${fallbackLine2})` : assigneeName
+}
+
+function buildVehicleLine(original, fallbackTitle) {
+  const r = original || {}
+  const car = r.requestedCar || r.vehicle || {}
+  const vehicleTitle =
+    [car.brand, car.model].filter(Boolean).join(' ') ||
+    (typeof fallbackTitle === 'string' ? fallbackTitle : '') ||
+    '—'
+  const year = car.year != null && car.year !== '' ? String(car.year) : ''
+  const dealership = car.dealership || r.dealership || ''
+  const assignee = getAssigneeDisplay(r.assignee, r)
+  return [vehicleTitle, year, dealership, assignee].filter(Boolean).join(' · ')
+}
+
+function resolveDealership(original) {
+  const r = original || {}
+  const car = r.requestedCar || r.vehicle || {}
+  return car.dealership || r.dealership || ''
+}
+
+function resolveYear(original) {
+  const r = original || {}
+  const car = r.requestedCar || r.vehicle || {}
+  return car.year != null && car.year !== '' ? String(car.year) : ''
+}
+
+function formatMonthYear(dateString) {
+  if (!dateString) return ''
+  const d = new Date(dateString)
+  if (Number.isNaN(d.getTime())) return ''
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const yyyy = String(d.getFullYear())
+  return `${mm}/${yyyy}`
+}
+
 const pastRequestRows = computed(() => {
   const rows = []
   const exId =
@@ -476,30 +526,40 @@ const pastRequestRows = computed(() => {
 
   ;(props.relatedLeads || []).forEach((l) => {
     if (Number.isFinite(exId) && exType === 'lead' && l.id === exId) return
+    const fallbackTitle = l.requestedCar
+      ? `${l.requestedCar.brand} ${l.requestedCar.model}`
+      : t('customerProfile.rightColumn.fallbackLeadTitle')
     rows.push({
       id: l.id,
       type: 'lead',
       compositeId: `lead-${l.id}`,
       stage: l.stage || 'Open',
-      title: l.requestedCar
-        ? `${l.requestedCar.brand} ${l.requestedCar.model}`
-        : t('customerProfile.rightColumn.fallbackLeadTitle'),
+      title: fallbackTitle,
+      titleWithYear: fallbackTitle,
       subtitle: l.requestedCar?.year ? String(l.requestedCar.year) : '',
+      dealership: resolveDealership(l),
+      assigneeName: l.assignee || '',
+      createdMonthYear: formatMonthYear(l.createdAt),
       sortTime: interactionSortTime(l),
       customer: l.customer || l
     })
   })
   ;(props.relatedOpportunities || []).forEach((o) => {
     if (Number.isFinite(exId) && exType === 'opportunity' && o.id === exId) return
+    const fallbackTitle = o.requestedCar
+      ? `${o.requestedCar.brand} ${o.requestedCar.model}`
+      : t('customerProfile.rightColumn.fallbackOpportunityTitle')
     rows.push({
       id: o.id,
       type: 'opportunity',
       compositeId: `opportunity-${o.id}`,
       stage: o.stage || 'Open',
-      title: o.requestedCar
-        ? `${o.requestedCar.brand} ${o.requestedCar.model}`
-        : t('customerProfile.rightColumn.fallbackOpportunityTitle'),
+      title: fallbackTitle,
+      titleWithYear: fallbackTitle,
       subtitle: o.requestedCar?.year ? String(o.requestedCar.year) : '',
+      dealership: resolveDealership(o),
+      assigneeName: o.assignee || '',
+      createdMonthYear: formatMonthYear(o.createdAt),
       sortTime: interactionSortTime(o),
       customer: o.customer || o
     })
@@ -511,7 +571,11 @@ const pastRequestRows = computed(() => {
       compositeId: `service-${s.id}`,
       stage: s.stage || 'Open',
       title: s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
+      titleWithYear: s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
       subtitle: (s.subtitle && String(s.subtitle).trim()) || '',
+      dealership: '',
+      assigneeName: '',
+      createdMonthYear: formatMonthYear(s.createdAt),
       sortTime: interactionSortTime(s),
       customer: props.task.customer || null
     })

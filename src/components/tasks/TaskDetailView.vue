@@ -223,6 +223,15 @@
       @save="handleNoteSave"
       @close="showNoteModal = false"
     />
+
+    <NoteComposerDock
+      v-if="displayTask?.type === 'lead' && Number(displayTask?.id) === 4"
+      :open="showSophieNoteComposer"
+      :initial-from="userStore.currentUser?.email || ''"
+      :initial-to="displayTask?.customer?.email || ''"
+      @update:open="setSophieNoteComposerOpen"
+      @save="handleNoteSave"
+    />
     
     <AttachmentWidget
       modal
@@ -244,11 +253,35 @@
       @save="handleSMSSave"
       @close="showSMSModal = false"
     />
+
+    <SMSComposerDock
+      v-if="displayTask?.type === 'lead' && Number(displayTask?.id) === 4"
+      :open="showSophieSMSComposer"
+      :initial-channel="sophieMessageChannel"
+      :initial-from="userStore.currentUser?.phone || userStore.currentUser?.mobile || ''"
+      :initial-to="displayTask?.customer?.phone || displayTask?.customer?.mobile || ''"
+      @update:open="setSophieSMSComposerOpen"
+      @save="handleSMSSave"
+    />
     
     <AddEmailModal
       :show="showEmailModal"
+      :initial-from="userStore.currentUser?.email || ''"
+      :initial-to="displayTask?.customer?.email || ''"
+      :recipient-customer-id="displayTask?.customerId ?? displayTask?.customer?.id ?? null"
       @save="handleEmailSave"
       @close="showEmailModal = false"
+    />
+
+    <EmailComposerDock
+      v-if="displayTask?.type === 'lead' && Number(displayTask?.id) === 4"
+      :open="showSophieEmailComposer"
+      :initial-from="userStore.currentUser?.email || ''"
+      :initial-to="displayTask?.customer?.email || ''"
+      :recipient-customer-id="displayTask?.customerId ?? displayTask?.customer?.id ?? null"
+      :recent-attachments="recentAttachments"
+      @update:open="setSophieEmailComposerOpen"
+      @save="handleEmailSave"
     />
     
     <ComingSoonModal
@@ -338,6 +371,9 @@ import AttachmentWidget from '@/components/shared/feed/AttachmentWidget.vue'
 import AddWhatsAppModal from '@/components/modals/AddWhatsAppModal.vue'
 import AddSMSModal from '@/components/modals/AddSMSModal.vue'
 import AddEmailModal from '@/components/modals/AddEmailModal.vue'
+import EmailComposerDock from '@/components/shared/communication/EmailComposerDock.vue'
+import SMSComposerDock from '@/components/shared/communication/SMSComposerDock.vue'
+import NoteComposerDock from '@/components/shared/feed/NoteComposerDock.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
 import PurchaseMethodModal from '@/components/modals/PurchaseMethodModal.vue'
 import AddVehicleModal from '@/components/modals/AddVehicleModal.vue'
@@ -483,7 +519,29 @@ const showAttachmentModal = ref(false)
 const showWhatsAppModal = ref(false)
 const showSMSModal = ref(false)
 const showEmailModal = ref(false)
+const showSophieEmailComposer = ref(false)
+const showSophieSMSComposer = ref(false)
+const sophieMessageChannel = ref('sms')
+const showSophieNoteComposer = ref(false)
 const showComingSoonModal = ref(false)
+function setSophieEmailComposerOpen(open) {
+  showSophieEmailComposer.value = !!open
+}
+
+function setSophieSMSComposerOpen(open) {
+  showSophieSMSComposer.value = !!open
+}
+
+function setSophieNoteComposerOpen(open) {
+  showSophieNoteComposer.value = !!open
+}
+
+const recentAttachments = computed(() => {
+  const task = displayTask.value
+  if (!task) return []
+  return (task.activities || []).filter((a) => a?.type === 'attachment')
+})
+
 const showFinancingModal = ref(false)
 const showTradeInModal = ref(false)
 const tradeInActionLoading = ref(false)
@@ -631,15 +689,33 @@ function openFinancingEdit(f) {
 // Handle add activity from TaskActivityCard
 const handleAddActivity = (activityType) => {
   if (activityType === 'note') {
-    showNoteModal.value = true
+    if (displayTask.value?.type === 'lead' && Number(displayTask.value?.id) === 4) {
+      showSophieNoteComposer.value = true
+    } else {
+      showNoteModal.value = true
+    }
   } else if (activityType === 'attachment') {
     showAttachmentModal.value = true
   } else if (activityType === 'whatsapp') {
-    showWhatsAppModal.value = true
+    if (displayTask.value?.type === 'lead' && Number(displayTask.value?.id) === 4) {
+      sophieMessageChannel.value = 'whatsapp'
+      showSophieSMSComposer.value = true
+    } else {
+      showWhatsAppModal.value = true
+    }
   } else if (activityType === 'sms') {
-    showSMSModal.value = true
+    if (displayTask.value?.type === 'lead' && Number(displayTask.value?.id) === 4) {
+      sophieMessageChannel.value = 'sms'
+      showSophieSMSComposer.value = true
+    } else {
+      showSMSModal.value = true
+    }
   } else if (activityType === 'email') {
-    showEmailModal.value = true
+    if (displayTask.value?.type === 'lead' && Number(displayTask.value?.id) === 4) {
+      showSophieEmailComposer.value = true
+    } else {
+      showEmailModal.value = true
+    }
   } else if (activityType === 'call') {
     showComingSoonModal.value = true
   } else if (activityType === 'financing') {
@@ -710,6 +786,10 @@ const handleWhatsAppSave = async (data) => {
 }
 
 const handleSMSSave = async (data) => {
+  if (data?.type === 'whatsapp') {
+    await handleWhatsAppSave(data)
+    return
+  }
   if (!props.storeAdapter || !props.task) return
   try {
     await props.storeAdapter.addActivity(props.task.id, {

@@ -52,7 +52,11 @@ export function getCallSummaryText(activity: ActivityRecord | undefined, t: TFn)
 export function getActivityIconKind(activity: ActivityRecord): ActivityTimelineIconKind {
   const type = activity.type
   if (type === 'note') return 'note'
-  if (type === 'call') return 'call'
+  if (type === 'call') {
+    const text = `${activity.action ?? ''} ${activity.message ?? ''} ${activity.content ?? ''}`.toLowerCase()
+    const isMissed = text.includes('no answer') || text.includes('voicemail')
+    return isMissed ? 'callMissed' : 'call'
+  }
   if (type === 'email' || type === 'customer-email') return 'email'
   if (type === 'whatsapp' || type === 'customer-whatsapp' || type === 'sms' || type === 'customer-sms')
     return 'messageGreen'
@@ -107,11 +111,17 @@ export function buildActivityHeadlineParts(activity: ActivityRecord, t: TFn): Ac
     return { primary: t('entities.activity.timeline.callCompletedFallback'), secondary: null }
   }
 
-  if (type === 'customer-email' || type === 'customer-whatsapp') {
+  if (type === 'customer-email' || type === 'customer-whatsapp' || type === 'customer-sms') {
     const name = user || t('entities.activity.timeline.contact')
+    const action =
+      type === 'customer-email'
+        ? t('entities.activity.timeline.sentEmail')
+        : type === 'customer-whatsapp'
+          ? t('entities.activity.timeline.sentWhatsapp')
+          : t('entities.activity.timeline.sentSms')
     return {
       primary: name,
-      secondary: t('entities.activity.timeline.contactSentMessageAction')
+      secondary: action
     }
   }
 
@@ -191,7 +201,7 @@ export function buildActivityHeadline(activity: ActivityRecord, t: TFn): string 
 export function getActivityCardAccent(activity: ActivityRecord): ActivityTimelineCardAccent {
   const type = activity.type
   if (type === 'note') return 'note'
-  if (type === 'email' || type === 'customer-email') return 'message'
+  if (type === 'email' || type === 'customer-email') return 'email'
   if (type === 'whatsapp' || type === 'customer-whatsapp' || type === 'sms' || type === 'customer-sms')
     return 'messageGreen'
   if (type === 'call') return 'call'

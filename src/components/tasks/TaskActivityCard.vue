@@ -1,42 +1,29 @@
 <template>
   <div class="flex w-full min-w-0 flex-col bg-background p-4">
-    <div
-      class="outcome-toggle-group mb-4 flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto pb-1 scrollbar-hide md:flex-wrap"
-    >
-      <Toggle
-        variant="outline"
-        class="outcome-toggle-item h-9 shrink-0 rounded-full border-border px-3 text-sm font-medium"
-        :model-value="selectedPill === 'all'"
-        @update:model-value="(on) => onPillToggle('all', on)"
+    <div class="mb-4 flex min-w-0 overflow-x-auto pb-1 scrollbar-hide">
+      <SegmentedControl
+        v-model="selectedPill"
+        :aria-label="t('entities.activity.pills.ariaLabel')"
+        :options="pillOptions"
       >
-        {{ t('entities.activity.pills.all') }}
-      </Toggle>
-      <Toggle
-        variant="outline"
-        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
-        :model-value="selectedPill === 'interactions'"
-        @update:model-value="(on) => onPillToggle('interactions', on)"
-      >
-        <MessagesSquare class="size-4 shrink-0 text-muted-foreground" />
-        <span>{{ t('entities.activity.pills.interactions') }}</span>
-        <span
-          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
-          >{{ pillCounts.interactions }}</span
-        >
-      </Toggle>
-      <Toggle
-        variant="outline"
-        class="outcome-toggle-item h-9 shrink-0 gap-2 rounded-full border-border px-3 text-sm"
-        :model-value="selectedPill === 'system'"
-        @update:model-value="(on) => onPillToggle('system', on)"
-      >
-        <Info class="size-4 shrink-0 text-muted-foreground" />
-        <span>{{ t('entities.activity.pills.system') }}</span>
-        <span
-          class="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground"
-          >{{ pillCounts.system }}</span
-        >
-      </Toggle>
+        <template #all>
+          <span class="inline-flex items-center justify-center gap-1.5">
+            <span>{{ t('entities.activity.pills.all') }}</span>
+          </span>
+        </template>
+        <template #interactions>
+          <span class="inline-flex items-center justify-center gap-1.5">
+            <MessagesSquare class="size-4 shrink-0" aria-hidden="true" />
+            <span>{{ t('entities.activity.pills.interactions') }}</span>
+          </span>
+        </template>
+        <template #system>
+          <span class="inline-flex items-center justify-center gap-1.5">
+            <Info class="size-4 shrink-0" aria-hidden="true" />
+            <span>{{ t('entities.activity.pills.system') }}</span>
+          </span>
+        </template>
+      </SegmentedControl>
     </div>
 
     <div class="flex min-w-0 flex-col">
@@ -44,6 +31,7 @@
         v-if="sortedActivities.length > 0"
         :activities="sortedActivities"
         :date-label="getActivityTimelineDateLabel(sortedActivities, t)"
+        :timeline-variant="timelineVariant"
         :show-thread-action="true"
         @activity-click="handleActivityClick"
         @open-transcript="openTranscriptDialog"
@@ -134,7 +122,6 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Toggle } from '@motork/component-library/future/primitives'
 import {
   MessagesSquare,
   Clock,
@@ -156,6 +143,7 @@ import {
 } from '@/composables/useActivityTimelinePresentation'
 import ActivityTimeline from '@/components/tasks/activity-timeline/ActivityTimeline.vue'
 import RequestTabEmptyState from '@/components/requests/RequestTabEmptyState.vue'
+import SegmentedControl from '@/components/shared/SegmentedControl.vue'
 
 const { t } = useI18n()
 
@@ -163,6 +151,10 @@ const props = defineProps({
   activities: {
     type: Array,
     default: () => []
+  },
+  timelineVariant: {
+    type: String,
+    default: ''
   },
   expandedSummaries: {
     type: Object,
@@ -179,6 +171,12 @@ const emit = defineEmits(['activity-click', 'toggle-summary-expanded', 'add-acti
 const selectedPill = ref(
   /** @type {'all' | 'interactions' | 'system'} */ ('all')
 )
+
+const pillOptions = [
+  { value: 'all', label: 'All' },
+  { value: 'interactions', label: 'Interactions' },
+  { value: 'system', label: 'System' }
+]
 const transcriptDialogActivity = ref(null)
 const threadDialogId = ref(null)
 const threadDialogKind = ref(/** @type {null | 'thread' | 'conversation'} */ (null))
@@ -250,16 +248,6 @@ const pillCounts = computed(() => {
     system: count((a) => getActivityFilterCategory(a) === 'system-updates')
   }
 })
-
-function onPillToggle(pill, on) {
-  if (on) {
-    selectedPill.value = pill
-    return
-  }
-  if (selectedPill.value === pill) {
-    selectedPill.value = 'all'
-  }
-}
 
 const sortedActivities = computed(() => {
   const pill = selectedPill.value

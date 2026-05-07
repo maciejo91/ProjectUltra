@@ -30,7 +30,6 @@
                   <span class="font-semibold text-foreground">{{ nameParts.primary || '—' }}</span>
                   <span class="text-sm font-normal text-muted-foreground">
                     <template v-if="customerCityLabel">{{ ' · ' }}{{ customerCityLabel }}</template>
-                    <template v-if="nameParts.location">{{ ' · ' }}{{ nameParts.location }}</template>
                     {{ ' · ' }}{{ t('requestDetail.headerDetailLabelSource') }}
                   </span>
                   <span class="text-sm font-normal text-foreground">{{ ' ' + headerDetailSourceLabel }}</span>

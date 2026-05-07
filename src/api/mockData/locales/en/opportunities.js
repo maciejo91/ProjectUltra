@@ -18,7 +18,7 @@ const baseRequestedCar = (brand, model, year, price, opts = {}) => {
     plateNumber: demoPlateNumber(brand, model, year),
     vin: 'WBA3B1C50EK123456',
     image: DEFAULT_CAR_IMAGE,
-    dealership: 'Munich',
+    dealership: 'Munich Downtown',
     fuelType: 'Petrol',
     gearType: 'Automatic',
     kilometers: 0,

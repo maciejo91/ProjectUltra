@@ -196,6 +196,166 @@ export const mockActivities = [
     timestamp: createHourOffset(-4),
     leadId: 4
   },
+  {
+    id: 21.1,
+    type: 'email',
+    user: 'David Miller',
+    action: 'sent an email',
+    content:
+      'Hi Sophie — happy to help. We have a C-Class available. Would you prefer Wed 12:30 or Thu 13:00 for a quick viewing in Munich?',
+    data: {
+      threadId: 'lead-4-email',
+      from: 'david.miller@motork.io',
+      to: 'sophie.mueller@example.com'
+    },
+    timestamp: createHourOffset(-3.7),
+    leadId: 4
+  },
+  {
+    id: 21.2,
+    type: 'customer-whatsapp',
+    user: 'Sophie Mueller',
+    action: 'sent a WhatsApp message',
+    content: 'Thu 13:00 works. Can you also confirm the car has the advanced driver assistance package?',
+    data: {
+      threadId: 'lead-4-whatsapp',
+      fromPhone: '+49 151 555 0404',
+      toPhone: '+49 89 555 0101'
+    },
+    timestamp: createHourOffset(-3.2),
+    leadId: 4
+  },
+  {
+    id: 21.3,
+    type: 'whatsapp',
+    user: 'David Miller',
+    action: 'sent a WhatsApp message',
+    content:
+      'Confirmed. It includes the assistance package + parking camera. I can book Thu 13:00 — shall I reserve it under your name?',
+    data: {
+      threadId: 'lead-4-whatsapp',
+      fromPhone: '+49 89 555 0101',
+      toPhone: '+49 151 555 0404'
+    },
+    timestamp: createHourOffset(-3),
+    leadId: 4
+  },
+  {
+    id: 21.4,
+    type: 'customer-email',
+    user: 'Sophie Mueller',
+    action: 'sent an email',
+    content:
+      'Please reserve it for Thu 13:00. Also, could you send a detailed quote incl. delivery time and warranty options?',
+    data: {
+      threadId: 'lead-4-email',
+      from: 'sophie.mueller@example.com',
+      to: 'sales@motork.io'
+    },
+    timestamp: createHourOffset(-2.7),
+    leadId: 4
+  },
+  {
+    id: 21.5,
+    type: 'note',
+    user: 'David Miller',
+    action: 'added a note',
+    content: 'Customer prefers email, no phone on file. Prepare quote + warranty options before appointment.',
+    timestamp: createHourOffset(-2.3),
+    leadId: 4
+  },
+  {
+    id: 21.6,
+    type: 'email',
+    user: 'David Miller',
+    action: 'sent an email',
+    content:
+      'Quote attached for the C-Class including warranty options. Delivery time is 7–10 days after confirmation. See you Thu 13:00 in Munich Downtown.',
+    data: {
+      threadId: 'lead-4-email',
+      from: 'david.miller@motork.io',
+      to: 'sophie.mueller@example.com'
+    },
+    timestamp: createHourOffset(-1.9),
+    leadId: 4
+  },
+  {
+    id: 21.7,
+    type: 'customer-sms',
+    user: 'Sophie Mueller',
+    action: 'sent an SMS',
+    content: 'Got it, thanks. Is parking available at the showroom?',
+    data: {
+      fromPhone: '+49 151 555 0404',
+      toPhone: '+49 89 555 0101'
+    },
+    timestamp: createHourOffset(-1.6),
+    leadId: 4
+  },
+  {
+    id: 21.8,
+    type: 'sms',
+    user: 'David Miller',
+    action: 'sent an SMS',
+    content: 'Yes — customer parking is available on site. Ask for “Sophie Mueller” at reception.',
+    data: {
+      fromPhone: '+49 89 555 0101',
+      toPhone: '+49 151 555 0404'
+    },
+    timestamp: createHourOffset(-1.5),
+    leadId: 4
+  },
+  {
+    id: 21.9,
+    type: 'lead-updated',
+    user: 'System',
+    action: 'Appointment scheduled: Thu 13:00 (Munich Downtown)',
+    message: 'Appointment scheduled: Thu 13:00 (Munich Downtown)',
+    timestamp: createHourOffset(-1.4),
+    leadId: 4
+  },
+  {
+    id: 21.91,
+    type: 'call',
+    user: 'David Miller',
+    action: 'attempted call',
+    message: 'No answer · voicemail left',
+    content: 'No answer · voicemail left',
+    data: {
+      direction: 'outbound',
+      summary: 'No answer · voicemail left'
+    },
+    timestamp: createHourOffset(-1.2),
+    leadId: 4
+  },
+  {
+    id: 21.92,
+    type: 'call',
+    user: 'David Miller',
+    action: 'call completed',
+    message: 'Answered · 3m 12s',
+    content: 'Answered · 3m 12s',
+    data: {
+      direction: 'outbound',
+      summary: 'Answered · 3m 12s'
+    },
+    timestamp: createHourOffset(-1.05),
+    leadId: 4
+  },
+  {
+    id: 21.93,
+    type: 'call',
+    user: 'David Miller',
+    action: 'attempted call',
+    message: 'No answer · voicemail left',
+    content: 'No answer · voicemail left',
+    data: {
+      direction: 'outbound',
+      summary: 'No answer · voicemail left'
+    },
+    timestamp: createHourOffset(-0.8),
+    leadId: 4
+  },
   // Opportunity customer replies (for Conversations tab)
   {
     id: 22,
@@ -349,6 +509,19 @@ export const mockActivities = [
       summary: 'No answer · voicemail left'
     },
     timestamp: createHourOffset(-2),
+    leadId: 1
+  },
+  {
+    id: 34.5,
+    type: 'call',
+    user: 'Sarah Jenkins',
+    action: 'call completed',
+    message: 'Answered · 2m 37s',
+    content: 'Answered · 2m 37s',
+    data: {
+      summary: 'Answered · 2m 37s'
+    },
+    timestamp: createHourOffset(-2.25),
     leadId: 1
   },
   {

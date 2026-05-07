@@ -9,6 +9,7 @@
     "contactDetails": "Dettagli contatto",
     "otherInteractions": "Cronologia contatto ({count})",
     "otherInteractionsRegion": "Lead, opportunity e service passati per questo contatto",
+    "groupSales": "Sales ({count})",
     "groupLeads": "Leads ({count})",
     "groupOpportunities": "Opportunities ({count})",
     "groupServices": "Services ({count})",

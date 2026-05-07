@@ -133,7 +133,17 @@
     "lightMode": "Hellmodus",
     "darkMode": "Dunkelmodus",
     "newContact": "Neuer Kontakt",
-    "newVehicle": "Neues Fahrzeug"
+    "newVehicle": "Neues Fahrzeug",
+    "newSms": "Neue SMS",
+    "newWhatsApp": "Neues WhatsApp",
+    "newNote": "Neue Notiz",
+    "template": "Vorlage",
+    "selectTemplate": "Vorlage auswählen…",
+    "message": "Nachricht",
+    "typeSms": "SMS-Nachricht eingeben…",
+    "smsFromPlaceholder": "Ihre Telefonnummer",
+    "smsToPlaceholder": "Telefonnummer hinzufügen",
+    "smsCharacters": "{count}/160 Zeichen"
   },
   "status": {
     "hot": "Hot",

@@ -88,9 +88,25 @@
       "emptyState": "Aucune activité",
       "emptyStateDescription": "Les notes, appels, messages et autres événements apparaîtront ici.",
       "viewThread": "Voir le fil ({count})",
+      "viewThreadShort": "Voir le fil",
       "threadTitle": "Fil",
       "viewConversation": "Voir la conversation ({count})",
-      "conversationTitle": "Conversation"
+      "viewConversationShort": "Voir la conversation",
+      "conversationTitle": "Conversation",
+      "callPills": {
+        "outbound": "Outbound call",
+        "noAnswer": "No answer",
+        "answered": "Answered"
+      },
+      "messagePills": {
+        "outbound": "Outbound message",
+        "inbound": "Inbound message / email"
+      },
+      "channels": {
+        "email": "Email",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp"
+      }
     }
   },
   "appointment": {

@@ -1,5 +1,27 @@
 {
+  "actions": {
+    "cancel": "Annuleren",
+    "send": "Verzenden"
+  },
+  "fields": {
+    "from": "Van",
+    "to": "Aan",
+    "cc": "Cc",
+    "bcc": "Bcc",
+    "subject": "Onderwerp",
+    "template": "Sjabloon"
+  },
+  "placeholders": {
+    "from": "email@bedrijf.com",
+    "to": "Ontvangers toevoegen",
+    "cc": "Cc toevoegen",
+    "bcc": "Bcc toevoegen",
+    "subject": "E-mailonderwerp…",
+    "message": "Schrijf je bericht…",
+    "template": "Selecteer een sjabloon…"
+  },
   "attach": {
+    "addButton": "Bijlagen toevoegen",
     "label": "Bestand bijvoegen",
     "hint": "Max. 25 MB totaal per verzending.",
     "browseOrDrop": "Bladeren of bestanden neerzetten",
@@ -8,5 +30,14 @@
     "fileFallback": "Bestand",
     "removeAria": "Bijlage verwijderen",
     "errorMaxSize": "De totale grootte van de bijlagen mag niet groter zijn dan 25 MB."
+  },
+  "composer": {
+    "title": "Nieuwe e-mail",
+    "aria": {
+      "minimize": "Composer minimaliseren",
+      "restore": "Composer herstellen",
+      "expand": "Composer openen als dialoog",
+      "close": "Composer sluiten"
+    }
   }
 }

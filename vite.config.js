@@ -17,10 +17,9 @@ export default defineConfig({
     include: ['@motork/component-library']
   },
   server: {
-    // Bind explicitly to IPv4 loopback so `http://127.0.0.1:<port>` works reliably on macOS
-    // (otherwise Vite may listen only on `::1`, which breaks tools/browsers that hit IPv4).
-    host: '127.0.0.1',
+    // Listen on both IPv4/IPv6 so `localhost` works everywhere (Cursor preview often resolves to ::1).
+    host: true,
     port: 5000,
-    strictPort: true
+    strictPort: false
   }
 })

@@ -3,7 +3,7 @@
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
       <DialogContent
-        class="w-[90vw] max-w-none max-h-[calc(100vh-4rem)] flex flex-col"
+        class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
         :show-close-button="true"
       >
         <DialogHeader class="shrink-0">
@@ -12,9 +12,13 @@
 
         <div class="flex-1 overflow-y-auto py-4 w-full space-y-6">
           <EmailForm
+            v-if="show"
             ref="formRef"
             :show-actions="false"
             :recent-attachments="recentAttachments"
+            :initial-from="initialFrom"
+            :initial-to="initialTo"
+            :recipient-customer-id="recipientCustomerId"
             @send="handleSend"
             @update:valid="(v) => (formValid = v)"
           />
@@ -60,6 +64,18 @@ defineProps({
   show: {
     type: Boolean,
     required: true
+  },
+  initialFrom: {
+    type: String,
+    default: ''
+  },
+  initialTo: {
+    type: String,
+    default: ''
+  },
+  recipientCustomerId: {
+    type: [Number, String],
+    default: null
   },
   recentAttachments: {
     type: Array,
