@@ -12,7 +12,7 @@
     "template": "Modèle"
   },
   "placeholders": {
-    "from": "email@@entreprise.com",
+    "from": "maciej@@motork.io",
     "to": "Ajouter des destinataires",
     "cc": "Ajouter Cc",
     "bcc": "Ajouter Cci",

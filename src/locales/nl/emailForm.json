@@ -12,7 +12,7 @@
     "template": "Sjabloon"
   },
   "placeholders": {
-    "from": "email@@bedrijf.com",
+    "from": "maciej@@motork.io",
     "to": "Ontvangers toevoegen",
     "cc": "Cc toevoegen",
     "bcc": "Bcc toevoegen",
