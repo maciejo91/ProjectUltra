@@ -300,7 +300,7 @@
     "required": "Obbligatorio"
   },
   "notes": {
-    "placeholder": "Scrivi una nota qui e usa @ per menzionare qualcuno"
+    "placeholder": "Scrivi una nota qui e usa @@ per menzionare qualcuno"
   },
   "tasks": {
     "filterAria": "Filtra attività",
@@ -338,7 +338,7 @@
     "outcomeNoAnswer": "Nessuna risposta",
     "outcomeNotInterested": "Non interessato",
     "notes": "Note della chiamata",
-    "notesPlaceholder": "Scrivi una nota qui e usa @ per menzionare qualcuno",
+    "notesPlaceholder": "Scrivi una nota qui e usa @@ per menzionare qualcuno",
     "inProgress": "Chiamata in corso",
     "ended": "Chiamata terminata",
     "endCall": "Termina chiamata",

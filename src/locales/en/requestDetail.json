@@ -137,7 +137,7 @@
     },
     "placeholders": {
       "name": "Customer name",
-      "email": "email@example.com",
+      "email": "email@@example.com",
       "phone": "+49…",
       "address": "Address"
     }
@@ -158,7 +158,7 @@
       "surname": "Surname",
       "location": "City or region",
       "address": "Street, postal code, city",
-      "email": "email@example.com",
+      "email": "email@@example.com",
       "phone": "+49…",
       "tags": "VIP, Premium"
     }

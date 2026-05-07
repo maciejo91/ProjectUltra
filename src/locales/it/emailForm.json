@@ -12,7 +12,7 @@
     "template": "Modello"
   },
   "placeholders": {
-    "from": "email@azienda.com",
+    "from": "email@@azienda.com",
     "to": "Aggiungi destinatari",
     "cc": "Aggiungi Cc",
     "bcc": "Aggiungi Ccn",

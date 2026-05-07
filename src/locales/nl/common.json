@@ -300,7 +300,7 @@
     "required": "Verplicht"
   },
   "notes": {
-    "placeholder": "Typ hier een notitie en gebruik @ om iemand te vermelden"
+    "placeholder": "Typ hier een notitie en gebruik @@ om iemand te vermelden"
   },
   "tasks": {
     "filterAria": "Taken filteren",
@@ -338,7 +338,7 @@
     "outcomeNoAnswer": "Geen antwoord",
     "outcomeNotInterested": "Niet geïnteresseerd",
     "notes": "Gespreksnotities",
-    "notesPlaceholder": "Typ hier een notitie en gebruik @ om iemand te vermelden",
+    "notesPlaceholder": "Typ hier een notitie en gebruik @@ om iemand te vermelden",
     "inProgress": "Gesprek bezig",
     "ended": "Gesprek beëindigd",
     "endCall": "Ophangen",

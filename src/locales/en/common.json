@@ -300,7 +300,7 @@
     "required": "Required"
   },
   "notes": {
-    "placeholder": "Type a note here and use @ to mention someone"
+    "placeholder": "Type a note here and use @@ to mention someone"
   },
   "tasks": {
     "filterAria": "Filter tasks",
@@ -338,7 +338,7 @@
     "outcomeNoAnswer": "No answer",
     "outcomeNotInterested": "Not interested",
     "notes": "Call notes",
-    "notesPlaceholder": "Type a note here and use @ to mention someone",
+    "notesPlaceholder": "Type a note here and use @@ to mention someone",
     "inProgress": "Call in progress",
     "ended": "Call ended",
     "endCall": "End call",
