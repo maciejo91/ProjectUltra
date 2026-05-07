@@ -8,7 +8,7 @@
     <div class="relative">
       <div
         v-if="timelineVariant === 'sophieAnchored' && activities.length > 0"
-        class="absolute left-3 top-0 bottom-0 w-px bg-border"
+        class="absolute left-4 top-0 bottom-0 w-px bg-border"
         aria-hidden="true"
       />
       <div class="relative z-10 flex flex-col">

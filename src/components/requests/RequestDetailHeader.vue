@@ -202,41 +202,15 @@
       <div
         class="flex shrink-0 flex-col items-stretch gap-2 sm:items-end lg:pt-0.5"
       >
-        <div class="flex flex-wrap items-center justify-end gap-2">
-          <DropdownMenu v-if="request" :modal="false">
-            <DropdownMenuTrigger as-child>
-              <button
-                type="button"
-                class="rounded-full border border-transparent p-0 transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                :aria-label="lifecycleAriaLabel || t('requestDetail.headerLifecycleMenuAria')"
-              >
-                <RequestHeaderLifecycleStepper :steps="lifecycleSteps" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="min-w-48 max-h-64 overflow-y-auto p-1.5" align="end">
-              <DropdownMenuItem
-                v-for="stage in statusOptions"
-                :key="stage"
-                class="flex cursor-pointer items-center rounded-sm px-2 py-1.5"
-                @select="emit('update-status', stage)"
-              >
-                <span
-                  class="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium leading-none"
-                  :class="[
-                    getStageColorClass(stage),
-                    stage === displayStage && 'ring-1 ring-ring ring-inset'
-                  ]"
-                >
-                  {{ stage }}
-                </span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div class="flex flex-wrap items-center justify-end gap-1">
+          <div v-if="request" class="inline-flex h-10 items-center rounded-md px-3">
+            <RequestHeaderLifecycleStepper :steps="lifecycleSteps" />
+          </div>
 
           <Button
             variant="outline"
             size="icon-sm"
-            class="rounded-md"
+            class="ml-1 rounded-md"
             :disabled="!hasPrevious"
             @click="$emit('previous')"
           >

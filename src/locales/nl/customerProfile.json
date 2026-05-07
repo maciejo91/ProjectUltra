@@ -20,6 +20,18 @@
     "serviceDetailDemo": "Servicedetails zijn niet beschikbaar in deze demo.",
     "fallbackLeadTitle": "Lead",
     "fallbackOpportunityTitle": "Opportunity",
+    "stages": {
+      "open": "Open",
+      "qualified": "Gekwalificeerd",
+      "validated": "Gevalideerd",
+      "notValid": "Ongeldig",
+      "notInterested": "Geen interesse",
+      "closedFailed": "Afgesloten (mislukt)",
+      "inNegotiation": "In onderhandeling",
+      "closedWon": "Gewonnen",
+      "closedLost": "Verloren",
+      "abandoned": "Afgebroken"
+    },
     "appointments": "Afspraken",
     "addAppointment": "Toevoegen",
     "noAppointments": "Geen aankomende afspraken.",

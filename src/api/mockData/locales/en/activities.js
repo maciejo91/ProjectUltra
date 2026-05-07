@@ -356,6 +356,34 @@ export const mockActivities = [
     timestamp: createHourOffset(-0.8),
     leadId: 4
   },
+  {
+    id: 21.94,
+    type: 'call',
+    user: 'Sophie Mueller',
+    action: 'inbound call',
+    message: 'Answered · 1m 08s',
+    content: 'Answered · 1m 08s',
+    data: {
+      direction: 'inbound',
+      summary: 'Answered · 1m 08s'
+    },
+    timestamp: createHourOffset(-0.6),
+    leadId: 4
+  },
+  {
+    id: 21.95,
+    type: 'call',
+    user: 'David Miller',
+    action: 'missed inbound call',
+    message: 'No answer · missed inbound call',
+    content: 'No answer · missed inbound call',
+    data: {
+      direction: 'inbound',
+      summary: 'No answer · missed inbound call'
+    },
+    timestamp: createHourOffset(-0.45),
+    leadId: 4
+  },
   // Opportunity customer replies (for Conversations tab)
   {
     id: 22,

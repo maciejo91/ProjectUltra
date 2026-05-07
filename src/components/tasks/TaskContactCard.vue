@@ -356,6 +356,12 @@ import TagPillWithPopover from '@/components/shared/TagPillWithPopover.vue'
 import MessagingQuickActionPopover from '@/components/shared/MessagingQuickActionPopover.vue'
 import EditCustomerDetailsModal from '@/components/modals/EditCustomerDetailsModal.vue'
 import ContactHistoryGroupedList from '@/components/shared/ContactHistoryGroupedList.vue'
+import {
+  buildContactHistoryVehicleLine,
+  formatContactHistoryMonthYear,
+  resolveContactHistoryDealership,
+  resolveContactHistorySource
+} from '@/utils/contactHistoryRow'
 import CallForm from '@/components/shared/communication/CallForm.vue'
 
 const props = defineProps({
@@ -495,27 +501,6 @@ function buildVehicleLine(original, fallbackTitle) {
   return [vehicleTitle, year, dealership, assignee].filter(Boolean).join(' · ')
 }
 
-function resolveDealership(original) {
-  const r = original || {}
-  const car = r.requestedCar || r.vehicle || {}
-  return car.dealership || r.dealership || ''
-}
-
-function resolveYear(original) {
-  const r = original || {}
-  const car = r.requestedCar || r.vehicle || {}
-  return car.year != null && car.year !== '' ? String(car.year) : ''
-}
-
-function formatMonthYear(dateString) {
-  if (!dateString) return ''
-  const d = new Date(dateString)
-  if (Number.isNaN(d.getTime())) return ''
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const yyyy = String(d.getFullYear())
-  return `${mm}/${yyyy}`
-}
-
 const pastRequestRows = computed(() => {
   const rows = []
   const exId =
@@ -537,9 +522,11 @@ const pastRequestRows = computed(() => {
       title: fallbackTitle,
       titleWithYear: fallbackTitle,
       subtitle: l.requestedCar?.year ? String(l.requestedCar.year) : '',
-      dealership: resolveDealership(l),
+      vehicleDisplayLine: buildContactHistoryVehicleLine(l, fallbackTitle),
+      sourceDetail: resolveContactHistorySource(l),
+      dealership: resolveContactHistoryDealership(l),
       assigneeName: l.assignee || '',
-      createdMonthYear: formatMonthYear(l.createdAt),
+      createdMonthYear: formatContactHistoryMonthYear(l.createdAt),
       sortTime: interactionSortTime(l),
       customer: l.customer || l
     })
@@ -557,9 +544,11 @@ const pastRequestRows = computed(() => {
       title: fallbackTitle,
       titleWithYear: fallbackTitle,
       subtitle: o.requestedCar?.year ? String(o.requestedCar.year) : '',
-      dealership: resolveDealership(o),
+      vehicleDisplayLine: buildContactHistoryVehicleLine(o, fallbackTitle),
+      sourceDetail: resolveContactHistorySource(o),
+      dealership: resolveContactHistoryDealership(o),
       assigneeName: o.assignee || '',
-      createdMonthYear: formatMonthYear(o.createdAt),
+      createdMonthYear: formatContactHistoryMonthYear(o.createdAt),
       sortTime: interactionSortTime(o),
       customer: o.customer || o
     })
@@ -573,9 +562,12 @@ const pastRequestRows = computed(() => {
       title: s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
       titleWithYear: s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
       subtitle: (s.subtitle && String(s.subtitle).trim()) || '',
+      vehicleDisplayLine:
+        s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
+      sourceDetail: resolveContactHistorySource(s),
       dealership: '',
       assigneeName: '',
-      createdMonthYear: formatMonthYear(s.createdAt),
+      createdMonthYear: formatContactHistoryMonthYear(s.createdAt),
       sortTime: interactionSortTime(s),
       customer: props.task.customer || null
     })

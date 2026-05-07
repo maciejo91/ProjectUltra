@@ -1,6 +1,6 @@
 <template>
   <div
-    class="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1.5 text-xs font-medium text-foreground"
+    class="inline-flex items-center gap-2 px-0 text-sm font-medium text-foreground"
     aria-hidden="true"
   >
     <template v-for="(step, index) in steps" :key="step.key">

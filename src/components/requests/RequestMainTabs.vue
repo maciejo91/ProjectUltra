@@ -1,6 +1,9 @@
 <template>
   <Tabs :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)">
-    <div class="relative w-full shrink-0">
+    <div
+      class="relative w-full shrink-0"
+      :class="showBaselineRule && 'request-main-tabs--with-baseline'"
+    >
       <TabsList
         class="request-main-tabs-list relative z-10 inline-flex w-fit max-w-full min-w-0 flex-nowrap items-end justify-start gap-1 overflow-x-auto border-0 bg-background p-0 shadow-none ring-0"
       >
@@ -30,6 +33,7 @@
         </TabsTrigger>
       </TabsList>
       <div
+        v-if="showBaselineRule"
         class="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-px bg-border"
         aria-hidden="true"
       />
@@ -48,6 +52,10 @@ defineProps({
   tabs: {
     type: Array,
     required: true
+  },
+  showBaselineRule: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -68,8 +76,12 @@ defineEmits(['update:modelValue'])
   flex: 0 0 auto !important;
   width: auto !important;
   max-width: none !important;
-  margin-bottom: -2px !important;
+  margin-bottom: 0 !important;
   box-shadow: none !important;
+}
+
+.request-main-tabs--with-baseline :deep(.request-main-tabs-trigger[role='tab']) {
+  margin-bottom: -2px !important;
 }
 
 :deep(.request-main-tabs-trigger[role='tab']::before),

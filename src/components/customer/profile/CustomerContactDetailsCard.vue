@@ -200,8 +200,13 @@ import {
 import { useToastStore } from '@/stores/toast'
 import { useRequestNavigationStore } from '@/stores/requestNavigation'
 import { useUserStore } from '@/stores/user'
-import { useUsersStore } from '@/stores/users'
 import ContactHistoryGroupedList from '@/components/shared/ContactHistoryGroupedList.vue'
+import {
+  buildContactHistoryVehicleLine,
+  formatContactHistoryMonthYear,
+  resolveContactHistoryDealership,
+  resolveContactHistorySource
+} from '@/utils/contactHistoryRow'
 import CallInterface from '@/components/tasks/lead/CallInterface.vue'
 import CallForm from '@/components/shared/communication/CallForm.vue'
 import AddEmailModal from '@/components/modals/AddEmailModal.vue'
@@ -224,7 +229,6 @@ const router = useRouter()
 const toastStore = useToastStore()
 const requestNavigationStore = useRequestNavigationStore()
 const userStore = useUserStore()
-const usersStore = useUsersStore()
 
 const showCallPanel = ref(false)
 const callActionsOpen = ref(false)
@@ -255,29 +259,6 @@ function interactionSortTime(raw) {
   return t1 ? new Date(t1).getTime() : 0
 }
 
-function getAssigneeDisplay(assigneeName, original) {
-  if (!assigneeName) return 'Unassigned'
-  const user = usersStore.users.find((u) => u.name === assigneeName)
-  if (!user) return assigneeName
-  const line2 = [user.team, user.dealership].filter(Boolean).join(' - ')
-  if (line2) return `${assigneeName} (${line2})`
-  const fallbackLine2 = [original?.assigneeTeam, original?.assigneeDealership].filter(Boolean).join(' - ')
-  return fallbackLine2 ? `${assigneeName} (${fallbackLine2})` : assigneeName
-}
-
-function buildVehicleLine(original, fallbackTitle) {
-  const r = original || {}
-  const car = r.requestedCar || r.vehicle || {}
-  const vehicleTitle =
-    [car.brand, car.model].filter(Boolean).join(' ') ||
-    (typeof fallbackTitle === 'string' ? fallbackTitle : '') ||
-    '—'
-  const year = car.year != null && car.year !== '' ? String(car.year) : ''
-  const dealership = car.dealership || r.dealership || ''
-  const assignee = getAssigneeDisplay(r.assignee, r)
-  return [vehicleTitle, year, dealership, assignee].filter(Boolean).join(' · ')
-}
-
 const otherInteractionRows = computed(() => {
   const rows = []
   ;(props.leads || []).forEach((l) => {
@@ -290,8 +271,13 @@ const otherInteractionRows = computed(() => {
       compositeId: `lead-${l.id}`,
       stage: l.stage || 'Open',
       title: fallbackTitle,
+      titleWithYear: fallbackTitle,
       subtitle: l.requestedCar?.year ? String(l.requestedCar.year) : '',
-      displayLine: buildVehicleLine(l, fallbackTitle),
+      vehicleDisplayLine: buildContactHistoryVehicleLine(l, fallbackTitle),
+      sourceDetail: resolveContactHistorySource(l),
+      dealership: resolveContactHistoryDealership(l),
+      assigneeName: l.assignee || '',
+      createdMonthYear: formatContactHistoryMonthYear(l.createdAt),
       sortTime: interactionSortTime(l),
       customer: l.customer || l
     })
@@ -306,8 +292,13 @@ const otherInteractionRows = computed(() => {
       compositeId: `opportunity-${o.id}`,
       stage: o.stage || 'Open',
       title: fallbackTitle,
+      titleWithYear: fallbackTitle,
       subtitle: o.requestedCar?.year ? String(o.requestedCar.year) : '',
-      displayLine: buildVehicleLine(o, fallbackTitle),
+      vehicleDisplayLine: buildContactHistoryVehicleLine(o, fallbackTitle),
+      sourceDetail: resolveContactHistorySource(o),
+      dealership: resolveContactHistoryDealership(o),
+      assigneeName: o.assignee || '',
+      createdMonthYear: formatContactHistoryMonthYear(o.createdAt),
       sortTime: interactionSortTime(o),
       customer: o.customer || o
     })
@@ -319,8 +310,14 @@ const otherInteractionRows = computed(() => {
       compositeId: `service-${s.id}`,
       stage: s.stage || 'Open',
       title: s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
+      titleWithYear: s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
       subtitle: (s.subtitle && String(s.subtitle).trim()) || '',
-      displayLine: s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
+      vehicleDisplayLine:
+        s.title || t('customerProfile.rightColumn.fallbackServiceTitle'),
+      sourceDetail: resolveContactHistorySource(s),
+      dealership: '',
+      assigneeName: '',
+      createdMonthYear: formatContactHistoryMonthYear(s.createdAt),
       sortTime: interactionSortTime(s),
       customer: props.customer || null
     })

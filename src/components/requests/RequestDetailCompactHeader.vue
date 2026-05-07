@@ -64,40 +64,12 @@
           </div>
         </div>
 
-        <div
-          class="flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-2 lg:justify-end"
-        >
-          <DropdownMenu :modal="false">
-            <DropdownMenuTrigger as-child>
-              <button
-                type="button"
-                class="shrink-0 rounded-full border border-transparent p-0 transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                :aria-label="lifecycleAriaLabel || t('requestDetail.headerLifecycleMenuAria')"
-              >
-                <RequestHeaderLifecycleStepper :steps="lifecycleSteps" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="max-h-64 min-w-48 overflow-y-auto p-1.5" align="end">
-              <DropdownMenuItem
-                v-for="stage in statusOptions"
-                :key="stage"
-                class="flex cursor-pointer items-center rounded-sm px-2 py-1.5"
-                @select="emit('update-status', stage)"
-              >
-                <span
-                  class="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium leading-none"
-                  :class="[
-                    getStageColorClass(stage),
-                    stage === displayStage && 'ring-1 ring-ring ring-inset'
-                  ]"
-                >
-                  {{ stage }}
-                </span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div class="flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-1 lg:justify-end">
+          <div class="inline-flex h-10 shrink-0 items-center rounded-md px-3">
+            <RequestHeaderLifecycleStepper :steps="lifecycleSteps" />
+          </div>
 
-          <div class="flex shrink-0 items-center gap-2">
+          <div class="ml-1 flex shrink-0 items-center gap-2">
             <Button
               variant="outline"
               size="icon-sm"
@@ -131,6 +103,7 @@
       </div>
 
       <div
+        v-if="showTagsRow"
         class="mt-1 flex w-full min-w-0 flex-wrap items-center gap-1 pl-12"
       >
         <TagPillWithPopover
@@ -189,10 +162,6 @@ import {
 } from 'lucide-vue-next'
 import {
   Button,
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem
 } from '@motork/component-library/future/primitives'
 import RequestHeaderLifecycleStepper from './RequestHeaderLifecycleStepper.vue'
 import TagPillWithPopover from '@/components/shared/TagPillWithPopover.vue'
@@ -226,6 +195,10 @@ const props = defineProps({
   aiSummary: {
     type: String,
     default: ''
+  },
+  showTags: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -243,16 +216,19 @@ const emit = defineEmits([
 const { t } = useI18n()
 
 const isFullWidthLayout = computed(() => props.layout === 'fullWidth')
+const isCompactStickyLayout = computed(() => props.layout === 'sticky')
+const showTagsRow = computed(() => props.showTags && isFullWidthLayout.value)
 
 const headerRootClass = computed(() => {
-  const base =
-    'flex min-w-0 shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-2 py-2 md:gap-3 md:px-4'
+  const base = isFullWidthLayout.value
+    ? 'flex min-w-0 shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-2 py-2 md:gap-3 md:px-4'
+    : 'flex min-w-0 shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-2 py-1 md:gap-3 md:px-4'
   if (isFullWidthLayout.value) {
     return [base, 'w-full']
   }
   return [
     base,
-    'sticky top-0 z-40',
+    'sticky top-0 z-50',
     props.show
       ? ''
       : 'pointer-events-none h-0 overflow-hidden border-0 py-0 opacity-0'

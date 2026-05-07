@@ -1235,7 +1235,6 @@ button[class*="size-icon-lg"] {
   position: relative;
   background: transparent !important;
 }
-
 /* Individual tab triggers - from reference */
 [role="tab"],
 .tab-trigger {

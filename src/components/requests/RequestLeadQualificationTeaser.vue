@@ -48,7 +48,8 @@
         <RequestLqTaskExpandedOutcomeShell
           :active="true"
           :flex-fill="false"
-          :show-animated-border="outcomeShellAnimated"
+          :use-shell-scroll="false"
+          :show-animated-border="false"
         >
           <slot name="outcome" />
         </RequestLqTaskExpandedOutcomeShell>
@@ -271,10 +272,6 @@ const props = defineProps({
   hideManageCallNowCta: {
     type: Boolean,
     default: false
-  },
-  outcomeShellAnimated: {
-    type: Boolean,
-    default: true
   },
   hideBodySubheader: {
     type: Boolean,

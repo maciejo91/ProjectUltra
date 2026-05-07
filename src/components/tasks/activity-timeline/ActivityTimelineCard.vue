@@ -1,11 +1,21 @@
 <template>
-  <div :class="cardClass">
-    <slot />
+  <div :class="[shellBaseClass, attrs.class]" v-bind="passthroughAttrs">
+    <span
+      v-if="showAccent"
+      class="w-1 shrink-0 self-stretch"
+      :class="accentBarClass"
+      aria-hidden="true"
+    />
+    <div :class="['min-w-0 flex-1', innerPaddingClass]">
+      <slot />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, useAttrs } from 'vue'
+
+defineOptions({ inheritAttrs: false })
 
 const props = defineProps({
   accent: {
@@ -14,33 +24,47 @@ const props = defineProps({
   },
   surface: {
     type: String,
-    default: 'muted' // 'muted' | 'background'
+    default: 'muted'
   },
   showAccent: {
     type: Boolean,
     default: true
+  },
+  innerPaddingClass: {
+    type: String,
+    default: 'py-3.5 pr-3.5 pl-4'
   }
 })
 
-const cardClass = computed(() => {
-  const base = `rounded-lg border border-border py-3.5 pl-4 pr-3.5 border-solid${
-    props.showAccent ? ' border-l-4' : ''
-  }`
+const attrs = useAttrs()
 
-  const accents = {
-    note: 'border-l-amber-500',
-    message: 'border-l-green-500',
-    messageGreen: 'border-l-green-500',
-    email: 'border-l-purple-500',
-    call: 'border-l-blue-600',
-    ai: 'border-l-purple-500',
-    appointment: 'border-l-purple-500',
-    default: 'border-l-muted-foreground/35'
+const passthroughAttrs = computed(() => {
+  const { class: _c, ...rest } = attrs
+  return rest
+})
+
+const accents = {
+  note: 'bg-amber-500',
+  message: 'bg-green-500',
+  messageGreen: 'bg-green-500',
+  email: 'bg-purple-500',
+  call: 'bg-blue-600',
+  ai: 'bg-purple-500',
+  appointment: 'bg-purple-500',
+  default: 'bg-muted-foreground/35'
+}
+
+const shellBaseClass = computed(() => {
+  const layout =
+    'flex min-w-0 overflow-hidden rounded-lg border border-solid border-border'
+  if (props.accent === 'note') {
+    return `${layout} border-transparent bg-amber-50`
   }
-
-  const noteSurface = props.accent === 'note' ? 'bg-amber-50 border-transparent' : ''
   const bg = props.surface === 'background' ? 'bg-background' : 'bg-muted'
-  const accentClass = props.showAccent ? accents[props.accent] || accents.default : ''
-  return `${base} ${noteSurface || bg} ${accentClass}`.trim()
+  return `${layout} ${bg}`
 })
+
+const accentBarClass = computed(() =>
+  props.showAccent ? accents[props.accent] || accents.default : ''
+)
 </script>

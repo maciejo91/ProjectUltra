@@ -1,12 +1,15 @@
 <template>
   <div
-    class="flex flex-col gap-2"
+    class="flex flex-col"
     :class="{
       'cursor-pointer transition-opacity hover:opacity-90': clickable,
       'border-b border-border': showRowSeparator,
-      'py-2': !isLast && compactBottomSpacing,
-      'py-4': !isLast && !compactBottomSpacing,
-      'gap-1': isSophieCondensedCommunication
+      'mb-5': !isLast && isSophieAnchoredVariant,
+      'py-2': !isLast && !isSophieAnchoredVariant && compactBottomSpacing,
+      'py-4': !isLast && !isSophieAnchoredVariant && !compactBottomSpacing,
+      'gap-3': isSophieAnchoredVariant,
+      'gap-2': !isSophieAnchoredVariant && isSophieCondensedCommunication,
+      'gap-2': !isSophieAnchoredVariant && !isSophieCondensedCommunication
     }"
     @click="onRowClick"
   >
@@ -16,10 +19,13 @@
     >
       <div :class="isCommunicationActivity || isCallActivity ? 'w-full sm:w-2/3' : 'w-full'">
         <div
-          class="flex min-w-0 items-center gap-3"
-          :class="isRightAlignedEffective ? 'justify-end' : 'justify-start'"
+          class="flex min-w-0 items-center"
+          :class="[
+            isRightAlignedEffective ? 'justify-end' : 'justify-start',
+            isSophieAnchoredVariant ? 'gap-2' : 'gap-3'
+          ]"
         >
-          <div class="relative flex w-6 shrink-0 justify-center">
+          <div class="relative flex w-8 shrink-0 justify-center">
             <ActivityTimelineIcon :activity="activity" />
           </div>
           <p
@@ -39,9 +45,6 @@
               </span>
               <template v-if="type === 'call'">
                 <span class="inline-flex flex-wrap items-center gap-1.5">
-                  <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
-                    {{ t('entities.activity.timeline.callPills.outbound') }}
-                  </span>
                   <span
                     v-if="callStatusPill.label"
                     class="rounded-full px-2 py-0.5 text-xs font-medium"
@@ -49,16 +52,6 @@
                   >
                     {{ callStatusPill.label }}
                   </span>
-                </span>
-              </template>
-              <template v-else-if="showMessagePills">
-                <span class="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
-                  <component
-                    :is="isInboundCommunication ? ArrowDownLeft : ArrowUpRight"
-                    class="size-3 shrink-0 text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                  {{ communicationChannelPillLabel }}
                 </span>
               </template>
               <span
@@ -83,14 +76,13 @@
       :class="[
         isRightAlignedEffective ? 'flex justify-end' : '',
         outboundCardShiftClass,
-        isSophieCondensedCommunication ? 'mt-1' : ''
+        isSophieAnchoredVariant ? 'mt-1' : (isSophieCondensedCommunication ? 'mt-1' : '')
       ]"
     >
       <template v-if="type === 'note'">
         <ActivityTimelineCard
           :accent="cardAccent"
           surface="background"
-          class="border-transparent bg-amber-50"
         >
           <p class="text-sm leading-relaxed text-foreground wrap-break-word">
             {{ noteOrAiBody }}
@@ -115,15 +107,15 @@
           :accent="cardAccent"
           :surface="isInboundCommunication ? 'background' : 'muted'"
           :show-accent="!(isSophieAnchoredVariant && !isInboundCommunication)"
+          :inner-padding-class="communicationCardInnerPaddingClass"
           :class="[
             isSophieAnchoredVariant && !isInboundCommunication
-              ? 'border-transparent bg-muted shadow-none py-3 pl-3 pr-3'
+              ? 'border-transparent bg-muted shadow-none'
               : isInboundCommunication
                 ? isSophieAnchoredVariant
                   ? 'border-foreground/5 shadow-mk-dashboard-card'
                   : 'border-foreground/12'
-                : 'border-transparent',
-            !(isSophieAnchoredVariant && !isInboundCommunication) && isSophieCondensedCommunication ? 'py-2' : ''
+                : 'border-transparent'
           ]"
           class="w-full sm:w-2/3"
         >
@@ -166,15 +158,15 @@
           :accent="cardAccent"
           :surface="isInboundCommunication ? 'background' : 'muted'"
           :show-accent="!(isSophieAnchoredVariant && !isInboundCommunication)"
+          :inner-padding-class="communicationCardInnerPaddingClass"
           :class="[
             isSophieAnchoredVariant && !isInboundCommunication
-              ? 'border-transparent bg-muted shadow-none py-3 pl-3 pr-3'
+              ? 'border-transparent bg-muted shadow-none'
               : isInboundCommunication
                 ? isSophieAnchoredVariant
                   ? 'border-foreground/5 shadow-mk-dashboard-card'
                   : 'border-foreground/12'
-                : 'border-transparent',
-            !(isSophieAnchoredVariant && !isInboundCommunication) && isSophieCondensedCommunication ? 'py-2' : ''
+                : 'border-transparent'
           ]"
           class="w-full sm:w-2/3"
         >
@@ -319,6 +311,9 @@ const systemHeadline = computed(() => isActivityTimelineSystemHeadline(props.act
 const callStatusPill = computed(() => {
   const raw = (props.activity?.message || props.activity?.content || props.activity?.data?.summary || '').toLowerCase()
   if (raw.includes('no answer')) {
+    if (isInboundCall.value) {
+      return { label: t('entities.activity.timeline.callPills.missed'), className: 'bg-orange-100 text-orange-700' }
+    }
     return { label: t('entities.activity.timeline.callPills.noAnswer'), className: 'bg-destructive/15 text-destructive' }
   }
   if (raw.includes('answered')) {
@@ -397,6 +392,18 @@ const showMessagePills = computed(() => {
 const isSophieCondensedCommunication = computed(() => {
   if (!isSophieAnchoredVariant.value) return false
   return isCommunicationActivity.value
+})
+
+const communicationMutedOutboundShell = computed(
+  () => isSophieAnchoredVariant.value && !isInboundCommunication.value
+)
+
+const communicationCardInnerPaddingClass = computed(() => {
+  if (communicationMutedOutboundShell.value) return 'py-3 px-3'
+  if (!communicationMutedOutboundShell.value && isSophieCondensedCommunication.value) {
+    return 'py-2 pr-3.5 pl-4'
+  }
+  return 'py-3.5 pr-3.5 pl-4'
 })
 
 const communicationChannelPillLabel = computed(() => {

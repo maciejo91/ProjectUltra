@@ -94,7 +94,9 @@
       "viewConversationShort": "Voir la conversation",
       "conversationTitle": "Conversation",
       "callPills": {
+        "inbound": "Inbound call",
         "outbound": "Outbound call",
+        "missed": "Missed call",
         "noAnswer": "No answer",
         "answered": "Answered"
       },

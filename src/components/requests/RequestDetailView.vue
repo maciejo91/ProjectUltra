@@ -140,7 +140,8 @@
           :filtered-requests="filteredRequests"
           :is-full-page="isFullPage"
           :show="true"
-          layout="fullWidth"
+          layout="sticky"
+          :show-tags="false"
           :ai-summary="request?.type === 'lead' ? request.aiSummary || '' : ''"
           @close="$emit('close')"
           @previous="handlePrevious"
@@ -168,7 +169,7 @@
         />
       </div>
       <div
-        class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-hidden p-4"
+        class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-x-hidden overflow-y-visible p-4"
       >
         <DuplicateDetectedCard
           v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
@@ -180,9 +181,9 @@
       <div
         ref="requestDetailRowRef"
         :class="[
-          'flex min-h-0 flex-1 flex-col gap-4 overflow-x-hidden overscroll-contain lg:flex-row lg:items-stretch lg:gap-4 lg:min-h-0',
+          'flex min-h-0 flex-1 flex-col gap-4 overscroll-contain max-lg:overflow-x-hidden lg:min-w-0 lg:flex-row lg:items-start lg:gap-4 lg:min-h-0',
           'max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto',
-          'lg:overflow-y-auto lg:overflow-x-hidden lg:overscroll-contain',
+          'lg:overflow-y-auto lg:overscroll-contain',
           requestFloatingBarScrollPadding.row
         ]"
       >
@@ -197,7 +198,7 @@
               requestFloatingBarScrollPadding.main
             ]"
           >
-          <div class="flex min-w-0 shrink-0 flex-col gap-4">
+          <div class="flex min-w-0 flex-col gap-4 max-lg:shrink-0 lg:min-h-0 lg:min-w-0 lg:flex-1">
             <div
               ref="requestCustomerSectionRef"
               class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg border border-border bg-background shadow-mk-dashboard-card"
@@ -219,13 +220,30 @@
             </div>
 
             <div
-              class="flex min-w-0 shrink-0 flex-col rounded-lg border border-border bg-background shadow-mk-dashboard-card"
+              class="flex min-h-0 min-w-0 max-lg:shrink-0 flex-col overflow-visible rounded-lg border border-border bg-background shadow-mk-dashboard-card isolate lg:flex-1 lg:min-h-0"
             >
-              <div class="sticky top-0 z-20 shrink-0 rounded-t-lg bg-background px-4 pt-2">
-                <RequestMainTabs class="shrink-0" v-model="mainTab" :tabs="mainTabs" />
-              </div>
+              <div class="flex min-h-0 min-w-0 flex-col">
+                <div
+                  class="sticky top-0 z-40 shrink-0 overflow-hidden rounded-t-lg bg-background"
+                  :class="{
+                    'lg:border-t lg:border-border': mainTabsStripElevated
+                  }"
+                >
+                  <div class="border-b border-border px-4 pb-0 pt-2">
+                    <RequestMainTabs
+                      class="shrink-0"
+                      v-model="mainTab"
+                      :tabs="mainTabs"
+                      :show-baseline-rule="false"
+                    />
+                  </div>
+                </div>
 
-              <div class="flex shrink-0 flex-col gap-4 border-t border-border p-4">
+                <div
+                  ref="requestTabPanelScrollRef"
+                  class="flex min-h-0 min-w-0 flex-col gap-4 overflow-x-hidden rounded-b-lg max-lg:shrink-0 lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+                  :class="mainTab === 'activity' ? '' : 'p-4'"
+                >
               <template v-if="mainTab === 'overview'">
                 <div class="flex flex-col gap-4">
                 <RequestInsightBanner
@@ -249,7 +267,6 @@
                   :assignment-lead-id="request?.id"
                   :manage-open="lqfInlineManageOpen"
                   :hide-manage-call-now-cta="lqfHideManageCallNowCta"
-                  :outcome-shell-animated="lqfOutcomeShellAnimated"
                   :contact-attempts="lqfContactAttemptsCount"
                   :max-contact-attempts="lqfMaxContactAttemptsLimit"
                   hide-body-subheader
@@ -397,6 +414,7 @@
                 </div>
               </template>
 
+                </div>
               </div>
             </div>
           </div>
@@ -426,46 +444,42 @@
         </div>
 
         <div
-          class="order-2 flex min-h-0 min-w-0 flex-col lg:sticky lg:top-0 lg:w-1/4 lg:shrink-0 lg:self-stretch lg:min-h-0 lg:overscroll-contain"
+          :class="[
+            'order-2 flex min-h-0 min-w-0 flex-col gap-4 lg:sticky lg:top-0 lg:w-1/4 lg:shrink-0 lg:self-start lg:max-h-screen lg:min-h-0 lg:overscroll-contain',
+            floatingLqFocusMode ? 'lg:overflow-hidden' : 'lg:overflow-y-auto lg:overscroll-contain'
+          ]"
         >
-          <div
-            :class="[
-              'flex flex-col gap-4 lg:min-h-0 lg:flex-1',
-              floatingLqFocusMode ? 'lg:overflow-hidden' : 'lg:overflow-y-auto lg:overscroll-contain'
-            ]"
-          >
-            <VehicleRequestCard
-              v-if="request && (request.requestedCar || request.vehicle)"
-              class="shrink-0"
-              :heading="t('requestDetail.vehicleCard.title')"
-              :vehicle="request.requestedCar || request.vehicle"
-              :request-message="request.requestMessage || request.requestedCar?.requestMessage"
-              :request-context="requestedVehicleRequestContext"
-              :dealership-needs-warning="!!request.dealershipNeedsWarning"
-              :source="request.source"
-              :source-url="request.requestedCar?.listingUrl || request.sourceUrl || ''"
-              :image-url="getCarImageUrl(request.requestedCar || request.vehicle)"
-              :save-requested-car="handleRequestedCarSave"
-              :stock-status="request.carStatus || ''"
-              :metrics-funnel-count="request.listingMetrics?.funnelViews"
-              :metrics-tag-count="request.listingMetrics?.tagCount"
-              hide-request-message
-              @open-ad="handleOpenAd"
-              @more-actions="handleMoreActions"
-            />
-            <RequestMessageCard
-              v-if="request && showRequestDetailsCard"
-              class="shrink-0"
-              :title="t('requestDetail.messageCard.title')"
-              :message="request.requestMessage || request.requestedCar?.requestMessage || ''"
-              :utm-source="requestAttribution.utmSource"
-              :utm-term="requestAttribution.utmTerm"
-              :utm-campaign="requestAttribution.utmCampaign"
-              :web-spark-campaign="requestAttribution.webSparkCampaign"
-              :advertisement-url="requestAttribution.advertisementUrl"
-              :original-email-url="requestAttribution.originalEmailUrl"
-            />
-          </div>
+          <VehicleRequestCard
+            v-if="request && (request.requestedCar || request.vehicle)"
+            class="shrink-0"
+            :heading="t('requestDetail.vehicleCard.title')"
+            :vehicle="request.requestedCar || request.vehicle"
+            :request-message="request.requestMessage || request.requestedCar?.requestMessage"
+            :request-context="requestedVehicleRequestContext"
+            :dealership-needs-warning="!!request.dealershipNeedsWarning"
+            :source="request.source"
+            :source-url="request.requestedCar?.listingUrl || request.sourceUrl || ''"
+            :image-url="getCarImageUrl(request.requestedCar || request.vehicle)"
+            :save-requested-car="handleRequestedCarSave"
+            :stock-status="request.carStatus || ''"
+            :metrics-funnel-count="request.listingMetrics?.funnelViews"
+            :metrics-tag-count="request.listingMetrics?.tagCount"
+            hide-request-message
+            @open-ad="handleOpenAd"
+            @more-actions="handleMoreActions"
+          />
+          <RequestMessageCard
+            v-if="request && showRequestDetailsCard"
+            class="shrink-0"
+            :title="t('requestDetail.messageCard.title')"
+            :message="request.requestMessage || request.requestedCar?.requestMessage || ''"
+            :utm-source="requestAttribution.utmSource"
+            :utm-term="requestAttribution.utmTerm"
+            :utm-campaign="requestAttribution.utmCampaign"
+            :web-spark-campaign="requestAttribution.webSparkCampaign"
+            :advertisement-url="requestAttribution.advertisementUrl"
+            :original-email-url="requestAttribution.originalEmailUrl"
+          />
         </div>
       </div>
     </div>
@@ -574,6 +588,7 @@ const duplicateBannerDismissed = ref(false)
 const requestMainColumnScrollRef = ref(null)
 const requestDetailRowRef = ref(null)
 const requestDetailBodyRef = ref(null)
+const requestTabPanelScrollRef = ref(null)
 const requestHeaderStripRef = ref(null)
 const requestCustomerSectionRef = ref(null)
 const showCompactRequestHeader = ref(false)
@@ -586,6 +601,7 @@ const lqfTeaserDismissed = ref(false)
 const lqfInlineManageOpen = ref(false)
 const leadLqOutcomeSummary = ref(null)
 const floatingLqFocusMode = ref(false)
+const mainTabsStripElevated = ref(false)
 
 const qualifyInlineSuccessForRequest = computed(() =>
   resolveStoredQualifyInlineSuccess(props.request, leadsStore.lastInlineLeadQualifySuccess)
@@ -901,8 +917,6 @@ const lqfHideManageCallNowCta = computed(() => {
   return stage === LEAD_STAGES.TO_BE_CALLED_BACK || stage === LEAD_STAGES.VALID_TO_BE_CALLED_BACK
 })
 
-const lqfOutcomeShellAnimated = computed(() => !leadLqOutcomeSummary.value)
-
 watch(isClosedLead, (closed, wasClosed) => {
   if (wasClosed === true && closed === false) {
     leadLqOutcomeSummary.value = null
@@ -926,17 +940,31 @@ function isCustomerSectionScrolledPast(scrollRoot, sectionEl) {
   return scrollRoot.scrollTop >= sectionBottomInContent - 1
 }
 
+function getWindowScrollRoot() {
+  if (typeof document === 'undefined') return null
+  return document.scrollingElement || document.documentElement
+}
+
+function isElementScrollable(el) {
+  if (!el) return false
+  return el.scrollHeight > el.clientHeight + 1
+}
+
 function getScrollRootForHeader() {
-  if (typeof window === 'undefined') return requestMainColumnScrollRef.value
-  return window.matchMedia('(min-width: 1024px)').matches
-    ? requestMainColumnScrollRef.value
-    : requestDetailRowRef.value
+  // We need the element that actually scrolls. After sticky tabs/layout changes,
+  // the main column wrapper is often NOT scrollable (overflow-visible).
+  const row = requestDetailRowRef.value
+  const body = requestDetailBodyRef.value
+  const mainCol = requestMainColumnScrollRef.value
+  if (isElementScrollable(row)) return row
+  if (isElementScrollable(body)) return body
+  if (isElementScrollable(mainCol)) return mainCol
+  return getWindowScrollRoot()
 }
 
 function updateCompactHeaderVisibility() {
   const section = requestCustomerSectionRef.value
   const mainCol = getScrollRootForHeader()
-  const body = requestDetailBodyRef.value
   if (!section) {
     showCompactRequestHeader.value = false
     return
@@ -945,11 +973,15 @@ function updateCompactHeaderVisibility() {
     showCompactRequestHeader.value = true
     return
   }
-  if (isCustomerSectionScrolledPast(body, section)) {
-    showCompactRequestHeader.value = true
-    return
-  }
   showCompactRequestHeader.value = false
+}
+
+function updateMainTabsStripElevation() {
+  const panel = requestTabPanelScrollRef.value
+  const row = requestDetailRowRef.value
+  mainTabsStripElevated.value = Boolean(
+    (panel && panel.scrollTop > 0) || (row && row.scrollTop > 0)
+  )
 }
 
 function scheduleCompactHeaderUpdate() {
@@ -958,6 +990,7 @@ function scheduleCompactHeaderUpdate() {
   requestAnimationFrame(() => {
     compactHeaderRafPending = false
     updateCompactHeaderVisibility()
+    updateMainTabsStripElevation()
   })
 }
 
@@ -1010,6 +1043,11 @@ function attachRequestHeaderCompactTracking() {
     row.addEventListener('scroll', onScroll, { passive: true })
     cleanups.push(() => row.removeEventListener('scroll', onScroll))
     cleanups.push(...attachScrollListenersToScrollableAncestors(row, onScroll))
+  }
+  const tabPanel = requestTabPanelScrollRef.value
+  if (tabPanel) {
+    tabPanel.addEventListener('scroll', onScroll, { passive: true })
+    cleanups.push(() => tabPanel.removeEventListener('scroll', onScroll))
   }
   if (body) {
     body.addEventListener('scroll', onScroll, { passive: true })

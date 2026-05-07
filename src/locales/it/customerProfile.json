@@ -20,6 +20,18 @@
     "serviceDetailDemo": "I dettagli del service non sono disponibili in questa demo.",
     "fallbackLeadTitle": "Lead",
     "fallbackOpportunityTitle": "Opportunity",
+    "stages": {
+      "open": "Open",
+      "qualified": "Qualificata",
+      "validated": "Convalidata",
+      "notValid": "Non valida",
+      "notInterested": "Non interessata",
+      "closedFailed": "Chiusa (fallita)",
+      "inNegotiation": "In trattativa",
+      "closedWon": "Vinta",
+      "closedLost": "Persa",
+      "abandoned": "Abbandonata"
+    },
     "appointments": "Appuntamenti",
     "addAppointment": "Aggiungi",
     "noAppointments": "Nessun appuntamento in programma.",
