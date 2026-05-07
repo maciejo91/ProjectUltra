@@ -16,10 +16,10 @@
             <Label class="block text-sm font-semibold text-foreground">
               Note <span class="text-brand-red">*</span>
             </Label>
-            <Textarea 
+            <Textarea
               v-model="noteText"
-              rows="8" 
-              :placeholder="t('common.notes.placeholder')"
+              rows="8"
+              :placeholder="notePlaceholder"
               required
               class="w-full min-h-[200px] resize-none"
             />
@@ -66,7 +66,7 @@
         v-model="noteText"
         rows="4"
         class="w-full resize-none min-h-[120px]"
-        :placeholder="t('common.notes.placeholder')"
+        :placeholder="notePlaceholder"
       />
     </div>
     <div v-if="!hideActions" class="flex justify-end gap-2 mt-6 pt-4 border-t border-border">
@@ -104,6 +104,7 @@ import {
 } from '@motork/component-library/future/primitives'
 
 const { t } = useI18n()
+const notePlaceholder = 'Type a note here and use @ to mention someone'
 
 const props = defineProps({
   // Modal mode props

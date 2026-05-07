@@ -3,7 +3,7 @@
     <div class="py-2">
       <Textarea
         v-model="message"
-        :placeholder="t('common.notes.placeholder')"
+        :placeholder="notePlaceholder"
         class="min-h-48 border-0 shadow-none focus-visible:ring-0 px-0 resize-none"
       />
     </div>
@@ -12,7 +12,6 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { Textarea } from '@motork/component-library/future/primitives'
 
 const props = defineProps({
@@ -21,7 +20,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:valid', 'update:draft', 'save'])
 
-const { t } = useI18n()
+const notePlaceholder = 'Type a note here and use @ to mention someone'
 
 const message = ref('')
 
