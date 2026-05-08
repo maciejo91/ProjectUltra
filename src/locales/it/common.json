@@ -143,7 +143,9 @@
     "typeSms": "Scrivi qui il tuo SMS…",
     "smsFromPlaceholder": "Il tuo numero di telefono",
     "smsToPlaceholder": "Aggiungi numero di telefono",
-    "smsCharacters": "{count}/160 caratteri"
+    "smsCharacters": "{count}/{max} caratteri",
+    "smsCreditsLeft": "Hai {count} crediti disponibili sul tuo account",
+    "send": "Invia"
   },
   "status": {
     "hot": "Hot",

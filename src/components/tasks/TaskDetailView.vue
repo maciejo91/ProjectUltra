@@ -255,7 +255,7 @@
     />
 
     <SMSComposerDock
-      v-if="displayTask?.type === 'lead'"
+      v-if="displayTask?.type === 'lead' && !useLegacyCommunicationDialogs"
       :open="showSophieSMSComposer"
       :initial-channel="sophieMessageChannel"
       :initial-from="userStore.currentUser?.phone || userStore.currentUser?.mobile || ''"
@@ -274,7 +274,7 @@
     />
 
     <EmailComposerDock
-      v-if="displayTask?.type === 'lead'"
+      v-if="displayTask?.type === 'lead' && !useLegacyCommunicationDialogs"
       :open="showSophieEmailComposer"
       :initial-from="userStore.currentUser?.email || ''"
       :initial-to="displayTask?.customer?.email || ''"
@@ -455,6 +455,11 @@ const displayTask = computed(() => {
     }
   }
   return t
+})
+
+const useLegacyCommunicationDialogs = computed(() => {
+  const customerName = String(displayTask.value?.customer?.name ?? '').trim()
+  return displayTask.value?.type === 'lead' && customerName === 'Josh Adams'
 })
 
 const qualifyInlineSuccessEffective = computed(() =>
@@ -689,30 +694,38 @@ function openFinancingEdit(f) {
 // Handle add activity from TaskActivityCard
 const handleAddActivity = (activityType) => {
   if (activityType === 'note') {
-    if (displayTask.value?.type === 'lead') {
-      showSophieNoteComposer.value = true
-    } else {
-      showNoteModal.value = true
-    }
+    showNoteModal.value = true
   } else if (activityType === 'attachment') {
     showAttachmentModal.value = true
   } else if (activityType === 'whatsapp') {
     if (displayTask.value?.type === 'lead') {
-      sophieMessageChannel.value = 'whatsapp'
-      showSophieSMSComposer.value = true
+      if (useLegacyCommunicationDialogs.value) {
+        showWhatsAppModal.value = true
+      } else {
+        sophieMessageChannel.value = 'whatsapp'
+        showSophieSMSComposer.value = true
+      }
     } else {
       showWhatsAppModal.value = true
     }
   } else if (activityType === 'sms') {
     if (displayTask.value?.type === 'lead') {
-      sophieMessageChannel.value = 'sms'
-      showSophieSMSComposer.value = true
+      if (useLegacyCommunicationDialogs.value) {
+        showSMSModal.value = true
+      } else {
+        sophieMessageChannel.value = 'sms'
+        showSophieSMSComposer.value = true
+      }
     } else {
       showSMSModal.value = true
     }
   } else if (activityType === 'email') {
     if (displayTask.value?.type === 'lead') {
-      showSophieEmailComposer.value = true
+      if (useLegacyCommunicationDialogs.value) {
+        showEmailModal.value = true
+      } else {
+        showSophieEmailComposer.value = true
+      }
     } else {
       showEmailModal.value = true
     }

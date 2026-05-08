@@ -22,7 +22,7 @@ export const useUserStore = defineStore('user', () => {
     try {
       const users = await usersApi.fetchUsers()
       if (users && users.length > 0) {
-        currentUser.value = users[0] // Default: First user (Salsabeel Khaleel - manager)
+        currentUser.value = users[0] // Default: first user (manager)
         isAuthenticated.value = true
       }
     } catch (error) {

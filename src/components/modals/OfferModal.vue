@@ -2,7 +2,7 @@
   <Dialog :open="show" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="w-[90vw] max-w-none min-h-[32rem] max-h-[calc(100vh-4rem)] flex flex-col p-0">
+      <DialogContent class="w-full sm:max-w-2xl min-h-[32rem] max-h-[calc(100vh-4rem)] flex flex-col p-0">
         <DialogHeader class="flex-shrink-0 p-6 pb-4 border-b border">
           <DialogTitle>Create Offer</DialogTitle>
         </DialogHeader>

@@ -60,6 +60,14 @@
       @close="showWhatsAppModal = false"
     />
 
+    <WhatsAppBusinessMockModal
+      :show="showWhatsAppBusinessMockModal"
+      :contact-name="request?.customer?.name || request?.customerName || ''"
+      :assignee-name="userStore.currentUser?.name || ''"
+      @close="showWhatsAppBusinessMockModal = false"
+      @choose-template="showWhatsAppBusinessMockModal = false"
+    />
+
     <AddSMSModal
       :show="showSMSModal"
       @save="handleActivitySMSSave"
@@ -67,7 +75,7 @@
     />
 
     <SMSComposerDock
-      v-if="request?.type === 'lead'"
+      v-if="request?.type === 'lead' && !useLegacyCommunicationDialogs"
       :open="showSophieSMSComposer"
       :initial-channel="sophieMessageChannel"
       :initial-from="userStore.currentUser?.phone || userStore.currentUser?.mobile || ''"
@@ -86,7 +94,7 @@
     />
 
     <EmailComposerDock
-      v-if="request?.type === 'lead'"
+      v-if="request?.type === 'lead' && !useLegacyCommunicationDialogs"
       :open="showSophieEmailComposer"
       :initial-from="userStore.currentUser?.email || ''"
       :initial-to="request?.customer?.email || ''"
@@ -516,6 +524,7 @@ import TaskActivityCard from '@/components/tasks/TaskActivityCard.vue'
 import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
 import AttachmentWidget from '@/components/shared/feed/AttachmentWidget.vue'
 import AddWhatsAppModal from '@/components/modals/AddWhatsAppModal.vue'
+import WhatsAppBusinessMockModal from '@/components/modals/WhatsAppBusinessMockModal.vue'
 import AddSMSModal from '@/components/modals/AddSMSModal.vue'
 import AddEmailModal from '@/components/modals/AddEmailModal.vue'
 import EmailComposerDock from '@/components/shared/communication/EmailComposerDock.vue'
@@ -618,10 +627,16 @@ function handleLqOutcomeSummary(payload) {
 const showNoteModal = ref(false)
 const showAttachmentModal = ref(false)
 const showWhatsAppModal = ref(false)
+const showWhatsAppBusinessMockModal = ref(false)
 const showSMSModal = ref(false)
 const showEmailModal = ref(false)
 const showSophieEmailComposer = ref(false)
 const showSophieSMSComposer = ref(false)
+
+const useLegacyCommunicationDialogs = computed(() => {
+  const customerName = String(props.request?.customer?.name ?? '').trim()
+  return props.request?.type === 'lead' && customerName === 'Josh Adams'
+})
 const sophieMessageChannel = ref('sms')
 const showSophieNoteComposer = ref(false)
 const showCallComingSoonModal = ref(false)
@@ -1348,7 +1363,11 @@ function handleQuickAction(key) {
   }
   if (key === 'email') {
     if (props.request?.type === 'lead') {
-      showSophieEmailComposer.value = true
+      if (useLegacyCommunicationDialogs.value) {
+        showEmailModal.value = true
+      } else {
+        showSophieEmailComposer.value = true
+      }
     } else {
       showEmailModal.value = true
     }
@@ -1356,28 +1375,34 @@ function handleQuickAction(key) {
   }
   if (key === 'sms') {
     if (props.request?.type === 'lead') {
-      sophieMessageChannel.value = 'sms'
-      showSophieSMSComposer.value = true
+      if (useLegacyCommunicationDialogs.value) {
+        showSMSModal.value = true
+      } else {
+        sophieMessageChannel.value = 'sms'
+        showSophieSMSComposer.value = true
+      }
     } else {
       showSMSModal.value = true
     }
     return
   }
   if (key === 'whatsapp') {
+    showWhatsAppBusinessMockModal.value = true
+    return
     if (props.request?.type === 'lead') {
-      sophieMessageChannel.value = 'whatsapp'
-      showSophieSMSComposer.value = true
+      if (useLegacyCommunicationDialogs.value) {
+        showWhatsAppModal.value = true
+      } else {
+        sophieMessageChannel.value = 'whatsapp'
+        showSophieSMSComposer.value = true
+      }
     } else {
       showWhatsAppModal.value = true
     }
     return
   }
   if (key === 'note') {
-    if (props.request?.type === 'lead') {
-      showSophieNoteComposer.value = true
-    } else {
-      showNoteModal.value = true
-    }
+    showNoteModal.value = true
     return
   }
   showGenericComingSoon.value = true
@@ -1468,24 +1493,28 @@ function handleActivitySummaryToggle(activityId) {
 
 function handleTaskAddActivity(activityType) {
   if (activityType === 'note') {
-    if (props.request?.type === 'lead') {
-      showSophieNoteComposer.value = true
-    } else {
-      showNoteModal.value = true
-    }
+    showNoteModal.value = true
   } else if (activityType === 'attachment') {
     showAttachmentModal.value = true
   } else if (activityType === 'whatsapp') {
     showWhatsAppModal.value = true
   } else if (activityType === 'sms') {
     if (props.request?.type === 'lead') {
-      showSophieSMSComposer.value = true
+      if (useLegacyCommunicationDialogs.value) {
+        showSMSModal.value = true
+      } else {
+        showSophieSMSComposer.value = true
+      }
     } else {
       showSMSModal.value = true
     }
   } else if (activityType === 'email') {
     if (props.request?.type === 'lead') {
-      showSophieEmailComposer.value = true
+      if (useLegacyCommunicationDialogs.value) {
+        showEmailModal.value = true
+      } else {
+        showSophieEmailComposer.value = true
+      }
     } else {
       showEmailModal.value = true
     }

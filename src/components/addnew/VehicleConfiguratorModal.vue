@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="handleOpenChange">
-    <DialogContent class="w-[90vw] max-w-none h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col gap-0 overflow-hidden p-0" :show-close-button="false">
+    <DialogContent class="w-full sm:max-w-2xl h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col gap-0 overflow-hidden p-0" :show-close-button="false">
       <DialogHeader class="shrink-0 px-6 py-4 border-b border-border overflow-hidden" style="border-bottom-color: var(--color-neutral-300);">
         <div class="grid grid-cols-[1fr_auto_1fr] items-start gap-4">
           <div class="min-w-0">

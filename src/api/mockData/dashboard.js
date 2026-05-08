@@ -69,7 +69,7 @@ export const mockActionableQuestions = [
     question: 'You had an appointment yesterday with Jean-Pierre Dubois but no offer is added so far. Did they show up to the appointment?',
     customer: { name: 'Jean-Pierre Dubois' },
     opportunityId: 1,
-    opportunity: { id: 1, assignee: 'Salsabeel Khaleel', customer: { name: 'Jean-Pierre Dubois' } },
+    opportunity: { id: 1, assignee: 'Maciej Ogonowski', customer: { name: 'Jean-Pierre Dubois' } },
     createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     appointmentDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   },
@@ -80,7 +80,7 @@ export const mockActionableQuestions = [
     question: 'This opportunity with Sarah Johnson has been inactive for 16 days. Are they still interested in purchasing?',
     customer: { name: 'Sarah Johnson' },
     opportunityId: 1,
-    opportunity: { id: 1, assignee: 'Salsabeel Khaleel', customer: { name: 'Sarah Johnson' } },
+    opportunity: { id: 1, assignee: 'Matteo Alpino', customer: { name: 'Sarah Johnson' } },
     createdAt: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(),
     daysInactive: 16
   },
@@ -93,7 +93,7 @@ export const mockActionableQuestions = [
     leadId: 1,
     opportunityId: null,
     opportunity: null,
-    lead: { id: 1, assignee: 'Salsabeel Khaleel', customer: { name: 'Michael Brown' } },
+    lead: { id: 1, assignee: 'Maciej Ogonowski', customer: { name: 'Michael Brown' } },
     createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
   }
 ]

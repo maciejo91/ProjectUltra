@@ -2,7 +2,7 @@
   <Dialog :open="show" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="w-[90vw] max-w-none max-h-[calc(100vh-4rem)] flex flex-col" :show-close-button="true">
+      <DialogContent class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col" :show-close-button="true">
         <DialogHeader class="shrink-0">
           <DialogTitle>Link lead</DialogTitle>
           <DialogDescription v-if="customer?.name" class="text-muted-foreground">

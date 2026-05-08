@@ -187,6 +187,32 @@ export class LeadRepository extends BaseRepository {
   }
 
   /**
+   * Keep assignee + initials in sync with current mock data for seeded leads.
+   * This avoids stale localStorage showing outdated demo names/initials after mock updates.
+   */
+  _syncAssigneeFromMock(leads) {
+    if (!Array.isArray(leads)) return
+    const mockLeads = getMockData().mockLeads || []
+    const mockById = new Map(mockLeads.map((l) => [l.id, l]))
+    let changed = false
+    for (const lead of leads) {
+      const mock = mockById.get(lead.id)
+      if (!mock) continue
+      const nextAssignee = mock.assignee ?? null
+      const nextInitials = mock.assigneeInitials ?? ''
+      if (lead.assignee !== nextAssignee) {
+        lead.assignee = nextAssignee
+        changed = true
+      }
+      if ((lead.assigneeInitials ?? '') !== nextInitials) {
+        lead.assigneeInitials = nextInitials
+        changed = true
+      }
+    }
+    if (changed) this._persist()
+  }
+
+  /**
    * Merge mock leads that don't exist in stored data (e.g. new demo leads).
    * Ensures new mock leads appear even when user has existing localStorage.
    */
@@ -217,12 +243,14 @@ export class LeadRepository extends BaseRepository {
           this._ensureRequestedCarPlates(this._leadsCache)
           this._ensureLeadAttributionFromMock(this._leadsCache)
           this._ensureTradeInsFinancingFromMock(this._leadsCache)
+          this._syncAssigneeFromMock(this._leadsCache)
           const merged = this._mergeNewMockLeads(this._leadsCache)
           if (merged.length > this._leadsCache.length) {
             this._leadsCache = merged
             this._ensureRequestedCarPlates(this._leadsCache)
             this._ensureLeadAttributionFromMock(this._leadsCache)
             this._ensureTradeInsFinancingFromMock(this._leadsCache)
+            this._syncAssigneeFromMock(this._leadsCache)
             this._persist()
           }
         }
@@ -233,6 +261,7 @@ export class LeadRepository extends BaseRepository {
         this._ensureRequestedCarPlates(this._leadsCache)
         this._ensureLeadAttributionFromMock(this._leadsCache)
         this._ensureTradeInsFinancingFromMock(this._leadsCache)
+        this._syncAssigneeFromMock(this._leadsCache)
         this._persist()
         try {
           localStorage.setItem(`${STORAGE_KEY}-version`, String(DATA_VERSION))

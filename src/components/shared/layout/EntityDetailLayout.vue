@@ -587,6 +587,14 @@
       @save="handleWhatsAppSave"
       @close="showWhatsAppModal = false"
     />
+
+    <WhatsAppBusinessMockModal
+      :show="showWhatsAppBusinessMockModal"
+      :contact-name="task?.customer?.name || task?.customerName || ''"
+      :assignee-name="userStore.currentUser?.name || ''"
+      @close="showWhatsAppBusinessMockModal = false"
+      @choose-template="showWhatsAppBusinessMockModal = false"
+    />
     
     <AddSMSModal
       :show="showSMSModal"
@@ -595,7 +603,7 @@
     />
 
     <SMSComposerDock
-      v-if="type === 'lead'"
+      v-if="type === 'lead' && !useLegacyCommunicationDialogs"
       :open="showSophieSMSComposer"
       :initial-channel="sophieMessageChannel"
       :initial-from="userStore.currentUser?.phone || userStore.currentUser?.mobile || ''"
@@ -615,7 +623,7 @@
     />
 
     <EmailComposerDock
-      v-if="type === 'lead'"
+      v-if="type === 'lead' && !useLegacyCommunicationDialogs"
       :open="showSophieEmailComposer"
       :initial-from="userStore.currentUser?.email || ''"
       :initial-to="task?.customer?.email || ''"
@@ -658,7 +666,7 @@
       <DialogPortal>
         <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
         <DialogContent
-          class="w-[90vw] max-w-none max-h-[calc(100vh-4rem)] flex flex-col"
+          class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
           :show-close-button="true"
         >
           <DialogHeader class="shrink-0">
@@ -719,6 +727,7 @@ import AddRequestedCarModal from '@/components/modals/AddRequestedCarModal.vue'
 import OfferModal from '@/components/modals/OfferModal.vue'
 import AddTagModal from '@/components/modals/AddTagModal.vue'
 import AddWhatsAppModal from '@/components/modals/AddWhatsAppModal.vue'
+import WhatsAppBusinessMockModal from '@/components/modals/WhatsAppBusinessMockModal.vue'
 import AddSMSModal from '@/components/modals/AddSMSModal.vue'
 import AddEmailModal from '@/components/modals/AddEmailModal.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
@@ -763,6 +772,11 @@ const activityAuthor = computed(() =>
 )
 
 const taskId = computed(() => props.task.id)
+
+const useLegacyCommunicationDialogs = computed(() => {
+  const customerName = String(props.task?.customer?.name ?? '').trim()
+  return props.type === 'lead' && customerName === 'Josh Adams'
+})
 
 // Check if we're on the tasks view (not the customer view)
 const isTasksView = computed(() => {
@@ -1256,6 +1270,7 @@ const dealerships = ref([])
 const showNoteModal = ref(false)
 const showAttachmentModal = ref(false)
 const showWhatsAppModal = ref(false)
+const showWhatsAppBusinessMockModal = ref(false)
 const showSMSModal = ref(false)
 const showEmailModal = ref(false)
 const showSophieEmailComposer = ref(false)
@@ -1377,9 +1392,15 @@ const handleContactInfoAction = (action) => {
     return
   }
   if (action === 'whatsapp') {
+    showWhatsAppBusinessMockModal.value = true
+    return
     if (props.type === 'lead') {
-      sophieMessageChannel.value = 'whatsapp'
-      showSophieSMSComposer.value = true
+      if (useLegacyCommunicationDialogs.value) {
+        showWhatsAppModal.value = true
+      } else {
+        sophieMessageChannel.value = 'whatsapp'
+        showSophieSMSComposer.value = true
+      }
     } else {
       showWhatsAppModal.value = true
     }
@@ -1387,8 +1408,12 @@ const handleContactInfoAction = (action) => {
   }
   if (action === 'sms') {
     if (props.type === 'lead') {
-      sophieMessageChannel.value = 'sms'
-      showSophieSMSComposer.value = true
+      if (useLegacyCommunicationDialogs.value) {
+        showSMSModal.value = true
+      } else {
+        sophieMessageChannel.value = 'sms'
+        showSophieSMSComposer.value = true
+      }
     } else {
       showSMSModal.value = true
     }
@@ -1396,7 +1421,11 @@ const handleContactInfoAction = (action) => {
   }
   if (action === 'email') {
     if (props.type === 'lead') {
-      showSophieEmailComposer.value = true
+      if (useLegacyCommunicationDialogs.value) {
+        showEmailModal.value = true
+      } else {
+        showSophieEmailComposer.value = true
+      }
     } else {
       showEmailModal.value = true
     }

@@ -32,7 +32,7 @@ export const mockActivities = [
   {
     id: 4,
     type: 'financing',
-    user: 'Salsabeel Khaleel',
+    user: 'Maciej Ogonowski',
     action: 'submitted financing request',
     content: 'Financing approved: 60-month term at 3.5% APR',
     data: { term: 60, apr: 3.5, amount: 120000, downPayment: 30000, monthlyPayment: 1635, status: 'approved' },
@@ -78,7 +78,7 @@ export const mockActivities = [
   {
     id: 9,
     type: 'tradein',
-    user: 'Salsabeel Khaleel',
+    user: 'Matteo Alpino',
     action: 'added trade-in information',
     content: 'Customer trade-in: 2019 Tesla Model S, valued at €45,000',
     data: { make: 'Tesla', model: 'Model S', year: 2019, mileage: 38000, condition: 'Very Good', value: 45000 },
@@ -492,7 +492,7 @@ export const mockActivities = [
   {
     id: 31,
     type: 'customer-sms',
-    user: 'Salsabeel Khaleel',
+    user: 'Maciej Ogonowski',
     action: 'sent an SMS',
     content: 'Running 10 min late for the appointment — still OK?',
     data: {

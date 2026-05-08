@@ -7,6 +7,68 @@ import type {
 
 type TFn = (key: string, ...args: unknown[]) => string
 
+type CommunicationChannel = 'email' | 'whatsapp' | 'sms'
+
+const WHATSAPP_CONVERSATION_WINDOW_MS = 24 * 60 * 60 * 1000
+
+const CHANNEL_BY_ACTIVITY_TYPE: Record<string, CommunicationChannel> = {
+  email: 'email',
+  'customer-email': 'email',
+  whatsapp: 'whatsapp',
+  'customer-whatsapp': 'whatsapp',
+  sms: 'sms',
+  'customer-sms': 'sms'
+}
+
+function getCommunicationChannel(activity: ActivityRecord): CommunicationChannel | null {
+  return CHANNEL_BY_ACTIVITY_TYPE[activity.type] ?? null
+}
+
+function getConversationKey(activity: ActivityRecord): string | null {
+  const channel = getCommunicationChannel(activity)
+  if (!channel) return null
+  const explicit = activity.data?.threadId || activity.threadId
+  if (explicit) return explicit
+  if (activity.leadId != null) return `lead-${activity.leadId}-${channel}`
+  if (activity.opportunityId != null) return `opportunity-${activity.opportunityId}-${channel}`
+  return null
+}
+
+function getActivityTimestampMs(activity: ActivityRecord): number {
+  const ts = activity.timestamp || activity.createdAt
+  if (!ts) return Number.NaN
+  const ms = new Date(ts).getTime()
+  return Number.isNaN(ms) ? Number.NaN : ms
+}
+
+export function isCommunicationReply(
+  activity: ActivityRecord,
+  allActivities: ActivityRecord[] | undefined
+): boolean {
+  if (!allActivities?.length) return false
+  const channel = getCommunicationChannel(activity)
+  if (!channel) return false
+  const key = getConversationKey(activity)
+  if (!key) return false
+  const ts = getActivityTimestampMs(activity)
+  if (Number.isNaN(ts)) return false
+
+  const windowMs = channel === 'email' ? null : WHATSAPP_CONVERSATION_WINDOW_MS
+
+  for (const other of allActivities) {
+    if (other === activity) continue
+    if (other.id != null && activity.id != null && other.id === activity.id) continue
+    if (getCommunicationChannel(other) !== channel) continue
+    if (getConversationKey(other) !== key) continue
+    const otherTs = getActivityTimestampMs(other)
+    if (Number.isNaN(otherTs)) continue
+    if (otherTs >= ts) continue
+    if (windowMs == null) return true
+    if (ts - otherTs <= windowMs) return true
+  }
+  return false
+}
+
 export function getActivityTimelineDateLabel(activities: ActivityRecord[] | undefined, t: TFn): string {
   if (!activities || activities.length === 0) return ''
   const mostRecent = activities[0]
@@ -82,7 +144,31 @@ export function isActivityTimelineSystemHeadline(activity: ActivityRecord): bool
   return getActivityIconKind(activity) === 'system'
 }
 
-export function buildActivityHeadlineParts(activity: ActivityRecord, t: TFn): ActivityTimelineHeadlineParts {
+function getCommunicationActionLabel(
+  activity: ActivityRecord,
+  t: TFn,
+  allActivities: ActivityRecord[] | undefined
+): string {
+  const channel = getCommunicationChannel(activity)
+  if (channel === 'sms') {
+    return t('entities.activity.timeline.sentSms')
+  }
+  const isReply = isCommunicationReply(activity, allActivities)
+  if (channel === 'email') {
+    return isReply
+      ? t('entities.activity.timeline.repliedEmailThread')
+      : t('entities.activity.timeline.startedEmailThread')
+  }
+  return isReply
+    ? t('entities.activity.timeline.repliedWhatsappConversation')
+    : t('entities.activity.timeline.startedWhatsappConversation')
+}
+
+export function buildActivityHeadlineParts(
+  activity: ActivityRecord,
+  t: TFn,
+  allActivities?: ActivityRecord[]
+): ActivityTimelineHeadlineParts {
   const type = activity.type
   const user = activity.user ?? ''
   const contactName = activity.data?.contactName || activity.customerName || ''
@@ -112,29 +198,16 @@ export function buildActivityHeadlineParts(activity: ActivityRecord, t: TFn): Ac
   }
 
   if (type === 'customer-email' || type === 'customer-whatsapp' || type === 'customer-sms') {
-    const name = user || t('entities.activity.timeline.contact')
-    const action =
-      type === 'customer-email'
-        ? t('entities.activity.timeline.sentEmail')
-        : type === 'customer-whatsapp'
-          ? t('entities.activity.timeline.sentWhatsapp')
-          : t('entities.activity.timeline.sentSms')
     return {
-      primary: name,
-      secondary: action
+      primary: user || t('entities.activity.timeline.contact'),
+      secondary: getCommunicationActionLabel(activity, t, allActivities)
     }
   }
 
   if (type === 'email' || type === 'whatsapp' || type === 'sms') {
-    const action =
-      type === 'email'
-        ? t('entities.activity.timeline.sentEmail')
-        : type === 'whatsapp'
-          ? t('entities.activity.timeline.sentWhatsapp')
-          : t('entities.activity.timeline.sentSms')
     return {
       primary: user || t('entities.activity.timeline.you'),
-      secondary: action
+      secondary: getCommunicationActionLabel(activity, t, allActivities)
     }
   }
 
@@ -192,8 +265,12 @@ export function buildActivityHeadlineParts(activity: ActivityRecord, t: TFn): Ac
   return { primary: single, secondary: null }
 }
 
-export function buildActivityHeadline(activity: ActivityRecord, t: TFn): string {
-  const { primary, secondary } = buildActivityHeadlineParts(activity, t)
+export function buildActivityHeadline(
+  activity: ActivityRecord,
+  t: TFn,
+  allActivities?: ActivityRecord[]
+): string {
+  const { primary, secondary } = buildActivityHeadlineParts(activity, t, allActivities)
   if (!secondary) return primary
   return `${primary} ${secondary}`.trim()
 }

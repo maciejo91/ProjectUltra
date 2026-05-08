@@ -2,7 +2,7 @@
   <!-- DialogContent already includes DialogPortal + DialogOverlay (Motork primitives). Do not nest another portal/overlay. -->
   <Dialog :open="open" @update:open="(v) => emit('update:open', v)">
     <DialogContent
-      class="w-[90vw] max-w-[1440px] h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col p-0"
+      class="w-full sm:max-w-5xl h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col p-0"
       :show-close-button="true"
     >
       <DialogHeader class="shrink-0 px-6 pt-5">

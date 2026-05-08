@@ -115,6 +115,36 @@
     "addNote": "Notitie toevoegen",
     "more": "Meer"
   },
+  "whatsappBusiness": {
+    "attach": "Bestand toevoegen",
+    "notice": "Deze conversatie valt buiten het WhatsApp-berichtenvenster van 24 uur. Stuur een templatebericht om de klant opnieuw te benaderen.",
+    "chooseTemplate": "Kies een sjabloon",
+    "templates": {
+      "stepTitle": "Kies een sjabloon",
+      "items": {
+        "genericStart": {
+          "title": "Start een generiek gesprek",
+          "body": "Buongiorno, grazie per aver scelto la nostra concessionaria"
+        },
+        "startNew": {
+          "title": "Start een nieuw gesprek",
+          "body": "Hello, thank you for choosing our dealership."
+        },
+        "hello": {
+          "title": "Hello",
+          "body": "Hello from Motork Automotive Group"
+        }
+      }
+    },
+    "mock": {
+      "outbound1": "Hoi Andrea",
+      "inbound1": "si",
+      "outbound2": "Buongiorno, grazie per aver scelto la nostra concessionaria",
+      "timestamp1": "10/10/2025, 12:54",
+      "timestamp2": "14/10/2025, 11:18",
+      "timestamp3": "02/02/2026, 17:48"
+    }
+  },
   "contactCard": {
     "activityMenu": "Activiteit ({count})",
     "otherInteractions": "Contactgeschiedenis ({count})",

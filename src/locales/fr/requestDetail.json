@@ -115,6 +115,36 @@
     "addNote": "Ajouter une note",
     "more": "Plus"
   },
+  "whatsappBusiness": {
+    "attach": "Joindre un fichier",
+    "notice": "Cette conversation est en dehors de la fenêtre de messagerie WhatsApp de 24 heures. Envoyez un message template pour réengager le client.",
+    "chooseTemplate": "Choisir un modèle",
+    "templates": {
+      "stepTitle": "Sélectionner un modèle",
+      "items": {
+        "genericStart": {
+          "title": "Démarrer une conversation générique",
+          "body": "Buongiorno, grazie per aver scelto la nostra concessionaria"
+        },
+        "startNew": {
+          "title": "Démarrer une nouvelle conversation",
+          "body": "Hello, thank you for choosing our dealership."
+        },
+        "hello": {
+          "title": "Hello",
+          "body": "Hello from Motork Automotive Group"
+        }
+      }
+    },
+    "mock": {
+      "outbound1": "Salut Andrea",
+      "inbound1": "si",
+      "outbound2": "Buongiorno, grazie per aver scelto la nostra concessionaria",
+      "timestamp1": "10/10/2025, 12:54",
+      "timestamp2": "14/10/2025, 11:18",
+      "timestamp3": "02/02/2026, 17:48"
+    }
+  },
   "contactCard": {
     "activityMenu": "Activité ({count})",
     "otherInteractions": "Historique du contact ({count})",

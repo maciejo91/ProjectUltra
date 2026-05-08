@@ -135,7 +135,7 @@
               variant="link"
               size="sm"
               class="h-auto gap-2 px-0 py-0 font-medium text-primary"
-              @click.stop="emit('open-thread', { threadId, kind: threadKind })"
+              @click.stop="emit('open-thread', { threadId, kind: threadKind, activity: props.activity })"
             >
               <span>
                 {{
@@ -186,7 +186,7 @@
               variant="link"
               size="sm"
               class="h-auto gap-2 px-0 py-0 font-medium text-primary"
-              @click.stop="emit('open-thread', { threadId, kind: threadKind })"
+              @click.stop="emit('open-thread', { threadId, kind: threadKind, activity: props.activity })"
             >
               <span>
                 {{
@@ -295,7 +295,7 @@ const timeLabel = computed(() => {
   return ts ? formatTime(ts) : ''
 })
 
-const headlineParts = computed(() => buildActivityHeadlineParts(props.activity, t))
+const headlineParts = computed(() => buildActivityHeadlineParts(props.activity, t, props.allActivities))
 const secondaryToneClass = computed(() => {
   const secondary = headlineParts.value.secondary || ''
   if (type.value !== 'call') return 'text-muted-foreground'

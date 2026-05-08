@@ -6,6 +6,7 @@
 
 const MOCK_DATA_KEYS = [
   'project-ultra-leads',
+  'project-ultra-leads-version',
   'projectUltra.createdOpportunities'
 ]
 

@@ -3,7 +3,7 @@
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-[100] bg-black/50" />
       <DialogContent
-        class="w-[90vw] max-w-none max-h-[calc(100vh-4rem)] flex flex-col z-[100]"
+        class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col z-[100]"
         :show-close-button="true"
       >
         <DialogHeader class="flex-shrink-0">

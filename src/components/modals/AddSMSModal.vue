@@ -3,14 +3,14 @@
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
       <DialogContent
-        class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
+        class="w-full sm:max-w-3xl max-h-[calc(100vh-2rem)] flex flex-col"
         :show-close-button="true"
       >
         <DialogHeader class="shrink-0">
-          <DialogTitle>Send SMS</DialogTitle>
+          <DialogTitle>{{ t('common.actions.newSms') }}</DialogTitle>
         </DialogHeader>
 
-        <div class="flex-1 overflow-y-auto py-4 w-full space-y-6">
+        <div class="flex-1 overflow-y-auto py-3 w-full space-y-4">
           <SMSForm
             ref="formRef"
             :show-actions="false"
@@ -25,7 +25,7 @@
             class="rounded-sm w-full sm:w-auto"
             @click="$emit('close')"
           >
-            Cancel
+            {{ t('common.buttons.cancel') }}
           </Button>
           <Button
             variant="default"
@@ -33,7 +33,7 @@
             :disabled="!formValid"
             @click="formRef?.submit?.()"
           >
-            Send
+            {{ t('common.actions.send') }}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -43,6 +43,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Button } from '@motork/component-library/future/primitives'
 import {
   Dialog,
@@ -54,6 +55,8 @@ import {
   DialogTitle
 } from '@motork/component-library/future/primitives'
 import SMSForm from '@/components/shared/communication/SMSForm.vue'
+
+const { t } = useI18n()
 
 defineProps({
   show: {

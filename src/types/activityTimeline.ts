@@ -54,6 +54,9 @@ export interface ActivityRecord {
   vehicle?: string
   transcription?: ActivityTranscription
   data?: ActivityData
+  leadId?: number
+  opportunityId?: number
+  threadId?: string
 }
 
 export type ActivityTimelineCardAccent =

@@ -119,6 +119,16 @@
       </DialogContent>
     </DialogPortal>
   </Dialog>
+
+  <WhatsAppBusinessMockModal
+    :show="showWhatsAppConversationModal"
+    :contact-name="whatsAppConversationContactName"
+    :assignee-name="whatsAppConversationAssigneeName"
+    :conversation-messages="whatsAppConversationMessages"
+    footer-variant="composer"
+    @close="closeWhatsAppConversationModal"
+    @choose-template="() => {}"
+  />
 </template>
 
 <script setup>
@@ -145,6 +155,7 @@ import {
 import ActivityTimeline from '@/components/tasks/activity-timeline/ActivityTimeline.vue'
 import RequestTabEmptyState from '@/components/requests/RequestTabEmptyState.vue'
 import SegmentedControl from '@/components/shared/SegmentedControl.vue'
+import WhatsAppBusinessMockModal from '@/components/modals/WhatsAppBusinessMockModal.vue'
 
 const { t } = useI18n()
 
@@ -182,6 +193,15 @@ const transcriptDialogActivity = ref(null)
 const threadDialogId = ref(null)
 const threadDialogKind = ref(/** @type {null | 'thread' | 'conversation'} */ (null))
 
+const showWhatsAppConversationModal = ref(false)
+const whatsAppConversationContactName = ref('')
+const whatsAppConversationAssigneeName = ref('')
+const whatsAppConversationMessages = ref([])
+
+function closeWhatsAppConversationModal() {
+  showWhatsAppConversationModal.value = false
+}
+
 const transcriptDialogLines = computed(() =>
   transcriptDialogActivity.value ? getCallTranscriptLines(transcriptDialogActivity.value) : []
 )
@@ -218,7 +238,7 @@ function getActivityFilterCategory(activity) {
   }
   if (activity.type === 'note') return 'notes'
   if (activity.type === 'appointment') return 'appointments'
-  if (activity.type === 'transcription' || activity.transcription) return 'system-updates'
+  if (activity.type === 'transcription') return 'system-updates'
   if (
     activity.type === 'system' ||
     activity.type === 'created' ||
@@ -265,6 +285,53 @@ function openTranscriptDialog(activity) {
 }
 
 function openThreadDialog(payload) {
+  const activity = payload?.activity || null
+  const isWhatsAppConversation =
+    payload?.kind === 'conversation' &&
+    ['whatsapp', 'customer-whatsapp'].includes(String(activity?.type || ''))
+
+  if (isWhatsAppConversation) {
+    threadDialogId.value = null
+    threadDialogKind.value = null
+    const threadId = payload?.threadId || null
+    const conversationActivities = threadId
+      ? activityList.value.filter((a) => (a?.data?.threadId || a?.threadId) === threadId)
+      : [activity].filter(Boolean)
+
+    const onlyWhatsApp = conversationActivities.filter((a) =>
+      ['whatsapp', 'customer-whatsapp'].includes(String(a?.type || ''))
+    )
+
+    const sortedAsc = onlyWhatsApp
+      .slice()
+      .sort(
+        (a, b) =>
+          new Date(a.timestamp || a.createdAt || 0) - new Date(b.timestamp || b.createdAt || 0)
+      )
+
+    whatsAppConversationMessages.value = sortedAsc.map((a, idx) => {
+      const inbound = String(a?.type || '').startsWith('customer-')
+      return {
+        id: a.id ?? `wa-${idx}-${a.timestamp ?? a.createdAt ?? ''}`,
+        side: inbound ? 'inbound' : 'outbound',
+        text: a.content || a.message || '',
+        timestampLabel: a.time || '',
+        userLabel: a.user || ''
+      }
+    })
+
+    const inferredCustomer =
+      sortedAsc.find((a) => String(a?.type || '').startsWith('customer-'))?.user ||
+      activity?.user ||
+      ''
+
+    whatsAppConversationContactName.value =
+      activity?.customerName || activity?.contactName || activity?.data?.contactName || inferredCustomer
+    whatsAppConversationAssigneeName.value = ''
+    showWhatsAppConversationModal.value = true
+    return
+  }
+
   threadDialogId.value = payload?.threadId || null
   threadDialogKind.value = payload?.kind || null
 }

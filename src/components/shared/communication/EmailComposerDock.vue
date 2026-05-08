@@ -11,7 +11,7 @@
     >
       <div
         class="flex items-center justify-between gap-3 px-3 py-2"
-        :class="minimized ? 'bg-white' : 'bg-muted'"
+        :class="minimized ? 'bg-white' : 'bg-muted-foreground/20'"
       >
         <div class="min-w-0">
           <div class="text-sm font-semibold text-foreground truncate">

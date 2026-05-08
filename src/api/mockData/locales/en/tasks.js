@@ -11,7 +11,7 @@ export const mockTasks = [
     customerId: 1,
     leadId: 1,
     opportunityId: null,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Maciej Ogonowski',
     createdAt: createHourOffset(-4)
   },
   {
@@ -37,7 +37,7 @@ export const mockTasks = [
     customerId: 1,
     leadId: null,
     opportunityId: 1,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Matteo Alpino',
     createdAt: createHourOffset(-3)
   },
   {
@@ -50,7 +50,7 @@ export const mockTasks = [
     customerId: 4,
     leadId: null,
     opportunityId: 4,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Maciej Ogonowski',
     createdAt: createHourOffset(-2)
   },
   {
@@ -89,7 +89,7 @@ export const mockTasks = [
     customerId: 2,
     leadId: null,
     opportunityId: 2,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Matteo Alpino',
     createdAt: createHourOffset(-3)
   },
   {
@@ -102,7 +102,7 @@ export const mockTasks = [
     customerId: 4,
     leadId: null,
     opportunityId: 4,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Maciej Ogonowski',
     createdAt: createHourOffset(-6)
   },
   {
@@ -115,7 +115,7 @@ export const mockTasks = [
     customerId: 5,
     leadId: 11,
     opportunityId: null,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Matteo Alpino',
     createdAt: createHourOffset(-1)
   },
   {
@@ -154,7 +154,7 @@ export const mockTasks = [
     customerId: 9,
     leadId: 14,
     opportunityId: null,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Maciej Ogonowski',
     createdAt: createHourOffset(-6)
   },
   {
@@ -167,7 +167,7 @@ export const mockTasks = [
     customerId: 46,
     leadId: 15,
     opportunityId: null,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Matteo Alpino',
     createdAt: createHourOffset(-8)
   },
   {
@@ -206,7 +206,7 @@ export const mockTasks = [
     customerId: 49,
     leadId: 18,
     opportunityId: null,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Maciej Ogonowski',
     createdAt: createHourOffset(-5)
   },
   {
@@ -245,7 +245,7 @@ export const mockTasks = [
     customerId: 52,
     leadId: 21,
     opportunityId: null,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Matteo Alpino',
     createdAt: createHourOffset(-4)
   },
   {
@@ -284,7 +284,7 @@ export const mockTasks = [
     customerId: 55,
     leadId: 24,
     opportunityId: null,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Matteo Alpino',
     createdAt: createHourOffset(-2)
   },
   {
@@ -323,7 +323,7 @@ export const mockTasks = [
     customerId: 58,
     leadId: 27,
     opportunityId: null,
-    assignee: 'Salsabeel Khaleel',
+    assignee: 'Maciej Ogonowski',
     createdAt: createHourOffset(-1)
   },
   {

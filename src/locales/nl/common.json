@@ -143,7 +143,9 @@
     "typeSms": "Typ hier je SMS…",
     "smsFromPlaceholder": "Jouw telefoonnummer",
     "smsToPlaceholder": "Telefoonnummer toevoegen",
-    "smsCharacters": "{count}/160 tekens"
+    "smsCharacters": "{count}/{max} tekens",
+    "smsCreditsLeft": "Je hebt nog {count} credits op je account",
+    "send": "Verzenden"
   },
   "status": {
     "hot": "Hot",

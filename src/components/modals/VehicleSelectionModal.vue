@@ -2,7 +2,7 @@
   <Dialog :open="show" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
-      <DialogContent class="w-[90vw] max-w-none h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col">
+      <DialogContent class="w-full sm:max-w-2xl h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col">
         <DialogHeader class="flex-shrink-0 px-6 pt-6 pb-4 border-b border-border">
           <DialogTitle class="text-foreground">Select Vehicle</DialogTitle>
         </DialogHeader>

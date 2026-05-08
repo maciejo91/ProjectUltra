@@ -1,6 +1,15 @@
 <template>
-  <div class="w-full flex flex-col divide-y divide-border">
-    <div class="flex items-center gap-3 py-1">
+  <div class="w-full flex flex-col">
+    <div v-if="showCreditsBanner && creditsLeft != null" class="pb-3">
+      <div class="flex items-center gap-3 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3">
+        <CircleCheck class="h-5 w-5 text-emerald-600 shrink-0" aria-hidden="true" />
+        <p class="text-sm text-foreground">
+          {{ t('common.actions.smsCreditsLeft', { count: creditsLeft }) }}
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 py-1 border-b border-border">
       <span class="w-14 text-sm text-muted-foreground shrink-0">{{ t('emailForm.fields.from') }}</span>
       <Input
         v-model="from"
@@ -10,7 +19,7 @@
       />
     </div>
 
-    <div class="flex items-center gap-3 py-1">
+    <div class="flex items-center gap-3 py-1 border-b border-border">
       <span class="w-14 text-sm text-muted-foreground shrink-0">{{ t('emailForm.fields.to') }}</span>
       <Input
         v-model="to"
@@ -38,11 +47,11 @@
       <Textarea
         v-model="message"
         :placeholder="t('common.actions.typeSms')"
-        maxlength="160"
-        class="min-h-48 border-0 shadow-none focus-visible:ring-0 px-0 resize-none"
+        :maxlength="SMS_MAX_CHARACTERS"
+        class="min-h-40 border border-border rounded-md shadow-none focus-visible:ring-0 px-3 py-2 resize-none"
       />
       <p v-if="showCounter" class="text-sm text-muted-foreground mt-2">
-        {{ t('common.actions.smsCharacters', { count: message.length }) }}
+        {{ t('common.actions.smsCharacters', { count: message.length, max: SMS_MAX_CHARACTERS }) }}
       </p>
     </div>
 
@@ -68,6 +77,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { CircleCheck } from 'lucide-vue-next'
 import {
   Button,
   Input,
@@ -80,6 +90,8 @@ import {
 } from '@motork/component-library/future/primitives'
 
 const { t } = useI18n()
+
+const SMS_MAX_CHARACTERS = 469
 
 const props = defineProps({
   draft: {
@@ -109,6 +121,14 @@ const props = defineProps({
   showCounter: {
     type: Boolean,
     default: true
+  },
+  showCreditsBanner: {
+    type: Boolean,
+    default: true
+  },
+  creditsLeft: {
+    type: Number,
+    default: 100
   }
 })
 

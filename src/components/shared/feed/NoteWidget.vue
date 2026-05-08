@@ -4,43 +4,38 @@
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
       <DialogContent
-        class="w-full sm:max-w-lg max-h-[calc(100vh-4rem)] flex flex-col"
+        class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col"
         :show-close-button="true"
       >
         <DialogHeader class="shrink-0">
-          <DialogTitle>{{ item ? 'Edit Note' : 'Add Note' }}</DialogTitle>
+          <DialogTitle>
+            {{ item ? t('common.actions.edit') : t('requestDetail.quickActions.addNote') }}
+          </DialogTitle>
         </DialogHeader>
 
-        <div class="flex-1 overflow-y-auto py-4 w-full space-y-6">
-          <div class="space-y-2">
-            <Label class="block text-sm font-semibold text-foreground">
-              Note <span class="text-brand-red">*</span>
-            </Label>
-            <Textarea
-              v-model="noteText"
-              rows="8"
-              :placeholder="notePlaceholder"
-              required
-              class="w-full min-h-[200px] resize-none"
-            />
-          </div>
+        <div class="flex-1 overflow-y-auto py-4 w-full">
+          <Textarea
+            v-model="noteText"
+            :placeholder="notePlaceholder"
+            class="min-h-56 border-0 shadow-none focus-visible:ring-0 px-0 resize-none"
+          />
         </div>
 
-        <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
+        <DialogFooter class="shrink-0 flex items-center justify-end gap-2">
           <Button
             variant="outline"
-            class="rounded-sm w-full sm:w-auto"
+            class="rounded-sm"
             @click="handleCancel"
           >
-            Cancel
+            {{ t('common.buttons.cancel') }}
           </Button>
           <Button
             variant="default"
-            class="rounded-sm w-full sm:w-auto"
+            class="rounded-sm"
             :disabled="!noteText.trim() || saving"
             @click="handleSave"
           >
-            {{ saving ? 'Saving...' : (item ? 'Update Note' : 'Add note') }}
+            {{ saving ? t('requestDetail.contactCard.saving') : t('common.buttons.save') }}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -90,7 +85,6 @@ import { useI18n } from 'vue-i18n'
 import { X } from 'lucide-vue-next'
 import { 
   Button,
-  Label,
   Textarea
 } from '@motork/component-library/future/primitives'
 import {
@@ -104,7 +98,7 @@ import {
 } from '@motork/component-library/future/primitives'
 
 const { t } = useI18n()
-const notePlaceholder = 'Type a note here and use @ to mention someone'
+const notePlaceholder = t('common.call.notesPlaceholder')
 
 const props = defineProps({
   // Modal mode props
