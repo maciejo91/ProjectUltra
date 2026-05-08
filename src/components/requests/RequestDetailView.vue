@@ -171,7 +171,7 @@
               class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg bg-background"
             >
               <div class="shrink-0 px-4 pt-2">
-                <RequestMainTabs class="shrink-0" v-model="mainTab" :tabs="mainTabs" />
+                <AppTabs class="shrink-0" v-model="mainTab" :tabs="mainTabs" />
               </div>
 
               <div class="flex shrink-0 flex-col gap-4 border-t border-border p-4">
@@ -392,7 +392,7 @@ import RequestDetailShell from './RequestDetailShell.vue'
 import RequestDetailHeader from './RequestDetailHeader.vue'
 import RequestDetailCompactHeader from './RequestDetailCompactHeader.vue'
 import VehicleRequestCard from '@/components/shared/VehicleRequestCard.vue'
-import RequestMainTabs from './RequestMainTabs.vue'
+import AppTabs from '@/components/shared/AppTabs.vue'
 import RequestConversationsTabContent from './RequestConversationsTabContent.vue'
 import RequestTabEmptyState from './RequestTabEmptyState.vue'
 import RequestLeadProfileSection from './RequestLeadProfileSection.vue'

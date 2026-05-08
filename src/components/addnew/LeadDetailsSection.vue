@@ -665,8 +665,11 @@
 
                 <div class="flex min-h-14 min-w-0 flex-1 flex-col gap-0.5">
                   <div class="flex w-full min-w-0 items-center gap-2">
-                    <span class="inline-flex shrink-0 items-center justify-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium leading-none text-secondary-foreground">
-                      New
+                    <span
+                      class="inline-flex shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-sm font-normal leading-5 text-foreground"
+                      :class="configureConditionBadgeClass"
+                    >
+                      {{ CONFIGURATOR_CONDITION_LABEL }}
                     </span>
                     <p class="min-w-0 truncate text-sm font-medium leading-5 text-foreground">
                       {{ vehicle.label || '—' }}
@@ -700,123 +703,381 @@
               </div>
             </template>
 
-            <!-- Manual insert fields (Figma 1710:68242) -->
-            <div
-              v-if="vehicle.manualOpen"
-              class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3"
-            >
-            <div class="space-y-2">
-              <Label class="text-sm font-medium text-foreground">
-                {{ t('forms.addNew.leadDetails.vehicle.manual.fields.vehicleClass') }}
-              </Label>
-              <Input
-                v-model="vehicle.manualVehicleClass"
-                class="h-8 w-full rounded-[10px] text-sm"
-                :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
-              />
-            </div>
+            <!-- Manual insert: Service = owned vehicle Figma grid; Sales = legacy manual grid -->
+            <div v-if="vehicle.manualOpen" class="space-y-4">
+              <template v-if="isService">
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">Vehicle class</Label>
+                    <Select v-model="vehicle.manualVehicleClass">
+                      <SelectTrigger class="h-8 w-full rounded-[10px] text-sm">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Passenger car">Passenger car</SelectItem>
+                        <SelectItem value="SUV">SUV</SelectItem>
+                        <SelectItem value="LCV">LCV</SelectItem>
+                        <SelectItem value="Motorcycle">Motorcycle</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">
+                      Brand <span class="text-destructive">*</span>
+                    </Label>
+                    <Select v-model="vehicle.manualBrand">
+                      <SelectTrigger class="h-8 w-full rounded-[10px] text-sm">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem v-for="b in manualBrandOptions" :key="b" :value="b">
+                          {{ b }}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">
+                      Model <span class="text-destructive">*</span>
+                    </Label>
+                    <Select v-model="vehicle.manualModel" :disabled="!manualModelSelectEnabled">
+                      <SelectTrigger
+                        class="h-8 w-full rounded-[10px] text-sm"
+                        :disabled="!manualModelSelectEnabled"
+                      >
+                        <SelectValue placeholder="Select model" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem v-for="m in manualModelOptions" :key="m" :value="m">
+                          {{ m }}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
 
-            <div class="space-y-2">
-              <Label class="text-sm font-medium text-foreground">
-                {{ t('forms.addNew.leadDetails.vehicle.manual.fields.vehicleType') }}
-              </Label>
-              <Input
-                v-model="vehicle.manualVehicleType"
-                class="h-8 w-full rounded-[10px] text-sm"
-                :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
-              />
-            </div>
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">Registration date</Label>
+                    <MiniCalendarDateField
+                      v-model="vehicle.manualRegistration"
+                      aria-label="Registration date"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">Mileage</Label>
+                    <Input
+                      v-model="vehicle.manualMileage"
+                      type="text"
+                      class="h-8 w-full rounded-[10px] text-sm"
+                      placeholder="Km"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">Plate</Label>
+                    <Input
+                      v-model="vehicle.plateNumber"
+                      type="text"
+                      class="h-8 w-full rounded-[10px] text-sm"
+                      placeholder="Insert..."
+                    />
+                  </div>
+                </div>
 
-            <div class="space-y-2">
-              <Label class="text-sm font-medium text-foreground">
-                {{ t('forms.addNew.leadDetails.vehicle.manual.fields.brand') }} <span class="text-destructive">*</span>
-              </Label>
-              <Select v-model="vehicle.manualBrand">
-                <SelectTrigger class="h-8 w-full rounded-[10px] text-sm">
-                  <SelectValue :placeholder="t('forms.addNew.leadDetails.vehicle.manual.placeholders.selectBrand')" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem v-for="b in manualBrandOptions" :key="b" :value="b">
-                    {{ b }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">VIN number</Label>
+                    <Input
+                      v-model="vehicle.vin"
+                      type="text"
+                      class="h-8 w-full rounded-[10px] text-sm"
+                      placeholder="Insert..."
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">Fuel type</Label>
+                    <Select v-model="vehicle.manualFuelType">
+                      <SelectTrigger class="h-8 w-full rounded-[10px] text-sm">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Petrol">Petrol</SelectItem>
+                        <SelectItem value="Diesel">Diesel</SelectItem>
+                        <SelectItem value="Electric">Electric</SelectItem>
+                        <SelectItem value="Hybrid">Hybrid</SelectItem>
+                        <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">Gear type</Label>
+                    <Select v-model="vehicle.manualGearType">
+                      <SelectTrigger class="h-8 w-full rounded-[10px] text-sm">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Manual">Manual</SelectItem>
+                        <SelectItem value="Automatic">Automatic</SelectItem>
+                        <SelectItem value="CVT">CVT</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
 
-            <div class="space-y-2">
-              <Label class="text-sm font-medium text-foreground">
-                {{ t('forms.addNew.leadDetails.vehicle.manual.fields.model') }} <span class="text-destructive">*</span>
-              </Label>
-              <Select
-                v-model="vehicle.manualModel"
-                :disabled="!manualModelSelectEnabled"
-              >
-                <SelectTrigger
-                  class="h-8 w-full rounded-[10px] text-sm"
-                  :disabled="!manualModelSelectEnabled"
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">Ownership (Account name)</Label>
+                    <Input
+                      v-model="vehicle.manualOwner"
+                      type="text"
+                      class="h-8 w-full rounded-[10px] text-sm"
+                      placeholder="Insert..."
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">Ownership starting date</Label>
+                    <MiniCalendarDateField
+                      v-model="vehicle.manualOwnedSince"
+                      aria-label="Ownership starting date"
+                    />
+                  </div>
+                </div>
+
+                <CollapsibleSection
+                  title="More details"
+                  :is-expanded="serviceOwnedMoreDetailsExpanded"
+                  :no-side-padding="true"
+                  @toggle="serviceOwnedMoreDetailsExpanded = !serviceOwnedMoreDetailsExpanded"
                 >
-                  <SelectValue :placeholder="manualModelPlaceholder" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem v-for="m in manualModelOptions" :key="m" :value="m">
-                    {{ m }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">Displacement</Label>
+                      <Input
+                        v-model="vehicle.manualDisplacement"
+                        type="text"
+                        class="h-8 w-full rounded-[10px] text-sm"
+                        placeholder="Insert..."
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">HP</Label>
+                      <Input
+                        v-model="vehicle.manualHp"
+                        type="text"
+                        class="h-8 w-full rounded-[10px] text-sm"
+                        placeholder="Insert..."
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">KW</Label>
+                      <Input
+                        v-model="vehicle.manualKw"
+                        type="text"
+                        class="h-8 w-full rounded-[10px] text-sm"
+                        placeholder="Insert..."
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">Colour</Label>
+                      <Input
+                        v-model="vehicle.manualColour"
+                        type="text"
+                        class="h-8 w-full rounded-[10px] text-sm"
+                        placeholder="Insert..."
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">Traction type</Label>
+                      <Select v-model="vehicle.manualTractionType">
+                        <SelectTrigger class="h-8 w-full rounded-[10px] text-sm">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="FWD">FWD</SelectItem>
+                          <SelectItem value="RWD">RWD</SelectItem>
+                          <SelectItem value="AWD">AWD</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">Doors</Label>
+                      <Input
+                        v-model="vehicle.manualDoors"
+                        type="text"
+                        class="h-8 w-full rounded-[10px] text-sm"
+                        placeholder="Insert..."
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">Seats</Label>
+                      <Input
+                        v-model="vehicle.manualSeats"
+                        type="text"
+                        class="h-8 w-full rounded-[10px] text-sm"
+                        placeholder="Insert..."
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">Model year</Label>
+                      <Input
+                        v-model="vehicle.manualModelYear"
+                        type="text"
+                        class="h-8 w-full rounded-[10px] text-sm"
+                        placeholder="Insert..."
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">Last Km update</Label>
+                      <MiniCalendarDateField
+                        v-model="vehicle.manualLastKmUpdate"
+                        aria-label="Last Km update"
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">Warranty starting date</Label>
+                      <MiniCalendarDateField
+                        v-model="vehicle.manualWarrantyStart"
+                        aria-label="Warranty starting date"
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">Warranty duration (months)</Label>
+                      <Input
+                        v-model="vehicle.manualWarrantyDurationMonths"
+                        type="text"
+                        class="h-8 w-full rounded-[10px] text-sm"
+                        placeholder="Insert..."
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <Label class="text-sm font-medium text-foreground">Warranty ending date</Label>
+                      <MiniCalendarDateField
+                        v-model="vehicle.manualWarrantyEnd"
+                        aria-label="Warranty ending date"
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+              </template>
 
-            <div class="space-y-2">
-              <Label class="text-sm font-medium text-foreground">
-                {{ t('forms.addNew.leadDetails.vehicle.manual.fields.version') }}
-              </Label>
-              <Input
-                v-model="vehicle.manualVersion"
-                class="h-8 w-full rounded-[10px] text-sm"
-                :placeholder="t('forms.addNew.leadDetails.placeholders.insert')"
-              />
-            </div>
+              <template v-else>
+                <div class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">
+                      {{ t('forms.addNew.leadDetails.vehicle.manual.fields.vehicleClass') }}
+                    </Label>
+                    <Input
+                      v-model="vehicle.manualVehicleClass"
+                      class="h-8 w-full rounded-[10px] text-sm"
+                      :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
+                    />
+                  </div>
 
-            <div class="space-y-2">
-              <Label class="text-sm font-medium text-foreground">
-                {{ t('forms.addNew.leadDetails.vehicle.manual.fields.fuelType') }}
-              </Label>
-              <Input
-                v-model="vehicle.manualFuelType"
-                class="h-8 w-full rounded-[10px] text-sm"
-                :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
-              />
-            </div>
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">
+                      {{ t('forms.addNew.leadDetails.vehicle.manual.fields.vehicleType') }}
+                    </Label>
+                    <Input
+                      v-model="vehicle.manualVehicleType"
+                      class="h-8 w-full rounded-[10px] text-sm"
+                      :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
+                    />
+                  </div>
 
-            <div class="space-y-2">
-              <Label class="text-sm font-medium text-foreground">
-                {{ t('forms.addNew.leadDetails.vehicle.manual.fields.quantity') }} <span class="text-destructive">*</span>
-              </Label>
-              <Input
-                v-model="vehicle.manualQuantity"
-                class="h-8 w-full rounded-[10px] text-sm"
-                inputmode="numeric"
-                :placeholder="t('forms.addNew.leadDetails.vehicle.manual.placeholders.quantity')"
-              />
-            </div>
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">
+                      {{ t('forms.addNew.leadDetails.vehicle.manual.fields.brand') }}
+                      <span class="text-destructive">*</span>
+                    </Label>
+                    <Select v-model="vehicle.manualBrand">
+                      <SelectTrigger class="h-8 w-full rounded-[10px] text-sm">
+                        <SelectValue
+                          :placeholder="t('forms.addNew.leadDetails.vehicle.manual.placeholders.selectBrand')"
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem v-for="b in manualBrandOptions" :key="b" :value="b">
+                          {{ b }}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-            <div class="space-y-2">
-              <Label class="text-sm font-medium text-foreground">
-                {{ t('forms.addNew.leadDetails.vehicle.manual.fields.vehiclePrice') }}
-              </Label>
-              <div class="relative w-full">
-                <span
-                  class="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-sm text-muted-foreground"
-                  aria-hidden="true"
-                >€</span>
-                <Input
-                  v-model="vehicle.manualVehiclePrice"
-                  class="h-8 w-full rounded-[10px] pl-8 text-sm"
-                  inputmode="decimal"
-                  :placeholder="t('forms.addNew.leadDetails.placeholders.price')"
-                />
-              </div>
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">
+                      {{ t('forms.addNew.leadDetails.vehicle.manual.fields.model') }}
+                      <span class="text-destructive">*</span>
+                    </Label>
+                    <Select v-model="vehicle.manualModel" :disabled="!manualModelSelectEnabled">
+                      <SelectTrigger
+                        class="h-8 w-full rounded-[10px] text-sm"
+                        :disabled="!manualModelSelectEnabled"
+                      >
+                        <SelectValue :placeholder="manualModelPlaceholder" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem v-for="m in manualModelOptions" :key="m" :value="m">
+                          {{ m }}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">
+                      {{ t('forms.addNew.leadDetails.vehicle.manual.fields.version') }}
+                    </Label>
+                    <Input
+                      v-model="vehicle.manualVersion"
+                      class="h-8 w-full rounded-[10px] text-sm"
+                      :placeholder="t('forms.addNew.leadDetails.placeholders.insert')"
+                    />
+                  </div>
+
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">
+                      {{ t('forms.addNew.leadDetails.vehicle.manual.fields.fuelType') }}
+                    </Label>
+                    <Input
+                      v-model="vehicle.manualFuelType"
+                      class="h-8 w-full rounded-[10px] text-sm"
+                      :placeholder="t('forms.addNew.leadDetails.placeholders.select')"
+                    />
+                  </div>
+
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">
+                      {{ t('forms.addNew.leadDetails.vehicle.manual.fields.quantity') }}
+                      <span class="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      v-model="vehicle.manualQuantity"
+                      class="h-8 w-full rounded-[10px] text-sm"
+                      inputmode="numeric"
+                      :placeholder="t('forms.addNew.leadDetails.vehicle.manual.placeholders.quantity')"
+                    />
+                  </div>
+
+                  <div class="space-y-2">
+                    <Label class="text-sm font-medium text-foreground">
+                      {{ t('forms.addNew.leadDetails.vehicle.manual.fields.vehiclePrice') }}
+                    </Label>
+                    <div class="relative w-full">
+                      <span
+                        class="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-sm text-muted-foreground"
+                        aria-hidden="true"
+                      >€</span>
+                      <Input
+                        v-model="vehicle.manualVehiclePrice"
+                        class="h-8 w-full rounded-[10px] pl-8 text-sm"
+                        inputmode="decimal"
+                        :placeholder="t('forms.addNew.leadDetails.placeholders.price')"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </template>
             </div>
-          </div>
           </div>
         </div>
 
@@ -937,6 +1198,8 @@ import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils
 import LeadDepartmentSegment from '@/components/addnew/LeadDepartmentSegment.vue'
 import VehicleFromStockModal from '@/components/addnew/VehicleFromStockModal.vue'
 import VehicleConfiguratorModal from '@/components/addnew/VehicleConfiguratorModal.vue'
+import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
 
 const props = defineProps({
   leadForm: { type: Object, required: true },
@@ -1174,6 +1437,13 @@ const stockConditionBadgeClass = computed(() =>
   getVehicleConditionBadgeClass(stockConditionBadge.value)
 )
 
+/** Configurator vehicles are factory orders — always "New", not inventory Km0. */
+const CONFIGURATOR_CONDITION_LABEL = 'New'
+
+const configureConditionBadgeClass = computed(() =>
+  getVehicleConditionBadgeClass(CONFIGURATOR_CONDITION_LABEL)
+)
+
 const stockMetricsFunnel = computed(() => selectedStockVehicle.value?.listingMetrics?.funnelViews)
 const stockMetricsTag = computed(() => selectedStockVehicle.value?.listingMetrics?.tagCount)
 const hasStockInteractionMetrics = computed(
@@ -1223,6 +1493,7 @@ const keyboardShortcutLabel = computed(() => (isMac.value ? '⌘K' : 'Ctrl+K'))
 const vehicleModalOpen = ref(false)
 const vehicleConfiguratorOpen = ref(false)
 const showDiscardManualVehicleConfirm = ref(false)
+const serviceOwnedMoreDetailsExpanded = ref(false)
 
 const manualBrandOptions = VEHICLE_BRANDS
 
@@ -1250,6 +1521,32 @@ watch(
 function isManualVehicleDirty() {
   if (!vehicle.manualOpen) return false
   const t = (s) => String(s ?? '').trim()
+  if (isService.value) {
+    if (t(vehicle.manualVehicleClass)) return true
+    if (t(vehicle.manualBrand)) return true
+    if (t(vehicle.manualModel)) return true
+    if (t(vehicle.manualRegistration)) return true
+    if (t(vehicle.manualMileage)) return true
+    if (t(vehicle.plateNumber)) return true
+    if (t(vehicle.vin)) return true
+    if (t(vehicle.manualFuelType)) return true
+    if (t(vehicle.manualGearType)) return true
+    if (t(vehicle.manualOwner)) return true
+    if (t(vehicle.manualOwnedSince)) return true
+    if (t(vehicle.manualDisplacement)) return true
+    if (t(vehicle.manualHp)) return true
+    if (t(vehicle.manualKw)) return true
+    if (t(vehicle.manualColour)) return true
+    if (t(vehicle.manualTractionType)) return true
+    if (t(vehicle.manualDoors)) return true
+    if (t(vehicle.manualSeats)) return true
+    if (t(vehicle.manualModelYear)) return true
+    if (t(vehicle.manualLastKmUpdate)) return true
+    if (t(vehicle.manualWarrantyStart)) return true
+    if (t(vehicle.manualWarrantyDurationMonths)) return true
+    if (t(vehicle.manualWarrantyEnd)) return true
+    return false
+  }
   if (t(vehicle.manualVehicleClass)) return true
   if (t(vehicle.manualVehicleType)) return true
   if (t(vehicle.manualBrand)) return true
@@ -1349,6 +1646,24 @@ function clearVehicleSelection() {
   vehicle.manualFuelType = ''
   vehicle.manualQuantity = '1'
   vehicle.manualVehiclePrice = ''
+  vehicle.manualGearType = ''
+  vehicle.manualRegistration = ''
+  vehicle.manualMileage = ''
+  vehicle.manualOwner = ''
+  vehicle.manualOwnedSince = ''
+  vehicle.manualDisplacement = ''
+  vehicle.manualHp = ''
+  vehicle.manualKw = ''
+  vehicle.manualColour = ''
+  vehicle.manualTractionType = ''
+  vehicle.manualDoors = ''
+  vehicle.manualSeats = ''
+  vehicle.manualModelYear = ''
+  vehicle.manualLastKmUpdate = ''
+  vehicle.manualWarrantyStart = ''
+  vehicle.manualWarrantyDurationMonths = ''
+  vehicle.manualWarrantyEnd = ''
+  serviceOwnedMoreDetailsExpanded.value = false
 
   vehicle.configImageUrl = ''
   vehicle.configQuantity = null

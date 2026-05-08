@@ -3,7 +3,7 @@
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-[100] bg-black/50" />
       <DialogContent
-        class="w-[90vw] max-w-none max-h-[calc(100vh-4rem)] flex flex-col z-[100]"
+        class="w-full sm:max-w-5xl max-h-[calc(100vh-4rem)] flex flex-col z-[100]"
         :show-close-button="true"
       >
         <DialogHeader class="flex-shrink-0">
@@ -221,175 +221,439 @@
 
           <!-- Regular Vehicle Fields (for non-trade-in mode) -->
           <template v-else>
-            <!-- Vehicle Information -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Owned vehicle (Service Figma) -->
+            <template v-if="selectedVehicleType === 'drove'">
+              <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Vehicle class</Label>
+                  <Select v-model="vehicleData.vehicleClass">
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Passenger car">Passenger car</SelectItem>
+                      <SelectItem value="SUV">SUV</SelectItem>
+                      <SelectItem value="LCV">LCV</SelectItem>
+                      <SelectItem value="Motorcycle">Motorcycle</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Brand</Label>
+                  <Popover :open="showBrandDropdown" @update:open="(v) => (showBrandDropdown = v)">
+                    <PopoverAnchor class="block w-full">
+                      <Input
+                        v-model="vehicleData.brand"
+                        type="text"
+                        class="w-full"
+                        placeholder="Select"
+                        @focus="showBrandDropdown = true"
+                      />
+                    </PopoverAnchor>
+                    <PopoverContent
+                      class="z-[110] w-(--radix-popover-trigger-width) min-w-(--radix-popover-trigger-width) p-0"
+                      align="start"
+                      @open-auto-focus.prevent
+                    >
+                      <Command class="rounded-md border border-border bg-background" :filter-disabled="true">
+                        <CommandList class="max-h-64 overflow-y-auto">
+                          <CommandEmpty class="py-4 text-center text-sm text-muted-foreground"
+                            >No brand found.</CommandEmpty
+                          >
+                          <CommandGroup>
+                            <CommandItem
+                              v-for="b in filteredBrands"
+                              :key="b"
+                              :value="b"
+                              class="cursor-pointer"
+                              @select="selectBrand(b)"
+                            >
+                              {{ b }}
+                            </CommandItem>
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Model</Label>
+                  <Popover :open="showModelDropdown" @update:open="(v) => (showModelDropdown = v)">
+                    <PopoverAnchor class="block w-full">
+                      <Input
+                        v-model="vehicleData.model"
+                        type="text"
+                        class="w-full"
+                        placeholder="Select model"
+                        :disabled="!vehicleData.brand"
+                        @focus="showModelDropdown = true"
+                      />
+                    </PopoverAnchor>
+                    <PopoverContent
+                      class="z-[110] w-(--radix-popover-trigger-width) min-w-(--radix-popover-trigger-width) p-0"
+                      align="start"
+                      @open-auto-focus.prevent
+                    >
+                      <Command class="rounded-md border border-border bg-background" :filter-disabled="true">
+                        <CommandList class="max-h-64 overflow-y-auto">
+                          <CommandEmpty class="py-4 text-center text-sm text-muted-foreground"
+                            >No model found.</CommandEmpty
+                          >
+                          <CommandGroup>
+                            <CommandItem
+                              v-for="m in filteredModels"
+                              :key="m"
+                              :value="m"
+                              class="cursor-pointer"
+                              @select="selectModel(m)"
+                            >
+                              {{ m }}
+                            </CommandItem>
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Registration date</Label>
+                  <MiniCalendarDateField
+                    v-model="vehicleData.registration"
+                    aria-label="Registration date"
+                    input-class="h-10 w-full min-w-0"
+                    calendar-button-class="rounded-md"
+                    popover-content-class="z-[110]"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Mileage</Label>
+                  <Input v-model="vehicleData.kilometers" type="text" placeholder="Km" class="w-full" />
+                </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Plate</Label>
+                  <Input v-model="vehicleData.plates" type="text" placeholder="Insert..." class="w-full" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">VIN number</Label>
+                  <Input v-model="vehicleData.vin" type="text" placeholder="Insert..." class="w-full" />
+                </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Fuel type</Label>
+                  <Select v-model="vehicleData.fuelType">
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Petrol">Petrol</SelectItem>
+                      <SelectItem value="Diesel">Diesel</SelectItem>
+                      <SelectItem value="Electric">Electric</SelectItem>
+                      <SelectItem value="Hybrid">Hybrid</SelectItem>
+                      <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Gear type</Label>
+                  <Select v-model="vehicleData.gearType">
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Manual">Manual</SelectItem>
+                      <SelectItem value="Automatic">Automatic</SelectItem>
+                      <SelectItem value="CVT">CVT</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Ownership (Account name)</Label>
+                  <Input v-model="vehicleData.owner" type="text" placeholder="Insert..." class="w-full" />
+                </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-medium text-foreground">Ownership starting date</Label>
+                  <MiniCalendarDateField
+                    v-model="vehicleData.ownedSince"
+                    aria-label="Ownership starting date"
+                    input-class="h-10 w-full min-w-0"
+                    calendar-button-class="rounded-md"
+                    popover-content-class="z-[110]"
+                  />
+                </div>
+              </div>
+
+              <CollapsibleSection
+                title="More details"
+                :is-expanded="moreDetailsExpanded"
+                :no-side-padding="true"
+                @toggle="moreDetailsExpanded = !moreDetailsExpanded"
+              >
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Displacement</Label>
+                    <Input v-model="vehicleData.displacement" type="text" placeholder="Insert..." class="w-full" />
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">HP</Label>
+                    <Input v-model="vehicleData.hp" type="text" placeholder="Insert..." class="w-full" />
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">kW</Label>
+                    <Input v-model="vehicleData.kw" type="text" placeholder="Insert..." class="w-full" />
+                  </div>
+
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Colour</Label>
+                    <Input v-model="vehicleData.colour" type="text" placeholder="Insert..." class="w-full" />
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Traction type</Label>
+                    <Select v-model="vehicleData.tractionType">
+                      <SelectTrigger class="w-full">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="FWD">FWD</SelectItem>
+                        <SelectItem value="RWD">RWD</SelectItem>
+                        <SelectItem value="AWD">AWD</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Doors</Label>
+                    <Input v-model="vehicleData.doors" type="text" placeholder="Insert..." class="w-full" />
+                  </div>
+
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Seats</Label>
+                    <Input v-model="vehicleData.seats" type="text" placeholder="Insert..." class="w-full" />
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Model year</Label>
+                    <Input v-model="vehicleData.year" type="text" placeholder="Insert..." class="w-full" />
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Last Km update</Label>
+                    <MiniCalendarDateField
+                      v-model="vehicleData.lastKmUpdate"
+                      aria-label="Last Km update"
+                      input-class="h-10 w-full min-w-0"
+                      calendar-button-class="rounded-md"
+                      popover-content-class="z-[110]"
+                    />
+                  </div>
+
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Warranty starting date</Label>
+                    <MiniCalendarDateField
+                      v-model="vehicleData.warrantyStart"
+                      aria-label="Warranty starting date"
+                      input-class="h-10 w-full min-w-0"
+                      calendar-button-class="rounded-md"
+                      popover-content-class="z-[110]"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Warranty duration (months)</Label>
+                    <Input v-model="vehicleData.warrantyDurationMonths" type="text" placeholder="Insert..." class="w-full" />
+                  </div>
+                  <div class="space-y-2">
+                    <Label class="block text-sm font-medium text-foreground">Warranty ending date</Label>
+                    <MiniCalendarDateField
+                      v-model="vehicleData.warrantyEnd"
+                      aria-label="Warranty ending date"
+                      input-class="h-10 w-full min-w-0"
+                      calendar-button-class="rounded-md"
+                      popover-content-class="z-[110]"
+                    />
+                  </div>
+                </div>
+              </CollapsibleSection>
+            </template>
+
+            <!-- Default (requested / generic) keeps legacy layout -->
+            <template v-else>
+              <!-- Vehicle Information -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="space-y-2">
+                  <Label class="block text-sm font-semibold text-foreground">Brand</Label>
+                  <Input 
+                    v-model="vehicleData.brand"
+                    type="text" 
+                    placeholder="e.g., Volkswagen" 
+                    class="w-full"
+                    required
+                  />
+                </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-semibold text-foreground">Model</Label>
+                  <Input 
+                    v-model="vehicleData.model"
+                    type="text" 
+                    placeholder="e.g., ID.4" 
+                    class="w-full"
+                    required
+                  />
+                </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-semibold text-foreground">Registration year</Label>
+                  <Input 
+                    v-model="vehicleData.year"
+                    type="number" 
+                    placeholder="e.g., 2024" 
+                    class="w-full"
+                    min="1900"
+                    :max="new Date().getFullYear() + 1"
+                    required
+                  />
+                </div>
+              </div>
+
+              <!-- Version/Trim -->
               <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">Brand</Label>
+                <Label class="block text-sm font-semibold text-foreground">Version/Trim</Label>
                 <Input 
-                  v-model="vehicleData.brand"
+                  v-model="vehicleData.version"
                   type="text" 
-                  placeholder="e.g., Volkswagen" 
+                  placeholder="e.g., Premium Plus" 
                   class="w-full"
-                  required
                 />
               </div>
+
+              <!-- Identification -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <Label class="block text-sm font-semibold text-foreground">VIN</Label>
+                  <Input 
+                    v-model="vehicleData.vin"
+                    type="text" 
+                    placeholder="Vehicle Identification Number" 
+                    class="w-full"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-semibold text-foreground">Plates</Label>
+                  <Input 
+                    v-model="vehicleData.plates"
+                    type="text" 
+                    placeholder="License plate number" 
+                    class="w-full"
+                  />
+                </div>
+              </div>
+
+              <!-- Vehicle Details -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="space-y-2">
+                  <Label class="block text-sm font-semibold text-foreground">Fuel Type</Label>
+                  <Select v-model="vehicleData.fuelType">
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="Select fuel type..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Petrol">Petrol</SelectItem>
+                      <SelectItem value="Diesel">Diesel</SelectItem>
+                      <SelectItem value="Electric">Electric</SelectItem>
+                      <SelectItem value="Hybrid">Hybrid</SelectItem>
+                      <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-semibold text-foreground">Gear Type</Label>
+                  <Select v-model="vehicleData.gearType">
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="Select gear type..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Manual">Manual</SelectItem>
+                      <SelectItem value="Automatic">Automatic</SelectItem>
+                      <SelectItem value="CVT">CVT</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-semibold text-foreground">Mileage (km)</Label>
+                  <Input 
+                    v-model.number="vehicleData.kilometers"
+                    type="number" 
+                    placeholder="0" 
+                    class="w-full"
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              <!-- Registration -->
               <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">Model</Label>
+                <Label class="block text-sm font-semibold text-foreground">Registration Year/Month</Label>
                 <Input 
-                  v-model="vehicleData.model"
+                  v-model="vehicleData.registration"
                   type="text" 
-                  placeholder="e.g., ID.4" 
-                  class="w-full"
-                  required
-                />
-              </div>
-              <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">Registration year</Label>
-                <Input 
-                  v-model="vehicleData.year"
-                  type="number" 
-                  placeholder="e.g., 2024" 
-                  class="w-full"
-                  min="1900"
-                  :max="new Date().getFullYear() + 1"
-                  required
-                />
-              </div>
-            </div>
-
-            <!-- Version/Trim -->
-            <div class="space-y-2">
-              <Label class="block text-sm font-semibold text-foreground">Version/Trim</Label>
-              <Input 
-                v-model="vehicleData.version"
-                type="text" 
-                placeholder="e.g., Premium Plus" 
-                class="w-full"
-              />
-            </div>
-
-            <!-- Identification -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">VIN</Label>
-                <Input 
-                  v-model="vehicleData.vin"
-                  type="text" 
-                  placeholder="Vehicle Identification Number" 
                   class="w-full"
                 />
               </div>
+
+              <!-- Owner Information -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <Label class="block text-sm font-semibold text-foreground">Owned Since</Label>
+                  <MiniCalendarDateField
+                    v-model="vehicleData.ownedSince"
+                    aria-label="Owned since"
+                    input-class="h-10 w-full min-w-0"
+                    calendar-button-class="rounded-md"
+                    popover-content-class="z-[110]"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <Label class="block text-sm font-semibold text-foreground">Owner</Label>
+                  <Input 
+                    v-model="vehicleData.owner"
+                    type="text" 
+                    placeholder="Owner name" 
+                    class="w-full"
+                  />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <Label class="block text-sm font-semibold text-foreground">Ownership Type</Label>
+                  <Select v-model="vehicleData.ownershipType">
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="Select ownership type..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Private">Private</SelectItem>
+                      <SelectItem value="Company">Company</SelectItem>
+                      <SelectItem value="Lease">Lease</SelectItem>
+                      <SelectItem value="Fleet">Fleet</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">Plates</Label>
-                <Input 
-                  v-model="vehicleData.plates"
-                  type="text" 
-                  placeholder="License plate number" 
-                  class="w-full"
+                <Label class="block text-sm font-semibold text-foreground">Warranty Info</Label>
+                <Textarea 
+                  v-model="vehicleData.warrantyInfo"
+                  rows="4"
+                  placeholder="Warranty information..." 
+                  class="w-full resize-none"
                 />
               </div>
-            </div>
-
-            <!-- Vehicle Details -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">Fuel Type</Label>
-                <Select v-model="vehicleData.fuelType">
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select fuel type..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Petrol">Petrol</SelectItem>
-                    <SelectItem value="Diesel">Diesel</SelectItem>
-                    <SelectItem value="Electric">Electric</SelectItem>
-                    <SelectItem value="Hybrid">Hybrid</SelectItem>
-                    <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">Gear Type</Label>
-                <Select v-model="vehicleData.gearType">
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select gear type..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Manual">Manual</SelectItem>
-                    <SelectItem value="Automatic">Automatic</SelectItem>
-                    <SelectItem value="CVT">CVT</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">Mileage (km)</Label>
-                <Input 
-                  v-model.number="vehicleData.kilometers"
-                  type="number" 
-                  placeholder="0" 
-                  class="w-full"
-                  min="0"
-                />
-              </div>
-            </div>
-
-            <!-- Registration -->
-            <div class="space-y-2">
-              <Label class="block text-sm font-semibold text-foreground">Registration Year/Month</Label>
-              <Input 
-                v-model="vehicleData.registration"
-                type="text" 
-                class="w-full"
-              />
-            </div>
-
-            <!-- Owner Information -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">Owned Since</Label>
-                <Input 
-                  v-model="vehicleData.ownedSince"
-                  type="text" 
-                  placeholder="MM/YYYY (e.g., 01/2024)" 
-                  class="w-full"
-                />
-              </div>
-              <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">Owner</Label>
-                <Input 
-                  v-model="vehicleData.owner"
-                  type="text" 
-                  placeholder="Owner name" 
-                  class="w-full"
-                />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label class="block text-sm font-semibold text-foreground">Ownership Type</Label>
-                <Select v-model="vehicleData.ownershipType">
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select ownership type..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Private">Private</SelectItem>
-                    <SelectItem value="Company">Company</SelectItem>
-                    <SelectItem value="Lease">Lease</SelectItem>
-                    <SelectItem value="Fleet">Fleet</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div class="space-y-2">
-              <Label class="block text-sm font-semibold text-foreground">Warranty Info</Label>
-              <Textarea 
-                v-model="vehicleData.warrantyInfo"
-                rows="4"
-                placeholder="Warranty information..." 
-                class="w-full resize-none"
-              />
-            </div>
+            </template>
             </template>
             </div>
           </div>
@@ -425,7 +689,11 @@
                 class="size-4 shrink-0"
                 aria-hidden
               />
-              <span>{{ item ? 'Update Trade-In' : (isTradeIn ? 'Save Trade-In' : 'Add Vehicle') }}</span>
+              <span>{{
+                item
+                  ? (isTradeIn ? 'Update Trade-In' : 'Update Vehicle')
+                  : (isTradeIn ? 'Save Trade-In' : (selectedVehicleType === 'drove' ? 'Save' : 'Add Vehicle'))
+              }}</span>
             </Button>
           </div>
         </DialogFooter>
@@ -465,12 +733,18 @@ import {
   Spinner
 } from '@motork/component-library/future/primitives'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
 import { VEHICLE_BRANDS, getModelsForBrand, getAllModels } from '@/constants/vehicleSuggestions'
 
 const props = defineProps({
   show: {
     type: Boolean,
     required: true
+  },
+  /** Optional UI context (e.g. 'service') to allow scoped redesigns. */
+  context: {
+    type: String,
+    default: ''
   },
   mode: {
     type: String,
@@ -543,12 +817,30 @@ function selectModel(model) {
   showModelDropdown.value = false
 }
 
+function inferVehicleTypeFromItem(item) {
+  if (!item) return null
+  const t =
+    (item.vehicleType || item.type || item.data?.vehicleType || item.vehicle?.vehicleType || '')
+      .toString()
+      .trim()
+      .toLowerCase()
+  if (t === 'drove' || t === 'requested' || t === 'tradein') return t
+  // Heuristic: trade-in items usually carry valuation details
+  if (item.valuationDetail || item.valuation != null || item.data?.tradeInPrice != null) return 'tradein'
+  return null
+}
+
 // Get modal title based on context
 const getTitle = () => {
-  if (props.item) return 'Edit Trade-In'
+  if (props.item) {
+    if (selectedVehicleType.value === 'tradein') return 'Edit Trade-In'
+    if (selectedVehicleType.value === 'drove') return 'Owned vehicle'
+    if (selectedVehicleType.value === 'requested') return 'Edit Requested Vehicle'
+    return 'Edit Vehicle'
+  }
   if (props.mode === 'tradein') return 'Add Trade-In Vehicle'
   if (selectedVehicleType.value === 'tradein') return 'Add Trade-In Vehicle'
-  if (selectedVehicleType.value === 'drove') return 'Add Drove Vehicle'
+  if (selectedVehicleType.value === 'drove') return 'Owned vehicle'
   if (selectedVehicleType.value === 'requested') return 'Add Requested Vehicle'
   return 'Add Vehicle'
 }
@@ -559,7 +851,7 @@ const getDescription = () => {
     return 'Record details of the customer\'s trade-in vehicle'
   }
   if (selectedVehicleType.value === 'drove') {
-    return 'Record details of a vehicle the customer drove'
+    return ''
   }
   if (selectedVehicleType.value === 'requested') {
     return 'Record details of a vehicle the customer requested'
@@ -574,6 +866,7 @@ const vehicleData = ref({
   version: '',
   vin: '',
   plates: '',
+  vehicleClass: '',
   fuelType: '',
   gearType: '',
   kilometers: '',
@@ -582,6 +875,18 @@ const vehicleData = ref({
   ownershipType: '',
   ownedSince: '',
   warrantyInfo: '',
+  // Owned vehicle - more details (Figma)
+  displacement: '',
+  hp: '',
+  kw: '',
+  colour: '',
+  tractionType: '',
+  doors: '',
+  seats: '',
+  lastKmUpdate: '',
+  warrantyStart: '',
+  warrantyDurationMonths: '',
+  warrantyEnd: '',
   note: '',
   stockDays: null,
   valuation: null
@@ -615,6 +920,7 @@ function loadItemIntoForm(item) {
       version: item.data.version || '',
       vin: item.data.vin || '',
       plates: item.data.plate || item.data.plates || '',
+      vehicleClass: item.data.vehicleClass || '',
       fuelType: item.data.fuelType || '',
       gearType: item.data.gearType || '',
       kilometers: item.data.km || item.data.kilometers || '',
@@ -623,6 +929,17 @@ function loadItemIntoForm(item) {
       ownershipType: item.data.ownershipType || '',
       ownedSince: item.data.ownedSince || '',
       warrantyInfo: item.data.warrantyInfo || '',
+      displacement: item.data.displacement || '',
+      hp: item.data.hp || '',
+      kw: item.data.kw || '',
+      colour: item.data.colour || '',
+      tractionType: item.data.tractionType || '',
+      doors: item.data.doors || '',
+      seats: item.data.seats || '',
+      lastKmUpdate: item.data.lastKmUpdate || '',
+      warrantyStart: item.data.warrantyStart || '',
+      warrantyDurationMonths: item.data.warrantyDurationMonths || '',
+      warrantyEnd: item.data.warrantyEnd || '',
       note: item.data.note || '',
       stockDays: null,
       valuation: item.data.tradeInPrice ?? null
@@ -636,6 +953,7 @@ function loadItemIntoForm(item) {
       version: v.version || '',
       vin: v.vin || '',
       plates: v.plates || '',
+      vehicleClass: v.vehicleClass || '',
       fuelType: v.fuelType || '',
       gearType: v.gearType || '',
       kilometers: v.kilometers ?? '',
@@ -644,6 +962,17 @@ function loadItemIntoForm(item) {
       ownershipType: v.ownershipType || '',
       ownedSince: v.ownedSince || '',
       warrantyInfo: v.warrantyInfo || '',
+      displacement: v.displacement || '',
+      hp: v.hp || '',
+      kw: v.kw || '',
+      colour: v.colour || '',
+      tractionType: v.tractionType || '',
+      doors: v.doors || '',
+      seats: v.seats || '',
+      lastKmUpdate: v.lastKmUpdate || '',
+      warrantyStart: v.warrantyStart || '',
+      warrantyDurationMonths: v.warrantyDurationMonths || '',
+      warrantyEnd: v.warrantyEnd || '',
       note: v.note || '',
       stockDays: null,
       valuation: item.valuation ?? (item.valuationDetail?.tradeInPrice ?? null)
@@ -658,6 +987,7 @@ function loadItemIntoForm(item) {
       version: '',
       vin: '',
       plates: '',
+      vehicleClass: '',
       fuelType: '',
       gearType: '',
       kilometers: '',
@@ -666,6 +996,17 @@ function loadItemIntoForm(item) {
       ownershipType: '',
       ownedSince: '',
       warrantyInfo: '',
+      displacement: '',
+      hp: '',
+      kw: '',
+      colour: '',
+      tractionType: '',
+      doors: '',
+      seats: '',
+      lastKmUpdate: '',
+      warrantyStart: '',
+      warrantyDurationMonths: '',
+      warrantyEnd: '',
       note: '',
       stockDays: null,
       valuation
@@ -701,7 +1042,8 @@ const resetForm = () => {
 
 watch(() => [props.show, props.item], ([isOpen, item]) => {
   if (isOpen && item) {
-    selectedVehicleType.value = 'tradein'
+    const inferred = inferVehicleTypeFromItem(item)
+    selectedVehicleType.value = props.mode === 'tradein' ? 'tradein' : (inferred || null)
     loadItemIntoForm(item)
   } else if (isOpen && !item) {
     selectedVehicleType.value = props.mode === 'tradein' ? 'tradein' : null
@@ -716,7 +1058,13 @@ watch(() => [props.show, props.item], ([isOpen, item]) => {
 }, { immediate: true })
 
 const isValid = computed(() => {
-  return !!vehicleData.value.brand && !!vehicleData.value.model && !!vehicleData.value.year
+  if (isTradeIn.value) {
+    return !!vehicleData.value.brand && !!vehicleData.value.model && !!vehicleData.value.year
+  }
+  if (selectedVehicleType.value === 'drove' || selectedVehicleType.value === 'requested') {
+    return !!vehicleData.value.brand && !!vehicleData.value.model
+  }
+  return !!vehicleData.value.brand && !!vehicleData.value.model
 })
 
 const handleOpenChange = (isOpen) => {
@@ -736,6 +1084,7 @@ const handleSubmit = () => {
       version: vehicleData.value.version || null,
       vin: vehicleData.value.vin || null,
       plates: vehicleData.value.plates || null,
+      vehicleClass: vehicleData.value.vehicleClass || null,
       fuelType: vehicleData.value.fuelType || null,
       gearType: vehicleData.value.gearType || null,
       kilometers: parseInt(vehicleData.value.kilometers) || 0,
@@ -744,6 +1093,17 @@ const handleSubmit = () => {
       ownershipType: vehicleData.value.ownershipType || null,
       ownedSince: vehicleData.value.ownedSince || null,
       warrantyInfo: vehicleData.value.warrantyInfo || null,
+      displacement: vehicleData.value.displacement || null,
+      hp: vehicleData.value.hp || null,
+      kw: vehicleData.value.kw || null,
+      colour: vehicleData.value.colour || null,
+      tractionType: vehicleData.value.tractionType || null,
+      doors: vehicleData.value.doors || null,
+      seats: vehicleData.value.seats || null,
+      lastKmUpdate: vehicleData.value.lastKmUpdate || null,
+      warrantyStart: vehicleData.value.warrantyStart || null,
+      warrantyDurationMonths: vehicleData.value.warrantyDurationMonths || null,
+      warrantyEnd: vehicleData.value.warrantyEnd || null,
       note: vehicleData.value.note || null,
       stockDays: null,
       status: 'Available'

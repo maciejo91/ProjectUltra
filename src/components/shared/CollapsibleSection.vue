@@ -1,7 +1,6 @@
 <template>
   <div
-    class="overflow-hidden border border-border rounded-lg"
-    :class="cardStyle ? 'bg-white' : ''"
+    class="mk-collapsible-section-card overflow-hidden border border-border rounded-lg"
   >
     <!-- Section Header -->
     <button
@@ -30,7 +29,7 @@
     
     <!-- Section Content -->
     <transition name="expand">
-      <div v-if="isExpanded" class="pb-4" :class="noSidePadding ? '' : 'px-4'">
+      <div v-if="isExpanded" :class="noSidePadding ? 'p-4' : 'px-4 pb-4'">
         <slot />
       </div>
     </transition>
@@ -67,6 +66,14 @@ defineEmits(['toggle'])
 </script>
 
 <style scoped>
+.mk-collapsible-section-card {
+  background-color: var(--base-card);
+  color: rgba(0, 0, 0, 1);
+  border-color: var(--figma-border);
+  background-clip: unset;
+  -webkit-background-clip: unset;
+}
+
 .expand-enter-active,
 .expand-leave-active {
   transition: all 0.3s ease;

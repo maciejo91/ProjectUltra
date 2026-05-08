@@ -1452,11 +1452,24 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 .bg-badge-red { background-color: var(--badge-red-bg); border: none; }
 .bg-badge-orange { background-color: var(--badge-orange-bg); border: none; }
 
+/* Utility: success green using Motork token/vars (avoid Tailwind emerald hardcodes) */
+.text-mk-green-600 {
+  color: var(--color-green-600) !important;
+}
+
 /* All badge-like elements: borderless */
 [data-slot="badge"],
 .data-table-inner span.inline-flex.rounded[class*="px-2"],
 .badge-ui {
   border: none !important;
+}
+
+/* Badge sizing override (Motork Badge / shadcn-like):
+   In preview we increased vertical padding and removed fixed h/min-w sizing. */
+[data-slot="badge"][data-variant="secondary"] {
+  padding: 4px 10px !important;
+  width: fit-content !important;
+  height: fit-content !important;
 }
 
 /* Performance widget chart colors (blue + grey main, green secondary) */

@@ -4,7 +4,7 @@
       <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide min-h-0">
         <div class="bg-background mb-8">
           <div class="shrink-0 overflow-visible pb-2 pt-1 mb-2">
-            <RequestMainTabs v-model="selectedSegment" :tabs="filterChips" />
+            <AppTabs v-model="selectedSegment" :tabs="filterChips" />
           </div>
           <DataTableWithUnifiedSearch
             ref="datatableShellRef"
@@ -93,7 +93,7 @@ import { useI18n } from 'vue-i18n'
 import { FileText, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
-import RequestMainTabs from '@/components/requests/RequestMainTabs.vue'
+import AppTabs from '@/components/shared/AppTabs.vue'
 import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import { useTableRowClick } from '@/composables/useTableRowClick'
 import { useRequestsList, SEGMENT_KEYS } from '@/composables/useRequestsList'

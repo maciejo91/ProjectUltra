@@ -262,7 +262,7 @@ function createDefaultVehicleFormState() {
     configSpecification: '',
     configPurchaseMethod: '',
 
-    // Manual insert (Figma 1710:68242)
+    // Manual insert — Sales (Figma 1710:68242)
     manualVehicleClass: '',
     manualVehicleType: '',
     manualBrand: '',
@@ -271,6 +271,25 @@ function createDefaultVehicleFormState() {
     manualFuelType: '',
     manualQuantity: '1',
     manualVehiclePrice: '',
+    manualGearType: '',
+
+    // Manual insert — Service owned vehicle (Figma)
+    manualRegistration: '',
+    manualMileage: '',
+    manualOwner: '',
+    manualOwnedSince: '',
+    manualDisplacement: '',
+    manualHp: '',
+    manualKw: '',
+    manualColour: '',
+    manualTractionType: '',
+    manualDoors: '',
+    manualSeats: '',
+    manualModelYear: '',
+    manualLastKmUpdate: '',
+    manualWarrantyStart: '',
+    manualWarrantyDurationMonths: '',
+    manualWarrantyEnd: '',
   }
 }
 

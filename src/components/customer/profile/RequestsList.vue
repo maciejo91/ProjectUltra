@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-4">
     <div class="shrink-0 overflow-visible pb-2 pt-1">
-      <RequestMainTabs v-model="selectedFilter" :tabs="filterChips" />
+      <AppTabs v-model="selectedFilter" :tabs="filterChips" />
     </div>
 
     <div v-if="filteredItems.length === 0" class="text-muted-foreground text-sm italic">
@@ -39,7 +39,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { Badge } from '@motork/component-library/future/primitives'
-import RequestMainTabs from '@/components/requests/RequestMainTabs.vue'
+import AppTabs from '@/components/shared/AppTabs.vue'
 import { Car } from 'lucide-vue-next'
 import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
 

@@ -82,7 +82,7 @@
                 class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-background"
               >
                 <div class="shrink-0 px-4 pt-2">
-                  <RequestMainTabs class="shrink-0" v-model="activeTab" :tabs="mainTabs" />
+                  <AppTabs class="shrink-0" v-model="activeTab" :tabs="mainTabs" />
                 </div>
                 <div class="flex min-h-0 flex-1 flex-col gap-4 border-t border-border p-4">
                   <div
@@ -186,7 +186,7 @@ import { useCustomersStore } from '@/stores/customers'
 import { useUserStore } from '@/stores/user'
 import { useToastStore } from '@/stores/toast'
 import TaskContactCard from '@/components/tasks/TaskContactCard.vue'
-import RequestMainTabs from '@/components/requests/RequestMainTabs.vue'
+import AppTabs from '@/components/shared/AppTabs.vue'
 import CustomerProfileContent from '@/components/customer/profile/CustomerProfileContent.vue'
 import CustomerProfileRightColumn from '@/components/customer/profile/CustomerProfileRightColumn.vue'
 import AddLeadOpportunityModal from '@/components/modals/AddLeadOpportunityModal.vue'

@@ -7,7 +7,7 @@
           <DialogTitle class="text-foreground">Select Vehicle</DialogTitle>
         </DialogHeader>
 
-        <div class="flex-1 min-h-0 overflow-y-auto px-6 py-4 w-full space-y-6">
+        <div class="flex-1 min-h-0 overflow-y-auto px-6 py-0 w-full space-y-6">
           <!-- Stock mode: Recommended + Browse Stock -->
           <template v-if="showStockSection">
             <div v-if="allRecommendedVehicles.length" class="space-y-3">

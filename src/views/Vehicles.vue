@@ -4,7 +4,7 @@
       <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide min-h-0">
         <div class="mb-8 flex flex-col gap-2 md:gap-3">
           <div class="shrink-0 overflow-visible pb-2 pt-1">
-            <RequestMainTabs v-model="selectedInventoryChip" :tabs="filterChips" />
+            <AppTabs v-model="selectedInventoryChip" :tabs="filterChips" />
           </div>
           <div class="bg-background min-w-0 w-full">
             <DataTableWithUnifiedSearch
@@ -56,7 +56,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { FilePlus } from 'lucide-vue-next'
 import { useVehiclesStore } from '@/stores/vehicles'
 import { Badge, Button } from '@motork/component-library/future/primitives'
-import RequestMainTabs from '@/components/requests/RequestMainTabs.vue'
+import AppTabs from '@/components/shared/AppTabs.vue'
 import VehicleGrid from '@/components/vehicles/VehicleGrid.vue'
 import AddOfferModal from '@/components/modals/AddOfferModal.vue'
 import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'

@@ -116,6 +116,56 @@ export function useAddFormSubmission({
     }
 
     if (isManual) {
+      const isServiceDept = leadDetailsForm?.department === 'service'
+
+      if (isServiceDept) {
+        const brand = String(vehicleData.manualBrand || '').trim()
+        const model = String(vehicleData.manualModel || '').trim()
+        const kmRaw = String(vehicleData.manualMileage ?? '')
+          .trim()
+          .replace(/\./g, '')
+          .replace(/km/gi, '')
+          .replace(/\s/g, '')
+        const kmParsed = kmRaw ? Number.parseInt(kmRaw, 10) : NaN
+        const kilometers = Number.isFinite(kmParsed) ? kmParsed : undefined
+
+        const yearRaw = String(vehicleData.manualModelYear ?? '').trim()
+        const yearParsed = yearRaw ? Number.parseInt(yearRaw, 10) : NaN
+        const year = Number.isFinite(yearParsed) ? yearParsed : undefined
+
+        const vin = String(vehicleData.vin || '').trim()
+        const plate = String(vehicleData.plateNumber || '').trim()
+
+        const out = {
+          brand,
+          model,
+          year,
+          vehicleClass: String(vehicleData.manualVehicleClass || '').trim() || undefined,
+          fuelType: String(vehicleData.manualFuelType || '').trim() || undefined,
+          gearType: String(vehicleData.manualGearType || '').trim() || undefined,
+          vin: vin || undefined,
+          plateNumber: plate || undefined,
+          plates: plate || undefined,
+          kilometers,
+          registration: String(vehicleData.manualRegistration || '').trim() || undefined,
+          owner: String(vehicleData.manualOwner || '').trim() || undefined,
+          ownedSince: String(vehicleData.manualOwnedSince || '').trim() || undefined,
+          displacement: String(vehicleData.manualDisplacement || '').trim() || undefined,
+          hp: String(vehicleData.manualHp || '').trim() || undefined,
+          kw: String(vehicleData.manualKw || '').trim() || undefined,
+          colour: String(vehicleData.manualColour || '').trim() || undefined,
+          tractionType: String(vehicleData.manualTractionType || '').trim() || undefined,
+          doors: String(vehicleData.manualDoors || '').trim() || undefined,
+          seats: String(vehicleData.manualSeats || '').trim() || undefined,
+          lastKmUpdate: String(vehicleData.manualLastKmUpdate || '').trim() || undefined,
+          warrantyStart: String(vehicleData.manualWarrantyStart || '').trim() || undefined,
+          warrantyDurationMonths:
+            String(vehicleData.manualWarrantyDurationMonths || '').trim() || undefined,
+          warrantyEnd: String(vehicleData.manualWarrantyEnd || '').trim() || undefined,
+        }
+        return pickNonEmpty(out)
+      }
+
       const brand = String(vehicleData.manualBrand || '').trim()
       const modelLine = [vehicleData.manualModel, vehicleData.manualVersion]
         .map((s) => String(s || '').trim())

@@ -1,11 +1,16 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
 
 const props = defineProps({
   modelValue: { type: Date, required: true },
   preserveDayWhenChangingMonth: { type: Boolean, default: false },
+  /**
+   * When true, prev/next month only change the visible month; modelValue updates only when a day is clicked.
+   * Use in popover date fields so browsing months does not overwrite the bound value.
+   */
+  decoupleNavigation: { type: Boolean, default: false },
 })
 
 function addMonthsClampingDay(date, deltaMonths) {
@@ -21,8 +26,22 @@ function addMonthsClampingDay(date, deltaMonths) {
 
 const emit = defineEmits(['update:modelValue'])
 
+/** First day of month shown in the grid; only used when decoupleNavigation is true. */
+const navigationMonth = ref(null)
+
+watch(
+  () => props.modelValue,
+  () => {
+    if (props.decoupleNavigation) navigationMonth.value = null
+  },
+)
+
 const monthStart = computed(() => {
-  const d = new Date(props.modelValue)
+  const src =
+    props.decoupleNavigation && navigationMonth.value != null
+      ? navigationMonth.value
+      : props.modelValue
+  const d = new Date(src)
   d.setDate(1)
   d.setHours(0, 0, 0, 0)
   return d
@@ -61,6 +80,12 @@ const gridDays = computed(() => {
 })
 
 const goToPreviousMonth = () => {
+  if (props.decoupleNavigation) {
+    const d = new Date(monthStart.value)
+    d.setMonth(d.getMonth() - 1)
+    navigationMonth.value = d
+    return
+  }
   if (props.preserveDayWhenChangingMonth) {
     emit('update:modelValue', addMonthsClampingDay(props.modelValue, -1))
     return
@@ -71,6 +96,12 @@ const goToPreviousMonth = () => {
 }
 
 const goToNextMonth = () => {
+  if (props.decoupleNavigation) {
+    const d = new Date(monthStart.value)
+    d.setMonth(d.getMonth() + 1)
+    navigationMonth.value = d
+    return
+  }
   if (props.preserveDayWhenChangingMonth) {
     emit('update:modelValue', addMonthsClampingDay(props.modelValue, 1))
     return
@@ -83,6 +114,11 @@ const goToNextMonth = () => {
 const selectDate = (date) => {
   const d = new Date(date)
   d.setHours(0, 0, 0, 0)
+  if (props.decoupleNavigation) {
+    const ms = new Date(d.getFullYear(), d.getMonth(), 1)
+    ms.setHours(0, 0, 0, 0)
+    navigationMonth.value = ms
+  }
   emit('update:modelValue', d)
 }
 </script>

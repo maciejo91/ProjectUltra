@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="handleOpenChange">
-    <DialogContent class="w-[90vw] max-w-none h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col gap-0 overflow-hidden p-0" :show-close-button="false">
+    <DialogContent class="w-[90vw] max-w-screen-2xl h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col gap-0 overflow-hidden p-0" :show-close-button="false">
       <DialogHeader class="shrink-0 px-6 py-4 border-b border-border overflow-hidden" style="border-bottom-color: var(--color-neutral-300);">
         <div class="grid grid-cols-[1fr_auto_1fr] items-start gap-4">
           <div class="min-w-0">
@@ -76,7 +76,7 @@
             :key="b.id"
             type="button"
             :class="[
-              'bg-background border border-border rounded-lg p-4 flex flex-col items-center gap-2 shadow-mk-dashboard-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              'bg-background border border-border rounded-lg p-4 flex flex-col items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
               selectedBrand === b.id ? 'ring-2 ring-primary border-primary' : ''
             ]"
             @click="selectBrand(b.id)"
@@ -107,7 +107,7 @@
 
         <div v-else-if="step === 2" class="w-full h-full flex flex-col min-h-0">
           <div class="shrink-0 bg-muted px-6 py-4 flex items-center justify-between gap-4">
-            <div class="relative flex-1">
+            <div class="relative flex-1 w-full max-w-xl">
               <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 v-model="modelSearchQuery"
@@ -121,26 +121,40 @@
               <div class="flex items-center gap-3">
                 <span class="text-sm font-medium text-foreground">Show net prices</span>
                 <Switch
-                  size="sm"
-                  :model-value="showNetPrices"
+                  :model-value="showNetPrices === true"
                   @update:model-value="(v) => (showNetPrices = v === true)"
                 />
               </div>
 
-              <Button type="button" variant="outline" size="sm" class="rounded-md">
-                VAT 22%
-              </Button>
+              <DropdownMenu :modal="false">
+                <DropdownMenuTrigger as-child>
+                  <Button type="button" variant="outline" size="sm" class="rounded-md">
+                    {{ selectedVatOption.shortLabel }}
+                    <ChevronDown class="size-4 ml-1.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent class="w-56" align="end">
+                  <DropdownMenuItem
+                    v-for="opt in VAT_OPTIONS"
+                    :key="opt.id"
+                    :class="opt.id === selectedVatId ? 'bg-muted font-medium' : ''"
+                    @select="selectedVatId = opt.id"
+                  >
+                    {{ opt.label }}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
-          <div class="flex-1 min-h-0 overflow-y-auto px-6 py-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          <div class="flex-1 min-h-0 overflow-y-auto px-6 py-0">
+            <div class="grid py-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               <button
                 v-for="m in filteredModels"
                 :key="m.id"
                 type="button"
                 :class="[
-                  'bg-background border border-border rounded-lg p-4 flex flex-col items-start text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  'bg-background border border-border rounded-lg p-4 flex flex-col items-start text-left gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   selectedModel === m.id ? 'ring-2 ring-primary border-primary' : ''
                 ]"
                 @click="selectModel(m.id)"
@@ -155,23 +169,16 @@
                   <img v-if="m.imageUrl" :src="m.imageUrl" alt="" class="h-full w-full object-cover" loading="lazy" />
                 </div>
 
-                <div class="w-full pt-4 space-y-2">
+                <div class="w-full pt-4 space-y-1">
                   <div class="flex items-center justify-between gap-2">
                     <p class="text-sm text-muted-foreground truncate">
                       {{ m.versionsLabel }}
                     </p>
-                    <div
-                      v-if="m.promoCount"
-                      class="shrink-0 h-5 rounded-md bg-destructive text-destructive-foreground flex items-center gap-1.5 pl-1 pr-2 shadow-mk-dashboard-card"
-                    >
-                      <div class="h-3.5 min-w-3.5 rounded-sm bg-background text-destructive flex items-center justify-center px-1 text-xs leading-none">
-                        {{ m.promoCount }}
-                      </div>
-                      <span class="promo-label text-xs font-semibold leading-none">PROMO</span>
-                    </div>
+                    <PromoBadge :promos="modelPromos(m)" />
                   </div>
                   <p class="text-sm text-foreground">
-                    {{ m.priceLabel }}
+                    from {{ formatCurrency(modelDisplayPrice(m)) }}
+                    <span v-if="showNetPrices"> VAT excl.</span>
                   </p>
                 </div>
               </button>
@@ -179,180 +186,202 @@
           </div>
         </div>
 
-        <div v-else class="w-full h-full flex flex-col min-h-0">
+          <div v-else class="w-full h-full flex flex-col min-h-0">
           <div class="shrink-0 bg-muted px-6 py-4 flex items-center justify-between gap-4">
-            <div class="relative flex-1">
-              <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <div class="flex-1 w-full max-w-xl">
               <Input
+                v-if="activeTab !== 'quotation'"
                 v-model="itemSearchQuery"
                 type="text"
                 placeholder="Search items..."
                 class="w-full pl-9 bg-background border-border"
               />
+              <div
+                v-else
+                role="button"
+                tabindex="0"
+                class="flex h-8 min-h-8 w-full min-w-0 max-w-full cursor-pointer items-center gap-1.5 rounded-[10px] border border-input bg-background px-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-[220px] sm:max-w-[220px] sm:shrink-0"
+                @click="openQuotationSearch"
+                @keydown.enter.prevent="openQuotationSearch"
+              >
+                <Search class="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <span class="min-w-0 flex-1 truncate text-left text-muted-foreground">Search items...</span>
+                <kbd
+                  class="inline-flex h-5 shrink-0 items-center justify-center rounded-md bg-muted px-1 text-xs font-medium leading-none text-muted-foreground"
+                >
+                  {{ keyboardShortcutLabel }}
+                </kbd>
+              </div>
             </div>
 
             <div class="shrink-0 flex items-center gap-4">
               <div class="flex items-center gap-3">
                 <span class="text-sm font-medium text-foreground">Show net prices</span>
                 <Switch
-                  size="sm"
-                  :model-value="showNetPrices"
+                  :model-value="showNetPrices === true"
                   @update:model-value="(v) => (showNetPrices = v === true)"
                 />
               </div>
 
-              <Button type="button" variant="outline" size="sm" class="rounded-md">
-                VAT 22%
-              </Button>
+              <DropdownMenu :modal="false">
+                <DropdownMenuTrigger as-child>
+                  <Button type="button" variant="outline" size="sm" class="rounded-md">
+                    {{ selectedVatOption.shortLabel }}
+                    <ChevronDown class="size-4 ml-1.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent class="w-56" align="end">
+                  <DropdownMenuItem
+                    v-for="opt in VAT_OPTIONS"
+                    :key="opt.id"
+                    :class="opt.id === selectedVatId ? 'bg-muted font-medium' : ''"
+                    @select="selectedVatId = opt.id"
+                  >
+                    {{ opt.label }}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
-          <div class="shrink-0 px-6 pt-2">
-            <Tabs :model-value="activeTab" @update:model-value="(v) => (activeTab = String(v || 'quotation'))">
-              <TabsList class="bg-transparent p-0 h-auto gap-6 border-b border-border rounded-none w-full justify-start">
-                <TabsTrigger value="version" class="rounded-none px-0 py-2 text-sm">
-                  Version
-                </TabsTrigger>
-                <TabsTrigger value="colour" class="rounded-none px-0 py-2 text-sm">
-                  Colour
-                </TabsTrigger>
-                <TabsTrigger value="equipment" class="rounded-none px-0 py-2 text-sm">
-                  Equipment - Optional
-                </TabsTrigger>
-                <TabsTrigger value="quotation" class="rounded-none px-0 py-2 text-sm">
-                  Quotation
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-
-          <div class="flex-1 min-h-0 overflow-y-auto px-6 py-4">
+          <div class="flex-1 min-h-0 overflow-y-auto px-6 py-0">
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-              <div class="space-y-4">
-                <div class="rounded-lg border border-border bg-background overflow-hidden">
-                  <button type="button" class="w-full flex items-center justify-between px-4 py-3 text-left" @click="toggleSection('vehicleDetails')">
-                    <span class="text-sm font-medium text-foreground">Vehicle details</span>
-                    <ChevronDown class="size-4 text-muted-foreground" :class="sectionOpen.vehicleDetails ? 'rotate-180' : ''" />
-                  </button>
-                  <div v-show="sectionOpen.vehicleDetails" class="px-4 pb-4 space-y-2">
-                    <div class="flex items-center justify-between gap-3 rounded-md bg-muted px-3 py-2">
-                      <p class="text-sm text-foreground truncate">{{ configuredVehicleLine }}</p>
-                      <p class="text-sm text-foreground">{{ formatCurrency(configuredPrice) }}</p>
-                    </div>
-                    <div class="flex items-center justify-between gap-3 rounded-md bg-muted px-3 py-2">
-                      <p class="text-sm text-muted-foreground">Colour: {{ configuredColour }}</p>
-                      <p class="text-sm text-muted-foreground">{{ formatCurrency(300) }}</p>
-                    </div>
-                  </div>
-                </div>
+              <div class="space-y-4 pt-4">
+                <AppTabs
+                  :model-value="activeTab"
+                  :tabs="configuratorTabs"
+                  divider="touching"
+                  @update:model-value="(v) => (activeTab = String(v || 'version'))"
+                />
 
-                <div class="rounded-lg border border-border bg-background overflow-hidden">
-                  <button type="button" class="w-full flex items-center justify-between px-4 py-3 text-left" @click="toggleSection('promoCampaigns')">
-                    <span class="text-sm font-medium text-foreground">Promo and Campaigns</span>
-                    <ChevronDown class="size-4 text-muted-foreground" :class="sectionOpen.promoCampaigns ? 'rotate-180' : ''" />
-                  </button>
-                </div>
-
-                <div class="rounded-lg border border-border bg-background overflow-hidden">
-                  <div class="w-full flex items-center justify-between px-4 py-3">
-                    <span class="text-sm font-medium text-foreground">Discounts</span>
-                    <Button type="button" variant="outline" size="sm" class="rounded-md">
-                      <Plus class="size-4 mr-1" />
-                      Add
-                    </Button>
-                  </div>
-                </div>
-
-                <div class="rounded-lg border border-border bg-background overflow-hidden">
-                  <button type="button" class="w-full flex items-center justify-between px-4 py-3 text-left" @click="toggleSection('accessories')">
-                    <span class="text-sm font-medium text-foreground">Accessories and services</span>
-                    <ChevronDown class="size-4 text-muted-foreground" :class="sectionOpen.accessories ? 'rotate-180' : ''" />
-                  </button>
-                </div>
-
-                <div class="rounded-lg border border-border bg-background overflow-hidden">
-                  <button type="button" class="w-full flex items-center justify-between px-4 py-3 text-left" @click="toggleSection('taxes')">
-                    <span class="text-sm font-medium text-foreground">Taxes and extra-costs</span>
-                    <ChevronDown class="size-4 text-muted-foreground" :class="sectionOpen.taxes ? 'rotate-180' : ''" />
-                  </button>
-                </div>
-
-                <div class="rounded-lg border border-border bg-background overflow-hidden">
-                  <button type="button" class="w-full flex items-center justify-between px-4 py-3 text-left" @click="toggleSection('tradeIn')">
-                    <span class="text-sm font-medium text-foreground">Trade-in</span>
-                    <ChevronDown class="size-4 text-muted-foreground" :class="sectionOpen.tradeIn ? 'rotate-180' : ''" />
-                  </button>
-                </div>
-
-                <div class="rounded-lg border border-border bg-background overflow-hidden">
-                  <div class="w-full flex items-center justify-between px-4 py-3">
-                    <span class="text-sm font-medium text-foreground">Purchase methods</span>
-                    <Button type="button" variant="outline" size="sm" class="rounded-md">
-                      <Plus class="size-4 mr-1" />
-                      Add
-                    </Button>
-                  </div>
-                </div>
+                <VersionPanel
+                  v-if="activeTab === 'version'"
+                  :model-value="configurator.selectedVersionId.value"
+                  :versions="filteredVersions"
+                  :base-price="configuredModelBasePrice"
+                  :show-net-prices="showNetPrices"
+                  :vat-rate-percent="currentVatRate"
+                  @update:model-value="onVersionPicked"
+                />
+                <ColourPanel
+                  v-else-if="activeTab === 'colour'"
+                  :exterior-id="configurator.selectedColourId.value"
+                  :interior-id="configurator.selectedInteriorColourId.value"
+                  :colours="filteredColours"
+                  :show-net-prices="showNetPrices"
+                  :vat-rate-percent="currentVatRate"
+                  @update:exterior-id="onExteriorColourPicked"
+                  @update:interior-id="onInteriorColourPicked"
+                />
+                <EquipmentPanel
+                  v-else-if="activeTab === 'equipment'"
+                  :equipment="filteredEquipment"
+                  :selection="configurator.equipmentSelection"
+                  :locked-ids="configurator.lockedEquipmentIds.value"
+                  :groups="EQUIPMENT_GROUPS"
+                  :show-net-prices="showNetPrices"
+                  :vat-rate-percent="currentVatRate"
+                  :show-standard-equipment="showStandardEquipment"
+                  @update:show-standard-equipment="(v) => (showStandardEquipment = v === true)"
+                  @toggle="(id, v) => configurator.toggleEquipment(id, v)"
+                />
+                <QuotationPanel
+                  v-else
+                  ref="quotationPanelRef"
+                  :vehicle-line="quotationVehicleLine"
+                  :vehicle-base-total="configurator.vehicleBasePrice.value"
+                  :colour-label="configurator.selectedColour.value?.name || ''"
+                  :colour-price-delta="configurator.colourPriceDelta.value"
+                  :interior-colour-label="configurator.selectedInteriorColour.value?.name || ''"
+                  :interior-colour-price-delta="configurator.interiorColourPriceDelta.value"
+                  :selected-equipment="configurator.selectedEquipment.value"
+                  :show-net-prices="showNetPrices"
+                  :vat-rate-percent="currentVatRate"
+                  :promos="configurator.catalog.PROMOS"
+                  :promo-selection="configurator.promoSelection"
+                  :user-discounts="configurator.userDiscounts.value"
+                  :accessories="configurator.catalog.ACCESSORIES"
+                  :accessory-selection="configurator.accessorySelection"
+                  :taxes="configurator.catalog.TAXES"
+                  :vat-amount="configurator.vatAmount.value"
+                  :trade-in-applied="configurator.tradeInApplied.value"
+                  :trade-in-mock-value="TRADE_IN_MOCK_VALUE"
+                  :purchase-methods="configurator.catalog.PURCHASE_METHODS"
+                  :selected-purchase-method-id="configurator.selectedPurchaseMethodId.value"
+                  @toggle-promo="(id, v) => configurator.togglePromo(id, v)"
+                  @add-discount="(d) => configurator.addDiscount(d)"
+                  @remove-discount="(id) => configurator.removeDiscount(id)"
+                  @toggle-accessory="(id, v) => configurator.toggleAccessory(id, v)"
+                  @toggle-trade-in="(v) => configurator.setTradeInApplied(v)"
+                  @select-purchase-method="(id) => configurator.selectPurchaseMethod(id)"
+                />
               </div>
 
-              <div class="rounded-lg border border-border bg-background shadow-mk-dashboard-card overflow-hidden">
-                <div class="p-4 space-y-3">
-                  <div class="inline-flex items-center justify-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground w-fit">
-                    New
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-foreground">{{ configuredBrandLabel }}</p>
-                    <p class="text-base font-semibold text-foreground">{{ configuredModelTitle }}</p>
-                    <p class="text-sm text-muted-foreground">{{ configuredSubline }}</p>
-                    <div class="flex items-center gap-2 pt-2 text-sm text-muted-foreground">
-                      <span class="size-2 rounded-full bg-muted-foreground/60" aria-hidden="true" />
-                      {{ configuredColour }}
-                    </div>
-                  </div>
-                </div>
-                <div class="px-4 pb-4">
-                  <div class="aspect-[16/9] w-full overflow-hidden rounded-md bg-muted">
-                    <img v-if="configuredImageUrl" :src="configuredImageUrl" alt="" class="h-full w-full object-cover" loading="lazy" />
-                  </div>
-                </div>
-                <div class="border-t border-border p-4 space-y-3">
-                  <p class="text-sm font-semibold text-foreground">Offer summary</p>
-                  <div class="space-y-2 text-sm">
-                    <div class="flex items-center justify-between">
-                      <span class="text-muted-foreground">Vehicle</span>
-                      <span class="text-foreground">{{ formatCurrency(configuredPrice + 600) }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <span class="text-muted-foreground">Promo</span>
-                      <span class="text-foreground">- {{ formatCurrency(1500) }}</span>
-                    </div>
-                    <div class="flex items-center justify-between pt-1 font-semibold">
-                      <span class="text-foreground">Subtotal</span>
-                      <span class="text-foreground">{{ formatCurrency(configuredPrice + 600 - 1500) }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <span class="text-muted-foreground">Taxes and extra costs</span>
-                      <span class="text-foreground">{{ formatCurrency(862.98) }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <span class="text-muted-foreground">Trade-in</span>
-                      <span class="text-foreground">- {{ formatCurrency(4000) }}</span>
-                    </div>
-                    <div class="flex items-center justify-between pt-2 text-base font-semibold">
-                      <span class="text-foreground">Grand total</span>
-                      <span class="text-foreground">{{ formatCurrency(configuredPrice + 600 - 1500 + 862.98 - 4000) }}</span>
-                    </div>
-                  </div>
-                  <Button type="button" variant="outline" size="sm" class="rounded-md w-full justify-start">
-                    <CornerDownLeft class="size-4 mr-2" />
-                    Round price
-                  </Button>
-                </div>
+              <div class="self-start lg:sticky lg:top-0">
+                <ConfigurationSummary
+                  :brand-label="configuredBrandLabel"
+                  :model-title="configuredModelTitle"
+                  :version-name="configurator.selectedVersion.value?.name || ''"
+                  :colour-name="configurator.selectedColour.value?.name || ''"
+                  :interior-colour-name="configurator.selectedInteriorColour.value?.name || ''"
+                  :colour-hex="configurator.selectedColour.value?.hex || ''"
+                  :configured-image-url="configurator.configuredImageUrl.value"
+                  :vehicle-base-price="configurator.vehicleBasePrice.value"
+                  :equipment-total="configurator.equipmentTotal.value"
+                  :accessories-total="configurator.accessoriesTotal.value"
+                  :promo-total="configurator.promoTotal.value"
+                  :discounts-total="configurator.discountsTotal.value"
+                  :subtotal="configurator.subtotal.value"
+                  :taxes-total="configurator.taxesTotal.value"
+                  :trade-in-value="configurator.tradeInValue.value"
+                  :grand-total-raw="configurator.grandTotalRaw.value"
+                  :grand-total="configurator.grandTotal.value"
+                  :show-net-prices="showNetPrices"
+                  :round-price-applied="configurator.roundPriceApplied.value"
+                  :round-price-adjustment="configurator.roundPriceAdjustment.value"
+                  @toggle-round-price="configurator.toggleRoundPrice()"
+                  @update-round-price-adjustment="(value) => configurator.updateRoundPriceAdjustment(value)"
+                  @reset-round-price="configurator.resetRoundPrice()"
+                />
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <Dialog :open="quotationSearchOpen" @update:open="(v) => (quotationSearchOpen = v)">
+        <DialogContent class="w-full sm:max-w-2xl max-h-[calc(100vh-4rem)] flex flex-col">
+          <DialogHeader class="shrink-0">
+            <DialogTitle>Search quotation items</DialogTitle>
+          </DialogHeader>
+
+          <div class="flex-1 overflow-y-auto py-4 w-full space-y-4">
+            <Input
+              :model-value="quotationSearchQuery"
+              type="text"
+              placeholder="Type the item name..."
+              class="bg-background border-border"
+              @update:model-value="(v) => (quotationSearchQuery = String(v ?? ''))"
+            />
+
+            <div class="rounded-lg border border-border bg-background overflow-hidden">
+              <button
+                v-for="item in filteredQuotationSearchItems"
+                :key="item.key"
+                type="button"
+                class="w-full px-4 py-2 flex items-center justify-between gap-4 text-left hover:bg-muted/40 transition-colors"
+                @click="selectQuotationSearchItem(item)"
+              >
+                <span class="text-sm text-foreground truncate">{{ item.label }}</span>
+                <span class="text-sm text-muted-foreground shrink-0">{{ item.groupLabel }}</span>
+              </button>
+              <div v-if="filteredQuotationSearchItems.length === 0" class="px-4 py-8 text-center">
+                <p class="text-sm text-muted-foreground">No items found</p>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <DialogFooter class="shrink-0 border-t border-border px-6 py-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3" style="border-top-color: var(--color-neutral-300);">
         <div v-if="step === 1" class="flex w-full justify-end">
@@ -376,7 +405,13 @@
             <ArrowLeft class="size-4 mr-2" />
             Back to models
           </Button>
-          <Button type="button" variant="default" class="rounded-sm w-full sm:w-auto" @click="handleSaveAndClose">
+          <Button
+            type="button"
+            variant="default"
+            class="rounded-sm w-full sm:w-auto"
+            :disabled="!configurator.isReadyToSave.value"
+            @click="handleSaveAndClose"
+          >
             Save and close
           </Button>
         </div>
@@ -386,9 +421,24 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
-import { ArrowLeft, Check, ChevronDown, CornerDownLeft, Plus, Search, X } from 'lucide-vue-next'
-import { Badge, Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Input, Switch, Tabs, TabsList, TabsTrigger } from '@motork/component-library/future/primitives'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { ArrowLeft, Check, ChevronDown, Search, X } from 'lucide-vue-next'
+import { Badge, Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Input, Switch } from '@motork/component-library/future/primitives'
+import AppTabs from '@/components/shared/AppTabs.vue'
+import VersionPanel from '@/components/addnew/configurator/VersionPanel.vue'
+import ColourPanel from '@/components/addnew/configurator/ColourPanel.vue'
+import EquipmentPanel from '@/components/addnew/configurator/EquipmentPanel.vue'
+import QuotationPanel from '@/components/addnew/configurator/QuotationPanel.vue'
+import ConfigurationSummary from '@/components/addnew/configurator/ConfigurationSummary.vue'
+import PromoBadge from '@/components/shared/PromoBadge.vue'
+import { useVehicleConfigurator } from '@/composables/useVehicleConfigurator'
+import {
+  DEFAULT_VAT_OPTION_ID,
+  EQUIPMENT_GROUPS,
+  TRADE_IN_MOCK_VALUE,
+  VAT_OPTIONS,
+  findPromo,
+} from '@/constants/vehicleConfiguratorCatalog'
 
 const props = defineProps({
   open: { type: Boolean, default: false }
@@ -399,6 +449,141 @@ const emit = defineEmits(['update:open', 'save'])
 const step = ref(1)
 const selectedBrand = ref('')
 const selectedModel = ref('')
+
+const quotationPanelRef = ref(null)
+const quotationSearchOpen = ref(false)
+const quotationSearchQuery = ref('')
+
+const isMac = computed(() => {
+  if (typeof navigator === 'undefined') return true
+  const platform = String(navigator.platform || '')
+  return /mac|iphone|ipad|ipod/i.test(platform)
+})
+
+const keyboardShortcutLabel = computed(() => (isMac.value ? '⌘K' : 'Ctrl+K'))
+
+function openQuotationSearch() {
+  quotationSearchOpen.value = true
+}
+
+function onGlobalKeydown(e) {
+  if (!props.open) return
+  if (step.value !== 3) return
+  if (activeTab.value !== 'quotation') return
+  if (quotationSearchOpen.value) return
+
+  const key = String(e?.key || '').toLowerCase()
+  const isCombo = isMac.value ? e.metaKey : e.ctrlKey
+  if (!isCombo || key !== 'k') return
+
+  e.preventDefault()
+  openQuotationSearch()
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', onGlobalKeydown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onGlobalKeydown)
+})
+
+const quotationSearchItems = computed(() => {
+  const out = []
+
+  const promos = Array.isArray(configurator?.catalog?.PROMOS) ? configurator.catalog.PROMOS : []
+  for (const p of promos) {
+    if (!p) continue
+    out.push({
+      key: `promo:${p.id ?? p.label}`,
+      label: String(p.label ?? '').trim(),
+      groupKey: 'promoCampaigns',
+      groupLabel: 'Promo and campaigns',
+    })
+  }
+
+  const discounts = Array.isArray(configurator?.userDiscounts?.value) ? configurator.userDiscounts.value : []
+  for (const d of discounts) {
+    if (!d) continue
+    out.push({
+      key: `discount:${d.id ?? d.label}`,
+      label: String(d.label ?? 'Discount').trim(),
+      groupKey: 'discounts',
+      groupLabel: 'Discount',
+    })
+  }
+
+  const accessories = Array.isArray(configurator?.catalog?.ACCESSORIES) ? configurator.catalog.ACCESSORIES : []
+  for (const a of accessories) {
+    if (!a) continue
+    out.push({
+      key: `accessory:${a.id ?? a.name}`,
+      label: String(a.name ?? '').trim(),
+      groupKey: 'accessories',
+      groupLabel: 'Accessories and services',
+    })
+  }
+
+  const purchaseMethods = Array.isArray(configurator?.catalog?.PURCHASE_METHODS)
+    ? configurator.catalog.PURCHASE_METHODS
+    : []
+  for (const m of purchaseMethods) {
+    if (!m) continue
+    out.push({
+      key: `purchaseMethod:${m.id ?? m.label}`,
+      label: String(m.label ?? '').trim(),
+      groupKey: 'purchaseMethod',
+      groupLabel: 'Purchase method',
+    })
+  }
+
+  const taxes = configurator?.catalog?.TAXES ?? null
+  if (taxes) {
+    out.push({
+      key: 'tax:vat',
+      label: `VAT (${Number(taxes.vatRatePercent || 0)}%)`,
+      groupKey: 'taxes',
+      groupLabel: 'Taxes and extra costs',
+    })
+    out.push({
+      key: 'tax:registration',
+      label: 'Registration tax',
+      groupKey: 'taxes',
+      groupLabel: 'Taxes and extra costs',
+    })
+    out.push({
+      key: 'tax:eco',
+      label: 'Eco tax',
+      groupKey: 'taxes',
+      groupLabel: 'Taxes and extra costs',
+    })
+  }
+
+  if (configurator?.tradeInApplied?.value === true) {
+    out.push({
+      key: 'tradeIn:applied',
+      label: 'Trade-in vehicle',
+      groupKey: 'tradeIn',
+      groupLabel: 'Trade-in',
+    })
+  }
+
+  return out.filter((i) => i.label)
+})
+
+const filteredQuotationSearchItems = computed(() => {
+  const q = quotationSearchQuery.value.trim().toLowerCase()
+  const list = quotationSearchItems.value
+  if (!q) return list
+  return list.filter((i) => i.label.toLowerCase().includes(q))
+})
+
+function selectQuotationSearchItem(item) {
+  if (!item) return
+  quotationSearchOpen.value = false
+  quotationSearchQuery.value = ''
+  quotationPanelRef.value?.openSection?.(item.groupKey)
+}
 
 const brands = [
   {
@@ -427,33 +612,55 @@ const brandLogoFailed = ref({})
 const logoRenderKey = ref(0)
 
 const showNetPrices = ref(false)
+const showStandardEquipment = ref(true)
 const modelSearchQuery = ref('')
 const itemSearchQuery = ref('')
 
-const activeTab = ref('quotation')
+const activeTab = ref('version')
 
-const sectionOpen = ref({
-  vehicleDetails: true,
-  promoCampaigns: false,
-  accessories: false,
-  taxes: false,
-  tradeIn: false,
-})
+const selectedVatId = ref(DEFAULT_VAT_OPTION_ID)
+const selectedVatOption = computed(
+  () => VAT_OPTIONS.find((v) => v.id === selectedVatId.value) || VAT_OPTIONS[0]
+)
+const currentVatRate = computed(() => Number(selectedVatOption.value?.rate || 0))
 
 function makeModelCards({ brandId, count, seed }) {
   const baseImageUrl = 'https://www.figma.com/api/mcp/asset/b84d02b2-bdf4-4a4a-8d63-4e78d9b74111'
   return Array.from({ length: count }).map((_, idx) => {
     const n = seed + idx
-    const promoCount = n % 7 === 0 ? 2 : n % 5 === 0 ? 1 : 0
+    const promoIds =
+      n % 7 === 0
+        ? ['p-spring-2026', 'p-loyalty']
+        : n % 5 === 0
+          ? ['p-spring-2026']
+          : []
     return {
       id: `${brandId}-model-${n}`,
       title: `A${(n % 8) + 1} Sportback Berlina 5 porte`,
       imageUrl: baseImageUrl,
       versionsLabel: `${10 + (n % 6)} versions`,
-      promoCount,
-      priceLabel: `from € ${28_000 + (n % 12) * 1_500}`,
+      promoIds,
+      fromPrice: 28_000 + (n % 12) * 1_500,
     }
   })
+}
+
+function modelPromos(model) {
+  return (model?.promoIds || []).map(findPromo).filter(Boolean)
+}
+
+function formatCurrency(value) {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return '—'
+  return `${Math.round(n).toLocaleString()}€`
+}
+
+function modelDisplayPrice(model) {
+  const gross = Number(model?.fromPrice) || 0
+  if (!showNetPrices.value) return gross
+  const rate = currentVatRate.value / 100
+  if (selectedVatOption.value?.notApplicable || rate <= 0) return gross
+  return gross / (1 + rate)
 }
 
 const modelsByBrand = {
@@ -507,30 +714,95 @@ const headerSubtitle = computed(() =>
 const configuredBrandLabel = computed(() => brands.find((b) => b.id === selectedBrand.value)?.label || '')
 const configuredModel = computed(() => (modelsByBrand[selectedBrand.value] ?? []).find((m) => m.id === selectedModel.value) || null)
 const configuredModelTitle = computed(() => configuredModel.value?.title || '')
-const configuredImageUrl = computed(() => configuredModel.value?.imageUrl || '')
-const configuredSubline = computed(() => 'Identity black 30 TFSI S')
-const configuredColour = computed(() => 'Gray zinc pearl')
-const configuredVehicleLine = computed(() => {
+const configuredModelImageUrl = computed(() => configuredModel.value?.imageUrl || '')
+
+const configuredModelBasePrice = computed(
+  () => Number(configuredModel.value?.fromPrice) || 0
+)
+
+const configurator = useVehicleConfigurator({
+  brandLabel: configuredBrandLabel,
+  modelTitle: configuredModelTitle,
+  modelImageUrl: configuredModelImageUrl,
+  modelBasePrice: configuredModelBasePrice,
+  vatRatePercent: currentVatRate,
+  showNetPrices,
+})
+
+const quotationVehicleLine = computed(() => {
   const base = [configuredBrandLabel.value, configuredModelTitle.value].filter(Boolean).join(' ')
-  return [base, configuredSubline.value].filter(Boolean).join(' - ')
+  const versionName = configurator.selectedVersion.value?.name || ''
+  return [base, versionName].filter(Boolean).join(' – ')
 })
 
-const configuredPrice = computed(() => {
-  const raw = String(configuredModel.value?.priceLabel || '')
-  const m = raw.match(/(\d[\d_.]*)/)
-  if (!m) return 0
-  const n = Number(String(m[1]).replace(/[^\d]/g, ''))
-  return Number.isFinite(n) ? n : 0
+const configuratorTabs = computed(() => [
+  { key: 'version', label: 'Version' },
+  { key: 'colour', label: 'Colour' },
+  {
+    key: 'equipment',
+    label: 'Equipment - Optional',
+    count: configurator.selectedEquipment.value.length,
+  },
+  { key: 'quotation', label: 'Quotation' },
+])
+
+/** Filter Step-3 catalog content by the in-tab search box. */
+const filteredVersions = computed(() => {
+  const list = configurator.catalog.VERSIONS
+  const q = itemSearchQuery.value.trim().toLowerCase()
+  if (!q) return list
+  return list.filter((v) => `${v.name} ${v.engine} ${v.fuel} ${v.gearbox}`.toLowerCase().includes(q))
 })
 
-function formatCurrency(value) {
-  const n = Number(value)
-  if (!Number.isFinite(n)) return '—'
-  return `${n.toLocaleString()}€`
+const filteredColours = computed(() => {
+  const list = configurator.catalog.COLOURS
+  const q = itemSearchQuery.value.trim().toLowerCase()
+  if (!q) return list
+  return list.filter((c) =>
+    `${c.name} ${c.finish} ${c.category || ''} ${c.subgroup || ''}`.toLowerCase().includes(q)
+  )
+})
+
+const filteredEquipment = computed(() => {
+  const list = configurator.catalog.EQUIPMENT
+  const q = itemSearchQuery.value.trim().toLowerCase()
+  if (!q) return list
+  return list.filter((e) => `${e.name} ${e.group}`.toLowerCase().includes(q))
+})
+
+function onVersionPicked(id) {
+  configurator.selectVersion(id)
 }
 
-function toggleSection(key) {
-  sectionOpen.value = { ...sectionOpen.value, [key]: !sectionOpen.value[key] }
+function onExteriorColourPicked(id) {
+  configurator.selectColour(id)
+}
+
+function onInteriorColourPicked(id) {
+  configurator.selectInteriorColour(id)
+}
+
+function ensureDefaultColoursSelected() {
+  const colours = configurator.catalog?.COLOURS ?? []
+  if (!Array.isArray(colours) || !colours.length) return
+
+  const firstExteriorIncluded =
+    colours.find((c) => c?.category === 'exterior' && Number(c?.priceDelta || 0) === 0) ||
+    colours.find((c) => c?.category === 'exterior') ||
+    null
+
+  const firstInteriorIncluded =
+    colours.find((c) => c?.category === 'interior' && Number(c?.priceDelta || 0) === 0) ||
+    colours.find((c) => c?.category === 'interior') ||
+    null
+
+  if (!configurator.selectedColourId.value && firstExteriorIncluded?.id) {
+    configurator.selectColour(firstExteriorIncluded.id)
+  }
+
+  if (!configurator.selectedInteriorColourId.value && firstInteriorIncluded?.id) {
+    configurator.selectInteriorColour(firstInteriorIncluded.id)
+  }
 }
 
 function resetState() {
@@ -540,7 +812,10 @@ function resetState() {
   brandLogoFailed.value = {}
   modelSearchQuery.value = ''
   itemSearchQuery.value = ''
-  activeTab.value = 'quotation'
+  activeTab.value = 'version'
+  selectedVatId.value = DEFAULT_VAT_OPTION_ID
+  showNetPrices.value = false
+  configurator.reset()
 }
 
 function selectBrand(brandId) {
@@ -552,6 +827,9 @@ function selectBrand(brandId) {
 function selectModel(modelId) {
   if (!modelId) return
   selectedModel.value = modelId
+  configurator.reset()
+  itemSearchQuery.value = ''
+  activeTab.value = 'version'
   step.value = 3
 }
 
@@ -590,18 +868,8 @@ function backToBrandSelection() {
 }
 
 function handleSaveAndClose() {
-  emit('save', {
-    mode: 'configurator',
-    brand: configuredBrandLabel.value,
-    model: configuredModelTitle.value,
-    label: [configuredBrandLabel.value, configuredModelTitle.value].filter(Boolean).join(' ').trim(),
-    summary: configuredSubline.value,
-    imageUrl: configuredImageUrl.value,
-    quantity: 1,
-    price: configuredPrice.value,
-    specification: 'Petrol - Automatic',
-    purchaseMethod: 'Leasing',
-  })
+  if (!configurator.isReadyToSave.value) return
+  emit('save', { ...configurator.payload.value })
   handleOpenChange(false)
 }
 
@@ -618,15 +886,28 @@ watch(
 )
 
 watch(
+  () => activeTab.value,
+  (tab) => {
+    if (tab === 'colour') {
+      ensureDefaultColoursSelected()
+    }
+  }
+)
+
+watch(
   () => step.value,
-  (s) => {
+  (s, prev) => {
     if (s === 1) brandLogoFailed.value = {}
+    if (prev === 3 && s !== 3) {
+      configurator.reset()
+      itemSearchQuery.value = ''
+    }
   }
 )
 </script>
 
 <style scoped>
-.promo-label {
-  color: var(--color-white);
+:deep(button.bg-background) {
+  border-color: var(--figma-border);
 }
 </style>

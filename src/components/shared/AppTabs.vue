@@ -1,14 +1,15 @@
 <template>
   <Tabs :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)">
-    <div class="relative w-full shrink-0">
+    <div class="relative w-full shrink-0 box-content overflow-hidden">
       <TabsList
-        class="request-main-tabs-list relative z-10 inline-flex w-fit max-w-full min-w-0 flex-nowrap items-end justify-start gap-1 overflow-x-auto border-0 bg-background p-0 shadow-none ring-0"
+        class="app-tabs-list relative z-10 inline-flex w-fit max-w-full min-w-0 flex-nowrap items-end justify-start gap-1 overflow-x-auto rounded-none border-0 bg-transparent p-0 shadow-none ring-0"
+        :class="tabsListSpacingClass"
       >
         <TabsTrigger
           v-for="tab in tabs"
           :key="tab.key"
           :value="tab.key"
-          class="request-main-tabs-trigger inline-flex w-auto max-w-none flex-none shrink-0 items-center gap-1.5 rounded-none bg-transparent px-1.5 py-1.5 text-sm outline-none transition-colors whitespace-nowrap"
+          class="app-tabs-trigger inline-flex w-auto max-w-none flex-none shrink-0 items-center gap-1.5 rounded-none bg-transparent data-active:bg-transparent px-1.5 py-1.5 text-sm outline-none transition-colors whitespace-nowrap"
           :class="
             modelValue === tab.key
               ? 'border-b-2 border-primary font-semibold text-foreground'
@@ -30,6 +31,7 @@
         </TabsTrigger>
       </TabsList>
       <div
+        v-if="divider !== 'none'"
         class="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-px bg-border"
         aria-hidden="true"
       />
@@ -38,9 +40,10 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { Tabs, TabsList, TabsTrigger } from '@motork/component-library/future/primitives'
 
-defineProps({
+const props = defineProps({
   modelValue: {
     type: String,
     required: true
@@ -48,23 +51,33 @@ defineProps({
   tabs: {
     type: Array,
     required: true
+  },
+  divider: {
+    type: String,
+    default: 'default',
+    validator: (v) => ['default', 'touching', 'none'].includes(String(v))
   }
 })
 
 defineEmits(['update:modelValue'])
+
+const tabsListSpacingClass = computed(() => {
+  if (props.divider === 'touching') return ''
+  return '!mb-2'
+})
 </script>
 
 <style scoped>
-:deep(.request-main-tabs-list[role='tablist']) {
+:deep(.app-tabs-list[role='tablist']) {
   padding: 0 !important;
-  margin: 0 !important;
+  margin: 0;
   min-height: 0 !important;
   width: fit-content !important;
   max-width: 100% !important;
   gap: 0.25rem !important;
 }
 
-:deep(.request-main-tabs-trigger[role='tab']) {
+:deep(.app-tabs-trigger[role='tab']) {
   flex: 0 0 auto !important;
   width: auto !important;
   max-width: none !important;
@@ -72,8 +85,8 @@ defineEmits(['update:modelValue'])
   box-shadow: none !important;
 }
 
-:deep(.request-main-tabs-trigger[role='tab']::before),
-:deep(.request-main-tabs-trigger[role='tab']::after) {
+:deep(.app-tabs-trigger[role='tab']::before),
+:deep(.app-tabs-trigger[role='tab']::after) {
   display: none !important;
   content: none !important;
   box-shadow: none !important;
