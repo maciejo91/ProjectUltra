@@ -1,17 +1,20 @@
 <template>
-  <div class="w-full flex flex-col divide-y divide-border">
-    <div class="py-2">
-      <Textarea
-        v-model="message"
-        :placeholder="notePlaceholder"
-        class="min-h-48 border-0 shadow-none focus-visible:ring-0 px-0 resize-none"
-      />
+  <div class="w-full flex flex-col">
+    <div class="rounded-md border border-foreground/12 overflow-hidden bg-background">
+      <div class="px-2 py-2">
+        <Textarea
+          v-model="message"
+          :placeholder="notePlaceholderText"
+          class="min-h-48 border-0 shadow-none focus-visible:ring-0 px-0 resize-none"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Textarea } from '@motork/component-library/future/primitives'
 
 const props = defineProps({
@@ -20,7 +23,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:valid', 'update:draft', 'save'])
 
-const notePlaceholder = 'Type a note here and use @ to mention someone'
+const { t } = useI18n()
+const notePlaceholderText = computed(() => t('common.notes.placeholder'))
 
 const message = ref('')
 

@@ -488,19 +488,6 @@ function getAssigneeDisplay(assigneeName, original) {
   return fallbackLine2 ? `${assigneeName} (${fallbackLine2})` : assigneeName
 }
 
-function buildVehicleLine(original, fallbackTitle) {
-  const r = original || {}
-  const car = r.requestedCar || r.vehicle || {}
-  const vehicleTitle =
-    [car.brand, car.model].filter(Boolean).join(' ') ||
-    (typeof fallbackTitle === 'string' ? fallbackTitle : '') ||
-    '—'
-  const year = car.year != null && car.year !== '' ? String(car.year) : ''
-  const dealership = car.dealership || r.dealership || ''
-  const assignee = getAssigneeDisplay(r.assignee, r)
-  return [vehicleTitle, year, dealership, assignee].filter(Boolean).join(' · ')
-}
-
 const pastRequestRows = computed(() => {
   const rows = []
   const exId =
@@ -521,7 +508,7 @@ const pastRequestRows = computed(() => {
       stage: l.stage || 'Open',
       title: fallbackTitle,
       titleWithYear: fallbackTitle,
-      subtitle: l.requestedCar?.year ? String(l.requestedCar.year) : '',
+      subtitle: '',
       vehicleDisplayLine: buildContactHistoryVehicleLine(l, fallbackTitle),
       sourceDetail: resolveContactHistorySource(l),
       dealership: resolveContactHistoryDealership(l),
@@ -543,7 +530,7 @@ const pastRequestRows = computed(() => {
       stage: o.stage || 'Open',
       title: fallbackTitle,
       titleWithYear: fallbackTitle,
-      subtitle: o.requestedCar?.year ? String(o.requestedCar.year) : '',
+      subtitle: '',
       vehicleDisplayLine: buildContactHistoryVehicleLine(o, fallbackTitle),
       sourceDetail: resolveContactHistorySource(o),
       dealership: resolveContactHistoryDealership(o),

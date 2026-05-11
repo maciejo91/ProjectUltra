@@ -55,10 +55,7 @@
         role="timer"
         aria-live="polite"
         :class="[
-          'inline-flex h-7 min-h-7 shrink-0 select-none items-center gap-1.5 rounded-full border px-2.5 text-sm font-medium tabular-nums',
-          onDarkSurface
-            ? 'border-transparent bg-background text-foreground'
-            : 'border-border bg-background text-foreground'
+          'inline-flex h-7 min-h-7 shrink-0 select-none items-center gap-1.5 rounded-full px-2.5 text-sm font-medium tabular-nums bg-background text-foreground'
         ]"
         :aria-label="timerAria"
         :title="timerTitle"

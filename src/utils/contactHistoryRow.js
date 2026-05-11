@@ -14,9 +14,8 @@ export function buildContactHistoryVehicleLine(original, fallbackTitle) {
     [car.brand, car.model].filter(Boolean).join(' ') ||
     (typeof fallbackTitle === 'string' ? fallbackTitle : '') ||
     '—'
-  const year = car.year != null && car.year !== '' ? String(car.year) : ''
   const variant = car.variant && String(car.variant).trim() ? String(car.variant).trim() : ''
-  return [base, year, variant].filter(Boolean).join(' · ')
+  return [base, variant].filter(Boolean).join(' · ')
 }
 
 export function resolveContactHistoryDealership(original) {

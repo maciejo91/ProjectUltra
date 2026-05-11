@@ -81,10 +81,9 @@ function buildVehicleLine(original, fallbackTitle) {
     [car.brand, car.model].filter(Boolean).join(' ') ||
     (typeof fallbackTitle === 'string' ? fallbackTitle : '') ||
     '—'
-  const year = car.year != null && car.year !== '' ? String(car.year) : ''
   const dealership = car.dealership || r.dealership || ''
   const assignee = getAssigneeDisplay(r.assignee, r)
-  return [vehicleTitle, year, dealership, assignee].filter(Boolean).join(' · ')
+  return [vehicleTitle, dealership, assignee].filter(Boolean).join(' · ')
 }
 
 const allItems = computed(() => {
@@ -96,7 +95,7 @@ const allItems = computed(() => {
       compositeId: `lead-${l.id}`,
       status: l.stage || 'Open',
       title: l.requestedCar ? `${l.requestedCar.brand} ${l.requestedCar.model}` : 'New Lead',
-      subtitle: l.requestedCar?.year || '',
+      subtitle: '',
       image: l.requestedCar?.image || (l.requestedCar ? DEFAULT_CAR_IMAGE : null),
       displayLine: buildVehicleLine(l, l.requestedCar ? `${l.requestedCar.brand} ${l.requestedCar.model}` : 'New Lead'),
       original: l
@@ -109,7 +108,7 @@ const allItems = computed(() => {
       compositeId: `opportunity-${o.id}`,
       status: o.stage || 'Open',
       title: o.requestedCar ? `${o.requestedCar.brand} ${o.requestedCar.model}` : 'Opportunity',
-      subtitle: o.requestedCar?.year || '',
+      subtitle: '',
       image: o.requestedCar?.image || (o.requestedCar ? DEFAULT_CAR_IMAGE : null),
       displayLine: buildVehicleLine(o, o.requestedCar ? `${o.requestedCar.brand} ${o.requestedCar.model}` : 'Opportunity'),
       original: o

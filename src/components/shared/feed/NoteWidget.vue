@@ -16,7 +16,7 @@
         <div class="flex-1 overflow-y-auto py-4 w-full">
           <Textarea
             v-model="noteText"
-            :placeholder="notePlaceholder"
+            :placeholder="notePlaceholderText"
             class="min-h-56 border-0 shadow-none focus-visible:ring-0 px-0 resize-none"
           />
         </div>
@@ -61,7 +61,7 @@
         v-model="noteText"
         rows="4"
         class="w-full resize-none min-h-[120px]"
-        :placeholder="notePlaceholder"
+        :placeholder="notePlaceholderText"
       />
     </div>
     <div v-if="!hideActions" class="flex justify-end gap-2 mt-6 pt-4 border-t border-border">
@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { X } from 'lucide-vue-next'
 import { 
@@ -98,7 +98,7 @@ import {
 } from '@motork/component-library/future/primitives'
 
 const { t } = useI18n()
-const notePlaceholder = t('common.call.notesPlaceholder')
+const notePlaceholderText = computed(() => t('common.call.notesPlaceholder'))
 
 const props = defineProps({
   // Modal mode props

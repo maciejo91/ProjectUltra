@@ -302,7 +302,7 @@
     "required": "Erforderlich"
   },
   "notes": {
-    "placeholder": "Notiz hier eingeben und @@ verwenden, um jemanden zu erwähnen"
+    "placeholder": "Notiz hier eingeben und {'@'} verwenden, um jemanden zu erwähnen"
   },
   "tasks": {
     "filterAria": "Aufgaben filtern",
@@ -340,7 +340,7 @@
     "outcomeNoAnswer": "Keine Antwort",
     "outcomeNotInterested": "Nicht interessiert",
     "notes": "Notizen zum Anruf",
-    "notesPlaceholder": "Notiz hier eingeben und @@ verwenden, um jemanden zu erwähnen",
+    "notesPlaceholder": "Notiz hier eingeben und {'@'} verwenden, um jemanden zu erwähnen",
     "inProgress": "Anruf läuft",
     "ended": "Anruf beendet",
     "endCall": "Anruf beenden",

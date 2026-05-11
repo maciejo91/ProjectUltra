@@ -320,7 +320,11 @@ const callStatusPill = computed(() => {
     const original = String(props.activity?.message || props.activity?.content || props.activity?.data?.summary || '')
     const durationMatch =
       original.match(/(\d+\s*m\s*\d+\s*s|\d+\s*s|\d+:\d{2})/i)?.[1] ?? ''
-    return { label: durationMatch.trim(), className: 'bg-muted text-muted-foreground' }
+    const duration = durationMatch.trim()
+    const label = duration
+      ? t('entities.activity.timeline.callPills.answeredWithDuration', { duration })
+      : t('entities.activity.timeline.callPills.answered')
+    return { label, className: 'bg-emerald-50 text-emerald-800' }
   }
   return { label: '', className: '' }
 })

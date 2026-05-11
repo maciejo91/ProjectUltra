@@ -102,7 +102,8 @@
         "outbound": "Outbound call",
         "missed": "Missed call",
         "noAnswer": "No answer",
-        "answered": "Answered"
+        "answered": "Answered",
+        "answeredWithDuration": "Beantwoord · {duration}"
       },
       "messagePills": {
         "outbound": "Outbound message",

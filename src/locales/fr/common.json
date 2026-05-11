@@ -302,7 +302,7 @@
     "required": "Requis"
   },
   "notes": {
-    "placeholder": "Saisissez une note ici et utilisez @@ pour mentionner quelqu’un"
+    "placeholder": "Saisissez une note ici et utilisez {'@'} pour mentionner quelqu’un"
   },
   "tasks": {
     "filterAria": "Filtrer les tâches",
@@ -340,7 +340,7 @@
     "outcomeNoAnswer": "Pas de réponse",
     "outcomeNotInterested": "Pas intéressé",
     "notes": "Notes d’appel",
-    "notesPlaceholder": "Saisissez une note ici et utilisez @@ pour mentionner quelqu’un",
+    "notesPlaceholder": "Saisissez une note ici et utilisez {'@'} pour mentionner quelqu’un",
     "inProgress": "Appel en cours",
     "ended": "Appel terminé",
     "endCall": "Raccrocher",

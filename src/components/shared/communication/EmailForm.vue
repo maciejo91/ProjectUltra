@@ -1,6 +1,6 @@
 <template>
   <div class="w-full flex flex-col">
-    <div class="flex items-center gap-3 py-1 border-b border-border">
+    <div class="flex items-center gap-3 py-1 border-b border-foreground/12">
       <span class="w-14 text-sm text-muted-foreground shrink-0">{{ t('emailForm.fields.from') }}</span>
       <Input
         v-model="from"
@@ -10,7 +10,7 @@
       />
     </div>
 
-    <div class="flex items-center gap-3 py-1 border-b border-border">
+    <div class="flex items-center gap-3 py-1 border-b border-foreground/12">
       <span class="w-14 text-sm text-muted-foreground shrink-0">{{ t('emailForm.fields.to') }}</span>
       <div class="flex-1 min-w-0">
         <div class="flex min-h-8 flex-wrap items-center gap-1">
@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-3 py-1 border-b border-border">
+    <div class="flex items-center gap-3 py-1 border-b border-foreground/12">
       <span class="w-14 text-sm text-muted-foreground shrink-0">{{ t('emailForm.fields.cc') }}</span>
       <div class="flex-1 min-w-0">
         <div class="flex min-h-8 flex-wrap items-center gap-1">
@@ -80,7 +80,7 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-3 py-1 border-b border-border">
+    <div class="flex items-center gap-3 py-1 border-b border-foreground/12">
       <span class="w-14 text-sm text-muted-foreground shrink-0">{{ t('emailForm.fields.template') }}</span>
       <Select :model-value="selectedTemplate" @update:model-value="selectTemplate">
         <SelectTrigger class="h-8 min-h-8 w-full border-0 bg-transparent px-0 shadow-none">
@@ -106,8 +106,8 @@
 
     <div class="py-2">
       <TooltipProvider :delay-duration="150">
-        <div class="rounded-md border border-border overflow-hidden bg-background">
-          <div class="flex items-center justify-between gap-2 bg-muted px-2 py-1.5 border-b border-border">
+        <div class="rounded-md border border-foreground/12 overflow-hidden bg-background">
+          <div class="flex items-center justify-between gap-2 bg-muted px-2 py-1.5 border-b border-foreground/12">
             <div class="flex items-center gap-1">
             <Popover :open="textStylePopoverOpen" @update:open="(v) => (textStylePopoverOpen = v)">
               <PopoverTrigger as-child>

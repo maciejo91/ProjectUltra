@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-3 py-1 border-b border-border">
+    <div class="flex items-center gap-3 py-1 border-b border-foreground/12">
       <span class="w-14 text-sm text-muted-foreground shrink-0">{{ t('emailForm.fields.from') }}</span>
       <Input
         v-model="from"
@@ -19,7 +19,7 @@
       />
     </div>
 
-    <div class="flex items-center gap-3 py-1 border-b border-border">
+    <div class="flex items-center gap-3 py-1 border-b border-foreground/12">
       <span class="w-14 text-sm text-muted-foreground shrink-0">{{ t('emailForm.fields.to') }}</span>
       <Input
         v-model="to"
@@ -44,12 +44,14 @@
     </div>
 
     <div class="py-2">
-      <Textarea
-        v-model="message"
-        :placeholder="t('common.actions.typeSms')"
-        :maxlength="SMS_MAX_CHARACTERS"
-        class="min-h-40 border border-border rounded-md shadow-none focus-visible:ring-0 px-3 py-2 resize-none"
-      />
+      <div class="rounded-md border border-foreground/12 overflow-hidden bg-background">
+        <Textarea
+          v-model="message"
+          :placeholder="t('common.actions.typeSms')"
+          :maxlength="SMS_MAX_CHARACTERS"
+          class="min-h-40 border-0 shadow-none focus-visible:ring-0 px-3 py-2 resize-none"
+        />
+      </div>
       <p v-if="showCounter" class="text-sm text-muted-foreground mt-2">
         {{ t('common.actions.smsCharacters', { count: message.length, max: SMS_MAX_CHARACTERS }) }}
       </p>
