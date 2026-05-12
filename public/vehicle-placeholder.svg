@@ -1,0 +1,15 @@
+<svg width="800" height="450" viewBox="0 0 800 450" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="450" rx="24" fill="#F3F4F6"/>
+  <path
+    d="M210 270C210 255 222 243 237 243H260L300 186C312 169 331 159 352 159H520C546 159 569 175 579 199L605 243H630C645 243 657 255 657 270V308C657 320 647 330 635 330H617C611 351 592 366 570 366C548 366 529 351 523 330H344C338 351 319 366 297 366C275 366 256 351 250 330H232C220 330 210 320 210 308V270Z"
+    fill="#D1D5DB"
+  />
+  <circle cx="297" cy="330" r="36" fill="#9CA3AF"/>
+  <circle cx="297" cy="330" r="18" fill="#6B7280"/>
+  <circle cx="570" cy="330" r="36" fill="#9CA3AF"/>
+  <circle cx="570" cy="330" r="18" fill="#6B7280"/>
+  <path d="M332 243L364 186H520C536 186 550 196 556 211L570 243H332Z" fill="#E5E7EB"/>
+  <text x="400" y="112" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif" font-size="22" fill="#6B7280">
+    Vehicle image
+  </text>
+</svg>

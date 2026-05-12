@@ -32,6 +32,7 @@
           alt=""
           class="h-full w-full object-cover"
           loading="lazy"
+          @error="onVehicleImageError"
         />
       </div>
     </div>
@@ -185,6 +186,15 @@ const colourSwatchStyle = computed(() => {
   if (!props.colourHex) return { backgroundColor: 'var(--muted)' }
   return { backgroundColor: props.colourHex }
 })
+
+function onVehicleImageError(e) {
+  const img = e?.target
+  if (!img) return
+  const fallback = '/vehicle-placeholder.svg'
+  const current = String(img.getAttribute?.('src') || '')
+  if (current === fallback) return
+  img.setAttribute?.('src', fallback)
+}
 
 function formatCurrency(value) {
   const n = Number(value)

@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-4">
+  <div>
     <div class="flex items-center justify-end gap-4">
       <button
         type="button"
@@ -10,54 +10,117 @@
       </button>
     </div>
 
+    <div class="mt-4 space-y-2.5">
     <div ref="sectionEls.vehicleDetails">
       <CollapsibleSection
         title="Vehicle details"
+        :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.vehicleDetails"
         card-style
         @toggle="toggleSection('vehicleDetails')"
       >
-        <div class="space-y-2">
-          <div class="flex items-center justify-between gap-3 rounded-md bg-muted px-3 py-2">
-            <p class="text-sm text-foreground truncate">{{ vehicleLine }}</p>
-            <p class="text-sm text-foreground shrink-0">{{ formatCurrency(vehicleBaseTotal) }}</p>
+        <div class="space-y-2.5">
+          <div
+            v-if="showNetPrices"
+            class="flex flex-wrap items-center gap-2.5"
+          >
+            <span class="min-w-0 flex-1 select-none text-xs leading-none text-muted-foreground invisible">
+              Item description
+            </span>
+            <span class="w-32 shrink-0 text-xs leading-none text-muted-foreground">Net price</span>
+            <span class="w-40 shrink-0 text-xs leading-none text-muted-foreground">VAT (%)</span>
+            <span class="w-32 shrink-0 text-xs leading-none text-muted-foreground">Price VAT incl.</span>
           </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <div class="flex h-8 min-w-0 flex-1 items-center rounded-lg bg-muted px-2.5 py-1">
+              <p class="truncate text-sm leading-normal text-muted-foreground">{{ vehicleLine }}</p>
+            </div>
+            <template v-if="showNetPrices">
+              <VehicleDetailAmountPill :amount="toNet(vehicleBaseTotal)" />
+              <VehicleDetailVatStub :label="vatSelectLabel" />
+              <VehicleDetailAmountPill :amount="Number(vehicleBaseTotal)" />
+            </template>
+            <VehicleDetailAmountPill v-else :amount="Number(vehicleBaseTotal)" />
+          </div>
+
           <div
             v-if="colourLabel"
-            class="flex items-center justify-between gap-3 rounded-md bg-muted px-3 py-2"
+            class="flex flex-wrap items-center gap-2.5"
           >
-            <p class="text-sm text-muted-foreground truncate">Colour: {{ colourLabel }}</p>
-            <p class="text-sm text-muted-foreground shrink-0">
-              {{ colourPriceDelta > 0 ? `+ ${formatCurrency(colourPriceDelta)}` : 'Included' }}
-            </p>
+            <div class="flex h-8 min-w-0 flex-1 items-center rounded-lg bg-muted px-2.5 py-1">
+              <p class="truncate text-sm leading-normal text-muted-foreground">
+                Colour: {{ colourLabel }}
+              </p>
+            </div>
+            <template v-if="showNetPrices">
+              <VehicleDetailAmountPill
+                v-if="colourPriceDelta > 0"
+                :amount="toNet(colourPriceDelta)"
+              />
+              <div
+                v-else
+                class="flex h-8 w-32 shrink-0 items-center justify-end rounded-lg bg-muted px-2.5 py-1 text-sm text-muted-foreground"
+              >
+                —
+              </div>
+              <VehicleDetailVatStub :label="vatSelectLabel" />
+              <VehicleDetailAmountPill v-if="colourPriceDelta > 0" :amount="colourPriceDelta" />
+              <VehicleDetailAmountPill v-else :amount="0" />
+            </template>
+            <VehicleDetailAmountPill v-else-if="colourPriceDelta > 0" :amount="colourPriceDelta" />
+            <VehicleDetailAmountPill v-else :amount="0" />
           </div>
+
           <div
             v-if="interiorColourLabel"
-            class="flex items-center justify-between gap-3 rounded-md bg-muted px-3 py-2"
+            class="flex flex-wrap items-center gap-2.5"
           >
-            <p class="text-sm text-muted-foreground truncate">Interior: {{ interiorColourLabel }}</p>
-            <p class="text-sm text-muted-foreground shrink-0">
-              {{
-                interiorColourPriceDelta > 0
-                  ? `+ ${formatCurrency(interiorColourPriceDelta)}`
-                  : 'Included'
-              }}
-            </p>
+            <div class="flex h-8 min-w-0 flex-1 items-center rounded-lg bg-muted px-2.5 py-1">
+              <p class="truncate text-sm leading-normal text-muted-foreground">
+                Interior: {{ interiorColourLabel }}
+              </p>
+            </div>
+            <template v-if="showNetPrices">
+              <VehicleDetailAmountPill
+                v-if="interiorColourPriceDelta > 0"
+                :amount="toNet(interiorColourPriceDelta)"
+              />
+              <div
+                v-else
+                class="flex h-8 w-32 shrink-0 items-center justify-end rounded-lg bg-muted px-2.5 py-1 text-sm text-muted-foreground"
+              >
+                —
+              </div>
+              <VehicleDetailVatStub :label="vatSelectLabel" />
+              <VehicleDetailAmountPill v-if="interiorColourPriceDelta > 0" :amount="interiorColourPriceDelta" />
+              <VehicleDetailAmountPill v-else :amount="0" />
+            </template>
+            <VehicleDetailAmountPill v-else-if="interiorColourPriceDelta > 0" :amount="interiorColourPriceDelta" />
+            <VehicleDetailAmountPill v-else :amount="0" />
           </div>
+
           <div
             v-if="selectedEquipment.length"
-            class="rounded-md bg-muted px-3 py-2 space-y-1.5"
+            class="space-y-2.5"
           >
-            <p class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <p class="text-xs font-medium leading-none text-muted-foreground">
               Selected equipment
             </p>
             <div
               v-for="item in selectedEquipment"
               :key="item.id"
-              class="flex items-center justify-between gap-3 text-sm"
+              class="flex flex-wrap items-center gap-2.5"
             >
-              <span class="text-foreground truncate">{{ item.name }}</span>
-              <span class="text-foreground shrink-0">+ {{ formatCurrency(item.price) }}</span>
+              <div class="flex h-8 min-w-0 flex-1 items-center rounded-lg bg-muted px-2.5 py-1">
+                <p class="truncate text-sm leading-normal text-muted-foreground">{{ item.name }}</p>
+              </div>
+              <template v-if="showNetPrices">
+                <VehicleDetailAmountPill :amount="toNet(item.price)" />
+                <VehicleDetailVatStub :label="vatSelectLabel" />
+                <VehicleDetailAmountPill :amount="Number(item.price)" />
+              </template>
+              <VehicleDetailAmountPill v-else :amount="Number(item.price)" />
             </div>
           </div>
         </div>
@@ -67,166 +130,307 @@
     <div ref="sectionEls.promoCampaigns">
       <CollapsibleSection
         title="Promo and Campaigns"
+        :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.promoCampaigns"
         card-style
         @toggle="toggleSection('promoCampaigns')"
       >
-      <ul class="space-y-2">
-        <li
-          v-for="promo in promos"
-          :key="promo.id"
-          class="rounded-md border border-border px-3 py-2 flex items-start justify-between gap-3"
-        >
-          <label
-            class="flex items-start gap-3 cursor-pointer min-w-0 flex-1"
-            :for="`promo-${promo.id}`"
-          >
-            <Checkbox
-              :id="`promo-${promo.id}`"
-              :model-value="!!promoSelection[promo.id]"
-              @update:model-value="(v) => emit('toggle-promo', promo.id, v)"
-            />
-            <span class="min-w-0">
-              <span class="block text-sm font-medium text-foreground">{{ promo.label }}</span>
-              <span class="block text-xs text-muted-foreground">{{ promo.description }}</span>
-            </span>
-          </label>
-          <span class="shrink-0 text-sm font-medium text-mk-green-600">
-            {{ formatPromoDiscountDisplay(promo) }}
-          </span>
-        </li>
-      </ul>
+        <div class="space-y-4">
+          <section v-if="promos.length" class="space-y-2.5">
+            <p class="text-sm font-normal text-muted-foreground">OEM promo</p>
+            <div class="space-y-3">
+              <PromoCard
+                v-for="promo in promos"
+                :key="promo.id"
+                kind="oem"
+                :checkbox-id="`promo-${promo.id}`"
+                :selected="!!promoSelection[promo.id]"
+                :disabled="disabledPromoIds.includes(promo.id)"
+                :label="promo.label"
+                :description="promo.description"
+                :expires-at="promo.expiresAt || ''"
+                :show-net-prices="showNetPrices"
+                :vat-options="vatOptions"
+                :modal-vat-rate-percent="Number(vatRatePercent)"
+                :oem-percent="oemPercentForPromo(promo)"
+                :oem-amount-gross="oemAmountGrossForPromo(promo)"
+                :oem-amount-net="oemAmountNetForPromo(promo)"
+                @toggle="(v) => emit('toggle-promo', promo.id, v)"
+              />
+            </div>
+          </section>
+
+          <section v-if="userCampaigns.length" class="space-y-2.5">
+            <p class="text-xs font-medium text-muted-foreground">Dealer campaigns</p>
+            <div class="space-y-3">
+              <PromoCard
+                v-for="c in userCampaigns"
+                :key="c.id"
+                kind="dealer"
+                :checkbox-id="`campaign-${c.id}`"
+                :selected="!!c.active"
+                :label="c.description || 'Dealer campaign'"
+                :description="c.description || ''"
+                :expires-at="c.expiresAt || ''"
+                :campaign="c"
+                :show-net-prices="showNetPrices"
+                :vat-options="vatOptions"
+                :modal-vat-rate-percent="Number(vatRatePercent)"
+                editable
+                removable
+                @toggle="(v) => emit('toggle-campaign-active', c.id, v)"
+                @update:description="(t) => emit('update-campaign', c.id, { description: t })"
+                @update:percent="(p) => emit('update-campaign', c.id, { percent: p })"
+                @update:amount="(a) => emit('update-campaign', c.id, { amount: a })"
+                @update:vat-rate-percent="(rate) => emit('update-campaign-vat', c.id, rate)"
+                @remove="emit('remove-campaign', c.id)"
+              />
+            </div>
+          </section>
+
+          <div class="flex w-full flex-wrap items-center justify-start gap-2 py-0">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              class="rounded-md"
+              @click="handleAddCampaign"
+            >
+              <Plus class="size-4 mr-1" />
+              Add
+            </Button>
+          </div>
+        </div>
       </CollapsibleSection>
     </div>
 
     <div ref="sectionEls.discounts">
       <CollapsibleSection
+        v-if="userDiscounts.length === 0"
         title="Discounts"
-        :is-expanded="open.discounts"
+        :title-class="collapsibleSectionTitleClass"
+        static-header
+        :show-chevron="false"
         card-style
-        @toggle="toggleSection('discounts')"
+        elevated
+        header-class="!py-0 min-h-14"
       >
-      <div class="space-y-3">
-        <ul v-if="userDiscounts.length" class="space-y-2">
-          <li
-            v-for="d in userDiscounts"
-            :key="d.id"
-            class="flex items-center justify-between gap-3 rounded-md bg-muted px-3 py-2"
-          >
-            <span class="text-sm text-foreground truncate">{{ d.label }}</span>
-            <div class="flex items-center gap-3 shrink-0">
-              <span class="text-sm font-medium text-mk-green-600">
-                - {{ formatCurrency(d.amount) }}
-              </span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                class="rounded-md"
-                @click="emit('remove-discount', d.id)"
-              >
-                <X class="size-4" />
-                <span class="sr-only">Remove discount</span>
-              </Button>
-            </div>
-          </li>
-        </ul>
-        <p v-else class="text-sm text-muted-foreground">No manual discounts added yet.</p>
-
-        <div class="flex flex-col sm:flex-row gap-2 sm:items-end">
-          <div class="flex-1 flex flex-col gap-1">
-            <label class="text-xs font-medium text-muted-foreground" for="discount-label">
-              Label
-            </label>
-            <Input
-              id="discount-label"
-              v-model="newDiscountLabel"
-              type="text"
-              placeholder="e.g. Loyalty bonus"
-              class="bg-background border-border"
-            />
-          </div>
-          <div class="w-full sm:w-32 flex flex-col gap-1">
-            <label class="text-xs font-medium text-muted-foreground" for="discount-amount">
-              Amount (€)
-            </label>
-            <Input
-              id="discount-amount"
-              v-model="newDiscountAmount"
-              type="number"
-              min="0"
-              placeholder="0"
-              class="bg-background border-border"
-            />
-          </div>
+        <template #afterTitle>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            class="rounded-md sm:self-end"
-            :disabled="!canAddDiscount"
-            @click="handleAddDiscount"
+            class="ml-auto shrink-0 rounded-md font-medium"
+            @click.stop="handleAddDiscount"
           >
-            <Plus class="size-4 mr-1" />
+            <Plus class="size-4 mr-1.5" />
             Add
           </Button>
+        </template>
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        v-else
+        title="Discounts"
+        :title-class="collapsibleSectionTitleClass"
+        :is-expanded="open.discounts"
+        card-style
+        elevated
+        @toggle="toggleSection('discounts')"
+      >
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2.5">
+            <div
+              v-for="d in userDiscounts"
+              :key="d.id"
+              class="flex flex-wrap items-center gap-2.5"
+            >
+              <Input
+                type="text"
+                :model-value="d.description || ''"
+                placeholder="Item description"
+                class="h-8 min-w-0 flex-1 bg-background border-border"
+                @update:model-value="(v) => emit('update-discount', d.id, { description: String(v ?? '') })"
+              />
+              <div class="flex shrink-0 items-stretch">
+                <div class="relative flex h-8 w-24 shrink-0 items-center rounded-l-lg border border-border bg-background">
+                  <span
+                    class="pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-sm text-muted-foreground"
+                    aria-hidden="true"
+                  >
+                    %
+                  </span>
+                  <Input
+                    type="text"
+                    inputmode="decimal"
+                    :model-value="discountPercentInputValue(d)"
+                    class="h-8 w-full min-w-0 border-0 bg-transparent pr-2.5 pl-7 text-right text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                    @update:model-value="(v) => onDiscountPercentChange(d.id, v)"
+                  />
+                </div>
+                <div class="relative -ml-px flex h-8 w-40 shrink-0 items-center rounded-r-lg border border-border bg-background">
+                  <span
+                    class="pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-sm text-muted-foreground"
+                    aria-hidden="true"
+                  >
+                    €
+                  </span>
+                  <Input
+                    type="text"
+                    inputmode="decimal"
+                    :model-value="discountAmountInputValue(d)"
+                    class="h-8 w-full min-w-0 border-0 bg-transparent pr-2.5 pl-7 text-right text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                    @update:model-value="(v) => onDiscountAmountChange(d.id, v)"
+                  />
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                class="size-8 shrink-0 rounded-md"
+                @click="emit('remove-discount', d.id)"
+              >
+                <Trash2 class="size-4" />
+                <span class="sr-only">Remove discount</span>
+              </Button>
+            </div>
+          </div>
+
+          <div
+            v-if="userDiscounts.length > 0"
+            class="flex gap-2 py-1"
+          >
+            <Info class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <p class="min-w-0 flex-1 text-xs leading-normal text-muted-foreground">
+              The percentage discount is applied to the vehicle's price, net of applied promotions (excluding taxes and accessories).
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              class="rounded-md font-medium"
+              @click="handleAddDiscount"
+            >
+              <Plus class="size-4 mr-1.5" />
+              Add
+            </Button>
+          </div>
         </div>
-      </div>
       </CollapsibleSection>
     </div>
 
     <div ref="sectionEls.accessories">
       <CollapsibleSection
+        v-if="!hasUserAccessoryLines"
         title="Accessories and services"
+        :title-class="collapsibleSectionTitleClass"
+        static-header
+        :show-chevron="false"
+        card-style
+        elevated
+        header-class="!py-0 min-h-14"
+      >
+        <template #afterTitle>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            class="ml-auto shrink-0 rounded-md font-medium"
+            @click.stop="handleAddAccessoryLine"
+          >
+            <Plus class="size-4 mr-1.5" />
+            Add
+          </Button>
+        </template>
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        v-else
+        title="Accessories and services"
+        :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.accessories"
         card-style
+        elevated
         @toggle="toggleSection('accessories')"
       >
-      <ul class="space-y-2">
-        <li
-          v-for="acc in accessories"
-          :key="acc.id"
-          class="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2"
-        >
-          <label
-            class="flex items-center gap-3 cursor-pointer min-w-0 flex-1"
-            :for="`acc-${acc.id}`"
+        <div class="flex flex-col gap-2.5">
+          <div
+            v-for="row in userAccessoryLines"
+            :key="row.id"
+            class="flex flex-wrap items-center gap-2.5"
           >
-            <Checkbox
-              :id="`acc-${acc.id}`"
-              :model-value="!!accessorySelection[acc.id]"
-              @update:model-value="(v) => emit('toggle-accessory', acc.id, v)"
+            <Input
+              type="text"
+              :model-value="row.description || ''"
+              placeholder="Item description"
+              class="h-8 min-w-0 flex-1 bg-background border-border"
+              @update:model-value="(v) => emit('update-accessory-line', row.id, { description: String(v ?? '') })"
             />
-            <span class="text-sm text-foreground truncate">{{ acc.name }}</span>
-          </label>
-          <span class="shrink-0 text-sm font-medium text-foreground">
-            + {{ formatCurrency(acc.price) }}
-          </span>
-        </li>
-      </ul>
+            <div class="relative flex h-8 w-32 shrink-0 items-center rounded-lg border border-border bg-background">
+              <span
+                class="pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-sm text-muted-foreground"
+                aria-hidden="true"
+              >
+                €
+              </span>
+              <Input
+                type="text"
+                inputmode="decimal"
+                :model-value="accessoryPriceInputValue(row)"
+                class="h-8 w-full min-w-0 border-0 bg-transparent pr-2.5 pl-7 text-right text-sm text-foreground shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                @update:model-value="(v) => onAccessoryPriceChange(row.id, v)"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              class="size-8 shrink-0 rounded-md"
+              @click="emit('remove-accessory-line', row.id)"
+            >
+              <Trash2 class="size-4" />
+              <span class="sr-only">Remove line</span>
+            </Button>
+          </div>
+
+          <div class="flex flex-wrap gap-2 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              class="h-9 shrink-0 rounded-md px-4 font-medium"
+              @click="handleAddAccessoryLine"
+            >
+              <Plus class="size-4 mr-2" />
+              Add
+            </Button>
+          </div>
+        </div>
       </CollapsibleSection>
     </div>
 
     <div ref="sectionEls.taxes">
       <CollapsibleSection
         title="Taxes and extra-costs"
+        :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.taxes"
         card-style
         @toggle="toggleSection('taxes')"
       >
-      <div class="space-y-2">
-        <div class="flex items-center justify-between gap-3 rounded-md bg-muted px-3 py-2">
-          <p class="text-sm text-foreground">VAT ({{ taxes.vatRatePercent }}%)</p>
-          <p class="text-sm text-foreground">{{ formatCurrency(vatAmount) }}</p>
-        </div>
-        <div class="flex items-center justify-between gap-3 rounded-md bg-muted px-3 py-2">
-          <p class="text-sm text-foreground">Registration tax</p>
-          <p class="text-sm text-foreground">{{ formatCurrency(taxes.registrationTax) }}</p>
-        </div>
-        <div class="flex items-center justify-between gap-3 rounded-md bg-muted px-3 py-2">
-          <p class="text-sm text-foreground">Eco tax</p>
-          <p class="text-sm text-foreground">{{ formatCurrency(taxes.ecoTax) }}</p>
-        </div>
+      <div class="space-y-4">
+        <QuotationTaxesTable
+          :lines="taxExtraCostLines"
+          :show-net-prices="showNetPrices"
+          :vat-amount="vatAmount"
+          :modal-vat-rate-percent="vatRatePercent"
+          :vat-options="vatOptions"
+          @add-line="emit('add-tax-line')"
+          @remove-line="(id) => emit('remove-tax-line', id)"
+          @update-line="(id, patch) => emit('update-tax-line', id, patch)"
+        />
       </div>
       </CollapsibleSection>
     </div>
@@ -234,6 +438,7 @@
     <div ref="sectionEls.tradeIn">
       <CollapsibleSection
         title="Trade-in"
+        :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.tradeIn"
         card-style
         @toggle="toggleSection('tradeIn')"
@@ -281,6 +486,7 @@
     <div ref="sectionEls.purchaseMethod">
       <CollapsibleSection
         title="Purchase methods"
+        :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.purchaseMethod"
         card-style
         @toggle="toggleSection('purchaseMethod')"
@@ -299,15 +505,19 @@
       </div>
       </CollapsibleSection>
     </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, computed, nextTick } from 'vue'
-import { Plus, X } from 'lucide-vue-next'
-import { Button, Checkbox, Input, Toggle } from '@motork/component-library/future/primitives'
+import { reactive, ref, computed, nextTick, watch } from 'vue'
+import { Info, Plus, Trash2 } from 'lucide-vue-next'
+import { Button, Input, Toggle } from '@motork/component-library/future/primitives'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
-import { formatPromoDiscount } from '@/constants/vehicleConfiguratorCatalog'
+import VehicleDetailAmountPill from '@/components/addnew/configurator/VehicleDetailAmountPill.vue'
+import VehicleDetailVatStub from '@/components/addnew/configurator/VehicleDetailVatStub.vue'
+import PromoCard from '@/components/addnew/configurator/PromoCard.vue'
+import QuotationTaxesTable from '@/components/addnew/configurator/QuotationTaxesTable.vue'
 
 const props = defineProps({
   vehicleLine: { type: String, default: '' },
@@ -321,10 +531,13 @@ const props = defineProps({
   vatRatePercent: { type: Number, default: 0 },
   promos: { type: Array, required: true },
   promoSelection: { type: Object, required: true },
+  disabledPromoIds: { type: Array, default: () => [] },
+  discountBaseGross: { type: Number, default: 0 },
+  userCampaigns: { type: Array, default: () => [] },
+  vatOptions: { type: Array, default: () => [] },
   userDiscounts: { type: Array, default: () => [] },
-  accessories: { type: Array, required: true },
-  accessorySelection: { type: Object, required: true },
-  taxes: { type: Object, required: true },
+  userAccessoryLines: { type: Array, default: () => [] },
+  taxExtraCostLines: { type: Array, required: true },
   vatAmount: { type: Number, default: 0 },
   tradeInApplied: { type: Boolean, default: false },
   tradeInMockValue: { type: Number, default: 0 },
@@ -335,11 +548,38 @@ const props = defineProps({
 const emit = defineEmits([
   'toggle-promo',
   'add-discount',
+  'update-discount',
   'remove-discount',
-  'toggle-accessory',
+  'add-accessory-line',
+  'update-accessory-line',
+  'remove-accessory-line',
+  'add-campaign',
+  'update-campaign',
+  'update-campaign-vat',
+  'remove-campaign',
+  'toggle-campaign-active',
   'toggle-trade-in',
   'select-purchase-method',
+  'add-tax-line',
+  'remove-tax-line',
+  'update-tax-line',
 ])
+
+const collapsibleSectionTitleClass = 'text-base font-semibold'
+
+const vatSelectLabel = computed(() => {
+  const p = Number(props.vatRatePercent)
+  if (!Number.isFinite(p) || p <= 0) return '0% VAT'
+  const label = Number.isInteger(p) ? String(p) : p.toLocaleString(undefined, { maximumFractionDigits: 2 })
+  return `${label}% VAT`
+})
+
+const hasUserAccessoryLines = computed(() => props.userAccessoryLines.length > 0)
+
+watch(hasUserAccessoryLines, (next, prev) => {
+  if (!next) open.accessories = false
+  else if (next && !prev) open.accessories = true
+})
 
 const sectionKeys = [
   'vehicleDetails',
@@ -391,24 +631,138 @@ async function openSection(key) {
   sectionEls[key]?.value?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
 }
 
-defineExpose({ openSection })
+function addDiscountFromSearch(payload) {
+  emit('add-discount', {
+    description: String(payload?.description || '').trim() || 'Discount',
+    percent: Number(payload?.percent) || 0,
+    amount: Number(payload?.amount) || 0,
+  })
+  openSection('discounts')
+}
 
-const newDiscountLabel = ref('')
-const newDiscountAmount = ref('')
+function addCampaignFromSearch(payload) {
+  emit('add-campaign', {
+    description: String(payload?.description || '').trim() || 'Campaign',
+    percent: Number(payload?.percent) || 0,
+    amount: Number(payload?.amount) || 0,
+  })
+  openSection('promoCampaigns')
+}
 
-const canAddDiscount = computed(() => {
-  const amount = Number(newDiscountAmount.value)
-  return Number.isFinite(amount) && amount > 0
-})
+function addAccessoryFromSearch(payload) {
+  emit('add-accessory-line', {
+    description: String(payload?.description || '').trim(),
+    price: Math.max(0, Number(payload?.price) || 0),
+  })
+  openSection('accessories')
+}
+
+function handleAddAccessoryLine() {
+  emit('add-accessory-line', { description: '', price: 0 })
+  open.accessories = true
+}
+
+function accessoryPriceInputValue(row) {
+  const n = displayValue(Number(row?.price || 0))
+  if (!Number.isFinite(n)) return '0'
+  if (n === 0) return '0'
+  return n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+}
+
+function onAccessoryPriceChange(id, raw) {
+  const n = parseDecimalInput(raw)
+  if (!Number.isFinite(n) || n < 0) {
+    emit('update-accessory-line', id, { price: 0 })
+    return
+  }
+  const rate = Number(props.vatRatePercent || 0) / 100
+  const gross = props.showNetPrices && rate > 0 ? n * (1 + rate) : n
+  emit('update-accessory-line', id, { price: gross })
+}
+
+function parseDecimalInput(raw) {
+  const s = String(raw ?? '').trim().replace(/\s/g, '').replace(',', '.')
+  if (s === '' || s === '-' || s === '.' || s === '-.') return NaN
+  return Number(s)
+}
+
+function discountPercentInputValue(d) {
+  const p = Math.abs(Number(d?.percent || 0))
+  if (!Number.isFinite(p) || p === 0) return '0'
+  return String(p)
+}
+
+function discountAmountInputValue(d) {
+  const raw = props.showNetPrices
+    ? Number(d?.netAmount ?? d?.amount ?? 0)
+    : Number(d?.grossAmount ?? d?.amount ?? 0)
+  const abs = Math.abs(Number.isFinite(raw) ? raw : 0)
+  if (abs === 0) return '0'
+  return String(abs)
+}
+
+function onDiscountPercentChange(id, raw) {
+  const n = parseDecimalInput(raw)
+  if (!Number.isFinite(n) || n < 0) {
+    emit('update-discount', id, { percent: 0 })
+    return
+  }
+  emit('update-discount', id, { percent: n })
+}
+
+function onDiscountAmountChange(id, raw) {
+  const n = parseDecimalInput(raw)
+  if (!Number.isFinite(n) || n < 0) {
+    emit('update-discount', id, { amount: 0 })
+    return
+  }
+  emit('update-discount', id, { amount: n })
+}
 
 function handleAddDiscount() {
-  if (!canAddDiscount.value) return
   emit('add-discount', {
-    label: newDiscountLabel.value.trim() || 'Discount',
-    amount: Number(newDiscountAmount.value),
+    description: '',
+    percent: 0,
+    amount: 0,
   })
-  newDiscountLabel.value = ''
-  newDiscountAmount.value = ''
+  open.discounts = true
+}
+
+function handleAddCampaign() {
+  emit('add-campaign', {
+    description: '',
+    percent: 0,
+    amount: 0,
+  })
+}
+
+function oemPercentForPromo(promo) {
+  const p = promo
+  if (!p) return 0
+  if (p.discountType === 'percent') return -Math.abs(Number(p.discountPercent))
+  const base = Number(props.discountBaseGross)
+  const amt = Math.abs(Number(p.amount || 0))
+  if (!Number.isFinite(amt) || amt === 0 || !Number.isFinite(base) || base <= 0) return 0
+  return -(amt / base) * 100
+}
+
+function oemAmountGrossForPromo(promo) {
+  const p = promo
+  if (!p) return 0
+  if (p.discountType === 'percent') {
+    const base = Number(props.discountBaseGross)
+    const pct = Math.abs(Number(p.discountPercent))
+    if (!Number.isFinite(base) || base <= 0 || !Number.isFinite(pct)) return 0
+    return -Math.abs((base * pct) / 100)
+  }
+  const amt = Number(p.amount || 0)
+  return Number.isFinite(amt) ? -Math.abs(amt) : 0
+}
+
+function oemAmountNetForPromo(promo) {
+  const g = oemAmountGrossForPromo(promo)
+  if (!Number.isFinite(g) || g === 0) return 0
+  return -Math.abs(toNet(Math.abs(g)))
 }
 
 function toNet(grossValue) {
@@ -429,13 +783,5 @@ function formatCurrency(value) {
   return `${n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}€`
 }
 
-function formatPromoDiscountDisplay(promo) {
-  if (!promo) return ''
-  if (promo.discountType === 'percent') {
-    return formatPromoDiscount(promo)
-  }
-  const amount = displayValue(promo.amount || 0)
-  if (!Number.isFinite(amount)) return ''
-  return `- ${formatCurrency(amount)}`
-}
+defineExpose({ openSection, addDiscountFromSearch, addCampaignFromSearch, addAccessoryFromSearch })
 </script>

@@ -5,7 +5,7 @@
  */
 
 const SHARED_CONFIGURED_IMAGE_URL =
-  'https://www.figma.com/api/mcp/asset/b84d02b2-bdf4-4a4a-8d63-4e78d9b74111'
+  'https://cdn-datak.motork.net/configurator-icon/cars/it/400/AUDI/A1-SPORTBACK/32536_BERLINA-5-PORTE/audi-a1-sportback-2018-icona.png'
 
 export const VERSIONS = [
   {
@@ -250,22 +250,27 @@ export const PROMOS = [
     id: 'p-spring-2026',
     label: 'Spring campaign 2026',
     description: 'Seasonal discount applied at the dealership level.',
+    expiresAt: '2026-06-30',
     amount: 1_500,
     discountType: 'amount',
     defaultActive: true,
+    incompatibleWith: ['p-loyalty'],
   },
   {
     id: 'p-loyalty',
     label: 'Loyalty bonus',
     description: 'Reserved for returning customers.',
+    expiresAt: '2026-12-31',
     amount: 750,
     discountType: 'amount',
     defaultActive: false,
+    incompatibleWith: ['p-spring-2026'],
   },
   {
     id: 'p-trade-in-bonus',
     label: 'Trade-in incentive',
     description: 'Extra percentage off when a trade-in vehicle is provided.',
+    expiresAt: '2026-03-31',
     amount: 0,
     discountType: 'percent',
     discountPercent: 3,
@@ -273,12 +278,38 @@ export const PROMOS = [
   },
 ]
 
+export const DISCOUNT_ITEMS = [
+  { id: 'di-fleet', label: 'Fleet discount', percent: -2 },
+  { id: 'di-trade', label: 'Trade-in bonus', percent: -3.5 },
+  { id: 'di-loyalty', label: 'Loyalty discount', percent: -1.5 },
+]
+
+export const CAMPAIGN_ITEMS = [
+  { id: 'c-winter-tyres', label: 'Winter tyres campaign', amount: 0 },
+  { id: 'c-end-of-year', label: 'End-of-year bonus', percent: -2 },
+  { id: 'c-loyalty-dealer', label: 'Dealer loyalty bonus', amount: 250 },
+]
+
+export function findDiscountItem(id) {
+  return DISCOUNT_ITEMS.find((d) => d.id === id) || null
+}
+
+export function findCampaignItem(id) {
+  return CAMPAIGN_ITEMS.find((c) => c.id === id) || null
+}
+
 function normalizeTrimLabel(label) {
   return String(label || '').trim().toLowerCase()
 }
 
 const TRIM_PROMO_IDS = {
   [normalizeTrimLabel('Identity black')]: ['p-spring-2026'],
+}
+
+export function promoIdsForTrimLabel(label) {
+  const key = normalizeTrimLabel(label)
+  const list = TRIM_PROMO_IDS[key]
+  return Array.isArray(list) ? list.filter(Boolean) : []
 }
 
 export function formatPromoDiscount(promo) {
@@ -297,10 +328,87 @@ export const ACCESSORIES = [
   { id: 'a-roof-rack', name: 'Roof rack system', price: 360 },
 ]
 
+/** Quick-add templates for quotation search (services / extras), same pattern as DISCOUNT_ITEMS. */
+export const ACCESSORY_LINE_ITEMS = [
+  { id: 'as-roadside', name: 'Roadside assistance (12 months)', price: 120 },
+  { id: 'as-delivery', name: 'Home delivery service', price: 250 },
+  { id: 'as-detailing', name: 'Interior & exterior detailing', price: 180 },
+]
+
+export function findAccessoryLineItem(id) {
+  return ACCESSORY_LINE_ITEMS.find((a) => a.id === id) || null
+}
+
+/** Default VAT % for the configurator when the modal has no override. */
 export const TAXES = {
   vatRatePercent: 22,
-  registrationTax: 562.98,
-  ecoTax: 300,
+}
+
+/**
+ * Seed rows for "Taxes and extra-costs" (quotation tab). Extra totals are derived from these lines.
+ * @typedef {Object} TaxExtraCostSeed
+ * @property {string} id
+ * @property {'system'|'user'} kind
+ * @property {string} description
+ * @property {number} grossAmount
+ * @property {number} vatRatePercent
+ * @property {boolean} [descriptionEditable]
+ * @property {boolean} [amountsEditable]
+ * @property {boolean} [vatEditable]
+ */
+export const TAX_EXTRA_COST_LINE_SEEDS = [
+  {
+    id: 'sys-road-prep',
+    kind: 'system',
+    description: 'Messa su strada',
+    grossAmount: 180,
+    vatRatePercent: 22,
+    descriptionEditable: false,
+    amountsEditable: false,
+    vatEditable: false,
+  },
+  {
+    id: 'sys-registration',
+    kind: 'system',
+    description: 'Vehicle registration',
+    grossAmount: 562.98,
+    vatRatePercent: 22,
+    descriptionEditable: true,
+    amountsEditable: true,
+    vatEditable: true,
+  },
+  {
+    id: 'sys-eco-pfu',
+    kind: 'system',
+    description: 'PFU / Eco tax',
+    grossAmount: 300,
+    vatRatePercent: 22,
+    descriptionEditable: false,
+    amountsEditable: false,
+    vatEditable: false,
+  },
+]
+
+/** Builds working tax extra-cost line objects (net + gross aligned to VAT rate). */
+export function createTaxExtraCostLinesFromSeeds() {
+  return TAX_EXTRA_COST_LINE_SEEDS.map((s) => {
+    const rate = Number(s.vatRatePercent) || 0
+    const gross = Math.max(0, Number(s.grossAmount) || 0)
+    const factor = 1 + rate / 100
+    const net = factor > 0 ? gross / factor : gross
+    return {
+      id: s.id,
+      kind: s.kind,
+      removable: s.kind === 'user',
+      description: String(s.description || ''),
+      descriptionEditable: !!s.descriptionEditable,
+      amountsEditable: !!s.amountsEditable,
+      vatEditable: !!s.vatEditable,
+      netAmount: net,
+      grossAmount: gross,
+      vatRatePercent: rate,
+    }
+  })
 }
 
 export const VAT_OPTIONS = [

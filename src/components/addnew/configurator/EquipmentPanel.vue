@@ -18,12 +18,14 @@
       </button>
     </div>
 
-    <div class="space-y-3">
+    <div class="space-y-2.5">
       <CollapsibleSection
         v-for="group in equipmentByGroup"
         :key="group.name"
         :title="group.name"
         :is-expanded="isExpanded(group.name)"
+        title-class="text-base font-semibold"
+        card-style
         @toggle="toggleGroup(group.name)"
       >
         <ul v-if="group.items.length" class="divide-y divide-border">
@@ -42,11 +44,8 @@
               <span class="text-sm text-foreground truncate">{{ item.name }}</span>
             </label>
 
-            <span
-              class="shrink-0 text-sm font-medium"
-              :class="isIncluded(item) ? 'text-mk-green-600' : 'text-foreground'"
-            >
-              {{ isIncluded(item) ? 'Included' : `+ ${formatAmount(item.price)}` }}
+            <span class="shrink-0 text-sm font-medium text-foreground">
+              {{ isIncluded(item) ? includedZeroLabel : `+ ${formatAmount(item.price)}` }}
             </span>
           </li>
         </ul>
@@ -93,6 +92,7 @@ function onShowStandardEquipmentChange(v) {
 const expandedGroups = reactive({})
 
 const allExpanded = computed(() => props.groups.every((name) => expandedGroups[name] !== false))
+
 const noneExpanded = computed(() => props.groups.every((name) => isExpanded(name) === false))
 
 function isExpanded(name) {
@@ -134,6 +134,10 @@ const equipmentByGroup = computed(() =>
       name,
       items: visibleEquipment.value.filter((item) => item.group === name),
     }))
+)
+
+const includedZeroLabel = computed(() =>
+  props.showNetPrices ? '€ 0.00 VAT excl.' : '€ 0.00'
 )
 
 function formatAmount(value) {

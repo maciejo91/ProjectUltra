@@ -1,34 +1,44 @@
 <template>
   <div
     class="mk-collapsible-section-card overflow-hidden border border-border rounded-lg"
+    :class="elevated ? 'shadow-mk-dashboard-card' : ''"
   >
     <!-- Section Header -->
-    <button
-      type="button"
-      @click="$emit('toggle')"
-      class="w-full flex items-center justify-between py-3 transition-colors"
+    <component
+      :is="staticHeader ? 'div' : 'button'"
+      :type="staticHeader ? undefined : 'button'"
+      class="w-full flex items-center justify-between gap-2 py-3 transition-colors text-left"
       :class="[
         noSidePadding ? 'px-0' : 'px-4',
-        cardStyle ? 'bg-white hover:bg-muted/30' : 'bg-muted/30 hover:bg-muted/50'
+        cardStyle && !staticHeader ? 'bg-white hover:bg-muted/30' : '',
+        cardStyle && staticHeader ? 'bg-white' : '',
+        !cardStyle && !staticHeader ? 'bg-muted/30 hover:bg-muted/50' : '',
+        !cardStyle && staticHeader ? 'bg-muted/30' : '',
+        headerClass,
       ]"
+      @click="onHeaderClick"
     >
-      <h5
-        class="mb-0 text-foreground"
-        :class="[
-          titleClass || 'text-sm font-semibold',
-          noSidePadding ? 'px-4' : ''
-        ]"
-      >
-        {{ title }}
-      </h5>
+      <div class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+        <h5
+          class="mb-0 shrink-0 text-foreground"
+          :class="[
+            titleClass || 'text-sm font-semibold',
+            noSidePadding ? 'px-4' : '',
+          ]"
+        >
+          {{ title }}
+        </h5>
+        <slot name="afterTitle" />
+      </div>
       <ChevronDown
+        v-if="showChevron"
         class="w-3 h-3 shrink-0 text-muted-foreground transition-transform duration-200"
         :class="[{ 'rotate-180': isExpanded }, noSidePadding ? 'mr-4' : '']"
       />
-    </button>
+    </component>
     
-    <!-- Section Content -->
-    <transition name="expand">
+    <!-- Section Content: no body when staticHeader (compact empty bar per design) -->
+    <transition v-if="!staticHeader" name="expand">
       <div v-if="isExpanded" :class="noSidePadding ? 'p-4' : 'px-4 pb-4'">
         <slot />
       </div>
@@ -39,7 +49,7 @@
 <script setup>
 import { ChevronDown } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   title: {
     type: String,
     required: true
@@ -59,10 +69,34 @@ defineProps({
   titleClass: {
     type: String,
     default: ''
-  }
+  },
+  /** When true, the header does not toggle expansion (non-interactive bar; use with #afterTitle). */
+  staticHeader: {
+    type: Boolean,
+    default: false,
+  },
+  /** When false, hides the collapse chevron. */
+  showChevron: {
+    type: Boolean,
+    default: true,
+  },
+  /** Elevated card shadow (e.g. compact empty header in quotation). */
+  elevated: {
+    type: Boolean,
+    default: false,
+  },
+  /** Extra classes for the header row (e.g. compact vertical padding). */
+  headerClass: {
+    type: String,
+    default: '',
+  },
 })
 
-defineEmits(['toggle'])
+const emit = defineEmits(['toggle'])
+
+function onHeaderClick() {
+  if (!props.staticHeader) emit('toggle')
+}
 </script>
 
 <style scoped>

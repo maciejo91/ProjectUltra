@@ -660,6 +660,7 @@
                     alt=""
                     class="h-full w-full object-cover"
                     loading="lazy"
+                    @error="onConfiguredVehicleImageError"
                   />
                 </div>
 
@@ -1200,6 +1201,15 @@ import VehicleFromStockModal from '@/components/addnew/VehicleFromStockModal.vue
 import VehicleConfiguratorModal from '@/components/addnew/VehicleConfiguratorModal.vue'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
 import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+
+function onConfiguredVehicleImageError(e) {
+  const img = e?.target
+  if (!img) return
+  const fallback = '/vehicle-placeholder.svg'
+  const current = String(img.getAttribute?.('src') || '')
+  if (current === fallback) return
+  img.setAttribute?.('src', fallback)
+}
 
 const props = defineProps({
   leadForm: { type: Object, required: true },

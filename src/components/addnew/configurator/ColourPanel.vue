@@ -39,10 +39,7 @@
               </div>
 
               <div class="flex items-start justify-start gap-2 pt-2 border-t border-border">
-                <span
-                  class="text-sm font-medium"
-                  :class="Number(c.priceDelta) > 0 ? 'text-foreground' : 'text-mk-green-600'"
-                >
+                <span class="text-sm font-medium text-foreground">
                   {{ formatPriceDelta(c.priceDelta) }}
                 </span>
               </div>
@@ -91,10 +88,7 @@
               </div>
 
               <div class="flex items-start justify-start gap-2 pt-2 border-t border-border">
-                <span
-                  class="text-sm font-medium"
-                  :class="Number(c.priceDelta) > 0 ? 'text-foreground' : 'text-mk-green-600'"
-                >
+                <span class="text-sm font-medium text-foreground">
                   {{ formatPriceDelta(c.priceDelta) }}
                 </span>
               </div>
@@ -152,7 +146,9 @@ function emitFor(c) {
 
 function formatPriceDelta(delta) {
   const n = Number(delta)
-  if (!Number.isFinite(n) || n === 0) return 'Included'
+  if (!Number.isFinite(n) || n === 0) {
+    return props.showNetPrices ? '€ 0.00 VAT excl.' : '€ 0.00'
+  }
   const rate = Number(props.vatRatePercent || 0) / 100
   const gross = Math.abs(n)
   const value = props.showNetPrices && rate > 0 ? gross / (1 + rate) : gross

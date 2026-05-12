@@ -166,7 +166,14 @@
                 </div>
 
                 <div class="w-full aspect-[16/9] overflow-hidden rounded-md bg-muted">
-                  <img v-if="m.imageUrl" :src="m.imageUrl" alt="" class="h-full w-full object-cover" loading="lazy" />
+                  <img
+                    v-if="m.imageUrl"
+                    :src="m.imageUrl"
+                    alt=""
+                    class="h-full w-full object-cover"
+                    loading="lazy"
+                    @error="onModelImageError"
+                  />
                 </div>
 
                 <div class="w-full pt-4 space-y-1">
@@ -188,14 +195,19 @@
 
           <div v-else class="w-full h-full flex flex-col min-h-0">
           <div class="shrink-0 bg-muted px-6 py-4 flex items-center justify-between gap-4">
-            <div class="flex-1 w-full max-w-xl">
-              <Input
-                v-if="activeTab !== 'quotation'"
-                v-model="itemSearchQuery"
-                type="text"
-                placeholder="Search items..."
-                class="w-full pl-9 bg-background border-border"
-              />
+            <div class="relative flex-1 w-full max-w-xl">
+              <template v-if="activeTab !== 'quotation'">
+                <Search
+                  class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                  aria-hidden="true"
+                />
+                <Input
+                  v-model="itemSearchQuery"
+                  type="text"
+                  placeholder="Search items..."
+                  class="w-full pl-9 bg-background border-border"
+                />
+              </template>
               <div
                 v-else
                 role="button"
@@ -299,21 +311,36 @@
                   :vat-rate-percent="currentVatRate"
                   :promos="configurator.catalog.PROMOS"
                   :promo-selection="configurator.promoSelection"
+                  :disabled-promo-ids="configurator.disabledPromoIds.value"
+                  :discount-base-gross="configurator.discountBaseGross.value"
+                  :user-campaigns="configurator.userCampaigns.value"
+                  :vat-options="VAT_OPTIONS"
                   :user-discounts="configurator.userDiscounts.value"
-                  :accessories="configurator.catalog.ACCESSORIES"
-                  :accessory-selection="configurator.accessorySelection"
-                  :taxes="configurator.catalog.TAXES"
+                  :user-accessory-lines="configurator.userAccessoryLines.value"
+                  :tax-extra-cost-lines="configurator.extraCostLines.value"
                   :vat-amount="configurator.vatAmount.value"
                   :trade-in-applied="configurator.tradeInApplied.value"
                   :trade-in-mock-value="TRADE_IN_MOCK_VALUE"
                   :purchase-methods="configurator.catalog.PURCHASE_METHODS"
                   :selected-purchase-method-id="configurator.selectedPurchaseMethodId.value"
                   @toggle-promo="(id, v) => configurator.togglePromo(id, v)"
+                  @add-campaign="(c) => configurator.addCampaign(c)"
+                  @update-campaign="(id, patch) => configurator.updateCampaign(id, patch)"
+                  @update-campaign-vat="(id, vat) => configurator.updateCampaignVat(id, vat)"
+                  @remove-campaign="(id) => configurator.removeCampaign(id)"
+                  @toggle-campaign-active="(id, v) => configurator.toggleCampaignActive(id, v)"
                   @add-discount="(d) => configurator.addDiscount(d)"
+                  @update-discount="(id, patch) => configurator.updateDiscount(id, patch)"
+                  @update-discount-vat="(id, vat) => configurator.updateDiscountVat(id, vat)"
                   @remove-discount="(id) => configurator.removeDiscount(id)"
-                  @toggle-accessory="(id, v) => configurator.toggleAccessory(id, v)"
+                  @add-accessory-line="(p) => configurator.addAccessoryLine(p)"
+                  @update-accessory-line="(id, patch) => configurator.updateAccessoryLine(id, patch)"
+                  @remove-accessory-line="(id) => configurator.removeAccessoryLine(id)"
                   @toggle-trade-in="(v) => configurator.setTradeInApplied(v)"
                   @select-purchase-method="(id) => configurator.selectPurchaseMethod(id)"
+                  @add-tax-line="configurator.addTaxExtraCostLine"
+                  @remove-tax-line="(id) => configurator.removeTaxExtraCostLine(id)"
+                  @update-tax-line="(id, patch) => configurator.updateTaxExtraCostLine(id, patch)"
                 />
               </div>
 
@@ -433,10 +460,17 @@ import ConfigurationSummary from '@/components/addnew/configurator/Configuration
 import PromoBadge from '@/components/shared/PromoBadge.vue'
 import { useVehicleConfigurator } from '@/composables/useVehicleConfigurator'
 import {
+  ACCESSORY_LINE_ITEMS,
+  CAMPAIGN_ITEMS,
   DEFAULT_VAT_OPTION_ID,
+  DISCOUNT_ITEMS,
   EQUIPMENT_GROUPS,
   TRADE_IN_MOCK_VALUE,
   VAT_OPTIONS,
+  findAccessory,
+  findAccessoryLineItem,
+  findCampaignItem,
+  findDiscountItem,
   findPromo,
 } from '@/constants/vehicleConfiguratorCatalog'
 
@@ -513,6 +547,51 @@ const quotationSearchItems = computed(() => {
     })
   }
 
+  for (const item of DISCOUNT_ITEMS) {
+    if (!item) continue
+    out.push({
+      key: `discountItem:${item.id ?? item.label}`,
+      label: String(item.label ?? '').trim(),
+      groupKey: 'discounts',
+      groupLabel: 'Discount',
+    })
+  }
+
+  for (const item of CAMPAIGN_ITEMS) {
+    if (!item) continue
+    out.push({
+      key: `campaignItem:${item.id ?? item.label}`,
+      label: String(item.label ?? '').trim(),
+      groupKey: 'promoCampaigns',
+      groupLabel: 'Promo and campaigns',
+    })
+  }
+
+  for (const item of ACCESSORY_LINE_ITEMS) {
+    if (!item) continue
+    out.push({
+      key: `accessoryItem:${item.id}`,
+      label: String(item.name ?? '').trim(),
+      groupKey: 'accessories',
+      groupLabel: 'Accessories and services',
+    })
+  }
+
+  const userAccessoryLines = Array.isArray(configurator?.userAccessoryLines?.value)
+    ? configurator.userAccessoryLines.value
+    : []
+  for (const row of userAccessoryLines) {
+    if (!row) continue
+    const label = String(row.description || '').trim()
+    if (!label) continue
+    out.push({
+      key: `accessoryLine:${row.id}`,
+      label,
+      groupKey: 'accessories',
+      groupLabel: 'Accessories and services',
+    })
+  }
+
   const accessories = Array.isArray(configurator?.catalog?.ACCESSORIES) ? configurator.catalog.ACCESSORIES : []
   for (const a of accessories) {
     if (!a) continue
@@ -537,26 +616,29 @@ const quotationSearchItems = computed(() => {
     })
   }
 
-  const taxes = configurator?.catalog?.TAXES ?? null
-  if (taxes) {
+  const vatRate = Number(configurator?.catalog?.TAXES?.vatRatePercent)
+  if (Number.isFinite(vatRate)) {
     out.push({
       key: 'tax:vat',
-      label: `VAT (${Number(taxes.vatRatePercent || 0)}%)`,
+      label: `VAT (${vatRate}%)`,
       groupKey: 'taxes',
       groupLabel: 'Taxes and extra costs',
     })
-    out.push({
-      key: 'tax:registration',
-      label: 'Registration tax',
-      groupKey: 'taxes',
-      groupLabel: 'Taxes and extra costs',
-    })
-    out.push({
-      key: 'tax:eco',
-      label: 'Eco tax',
-      groupKey: 'taxes',
-      groupLabel: 'Taxes and extra costs',
-    })
+  }
+
+  const taxLines = configurator?.extraCostLines?.value
+  if (Array.isArray(taxLines)) {
+    for (const line of taxLines) {
+      if (!line) continue
+      const label = String(line.description || '').trim()
+      if (!label) continue
+      out.push({
+        key: `taxLine:${line.id}`,
+        label,
+        groupKey: 'taxes',
+        groupLabel: 'Taxes and extra costs',
+      })
+    }
   }
 
   if (configurator?.tradeInApplied?.value === true) {
@@ -582,6 +664,45 @@ function selectQuotationSearchItem(item) {
   if (!item) return
   quotationSearchOpen.value = false
   quotationSearchQuery.value = ''
+  const key = String(item.key || '')
+  if (item.groupKey === 'discounts' && key.startsWith('discountItem:')) {
+    const id = key.slice('discountItem:'.length)
+    const discount = findDiscountItem(id)
+    const percent = Number(discount?.percent)
+    quotationPanelRef.value?.addDiscountFromSearch?.({
+      description: String(item.label || '').trim(),
+      percent: Number.isFinite(percent) ? percent : -2,
+    })
+    return
+  }
+  if (item.groupKey === 'promoCampaigns' && key.startsWith('campaignItem:')) {
+    const id = key.slice('campaignItem:'.length)
+    const tpl = findCampaignItem(id)
+    quotationPanelRef.value?.addCampaignFromSearch?.({
+      description: String(item.label || '').trim(),
+      percent: Number(tpl?.percent) || 0,
+      amount: Number(tpl?.amount) || 0,
+    })
+    return
+  }
+  if (item.groupKey === 'accessories' && key.startsWith('accessoryItem:')) {
+    const id = key.slice('accessoryItem:'.length)
+    const tpl = findAccessoryLineItem(id)
+    quotationPanelRef.value?.addAccessoryFromSearch?.({
+      description: String(tpl?.name || item.label || '').trim(),
+      price: Number(tpl?.price) || 0,
+    })
+    return
+  }
+  if (item.groupKey === 'accessories' && key.startsWith('accessory:')) {
+    const id = key.slice('accessory:'.length)
+    const acc = findAccessory(id)
+    quotationPanelRef.value?.addAccessoryFromSearch?.({
+      description: String(acc?.name || item.label || '').trim(),
+      price: Math.max(0, Number(acc?.price) || 0),
+    })
+    return
+  }
   quotationPanelRef.value?.openSection?.(item.groupKey)
 }
 
@@ -625,7 +746,8 @@ const selectedVatOption = computed(
 const currentVatRate = computed(() => Number(selectedVatOption.value?.rate || 0))
 
 function makeModelCards({ brandId, count, seed }) {
-  const baseImageUrl = 'https://www.figma.com/api/mcp/asset/b84d02b2-bdf4-4a4a-8d63-4e78d9b74111'
+  const baseImageUrl =
+    'https://cdn-datak.motork.net/configurator-icon/cars/it/400/AUDI/A1-SPORTBACK/32536_BERLINA-5-PORTE/audi-a1-sportback-2018-icona.png'
   return Array.from({ length: count }).map((_, idx) => {
     const n = seed + idx
     const promoIds =
@@ -643,6 +765,15 @@ function makeModelCards({ brandId, count, seed }) {
       fromPrice: 28_000 + (n % 12) * 1_500,
     }
   })
+}
+
+function onModelImageError(e) {
+  const img = e?.target
+  if (!img) return
+  const fallback = '/vehicle-placeholder.svg'
+  const current = String(img.getAttribute?.('src') || '')
+  if (current === fallback) return
+  img.setAttribute?.('src', fallback)
 }
 
 function modelPromos(model) {
@@ -830,6 +961,11 @@ function selectModel(modelId) {
   configurator.reset()
   itemSearchQuery.value = ''
   activeTab.value = 'version'
+  const firstVersionId = configurator?.catalog?.VERSIONS?.[0]?.id
+  if (firstVersionId) {
+    configurator.selectVersion(firstVersionId)
+  }
+  ensureDefaultColoursSelected()
   step.value = 3
 }
 
