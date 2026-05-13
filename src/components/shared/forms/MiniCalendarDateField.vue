@@ -143,8 +143,24 @@ watch(open, (isOpen) => {
   }
 })
 
+/** Progressive DD.MM.YYYY mask while typing; also reformats pasted ISO dates. */
+function maskDateInput(raw) {
+  const s = String(raw ?? '')
+  const iso = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/)
+  if (iso) {
+    const y = iso[1]
+    const m = iso[2].padStart(2, '0')
+    const d = iso[3].padStart(2, '0')
+    return `${d}.${m}.${y}`
+  }
+  const digits = s.replace(/\D/g, '').slice(0, 8)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 4) return `${digits.slice(0, 2)}.${digits.slice(2)}`
+  return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`
+}
+
 function onInputUpdate(v) {
-  emit('update:modelValue', v)
+  emit('update:modelValue', maskDateInput(v))
 }
 
 /** Normalize valid dates to DD.MM.YYYY; leave invalid or empty text for the user to fix. */

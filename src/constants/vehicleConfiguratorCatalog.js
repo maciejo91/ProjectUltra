@@ -351,62 +351,84 @@ export const TAXES = {
  * @property {'system'|'user'} kind
  * @property {string} description
  * @property {number} grossAmount
- * @property {number} vatRatePercent
+ * @property {string} vatOptionId
+ * @property {number} [vatRatePercent]
  * @property {boolean} [descriptionEditable]
  * @property {boolean} [amountsEditable]
  * @property {boolean} [vatEditable]
  */
 export const TAX_EXTRA_COST_LINE_SEEDS = [
   {
-    id: 'sys-road-prep',
+    id: 'sys-road-prep-exempt',
     kind: 'system',
-    description: 'Messa su strada',
-    grossAmount: 180,
-    vatRatePercent: 22,
+    description: 'Messa su strada – VAT-exempt amount',
+    grossAmount: 142.98,
+    vatOptionId: 'vat-na',
     descriptionEditable: false,
     amountsEditable: false,
     vatEditable: false,
   },
   {
-    id: 'sys-registration',
+    id: 'sys-road-prep-taxable',
     kind: 'system',
-    description: 'Vehicle registration',
-    grossAmount: 562.98,
-    vatRatePercent: 22,
-    descriptionEditable: true,
-    amountsEditable: true,
+    description: 'Messa su strada – Taxable amount',
+    grossAmount: 610,
+    vatOptionId: 'vat-22',
+    descriptionEditable: false,
+    amountsEditable: false,
     vatEditable: true,
   },
   {
-    id: 'sys-eco-pfu',
+    id: 'sys-pfu',
     kind: 'system',
-    description: 'PFU / Eco tax',
-    grossAmount: 300,
-    vatRatePercent: 22,
+    description: 'PFU contribute',
+    grossAmount: 10,
+    vatOptionId: 'vat-na',
     descriptionEditable: false,
     amountsEditable: false,
     vatEditable: false,
   },
 ]
 
+/**
+ * User-added lines are always removable. System lines are removable only when any amount/description/VAT field is editable.
+ * @param {{ kind?: string, descriptionEditable?: boolean, amountsEditable?: boolean, vatEditable?: boolean }} row
+ */
+export function taxExtraCostLineIsRemovable(row) {
+  if (!row) return false
+  if (row.kind === 'user') return true
+  return !!(row.descriptionEditable || row.amountsEditable || row.vatEditable)
+}
+
 /** Builds working tax extra-cost line objects (net + gross aligned to VAT rate). */
 export function createTaxExtraCostLinesFromSeeds() {
+  const vatOptionById = new Map(VAT_OPTIONS.map((o) => [o.id, o]))
   return TAX_EXTRA_COST_LINE_SEEDS.map((s) => {
-    const rate = Number(s.vatRatePercent) || 0
+    const opt = vatOptionById.get(s.vatOptionId)
+    const rate = opt ? Number(opt.rate) || 0 : Number(s.vatRatePercent) || 0
     const gross = Math.max(0, Number(s.grossAmount) || 0)
     const factor = 1 + rate / 100
     const net = factor > 0 ? gross / factor : gross
+    const descriptionEditable = !!s.descriptionEditable
+    const amountsEditable = !!s.amountsEditable
+    const vatEditable = !!s.vatEditable
     return {
       id: s.id,
       kind: s.kind,
-      removable: s.kind === 'user',
+      removable: taxExtraCostLineIsRemovable({
+        kind: s.kind,
+        descriptionEditable,
+        amountsEditable,
+        vatEditable,
+      }),
       description: String(s.description || ''),
-      descriptionEditable: !!s.descriptionEditable,
-      amountsEditable: !!s.amountsEditable,
-      vatEditable: !!s.vatEditable,
+      descriptionEditable,
+      amountsEditable,
+      vatEditable,
       netAmount: net,
       grossAmount: gross,
       vatRatePercent: rate,
+      vatOptionId: String(s.vatOptionId || ''),
     }
   })
 }
@@ -415,7 +437,7 @@ export const VAT_OPTIONS = [
   { id: 'vat-22', label: '22% VAT', shortLabel: 'VAT 22%', rate: 22 },
   { id: 'vat-4', label: '4% VAT (Law 104)', shortLabel: 'VAT 4% (Law 104)', rate: 4 },
   { id: 'vat-0', label: '0% VAT', shortLabel: 'VAT 0%', rate: 0 },
-  { id: 'vat-na', label: 'VAT Not Applicable', shortLabel: 'VAT n/a', rate: 0, notApplicable: true },
+  { id: 'vat-na', label: 'Not applicable', shortLabel: 'Not applicable', rate: 0, notApplicable: true },
 ]
 
 export const DEFAULT_VAT_OPTION_ID = 'vat-22'

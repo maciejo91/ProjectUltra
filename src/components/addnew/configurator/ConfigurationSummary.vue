@@ -48,10 +48,6 @@
           <span class="text-muted-foreground">Equipment</span>
           <span class="text-foreground">{{ formatCurrency(equipmentTotal) }}</span>
         </div>
-        <div v-if="accessoriesTotal > 0" class="flex items-center justify-between">
-          <span class="text-muted-foreground">Accessories</span>
-          <span class="text-foreground">{{ formatCurrency(accessoriesTotal) }}</span>
-        </div>
         <div v-if="promoTotal > 0" class="flex items-center justify-between">
           <span class="text-muted-foreground">Promo</span>
           <span class="text-foreground">- {{ formatCurrency(promoTotal) }}</span>
@@ -65,10 +61,18 @@
           <span class="text-foreground pt-2">Subtotal</span>
           <span class="text-foreground pt-2">{{ formatCurrency(subtotal) }}</span>
         </div>
+        <div
+          v-if="accessoriesTotal > 0"
+          class="flex items-center justify-between border-t border-border pt-2 mt-2"
+        >
+          <span class="text-muted-foreground">Accessories and services</span>
+          <span class="text-foreground">{{ formatCurrency(accessoriesTotal) }}</span>
+        </div>
 
-        <div class="border-t border-border" aria-hidden="true" />
-
-        <div class="flex items-center justify-between">
+        <div
+          class="flex items-center justify-between"
+          :class="accessoriesTotal <= 0 ? 'border-t border-border pt-2 mt-2' : ''"
+        >
           <span class="text-muted-foreground">Taxes and extra costs</span>
           <span class="text-foreground">{{ formatCurrency(taxesTotal) }}</span>
         </div>

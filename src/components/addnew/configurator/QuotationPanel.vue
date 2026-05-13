@@ -34,11 +34,15 @@
 
           <div class="flex flex-wrap items-center gap-2.5">
             <div class="flex h-8 min-w-0 flex-1 items-center rounded-lg bg-muted px-2.5 py-1">
-              <p class="truncate text-sm leading-normal text-muted-foreground">{{ vehicleLine }}</p>
+              <TruncatingTooltip :text="vehicleLine" wrapper-class="min-w-0 flex-1">
+                <p class="truncate text-sm leading-normal text-muted-foreground">{{ vehicleLine }}</p>
+              </TruncatingTooltip>
             </div>
             <template v-if="showNetPrices">
               <VehicleDetailAmountPill :amount="toNet(vehicleBaseTotal)" />
-              <VehicleDetailVatStub :label="vatSelectLabel" />
+              <TruncatingTooltip :text="vatSelectLabel" wrapper-class="w-40 shrink-0 min-w-0">
+                <VehicleDetailVatStub :label="vatSelectLabel" />
+              </TruncatingTooltip>
               <VehicleDetailAmountPill :amount="Number(vehicleBaseTotal)" />
             </template>
             <VehicleDetailAmountPill v-else :amount="Number(vehicleBaseTotal)" />
@@ -49,9 +53,11 @@
             class="flex flex-wrap items-center gap-2.5"
           >
             <div class="flex h-8 min-w-0 flex-1 items-center rounded-lg bg-muted px-2.5 py-1">
-              <p class="truncate text-sm leading-normal text-muted-foreground">
-                Colour: {{ colourLabel }}
-              </p>
+              <TruncatingTooltip :text="`Colour: ${colourLabel}`" wrapper-class="min-w-0 flex-1">
+                <p class="truncate text-sm leading-normal text-muted-foreground">
+                  Colour: {{ colourLabel }}
+                </p>
+              </TruncatingTooltip>
             </div>
             <template v-if="showNetPrices">
               <VehicleDetailAmountPill
@@ -64,7 +70,9 @@
               >
                 —
               </div>
-              <VehicleDetailVatStub :label="vatSelectLabel" />
+              <TruncatingTooltip :text="vatSelectLabel" wrapper-class="w-40 shrink-0 min-w-0">
+                <VehicleDetailVatStub :label="vatSelectLabel" />
+              </TruncatingTooltip>
               <VehicleDetailAmountPill v-if="colourPriceDelta > 0" :amount="colourPriceDelta" />
               <VehicleDetailAmountPill v-else :amount="0" />
             </template>
@@ -77,9 +85,11 @@
             class="flex flex-wrap items-center gap-2.5"
           >
             <div class="flex h-8 min-w-0 flex-1 items-center rounded-lg bg-muted px-2.5 py-1">
-              <p class="truncate text-sm leading-normal text-muted-foreground">
-                Interior: {{ interiorColourLabel }}
-              </p>
+              <TruncatingTooltip :text="`Interior: ${interiorColourLabel}`" wrapper-class="min-w-0 flex-1">
+                <p class="truncate text-sm leading-normal text-muted-foreground">
+                  Interior: {{ interiorColourLabel }}
+                </p>
+              </TruncatingTooltip>
             </div>
             <template v-if="showNetPrices">
               <VehicleDetailAmountPill
@@ -92,7 +102,9 @@
               >
                 —
               </div>
-              <VehicleDetailVatStub :label="vatSelectLabel" />
+              <TruncatingTooltip :text="vatSelectLabel" wrapper-class="w-40 shrink-0 min-w-0">
+                <VehicleDetailVatStub :label="vatSelectLabel" />
+              </TruncatingTooltip>
               <VehicleDetailAmountPill v-if="interiorColourPriceDelta > 0" :amount="interiorColourPriceDelta" />
               <VehicleDetailAmountPill v-else :amount="0" />
             </template>
@@ -113,11 +125,15 @@
               class="flex flex-wrap items-center gap-2.5"
             >
               <div class="flex h-8 min-w-0 flex-1 items-center rounded-lg bg-muted px-2.5 py-1">
-                <p class="truncate text-sm leading-normal text-muted-foreground">{{ item.name }}</p>
+                <TruncatingTooltip :text="item.name" wrapper-class="min-w-0 flex-1">
+                  <p class="truncate text-sm leading-normal text-muted-foreground">{{ item.name }}</p>
+                </TruncatingTooltip>
               </div>
               <template v-if="showNetPrices">
                 <VehicleDetailAmountPill :amount="toNet(item.price)" />
-                <VehicleDetailVatStub :label="vatSelectLabel" />
+                <TruncatingTooltip :text="vatSelectLabel" wrapper-class="w-40 shrink-0 min-w-0">
+                  <VehicleDetailVatStub :label="vatSelectLabel" />
+                </TruncatingTooltip>
                 <VehicleDetailAmountPill :amount="Number(item.price)" />
               </template>
               <VehicleDetailAmountPill v-else :amount="Number(item.price)" />
@@ -212,8 +228,6 @@
         static-header
         :show-chevron="false"
         card-style
-        elevated
-        header-class="!py-0 min-h-14"
       >
         <template #afterTitle>
           <Button
@@ -235,11 +249,95 @@
         :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.discounts"
         card-style
-        elevated
         @toggle="toggleSection('discounts')"
       >
         <div class="flex flex-col gap-4">
-          <div class="flex flex-col gap-2.5">
+          <div v-if="showNetPrices" class="space-y-2.5">
+            <div class="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-2.5">
+              <span class="min-w-0 flex-1 select-none text-xs leading-none text-muted-foreground invisible">
+                Item description
+              </span>
+              <div class="flex shrink-0 flex-nowrap items-center gap-2.5">
+                <span class="w-64 shrink-0 text-xs leading-none text-muted-foreground">Net Discount</span>
+                <span class="w-40 shrink-0 text-xs leading-none text-muted-foreground">VAT (%)</span>
+                <span class="w-32 shrink-0 text-xs leading-none text-muted-foreground">
+                  Discount VAT incl.
+                </span>
+                <span class="w-8 shrink-0" aria-hidden="true" />
+              </div>
+            </div>
+
+            <div
+              v-for="d in userDiscounts"
+              :key="d.id"
+              class="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-2.5"
+            >
+              <div class="flex h-8 min-w-0 flex-1 items-center rounded-lg border border-input bg-background px-2.5 py-1">
+                <Input
+                  type="text"
+                  :model-value="d.description || ''"
+                  placeholder="Item description"
+                  class="h-7 min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-foreground shadow-none focus-visible:ring-0"
+                  @update:model-value="(v) => emit('update-discount', d.id, { description: String(v ?? '') })"
+                />
+              </div>
+              <div class="flex shrink-0 flex-nowrap items-center gap-2.5">
+                <div class="flex h-8 shrink-0 flex-nowrap overflow-hidden rounded-lg border border-input">
+                  <div class="relative w-24 min-w-0 shrink-0 border-r border-input bg-background px-2.5 pl-7">
+                    <Input
+                      type="text"
+                      inputmode="decimal"
+                      :model-value="discountPercentInputValue(d)"
+                      class="h-7 min-w-0 border-0 bg-transparent p-0 text-right text-sm text-foreground shadow-none focus-visible:ring-0"
+                      @update:model-value="(v) => onDiscountPercentChange(d.id, v)"
+                    />
+                    <span
+                      class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
+                      aria-hidden="true"
+                    >
+                      %
+                    </span>
+                  </div>
+                  <div class="relative w-40 min-w-0 shrink-0 bg-background px-2.5 pl-7">
+                    <Input
+                      type="text"
+                      inputmode="decimal"
+                      :model-value="discountAmountInputValue(d)"
+                      class="h-7 min-w-0 border-0 bg-transparent p-0 text-right text-sm text-foreground shadow-none focus-visible:ring-0"
+                      @update:model-value="(v) => onDiscountAmountChange(d.id, v)"
+                    />
+                    <span
+                      class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
+                      aria-hidden="true"
+                    >
+                      €
+                    </span>
+                  </div>
+                </div>
+                <TruncatingCatalogSelect
+                  select-class="w-40 shrink-0"
+                  :model-value="String(discountRowVatRate(d))"
+                  :display-label="discountRowVatDisplayLabel(d)"
+                  :options="discountVatSelectOptions"
+                  @update:model-value="(v) => emit('update-discount-vat', d.id, Number(v))"
+                />
+                <QuotationReadOnlyAmount width-class="w-32 shrink-0" :amount="discountGrossAmount(d)" />
+                <div class="flex w-8 shrink-0 items-center justify-end">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    class="size-8 shrink-0 rounded-md"
+                    @click="emit('remove-discount', d.id)"
+                  >
+                    <Trash2 class="size-4" />
+                    <span class="sr-only">Remove discount</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="flex flex-col gap-2.5">
             <div
               v-for="d in userDiscounts"
               :key="d.id"
@@ -331,8 +429,6 @@
         static-header
         :show-chevron="false"
         card-style
-        elevated
-        header-class="!py-0 min-h-14"
       >
         <template #afterTitle>
           <Button
@@ -354,47 +450,109 @@
         :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.accessories"
         card-style
-        elevated
         @toggle="toggleSection('accessories')"
       >
-        <div class="flex flex-col gap-2.5">
-          <div
-            v-for="row in userAccessoryLines"
-            :key="row.id"
-            class="flex flex-wrap items-center gap-2.5"
-          >
-            <Input
-              type="text"
-              :model-value="row.description || ''"
-              placeholder="Item description"
-              class="h-8 min-w-0 flex-1 bg-background border-border"
-              @update:model-value="(v) => emit('update-accessory-line', row.id, { description: String(v ?? '') })"
-            />
-            <div class="relative flex h-8 w-32 shrink-0 items-center rounded-lg border border-border bg-background">
-              <span
-                class="pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-sm text-muted-foreground"
-                aria-hidden="true"
-              >
-                €
+        <div class="flex flex-col gap-4">
+          <div v-if="showNetPrices" class="space-y-2.5">
+            <div class="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-2.5">
+              <span class="min-w-0 flex-1 select-none text-xs leading-none text-muted-foreground invisible">
+                Item description
               </span>
+              <div class="flex shrink-0 flex-nowrap items-center gap-2.5">
+                <span class="w-32 shrink-0 text-xs leading-none text-muted-foreground">Net price</span>
+                <span class="w-40 shrink-0 text-xs leading-none text-muted-foreground">VAT (%)</span>
+                <span class="w-32 shrink-0 text-xs leading-none text-muted-foreground">Price VAT incl.</span>
+                <span class="w-8 shrink-0" aria-hidden="true" />
+              </div>
+            </div>
+
+            <div
+              v-for="row in userAccessoryLines"
+              :key="row.id"
+              class="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-2.5"
+            >
+              <div class="flex h-8 min-w-0 flex-1 items-center rounded-lg border border-input bg-background px-2.5 py-1">
+                <Input
+                  type="text"
+                  :model-value="row.description || ''"
+                  placeholder="Item description"
+                  class="h-7 min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-foreground shadow-none focus-visible:ring-0"
+                  @update:model-value="(v) => emit('update-accessory-line', row.id, { description: String(v ?? '') })"
+                />
+              </div>
+              <div class="flex shrink-0 flex-nowrap items-center gap-2.5">
+                <QuotationEditableAmount
+                  width-class="w-32 shrink-0"
+                  :model-value="accessoryNetInputString(row)"
+                  @update:model-value="(v) => onAccessoryNetAmountChange(row.id, v)"
+                />
+                <TruncatingCatalogSelect
+                  select-class="w-40 shrink-0"
+                  :model-value="String(accessoryRowVatRate(row))"
+                  :display-label="accessoryRowVatDisplayLabel(row)"
+                  :options="discountVatSelectOptions"
+                  @update:model-value="(v) => emit('update-accessory-line', row.id, { vatRatePercent: Number(v) })"
+                />
+                <QuotationEditableAmount
+                  width-class="w-32 shrink-0"
+                  :model-value="accessoryGrossInputString(row)"
+                  @update:model-value="(v) => onAccessoryGrossAmountChange(row.id, v)"
+                />
+                <div class="flex w-8 shrink-0 items-center justify-end">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    class="size-8 shrink-0 rounded-md"
+                    @click="emit('remove-accessory-line', row.id)"
+                  >
+                    <Trash2 class="size-4" />
+                    <span class="sr-only">Remove line</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="flex flex-col gap-2.5">
+            <div
+              v-for="row in userAccessoryLines"
+              :key="row.id"
+              class="flex flex-wrap items-center gap-2.5"
+            >
               <Input
                 type="text"
-                inputmode="decimal"
-                :model-value="accessoryPriceInputValue(row)"
-                class="h-8 w-full min-w-0 border-0 bg-transparent pr-2.5 pl-7 text-right text-sm text-foreground shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                @update:model-value="(v) => onAccessoryPriceChange(row.id, v)"
+                :model-value="row.description || ''"
+                placeholder="Item description"
+                class="h-8 min-w-0 flex-1 bg-background border-border"
+                @update:model-value="(v) => emit('update-accessory-line', row.id, { description: String(v ?? '') })"
               />
+              <div class="relative flex h-8 w-32 shrink-0 items-center rounded-lg border border-border bg-background">
+                <span
+                  class="pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-sm text-muted-foreground"
+                  aria-hidden="true"
+                >
+                  €
+                </span>
+                <Input
+                  type="text"
+                  inputmode="decimal"
+                  :model-value="accessoryPriceInputValue(row)"
+                  class="h-8 w-full min-w-0 border-0 bg-transparent pr-2.5 pl-7 text-right text-sm text-foreground shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  @update:model-value="(v) => onAccessoryPriceChange(row.id, v)"
+                />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                class="size-8 shrink-0 rounded-md"
+                @click="emit('remove-accessory-line', row.id)"
+              >
+                <Trash2 class="size-4" />
+                <span class="sr-only">Remove line</span>
+              </Button>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              class="size-8 shrink-0 rounded-md"
-              @click="emit('remove-accessory-line', row.id)"
-            >
-              <Trash2 class="size-4" />
-              <span class="sr-only">Remove line</span>
-            </Button>
           </div>
 
           <div class="flex flex-wrap gap-2 pt-4">
@@ -420,7 +578,7 @@
         card-style
         @toggle="toggleSection('taxes')"
       >
-      <div class="space-y-4">
+      <div class="space-y-2.5">
         <QuotationTaxesTable
           :lines="taxExtraCostLines"
           :show-net-prices="showNetPrices"
@@ -437,49 +595,143 @@
 
     <div ref="sectionEls.tradeIn">
       <CollapsibleSection
+        v-if="!hasUserTradeInLines"
+        title="Trade-in"
+        :title-class="collapsibleSectionTitleClass"
+        static-header
+        :show-chevron="false"
+        card-style
+      >
+        <template #afterTitle>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            class="ml-auto shrink-0 rounded-md font-medium"
+            @click.stop="openTradeInModalAdd"
+          >
+            <Plus class="size-4 mr-1.5" />
+            Add
+          </Button>
+        </template>
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        v-else
         title="Trade-in"
         :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.tradeIn"
         card-style
         @toggle="toggleSection('tradeIn')"
       >
-      <div
-        class="rounded-md border border-border px-3 py-3 flex items-center justify-between gap-3"
-      >
-        <div class="min-w-0">
-          <p class="text-sm font-medium text-foreground">
-            {{ tradeInApplied ? 'Trade-in vehicle' : 'No trade-in attached' }}
-          </p>
-          <p class="text-xs text-muted-foreground">
-            {{
-              tradeInApplied
-                ? `Mock valuation applied to the offer (- ${formatCurrency(tradeInMockValue)}).`
-                : 'Attach a trade-in to deduct its valuation from the grand total.'
-            }}
-          </p>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-4">
+            <div
+              v-for="row in userTradeInLines"
+              :key="row.id"
+              class="flex items-center justify-start gap-2"
+            >
+              <div class="min-w-0 flex-1 rounded-lg border border-border bg-background p-4">
+                <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-6">
+                  <div class="min-w-0 flex-1 space-y-3">
+                    <div
+                      class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2 gap-y-0"
+                    >
+                      <Car
+                        class="row-start-1 col-start-1 size-6 shrink-0 text-sidebar-foreground mt-0.5"
+                        aria-hidden="true"
+                      />
+                      <TruncatingTooltip
+                        :text="tradeInDisplayTitle(row)"
+                        wrapper-class="row-start-1 col-start-2 min-w-0"
+                      >
+                        <p class="truncate text-base font-medium text-foreground">
+                          {{ tradeInDisplayTitle(row) || '—' }}
+                        </p>
+                      </TruncatingTooltip>
+                      <p
+                        v-if="tradeInDisplayVersion(row)"
+                        class="col-span-2 row-start-2 min-w-0 truncate text-sm text-muted-foreground"
+                      >
+                        {{ tradeInDisplayVersion(row) }}
+                      </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 text-sm text-muted-foreground">
+                      <div class="flex min-w-0 items-start justify-start gap-1.5">
+                        <Calendar
+                          class="size-4 shrink-0 text-sidebar-foreground"
+                          aria-hidden="true"
+                        />
+                        <span class="min-w-0 truncate text-card-foreground">{{
+                          row.firstRegistration || '—'
+                        }}</span>
+                      </div>
+                      <div class="flex min-w-0 items-start justify-start gap-1.5">
+                        <Gauge
+                          class="size-4 shrink-0 text-sidebar-foreground"
+                          aria-hidden="true"
+                        />
+                        <span class="min-w-0 truncate text-card-foreground">{{
+                          row.mileageLabel || '—'
+                        }}</span>
+                      </div>
+                      <div class="flex min-w-0 max-w-full items-center justify-start">
+                        <LicensePlateBadge
+                          :plate="row.licensePlate || ''"
+                          uppercase
+                          truncate
+                          placeholder="—"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex shrink-0 flex-col gap-0 md:items-end">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      class="size-8 shrink-0 self-end rounded-md"
+                      @click="openTradeInModalEdit(row)"
+                    >
+                      <PenLine class="size-4" />
+                      <span class="sr-only">Edit trade-in details</span>
+                    </Button>
+                    <div class="space-y-1">
+                      <p class="text-xs leading-none text-muted-foreground">Evaluation</p>
+                      <div class="flex h-8 w-full min-w-0 items-center justify-end rounded-lg border border-border bg-muted px-2.5 sm:w-40">
+                        <span class="truncate text-right text-sm text-muted-foreground">
+                          € {{ formatTradeInMoney(row.valuation) }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                class="size-8 shrink-0 rounded-md"
+                @click="emit('remove-trade-in-line', row.id)"
+              >
+                <Trash2 class="size-4" />
+                <span class="sr-only">Remove trade-in</span>
+              </Button>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              class="h-9 shrink-0 rounded-md px-4 font-medium"
+              @click="openTradeInModalAdd"
+            >
+              <Plus class="size-4 mr-2" />
+              Add
+            </Button>
+          </div>
         </div>
-        <Button
-          v-if="!tradeInApplied"
-          type="button"
-          variant="outline"
-          size="sm"
-          class="rounded-md shrink-0"
-          @click="emit('toggle-trade-in', true)"
-        >
-          <Plus class="size-4 mr-1" />
-          Add trade-in
-        </Button>
-        <Button
-          v-else
-          type="button"
-          variant="ghost"
-          size="sm"
-          class="rounded-md shrink-0"
-          @click="emit('toggle-trade-in', false)"
-        >
-          Remove
-        </Button>
-      </div>
       </CollapsibleSection>
     </div>
 
@@ -491,33 +743,47 @@
         card-style
         @toggle="toggleSection('purchaseMethod')"
       >
-      <div class="outcome-toggle-group flex flex-wrap gap-3">
-        <Toggle
-          v-for="method in purchaseMethods"
-          :key="method.id"
-          variant="outline"
-          class="outcome-toggle-item"
-          :model-value="selectedPurchaseMethodId === method.id"
-          @update:model-value="(p) => emit('select-purchase-method', p ? method.id : '')"
-        >
-          {{ method.label }}
-        </Toggle>
-      </div>
+        <div class="outcome-toggle-group flex flex-wrap gap-3">
+          <Toggle
+            v-for="method in purchaseMethods"
+            :key="method.id"
+            variant="outline"
+            class="outcome-toggle-item"
+            :model-value="selectedPurchaseMethodId === method.id"
+            @update:model-value="(p) => emit('select-purchase-method', p ? method.id : '')"
+          >
+            {{ method.label }}
+          </Toggle>
+        </div>
       </CollapsibleSection>
     </div>
     </div>
+
+    <TradeInQuotationModal
+      :open="tradeInModalOpen"
+      :mode="tradeInModalMode"
+      :initial="tradeInModalInitial"
+      @update:open="(v) => (tradeInModalOpen = v)"
+      @save="onTradeInModalSave"
+    />
   </div>
 </template>
 
 <script setup>
 import { reactive, ref, computed, nextTick, watch } from 'vue'
-import { Info, Plus, Trash2 } from 'lucide-vue-next'
+import { Info, Plus, Trash2, Car, Calendar, Gauge, PenLine } from 'lucide-vue-next'
 import { Button, Input, Toggle } from '@motork/component-library/future/primitives'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
+import TradeInQuotationModal from '@/components/addnew/configurator/TradeInQuotationModal.vue'
 import VehicleDetailAmountPill from '@/components/addnew/configurator/VehicleDetailAmountPill.vue'
 import VehicleDetailVatStub from '@/components/addnew/configurator/VehicleDetailVatStub.vue'
 import PromoCard from '@/components/addnew/configurator/PromoCard.vue'
+import QuotationEditableAmount from '@/components/addnew/configurator/QuotationEditableAmount.vue'
+import QuotationReadOnlyAmount from '@/components/addnew/configurator/QuotationReadOnlyAmount.vue'
 import QuotationTaxesTable from '@/components/addnew/configurator/QuotationTaxesTable.vue'
+import LicensePlateBadge from '@/components/shared/LicensePlateBadge.vue'
+import TruncatingCatalogSelect from '@/components/shared/TruncatingCatalogSelect.vue'
+import TruncatingTooltip from '@/components/shared/TruncatingTooltip.vue'
 
 const props = defineProps({
   vehicleLine: { type: String, default: '' },
@@ -537,10 +803,9 @@ const props = defineProps({
   vatOptions: { type: Array, default: () => [] },
   userDiscounts: { type: Array, default: () => [] },
   userAccessoryLines: { type: Array, default: () => [] },
+  userTradeInLines: { type: Array, default: () => [] },
   taxExtraCostLines: { type: Array, required: true },
   vatAmount: { type: Number, default: 0 },
-  tradeInApplied: { type: Boolean, default: false },
-  tradeInMockValue: { type: Number, default: 0 },
   purchaseMethods: { type: Array, required: true },
   selectedPurchaseMethodId: { type: String, default: '' },
 })
@@ -549,16 +814,19 @@ const emit = defineEmits([
   'toggle-promo',
   'add-discount',
   'update-discount',
+  'update-discount-vat',
   'remove-discount',
   'add-accessory-line',
   'update-accessory-line',
   'remove-accessory-line',
+  'add-trade-in-line',
+  'update-trade-in-line',
+  'remove-trade-in-line',
   'add-campaign',
   'update-campaign',
   'update-campaign-vat',
   'remove-campaign',
   'toggle-campaign-active',
-  'toggle-trade-in',
   'select-purchase-method',
   'add-tax-line',
   'remove-tax-line',
@@ -574,11 +842,50 @@ const vatSelectLabel = computed(() => {
   return `${label}% VAT`
 })
 
+const discountVatSelectOptions = computed(() =>
+  props.vatOptions.map((o) => ({
+    value: String(o?.rate ?? ''),
+    label: String(o?.label ?? ''),
+  })),
+)
+
+function discountRowVatRate(d) {
+  const row = Number(d?.vatRatePercent)
+  if (Number.isFinite(row) && row >= 0) return row
+  return Number(props.vatRatePercent) || 0
+}
+
+function discountRowVatDisplayLabel(d) {
+  const rate = discountRowVatRate(d)
+  const opt = props.vatOptions.find((o) => Number(o?.rate) === Number(rate))
+  if (opt?.label) return String(opt.label)
+  const p = rate
+  if (!Number.isFinite(p) || p <= 0) return '0% VAT'
+  const label = Number.isInteger(p) ? String(p) : p.toLocaleString(undefined, { maximumFractionDigits: 2 })
+  return `${label}% VAT`
+}
+
+function discountGrossAmount(d) {
+  return Number(d?.grossAmount ?? d?.amount ?? 0)
+}
+
 const hasUserAccessoryLines = computed(() => props.userAccessoryLines.length > 0)
 
 watch(hasUserAccessoryLines, (next, prev) => {
   if (!next) open.accessories = false
   else if (next && !prev) open.accessories = true
+})
+
+const hasUserTradeInLines = computed(() => props.userTradeInLines.length > 0)
+
+const tradeInModalOpen = ref(false)
+const tradeInModalMode = ref('add')
+const tradeInEditId = ref(null)
+const tradeInModalInitial = ref({})
+
+watch(hasUserTradeInLines, (next, prev) => {
+  if (!next) open.tradeIn = false
+  else if (next && !prev) open.tradeIn = true
 })
 
 const sectionKeys = [
@@ -662,11 +969,117 @@ function handleAddAccessoryLine() {
   open.accessories = true
 }
 
+function addTradeInFromSearch(payload) {
+  tradeInModalMode.value = 'add'
+  tradeInEditId.value = null
+  tradeInModalInitial.value = { ...(payload && typeof payload === 'object' ? payload : {}) }
+  tradeInModalOpen.value = true
+  openSection('tradeIn')
+}
+
+function openTradeInModalAdd() {
+  tradeInModalMode.value = 'add'
+  tradeInEditId.value = null
+  tradeInModalInitial.value = {}
+  tradeInModalOpen.value = true
+}
+
+function openTradeInModalEdit(row) {
+  tradeInModalMode.value = 'edit'
+  tradeInEditId.value = row?.id || null
+  tradeInModalInitial.value = row ? { ...row } : {}
+  tradeInModalOpen.value = true
+}
+
+function onTradeInModalSave(payload) {
+  if (tradeInModalMode.value === 'edit' && tradeInEditId.value) {
+    emit('update-trade-in-line', tradeInEditId.value, payload)
+  } else {
+    emit('add-trade-in-line', payload)
+  }
+}
+
+function tradeInDisplayTitle(row) {
+  const t = String(row?.title || '').trim()
+  if (t) return t
+  const b = String(row?.brand || '').trim()
+  const m = String(row?.model || '').trim()
+  if (b && m) return `${b} ${m}`.trim()
+  if (b) return b
+  if (m) return m
+  return ''
+}
+
+function tradeInDisplayVersion(row) {
+  return String(row?.version || row?.trimLine || '').trim()
+}
+
+function formatTradeInMoney(n) {
+  const x = Number(n)
+  if (!Number.isFinite(x)) return '—'
+  return x.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 function accessoryPriceInputValue(row) {
   const n = displayValue(Number(row?.price || 0))
   if (!Number.isFinite(n)) return '0'
   if (n === 0) return '0'
   return n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+}
+
+function accessoryRowVatRate(row) {
+  const r = Number(row?.vatRatePercent)
+  if (Number.isFinite(r) && r >= 0) return r
+  return Number(props.vatRatePercent) || 0
+}
+
+function accessoryRowVatDisplayLabel(row) {
+  const rate = accessoryRowVatRate(row)
+  const opt = props.vatOptions.find((o) => Number(o?.rate) === Number(rate))
+  if (opt?.label) return String(opt.label)
+  const p = rate
+  if (!Number.isFinite(p) || p <= 0) return '0% VAT'
+  const label = Number.isInteger(p) ? String(p) : p.toLocaleString(undefined, { maximumFractionDigits: 2 })
+  return `${label}% VAT`
+}
+
+function accessoryGrossAmount(row) {
+  return Math.max(0, Number(row?.price || 0))
+}
+
+function accessoryGrossInputString(row) {
+  const gross = accessoryGrossAmount(row)
+  const n = gross
+  return Number.isFinite(n) && n !== 0 ? String(n) : ''
+}
+
+function accessoryNetInputString(row) {
+  const gross = accessoryGrossAmount(row)
+  const r = accessoryRowVatRate(row) / 100
+  const net = r > 0 ? gross / (1 + r) : gross
+  const n = net
+  return Number.isFinite(n) && n !== 0 ? String(n) : ''
+}
+
+function onAccessoryNetAmountChange(id, raw) {
+  const row = props.userAccessoryLines.find((r) => r.id === id)
+  const n = parseDecimalInput(raw)
+  if (!Number.isFinite(n) || n < 0) {
+    emit('update-accessory-line', id, { price: 0 })
+    return
+  }
+  const rate = accessoryRowVatRate(row || {}) / 100
+  const gross = rate > 0 ? n * (1 + rate) : n
+  emit('update-accessory-line', id, { price: gross })
+}
+
+function onAccessoryGrossAmountChange(id, raw) {
+  const n = parseDecimalInput(raw)
+  if (!Number.isFinite(n) || n < 0) {
+    emit('update-accessory-line', id, { price: 0 })
+    return
+  }
+  emit('update-accessory-line', id, { price: n })
 }
 
 function onAccessoryPriceChange(id, raw) {
@@ -675,9 +1088,7 @@ function onAccessoryPriceChange(id, raw) {
     emit('update-accessory-line', id, { price: 0 })
     return
   }
-  const rate = Number(props.vatRatePercent || 0) / 100
-  const gross = props.showNetPrices && rate > 0 ? n * (1 + rate) : n
-  emit('update-accessory-line', id, { price: gross })
+  emit('update-accessory-line', id, { price: n })
 }
 
 function parseDecimalInput(raw) {
@@ -783,5 +1194,5 @@ function formatCurrency(value) {
   return `${n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}€`
 }
 
-defineExpose({ openSection, addDiscountFromSearch, addCampaignFromSearch, addAccessoryFromSearch })
+defineExpose({ openSection, addDiscountFromSearch, addCampaignFromSearch, addAccessoryFromSearch, addTradeInFromSearch })
 </script>

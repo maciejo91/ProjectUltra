@@ -34,7 +34,9 @@
               </div>
 
               <div class="space-y-1">
-                <p class="text-base font-semibold text-foreground truncate">{{ c.name }}</p>
+                <TruncatingTooltip :text="c.name" wrapper-class="min-w-0 w-full">
+                  <p class="text-base font-semibold text-foreground truncate">{{ c.name }}</p>
+                </TruncatingTooltip>
                 <p class="text-sm text-muted-foreground">{{ c.finish }}</p>
               </div>
 
@@ -83,7 +85,9 @@
               </div>
 
               <div class="space-y-1">
-                <p class="text-base font-semibold text-foreground truncate">{{ c.name }}</p>
+                <TruncatingTooltip :text="c.name" wrapper-class="min-w-0 w-full">
+                  <p class="text-base font-semibold text-foreground truncate">{{ c.name }}</p>
+                </TruncatingTooltip>
                 <p class="text-sm text-muted-foreground">{{ c.finish }}</p>
               </div>
 
@@ -102,6 +106,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import TruncatingTooltip from '@/components/shared/TruncatingTooltip.vue'
 
 const props = defineProps({
   exteriorId: { type: String, default: '' },

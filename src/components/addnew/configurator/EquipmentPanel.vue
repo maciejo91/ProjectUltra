@@ -41,7 +41,9 @@
                 :disabled="isLocked(item)"
                 @update:model-value="(v) => emit('toggle', item.id, v)"
               />
-              <span class="text-sm text-foreground truncate">{{ item.name }}</span>
+              <TruncatingTooltip :text="item.name" wrapper-class="min-w-0 flex-1">
+                <span class="text-sm text-foreground truncate">{{ item.name }}</span>
+              </TruncatingTooltip>
             </label>
 
             <span class="shrink-0 text-sm font-medium text-foreground">
@@ -62,6 +64,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { Checkbox, Switch } from '@motork/component-library/future/primitives'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
+import TruncatingTooltip from '@/components/shared/TruncatingTooltip.vue'
 
 const props = defineProps({
   equipment: { type: Array, required: true },

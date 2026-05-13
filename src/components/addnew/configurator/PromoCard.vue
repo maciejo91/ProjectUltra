@@ -38,8 +38,7 @@
           :class="dealerDescriptionFieldClass"
           @update:model-value="onDealerDescriptionInput"
         />
-        <TooltipProvider :delay-duration="200">
-          <Tooltip>
+        <Tooltip>
             <TooltipTrigger as-child>
               <button
                 type="button"
@@ -71,8 +70,7 @@
                 </p>
               </div>
             </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        </Tooltip>
       </div>
 
       <div class="flex flex-wrap items-center justify-end gap-2 sm:ml-auto sm:shrink-0">
@@ -96,9 +94,11 @@
               />
             </template>
             <template v-else>
-              <p class="min-w-0 flex-1 truncate py-1 text-right text-sm text-muted-foreground">
-                {{ formatPercent(percentValue) }}
-              </p>
+              <TruncatingTooltip :text="formatPercent(percentValue)" wrapper-class="min-w-0 flex-1">
+                <p class="min-w-0 flex-1 truncate py-1 text-right text-sm text-muted-foreground">
+                  {{ formatPercent(percentValue) }}
+                </p>
+              </TruncatingTooltip>
             </template>
             <span
               class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
@@ -123,9 +123,11 @@
               />
             </template>
             <template v-else>
-              <p class="min-w-0 flex-1 truncate py-1 text-right text-sm text-muted-foreground">
-                {{ formatMoney(pairedDiscountAmount) }}
-              </p>
+              <TruncatingTooltip :text="formatMoney(pairedDiscountAmount)" wrapper-class="min-w-0 flex-1">
+                <p class="min-w-0 flex-1 truncate py-1 text-right text-sm text-muted-foreground">
+                  {{ formatMoney(pairedDiscountAmount) }}
+                </p>
+              </TruncatingTooltip>
             </template>
             <span
               class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
@@ -137,25 +139,15 @@
 
         <template v-if="showNetPrices">
           <template v-if="editable && campaign">
-            <Select
-              class="w-40 shrink-0"
+            <TruncatingCatalogSelect
+              select-class="w-40 shrink-0"
               :model-value="String(selectVatPercent)"
+              :display-label="promoVatSelectDisplayLabel"
+              :options="promoVatSelectOptions"
               :disabled="!selected || checkboxDisabled"
+              trigger-class="flex h-8 min-w-0 w-full shrink-0 items-center justify-between gap-1.5 overflow-hidden rounded-lg border border-input bg-background px-2.5 py-2 text-sm text-foreground shadow-none"
               @update:model-value="(v) => emit('update:vatRatePercent', Number(v))"
-            >
-              <SelectTrigger class="h-8 w-full rounded-lg border border-input bg-background px-2.5 py-2 text-sm">
-                <SelectValue :placeholder="vatSelectLabelComputed" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-for="opt in vatOptions"
-                  :key="opt.id ?? String(opt.rate)"
-                  :value="String(opt.rate)"
-                >
-                  {{ opt.label }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            />
             <QuotationReadOnlyAmount
               class="shrink-0"
               width-class="w-32 shrink-0"
@@ -163,7 +155,9 @@
             />
           </template>
           <template v-else>
-            <VehicleDetailVatStub :label="vatSelectLabelComputed" />
+            <TruncatingTooltip :text="vatSelectLabelComputed" wrapper-class="w-40 shrink-0 min-w-0">
+              <VehicleDetailVatStub :label="vatSelectLabelComputed" />
+            </TruncatingTooltip>
             <QuotationReadOnlyAmount
               class="shrink-0"
               width-class="w-32 shrink-0"
@@ -213,43 +207,43 @@
             class="min-w-0 flex-1 cursor-pointer"
             :class="checkboxDisabled ? 'cursor-default' : ''"
           >
-            <span class="block truncate text-sm font-medium leading-none text-foreground">{{ label }}</span>
+            <TruncatingTooltip :text="label" wrapper-class="min-w-0 flex-1">
+              <span class="block truncate text-sm font-medium leading-none text-foreground">{{ label }}</span>
+            </TruncatingTooltip>
           </label>
-          <TooltipProvider :delay-duration="200">
-            <Tooltip>
-              <TooltipTrigger as-child>
-                <button
-                  type="button"
-                  class="inline-flex shrink-0 rounded-sm text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  :aria-label="promoInfoAriaLabel"
-                  @click.stop
-                >
-                  <Info class="size-4" aria-hidden="true" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent
-                side="top"
-                align="start"
-                class="max-w-sm rounded-md border border-border bg-background p-4 text-foreground shadow-md"
+          <Tooltip>
+            <TooltipTrigger as-child>
+              <button
+                type="button"
+                class="inline-flex shrink-0 rounded-sm text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                :aria-label="promoInfoAriaLabel"
+                @click.stop
               >
-                <div class="flex w-full flex-col gap-2 text-balance">
-                  <p class="text-base font-semibold leading-normal text-foreground">{{ label }}</p>
-                  <p
-                    v-if="formattedExpiresAt"
-                    class="text-sm font-normal leading-normal text-muted-foreground"
-                  >
-                    Expires {{ formattedExpiresAt }}
-                  </p>
-                  <p
-                    v-if="showDetailsSection"
-                    class="text-sm font-normal leading-normal text-foreground"
-                  >
-                    {{ infoDetailsText }}
-                  </p>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                <Info class="size-4" aria-hidden="true" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              align="start"
+              class="max-w-sm rounded-md border border-border bg-background p-4 text-foreground shadow-md"
+            >
+              <div class="flex w-full flex-col gap-2 text-balance">
+                <p class="text-base font-semibold leading-normal text-foreground">{{ label }}</p>
+                <p
+                  v-if="formattedExpiresAt"
+                  class="text-sm font-normal leading-normal text-muted-foreground"
+                >
+                  Expires {{ formattedExpiresAt }}
+                </p>
+                <p
+                  v-if="showDetailsSection"
+                  class="text-sm font-normal leading-normal text-foreground"
+                >
+                  {{ infoDetailsText }}
+                </p>
+              </div>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
 
@@ -310,9 +304,11 @@
                   <div
                     class="flex h-8 items-center rounded-l-lg border border-r-0 border-border bg-muted px-2.5 py-1 pl-7"
                   >
-                    <p class="min-w-0 flex-1 truncate text-right text-sm text-muted-foreground">
-                      {{ formatPercent(percentValue) }}
-                    </p>
+                    <TruncatingTooltip :text="formatPercent(percentValue)" wrapper-class="min-w-0 flex-1">
+                      <p class="min-w-0 flex-1 truncate text-right text-sm text-muted-foreground">
+                        {{ formatPercent(percentValue) }}
+                      </p>
+                    </TruncatingTooltip>
                   </div>
                   <span
                     class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
@@ -322,9 +318,11 @@
                 </div>
                 <div class="relative w-40">
                   <div class="flex h-8 items-center rounded-r-lg border border-border bg-muted px-2.5 py-1 pl-7">
-                    <p class="min-w-0 flex-1 truncate text-right text-sm text-muted-foreground">
-                      {{ formatMoney(pairedDiscountAmount) }}
-                    </p>
+                    <TruncatingTooltip :text="formatMoney(pairedDiscountAmount)" wrapper-class="min-w-0 flex-1">
+                      <p class="min-w-0 flex-1 truncate text-right text-sm text-muted-foreground">
+                        {{ formatMoney(pairedDiscountAmount) }}
+                      </p>
+                    </TruncatingTooltip>
                   </div>
                   <span
                     class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
@@ -337,24 +335,14 @@
 
             <template v-if="showNetPrices">
               <template v-if="editable && campaign">
-                <Select
-                  class="w-40 shrink-0"
+                <TruncatingCatalogSelect
+                  select-class="w-40 shrink-0"
                   :model-value="String(selectVatPercent)"
+                  :display-label="promoVatSelectDisplayLabel"
+                  :options="promoVatSelectOptions"
+                  trigger-class="flex h-8 min-w-0 w-full shrink-0 items-center justify-between gap-1.5 overflow-hidden rounded-lg border border-input bg-background px-2.5 py-2 text-sm text-foreground shadow-none"
                   @update:model-value="(v) => emit('update:vatRatePercent', Number(v))"
-                >
-                  <SelectTrigger class="h-8 w-full rounded-lg border border-input bg-background px-2.5 py-2 text-sm">
-                    <SelectValue :placeholder="vatSelectLabelComputed" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem
-                      v-for="opt in vatOptions"
-                      :key="opt.id ?? String(opt.rate)"
-                      :value="String(opt.rate)"
-                    >
-                      {{ opt.label }}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                />
                 <QuotationReadOnlyAmount
                   class="shrink-0"
                   width-class="w-32 shrink-0"
@@ -362,7 +350,9 @@
                 />
               </template>
               <template v-else>
-                <VehicleDetailVatStub :label="vatSelectLabelComputed" />
+                <TruncatingTooltip :text="vatSelectLabelComputed" wrapper-class="w-40 shrink-0 min-w-0">
+                  <VehicleDetailVatStub :label="vatSelectLabelComputed" />
+                </TruncatingTooltip>
                 <QuotationReadOnlyAmount
                   class="shrink-0"
                   width-class="w-32 shrink-0"
@@ -384,18 +374,14 @@ import {
   Button,
   Checkbox,
   Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '@motork/component-library/future/primitives'
 import QuotationReadOnlyAmount from '@/components/addnew/configurator/QuotationReadOnlyAmount.vue'
 import VehicleDetailVatStub from '@/components/addnew/configurator/VehicleDetailVatStub.vue'
+import TruncatingCatalogSelect from '@/components/shared/TruncatingCatalogSelect.vue'
+import TruncatingTooltip from '@/components/shared/TruncatingTooltip.vue'
 
 const props = defineProps({
   kind: { type: String, required: true },
@@ -519,6 +505,20 @@ const vatSelectLabelComputed = computed(() => {
   )
   if (!Number.isFinite(p) || p <= 0) return '0% VAT'
   return `${Number.isInteger(p) ? String(p) : p.toLocaleString(undefined, { maximumFractionDigits: 2 })}% VAT`
+})
+
+const promoVatSelectOptions = computed(() =>
+  props.vatOptions.map((o) => ({
+    value: String(o?.rate ?? ''),
+    label: String(o?.label ?? ''),
+  })),
+)
+
+const promoVatSelectDisplayLabel = computed(() => {
+  const rate = selectVatPercent.value
+  const opt = props.vatOptions.find((o) => Number(o?.rate) === Number(rate))
+  if (opt?.label) return String(opt.label)
+  return vatSelectLabelComputed.value
 })
 
 const dealerPercentInput = computed(() => {

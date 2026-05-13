@@ -1,6 +1,7 @@
 <template>
   <Dialog :open="open" @update:open="handleOpenChange">
     <DialogContent class="w-[90vw] max-w-screen-2xl h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col gap-0 overflow-hidden p-0" :show-close-button="false">
+      <TooltipProvider :delay-duration="200">
       <DialogHeader class="shrink-0 px-6 py-4 border-b border-border overflow-hidden" style="border-bottom-color: var(--color-neutral-300);">
         <div class="grid grid-cols-[1fr_auto_1fr] items-start gap-4">
           <div class="min-w-0">
@@ -99,9 +100,11 @@
                 {{ getBrandInitials(b.label) }}
               </div>
             </div>
-            <div class="text-sm font-medium text-foreground text-center w-full truncate">
-              {{ b.label }}
-            </div>
+            <TruncatingTooltip :text="b.label" wrapper-class="w-full min-w-0">
+              <div class="text-sm font-medium text-foreground text-center w-full truncate">
+                {{ b.label }}
+              </div>
+            </TruncatingTooltip>
           </button>
         </div>
 
@@ -178,9 +181,11 @@
 
                 <div class="w-full pt-4 space-y-1">
                   <div class="flex items-center justify-between gap-2">
+                  <TruncatingTooltip :text="m.versionsLabel" wrapper-class="min-w-0 flex-1">
                     <p class="text-sm text-muted-foreground truncate">
                       {{ m.versionsLabel }}
                     </p>
+                  </TruncatingTooltip>
                     <PromoBadge :promos="modelPromos(m)" />
                   </div>
                   <p class="text-sm text-foreground">
@@ -319,8 +324,7 @@
                   :user-accessory-lines="configurator.userAccessoryLines.value"
                   :tax-extra-cost-lines="configurator.extraCostLines.value"
                   :vat-amount="configurator.vatAmount.value"
-                  :trade-in-applied="configurator.tradeInApplied.value"
-                  :trade-in-mock-value="TRADE_IN_MOCK_VALUE"
+                  :user-trade-in-lines="configurator.userTradeInLines.value"
                   :purchase-methods="configurator.catalog.PURCHASE_METHODS"
                   :selected-purchase-method-id="configurator.selectedPurchaseMethodId.value"
                   @toggle-promo="(id, v) => configurator.togglePromo(id, v)"
@@ -336,7 +340,9 @@
                   @add-accessory-line="(p) => configurator.addAccessoryLine(p)"
                   @update-accessory-line="(id, patch) => configurator.updateAccessoryLine(id, patch)"
                   @remove-accessory-line="(id) => configurator.removeAccessoryLine(id)"
-                  @toggle-trade-in="(v) => configurator.setTradeInApplied(v)"
+                  @add-trade-in-line="(p) => configurator.addTradeInLine(p)"
+                  @update-trade-in-line="(id, patch) => configurator.updateTradeInLine(id, patch)"
+                  @remove-trade-in-line="(id) => configurator.removeTradeInLine(id)"
                   @select-purchase-method="(id) => configurator.selectPurchaseMethod(id)"
                   @add-tax-line="configurator.addTaxExtraCostLine"
                   @remove-tax-line="(id) => configurator.removeTaxExtraCostLine(id)"
@@ -356,9 +362,9 @@
                   :vehicle-base-price="configurator.vehicleBasePrice.value"
                   :equipment-total="configurator.equipmentTotal.value"
                   :accessories-total="configurator.accessoriesTotal.value"
-                  :promo-total="configurator.promoTotal.value"
+                  :promo-total="configurator.offerSummaryPromoTotal.value"
                   :discounts-total="configurator.discountsTotal.value"
-                  :subtotal="configurator.subtotal.value"
+                  :subtotal="configurator.offerSummarySubtotalBeforeAccessories.value"
                   :taxes-total="configurator.taxesTotal.value"
                   :trade-in-value="configurator.tradeInValue.value"
                   :grand-total-raw="configurator.grandTotalRaw.value"
@@ -399,7 +405,9 @@
                 class="w-full px-4 py-2 flex items-center justify-between gap-4 text-left hover:bg-muted/40 transition-colors"
                 @click="selectQuotationSearchItem(item)"
               >
-                <span class="text-sm text-foreground truncate">{{ item.label }}</span>
+                <TruncatingTooltip :text="item.label" wrapper-class="min-w-0 flex-1">
+                  <span class="text-sm text-foreground truncate">{{ item.label }}</span>
+                </TruncatingTooltip>
                 <span class="text-sm text-muted-foreground shrink-0">{{ item.groupLabel }}</span>
               </button>
               <div v-if="filteredQuotationSearchItems.length === 0" class="px-4 py-8 text-center">
@@ -443,6 +451,7 @@
           </Button>
         </div>
       </DialogFooter>
+      </TooltipProvider>
     </DialogContent>
   </Dialog>
 </template>
@@ -450,13 +459,14 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ArrowLeft, Check, ChevronDown, Search, X } from 'lucide-vue-next'
-import { Badge, Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Input, Switch } from '@motork/component-library/future/primitives'
+import { Badge, Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Input, Switch, TooltipProvider } from '@motork/component-library/future/primitives'
 import AppTabs from '@/components/shared/AppTabs.vue'
 import VersionPanel from '@/components/addnew/configurator/VersionPanel.vue'
 import ColourPanel from '@/components/addnew/configurator/ColourPanel.vue'
 import EquipmentPanel from '@/components/addnew/configurator/EquipmentPanel.vue'
 import QuotationPanel from '@/components/addnew/configurator/QuotationPanel.vue'
 import ConfigurationSummary from '@/components/addnew/configurator/ConfigurationSummary.vue'
+import TruncatingTooltip from '@/components/shared/TruncatingTooltip.vue'
 import PromoBadge from '@/components/shared/PromoBadge.vue'
 import { useVehicleConfigurator } from '@/composables/useVehicleConfigurator'
 import {
@@ -465,7 +475,6 @@ import {
   DEFAULT_VAT_OPTION_ID,
   DISCOUNT_ITEMS,
   EQUIPMENT_GROUPS,
-  TRADE_IN_MOCK_VALUE,
   VAT_OPTIONS,
   findAccessory,
   findAccessoryLineItem,
@@ -641,10 +650,22 @@ const quotationSearchItems = computed(() => {
     }
   }
 
-  if (configurator?.tradeInApplied?.value === true) {
+  out.push({
+    key: 'tradeIn:add',
+    label: 'Trade-in vehicle',
+    groupKey: 'tradeIn',
+    groupLabel: 'Trade-in',
+  })
+
+  const userTradeInLines = Array.isArray(configurator?.userTradeInLines?.value)
+    ? configurator.userTradeInLines.value
+    : []
+  for (const row of userTradeInLines) {
+    if (!row) continue
+    const label = String(row.title || '').trim() || 'Trade-in'
     out.push({
-      key: 'tradeIn:applied',
-      label: 'Trade-in vehicle',
+      key: `tradeInLine:${row.id}`,
+      label,
       groupKey: 'tradeIn',
       groupLabel: 'Trade-in',
     })
@@ -701,6 +722,14 @@ function selectQuotationSearchItem(item) {
       description: String(acc?.name || item.label || '').trim(),
       price: Math.max(0, Number(acc?.price) || 0),
     })
+    return
+  }
+  if (item.groupKey === 'tradeIn' && key === 'tradeIn:add') {
+    quotationPanelRef.value?.addTradeInFromSearch?.({})
+    return
+  }
+  if (item.groupKey === 'tradeIn' && key.startsWith('tradeInLine:')) {
+    quotationPanelRef.value?.openSection?.('tradeIn')
     return
   }
   quotationPanelRef.value?.openSection?.(item.groupKey)

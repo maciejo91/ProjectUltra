@@ -8,6 +8,7 @@ import {
   PROMOS,
   PURCHASE_METHODS,
   TAXES,
+  taxExtraCostLineIsRemovable,
   TRADE_IN_MOCK_VALUE,
   VERSION_INCLUDED_EQUIPMENT,
   VERSIONS,
@@ -85,7 +86,8 @@ export function useVehicleConfigurator(ctx = {}) {
   /** User-entered accessory / service lines (gross €); not tied to Equipment tab. */
   const userAccessoryLines = ref([])
   const userCampaigns = ref([])
-  const tradeInApplied = ref(false)
+  /** User trade-in rows (valuation € deducted from grand total). */
+  const userTradeInLines = ref([])
   const selectedPurchaseMethodId = ref('')
   const roundPriceApplied = ref(false)
   const roundPriceAdjustment = ref(0)
@@ -153,20 +155,55 @@ export function useVehicleConfigurator(ctx = {}) {
     userAccessoryLines.value.reduce((sum, row) => sum + Math.max(0, Number(row.price || 0)), 0)
   )
 
+  function accessoryLineVatRate(row) {
+    const r = Number(row?.vatRatePercent)
+    if (Number.isFinite(r) && r >= 0) return r
+    return readVatRate()
+  }
+
   const equipmentTotal = computed(() => {
     if (!readShowNetPrices()) return equipmentTotalGross.value
     return selectedEquipment.value.reduce((sum, item) => sum + toNet(Number(item.price || 0)), 0)
   })
   const accessoriesTotal = computed(() => {
     if (!readShowNetPrices()) return accessoriesTotalGross.value
-    return userAccessoryLines.value.reduce(
-      (sum, row) => sum + toNet(Math.max(0, Number(row.price || 0))),
-      0
-    )
+    return userAccessoryLines.value.reduce((sum, row) => {
+      const gross = Math.max(0, Number(row.price || 0))
+      const r = accessoryLineVatRate(row) / 100
+      if (r <= 0) return sum + gross
+      return sum + gross / (1 + r)
+    }, 0)
   })
-  const promoTotal = computed(() =>
-    activePromos.value.reduce((sum, item) => sum + Number(item.amount || 0), 0)
+  /** Fixed EUR OEM promos only; percent-based OEM lines use amount 0 in catalog. */
+  const oemAmountPromoTotalGross = computed(() =>
+    activePromos.value.reduce((sum, item) => {
+      if (item.discountType === 'percent') return sum
+      return sum + Math.abs(Number(item.amount || 0))
+    }, 0)
   )
+
+  const discountBaseGross = computed(() => {
+    // Matches QuotationPanel: % OEM and manual discounts apply to vehicle minus fixed OEM promos.
+    const base = Number(vehicleBasePriceGross.value || 0) - oemAmountPromoTotalGross.value
+    return Number.isFinite(base) ? Math.max(0, base) : 0
+  })
+
+  const discountBaseNet = computed(() => toNet(discountBaseGross.value))
+
+  /** Total OEM promo reduction (gross €): fixed amounts + % of discountBaseGross per active percent promo. */
+  const promoTotal = computed(() => {
+    const fixed = oemAmountPromoTotalGross.value
+    const base = discountBaseGross.value
+    const fromPercent = activePromos.value
+      .filter((p) => p.discountType === 'percent')
+      .reduce((sum, p) => {
+        const pct = Math.abs(Number(p.discountPercent))
+        if (!Number.isFinite(pct) || base <= 0) return sum
+        return sum + (base * pct) / 100
+      }, 0)
+    return fixed + fromPercent
+  })
+
   // Sum of discount magnitudes (stored rows are negative).
   const discountsTotalNet = computed(() =>
     userDiscounts.value.reduce((sum, item) => sum + Math.abs(Number(item.netAmount ?? item.amount ?? 0)), 0)
@@ -187,21 +224,33 @@ export function useVehicleConfigurator(ctx = {}) {
       .reduce((sum, c) => sum + Math.abs(Number(c.grossAmount ?? c.amount ?? 0)), 0)
   )
 
-  const tradeInValue = computed(() => (tradeInApplied.value ? TRADE_IN_MOCK_VALUE : 0))
+  /** OEM promos + active dealer campaigns, same net/gross basis as row amounts in the offer summary. */
+  const offerSummaryPromoTotal = computed(() => {
+    const oem = readShowNetPrices() ? toNet(promoTotal.value) : promoTotal.value
+    const campaigns = readShowNetPrices() ? campaignTotalNet.value : campaignTotalGross.value
+    return oem + campaigns
+  })
 
-  /**
-   * Subtotal: vehicle + equipment + accessories − promo − manual discounts.
-   * VAT and registration taxes are applied on top to reach the grand total.
-   */
-  const subtotal = computed(
+  const tradeInApplied = computed(() => userTradeInLines.value.length > 0)
+
+  const tradeInValue = computed(() =>
+    userTradeInLines.value.reduce((sum, row) => sum + Math.max(0, Number(row?.valuation || 0)), 0),
+  )
+
+  /** Vehicle + equipment − promos/campaigns − discounts (excludes accessories; used in offer summary layout). */
+  const offerSummarySubtotalBeforeAccessories = computed(
     () =>
       vehicleBasePrice.value +
-      equipmentTotal.value +
-      accessoriesTotal.value -
-      (readShowNetPrices() ? toNet(promoTotal.value) : promoTotal.value) -
-      (readShowNetPrices() ? discountsTotalNet.value : discountsTotalGross.value) -
-      (readShowNetPrices() ? campaignTotalNet.value : campaignTotalGross.value)
+      equipmentTotal.value -
+      offerSummaryPromoTotal.value -
+      (readShowNetPrices() ? discountsTotalNet.value : discountsTotalGross.value)
   )
+
+  /**
+   * Taxable subtotal: vehicle + equipment + accessories − promo − campaigns − discounts.
+   * VAT and registration taxes are applied on top to reach the grand total.
+   */
+  const subtotal = computed(() => offerSummarySubtotalBeforeAccessories.value + accessoriesTotal.value)
 
   const vatAmount = computed(() => {
     const rate = readVatRate() / 100
@@ -238,7 +287,6 @@ export function useVehicleConfigurator(ctx = {}) {
     const next = {
       id: `tax-user-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       kind: 'user',
-      removable: true,
       description: '',
       descriptionEditable: true,
       amountsEditable: true,
@@ -246,15 +294,17 @@ export function useVehicleConfigurator(ctx = {}) {
       netAmount: 0,
       grossAmount: 0,
       vatRatePercent: readVatRate(),
+      vatOptionId: 'vat-22',
     }
     alignExtraCostLineDerived(next)
+    next.removable = taxExtraCostLineIsRemovable(next)
     extraCostLines.value = [...extraCostLines.value, next]
   }
 
   function removeTaxExtraCostLine(id) {
     extraCostLines.value = extraCostLines.value.filter((row) => {
       if (row.id !== id) return true
-      return row.kind === 'user' && row.removable
+      return !taxExtraCostLineIsRemovable(row)
     })
   }
 
@@ -271,6 +321,9 @@ export function useVehicleConfigurator(ctx = {}) {
     if (patch.vatRatePercent !== undefined && row.vatEditable) {
       const n = Number(patch.vatRatePercent)
       row.vatRatePercent = Number.isFinite(n) ? Math.max(0, n) : readVatRate()
+    }
+    if (patch.vatOptionId !== undefined && row.vatEditable) {
+      row.vatOptionId = String(patch.vatOptionId || '')
     }
 
     if (row.amountsEditable) {
@@ -399,6 +452,7 @@ export function useVehicleConfigurator(ctx = {}) {
       id: `as-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       description: String(description || '').trim(),
       price: Math.max(0, Number(price) || 0),
+      vatRatePercent: readVatRate(),
     }
     userAccessoryLines.value = [...userAccessoryLines.value, next]
   }
@@ -410,6 +464,19 @@ export function useVehicleConfigurator(ctx = {}) {
     const current = { ...list[idx] }
     if (patch.description !== undefined) {
       current.description = String(patch.description ?? '').trim()
+    }
+    if (patch.vatRatePercent !== undefined) {
+      const oldRate = accessoryLineVatRate(current)
+      let newV = Number(patch.vatRatePercent)
+      if (!Number.isFinite(newV) || newV < 0) newV = readVatRate()
+      current.vatRatePercent = newV
+      if (readShowNetPrices()) {
+        const gross = Math.max(0, Number(current.price || 0))
+        const oldFactor = 1 + oldRate / 100
+        const net = oldFactor > 0 ? gross / oldFactor : gross
+        const newFactor = 1 + accessoryLineVatRate(current) / 100
+        current.price = newFactor > 0 ? net * newFactor : net
+      }
     }
     if (patch.price !== undefined) {
       const n = Number(patch.price)
@@ -423,14 +490,6 @@ export function useVehicleConfigurator(ctx = {}) {
   function removeAccessoryLine(id) {
     userAccessoryLines.value = userAccessoryLines.value.filter((row) => row.id !== id)
   }
-
-  const discountBaseGross = computed(() => {
-    // Vehicle discounts apply to the vehicle price net of applied promotions (excluding taxes and accessories).
-    const base = Number(vehicleBasePriceGross.value || 0) - Number(promoTotal.value || 0)
-    return Number.isFinite(base) ? Math.max(0, base) : 0
-  })
-
-  const discountBaseNet = computed(() => toNet(discountBaseGross.value))
 
   function discountVatRate(discount) {
     const row = Number(discount?.vatRatePercent)
@@ -674,8 +733,108 @@ export function useVehicleConfigurator(ctx = {}) {
     userCampaigns.value = [...list]
   }
 
-  function setTradeInApplied(value) {
-    tradeInApplied.value = !!value
+  function addTradeInLine(payload = {}) {
+    const p = payload && typeof payload === 'object' ? payload : {}
+    const valNum = Number(p.valuation)
+    const valuation =
+      p.valuation !== undefined && p.valuation !== null && String(p.valuation).trim() !== '' && Number.isFinite(valNum)
+        ? Math.max(0, valNum)
+        : TRADE_IN_MOCK_VALUE
+    const mainNum = Number(p.mainOfferEvaluation)
+    const mainOfferEvaluation =
+      p.mainOfferEvaluation !== undefined &&
+      p.mainOfferEvaluation !== null &&
+      String(p.mainOfferEvaluation).trim() !== '' &&
+      Number.isFinite(mainNum)
+        ? Math.max(0, mainNum)
+        : 0
+
+    const brand = String(p.brand || '').trim()
+    const model = String(p.model || '').trim()
+    const title =
+      String(p.title || '').trim() ||
+      (brand && model ? `${brand} ${model}`.trim() : '') ||
+      String(p.description || '').trim() ||
+      'Trade-in'
+
+    const trimLine = String(p.trimLine || p.version || '').trim()
+    const next = {
+      id: `ti-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      vehicleClass: String(p.vehicleClass || 'car'),
+      brand,
+      model,
+      title,
+      version: trimLine,
+      trimLine,
+      firstRegistration: String(p.firstRegistration || '').trim(),
+      mileageLabel: String(p.mileageLabel || '').trim(),
+      licensePlate: String(p.licensePlate || '').trim(),
+      valuation: Number.isFinite(valuation) ? valuation : TRADE_IN_MOCK_VALUE,
+      mainOfferEvaluation: Number.isFinite(mainOfferEvaluation) ? mainOfferEvaluation : 0,
+      fuelType: String(p.fuelType || '').trim(),
+      gearType: String(p.gearType || '').trim(),
+      colour: String(p.colour || '').trim(),
+      owner: String(p.owner || '').trim(),
+      vatDeductible: p.vatDeductible === true,
+    }
+    userTradeInLines.value = [...userTradeInLines.value, next]
+  }
+
+  function updateTradeInLine(id, patch = {}) {
+    const list = userTradeInLines.value
+    const idx = list.findIndex((row) => row.id === id)
+    if (idx < 0) return
+    const current = { ...list[idx] }
+    if (patch.vehicleClass !== undefined) current.vehicleClass = String(patch.vehicleClass || 'car')
+    if (patch.brand !== undefined) current.brand = String(patch.brand ?? '').trim()
+    if (patch.model !== undefined) current.model = String(patch.model ?? '').trim()
+    if (patch.title !== undefined) current.title = String(patch.title ?? '').trim()
+    if (patch.trimLine !== undefined || patch.version !== undefined) {
+      const trim =
+        patch.trimLine !== undefined
+          ? String(patch.trimLine ?? '').trim()
+          : String(current.trimLine ?? '').trim()
+      const ver =
+        patch.version !== undefined
+          ? String(patch.version ?? '').trim()
+          : String(current.version ?? current.trimLine ?? '').trim()
+      const v = String(trim || ver || '').trim()
+      current.trimLine = v
+      current.version = v
+    }
+    if (patch.firstRegistration !== undefined) {
+      current.firstRegistration = String(patch.firstRegistration ?? '').trim()
+    }
+    if (patch.mileageLabel !== undefined) current.mileageLabel = String(patch.mileageLabel ?? '').trim()
+    if (patch.licensePlate !== undefined) current.licensePlate = String(patch.licensePlate ?? '').trim()
+    if (patch.valuation !== undefined) {
+      const n = Number(patch.valuation)
+      current.valuation = Number.isFinite(n) ? Math.max(0, n) : 0
+    }
+    if (patch.mainOfferEvaluation !== undefined) {
+      const n = Number(patch.mainOfferEvaluation)
+      current.mainOfferEvaluation = Number.isFinite(n) ? Math.max(0, n) : 0
+    }
+    if (patch.fuelType !== undefined) current.fuelType = String(patch.fuelType ?? '').trim()
+    if (patch.gearType !== undefined) current.gearType = String(patch.gearType ?? '').trim()
+    if (patch.colour !== undefined) current.colour = String(patch.colour ?? '').trim()
+    if (patch.owner !== undefined) current.owner = String(patch.owner ?? '').trim()
+    if (patch.vatDeductible !== undefined) current.vatDeductible = patch.vatDeductible === true
+
+    if (patch.brand !== undefined || patch.model !== undefined || patch.title !== undefined) {
+      const b = String(current.brand || '').trim()
+      const m = String(current.model || '').trim()
+      const t = String(current.title || '').trim()
+      current.title = t || (b && m ? `${b} ${m}`.trim() : '') || 'Trade-in'
+    }
+
+    const next = [...list]
+    next[idx] = current
+    userTradeInLines.value = next
+  }
+
+  function removeTradeInLine(id) {
+    userTradeInLines.value = userTradeInLines.value.filter((row) => row.id !== id)
   }
 
   function selectPurchaseMethod(id) {
@@ -729,7 +888,7 @@ export function useVehicleConfigurator(ctx = {}) {
     userAccessoryLines.value = []
     userDiscounts.value = []
     userCampaigns.value = []
-    tradeInApplied.value = false
+    userTradeInLines.value = []
     selectedPurchaseMethodId.value = ''
     roundPriceApplied.value = false
     roundPriceAdjustment.value = 0
@@ -748,6 +907,7 @@ export function useVehicleConfigurator(ctx = {}) {
     userDiscounts,
     userAccessoryLines,
     userCampaigns,
+    userTradeInLines,
     discountBaseGross,
     discountBaseNet,
     tradeInApplied,
@@ -767,9 +927,11 @@ export function useVehicleConfigurator(ctx = {}) {
     equipmentTotal,
     accessoriesTotal,
     promoTotal,
+    offerSummaryPromoTotal,
     discountsTotal,
     campaignTotalNet,
     campaignTotalGross,
+    offerSummarySubtotalBeforeAccessories,
     tradeInValue,
     subtotal,
     vatAmount,
@@ -804,7 +966,9 @@ export function useVehicleConfigurator(ctx = {}) {
     updateCampaignVat,
     removeCampaign,
     toggleCampaignActive,
-    setTradeInApplied,
+    addTradeInLine,
+    updateTradeInLine,
+    removeTradeInLine,
     selectPurchaseMethod,
     applyRoundPrice,
     updateRoundPriceAdjustment,

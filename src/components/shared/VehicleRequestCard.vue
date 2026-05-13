@@ -216,20 +216,7 @@
         <div
           class="flex min-w-0 w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-1"
         >
-          <div
-            v-if="plateDisplay"
-            class="inline-flex max-w-full items-center gap-1 overflow-hidden rounded-sm border border-border bg-background py-0.5 pl-0.5 pr-2"
-          >
-            <span
-              class="h-4 w-1.5 shrink-0 rounded-bl-sm rounded-tl-sm bg-primary"
-              aria-hidden
-            />
-            <span
-              class="whitespace-nowrap text-sm font-semibold leading-4 text-foreground"
-            >
-              {{ plateDisplay }}
-            </span>
-          </div>
+          <LicensePlateBadge v-if="plateDisplay" :plate="plateDisplay" />
           <div
             v-if="vinDisplay"
             class="inline-flex min-w-0 max-w-full items-center overflow-hidden rounded-sm border border-border bg-background px-2 py-0.5"
@@ -294,6 +281,7 @@ import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Button } from '@motork/component-library/future/primitives'
 import { ArrowUpRight, Car, Filter, Pencil, Tag } from 'lucide-vue-next'
+import LicensePlateBadge from '@/components/shared/LicensePlateBadge.vue'
 import EditRequestedVehicleModal from '@/components/modals/EditRequestedVehicleModal.vue'
 import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 

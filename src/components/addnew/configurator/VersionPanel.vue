@@ -28,9 +28,11 @@
                   >
                     <span v-if="selectedTrim === t.key" class="size-2.5 rounded-full bg-primary" />
                   </span>
-                  <p class="text-base leading-none font-semibold text-foreground truncate">
-                    {{ t.label }}
-                  </p>
+                  <TruncatingTooltip :text="t.label" wrapper-class="min-w-0 flex-1">
+                    <p class="text-base leading-none font-semibold text-foreground truncate">
+                      {{ t.label }}
+                    </p>
+                  </TruncatingTooltip>
                 </div>
                 <PromoBadge :promos="t.promos" />
               </div>
@@ -75,9 +77,11 @@
                 <span v-if="modelValue === v.id" class="size-3 rounded-full bg-primary" />
               </span>
 
-            <p class="text-base leading-none font-semibold text-foreground truncate">
+            <TruncatingTooltip :text="versionTitle(v)" wrapper-class="min-w-0 flex-1">
+              <p class="text-base leading-none font-semibold text-foreground truncate">
                 {{ versionTitle(v) }}
               </p>
+            </TruncatingTooltip>
             </div>
 
             <div class="flex flex-wrap gap-2">
@@ -135,6 +139,7 @@ import { Fuel, Settings2, User } from 'lucide-vue-next'
 import { Filters } from '@motork/component-library/future/components'
 import { Badge, Separator } from '@motork/component-library/future/primitives'
 import PromoBadge from '@/components/shared/PromoBadge.vue'
+import TruncatingTooltip from '@/components/shared/TruncatingTooltip.vue'
 import { promosForTrimLabel } from '@/constants/vehicleConfiguratorCatalog'
 
 const props = defineProps({
