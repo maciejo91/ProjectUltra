@@ -461,7 +461,6 @@
     "dealership": "Dealer",
     "price": "Prijs",
     "specification": "Specificatie",
-    "vin": "VIN",
     "registrationDate": "Registratiedatum",
     "carLocation": "Locatie voertuig",
     "mileage": "Kilometerstand",
@@ -526,11 +525,11 @@
       "commercial": "Bedrijfsvoertuig"
     },
     "requestTypes": {
-      "genericSales": "Generic sales",
-      "quotation": "Quotation",
+      "genericSales": "Algemene verkoopaanvraag",
+      "quotation": "Offerte",
       "testDrive": "Test drive",
-      "financing": "Financing",
-      "tradeIn": "Trade-in"
+      "financing": "Financiering",
+      "tradeIn": "Inruil"
     },
     "channels": {
       "manualImport": "Manual import",

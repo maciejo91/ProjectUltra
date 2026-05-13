@@ -7,7 +7,7 @@ import {
 } from '@/utils/mockDataHelpers'
 
 const STORAGE_KEY = 'project-ultra-leads'
-const DATA_VERSION = 5
+const DATA_VERSION = 7
 
 /**
  * Lead Repository

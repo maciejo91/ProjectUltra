@@ -283,6 +283,7 @@ import RequestHeaderLifecycleStepper from './RequestHeaderLifecycleStepper.vue'
 import TagPillWithPopover from '@/components/shared/TagPillWithPopover.vue'
 import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
+import { getRequestSourceLabel, getRequestTypeLabel } from '@/utils/requestDisplayLabels'
 
 const props = defineProps({
   request: {
@@ -477,14 +478,14 @@ const hasNext = computed(
   () => currentIndex.value >= 0 && currentIndex.value < props.filteredRequests.length - 1
 )
 
-const sourceLabel = computed(() => props.request?.source || '—')
+const sourceLabel = computed(() => getRequestSourceLabel(props.request?.source, t))
 const headerDetailSourceLabel = computed(() => {
   const r = props.request
   if (!r) return '—'
-  return r.sourceCategory ?? (r.source || '—')
+  return getRequestSourceLabel(r.sourceCategory ?? r.source, t)
 })
 const requestTypeLabel = computed(
-  () => props.request?.requestType || props.request?.genericSales || '—'
+  () => getRequestTypeLabel(props.request?.requestType || props.request?.genericSales, t)
 )
 
 const entityLabel = computed(() => {

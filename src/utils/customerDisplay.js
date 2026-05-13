@@ -10,6 +10,32 @@ function splitTrailingParentheticalName(raw) {
   return { core, inner }
 }
 
+const italianCityFallbacks = {
+  berlin: 'Milano',
+  frankfurt: 'Roma',
+  'frankfurt am main': 'Roma',
+  stuttgart: 'Milano',
+  munich: 'Milano',
+  münchen: 'Milano',
+  hamburg: 'Roma',
+  düsseldorf: 'Milano',
+  dusseldorf: 'Milano',
+  cologne: 'Milano',
+  köln: 'Milano',
+  paris: 'Milano',
+  amsterdam: 'Milano',
+  vienna: 'Milano',
+  copenhagen: 'Milano',
+  milan: 'Milano',
+  florence: 'Firenze'
+}
+
+function toItalianCityLabel(value) {
+  const city = typeof value === 'string' ? value.trim() : ''
+  if (!city) return ''
+  return italianCityFallbacks[city.toLowerCase()] || city
+}
+
 export function getCustomerNameParts(name) {
   const raw = typeof name === 'string' ? name : ''
   const { core, inner } = splitTrailingParentheticalName(raw.trim())
@@ -44,16 +70,16 @@ export function buildCustomerDisplayName({ firstName, surname, location }) {
 export function getCustomerCityLabel(customer) {
   if (!customer) return ''
   const direct = customer.city
-  if (typeof direct === 'string' && direct.trim()) return direct.trim()
+  if (typeof direct === 'string' && direct.trim()) return toItalianCityLabel(direct)
   const addr = customer.address
   if (addr && typeof addr === 'object' && addr.city) {
-    return String(addr.city).trim()
+    return toItalianCityLabel(String(addr.city).trim())
   }
   if (typeof addr === 'string' && addr.trim()) {
     const parts = addr.split(',').map((s) => s.trim()).filter(Boolean)
     if (parts.length === 0) return ''
     const last = parts[parts.length - 1]
-    return last.replace(/^\d{4,6}\s+/, '').trim()
+    return toItalianCityLabel(last.replace(/^\d{4,6}\s+/, '').trim())
   }
   return ''
 }

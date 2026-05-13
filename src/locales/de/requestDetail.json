@@ -461,7 +461,6 @@
     "dealership": "Händler",
     "price": "Preis",
     "specification": "Ausstattung",
-    "vin": "VIN",
     "registrationDate": "Erstzulassung",
     "carLocation": "Standort Fahrzeug",
     "mileage": "Kilometerstand",
@@ -526,11 +525,11 @@
       "commercial": "Nutzfahrzeug"
     },
     "requestTypes": {
-      "genericSales": "Generic sales",
-      "quotation": "Quotation",
+      "genericSales": "Allgemeine Verkaufsanfrage",
+      "quotation": "Angebot",
       "testDrive": "Test drive",
-      "financing": "Financing",
-      "tradeIn": "Trade-in"
+      "financing": "Finanzierung",
+      "tradeIn": "Inzahlungnahme"
     },
     "channels": {
       "manualImport": "Manual import",

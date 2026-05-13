@@ -198,6 +198,7 @@ import RequestInsightBanner from './RequestInsightBanner.vue'
 import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 import { getCustomerCityLabel, getCustomerNameParts } from '@/utils/customerDisplay'
+import { getRequestSourceLabel } from '@/utils/requestDisplayLabels'
 
 const props = defineProps({
   request: {
@@ -311,7 +312,7 @@ const customerCityLabel = computed(() => getCustomerCityLabel(props.request?.cus
 const headerDetailSourceLabel = computed(() => {
   const r = props.request
   if (!r) return '—'
-  return r.sourceCategory ?? (r.source || '—')
+  return getRequestSourceLabel(r.sourceCategory ?? r.source, t)
 })
 
 const aiSummaryText = computed(() => props.aiSummary?.trim() || '')

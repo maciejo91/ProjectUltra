@@ -3,6 +3,29 @@ import { getMockData } from '@/api/mockData/localeLoader.js'
 import { LeadRepository } from '@/repositories/LeadRepository'
 import { CustomerRepository } from '@/repositories/CustomerRepository'
 
+const DEMO_VEHICLE_MENTIONS = [
+  'BMW iX xDrive50',
+  'BMW iX',
+  'Audi A6 Allroad',
+  'Audi A6',
+  'Volkswagen ID.4',
+  'VW ID.4',
+  'ID.4',
+  'Mercedes-Benz C-Class',
+  'Mercedes C-Class',
+  'C-Class'
+]
+
+const DEMO_STAFF_MENTIONS = ['Sara Marino', 'Davide Rinaldi', 'Matteo Greco', 'Matteo Alpino']
+const DEMO_VEHICLE_MENTION_PATTERN = new RegExp(
+  DEMO_VEHICLE_MENTIONS
+    .slice()
+    .sort((a, b) => b.length - a.length)
+    .map((mention) => mention.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|'),
+  'g'
+)
+
 /**
  * Activity Repository
  * 
@@ -49,6 +72,36 @@ export class ActivityRepository extends BaseRepository {
     return obj ? JSON.parse(JSON.stringify(obj)) : obj
   }
 
+  _dedupeActivities(activities) {
+    if (!Array.isArray(activities)) return []
+    const seen = new Set()
+    const callSeen = new Set()
+    return activities.filter((activity) => {
+      const content = activity?.content ?? activity?.message ?? activity?.action ?? ''
+      if (activity?.type === 'call') {
+        const callKey = [
+          activity?.leadId ?? '',
+          activity?.opportunityId ?? '',
+          activity?.timestamp ?? '',
+          activity?.user ?? ''
+        ].join('|')
+        if (callSeen.has(callKey)) return false
+        callSeen.add(callKey)
+      }
+      const key = [
+        activity?.leadId ?? '',
+        activity?.opportunityId ?? '',
+        activity?.type ?? '',
+        activity?.timestamp ?? '',
+        activity?.user ?? '',
+        String(content).trim()
+      ].join('|')
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }
+
   _resolveLeadContext(leadId) {
     if (this._leadContextCache.has(leadId)) return this._leadContextCache.get(leadId)
     const leadRepo = this._getLeadRepository()
@@ -62,6 +115,7 @@ export class ActivityRepository extends BaseRepository {
       customerId,
       customerName: customer?.name || lead?.contactName || '',
       assigneeName: lead?.assignee || '',
+      requestedVehicleName: [lead?.requestedCar?.brand, lead?.requestedCar?.model].filter(Boolean).join(' '),
       templateCustomerName: 'Giulia Conti'
     }
     this._leadContextCache.set(leadId, ctx)
@@ -72,6 +126,7 @@ export class ActivityRepository extends BaseRepository {
     if (typeof text !== 'string' || !text.trim()) return text
     const customerName = ctx?.customerName || ''
     const assigneeName = ctx?.assigneeName || ''
+    const requestedVehicleName = ctx?.requestedVehicleName || ''
     const templateName = ctx?.templateCustomerName || 'Giulia Conti'
 
     let out = text
@@ -96,9 +151,19 @@ export class ActivityRepository extends BaseRepository {
       out = out.replaceAll(templateName, 'the customer')
     }
 
+    if (requestedVehicleName) {
+      out = out
+        .replace(/BMW\s+BMW\s+iX\s+xDrive50(?:\s+xDrive50)*/g, 'BMW iX xDrive50')
+        .replace(/BMW\s+iX\s+xDrive50(?:\s+xDrive50)+/g, 'BMW iX xDrive50')
+        .replace(DEMO_VEHICLE_MENTION_PATTERN, requestedVehicleName)
+    }
+
     // Ensure the rep signature isn't "Davide Rinaldi" for everyone.
     if (mode === 'outbound' && assigneeName) {
-      out = out.replaceAll('Davide Rinaldi', assigneeName)
+      out = DEMO_STAFF_MENTIONS.reduce(
+        (nextText, mention) => nextText.replaceAll(mention, assigneeName),
+        out
+      )
     }
 
     return out
@@ -208,11 +273,11 @@ export class ActivityRepository extends BaseRepository {
 
     const keepProbabilityForType = (type) => {
       if (['lead-created', 'lead-assigned', 'lead-updated'].includes(type)) return 1
-      if (type === 'ai-summary') return 0.65
-      if (type === 'note') return 0.75
-      if (type === 'call') return 0.8
-      if (['email', 'customer-email', 'whatsapp', 'customer-whatsapp', 'sms', 'customer-sms'].includes(type)) return 0.9
-      return 0.7
+      if (type === 'ai-summary') return 0.35
+      if (type === 'note') return 0.45
+      if (type === 'call') return 0.35
+      if (['email', 'customer-email', 'whatsapp', 'customer-whatsapp', 'sms', 'customer-sms'].includes(type)) return 0.55
+      return 0.4
     }
 
     const pickFrom = (list) => {
@@ -222,10 +287,28 @@ export class ActivityRepository extends BaseRepository {
     }
 
     const randomized = []
+    const typeCounts = new Map()
+    const maxByType = new Map([
+      ['call', 2],
+      ['email', 2],
+      ['customer-email', 2],
+      ['whatsapp', 2],
+      ['customer-whatsapp', 2],
+      ['sms', 1],
+      ['customer-sms', 1],
+      ['note', 1],
+      ['ai-summary', 1],
+      ['lead-created', 1],
+      ['lead-assigned', 1],
+      ['lead-updated', 1]
+    ])
 
     for (const base of template) {
       const type = base?.type || 'unknown'
       if (rng() > keepProbabilityForType(type)) continue
+      const currentCount = typeCounts.get(type) || 0
+      const maxCount = maxByType.get(type) ?? 1
+      if (currentCount >= maxCount) continue
 
       const pool = byType.get(type) || [base]
       const picked = pickFrom(pool) || base
@@ -240,6 +323,7 @@ export class ActivityRepository extends BaseRepository {
       )
 
       randomized.push(this._rewriteActivityForLead(mapped, targetLeadId))
+      typeCounts.set(type, currentCount + 1)
     }
 
     // Ensure at least a couple of interactions exist.
@@ -261,7 +345,30 @@ export class ActivityRepository extends BaseRepository {
       )
     }
 
-    return randomized
+    return this._limitTimelineActivities(this._dedupeActivities(randomized), rng)
+  }
+
+  _limitTimelineActivities(activities, rng) {
+    const maxItems = 5 + Math.floor(rng() * 6)
+    const sorted = [...activities].sort((a, b) => {
+      const ta = a?.timestamp ? new Date(a.timestamp).getTime() : 0
+      const tb = b?.timestamp ? new Date(b.timestamp).getTime() : 0
+      return tb - ta
+    })
+    if (sorted.length <= maxItems) return sorted
+    const systemItems = sorted.filter((activity) =>
+      ['lead-created', 'lead-assigned', 'lead-updated'].includes(activity?.type)
+    )
+    const interactionItems = sorted.filter((activity) =>
+      !['lead-created', 'lead-assigned', 'lead-updated'].includes(activity?.type)
+    )
+    const keepSystem = systemItems.slice(0, 2)
+    const keepInteractions = interactionItems.slice(0, Math.max(0, maxItems - keepSystem.length))
+    return [...keepInteractions, ...keepSystem].sort((a, b) => {
+      const ta = a?.timestamp ? new Date(a.timestamp).getTime() : 0
+      const tb = b?.timestamp ? new Date(b.timestamp).getTime() : 0
+      return tb - ta
+    })
   }
   
   /**
@@ -287,7 +394,10 @@ export class ActivityRepository extends BaseRepository {
       if (requestedLeadId !== null && requestedLeadId !== ActivityRepository.DEFAULT_LEAD_TEMPLATE_ID) {
         const randomizedTimeline = this._getRandomizedLeadTimelineActivities(requestedLeadId)
         const leadSpecific = results.filter((a) => a.leadId === requestedLeadId)
-        results = [...randomizedTimeline, ...leadSpecific]
+        results = this._limitTimelineActivities(
+          this._dedupeActivities([...randomizedTimeline, ...leadSpecific]),
+          this._makeRng(requestedLeadId * 2017 + 31)
+        )
       } else {
         results = results.filter(activity => activity.leadId === requestedLeadId)
       }
@@ -299,7 +409,7 @@ export class ActivityRepository extends BaseRepository {
       results = results.filter(activity => activity.type === filters.type)
     }
     
-    return results
+    return this._dedupeActivities(results)
   }
 
   /**

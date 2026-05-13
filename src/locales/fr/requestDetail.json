@@ -461,7 +461,6 @@
     "dealership": "Concession",
     "price": "Prix",
     "specification": "Spécifications",
-    "vin": "VIN",
     "registrationDate": "Date d’immatriculation",
     "carLocation": "Localisation du véhicule",
     "mileage": "Kilométrage",
@@ -526,11 +525,11 @@
       "commercial": "Utilitaire"
     },
     "requestTypes": {
-      "genericSales": "Generic sales",
-      "quotation": "Quotation",
+      "genericSales": "Demande commerciale",
+      "quotation": "Devis",
       "testDrive": "Test drive",
-      "financing": "Financing",
-      "tradeIn": "Trade-in"
+      "financing": "Financement",
+      "tradeIn": "Reprise"
     },
     "channels": {
       "manualImport": "Manual import",

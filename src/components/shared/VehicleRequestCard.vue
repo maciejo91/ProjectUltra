@@ -62,13 +62,13 @@
               </p>
             </div>
             <p
-              v-if="trimLine"
+              v-if="trimLine && !isNewVehicle"
               class="w-full text-sm leading-4 text-muted-foreground"
             >
               {{ trimLine }}
             </p>
             <div
-              v-if="vinDisplay && !isNewVehicle"
+              v-if="plateDisplay && !isNewVehicle"
               class="mt-1 flex max-w-full flex-wrap items-center gap-2"
             >
               <div
@@ -78,13 +78,10 @@
                   class="h-4 w-1.5 shrink-0 rounded-bl-sm rounded-tl-sm bg-primary"
                   aria-hidden
                 />
-                <span class="shrink-0 text-xs font-medium leading-4 text-muted-foreground">
-                  {{ t('requestDetail.vehicleCard.vin') }}
-                </span>
                 <span
                   class="truncate whitespace-nowrap text-sm font-semibold leading-4 text-foreground"
                 >
-                  {{ vinDisplay }}
+                  {{ plateDisplay }}
                 </span>
               </div>
             </div>
@@ -93,7 +90,7 @@
       </div>
 
       <div
-        v-if="savedStaffNoteText"
+        v-if="savedStaffNoteText && !isNewVehicle"
         class="flex w-full min-w-0 flex-col gap-2 border-t border-border pt-3"
       >
         <div
@@ -128,7 +125,7 @@
 
       <div class="flex w-full flex-col gap-2 pt-2">
         <div
-          v-if="vehicleLocationDisplay"
+          v-if="vehicleLocationDisplay && !isNewVehicle"
           class="flex w-full items-center justify-between gap-3"
         >
           <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
@@ -173,7 +170,7 @@
           >
         </div>
         <div
-          v-if="mileageDetailLine"
+          v-if="mileageDetailLine && !isNewVehicle"
           class="flex w-full items-center justify-between gap-3"
         >
           <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
@@ -185,7 +182,7 @@
           >
         </div>
         <div
-          v-if="registrationDateDisplay"
+          v-if="registrationDateDisplay && !isNewVehicle"
           class="flex w-full items-center justify-between gap-3"
         >
           <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
@@ -197,7 +194,7 @@
           >
         </div>
         <div
-          v-if="hasInteractionMetrics"
+          v-if="hasInteractionMetrics && !isNewVehicle"
           class="flex w-full items-center justify-between gap-3"
         >
           <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
@@ -236,7 +233,7 @@
       </div>
 
       <div
-        v-if="!hideRequestMessage && (requestMessage || source)"
+        v-if="!isNewVehicle && !hideRequestMessage && (requestMessage || source)"
         class="flex flex-col gap-2 border-t border-border pt-4"
       >
         <div class="flex flex-wrap items-start gap-2">
@@ -294,6 +291,7 @@ import {
 } from '@motork/component-library/future/primitives'
 import { Car, Filter, Pencil, Tag } from 'lucide-vue-next'
 import EditRequestedVehicleModal from '@/components/modals/EditRequestedVehicleModal.vue'
+import audiA6Allroad40TdiImage from '@/assets/images/mock-vehicles/audi-a6-allroad-40-tdi.png'
 import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 
 const props = defineProps({
@@ -390,6 +388,14 @@ watch(
   { immediate: true }
 )
 
+watch(
+  () => [props.vehicle, props.imageUrl],
+  () => {
+    imageError.value = false
+  },
+  { immediate: true }
+)
+
 function openVehicleEditModal() {
   noteExpanded.value = false
   showEditModal.value = true
@@ -414,7 +420,23 @@ async function handleEditModalSave(payload) {
   }
 }
 
+const conditionBadge = computed(() => getVehicleConditionLabel(props.vehicle))
+
+const conditionBadgeClass = computed(() =>
+  getVehicleConditionBadgeClass(conditionBadge.value)
+)
+
+const isNewVehicle = computed(
+  () => String(conditionBadge.value || '').toLowerCase() === 'new'
+)
+
+const usesAudiDisplayVehicle = computed(() => !isNewVehicle.value)
+
 const titleLine = computed(() => {
+  if (isNewVehicle.value && String(props.vehicle.brand || '').toLowerCase() !== 'bmw') {
+    return 'BMW iX xDrive50'
+  }
+  if (usesAudiDisplayVehicle.value) return 'Audi A6 Allroad'
   const parts = []
   if (props.vehicle.brand) parts.push(props.vehicle.brand)
   if (props.vehicle.model) parts.push(props.vehicle.model)
@@ -422,12 +444,14 @@ const titleLine = computed(() => {
 })
 
 const trimLine = computed(() => {
+  if (usesAudiDisplayVehicle.value) return '40 TDI 2.0 quattro S tronic Business Advanced'
   const v = props.vehicle
   const line = v?.trim || v?.variant || v?.engineLine || ''
   return typeof line === 'string' ? line.trim() : ''
 })
 
 const priceLine = computed(() => {
+  if (usesAudiDisplayVehicle.value) return '19.000€'
   const p = props.vehicle.price
   if (p == null || p === '') return '—'
   const n = typeof p === 'string' ? parseFloat(p) : p
@@ -439,17 +463,10 @@ const listingHref = computed(
   () => props.sourceUrl || props.vehicle?.listingUrl || ''
 )
 
-const isNewVehicle = computed(
-  () => String(conditionBadge.value || '').toLowerCase() === 'new'
-)
-
-const isNewBmwVehicle = computed(
-  () => isNewVehicle.value && String(props.vehicle?.brand || '').toLowerCase() === 'bmw'
-)
-
 const stockStatusDisplay = computed(() => {
+  if (isNewVehicle.value) return t('requestDetail.vehicleCard.stockToBeOrder')
+  if (usesAudiDisplayVehicle.value) return t('requestDetail.vehicleCard.stockInStock')
   const raw = (props.stockStatus || props.vehicle?.carStatus || '').trim()
-  if (!raw && isNewBmwVehicle.value) return t('requestDetail.vehicleCard.stockToBeOrder')
   if (!raw) return ''
   const key = raw.toLowerCase().replace(/\s+/g, '')
   if (key === 'instock')
@@ -462,6 +479,7 @@ const stockStatusDisplay = computed(() => {
 })
 
 const specificationLine = computed(() => {
+  if (usesAudiDisplayVehicle.value) return 'Petrol - Automatic'
   const v = props.vehicle
   const fuel = (v?.fuelType || '').trim()
   const gear = (v?.gearType || v?.transmission || '').trim()
@@ -481,17 +499,22 @@ const interactionMetricsTooltip = computed(() =>
   })
 )
 
-const vinDisplay = computed(
-  () => props.vehicle.vin || props.vehicle.vinNumber || ''
+const plateDisplay = computed(
+  () => usesAudiDisplayVehicle.value ? 'FZ131FG' : props.vehicle.plateNumber || props.vehicle.plate || props.vehicle.plates || ''
 )
 
 const usesLogoImage = computed(
-  () => isNewBmwVehicle.value || props.vehicle.imageDisplayMode === 'logo' || props.vehicle.imageType === 'logo'
+  () => isNewVehicle.value || (!usesAudiDisplayVehicle.value && (props.vehicle.imageDisplayMode === 'logo' || props.vehicle.imageType === 'logo'))
 )
 
-const resolvedImageUrl = computed(() => (isNewBmwVehicle.value ? '/brands/bmw-white.svg' : props.imageUrl))
+const resolvedImageUrl = computed(() => {
+  if (isNewVehicle.value) return '/brands/bmw-white.svg'
+  if (usesAudiDisplayVehicle.value) return audiA6Allroad40TdiImage
+  return props.imageUrl
+})
 
 const registrationDateDisplay = computed(() => {
+  if (usesAudiDisplayVehicle.value) return '22/12/2015'
   const r =
     props.vehicle.registrationDate ||
     props.vehicle.registration ||
@@ -499,25 +522,17 @@ const registrationDateDisplay = computed(() => {
   return r || ''
 })
 
-const vehicleLocationDisplay = computed(
-  () =>
-    props.vehicle.dealership ||
-    props.vehicle.location ||
-    props.vehicle.city ||
-    ''
-)
+const vehicleLocationDisplay = computed(() => {
+  if (usesAudiDisplayVehicle.value) return 'Roma'
+  return props.vehicle.dealership || props.vehicle.location || props.vehicle.city || ''
+})
 
 const mileageDetailLine = computed(() => {
+  if (usesAudiDisplayVehicle.value) return '10.237 km'
   const km = props.vehicle.kilometers ?? props.vehicle.mileage
   if (km == null || km === '') return ''
   return `${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(Number(km))} km`
 })
-
-const conditionBadge = computed(() => getVehicleConditionLabel(props.vehicle))
-
-const conditionBadgeClass = computed(() =>
-  getVehicleConditionBadgeClass(conditionBadge.value)
-)
 
 const handleImageError = () => {
   imageError.value = true

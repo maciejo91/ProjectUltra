@@ -681,22 +681,7 @@ const leadRef = computed(() => (props.request?.type === 'lead' ? props.request :
 
 const requestAttribution = computed(() => getRequestAttributionProps(props.request))
 
-const matteoBmwIxRequestMessage =
-  'Vorrei sapere se la BMW iX xDrive50 è ancora disponibile per un test drive. Potete confermare autonomia, tempi di consegna e opzioni di leasing?'
-
-const isMatteoBmwIxRequest = computed(() => {
-  const r = props.request
-  const vehicle = r?.requestedCar || r?.vehicle || {}
-  const customerName = String(r?.customer?.name || '').toLowerCase()
-  return (
-    (String(r?.customerId || '') === '3' || customerName.includes('matteo bianchi')) &&
-    String(vehicle.brand || '').toLowerCase() === 'bmw' &&
-    String(vehicle.model || '').toLowerCase().includes('ix')
-  )
-})
-
 const resolvedRequestMessage = computed(() => {
-  if (isMatteoBmwIxRequest.value) return matteoBmwIxRequestMessage
   return props.request?.requestMessage || props.request?.requestedCar?.requestMessage || ''
 })
 
@@ -849,7 +834,22 @@ const requestActivities = computed(() => {
       list = r.activities || []
     }
   }
-  return [...list].sort((a, b) => {
+  const seen = new Set()
+  const uniqueActivities = [...list].filter((activity) => {
+    const content = activity?.content ?? activity?.message ?? activity?.action ?? ''
+    const key = [
+      activity?.leadId ?? '',
+      activity?.opportunityId ?? '',
+      activity?.type ?? '',
+      activity?.timestamp ?? '',
+      activity?.user ?? '',
+      String(content).trim()
+    ].join('|')
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+  return uniqueActivities.sort((a, b) => {
     const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0
     const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0
     return tb - ta
