@@ -1,10 +1,10 @@
 {
   "greeting": "Buongiorno, {name}",
-  "summary": "{important} attività prioritarie oggi · {recent} nuove · {appointments} in agenda",
+  "summary": "{important} Tasks prioritari oggi · {recent} nuovi · {appointments} in agenda",
   "importantToday": {
     "title": "Importanti oggi",
-    "empty": "Nessuna attività urgente per oggi",
-    "openTasks": "Attività"
+    "empty": "Nessun task urgente per oggi",
+    "openTasks": "Tasks"
   },
   "newInbound": {
     "title": "Nuovi lead e opportunità",
@@ -20,7 +20,7 @@
     "title": "Agenda di oggi",
     "emptyTitle": "Niente in agenda oggi",
     "openCalendar": "Calendario",
-    "openTasks": "Attività"
+    "openTasks": "Tasks"
   },
   "performance": {
     "title": "Performance",
@@ -31,5 +31,86 @@
     "weeklyTarget": "Obiettivo settimanale",
     "monthlyTarget": "Obiettivo mensile",
     "quarterlyTarget": "Obiettivo trimestrale"
+  },
+  "nscDashboard": {
+    "leadsByArea": "Lead per area",
+    "contractsByArea": "Contratti per area",
+    "modelsSold": "Modelli venduti",
+    "totalLeads": "{count} lead totali",
+    "totalContracts": "{count} contratti totali",
+    "unitsSold": "{count} unità vendute",
+    "totalLeadsLabel": "Lead totali",
+    "totalContractsLabel": "Contratti totali",
+    "unitsSoldLabel": "Unità vendute",
+    "thisMonth": "Questo mese",
+    "vsLastMonth": "vs mese scorso",
+    "salesPipeline": "Funnel lead vendita",
+    "leadSources": "Sorgenti lead",
+    "bestPerformers": "Migliori performance",
+    "tasksDue": "Tasks in scadenza",
+    "expired": "Scaduto",
+    "noTasksDue": "Nessun task con scadenza",
+    "taskFallback": "Task",
+    "unknownCustomer": "Cliente sconosciuto",
+    "noVehicle": "Nessun veicolo specificato",
+    "lead": "Lead",
+    "opportunity": "Opportunity",
+    "percentage": "Percentuale",
+    "columns": {
+      "name": "Nome",
+      "leads": "Lead",
+      "qualifiedLeadsPercent": "Lead qualificati (%)",
+      "opportunities": "Opportunities",
+      "contracts": "Contratti",
+      "conversionRate": "Tasso di conversione"
+    },
+    "timeRanges": {
+      "last30Days": "Ultimi 30 giorni",
+      "last90Days": "Ultimi 90 giorni",
+      "last180Days": "Ultimi 180 giorni",
+      "lastYear": "Ultimo anno"
+    },
+    "kpis": {
+      "dealsClosedThisMonth": "Contratti chiusi questo mese",
+      "offersGeneratedThisMonth": "Offerte create questo mese",
+      "newLeadsToday": "Lead creati oggi",
+      "walkInOffersProducedToday": "Offerte walk-in create oggi",
+      "breakdown": {
+        "leads": "Lead",
+        "walkIns": "Walk-ins"
+      }
+    },
+    "stages": {
+      "lead": "Lead totale",
+      "takeInCharge": "Presi in gestione",
+      "qualified": "Qualificati",
+      "offerCreated": "Offerte generate",
+      "deal": "Contratti"
+    },
+    "averageTime": {
+      "hours": "{hours}h in media",
+      "daysHours": "{days}g {hours}h in media",
+      "worseThanLastMonth": "Peggiore rispetto al mese scorso."
+    },
+    "ai": {
+      "title": "Insight generati da AI",
+      "thinking": "Elaborazione...",
+      "you": "Tu",
+      "placeholder": "Chiedi qualsiasi cosa...",
+      "error": "Si è verificato un errore. Riprova.",
+      "suggestions": {
+        "newCarSellers": "Chi sono i miei top 5 venditori di auto nuove questo trimestre?",
+        "webSources": "Quali sono le mie top 5 fonti web più performanti?",
+        "bdcAppointments": "Riassumi il volume degli appuntamenti BDC e gli show rate di ieri."
+      }
+    },
+    "months": {
+      "januaryShort": "GEN",
+      "februaryShort": "FEB",
+      "marchShort": "MAR",
+      "aprilShort": "APR",
+      "mayShort": "MAG",
+      "juneShort": "GIU"
+    }
   }
 }

@@ -2,16 +2,19 @@
   <Card class="border border-border flex flex-col overflow-hidden shadow-mk-dashboard-card">
     <CardHeader class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 px-4 md:px-6 py-3 border-b border-border">
       <CardTitle class="text-sm font-medium leading-5">{{ t('home.performance.title') }}</CardTitle>
-      <select
-        v-model="selectedPeriod"
-        class="input text-sm w-full sm:w-auto bg-muted/50 border-border rounded-md px-2 py-1 outline-none focus:ring-1 focus:ring-primary/20"
-        @change="loadMetrics"
-      >
-        <option value="week">{{ t('home.performance.periodWeek') }}</option>
-        <option value="month">{{ t('home.performance.periodMonth') }}</option>
-        <option value="quarter">{{ t('home.performance.periodQuarter') }}</option>
-        <option value="year">{{ t('home.performance.periodYear') }}</option>
-      </select>
+      <Select :model-value="selectedPeriod" @update:model-value="handlePeriodChange">
+        <SelectTrigger
+          size="sm"
+          class="h-7 w-full rounded-lg border-0 bg-muted px-3 text-xs font-medium text-foreground shadow-none hover:bg-muted/80 focus:ring-0 focus-visible:ring-2 focus-visible:ring-ring sm:w-auto"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="end" class="rounded-lg border-border">
+          <SelectItem v-for="option in periodOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </SelectItem>
+        </SelectContent>
+      </Select>
     </CardHeader>
 
     <CardContent class="flex flex-col">
@@ -544,7 +547,19 @@ import { useI18n } from 'vue-i18n'
 import { LineChart, Lightbulb, Eye } from 'lucide-vue-next'
 import { useUserStore } from '@/stores/user'
 import { fetchBDCOperatorMetrics, fetchSalespersonMetrics, fetchManagerFunnelMetrics } from '@/api/dashboard'
-import { Badge, Button, Card, CardHeader, CardTitle, CardContent } from '@motork/component-library/future/primitives'
+import {
+  Badge,
+  Button,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@motork/component-library/future/primitives'
 import { SEGMENT_KEYS } from '@/composables/useRequestsList'
 
 const props = defineProps({
@@ -562,6 +577,12 @@ const userId = computed(() => userStore.currentUser?.id)
 
 const selectedPeriod = ref(props.defaultPeriod)
 const loading = ref(true)
+const periodOptions = computed(() => [
+  { value: 'week', label: t('home.performance.periodWeek') },
+  { value: 'month', label: t('home.performance.periodMonth') },
+  { value: 'quarter', label: t('home.performance.periodQuarter') },
+  { value: 'year', label: t('home.performance.periodYear') }
+])
 
 const bdcMetrics = ref(null)
 const salespersonMetrics = ref(null)
@@ -752,6 +773,11 @@ const loadMetrics = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const handlePeriodChange = (period) => {
+  selectedPeriod.value = period
+  loadMetrics()
 }
 
 watch([userId, userRole], () => {

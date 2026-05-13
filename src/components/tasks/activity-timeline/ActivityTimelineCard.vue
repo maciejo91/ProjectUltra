@@ -47,6 +47,7 @@ const accents = {
   note: 'bg-amber-500',
   message: 'bg-green-500',
   messageGreen: 'bg-green-500',
+  sms: 'bg-slate-600',
   email: 'bg-purple-500',
   call: 'bg-blue-600',
   ai: 'bg-purple-500',
@@ -58,7 +59,7 @@ const shellBaseClass = computed(() => {
   const layout =
     'flex min-w-0 overflow-hidden rounded-lg border border-solid border-border'
   if (props.accent === 'note') {
-    return `${layout} border-transparent bg-amber-50`
+    return `${layout} border-foreground/20 bg-background`
   }
   const bg = props.surface === 'background' ? 'bg-background' : 'bg-muted'
   return `${layout} ${bg}`

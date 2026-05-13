@@ -19,53 +19,56 @@
     >
       <div :class="isCommunicationActivity || isCallActivity ? 'w-full sm:w-2/3' : 'w-full'">
         <div
-          class="flex min-w-0 items-center"
-          :class="[
-            isRightAlignedEffective ? 'justify-end' : 'justify-start',
-            isSophieAnchoredVariant ? 'gap-2' : 'gap-3'
-          ]"
+          class="grid min-w-0 w-full items-start text-sm leading-snug wrap-break-word"
+          :class="[headlineRowGridCols, headlineRowGapClass, isRightAlignedEffective ? 'text-right' : 'text-left']"
         >
-          <div class="relative flex w-8 shrink-0 justify-center">
+          <div class="flex h-6 w-6 shrink-0 items-center justify-center self-start pt-px">
             <ActivityTimelineIcon :activity="activity" />
           </div>
-          <p
-            class="min-w-0 text-sm leading-snug wrap-break-word"
-            :class="[
-              isRightAlignedEffective ? 'text-right' : 'text-left',
-              ''
-            ]"
+          <div
+            v-if="showDirectionArrow"
+            class="flex h-6 w-4 shrink-0 items-center justify-center self-start pt-px text-muted-foreground"
+            aria-hidden="true"
           >
-            <span class="inline-flex min-w-0 flex-wrap items-baseline gap-x-1">
-              <span
-                :class="
-                  systemHeadline ? 'font-normal text-muted-foreground' : 'font-medium text-foreground'
-                "
-              >
-                {{ headlineParts.primary }}
-              </span>
-              <template v-if="type === 'call'">
-                <span class="inline-flex flex-wrap items-center gap-1.5">
-                  <span
-                    v-if="callStatusPill.label"
-                    class="rounded-full px-2 py-0.5 text-xs font-medium"
-                    :class="callStatusPill.className"
-                  >
-                    {{ callStatusPill.label }}
-                  </span>
-                </span>
-              </template>
-              <span
-                v-else-if="headlineParts.secondary"
-                class="font-normal"
-                :class="secondaryToneClass"
-              >
-                {{ headlineParts.secondary }}
-              </span>
+            <ArrowUpRight v-if="isOutboundDirection" :size="14" class="size-3.5 shrink-0" />
+            <ArrowDownLeft v-else-if="isInboundDirection" :size="14" class="size-3.5 shrink-0" />
+          </div>
+          <div
+            class="m-0 flex min-h-6 min-w-0 flex-wrap items-center gap-x-1 p-0"
+            :class="isRightAlignedEffective ? 'justify-end' : 'justify-start'"
+          >
+            <span
+              :class="
+                systemHeadline ? 'font-normal text-muted-foreground' : 'font-medium text-foreground'
+              "
+            >
+              {{ headlineParts.primary }}
             </span>
-            <span v-if="timeLabel" class="text-xs font-normal tabular-nums text-muted-foreground">
+            <template v-if="type === 'call'">
+              <span class="inline-flex flex-wrap items-center gap-1.5">
+                <span
+                  v-if="callStatusPill.label"
+                  class="rounded-full px-2 py-0.5 text-xs font-medium leading-none"
+                  :class="callStatusPill.className"
+                >
+                  {{ callStatusPill.label }}
+                </span>
+              </span>
+            </template>
+            <span
+              v-else-if="headlineParts.secondary"
+              class="min-w-0 font-normal leading-snug wrap-break-word"
+              :class="secondaryToneClass"
+            >
+              {{ headlineParts.secondary }}
+            </span>
+            <span
+              v-if="timeLabel"
+              class="shrink-0 text-xs font-normal tabular-nums leading-snug text-muted-foreground"
+            >
               · {{ timeLabel }}
             </span>
-          </p>
+          </div>
         </div>
       </div>
     </div>
@@ -76,13 +79,14 @@
       :class="[
         isRightAlignedEffective ? 'flex justify-end' : '',
         outboundCardShiftClass,
-        isSophieAnchoredVariant ? 'mt-1' : (isSophieCondensedCommunication ? 'mt-1' : '')
+        ''
       ]"
     >
       <template v-if="type === 'note'">
         <ActivityTimelineCard
           :accent="cardAccent"
           surface="background"
+          class="max-w-fit"
         >
           <p class="text-sm leading-relaxed text-foreground wrap-break-word">
             {{ noteOrAiBody }}
@@ -249,8 +253,7 @@ import {
   getCallSummaryText,
   getCallTranscriptLines,
   isActivityClickable,
-  shouldShowActivityCard,
-  getActivityIconKind
+  shouldShowActivityCard
 } from '@/composables/useActivityTimelinePresentation'
 import ActivityTimelineIcon from './ActivityTimelineIcon.vue'
 import ActivityTimelineCard from './ActivityTimelineCard.vue'
@@ -286,10 +289,11 @@ const emit = defineEmits(['activity-click', 'open-transcript', 'add-activity', '
 
 const { t } = useI18n()
 
-const type = computed(() => props.activity.type)
+const type = computed(() => props.activity?.type ?? '')
 
 const timeLabel = computed(() => {
   const a = props.activity
+  if (!a) return ''
   if (a.time) return a.time
   const ts = a.timestamp || a.createdAt
   return ts ? formatTime(ts) : ''
@@ -304,7 +308,6 @@ const secondaryToneClass = computed(() => {
   if (v.includes('answered')) return 'text-emerald-700'
   return 'text-muted-foreground'
 })
-const iconKind = computed(() => getActivityIconKind(props.activity))
 
 const systemHeadline = computed(() => isActivityTimelineSystemHeadline(props.activity))
 
@@ -337,7 +340,7 @@ const cardAccent = computed(() => getActivityCardAccent(props.activity))
 
 const callSummary = computed(() => getCallSummaryText(props.activity, t))
 
-const noteOrAiBody = computed(() => props.activity.message || props.activity.content || '')
+const noteOrAiBody = computed(() => props.activity?.message || props.activity?.content || '')
 
 const isCommunicationActivity = computed(() =>
   ['email', 'customer-email', 'whatsapp', 'customer-whatsapp', 'sms', 'customer-sms'].includes(type.value)
@@ -381,6 +384,32 @@ const isOutboundCommunication = computed(() => {
   if (!isCommunicationActivity.value) return false
   return !isInboundCommunication.value
 })
+
+const showDirectionArrow = computed(
+  () => isCommunicationActivity.value || isCallActivity.value
+)
+
+const isOutboundDirection = computed(() => {
+  if (isCommunicationActivity.value) return isOutboundCommunication.value
+  if (isCallActivity.value) return !isInboundCall.value
+  return false
+})
+
+const isInboundDirection = computed(() => {
+  if (isCommunicationActivity.value) return isInboundCommunication.value
+  if (isCallActivity.value) return isInboundCall.value
+  return false
+})
+
+const headlineRowGridCols = computed(() =>
+  showDirectionArrow.value
+    ? 'grid-cols-[1.5rem_1rem_minmax(0,1fr)]'
+    : 'grid-cols-[1.5rem_minmax(0,1fr)]'
+)
+
+const headlineRowGapClass = computed(() =>
+  isSophieAnchoredVariant.value ? 'gap-x-2' : 'gap-x-2 sm:gap-x-3'
+)
 
 const outboundCardShiftClass = computed(() => {
   if (!isSophieAnchoredVariant.value) return ''

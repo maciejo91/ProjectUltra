@@ -16,7 +16,7 @@
   <div v-else>
     <DataTableWithUnifiedSearch
       active-tab="reports"
-      placeholder="Search team performance..."
+      :placeholder="t('dataTable.searchReports')"
       :pagination="pagination"
       :include-margin-bottom="false"
       @update:global-filter="globalFilter = $event"
@@ -41,7 +41,7 @@
         <template #toolbar>
           <div class="flex items-center gap-2">
             <Trophy :size="16" class="text-foreground" />
-            <h3 class="text-lg font-medium text-foreground leading-5">Best performers</h3>
+            <h3 class="text-lg font-medium text-foreground leading-5">{{ t('dataTable.reports.bestPerformers') }}</h3>
           </div>
         </template>
       </DataTable>
@@ -51,6 +51,7 @@
 
 <script setup>
 import { ref, computed, h } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Trophy } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Avatar, AvatarFallback } from '@motork/component-library/future/primitives'
@@ -68,6 +69,9 @@ const props = defineProps({
   }
 })
 
+const { t } = useI18n()
+const reportColumnLabel = (key) => t(`dataTable.reports.columns.${key}`)
+
 // DataTable state management
 const pagination = ref({
   pageIndex: 0,
@@ -78,11 +82,11 @@ const sorting = ref([{ id: 'leads', desc: true }])
 const globalFilter = ref('')
 const columnFilters = ref([])
 
-const numericRangeOperators = [
-  { value: 'between', label: 'is between' },
-  { value: 'gte', label: 'is at least' },
-  { value: 'lte', label: 'is at most' }
-]
+const numericRangeOperators = computed(() => [
+  { value: 'between', label: t('dataTable.filters.operators.isBetween') },
+  { value: 'gte', label: t('dataTable.filters.operators.isAtLeast') },
+  { value: 'lte', label: t('dataTable.filters.operators.isAtMost') }
+])
 
 const getInitials = (name) => {
   if (!name) return 'U'
@@ -97,8 +101,8 @@ const getInitials = (name) => {
 const columns = computed(() => [
   {
     accessorKey: 'name',
-    header: () => 'Name',
-    meta: { title: 'Name' },
+    header: () => reportColumnLabel('name'),
+    meta: { title: reportColumnLabel('name') },
     cell: ({ row }) => {
       const member = row.original
       return h('div', { class: 'flex items-center gap-3' }, [
@@ -114,16 +118,16 @@ const columns = computed(() => [
   },
   {
     accessorKey: 'leads',
-    header: () => 'Leads',
-    meta: { title: 'Leads' },
+    header: () => reportColumnLabel('leads'),
+    meta: { title: reportColumnLabel('leads') },
     cell: ({ row }) => {
       return h('div', { class: 'text-sm text-foreground' }, row.original.leads)
     }
   },
   {
     accessorKey: 'qualifiedLeads',
-    header: () => 'Qualified leads (%)',
-    meta: { title: 'Qualified leads (%)' },
+    header: () => reportColumnLabel('qualifiedLeadsPercent'),
+    meta: { title: reportColumnLabel('qualifiedLeadsPercent') },
     cell: ({ row }) => {
       const member = row.original
       return h('div', { class: 'text-sm text-foreground' }, [
@@ -134,22 +138,22 @@ const columns = computed(() => [
   },
   {
     accessorKey: 'opportunities',
-    header: () => 'Opportunities',
-    meta: { title: 'Opportunities' },
+    header: () => reportColumnLabel('opportunities'),
+    meta: { title: reportColumnLabel('opportunities') },
     cell: ({ row }) => {
       return h('div', { class: 'text-sm text-foreground' }, row.original.opportunities)
     }
   },
   {
     accessorKey: 'contracts',
-    header: () => 'Contracts',
-    meta: { title: 'Contracts' },
+    header: () => reportColumnLabel('contracts'),
+    meta: { title: reportColumnLabel('contracts') },
     cell: ({ row }) => h('div', { class: 'text-sm text-foreground' }, row.original.contracts)
   },
   {
     accessorKey: 'conversionRate',
-    header: () => 'Conversion rate',
-    meta: { title: 'Conversion rate' },
+    header: () => reportColumnLabel('conversionRate'),
+    meta: { title: reportColumnLabel('conversionRate') },
     cell: ({ row }) => h('div', { class: 'text-sm text-foreground' }, `${row.original.conversionRate}%`)
   }
 ])
@@ -177,48 +181,48 @@ const filterDefinitions = computed(() => {
   return [
     {
       key: 'name',
-      label: 'Name',
+      label: reportColumnLabel('name'),
       type: 'multiselect',
       operators: [
-        { value: 'in', label: 'is any of' },
-        { value: 'notIn', label: 'is none of' }
+        { value: 'in', label: t('dataTable.filters.operators.isAnyOf') },
+        { value: 'notIn', label: t('dataTable.filters.operators.isNoneOf') }
       ],
       options: nameOptions.map((n) => ({ value: n, label: n }))
     },
     {
       key: 'leads',
-      label: 'Leads',
+      label: reportColumnLabel('leads'),
       type: 'inputrange',
       inputType: 'number',
-      operators: numericRangeOperators
+      operators: numericRangeOperators.value
     },
     {
       key: 'qualifiedLeads',
-      label: 'Qualified leads',
+      label: reportColumnLabel('qualifiedLeads'),
       type: 'inputrange',
       inputType: 'number',
-      operators: numericRangeOperators
+      operators: numericRangeOperators.value
     },
     {
       key: 'opportunities',
-      label: 'Opportunities',
+      label: reportColumnLabel('opportunities'),
       type: 'inputrange',
       inputType: 'number',
-      operators: numericRangeOperators
+      operators: numericRangeOperators.value
     },
     {
       key: 'contracts',
-      label: 'Contracts',
+      label: reportColumnLabel('contracts'),
       type: 'inputrange',
       inputType: 'number',
-      operators: numericRangeOperators
+      operators: numericRangeOperators.value
     },
     {
       key: 'conversionRate',
-      label: 'Conversion rate',
+      label: reportColumnLabel('conversionRate'),
       type: 'inputrange',
       inputType: 'number',
-      operators: numericRangeOperators
+      operators: numericRangeOperators.value
     }
   ]
 })

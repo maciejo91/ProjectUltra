@@ -35,7 +35,7 @@
     "appointments": "Appuntamenti",
     "addAppointment": "Aggiungi",
     "noAppointments": "Nessun appuntamento in programma.",
-    "recentActivity": "Attività recente"
+    "recentActivity": "Interazioni recenti"
   },
   "details": {
     "customerName": "Nome cliente",
@@ -53,9 +53,9 @@
     "phoneCopyFailed": "Impossibile copiare il numero"
   },
   "activityFeed": {
-    "title": "Attività recente",
+    "title": "Interazioni recenti",
     "add": "Aggiungi",
-    "empty": "Nessuna attività recente.",
+    "empty": "Nessuna interazione recente.",
     "performedAction": "ha eseguito un'azione",
     "systemUser": "Sistema",
     "justNow": "Proprio ora",

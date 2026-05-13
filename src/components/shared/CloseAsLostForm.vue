@@ -1,27 +1,27 @@
 <template>
   <div class="bg-white rounded-lg p-4 shadow-nsc-card">
     <div>
-      <Label class="block text-sm font-medium text-muted-foreground mb-1.5">Reason</Label>
+      <Label class="block text-sm font-medium text-muted-foreground mb-1.5">{{ t('requestDetail.closeAsLost.reason') }}</Label>
       <Select v-model="reason">
         <SelectTrigger class="w-full">
-          <SelectValue placeholder="Select a reason..." />
+          <SelectValue :placeholder="t('requestDetail.closeAsLost.selectReason')" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-if="showMultipleNoShows" value="Multiple no shows">Multiple no shows</SelectItem>
-          <SelectItem value="Data cleanup">Data cleanup</SelectItem>
-          <SelectItem value="Unreachable">Unreachable</SelectItem>
-          <SelectItem value="Purchase postponed">Purchase postponed</SelectItem>
-          <SelectItem value="Vehicle sold">Vehicle sold</SelectItem>
-          <SelectItem value="Out of budget">Out of budget</SelectItem>
-          <SelectItem value="Financing rejected">Financing rejected</SelectItem>
-          <SelectItem value="Duplicate">Duplicate</SelectItem>
-          <SelectItem value="Bought elsewhere">Bought elsewhere</SelectItem>
-          <SelectItem value="Not interested">Not interested</SelectItem>
-          <SelectItem value="Budget constraints">Budget constraints</SelectItem>
-          <SelectItem value="Found better price">Found better price at competitor</SelectItem>
-          <SelectItem value="No response">Customer not responding</SelectItem>
-          <SelectItem value="Wrong timing">Timing not right</SelectItem>
-          <SelectItem value="Other">Other</SelectItem>
+          <SelectItem v-if="showMultipleNoShows" value="Multiple no shows">{{ t('requestDetail.closeAsLost.reasons.multipleNoShows') }}</SelectItem>
+          <SelectItem value="Data cleanup">{{ t('requestDetail.closeAsLost.reasons.dataCleanup') }}</SelectItem>
+          <SelectItem value="Unreachable">{{ t('requestDetail.closeAsLost.reasons.unreachable') }}</SelectItem>
+          <SelectItem value="Purchase postponed">{{ t('requestDetail.closeAsLost.reasons.purchasePostponed') }}</SelectItem>
+          <SelectItem value="Vehicle sold">{{ t('requestDetail.closeAsLost.reasons.vehicleSold') }}</SelectItem>
+          <SelectItem value="Out of budget">{{ t('requestDetail.closeAsLost.reasons.outOfBudget') }}</SelectItem>
+          <SelectItem value="Financing rejected">{{ t('requestDetail.closeAsLost.reasons.financingRejected') }}</SelectItem>
+          <SelectItem value="Duplicate">{{ t('requestDetail.closeAsLost.reasons.duplicate') }}</SelectItem>
+          <SelectItem value="Bought elsewhere">{{ t('requestDetail.closeAsLost.reasons.boughtElsewhere') }}</SelectItem>
+          <SelectItem value="Not interested">{{ t('requestDetail.closeAsLost.reasons.notInterested') }}</SelectItem>
+          <SelectItem value="Budget constraints">{{ t('requestDetail.closeAsLost.reasons.budgetConstraints') }}</SelectItem>
+          <SelectItem value="Found better price">{{ t('requestDetail.closeAsLost.reasons.foundBetterPrice') }}</SelectItem>
+          <SelectItem value="No response">{{ t('requestDetail.closeAsLost.reasons.noResponse') }}</SelectItem>
+          <SelectItem value="Wrong timing">{{ t('requestDetail.closeAsLost.reasons.wrongTiming') }}</SelectItem>
+          <SelectItem value="Other">{{ t('requestDetail.closeAsLost.reasons.other') }}</SelectItem>
         </SelectContent>
       </Select>
     </div>
@@ -30,7 +30,10 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@motork/component-library/future/primitives'
+
+const { t } = useI18n()
 
 const props = defineProps({
   showMultipleNoShows: {

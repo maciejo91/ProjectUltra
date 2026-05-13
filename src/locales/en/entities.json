@@ -7,7 +7,15 @@
     "sendEmailToVerifyContact": "Send email to {name}",
     "sendEmailToVerifyContactNoName": "Send email to verify contact details",
     "beginQualificationSendEmailNamed": "Begin lead qualification by sending an email to {name}.",
-    "beginQualificationSendEmailAnonymous": "Begin lead qualification by sending an email to the customer."
+    "beginQualificationSendEmailAnonymous": "Begin lead qualification by sending an email to the customer.",
+    "taskActions": {
+      "callToVerify": "Call to Verify",
+      "callProspect": "Call Prospect",
+      "callBack": "Call back",
+      "disqualifyLead": "Disqualify Lead",
+      "postponeTask": "Postpone Task",
+      "reopenLead": "Reopen Lead"
+    }
   },
   "opportunity": {
     "title": "Opportunity",

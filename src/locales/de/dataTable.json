@@ -17,7 +17,7 @@
   "closeAiOverlay": "Schließen",
   "aiExampleTasks1": "Nicht zugewiesene BMW-Leads dieser Woche",
   "aiExampleTasks2": "Leads für Fahrzeuge über 48.000 €",
-  "aiExampleTasks3": "Leads, die von Sarah betreut werden",
+  "aiExampleTasks3": "Leads, die von Sara betreut werden",
   "aiExampleGeneric1": "Frag etwas… (z. B. mir zugewiesen, fällig diese Woche)",
   "aiExampleGeneric2": "Frag etwas… (z. B. heiße Leads, Probefahrten)",
   "aiExampleGeneric3": "Frag etwas… (z. B. nach Quelle, nach Status)",
@@ -87,6 +87,107 @@
     "vehicleZa": {
       "menu": "Fahrzeug · Z bis A",
       "summary": "Fahrzeug Z bis A"
+    }
+  },
+  "filters": {
+    "operators": {
+      "is": "ist",
+      "isAnyOf": "ist eines von",
+      "isNoneOf": "ist keines von",
+      "isBetween": "liegt zwischen",
+      "isAtLeast": "ist mindestens",
+      "isAtMost": "ist höchstens",
+      "isAfter": "ist nach",
+      "isBefore": "ist vor"
+    }
+  },
+  "tasks": {
+    "emptyState": "Keine Tasks gefunden",
+    "itemsSelected": "Elemente ausgewählt",
+    "columns": {
+      "urgency": "Dringlichkeit",
+      "task": "Task",
+      "dueTime": "Fälligkeit",
+      "customer": "Kunde",
+      "type": "Typ",
+      "requestStatus": "Anfragestatus",
+      "vehicle": "Fahrzeug",
+      "vin": "VIN",
+      "requestMessage": "Anfragenachricht",
+      "createdAt": "Erstellt am",
+      "attempts": "Versuche",
+      "source": "Quelle",
+      "assignee": "Zugewiesen",
+      "status": "Status"
+    },
+    "filters": {
+      "showClosed": "Geschlossene anzeigen",
+      "taskType": "Task-Typ",
+      "status": "Status",
+      "priority": "Priorität",
+      "source": "Quelle",
+      "assigned": "Zugewiesen",
+      "vehicleBrand": "Fahrzeugmarke",
+      "created": "Erstellt",
+      "dueDate": "Fälligkeit"
+    },
+    "values": {
+      "notSet": "Nicht festgelegt",
+      "recall": "Recall",
+      "unassigned": "Nicht zugewiesen",
+      "used": "Gebraucht",
+      "overdueJustNow": "Gerade überfällig",
+      "lessThanMinute": "in weniger als einer Minute",
+      "justNow": "Gerade eben"
+    },
+    "statuses": {
+      "overdue": "Überfällig",
+      "inProgress": "In Bearbeitung",
+      "open": "Offen"
+    },
+    "requestTypes": {
+      "testDrive": "Test Drive",
+      "quotation": "Angebot",
+      "genericSales": "Allgemeiner Verkauf"
+    },
+    "priority": {
+      "hot": "Hot",
+      "high": "Hoch",
+      "normal": "Normal"
+    }
+  },
+  "requests": {
+    "itemsSelected": "Elemente ausgewählt",
+    "columns": {
+      "type": "Typ",
+      "customer": "Kunde",
+      "stage": "Phase",
+      "source": "Quelle",
+      "assigned": "Zugewiesen"
+    }
+  },
+  "reports": {
+    "bestPerformers": "Beste Performer",
+    "aiInsights": {
+      "title": "KI-gestützte Insights",
+      "thinking": "Denke nach...",
+      "askPlaceholder": "Fragen Sie alles...",
+      "sendQuestion": "Frage senden",
+      "genericError": "Ein Fehler ist aufgetreten. Bitte erneut versuchen.",
+      "suggestions": {
+        "bestPerformers": "Wer performt am besten?",
+        "closedDeals": "Wie viele Abschlüsse wurden erzielt?",
+        "conversionRate": "Wie hoch ist die Conversion Rate?"
+      }
+    },
+    "columns": {
+      "name": "Name",
+      "leads": "Leads",
+      "qualifiedLeads": "Qualifizierte Leads",
+      "qualifiedLeadsPercent": "Qualifizierte Leads (%)",
+      "opportunities": "Opportunities",
+      "contracts": "Verträge",
+      "conversionRate": "Conversion Rate"
     }
   }
 }

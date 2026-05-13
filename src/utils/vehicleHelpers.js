@@ -36,8 +36,9 @@ export function getVehicleConditionLabel(vehicle) {
   const raw = vehicle.status || ''
   const status = raw.toLowerCase()
   const km = vehicle.kilometers ?? vehicle.mileage
-  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'new') {
-    return status === 'new' || km === 0 ? 'Km0' : 'New'
+  if (status === 'new') return 'New'
+  if (km === 0 || (typeof km === 'number' && km < 1)) {
+    return 'Km0'
   }
   if (raw) {
     return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase()

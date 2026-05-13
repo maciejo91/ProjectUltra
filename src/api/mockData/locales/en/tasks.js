@@ -11,7 +11,7 @@ export const mockTasks = [
     customerId: 1,
     leadId: 1,
     opportunityId: null,
-    assignee: 'Maciej Ogonowski',
+    assignee: 'Matteo Greco',
     createdAt: createHourOffset(-4)
   },
   {
@@ -24,7 +24,7 @@ export const mockTasks = [
     customerId: 2,
     leadId: 2,
     opportunityId: null,
-    assignee: 'Sarah Jenkins',
+    assignee: 'Sara Marino',
     createdAt: createHourOffset(-5)
   },
   {
@@ -50,7 +50,7 @@ export const mockTasks = [
     customerId: 4,
     leadId: null,
     opportunityId: 4,
-    assignee: 'Maciej Ogonowski',
+    assignee: 'Matteo Greco',
     createdAt: createHourOffset(-2)
   },
   {
@@ -63,7 +63,7 @@ export const mockTasks = [
     customerId: 3,
     leadId: 3,
     opportunityId: null,
-    assignee: 'David Miller',
+    assignee: 'Davide Rinaldi',
     createdAt: createHourOffset(-1)
   },
   {
@@ -76,7 +76,7 @@ export const mockTasks = [
     customerId: 4,
     leadId: null,
     opportunityId: null,
-    assignee: 'Sarah Jenkins',
+    assignee: 'Sara Marino',
     createdAt: createHourOffset(-12)
   },
   {
@@ -102,7 +102,7 @@ export const mockTasks = [
     customerId: 4,
     leadId: null,
     opportunityId: 4,
-    assignee: 'Maciej Ogonowski',
+    assignee: 'Matteo Greco',
     createdAt: createHourOffset(-6)
   },
   {
@@ -121,40 +121,40 @@ export const mockTasks = [
   {
     id: 10,
     title: 'Lead qualification – Audi A5 used',
-    description: 'Klaus Schmidt wants pricing on used A5 Sportback.',
+    description: 'Paolo Ricci wants pricing on used A5 Sportback.',
     status: 'active',
     priority: 'normal',
     dueDate: createHourOffset(12),
     customerId: 6,
     leadId: 12,
     opportunityId: null,
-    assignee: 'David Miller',
+    assignee: 'Davide Rinaldi',
     createdAt: createHourOffset(-5)
   },
   {
     id: 11,
     title: 'Lead qualification – Volvo XC60',
-    description: 'Thomas Weber inquired about XC60 safety pack and delivery.',
+    description: 'Tommaso Ferri inquired about XC60 safety pack and delivery.',
     status: 'active',
     priority: 'normal',
     dueDate: createHourOffset(7),
     customerId: 8,
     leadId: 13,
     opportunityId: null,
-    assignee: 'Sarah Jenkins',
+    assignee: 'Sara Marino',
     createdAt: createHourOffset(-2)
   },
   {
     id: 12,
     title: 'Lead qualification – Toyota bZ4X',
-    description: 'Julia Fischer comparing EV SUVs; follow up with range and charging.',
+    description: 'Giulia Serra comparing EV SUVs; follow up with range and charging.',
     status: 'active',
     priority: 'normal',
     dueDate: createHourOffset(9),
     customerId: 9,
     leadId: 14,
     opportunityId: null,
-    assignee: 'Maciej Ogonowski',
+    assignee: 'Matteo Greco',
     createdAt: createHourOffset(-6)
   },
   {
@@ -180,7 +180,7 @@ export const mockTasks = [
     customerId: 47,
     leadId: 16,
     opportunityId: null,
-    assignee: 'David Miller',
+    assignee: 'Davide Rinaldi',
     createdAt: createHourOffset(-7)
   },
   {
@@ -193,7 +193,7 @@ export const mockTasks = [
     customerId: 48,
     leadId: 17,
     opportunityId: null,
-    assignee: 'Sarah Jenkins',
+    assignee: 'Sara Marino',
     createdAt: createHourOffset(-6)
   },
   {
@@ -206,7 +206,7 @@ export const mockTasks = [
     customerId: 49,
     leadId: 18,
     opportunityId: null,
-    assignee: 'Maciej Ogonowski',
+    assignee: 'Matteo Greco',
     createdAt: createHourOffset(-5)
   },
   {
@@ -219,7 +219,7 @@ export const mockTasks = [
     customerId: 50,
     leadId: 19,
     opportunityId: null,
-    assignee: 'Sarah Jenkins',
+    assignee: 'Sara Marino',
     createdAt: createHourOffset(-5)
   },
   {
@@ -232,7 +232,7 @@ export const mockTasks = [
     customerId: 51,
     leadId: 20,
     opportunityId: null,
-    assignee: 'David Miller',
+    assignee: 'Davide Rinaldi',
     createdAt: createHourOffset(-4)
   },
   {
@@ -258,7 +258,7 @@ export const mockTasks = [
     customerId: 53,
     leadId: 22,
     opportunityId: null,
-    assignee: 'Sarah Jenkins',
+    assignee: 'Sara Marino',
     createdAt: createHourOffset(-3)
   },
   {
@@ -271,7 +271,7 @@ export const mockTasks = [
     customerId: 54,
     leadId: 23,
     opportunityId: null,
-    assignee: 'David Miller',
+    assignee: 'Davide Rinaldi',
     createdAt: createHourOffset(-3)
   },
   {
@@ -297,7 +297,7 @@ export const mockTasks = [
     customerId: 56,
     leadId: 25,
     opportunityId: null,
-    assignee: 'Sarah Jenkins',
+    assignee: 'Sara Marino',
     createdAt: createHourOffset(-2)
   },
   {
@@ -310,7 +310,7 @@ export const mockTasks = [
     customerId: 57,
     leadId: 26,
     opportunityId: null,
-    assignee: 'David Miller',
+    assignee: 'Davide Rinaldi',
     createdAt: createHourOffset(-1)
   },
   {
@@ -323,7 +323,7 @@ export const mockTasks = [
     customerId: 58,
     leadId: 27,
     opportunityId: null,
-    assignee: 'Maciej Ogonowski',
+    assignee: 'Matteo Greco',
     createdAt: createHourOffset(-1)
   },
   {
@@ -336,7 +336,7 @@ export const mockTasks = [
     customerId: 59,
     leadId: 28,
     opportunityId: null,
-    assignee: 'Sarah Jenkins',
+    assignee: 'Sara Marino',
     createdAt: createHourOffset(-1)
   },
   {
@@ -349,7 +349,7 @@ export const mockTasks = [
     customerId: 60,
     leadId: 29,
     opportunityId: null,
-    assignee: 'David Miller',
+    assignee: 'Davide Rinaldi',
     createdAt: createHourOffset(0)
   }
 ]

@@ -7,7 +7,15 @@
     "sendEmailToVerifyContact": "E-mail sturen naar {name}",
     "sendEmailToVerifyContactNoName": "E-mail sturen om contactgegevens te verifiëren",
     "beginQualificationSendEmailNamed": "Start de leadkwalificatie door een e-mail te sturen naar {name}.",
-    "beginQualificationSendEmailAnonymous": "Start de leadkwalificatie door een e-mail naar de klant te sturen."
+    "beginQualificationSendEmailAnonymous": "Start de leadkwalificatie door een e-mail naar de klant te sturen.",
+    "taskActions": {
+      "callToVerify": "Bellen om te verifiëren",
+      "callProspect": "Prospect bellen",
+      "callBack": "Terugbellen",
+      "disqualifyLead": "Lead diskwalificeren",
+      "postponeTask": "Taak uitstellen",
+      "reopenLead": "Lead heropenen"
+    }
   },
   "opportunity": {
     "title": "Kans",

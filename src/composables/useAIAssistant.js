@@ -176,12 +176,247 @@ const generateComparisonResponse = (question, data) => {
   return response
 }
 
-const generateResponse = (question, data) => {
+const isItalianLocale = (locale) => String(locale || '').toLowerCase().startsWith('it')
+
+const includesAny = (text, terms) => terms.some((term) => text.includes(term))
+
+const generateTopNewCarSellersResponse = (data) => {
+  const sellers = (data.newCarSellersThisQuarter?.length ? data.newCarSellersThisQuarter : data.teamPerformance || [])
+    .slice(0, 5)
+  if (!sellers.length) return "I don't have new car seller data available at the moment."
+
+  const totalSales = sellers.reduce((sum, seller) => sum + (seller.newCarsSoldThisQuarter || seller.contracts || 0), 0)
+  const sellerLines = sellers.map((seller, index) => {
+    const location = seller.city ? ` (${seller.city})` : ''
+    const sales = seller.newCarsSoldThisQuarter || seller.contracts || 0
+    return `${index + 1}. ${seller.name}${location} - ${sales} new cars sold, ${seller.conversionRate}% conversion rate`
+  }).join('\n')
+
+  return `Here are your top ${sellers.length} new car sellers this quarter:\n\n${sellerLines}\n\nTogether, they account for ${totalSales} new car sales this quarter.`
+}
+
+const generateTopWebSourcesResponse = (data) => {
+  const sources = [...(data.leadSources || [])]
+    .sort((a, b) => b.conversionRate - a.conversionRate)
+    .slice(0, 5)
+  if (!sources.length) return "I don't have web source performance data available at the moment."
+
+  const sourceLines = sources.map((source, index) =>
+    `${index + 1}. ${source.name} - ${source.conversionRate}% conversion, ${source.totalLeads} leads, ${source.wonDeals} won deals`
+  ).join('\n')
+
+  return `Your top ${sources.length} performing web sources are ranked by won-deal conversion rate:\n\n${sourceLines}`
+}
+
+const generateBdcAppointmentSummaryResponse = (data) => {
+  const summary = data.bdcAppointmentSummaryYesterday
+  if (!summary) return "I don't have BDC appointment data for yesterday yet."
+
+  const targetShowRate = summary.targetShowRate ?? 72
+  const targetGap = summary.showRate - targetShowRate
+  const targetText = targetGap >= 0
+    ? `${targetGap.toFixed(1)} points above target`
+    : `${Math.abs(targetGap).toFixed(1)} points below target`
+
+  return `Yesterday, BDC handled ${summary.booked} booked appointments, with ${summary.confirmed} confirmed.\n\n• ${summary.showed} customers showed\n• ${summary.noShows} no-shows\n• ${summary.rescheduled} rescheduled\n• Show rate: ${summary.showRate}% (${targetText})`
+}
+
+const generateItalianTopNewCarSellersResponse = (data) => {
+  const sellers = (data.newCarSellersThisQuarter?.length ? data.newCarSellersThisQuarter : data.teamPerformance || [])
+    .slice(0, 5)
+  if (!sellers.length) return 'Al momento non ho dati sui venditori di auto nuove disponibili.'
+
+  const totalSales = sellers.reduce((sum, seller) => sum + (seller.newCarsSoldThisQuarter || seller.contracts || 0), 0)
+  const sellerLines = sellers.map((seller, index) => {
+    const location = seller.city ? ` (${seller.city})` : ''
+    const sales = seller.newCarsSoldThisQuarter || seller.contracts || 0
+    return `${index + 1}. ${seller.name}${location} - ${sales} auto nuove vendute, conversione ${seller.conversionRate}%`
+  }).join('\n')
+
+  return `Ecco i tuoi top ${sellers.length} venditori di auto nuove questo trimestre:\n\n${sellerLines}\n\nInsieme rappresentano ${totalSales} vendite di auto nuove nel trimestre.`
+}
+
+const generateItalianTopWebSourcesResponse = (data) => {
+  const sources = [...(data.leadSources || [])]
+    .sort((a, b) => b.conversionRate - a.conversionRate)
+    .slice(0, 5)
+  if (!sources.length) return 'Al momento non ho dati sulle performance delle fonti web disponibili.'
+
+  const sourceLines = sources.map((source, index) =>
+    `${index + 1}. ${source.name} - ${source.conversionRate}% conversione, ${source.totalLeads} lead, ${source.wonDeals} deal vinti`
+  ).join('\n')
+
+  return `Le tue top ${sources.length} fonti web sono ordinate per conversione a deal vinti:\n\n${sourceLines}`
+}
+
+const generateItalianBdcAppointmentSummaryResponse = (data) => {
+  const summary = data.bdcAppointmentSummaryYesterday
+  if (!summary) return 'Non ho ancora dati sugli appuntamenti BDC di ieri.'
+
+  const targetShowRate = summary.targetShowRate ?? 72
+  const targetGap = summary.showRate - targetShowRate
+  const targetText = targetGap >= 0
+    ? `${targetGap.toFixed(1)} punti sopra il target`
+    : `${Math.abs(targetGap).toFixed(1)} punti sotto il target`
+
+  return `Ieri il BDC ha gestito ${summary.booked} appuntamenti prenotati, di cui ${summary.confirmed} confermati.\n\n• ${summary.showed} clienti si sono presentati\n• ${summary.noShows} no-show\n• ${summary.rescheduled} riprogrammati\n• Show rate: ${summary.showRate}% (${targetText})`
+}
+
+const formatItalianTrend = (changeType) => (changeType === 'increase' ? 'in crescita' : 'in calo')
+
+const formatItalianTeamMemberStats = (member, rank, total) =>
+  `${rank}. ${member.name} (${member.conversionRate}% tasso di conversione, posizione ${rank} su ${total})\n   - ${member.leads} lead, ${member.qualifiedLeads} lead qualificati (${member.qualifiedPercentage}%), ${member.opportunities} opportunities, ${member.contracts} contratti`
+
+const generateItalianBestPerformersResponse = (data, metric, count = 3, isLeast = false) => {
+  if (!data.teamPerformance?.length) return 'Al momento non ho dati sulle performance del team disponibili.'
+
+  const sortedTeam = metric
+    ? sortTeamByMetric(data.teamPerformance, metric, isLeast)
+    : [...data.teamPerformance].sort((a, b) => b.conversionRate - a.conversionRate)
+  const performers = sortedTeam.slice(0, Math.min(count, sortedTeam.length))
+  const totalMembers = data.teamPerformance.length
+  if (!performers.length) return 'Non ho trovato dati sulle performance del team da mostrare.'
+
+  const metricLabels = {
+    leads: 'lead',
+    contracts: 'contratti chiusi',
+    opportunities: 'opportunities',
+    qualifiedLeads: 'lead qualificati',
+    conversionRate: 'tasso di conversione'
+  }
+  const metricLabel = metric ? metricLabels[metric] : 'tasso di conversione'
+  const direction = isLeast ? 'piu bassi' : 'migliori'
+  const intro = metric
+    ? `Ecco i ${direction} ${performers.length} performer per ${metricLabel}:\n\n`
+    : `In base al tasso di conversione, i migliori ${performers.length} performer sono:\n\n`
+
+  return intro + performers.map((member, index) => {
+    const actualRank = isLeast ? totalMembers - index : index + 1
+    return formatItalianTeamMemberStats(member, actualRank, totalMembers)
+  }).join('\n\n')
+}
+
+const generateItalianTeamMemberResponse = (question, data) => {
+  const memberNames = extractTeamMemberNames(question, data.teamPerformance || [])
+  if (!memberNames.length) return 'Non ho trovato quel membro del team. Controlla il nome e riprova.'
+  const member = data.teamPerformance.find((m) => m.name === memberNames[0])
+  if (!member) return 'Non ho trovato quel membro del team nei dati disponibili.'
+  return `${member.name} ha:\n\n• ${member.leads} lead\n• ${member.qualifiedLeads} lead qualificati (${member.qualifiedPercentage}%)\n• ${member.opportunities} opportunities\n• ${member.contracts} contratti\n• ${member.conversionRate}% tasso di conversione`
+}
+
+const generateItalianResponse = (question, data) => {
+  const lowerQuestion = question.toLowerCase().trim()
+  const isGreeting = ['ciao', 'buongiorno', 'buonasera', 'salve', 'hey', 'hello', 'hi'].some((g) => lowerQuestion === g || lowerQuestion.startsWith(`${g} `))
+  if (isGreeting && !includesAny(lowerQuestion, ['deal', 'contratt', 'opportunit', 'lead'])) {
+    return 'Ciao! Sono qui per aiutarti a leggere la dashboard vendite. Puoi chiedermi informazioni su deal, opportunities, performance del team, tassi di conversione o altre metriche.'
+  }
+
+  if (includesAny(lowerQuestion, ['aiuto', 'cosa puoi', 'help', 'che cosa puoi'])) {
+    return "Posso aiutarti a capire i dati della dashboard vendite. Puoi chiedermi:\n\n• Quanti deal sono stati chiusi\n• Quanti nuovi lead o opportunities ci sono\n• Chi sono i migliori performer\n• Chi ha piu lead, contratti o opportunities\n• Il tasso di conversione per canale o campagna\n• Come procede il sales funnel"
+  }
+
+  if (includesAny(lowerQuestion, ['auto nuove', 'new car']) && includesAny(lowerQuestion, ['venditor', 'seller', 'top 5', 'trimestre'])) {
+    return generateItalianTopNewCarSellersResponse(data)
+  }
+
+  if (includesAny(lowerQuestion, ['fonti web', 'fonte web', 'web source', 'web sources']) && includesAny(lowerQuestion, ['top 5', 'perform'])) {
+    return generateItalianTopWebSourcesResponse(data)
+  }
+
+  if (includesAny(lowerQuestion, ['bdc']) && includesAny(lowerQuestion, ['appuntament', 'appointment']) && includesAny(lowerQuestion, ['show rate', 'show rates', 'ieri', 'yesterday'])) {
+    return generateItalianBdcAppointmentSummaryResponse(data)
+  }
+
+  if (includesAny(lowerQuestion, ['tasso di conversione', 'conversione', 'conversion rate', 'convert'])) {
+    if (lowerQuestion.includes('facebook')) {
+      const facebook = data.leadSources?.find((s) => s.name.toLowerCase().includes('facebook'))
+      if (facebook) return `Le campagne Facebook hanno un tasso di conversione del ${facebook.conversionRate}% da lead a deal vinti. Su ${facebook.totalLeads} lead totali, ${facebook.wonDeals} deal sono stati chiusi.`
+    }
+    if (includesAny(lowerQuestion, ['volvo', 'volvocars'])) {
+      const volvo = data.leadSources?.find((s) => s.name.toLowerCase().includes('volvo'))
+      if (volvo) return `Volvocars.com ha un tasso di conversione del ${volvo.conversionRate}%. Con ${volvo.totalLeads} lead totali, ${volvo.wonDeals} deal sono stati chiusi.`
+    }
+    if (includesAny(lowerQuestion, ['campagna', 'campaign', 'winter'])) {
+      const campaign = data.leadSources?.find((s) => s.name.toLowerCase().includes('winter') || s.name.toLowerCase().includes('campaign'))
+      if (campaign) return `${campaign.name} ha un tasso di conversione del ${campaign.conversionRate}%. Ha generato ${campaign.totalLeads} lead e chiuso ${campaign.wonDeals} deal.`
+    }
+    if (data.leadSources?.length) {
+      const avgConversion = data.leadSources.reduce((sum, source) => sum + source.conversionRate, 0) / data.leadSources.length
+      return `Il tasso di conversione medio su tutte le sorgenti lead e ${avgConversion.toFixed(1)}%.\n\nEcco il dettaglio:\n\n${data.leadSources.map((source) => `• ${source.name}: ${source.conversionRate}%`).join('\n')}`
+    }
+  }
+
+  if (includesAny(lowerQuestion, ['miglior', 'top', 'perform', 'classifica', 'chi sta', 'piu lead', 'piu contratti', 'piu opportunities', 'best'])) {
+    const metric = includesAny(lowerQuestion, ['lead']) ? 'leads'
+      : includesAny(lowerQuestion, ['contratt', 'deal chius']) ? 'contracts'
+        : includesAny(lowerQuestion, ['opportunit']) ? 'opportunities'
+          : includesAny(lowerQuestion, ['qualificat']) ? 'qualifiedLeads'
+            : includesAny(lowerQuestion, ['conversion']) ? 'conversionRate'
+              : undefined
+    return generateItalianBestPerformersResponse(data, metric, 3, includesAny(lowerQuestion, ['meno', 'peggior', 'lowest', 'worst']))
+  }
+
+  if (data.teamPerformance?.some((member) => lowerQuestion.includes(member.name.toLowerCase()))) {
+    return generateItalianTeamMemberResponse(question, data)
+  }
+
+  if (includesAny(lowerQuestion, ['deal', 'contratt']) && includesAny(lowerQuestion, ['chius', 'closed', 'close'])) {
+    const dealsKpi = data.kpis?.find((kpi) => kpi.title.toLowerCase().includes('deal') && kpi.title.toLowerCase().includes('chius'))
+    if (dealsKpi) return `Sono stati chiusi ${dealsKpi.value} deal questo mese. Il dato e ${formatItalianTrend(dealsKpi.changeType)} del ${Math.abs(dealsKpi.change)}% rispetto al mese scorso.`
+  }
+
+  if (includesAny(lowerQuestion, ['opportunit', 'opportunity', 'opportunities'])) {
+    const opportunitiesKpi = data.kpis?.find((kpi) => kpi.title.toLowerCase().includes('opportunit'))
+    if (opportunitiesKpi) return `Ci sono ${opportunitiesKpi.value} nuove opportunities. Il dato e ${formatItalianTrend(opportunitiesKpi.changeType)} del ${Math.abs(opportunitiesKpi.change)}% rispetto al mese scorso.`
+  }
+
+  if (lowerQuestion.includes('lead')) {
+    const leadsKpi = data.kpis?.find((kpi) => kpi.title.toLowerCase().includes('lead'))
+    if (leadsKpi) return `Hai ricevuto ${leadsKpi.value} nuovi lead. Il dato e ${formatItalianTrend(leadsKpi.changeType)} del ${Math.abs(leadsKpi.change)}% rispetto al mese scorso.`
+  }
+
+  if (includesAny(lowerQuestion, ['negoziazione', 'negoziazioni', 'negotiation'])) {
+    const negotiationKpi = data.kpis?.find((kpi) => kpi.title.toLowerCase().includes('negozia'))
+    if (negotiationKpi) return `Ci sono ${negotiationKpi.value} deal in negoziazione questo mese. Il dato e ${formatItalianTrend(negotiationKpi.changeType)} del ${Math.abs(negotiationKpi.change)}% rispetto al mese scorso.`
+  }
+
+  if (includesAny(lowerQuestion, ['funnel', 'pipeline', 'fase', 'stage'])) {
+    const stages = (data.pipeline || []).filter((stage) => stage.percentage !== undefined)
+    if (stages.length > 0) {
+      const stageInfo = stages.map((stage) => `• ${stage.name}: ${stage.percentage}% conversione${stage.avgTime ? ` (${stage.avgTime})` : ''}`).join('\n')
+      return `Ecco il dettaglio del sales funnel:\n\n${stageInfo}\n\nIl funnel mostra come i lead avanzano nelle diverse fasi, con il tasso di conversione per ogni step.`
+    }
+  }
+
+  if (includesAny(lowerQuestion, ['team', 'squadra'])) {
+    if (data.teamPerformance?.length > 0) {
+      const totalLeads = data.teamPerformance.reduce((sum, member) => sum + member.leads, 0)
+      const totalContracts = data.teamPerformance.reduce((sum, member) => sum + member.contracts, 0)
+      const avgConversion = totalLeads ? (totalContracts / totalLeads) * 100 : 0
+      return `Il team ha ${data.teamPerformance.length} persone attive sui lead. In totale ha generato ${totalLeads} lead e chiuso ${totalContracts} contratti, con un tasso di conversione medio del ${avgConversion.toFixed(1)}%.`
+    }
+  }
+
+  return "Posso aiutarti a leggere i dati della dashboard. Prova a chiedermi, ad esempio, il tasso di conversione, i deal chiusi, le opportunities o chi sono i migliori performer."
+}
+
+const generateResponse = (question, data, locale) => {
+  if (isItalianLocale(locale)) return generateItalianResponse(question, data)
+
   const lowerQuestion = question.toLowerCase().trim()
   const greetings = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening']
   const isGreeting = greetings.some((g) => lowerQuestion === g || lowerQuestion.startsWith(g + ' '))
   if (isGreeting && !lowerQuestion.includes('deal') && !lowerQuestion.includes('opportunit') && !lowerQuestion.includes('lead')) {
     return "Hello! I'm here to help you understand your sales dashboard. You can ask me about deals, opportunities, team performance, conversion rates, or any other metrics you'd like to know about."
+  }
+  if ((lowerQuestion.includes('new car') || lowerQuestion.includes('new cars')) && (lowerQuestion.includes('seller') || lowerQuestion.includes('sellers')) && (lowerQuestion.includes('top') || lowerQuestion.includes('quarter'))) {
+    return generateTopNewCarSellersResponse(data)
+  }
+  if ((lowerQuestion.includes('web source') || lowerQuestion.includes('web sources')) && (lowerQuestion.includes('top') || lowerQuestion.includes('performing'))) {
+    return generateTopWebSourcesResponse(data)
+  }
+  if (lowerQuestion.includes('bdc') && lowerQuestion.includes('appointment') && (lowerQuestion.includes('show rate') || lowerQuestion.includes('show rates') || lowerQuestion.includes('yesterday'))) {
+    return generateBdcAppointmentSummaryResponse(data)
   }
   if ((lowerQuestion.includes('deal') || lowerQuestion.includes('deals')) && (lowerQuestion.includes('close') || lowerQuestion.includes('closed') || lowerQuestion.includes('closing'))) {
     const dealsKpi = data.kpis.find((kpi) => {
@@ -358,7 +593,7 @@ const generateResponse = (question, data) => {
 const simulateThinkingDelay = () => new Promise((resolve) => setTimeout(resolve, 2000 + Math.random() * 1000))
 const simulateTypingDelay = () => new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 1200))
 
-export function useAIAssistant(getDashboardData) {
+export function useAIAssistant(getDashboardData, getLocale) {
   const messages = ref([])
   const isThinking = ref(false)
   const isTyping = ref(false)
@@ -374,7 +609,8 @@ export function useAIAssistant(getDashboardData) {
       isTyping.value = true
       await simulateTypingDelay()
       const data = typeof getDashboardData === 'function' ? getDashboardData() : (getDashboardData?.value ?? {})
-      return generateResponse(userMessage, data)
+      const locale = typeof getLocale === 'function' ? getLocale() : getLocale
+      return generateResponse(userMessage, data, locale)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred while processing your request. Please try again.'
       throw new Error(errorMessage)
@@ -385,12 +621,14 @@ export function useAIAssistant(getDashboardData) {
   }
 
   const addMessage = (role, content) => {
-    messages.value.push({
+    const message = {
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       role,
       content,
       timestamp: new Date(),
-    })
+    }
+    messages.value.push(message)
+    return messages.value[messages.value.length - 1]
   }
 
   const clearMessages = () => { messages.value = [] }

@@ -55,7 +55,7 @@ export const mockCampaignInteractions = [
   {
     id: 4,
     customerId: 4,
-    customer: { id: 4, name: 'Sophie Mueller', initials: 'SM' },
+    customer: { id: 4, name: 'Giulia Conti', initials: 'GC' },
     status: 'Active',
     channel: 'Email',
     direction: 'Outbound',
@@ -65,22 +65,22 @@ export const mockCampaignInteractions = [
     opportunityId: 2,
     messages: [
       { id: 1, type: 'email', user: 'Sales Team', timestamp: createDateTimeOffset(-2, 9, 30), content: 'We have showrooms in Munich and Stuttgart. Which would you prefer to visit?' },
-      { id: 2, type: 'customer-email', user: 'Sophie Mueller', timestamp: createDateTimeOffset(-2, 13, 45), content: 'Are your showrooms in Munich and Stuttgart easy to reach by public transport?' }
+      { id: 2, type: 'customer-email', user: 'Giulia Conti', timestamp: createDateTimeOffset(-2, 13, 45), content: 'Are your showrooms in Munich and Stuttgart easy to reach by public transport?' }
     ]
   },
   {
     id: 5,
     customerId: 5,
-    customer: { id: 5, name: 'Lorenzo', initials: 'L' },
+    customer: { id: 5, name: 'Lorenzo Ferretti', initials: 'LF' },
     status: 'New',
     channel: 'WhatsApp Business',
     direction: 'Inbound',
     lastMessageDate: createDateTimeOffset(-2, 14, 22),
-    lastMessage: 'Giusy: 14.900 € prezzo senza partita IVA.',
+    lastMessage: 'Giusi Bianchi: 14.900 € prezzo senza partita IVA.',
     leadId: null,
     opportunityId: null,
     messages: [
-      { id: 1, type: 'customer-whatsapp', user: 'Lorenzo', timestamp: createDateTimeOffset(-2, 14, 22), content: 'Giusy: 14.900 € prezzo senza partita IVA.' }
+      { id: 1, type: 'customer-whatsapp', user: 'Lorenzo Ferretti', timestamp: createDateTimeOffset(-2, 14, 22), content: 'Giusi Bianchi: 14.900 € prezzo senza partita IVA.' }
     ]
   },
   {
@@ -91,17 +91,17 @@ export const mockCampaignInteractions = [
     channel: 'Email',
     direction: 'Outbound',
     lastMessageDate: createDateTimeOffset(-3, 10, 15),
-    lastMessage: 'Simona: Benvenuto! 🙂 Grazie per il tuo interesse nel nostro servizio.',
+    lastMessage: 'Simona Riva: Benvenuto! 🙂 Grazie per il tuo interesse nel nostro servizio.',
     leadId: 3,
     opportunityId: null,
     messages: [
-      { id: 1, type: 'email', user: 'Simona', timestamp: createDateTimeOffset(-3, 10, 15), content: 'Simona: Benvenuto! 🙂 Grazie per il tuo interesse nel nostro servizio.' }
+      { id: 1, type: 'email', user: 'Simona', timestamp: createDateTimeOffset(-3, 10, 15), content: 'Simona Riva: Benvenuto! 🙂 Grazie per il tuo interesse nel nostro servizio.' }
     ]
   },
   {
     id: 7,
     customerId: 7,
-    customer: { id: 7, name: 'Pietro Del Prete', initials: 'PP' },
+    customer: { id: 7, name: 'Pietro Del Prete', initials: 'PD' },
     status: 'New',
     channel: 'Email',
     direction: 'Inbound',

@@ -7,11 +7,11 @@ export const useUserStore = defineStore('user', () => {
   // This will be replaced when real authentication is implemented
   const currentUser = ref({
     id: 1,
-    name: 'Maciej Ogonowski',
-    email: 'maciej.ogonowski@example.com',
+    name: 'Matteo Greco',
+    email: 'matteo.greco@example.com',
     phone: '+1 555 010 020',
     role: 'manager',
-    initials: 'MO',
+    initials: 'MG',
     /** Default fiscal entity for create-contact flows (mock; API would supply this) */
     fiscalEntityId: 'company-a',
   })

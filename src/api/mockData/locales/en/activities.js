@@ -5,7 +5,7 @@ export const mockActivities = [
   {
     id: 1,
     type: 'call',
-    user: 'Sarah Jenkins',
+    user: 'Sara Marino',
     action: 'made a call',
     content: 'Discussed color preferences. Customer interested in black or white.',
     timestamp: createHourOffset(-2),
@@ -14,7 +14,7 @@ export const mockActivities = [
   {
     id: 2,
     type: 'note',
-    user: 'Sarah Jenkins',
+    user: 'Sara Marino',
     action: 'added a note',
     content: 'Customer waiting for color availability. Follow up in 2 weeks.',
     timestamp: createHourOffset(-4),
@@ -32,7 +32,7 @@ export const mockActivities = [
   {
     id: 4,
     type: 'financing',
-    user: 'Maciej Ogonowski',
+    user: 'Matteo Greco',
     action: 'submitted financing request',
     content: 'Financing approved: 60-month term at 3.5% APR',
     data: { term: 60, apr: 3.5, amount: 120000, downPayment: 30000, monthlyPayment: 1635, status: 'approved' },
@@ -51,7 +51,7 @@ export const mockActivities = [
   {
     id: 6,
     type: 'call',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'made a call',
     content: 'Discussed offer details. Customer reviewing financing options.',
     timestamp: createHourOffset(-4),
@@ -60,7 +60,7 @@ export const mockActivities = [
   {
     id: 7,
     type: 'note',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'added a note',
     content: 'Customer requested additional discount. Preparing counter-offer.',
     timestamp: createHourOffset(-3),
@@ -97,7 +97,7 @@ export const mockActivities = [
   {
     id: 11,
     type: 'opportunity-won',
-    user: 'Sarah Jenkins',
+    user: 'Sara Marino',
     action: 'marked opportunity as won',
     timestamp: createDateOffset(-3),
     opportunityId: 5
@@ -105,7 +105,7 @@ export const mockActivities = [
   {
     id: 12,
     type: 'delivery',
-    user: 'Sarah Jenkins',
+    user: 'Sara Marino',
     action: 'completed delivery',
     content: 'Vehicle delivered successfully. Customer satisfied with purchase.',
     timestamp: createDateOffset(-2),
@@ -123,7 +123,7 @@ export const mockActivities = [
   {
     id: 14,
     type: 'call',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'made a call',
     content: 'Customer chose competitor. Logged lost reason.',
     timestamp: createDateOffset(-5),
@@ -141,7 +141,7 @@ export const mockActivities = [
   {
     id: 16,
     type: 'tradein',
-    user: 'Sarah Jenkins',
+    user: 'Sara Marino',
     action: 'added trade-in information',
     content: 'Customer trade-in: 2018 Porsche Cayenne, valued at €48,000',
     data: { make: 'Porsche', model: 'Cayenne', year: 2018, mileage: 52000, condition: 'Good', value: 48000 },
@@ -160,7 +160,7 @@ export const mockActivities = [
   {
     id: 19,
     type: 'customer-whatsapp',
-    user: 'Emma Watson',
+    user: 'Chiara Moretti',
     action: 'sent a WhatsApp message',
     content: 'I am still interested in the ID.4. Can we schedule a callback after 2 PM?',
     data: {
@@ -173,11 +173,11 @@ export const mockActivities = [
   {
     id: 20,
     type: 'customer-email',
-    user: 'Liam Johnson',
+    user: 'Matteo Bianchi',
     action: 'sent an email',
-    content: 'When can I visit the Munich dealership to see the BMW iX?',
+    content: 'When can I visit the Milano dealership to see the BMW iX?',
     data: {
-      from: 'liam.johnson@example.com',
+      from: 'matteo.bianchi@example.com',
       to: 'munich@motork.io'
     },
     timestamp: createHourOffset(-3),
@@ -186,11 +186,11 @@ export const mockActivities = [
   {
     id: 21,
     type: 'customer-email',
-    user: 'Sophie Mueller',
+    user: 'Giulia Conti',
     action: 'sent an email',
     content: 'Thanks for the C-Class info. I would like to see it this week.',
     data: {
-      from: 'sophie.mueller@example.com',
+      from: 'giulia.conti@example.com',
       to: 'sales@motork.io'
     },
     timestamp: createHourOffset(-4),
@@ -199,14 +199,14 @@ export const mockActivities = [
   {
     id: 21.1,
     type: 'email',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'sent an email',
     content:
-      'Hi Sophie — happy to help. We have a C-Class available. Would you prefer Wed 12:30 or Thu 13:00 for a quick viewing in Munich?',
+      'Hi Giulia — happy to help. We have a C-Class available. Would you prefer Wed 12:30 or Thu 13:00 for a quick viewing in Bologna?',
     data: {
       threadId: 'lead-4-email',
-      from: 'david.miller@motork.io',
-      to: 'sophie.mueller@example.com'
+      from: 'davide.rinaldi@motork.io',
+      to: 'giulia.conti@example.com'
     },
     timestamp: createHourOffset(-3.7),
     leadId: 4
@@ -214,7 +214,7 @@ export const mockActivities = [
   {
     id: 21.2,
     type: 'customer-whatsapp',
-    user: 'Sophie Mueller',
+    user: 'Giulia Conti',
     action: 'sent a WhatsApp message',
     content: 'Thu 13:00 works. Can you also confirm the car has the advanced driver assistance package?',
     data: {
@@ -228,7 +228,7 @@ export const mockActivities = [
   {
     id: 21.3,
     type: 'whatsapp',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'sent a WhatsApp message',
     content:
       'Confirmed. It includes the assistance package + parking camera. I can book Thu 13:00 — shall I reserve it under your name?',
@@ -243,13 +243,13 @@ export const mockActivities = [
   {
     id: 21.4,
     type: 'customer-email',
-    user: 'Sophie Mueller',
+    user: 'Giulia Conti',
     action: 'sent an email',
     content:
       'Please reserve it for Thu 13:00. Also, could you send a detailed quote incl. delivery time and warranty options?',
     data: {
       threadId: 'lead-4-email',
-      from: 'sophie.mueller@example.com',
+      from: 'giulia.conti@example.com',
       to: 'sales@motork.io'
     },
     timestamp: createHourOffset(-2.7),
@@ -258,7 +258,7 @@ export const mockActivities = [
   {
     id: 21.5,
     type: 'note',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'added a note',
     content: 'Customer prefers email, no phone on file. Prepare quote + warranty options before appointment.',
     timestamp: createHourOffset(-2.3),
@@ -267,14 +267,14 @@ export const mockActivities = [
   {
     id: 21.6,
     type: 'email',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'sent an email',
     content:
-      'Quote attached for the C-Class including warranty options. Delivery time is 7–10 days after confirmation. See you Thu 13:00 in Munich Downtown.',
+      'Quote attached for the C-Class including warranty options. Delivery time is 7–10 days after confirmation. See you Thu 13:00 in Milano.',
     data: {
       threadId: 'lead-4-email',
-      from: 'david.miller@motork.io',
-      to: 'sophie.mueller@example.com'
+      from: 'davide.rinaldi@motork.io',
+      to: 'giulia.conti@example.com'
     },
     timestamp: createHourOffset(-1.9),
     leadId: 4
@@ -282,7 +282,7 @@ export const mockActivities = [
   {
     id: 21.7,
     type: 'customer-sms',
-    user: 'Sophie Mueller',
+    user: 'Giulia Conti',
     action: 'sent an SMS',
     content: 'Got it, thanks. Is parking available at the showroom?',
     data: {
@@ -295,9 +295,9 @@ export const mockActivities = [
   {
     id: 21.8,
     type: 'sms',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'sent an SMS',
-    content: 'Yes — customer parking is available on site. Ask for “Sophie Mueller” at reception.',
+    content: 'Yes — customer parking is available on site. Ask for “Giulia Conti” at reception.',
     data: {
       fromPhone: '+49 89 555 0101',
       toPhone: '+49 151 555 0404'
@@ -309,15 +309,15 @@ export const mockActivities = [
     id: 21.9,
     type: 'lead-updated',
     user: 'System',
-    action: 'Appointment scheduled: Thu 13:00 (Munich Downtown)',
-    message: 'Appointment scheduled: Thu 13:00 (Munich Downtown)',
+    action: 'Appointment scheduled: Thu 13:00 (Milano)',
+    message: 'Appointment scheduled: Thu 13:00 (Milano)',
     timestamp: createHourOffset(-1.4),
     leadId: 4
   },
   {
     id: 21.91,
     type: 'call',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'attempted call',
     message: 'No answer · voicemail left',
     content: 'No answer · voicemail left',
@@ -331,7 +331,7 @@ export const mockActivities = [
   {
     id: 21.92,
     type: 'call',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'call completed',
     message: 'Answered · 3m 12s',
     content: 'Answered · 3m 12s',
@@ -345,7 +345,7 @@ export const mockActivities = [
   {
     id: 21.93,
     type: 'call',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'attempted call',
     message: 'No answer · voicemail left',
     content: 'No answer · voicemail left',
@@ -359,7 +359,7 @@ export const mockActivities = [
   {
     id: 21.94,
     type: 'call',
-    user: 'Sophie Mueller',
+    user: 'Giulia Conti',
     action: 'inbound call',
     message: 'Answered · 1m 08s',
     content: 'Answered · 1m 08s',
@@ -373,7 +373,7 @@ export const mockActivities = [
   {
     id: 21.95,
     type: 'call',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'missed inbound call',
     message: 'No answer · missed inbound call',
     content: 'No answer · missed inbound call',
@@ -388,12 +388,12 @@ export const mockActivities = [
   {
     id: 22,
     type: 'customer-email',
-    user: 'John Smith',
+    user: 'Giovanni Sarti',
     action: 'sent an email',
     content: 'I received the quote. Can we confirm the black exterior is still available?',
     data: {
-      from: 'john.smith@example.com',
-      to: 'sarah.jenkins@motork.io'
+      from: 'giovanni.sarti@example.com',
+      to: 'sara.marino@motork.io'
     },
     timestamp: createHourOffset(-5),
     opportunityId: 1
@@ -401,7 +401,7 @@ export const mockActivities = [
   {
     id: 23,
     type: 'customer-whatsapp',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'sent a WhatsApp message',
     content: 'Happy to proceed with the counter-offer. When can we sign?',
     data: {
@@ -415,12 +415,12 @@ export const mockActivities = [
   {
     id: 24,
     type: 'email',
-    user: 'Sarah Jenkins',
+    user: 'Sara Marino',
     action: 'sent an email',
     content: 'Here is the quote for the Audi A6 you requested. Let me know if you have questions.',
     data: {
-      from: 'sarah.jenkins@motork.io',
-      to: 'john.smith@example.com'
+      from: 'sara.marino@motork.io',
+      to: 'giovanni.sarti@example.com'
     },
     timestamp: createHourOffset(-6),
     opportunityId: 1
@@ -428,7 +428,7 @@ export const mockActivities = [
   {
     id: 25,
     type: 'whatsapp',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'sent a WhatsApp message',
     content: 'I have prepared a counter-offer with a 5% discount. Sending it now.',
     data: {
@@ -441,9 +441,9 @@ export const mockActivities = [
   {
     id: 27,
     type: 'whatsapp',
-    user: 'Emma Watson',
+    user: 'Chiara Moretti',
     action: 'sent a WhatsApp message',
-    content: 'Hi Emma, I tried calling you. I will call again after 2 PM as requested.',
+    content: 'Hi Chiara, I tried calling you. I will call again after 2 PM as requested.',
     data: {
       fromPhone: '+49 89 555 0199',
       toPhone: '+49 170 555 0142'
@@ -466,7 +466,7 @@ export const mockActivities = [
   {
     id: 29,
     type: 'customer-sms',
-    user: 'Liam Johnson',
+    user: 'Matteo Bianchi',
     action: 'sent an SMS',
     content: 'Can you confirm the BMW iX is still available for a test drive this Saturday?',
     data: {
@@ -479,9 +479,9 @@ export const mockActivities = [
   {
     id: 30,
     type: 'sms',
-    user: 'Sarah Jenkins',
+    user: 'Sara Marino',
     action: 'sent an SMS',
-    content: 'Yes, Saturday works. I will reserve the iX for 11:00. See you at the Munich showroom.',
+    content: 'Yes, Saturday works. I will reserve the iX for 11:00. See you at the Milano showroom.',
     data: {
       fromPhone: '+49 89 555 0200',
       toPhone: '+49 170 555 0311'
@@ -492,7 +492,7 @@ export const mockActivities = [
   {
     id: 31,
     type: 'customer-sms',
-    user: 'Maciej Ogonowski',
+    user: 'Matteo Greco',
     action: 'sent an SMS',
     content: 'Running 10 min late for the appointment — still OK?',
     data: {
@@ -505,7 +505,7 @@ export const mockActivities = [
   {
     id: 32,
     type: 'sms',
-    user: 'David Miller',
+    user: 'Davide Rinaldi',
     action: 'sent an SMS',
     content: 'No problem, we will hold the bay. Drive safe.',
     data: {
@@ -515,11 +515,11 @@ export const mockActivities = [
     timestamp: createHourOffset(-7.5),
     opportunityId: 2
   },
-  // Lead 1 (Josh Adams) – system logs + inbound email, unsuccessful call, follow-up note
+  // Lead 1 (Luca De Santis) – system logs + inbound email, unsuccessful call, follow-up note
   {
     id: 33,
     type: 'note',
-    user: 'Sarah Jenkins',
+    user: 'Sara Marino',
     action: 'added a note',
     message: 'After call attempt: no answer, left VM with Wed / Thu test drive options.',
     content: 'After call attempt: no answer, left VM with Wed / Thu test drive options.',
@@ -529,7 +529,7 @@ export const mockActivities = [
   {
     id: 34,
     type: 'call',
-    user: 'Sarah Jenkins',
+    user: 'Sara Marino',
     action: 'attempted call',
     message: 'No answer · voicemail left',
     content: 'No answer · voicemail left',
@@ -542,7 +542,7 @@ export const mockActivities = [
   {
     id: 34.5,
     type: 'call',
-    user: 'Sarah Jenkins',
+    user: 'Sara Marino',
     action: 'call completed',
     message: 'Answered · 2m 37s',
     content: 'Answered · 2m 37s',
@@ -555,12 +555,12 @@ export const mockActivities = [
   {
     id: 35,
     type: 'customer-email',
-    user: 'Josh Adams',
+    user: 'Luca De Santis',
     action: 'sent an email',
     content: 'Hi, I am interested in the Audi A6. Can we schedule a test drive?',
     data: {
       threadId: 'lead-1-email',
-      from: 'josh.adams@example.com',
+      from: 'luca.desantis@example.com',
       to: 'inbox@madrid.motork.io'
     },
     timestamp: createHourOffset(-6),
@@ -579,8 +579,8 @@ export const mockActivities = [
     id: 37,
     type: 'lead-assigned',
     user: 'System',
-    action: 'Lead was assigned to Sarah Jenkins',
-    message: 'Lead was assigned to Sarah Jenkins',
+    action: 'Lead was assigned to Sara Marino',
+    message: 'Lead was assigned to Sara Marino',
     timestamp: createHourOffset(-71.5),
     leadId: 1
   },
@@ -588,7 +588,7 @@ export const mockActivities = [
   {
     id: 38,
     type: 'customer-whatsapp',
-    user: 'Josh Adams',
+    user: 'Luca De Santis',
     action: 'sent a WhatsApp message',
     content: 'Hi, I can do Wed after 16:00 or Thu morning. What works best for a test drive?',
     data: {
@@ -602,9 +602,9 @@ export const mockActivities = [
   {
     id: 39,
     type: 'whatsapp',
-    user: 'Sarah Jenkins',
+    user: 'Sara Marino',
     action: 'sent a WhatsApp message',
-    content: 'Thu 11:00 is available. Shall I book the Audi A6 for you at 11:00 at Madrid showroom?',
+    content: 'Thu 11:00 is available. Shall I book the Audi A6 for you at 11:00 at Roma showroom?',
     data: {
       threadId: 'lead-1-whatsapp',
       fromPhone: '+34 910 555 0199',

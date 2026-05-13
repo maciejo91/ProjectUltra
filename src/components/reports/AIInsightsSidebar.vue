@@ -6,7 +6,7 @@
     <div class="bg-muted rounded-lg flex flex-col h-full overflow-hidden">
       <!-- Title Section -->
       <div class="px-4 py-4 flex items-center justify-between shrink-0">
-        <h3 class="text-lg font-medium text-foreground leading-5">Insights powered by AI</h3>
+        <h3 class="text-lg font-medium text-foreground leading-5">{{ t('dataTable.reports.aiInsights.title') }}</h3>
       </div>
 
       <!-- Card Content -->
@@ -45,7 +45,7 @@
               v-if="message.role === 'user'"
               class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0"
             >
-              <span class="text-sm font-medium text-purple-700">You</span>
+              <span class="text-sm font-medium text-purple-700">{{ t('entities.activity.timeline.you') }}</span>
             </div>
           </div>
 
@@ -57,7 +57,7 @@
               <Sparkles :size="14" class="text-white" />
             </div>
             <div class="bg-muted text-foreground border border-border rounded-lg px-4 py-2.5">
-              <p class="text-sm text-muted-foreground italic">Thinking...</p>
+              <p class="text-sm text-muted-foreground italic">{{ t('dataTable.reports.aiInsights.thinking') }}</p>
             </div>
           </div>
 
@@ -96,20 +96,21 @@
             class="mb-3 flex flex-wrap gap-2"
           >
             <button
-              v-for="suggestion in suggestions"
-              :key="suggestion"
+              v-for="suggestion in displayedSuggestions"
+              :key="suggestion.value"
               type="button"
               @click="handleSuggestionClick(suggestion)"
               class="px-3 py-1.5 text-sm bg-muted hover:bg-muted/80 border border-border rounded-lg text-foreground transition-colors cursor-pointer"
             >
-              {{ suggestion }}
+              {{ suggestion.label }}
             </button>
           </div>
           <div class="relative">
             <input
               v-model="questionInput"
               type="text"
-              placeholder="Ask anything..."
+              :placeholder="t('dataTable.reports.aiInsights.askPlaceholder')"
+              :aria-label="t('dataTable.reports.aiInsights.askPlaceholder')"
               class="w-full pr-12 text-sm rounded-lg border border-border bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               :disabled="isTyping || isThinking"
               @keypress="handleKeyPress"
@@ -118,6 +119,7 @@
               type="button"
               :disabled="!questionInput.trim() || isTyping || isThinking"
               @click="handleAsk"
+              :aria-label="t('dataTable.reports.aiInsights.sendQuestion')"
               class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
               :class="questionInput.trim() && !isTyping && !isThinking ? 'text-purple-600' : 'text-muted-foreground'"
             >
@@ -131,8 +133,11 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Send, Sparkles } from 'lucide-vue-next'
+
+const { t } = useI18n()
 
 const props = defineProps({
   messages: {
@@ -153,7 +158,7 @@ const props = defineProps({
   },
   suggestions: {
     type: Array,
-    default: () => ["Who's performing best?", "How many deals were closed?", "What's the conversion rate?"]
+    default: () => []
   }
 })
 
@@ -162,10 +167,39 @@ const emit = defineEmits(['send'])
 const questionInput = ref('')
 const chatContainerRef = ref(null)
 
+const defaultSuggestions = computed(() => [
+  {
+    label: t('dataTable.reports.aiInsights.suggestions.bestPerformers'),
+    value: "Who's performing best?"
+  },
+  {
+    label: t('dataTable.reports.aiInsights.suggestions.closedDeals'),
+    value: 'How many deals were closed?'
+  },
+  {
+    label: t('dataTable.reports.aiInsights.suggestions.conversionRate'),
+    value: "What's the conversion rate?"
+  }
+])
+
+const displayedSuggestions = computed(() => {
+  const suggestions = props.suggestions.length ? props.suggestions : defaultSuggestions.value
+  return suggestions.map((suggestion) => {
+    if (typeof suggestion === 'string') {
+      return { label: suggestion, value: suggestion }
+    }
+    return {
+      label: suggestion.label ?? suggestion.value ?? '',
+      value: suggestion.value ?? suggestion.label ?? ''
+    }
+  }).filter((suggestion) => suggestion.label && suggestion.value)
+})
+
 const handleSuggestionClick = (suggestion) => {
   if (props.isTyping || props.isThinking) return
-  questionInput.value = suggestion
-  handleAsk()
+  questionInput.value = suggestion.label
+  emit('send', { label: suggestion.label, value: suggestion.value })
+  questionInput.value = ''
 }
 
 const handleKeyPress = (e) => {

@@ -9,7 +9,7 @@
           <DataTableWithUnifiedSearch
             ref="datatableShellRef"
             active-tab="requests"
-            placeholder="Search requests..."
+            :placeholder="t('dataTable.searchRequests')"
             :pagination="pagination"
             :assignee-options="assigneeOptions"
             :status-options="statusOptions"
@@ -50,7 +50,7 @@
                     <div class="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-blue-600 text-white text-fluid-xs font-medium">
                       {{ selectedCount }}
                     </div>
-                    <span class="text-white text-fluid-sm font-medium whitespace-nowrap">Items selected</span>
+                    <span class="text-white text-fluid-sm font-medium whitespace-nowrap">{{ t('dataTable.requests.itemsSelected') }}</span>
                   </div>
                   <div class="h-4 w-px bg-greys-700"></div>
                   <Button
@@ -59,7 +59,7 @@
                     @click="handleBulkDelete"
                   >
                     <Trash2 class="w-4 h-4 shrink-0 mr-2" />
-                    Delete
+                    {{ t('common.buttons.delete') }}
                   </Button>
                   <Button
                     variant="ghost"
@@ -67,7 +67,7 @@
                     @click="clearSelection"
                   >
                     <X class="w-4 h-4 shrink-0 mr-2" />
-                    Close
+                    {{ t('common.buttons.close') }}
                   </Button>
                 </div>
               </template>
@@ -115,6 +115,7 @@ const selectableSegmentKeys = Object.values(SK).filter(k => k !== SK.ALL)
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
+const requestColumnLabel = (key) => t(`dataTable.requests.columns.${key}`)
 const usersStore = useUsersStore()
 const leadsStore = useLeadsStore()
 const opportunitiesStore = useOpportunitiesStore()
@@ -182,7 +183,7 @@ function getCustomerName(row) {
 
 function getAssigneeDisplay(row) {
   const name = row.assignee
-  if (!name) return 'Unassigned'
+  if (!name) return t('dataTable.tasks.values.unassigned')
   const user = usersStore.users.find(u => u.name === name)
   if (!user) return name
   const line2 = [user.team, user.dealership].filter(Boolean).join(' - ')
@@ -193,8 +194,8 @@ const columns = computed(() => [
   {
     id: 'type',
     accessorKey: 'type',
-    header: 'Type',
-    meta: { title: 'Type' },
+    header: requestColumnLabel('type'),
+    meta: { title: requestColumnLabel('type') },
     cell: ({ row }) => {
       const r = row.original
       const typeClass = r.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'
@@ -206,15 +207,15 @@ const columns = computed(() => [
   {
     id: 'customer',
     accessorKey: 'customer',
-    header: 'Customer',
-    meta: { title: 'Customer' },
+    header: requestColumnLabel('customer'),
+    meta: { title: requestColumnLabel('customer') },
     cell: ({ row }) => h('span', { class: 'text-foreground' }, getCustomerName(row.original))
   },
   {
     id: 'displayStage',
     accessorKey: 'displayStage',
-    header: 'Stage',
-    meta: { title: 'Stage' },
+    header: requestColumnLabel('stage'),
+    meta: { title: requestColumnLabel('stage') },
     cell: ({ row }) => {
       const stage = row.original.displayStage
       if (!stage) return h('span', { class: 'text-muted-foreground' }, '—')
@@ -227,15 +228,15 @@ const columns = computed(() => [
   {
     id: 'source',
     accessorKey: 'source',
-    header: 'Source',
-    meta: { title: 'Source' },
+    header: requestColumnLabel('source'),
+    meta: { title: requestColumnLabel('source') },
     cell: ({ row }) => h('span', { class: 'text-muted-foreground' }, row.original.source || '—')
   },
   {
     id: 'assignee',
     accessorKey: 'assignee',
-    header: 'Assigned',
-    meta: { title: 'Assigned' },
+    header: requestColumnLabel('assigned'),
+    meta: { title: requestColumnLabel('assigned') },
     cell: ({ row }) => h('span', { class: 'text-muted-foreground' }, getAssigneeDisplay(row.original))
   }
 ])

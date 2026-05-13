@@ -1,7 +1,9 @@
 <template>
   <div class="overflow-hidden rounded-lg bg-white shadow-nsc-card p-4 flex flex-col gap-4 w-full">
     <div class="flex items-center justify-between gap-2">
-      <h3 class="text-base font-medium text-foreground leading-6">Financing options</h3>
+      <h3 class="text-base font-medium text-foreground leading-6">
+        {{ t('requestDetail.purchaseDetails.financingOptions') }}
+      </h3>
       <Button
         variant="secondary"
         size="sm"
@@ -9,7 +11,7 @@
         @click="$emit('open-add')"
       >
         <Plus class="size-3.5" />
-        Add
+        {{ t('requestDetail.purchaseDetails.add') }}
       </Button>
     </div>
     <ul v-if="items.length" class="space-y-1.5">
@@ -20,7 +22,9 @@
         @click="$emit('open-edit', f)"
       >
         <span class="font-medium text-foreground">{{ f.label }}</span>
-        <span v-if="f.termMonths" class="text-muted-foreground shrink-0 text-sm">{{ f.termMonths }} months</span>
+        <span v-if="f.termMonths" class="text-muted-foreground shrink-0 text-sm">
+          {{ t('requestDetail.purchaseDetails.months', { count: f.termMonths }) }}
+        </span>
       </li>
     </ul>
   </div>
@@ -28,6 +32,7 @@
 
 <script setup>
 import { Plus } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 import { Button } from '@motork/component-library/future/primitives'
 
 defineProps({
@@ -38,4 +43,6 @@ defineProps({
 })
 
 defineEmits(['open-add', 'open-edit'])
+
+const { t } = useI18n()
 </script>

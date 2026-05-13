@@ -392,6 +392,19 @@
       "searchPlaceholder": "Rechercher par nom ou équipe",
       "noResults": "Aucun résultat"
     },
+    "communications": {
+      "title": "Envoyer confirmations et rappels",
+      "immediateConfirmation": "Envoyer une confirmation immédiate au client",
+      "reminderBeforeAppointment": "Envoyer un rappel la veille du rendez-vous",
+      "salespersonNotification": "Notifier {name} du rendez-vous",
+      "salespersonFallback": "vendeur",
+      "selectChannels": "Sélectionner les canaux",
+      "channels": {
+        "email": "par e-mail",
+        "sms": "par SMS",
+        "whatsapp": "par WhatsApp"
+      }
+    },
     "calendar": {
       "days": ["DIM", "LUN", "MAR", "MER", "JEU", "VEN", "SAM"]
     }

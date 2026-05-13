@@ -427,7 +427,7 @@ export const createOpportunityFromLead = async (leadData, activities, options = 
   await delay()
 
   // Get assignee name from options or lead
-  let assigneeName = leadData.assignee || 'Michael Thomas'
+  let assigneeName = leadData.assignee || 'Michele Tomasi'
   if (options.assigneeId) {
     const assigneeUser = mockUsers.find(u => u.id === options.assigneeId)
     if (assigneeUser) {

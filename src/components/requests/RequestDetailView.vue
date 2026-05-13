@@ -1,6 +1,6 @@
 <template>
   <RequestDetailShell :request="request">
-    <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div class="flex min-w-0 flex-col">
     <ComingSoonModal :show="showPostponeModal" @close="showPostponeModal = false" />
     <ComingSoonModal :show="showGenericComingSoon" @close="showGenericComingSoon = false" />
 
@@ -139,9 +139,13 @@
     <div
       ref="requestDetailBodyRef"
       v-if="showAssociatedTasksOrTimeline"
-      class="flex min-h-0 w-full flex-1 flex-col overflow-hidden"
+      class="flex w-full flex-col overflow-visible"
     >
-      <div v-if="request" ref="requestHeaderStripRef" class="w-full min-w-0 shrink-0">
+      <div
+        v-if="request"
+        ref="requestHeaderStripRef"
+        class="sticky top-0 z-50 w-full min-w-0 shrink-0 bg-muted pb-3"
+      >
         <RequestDetailCompactHeader
           v-if="showCompactRequestHeader"
           :request="request"
@@ -177,7 +181,10 @@
         />
       </div>
       <div
-        class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-x-hidden overflow-y-visible p-4"
+        :class="[
+          'flex min-w-0 flex-col gap-4 px-4 pb-4 pt-2',
+          requestFloatingBarScrollPadding.row
+        ]"
       >
         <DuplicateDetectedCard
           v-if="request && potentialDuplicates.length && !duplicateBannerDismissed"
@@ -187,19 +194,12 @@
           @dismiss="duplicateBannerDismissed = true"
         />
       <div
-        ref="requestDetailRowRef"
-        :class="[
-          'flex min-h-0 flex-1 flex-col gap-4 overscroll-contain max-lg:overflow-x-hidden lg:min-w-0 lg:flex-row lg:items-start lg:gap-4 lg:min-h-0',
-          'max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto',
-          'lg:overflow-y-auto lg:overscroll-contain',
-          requestFloatingBarScrollPadding.row
-        ]"
+        class="flex min-w-0 flex-col gap-4 overscroll-contain max-lg:overflow-x-hidden lg:min-w-0 lg:flex-row lg:items-start lg:gap-4"
       >
         <div
           class="order-1 relative flex min-h-0 min-w-0 flex-col gap-4 lg:min-h-0 lg:min-w-0 lg:flex-1"
         >
           <div
-            ref="requestMainColumnScrollRef"
             :class="[
               'flex min-h-0 min-w-0 flex-1 flex-col gap-4 max-lg:overflow-visible',
               'lg:overflow-visible lg:min-h-0',
@@ -209,7 +209,7 @@
           <div class="flex min-w-0 flex-col gap-4 max-lg:shrink-0 lg:min-h-0 lg:min-w-0 lg:flex-1">
             <div
               ref="requestCustomerSectionRef"
-              class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg border border-border bg-background shadow-mk-dashboard-card"
+              class="flex min-w-0 shrink-0 flex-col overflow-hidden rounded-lg bg-background shadow-mk-dashboard-card"
             >
               <RequestLeadProfileSection
                 v-if="request"
@@ -228,28 +228,27 @@
             </div>
 
             <div
-              class="flex min-h-0 min-w-0 max-lg:shrink-0 flex-col overflow-visible rounded-lg border border-border bg-background shadow-mk-dashboard-card isolate lg:flex-1 lg:min-h-0"
+              class="flex min-h-0 min-w-0 max-lg:shrink-0 flex-col overflow-visible rounded-lg bg-transparent shadow-mk-dashboard-card isolate lg:flex-1 lg:min-h-0"
             >
               <div class="flex min-h-0 min-w-0 flex-col">
                 <div
-                  class="sticky top-0 z-40 shrink-0 overflow-hidden rounded-t-lg bg-background"
-                  :class="{
-                    'lg:border-t lg:border-border': mainTabsStripElevated
-                  }"
+                  class="sticky top-0 z-40 shrink-0 bg-transparent"
+                  :style="tabsStickyStyle"
                 >
-                  <div class="border-b border-border px-4 pb-0 pt-2">
+                  <div class="overflow-hidden rounded-t-lg bg-background">
+                    <div class="border-b border-border px-4 pb-0 pt-2">
                     <RequestMainTabs
                       class="shrink-0"
                       v-model="mainTab"
                       :tabs="mainTabs"
                       :show-baseline-rule="false"
                     />
+                    </div>
                   </div>
                 </div>
 
                 <div
-                  ref="requestTabPanelScrollRef"
-                  class="flex min-h-0 min-w-0 flex-col gap-4 overflow-x-hidden rounded-b-lg max-lg:shrink-0 lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+                  class="flex min-w-0 flex-col gap-4 overflow-hidden rounded-b-lg bg-background max-lg:shrink-0"
                   :class="mainTab === 'activity' ? '' : 'p-4'"
                 >
               <template v-if="mainTab === 'overview'">
@@ -326,7 +325,7 @@
               </template>
 
               <template v-else-if="mainTab === 'insights'">
-                <div class="min-h-40 w-full" />
+                <RequestInsightsTab />
               </template>
 
               <template v-else-if="mainTab === 'financingTradeIns'">
@@ -451,16 +450,17 @@
 
         <div
           :class="[
-            'order-2 flex min-h-0 min-w-0 flex-col gap-4 lg:sticky lg:top-0 lg:w-1/4 lg:shrink-0 lg:self-start lg:max-h-screen lg:min-h-0 lg:overscroll-contain',
+            'order-2 flex min-h-0 min-w-0 flex-col gap-4 lg:sticky lg:max-h-screen lg:w-1/4 lg:shrink-0 lg:self-start lg:overscroll-contain',
             floatingLqFocusMode ? 'lg:overflow-hidden' : 'lg:overflow-y-auto lg:overscroll-contain'
           ]"
+          :style="sidebarStickyStyle"
         >
           <VehicleRequestCard
             v-if="request && (request.requestedCar || request.vehicle)"
             class="shrink-0"
             :heading="t('requestDetail.vehicleCard.title')"
             :vehicle="request.requestedCar || request.vehicle"
-            :request-message="request.requestMessage || request.requestedCar?.requestMessage"
+            :request-message="resolvedRequestMessage"
             :request-context="requestedVehicleRequestContext"
             :dealership-needs-warning="!!request.dealershipNeedsWarning"
             :source="request.source"
@@ -478,7 +478,7 @@
             v-if="request && showRequestDetailsCard"
             class="shrink-0"
             :title="t('requestDetail.messageCard.title')"
-            :message="request.requestMessage || request.requestedCar?.requestMessage || ''"
+            :message="resolvedRequestMessage"
             :utm-source="requestAttribution.utmSource"
             :utm-term="requestAttribution.utmTerm"
             :utm-campaign="requestAttribution.utmCampaign"
@@ -517,6 +517,7 @@ import RequestMainTabs from './RequestMainTabs.vue'
 import RequestTabEmptyState from './RequestTabEmptyState.vue'
 import RequestLeadProfileSection from './RequestLeadProfileSection.vue'
 import RequestInsightBanner from './RequestInsightBanner.vue'
+import RequestInsightsTab from './RequestInsightsTab.vue'
 import RequestLeadQualificationTeaser from './RequestLeadQualificationTeaser.vue'
 import RequestMessageCard from './RequestMessageCard.vue'
 import SuggestedNextActionCard from './SuggestedNextActionCard.vue'
@@ -592,13 +593,11 @@ const editingTradeIn = ref(null)
 const editingFinancingOption = ref(null)
 const tradeInActionLoading = ref(false)
 const duplicateBannerDismissed = ref(false)
-const requestMainColumnScrollRef = ref(null)
-const requestDetailRowRef = ref(null)
 const requestDetailBodyRef = ref(null)
-const requestTabPanelScrollRef = ref(null)
 const requestHeaderStripRef = ref(null)
 const requestCustomerSectionRef = ref(null)
 const showCompactRequestHeader = ref(false)
+const stickyHeaderOffset = ref(0)
 let removeRequestHeaderCompactScrollListeners = null
 let requestHeaderCompactWindowResize = null
 let compactHeaderResizeObserver = null
@@ -608,7 +607,14 @@ const lqfTeaserDismissed = ref(false)
 const lqfInlineManageOpen = ref(false)
 const leadLqOutcomeSummary = ref(null)
 const floatingLqFocusMode = ref(false)
-const mainTabsStripElevated = ref(false)
+
+const stickyHeaderTop = computed(() => `${stickyHeaderOffset.value}px`)
+const tabsStickyStyle = computed(() => ({
+  top: stickyHeaderTop.value
+}))
+const sidebarStickyStyle = computed(() => ({
+  top: stickyHeaderTop.value
+}))
 
 const qualifyInlineSuccessForRequest = computed(() =>
   resolveStoredQualifyInlineSuccess(props.request, leadsStore.lastInlineLeadQualifySuccess)
@@ -635,7 +641,7 @@ const showSophieSMSComposer = ref(false)
 
 const useLegacyCommunicationDialogs = computed(() => {
   const customerName = String(props.request?.customer?.name ?? '').trim()
-  return props.request?.type === 'lead' && customerName === 'Josh Adams'
+  return props.request?.type === 'lead' && customerName === 'Luca De Santis'
 })
 const sophieMessageChannel = ref('sms')
 const showSophieNoteComposer = ref(false)
@@ -675,6 +681,25 @@ const leadRef = computed(() => (props.request?.type === 'lead' ? props.request :
 
 const requestAttribution = computed(() => getRequestAttributionProps(props.request))
 
+const matteoBmwIxRequestMessage =
+  'Vorrei sapere se la BMW iX xDrive50 è ancora disponibile per un test drive. Potete confermare autonomia, tempi di consegna e opzioni di leasing?'
+
+const isMatteoBmwIxRequest = computed(() => {
+  const r = props.request
+  const vehicle = r?.requestedCar || r?.vehicle || {}
+  const customerName = String(r?.customer?.name || '').toLowerCase()
+  return (
+    (String(r?.customerId || '') === '3' || customerName.includes('matteo bianchi')) &&
+    String(vehicle.brand || '').toLowerCase() === 'bmw' &&
+    String(vehicle.model || '').toLowerCase().includes('ix')
+  )
+})
+
+const resolvedRequestMessage = computed(() => {
+  if (isMatteoBmwIxRequest.value) return matteoBmwIxRequestMessage
+  return props.request?.requestMessage || props.request?.requestedCar?.requestMessage || ''
+})
+
 const requestedVehicleRequestContext = computed(() => {
   const r = props.request
   if (!r) return {}
@@ -690,7 +715,7 @@ const requestedVehicleRequestContext = computed(() => {
 const showRequestDetailsCard = computed(() => {
   const r = props.request
   if (!r) return false
-  const msg = (r.requestMessage || r.requestedCar?.requestMessage || '').trim()
+  const msg = resolvedRequestMessage.value.trim()
   if (msg) return true
   if (r.utmSource || r.utmTerm || r.utmCampaign || r.webSparkCampaign) return true
   if (r.originalMessageUrl) return true
@@ -854,13 +879,13 @@ const overviewTabCount = computed(() => {
 const mainTabs = computed(() => [
   { key: 'overview', label: t('requestDetail.tabs.overview'), count: overviewTabCount.value },
   { key: 'activity', label: t('requestDetail.tabs.timeline'), count: requestActivities.value.length },
-  { key: 'insights', label: t('requestDetail.tabs.insights'), count: 0 },
   {
     key: 'financingTradeIns',
     label: t('requestDetail.tabs.financingTradeIns'),
     count: tradeInsCount.value + financingOptionsCount.value
   },
   { key: 'attachments', label: t('requestDetail.tabs.attachments'), count: attachmentsCount.value },
+  { key: 'insights', label: t('requestDetail.tabs.insights'), count: 0 },
 ])
 
 watch(
@@ -953,48 +978,40 @@ function isCustomerSectionScrolledPast(scrollRoot, sectionEl) {
   return scrollRoot.scrollTop >= sectionBottomInContent - 1
 }
 
-function getWindowScrollRoot() {
-  if (typeof document === 'undefined') return null
+function getScrollableAncestor(el) {
+  let node = el?.parentElement
+  while (node && node !== document.documentElement) {
+    const style = window.getComputedStyle(node)
+    const overflowY = style.overflowY
+    const canScroll =
+      (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') &&
+      node.scrollHeight > node.clientHeight + 1
+    if (canScroll) return node
+    node = node.parentElement
+  }
   return document.scrollingElement || document.documentElement
 }
 
-function isElementScrollable(el) {
-  if (!el) return false
-  return el.scrollHeight > el.clientHeight + 1
-}
-
 function getScrollRootForHeader() {
-  // We need the element that actually scrolls. After sticky tabs/layout changes,
-  // the main column wrapper is often NOT scrollable (overflow-visible).
-  const row = requestDetailRowRef.value
-  const body = requestDetailBodyRef.value
-  const mainCol = requestMainColumnScrollRef.value
-  if (isElementScrollable(row)) return row
-  if (isElementScrollable(body)) return body
-  if (isElementScrollable(mainCol)) return mainCol
-  return getWindowScrollRoot()
+  return getScrollableAncestor(requestDetailBodyRef.value)
 }
 
 function updateCompactHeaderVisibility() {
   const section = requestCustomerSectionRef.value
-  const mainCol = getScrollRootForHeader()
+  const scrollRoot = getScrollRootForHeader()
   if (!section) {
     showCompactRequestHeader.value = false
     return
   }
-  if (isCustomerSectionScrolledPast(mainCol, section)) {
+  if (isCustomerSectionScrolledPast(scrollRoot, section)) {
     showCompactRequestHeader.value = true
     return
   }
   showCompactRequestHeader.value = false
 }
 
-function updateMainTabsStripElevation() {
-  const panel = requestTabPanelScrollRef.value
-  const row = requestDetailRowRef.value
-  mainTabsStripElevated.value = Boolean(
-    (panel && panel.scrollTop > 0) || (row && row.scrollTop > 0)
-  )
+function updateStickyHeaderOffset() {
+  stickyHeaderOffset.value = requestHeaderStripRef.value?.offsetHeight || 0
 }
 
 function scheduleCompactHeaderUpdate() {
@@ -1002,27 +1019,9 @@ function scheduleCompactHeaderUpdate() {
   compactHeaderRafPending = true
   requestAnimationFrame(() => {
     compactHeaderRafPending = false
+    updateStickyHeaderOffset()
     updateCompactHeaderVisibility()
-    updateMainTabsStripElevation()
   })
-}
-
-function attachScrollListenersToScrollableAncestors(el, onScroll) {
-  const cleanups = []
-  let node = el
-  while (node && node !== document.documentElement) {
-    const style = window.getComputedStyle(node)
-    const oy = style.overflowY
-    const canScroll =
-      (oy === 'auto' || oy === 'scroll' || oy === 'overlay') &&
-      node.scrollHeight > node.clientHeight + 1
-    if (canScroll) {
-      node.addEventListener('scroll', onScroll, { passive: true })
-      cleanups.push(() => node.removeEventListener('scroll', onScroll))
-    }
-    node = node.parentElement
-  }
-  return cleanups
 }
 
 function attachRequestHeaderCompactTracking() {
@@ -1044,27 +1043,10 @@ function attachRequestHeaderCompactTracking() {
   window.addEventListener('scroll', onScroll, true)
   cleanups.push(() => window.removeEventListener('scroll', onScroll, true))
 
-  const mainCol = requestMainColumnScrollRef.value
-  const row = requestDetailRowRef.value
-  const body = requestDetailBodyRef.value
-  if (mainCol) {
-    mainCol.addEventListener('scroll', onScroll, { passive: true })
-    cleanups.push(() => mainCol.removeEventListener('scroll', onScroll))
-    cleanups.push(...attachScrollListenersToScrollableAncestors(mainCol, onScroll))
-  }
-  if (row) {
-    row.addEventListener('scroll', onScroll, { passive: true })
-    cleanups.push(() => row.removeEventListener('scroll', onScroll))
-    cleanups.push(...attachScrollListenersToScrollableAncestors(row, onScroll))
-  }
-  const tabPanel = requestTabPanelScrollRef.value
-  if (tabPanel) {
-    tabPanel.addEventListener('scroll', onScroll, { passive: true })
-    cleanups.push(() => tabPanel.removeEventListener('scroll', onScroll))
-  }
-  if (body) {
-    body.addEventListener('scroll', onScroll, { passive: true })
-    cleanups.push(() => body.removeEventListener('scroll', onScroll))
+  const scrollRoot = getScrollRootForHeader()
+  if (scrollRoot) {
+    scrollRoot.addEventListener('scroll', onScroll, { passive: true })
+    cleanups.push(() => scrollRoot.removeEventListener('scroll', onScroll))
   }
 
   removeRequestHeaderCompactScrollListeners = () => cleanups.forEach((fn) => fn())
@@ -1094,6 +1076,15 @@ watch(
     showCompactRequestHeader.value = false
     await nextTick()
     setupRequestHeaderCompactTracking()
+  },
+  { flush: 'post' }
+)
+
+watch(
+  () => showCompactRequestHeader.value,
+  async () => {
+    await nextTick()
+    scheduleCompactHeaderUpdate()
   },
   { flush: 'post' }
 )

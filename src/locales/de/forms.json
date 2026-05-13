@@ -392,6 +392,19 @@
       "internalNote": "Interne Notiz zum Termin",
       "internalNotePlaceholder": "Optionale Notiz nur für Ihr Team"
     },
+    "communications": {
+      "title": "Bestätigungen und Erinnerungen senden",
+      "immediateConfirmation": "Sofortige Bestätigung an den Kunden senden",
+      "reminderBeforeAppointment": "Erinnerung am Tag vor dem Termin senden",
+      "salespersonNotification": "{name} über den Termin benachrichtigen",
+      "salespersonFallback": "Verkäufer",
+      "selectChannels": "Kanäle auswählen",
+      "channels": {
+        "email": "per E-Mail",
+        "sms": "per SMS",
+        "whatsapp": "per WhatsApp"
+      }
+    },
     "calendar": {
       "days": ["SO", "MO", "DI", "MI", "DO", "FR", "SA"]
     }

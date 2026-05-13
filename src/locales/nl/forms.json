@@ -392,6 +392,19 @@
       "internalNote": "Interne notitie bij de afspraak",
       "internalNotePlaceholder": "Optionele notitie, alleen zichtbaar voor je team"
     },
+    "communications": {
+      "title": "Bevestigingen en herinneringen versturen",
+      "immediateConfirmation": "Directe bevestiging naar klant versturen",
+      "reminderBeforeAppointment": "Herinnering de dag voor de afspraak versturen",
+      "salespersonNotification": "{name} informeren over de afspraak",
+      "salespersonFallback": "verkoper",
+      "selectChannels": "Kanalen selecteren",
+      "channels": {
+        "email": "via e-mail",
+        "sms": "via SMS",
+        "whatsapp": "via WhatsApp"
+      }
+    },
     "calendar": {
       "days": ["ZON", "MAA", "DIN", "WOE", "DON", "VRI", "ZAT"]
     }

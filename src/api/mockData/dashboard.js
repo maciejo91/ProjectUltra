@@ -49,16 +49,16 @@ export const mockSalesPipeline = {
 }
 
 export const mockTeamPerformance = [
-  { name: 'David Martin', leads: 198, qualifiedLeads: 94, qualifiedPercentage: 47, opportunities: 51, contracts: 28 },
-  { name: 'Sophie Dubois', leads: 189, qualifiedLeads: 91, qualifiedPercentage: 48, opportunities: 49, contracts: 26 },
-  { name: 'Thomas Anderson', leads: 182, qualifiedLeads: 89, qualifiedPercentage: 49, opportunities: 48, contracts: 25 },
-  { name: 'Marie Leclerc', leads: 171, qualifiedLeads: 85, qualifiedPercentage: 49, opportunities: 42, contracts: 23 },
-  { name: 'James Wilson', leads: 167, qualifiedLeads: 82, qualifiedPercentage: 49, opportunities: 44, contracts: 22 },
-  { name: 'Camille Bernard', leads: 159, qualifiedLeads: 73, qualifiedPercentage: 46, opportunities: 41, contracts: 21 },
-  { name: 'Emily Brown', leads: 156, qualifiedLeads: 78, qualifiedPercentage: 50, opportunities: 45, contracts: 24 },
-  { name: 'Pierre Moreau', leads: 145, qualifiedLeads: 62, qualifiedPercentage: 43, opportunities: 38, contracts: 19 },
-  { name: 'Robert Taylor', leads: 143, qualifiedLeads: 65, qualifiedPercentage: 45, opportunities: 37, contracts: 18 },
-  { name: 'Julie Martin', leads: 134, qualifiedLeads: 59, qualifiedPercentage: 44, opportunities: 35, contracts: 17 }
+  { name: 'Davide Martino', leads: 198, qualifiedLeads: 94, qualifiedPercentage: 47, opportunities: 51, contracts: 28 },
+  { name: 'Sofia De Luca', leads: 189, qualifiedLeads: 91, qualifiedPercentage: 48, opportunities: 49, contracts: 26 },
+  { name: 'Tommaso Romano', leads: 182, qualifiedLeads: 89, qualifiedPercentage: 49, opportunities: 48, contracts: 25 },
+  { name: 'Maria Marchetti', leads: 171, qualifiedLeads: 85, qualifiedPercentage: 49, opportunities: 42, contracts: 23 },
+  { name: 'Giacomo Colombo', leads: 167, qualifiedLeads: 82, qualifiedPercentage: 49, opportunities: 44, contracts: 22 },
+  { name: 'Camilla Bernardi', leads: 159, qualifiedLeads: 73, qualifiedPercentage: 46, opportunities: 41, contracts: 21 },
+  { name: 'Emilia Bruno', leads: 156, qualifiedLeads: 78, qualifiedPercentage: 50, opportunities: 45, contracts: 24 },
+  { name: 'Pietro Morelli', leads: 145, qualifiedLeads: 62, qualifiedPercentage: 43, opportunities: 38, contracts: 19 },
+  { name: 'Roberto Fontana', leads: 143, qualifiedLeads: 65, qualifiedPercentage: 45, opportunities: 37, contracts: 18 },
+  { name: 'Giulia Martino', leads: 134, qualifiedLeads: 59, qualifiedPercentage: 44, opportunities: 35, contracts: 17 }
 ]
 
 export const mockActionableQuestions = [
@@ -66,10 +66,10 @@ export const mockActionableQuestions = [
     id: 'mock-appt-followup-1',
     type: 'appointment-followup',
     priority: 4,
-    question: 'You had an appointment yesterday with Jean-Pierre Dubois but no offer is added so far. Did they show up to the appointment?',
-    customer: { name: 'Jean-Pierre Dubois' },
+    question: 'You had an appointment yesterday with Gianni De Luca but no offer is added so far. Did they show up to the appointment?',
+    customer: { name: 'Gianni De Luca' },
     opportunityId: 1,
-    opportunity: { id: 1, assignee: 'Maciej Ogonowski', customer: { name: 'Jean-Pierre Dubois' } },
+    opportunity: { id: 1, assignee: 'Matteo Greco', customer: { name: 'Gianni De Luca' } },
     createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     appointmentDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   },
@@ -77,10 +77,10 @@ export const mockActionableQuestions = [
     id: 'mock-stuck-opportunity-1',
     type: 'stuck-opportunity',
     priority: 1,
-    question: 'This opportunity with Sarah Johnson has been inactive for 16 days. Are they still interested in purchasing?',
-    customer: { name: 'Sarah Johnson' },
+    question: 'This opportunity with Sara Mancini has been inactive for 16 days. Are they still interested in purchasing?',
+    customer: { name: 'Sara Mancini' },
     opportunityId: 1,
-    opportunity: { id: 1, assignee: 'Matteo Alpino', customer: { name: 'Sarah Johnson' } },
+    opportunity: { id: 1, assignee: 'Matteo Alpino', customer: { name: 'Sara Mancini' } },
     createdAt: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(),
     daysInactive: 16
   },
@@ -88,22 +88,22 @@ export const mockActionableQuestions = [
     id: 'mock-lead-qualification-urgency-1',
     type: 'lead-qualification-urgency',
     priority: 2,
-    question: 'Lead from Michael Brown is 10 days old and still unqualified. Should we prioritise qualification?',
-    customer: { name: 'Michael Brown' },
+    question: 'Lead from Michele Bruno is 10 days old and still unqualified. Should we prioritise qualification?',
+    customer: { name: 'Michele Bruno' },
     leadId: 1,
     opportunityId: null,
     opportunity: null,
-    lead: { id: 1, assignee: 'Maciej Ogonowski', customer: { name: 'Michael Brown' } },
+    lead: { id: 1, assignee: 'Matteo Greco', customer: { name: 'Michele Bruno' } },
     createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
   }
 ]
 
 export const mockTodaysEvents = [
-  { id: 1, date: 'February 14th', time: '09:30-10:30', title: 'Dealership visit', type: 'Dealership visit', name: 'Jean-Pierre Dubois', location: 'Volvo Paris' },
-  { id: 2, date: 'February 14th', time: '11:00-12:00', title: 'Test drive', type: 'Test drive', name: 'Sarah Johnson', location: 'Volvo Lyon' },
-  { id: 3, date: 'February 14th', time: '13:15-13:45', title: 'Call', type: 'Call', name: 'Michael Brown', location: 'Virtual Meeting' },
-  { id: 4, date: 'February 14th', time: '14:30-15:30', title: 'Delivery', type: 'Delivery', name: 'Marie Lefebvre', location: 'Volvo Marseille' },
-  { id: 5, date: 'February 14th', time: '15:45-16:45', title: 'Recall', type: 'Recall', name: 'David Martin', location: 'Volvo Nice' }
+  { id: 1, date: 'February 14th', time: '09:30-10:30', title: 'Dealership visit', type: 'Dealership visit', name: 'Gianni De Luca', location: 'Volvo Paris' },
+  { id: 2, date: 'February 14th', time: '11:00-12:00', title: 'Test drive', type: 'Test drive', name: 'Sara Mancini', location: 'Volvo Lyon' },
+  { id: 3, date: 'February 14th', time: '13:15-13:45', title: 'Call', type: 'Call', name: 'Michele Bruno', location: 'Virtual Meeting' },
+  { id: 4, date: 'February 14th', time: '14:30-15:30', title: 'Delivery', type: 'Delivery', name: 'Maria Ferrari', location: 'Volvo Marseille' },
+  { id: 5, date: 'February 14th', time: '15:45-16:45', title: 'Recall', type: 'Recall', name: 'Davide Martino', location: 'Volvo Nice' }
 ]
 
 export const mockPageViewsByVehicle = [

@@ -124,7 +124,7 @@ export const createLeadFromOpportunity = async (opportunityData, activities) => 
     source: opportunityData.source || 'Marketing',
     fiscalEntity: opportunityData.fiscalEntity || '',
     sourceDetails: opportunityData.sourceDetails || '',
-    assignee: opportunityData.assignee || 'Michael Thomas',
+    assignee: opportunityData.assignee || 'Michele Tomasi',
     assigneeInitials: opportunityData.assigneeInitials || 'MT',
     createdAt: new Date().toISOString(),
     lastActivity: new Date().toISOString(),

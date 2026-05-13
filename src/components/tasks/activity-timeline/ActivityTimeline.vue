@@ -8,24 +8,25 @@
     <div class="relative">
       <div
         v-if="timelineVariant === 'sophieAnchored' && activities.length > 0"
-        class="absolute left-4 top-0 bottom-0 w-px bg-border"
+        class="absolute left-3 top-0 bottom-0 w-px bg-border"
         aria-hidden="true"
       />
       <div class="relative z-10 flex flex-col">
-        <ActivityTimelineItem
-          v-for="(activity, index) in activities"
-          :key="activity.id ?? `activity-${activity.timestamp ?? activity.createdAt ?? ''}`"
-          :activity="activity"
-          :all-activities="activities"
-          :timeline-variant="timelineVariant"
-          :show-thread-action="showThreadAction"
-          :is-last="index === activities.length - 1"
-          :compact-bottom-spacing="pairwiseSystemCompact(activities, index)"
-          @activity-click="(a) => emit('activity-click', a)"
-          @open-transcript="(a) => emit('open-transcript', a)"
-          @add-activity="(action) => emit('add-activity', action)"
-          @open-thread="(payload) => emit('open-thread', payload)"
-        />
+        <template v-for="(activity, index) in activities" :key="activityKey(activity, index)">
+          <ActivityTimelineItem
+            v-if="activity"
+            :activity="activity"
+            :all-activities="activities"
+            :timeline-variant="timelineVariant"
+            :show-thread-action="showThreadAction"
+            :is-last="index === activities.length - 1"
+            :compact-bottom-spacing="pairwiseSystemCompact(activities, index)"
+            @activity-click="(a) => emit('activity-click', a)"
+            @open-transcript="(a) => emit('open-transcript', a)"
+            @add-activity="(action) => emit('add-activity', action)"
+            @open-thread="(payload) => emit('open-thread', payload)"
+          />
+        </template>
       </div>
     </div>
   </div>
@@ -35,12 +36,17 @@
 import { isActivityTimelineSystemHeadline } from '@/composables/useActivityTimelinePresentation'
 import ActivityTimelineItem from './ActivityTimelineItem.vue'
 
+function activityKey(activity, index) {
+  if (!activity) return `activity-slot-${index}`
+  return activity.id ?? `activity-${activity.timestamp ?? activity.createdAt ?? index}`
+}
+
 function pairwiseSystemCompact(list, index) {
   if (!list?.length || index >= list.length - 1) return false
-  return (
-    isActivityTimelineSystemHeadline(list[index]) &&
-    isActivityTimelineSystemHeadline(list[index + 1])
-  )
+  const a = list[index]
+  const b = list[index + 1]
+  if (!a || !b) return false
+  return isActivityTimelineSystemHeadline(a) && isActivityTimelineSystemHeadline(b)
 }
 
 defineProps({

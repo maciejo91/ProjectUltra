@@ -288,7 +288,7 @@ export class OpportunityRepository extends BaseRepository {
             start: startDate.toISOString(),
             end: endDate.toISOString(),
             type: existingAppointment?.type || 'Test Drive',
-            assignee: existingAppointment?.assignee || opp.assignee || 'Sarah Jenkins',
+            assignee: existingAppointment?.assignee || opp.assignee || 'Sara Marino',
             customerId: existingAppointment?.customerId || opp.customerId,
             opportunityId: 2,
             duration: existingAppointment?.duration || 60,

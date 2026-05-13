@@ -75,7 +75,31 @@
         <SidebarGroup v-if="hasActionsGroup">
           <SidebarMenu>
             <SidebarMenuItem v-if="actionsVisibility.addNew">
+              <TooltipProvider v-if="lockedActions.addNew" :delay-duration="200">
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <SidebarMenuButton
+                      :aria-disabled="true"
+                      :class="lockedNavButtonClass"
+                      @click.prevent
+                    >
+                      <span class="flex min-w-0 w-full items-center gap-2">
+                        <Plus class="size-4 shrink-0" />
+                        <span class="truncate group-data-[collapsible=icon]:hidden">{{ addNewLabel }}</span>
+                        <Lock class="ml-auto size-3.5 shrink-0 text-muted-foreground/50 group-data-[collapsible=icon]:hidden" />
+                      </span>
+                    </SidebarMenuButton>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" align="center" class="max-w-xs">
+                    <span class="flex items-center gap-2">
+                      <Lock class="size-3.5 shrink-0 text-muted-foreground/50" />
+                      <span>{{ lockedTooltipText }}</span>
+                    </span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <SidebarMenuButton
+                v-else
                 as-child
                 :is-active="isRouteActive('/add-new')"
                 :tooltip="addNewLabel"
@@ -102,7 +126,32 @@
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarNotificationsPopover />
+              <TooltipProvider v-if="lockedActions.notifications" :delay-duration="200">
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <SidebarMenuButton
+                      :aria-disabled="true"
+                      :class="lockedNavButtonClass"
+                      @click.prevent
+                    >
+                      <span class="flex min-w-0 w-full items-center gap-2">
+                        <Bell class="size-4 shrink-0" />
+                        <span class="truncate group-data-[collapsible=icon]:hidden">
+                          {{ t('common.navigation.notifications') }}
+                        </span>
+                        <Lock class="ml-auto size-3.5 shrink-0 text-muted-foreground/50 group-data-[collapsible=icon]:hidden" />
+                      </span>
+                    </SidebarMenuButton>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" align="center" class="max-w-xs">
+                    <span class="flex items-center gap-2">
+                      <Lock class="size-3.5 shrink-0 text-muted-foreground/50" />
+                      <span>{{ lockedTooltipText }}</span>
+                    </span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <SidebarNotificationsPopover v-else />
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
@@ -115,9 +164,33 @@
           </SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem v-for="item in primaryNavItems" :key="item.href">
+              <TooltipProvider v-if="item.locked" :delay-duration="200">
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <SidebarMenuButton
+                      :aria-disabled="true"
+                      :class="lockedNavButtonClass"
+                      @click.prevent
+                    >
+                      <span class="flex min-w-0 w-full items-center gap-2">
+                        <component :is="item.icon" class="size-4 shrink-0" />
+                        <span class="truncate group-data-[collapsible=icon]:hidden">{{ item.name }}</span>
+                        <Lock class="ml-auto size-3.5 shrink-0 text-muted-foreground/50 group-data-[collapsible=icon]:hidden" />
+                      </span>
+                    </SidebarMenuButton>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" align="center" class="max-w-xs">
+                    <span class="flex items-center gap-2">
+                      <Lock class="size-3.5 shrink-0 text-muted-foreground/50" />
+                      <span>{{ lockedTooltipText }}</span>
+                    </span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <SidebarMenuButton
+                v-else
                 as-child
-                :is-active="isRouteActive(item.href)"
+                :is-active="!item.locked && isRouteActive(item.href)"
                 :tooltip="item.name"
                 class="data-[active=true]:rounded-lg data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
               >
@@ -144,9 +217,33 @@
           </SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem v-for="item in dataNavItems" :key="dataItemKey(item)">
+              <TooltipProvider v-if="item.locked" :delay-duration="200">
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <SidebarMenuButton
+                      :aria-disabled="true"
+                      :class="lockedNavButtonClass"
+                      @click.prevent
+                    >
+                      <span class="flex min-w-0 w-full items-center gap-2">
+                        <component :is="item.icon" class="size-4 shrink-0" />
+                        <span class="truncate group-data-[collapsible=icon]:hidden">{{ item.name }}</span>
+                        <Lock class="ml-auto size-3.5 shrink-0 text-muted-foreground/50 group-data-[collapsible=icon]:hidden" />
+                      </span>
+                    </SidebarMenuButton>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" align="center" class="max-w-xs">
+                    <span class="flex items-center gap-2">
+                      <Lock class="size-3.5 shrink-0 text-muted-foreground/50" />
+                      <span>{{ lockedTooltipText }}</span>
+                    </span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <SidebarMenuButton
+                v-else
                 as-child
-                :is-active="isRouteActive(item.href)"
+                :is-active="!item.locked && isRouteActive(item.href)"
                 :tooltip="item.name"
                 class="data-[active=true]:rounded-lg data-[active=true]:bg-primary/10 data-[active=true]:text-primary"
               >
@@ -272,7 +369,33 @@
     <SidebarGroup class="shrink-0 border-t border-sidebar-border pt-2">
       <SidebarMenu>
         <SidebarMenuItem v-if="bottomNavVisibility.settings && !isSettingsArea">
+          <TooltipProvider v-if="lockedActions.settings" :delay-duration="200">
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <SidebarMenuButton
+                  :aria-disabled="true"
+                  :class="lockedNavButtonClass"
+                  @click.prevent
+                >
+                  <span class="flex min-w-0 w-full items-center gap-2">
+                    <Settings class="size-4 shrink-0" />
+                    <span class="truncate group-data-[collapsible=icon]:hidden">{{
+                      t('common.navigation.settings')
+                    }}</span>
+                    <Lock class="ml-auto size-3.5 shrink-0 text-muted-foreground/50 group-data-[collapsible=icon]:hidden" />
+                  </span>
+                </SidebarMenuButton>
+              </TooltipTrigger>
+              <TooltipContent side="right" align="center" class="max-w-xs">
+                <span class="flex items-center gap-2">
+                  <Lock class="size-3.5 shrink-0 text-muted-foreground/50" />
+                  <span>{{ lockedTooltipText }}</span>
+                </span>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <SidebarMenuButton
+            v-else
             as-child
             :is-active="isRouteActive(settingsPath)"
             :tooltip="t('common.navigation.settings')"
@@ -326,6 +449,8 @@ import {
   Search,
   LifeBuoy,
   Settings,
+  Lock,
+  Bell,
   ChevronLeft,
   ChevronRight,
   Phone,
@@ -347,6 +472,10 @@ import {
   SidebarMenuBadge,
   SidebarRail,
   SidebarTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
   useSidebar
 } from '@motork/component-library/future/primitives'
 import { useLayoutStore } from '@/stores/layout'
@@ -368,6 +497,7 @@ const { state: sidebarUiState, setOpen, isMobile, setOpenMobile } = useSidebar()
 const {
   actionsVisibility,
   bottomNavVisibility,
+  lockedActions,
   firstVisibleRoute,
   primaryNavItems,
   dataNavItems,
@@ -378,6 +508,8 @@ const settingsPath = '/settings'
 const showSupportModal = ref(false)
 const pbxPopoverOpen = ref(false)
 const toastStore = useToastStore()
+const lockedNavButtonClass = 'text-foreground/75 hover:text-foreground/85 hover:bg-muted/70 cursor-not-allowed opacity-100'
+const lockedTooltipText = computed(() => t('common.layout.demoAccess.lockedTooltip'))
 
 function onPbxDisconnect() {
   pbxPopoverOpen.value = false

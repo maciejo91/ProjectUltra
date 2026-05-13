@@ -1,6 +1,6 @@
 {
   "search": "Cerca o fai una domanda",
-  "searchTasks": "Cerca attività...",
+  "searchTasks": "Cerca Tasks...",
   "searchLeads": "Cerca lead...",
   "searchOpportunities": "Cerca opportunità...",
   "searchVehicles": "Cerca veicoli...",
@@ -17,7 +17,7 @@
   "closeAiOverlay": "Chiudi",
   "aiExampleTasks1": "Lead BMW non assegnati di questa settimana",
   "aiExampleTasks2": "Lead per auto oltre €48.000",
-  "aiExampleTasks3": "Lead gestiti da Sarah",
+  "aiExampleTasks3": "Lead gestiti da Sara",
   "aiExampleGeneric1": "Chiedi qualsiasi cosa… (es. assegnati a me, in scadenza questa settimana)",
   "aiExampleGeneric2": "Chiedi qualsiasi cosa… (es. lead caldi, test drive)",
   "aiExampleGeneric3": "Chiedi qualsiasi cosa… (es. per fonte, per stato)",
@@ -87,6 +87,107 @@
     "vehicleZa": {
       "menu": "Veicolo · Z-A",
       "summary": "Veicolo Z-A"
+    }
+  },
+  "filters": {
+    "operators": {
+      "is": "è",
+      "isAnyOf": "è uno di",
+      "isNoneOf": "non è nessuno di",
+      "isBetween": "è tra",
+      "isAtLeast": "è almeno",
+      "isAtMost": "è al massimo",
+      "isAfter": "è dopo",
+      "isBefore": "è prima"
+    }
+  },
+  "tasks": {
+    "emptyState": "Nessun task trovato",
+    "itemsSelected": "Elementi selezionati",
+    "columns": {
+      "urgency": "Urgenza",
+      "task": "Task",
+      "dueTime": "Scadenza",
+      "customer": "Cliente",
+      "type": "Tipo",
+      "requestStatus": "Stato richiesta",
+      "vehicle": "Veicolo",
+      "vin": "VIN",
+      "requestMessage": "Messaggio richiesta",
+      "createdAt": "Creato il",
+      "attempts": "Tentativi",
+      "source": "Fonte",
+      "assignee": "Assegnatario",
+      "status": "Stato"
+    },
+    "filters": {
+      "showClosed": "Mostra chiusi",
+      "taskType": "Tipo task",
+      "status": "Stato",
+      "priority": "Priorità",
+      "source": "Fonte",
+      "assigned": "Assegnato",
+      "vehicleBrand": "Marca veicolo",
+      "created": "Creato",
+      "dueDate": "Scadenza"
+    },
+    "values": {
+      "notSet": "Non impostato",
+      "recall": "Recall",
+      "unassigned": "Non assegnato",
+      "used": "Usato",
+      "overdueJustNow": "In ritardo adesso",
+      "lessThanMinute": "tra meno di un minuto",
+      "justNow": "Adesso"
+    },
+    "statuses": {
+      "overdue": "In ritardo",
+      "inProgress": "In corso",
+      "open": "Aperto"
+    },
+    "requestTypes": {
+      "testDrive": "Test Drive",
+      "quotation": "Preventivo",
+      "genericSales": "Vendite generiche"
+    },
+    "priority": {
+      "hot": "Hot",
+      "high": "Alta",
+      "normal": "Normal"
+    }
+  },
+  "requests": {
+    "itemsSelected": "Elementi selezionati",
+    "columns": {
+      "type": "Tipo",
+      "customer": "Cliente",
+      "stage": "Fase",
+      "source": "Fonte",
+      "assigned": "Assegnato"
+    }
+  },
+  "reports": {
+    "bestPerformers": "Migliori performance",
+    "aiInsights": {
+      "title": "Insights generati dall'AI",
+      "thinking": "Sto elaborando...",
+      "askPlaceholder": "Chiedi qualsiasi cosa...",
+      "sendQuestion": "Invia domanda",
+      "genericError": "Si è verificato un errore. Riprova.",
+      "suggestions": {
+        "bestPerformers": "Chi sta performando meglio?",
+        "closedDeals": "Quanti contratti sono stati chiusi?",
+        "conversionRate": "Qual è il tasso di conversione?"
+      }
+    },
+    "columns": {
+      "name": "Nome",
+      "leads": "Lead",
+      "qualifiedLeads": "Lead qualificati",
+      "qualifiedLeadsPercent": "Lead qualificati (%)",
+      "opportunities": "Opportunities",
+      "contracts": "Contratti",
+      "conversionRate": "Tasso di conversione"
     }
   }
 }

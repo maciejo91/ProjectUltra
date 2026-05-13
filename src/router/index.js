@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '@/components/layout/MainLayout.vue'
 import { useUserStore } from '@/stores/user'
+import { useSettingsStore } from '@/stores/settings'
 import { SETTINGS_PLACEHOLDER_ROUTE_ITEMS } from '@/constants/settingsNavRoutes'
+import { isRouteAvailableForDemo } from '@/utils/demoAccess'
 
 const SETTINGS_REAL_ROUTE_REL_PATHS = new Set(['operations/notifications'])
 
@@ -18,8 +20,8 @@ const routes = [
       {
         path: 'home',
         name: 'home-dashboard',
-        component: () => import('@/views/Home.vue'),
-        meta: { titleKey: 'common.navigation.home', mutedPageChrome: true }
+        component: () => import('@/views/NSCDashboardHome.vue'),
+        meta: { titleKey: 'common.navigation.nscDashboard', mutedPageChrome: true }
       },
       {
         path: 'add-new',
@@ -152,6 +154,15 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach((to) => {
+  const settingsStore = useSettingsStore()
+  const sidebarProfile = settingsStore.getSetting('sidebarProfile') || 'admin'
+
+  if (!isRouteAvailableForDemo(to, sidebarProfile)) {
+    return '/home'
+  }
 })
 
 export default router

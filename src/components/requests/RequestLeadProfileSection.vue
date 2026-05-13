@@ -56,10 +56,43 @@ const props = defineProps({
 
 const emit = defineEmits(['quick-action', 'add-tag', 'edit-customer-tag', 'delete-customer-tag'])
 
+const italianCities = [
+  'Milano',
+  'Roma',
+  'Torino',
+  'Bologna',
+  'Firenze',
+  'Napoli',
+  'Bari',
+  'Trento',
+  'Palermo',
+  'Genova',
+  'Venezia',
+  'Verona',
+  'Padova'
+]
+
+const locationCityRules = [
+  { pattern: /madrid|centro/i, city: 'Roma' },
+  { pattern: /airport/i, city: 'Torino' },
+  { pattern: /münchen|munich|downtown/i, city: 'Milano' },
+  { pattern: /zentrum/i, city: 'Bologna' },
+  { pattern: /berlin/i, city: 'Torino' },
+  { pattern: /paris|lyon|marseille|nice/i, city: 'Firenze' }
+]
+
+function getItalianCityLocation(location) {
+  const value = String(location || '').trim()
+  if (!value) return ''
+  const existingCity = italianCities.find((city) => new RegExp(`\\b${city}\\b`, 'i').test(value))
+  if (existingCity) return existingCity
+  return locationCityRules.find(({ pattern }) => pattern.test(value))?.city || 'Milano'
+}
+
 const taskForCard = computed(() => {
   const r = props.request
   if (!r?.customer) return r
-  const loc = r.requestedCar?.dealership || r.vehicle?.dealership
+  const loc = getItalianCityLocation(r.requestedCar?.dealership || r.vehicle?.dealership)
   const name = r.customer.name || ''
   const suffix = loc ? ` (${loc})` : ''
   if (!loc || !name) return r

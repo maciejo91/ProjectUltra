@@ -6,6 +6,17 @@ import i18n from '@/locales'
 const customerName = (item) => item?.customer?.name ?? ''
 const customerPhone = (item) => item?.customer?.phone ?? ''
 
+const LEAD_ACTION_TITLE_KEYS = {
+  'Call to Verify': 'entities.lead.taskActions.callToVerify',
+  'Call to Verify Contact Details': 'entities.lead.taskActions.callToVerify',
+  'Call Prospect': 'entities.lead.taskActions.callProspect',
+  'Call back': 'entities.lead.taskActions.callBack',
+  'Valid - to be called back': 'entities.lead.taskActions.callBack',
+  'Disqualify Lead': 'entities.lead.taskActions.disqualifyLead',
+  'Postpone Task': 'entities.lead.taskActions.postponeTask',
+  'Reopen Lead': 'entities.lead.taskActions.reopenLead'
+}
+
 export function resolveLeadVerifyContactDisplayTitle(lead) {
   const t = i18n.global.t
   const name = (lead?.customer?.name ?? '').trim()
@@ -79,6 +90,12 @@ export function getNoPhoneContactDescription(name) {
   return t('entities.lead.beginQualificationSendEmailAnonymous')
 }
 
+function translateLeadActionTitle(title) {
+  const key = LEAD_ACTION_TITLE_KEYS[title]
+  if (!key) return title
+  return i18n.global.t(key)
+}
+
 /**
  * Get the descriptive action title for a task card based on the next primary action.
  * Never returns null/empty for lead or opportunity; uses stage + customer name fallback.
@@ -119,7 +136,7 @@ export function getTaskActionTitle(item) {
           const label = typeof action.label === 'function' ? action.label(context) : action.label
           const title = typeof action.title === 'function' ? action.title(context) : action.title
           const resolved = (label || title || '').toString().trim()
-          if (resolved) return resolved
+          if (resolved) return translateLeadActionTitle(resolved)
         }
       }
 

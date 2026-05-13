@@ -7,7 +7,15 @@
     "sendEmailToVerifyContact": "Invia email a {name}",
     "sendEmailToVerifyContactNoName": "Invia email per verificare i recapiti di contatto",
     "beginQualificationSendEmailNamed": "Inizia la qualificazione del lead inviando un'email a {name}.",
-    "beginQualificationSendEmailAnonymous": "Inizia la qualificazione del lead inviando un'email al cliente."
+    "beginQualificationSendEmailAnonymous": "Inizia la qualificazione del lead inviando un'email al cliente.",
+    "taskActions": {
+      "callToVerify": "Chiama per verificare",
+      "callProspect": "Chiama il prospect",
+      "callBack": "Richiama",
+      "disqualifyLead": "Squalifica lead",
+      "postponeTask": "Rimanda task",
+      "reopenLead": "Riapri lead"
+    }
   },
   "opportunity": {
     "title": "Opportunità",
@@ -34,15 +42,15 @@
     "details": "Dettagli Veicolo"
   },
   "activity": {
-    "title": "Attività",
-    "plural": "Attività",
-    "new": "Nuova Attività",
-    "details": "Dettagli Attività",
+    "title": "Interazione",
+    "plural": "Interazioni",
+    "new": "Nuova interazione",
+    "details": "Dettagli interazione",
     "reply": "Rispondi",
-    "filterAll": "Tutte le attività",
-    "filterCommunication": "Communication",
-    "filterNotes": "Notes",
-    "filterSystemUpdates": "System updates",
+    "filterAll": "Tutte le interazioni",
+    "filterCommunication": "Comunicazioni",
+    "filterNotes": "Note",
+    "filterSystemUpdates": "Aggiornamenti di sistema",
     "filterAppointments": "Appuntamenti",
     "scheduleAppointment": "Programma appuntamento",
     "pills": {
@@ -51,11 +59,11 @@
       "notes": "Note",
       "calls": "Chiamate",
       "emails": "Email",
-      "tasks": "Attività",
+      "tasks": "Tasks",
       "messages": "Messaggi",
       "system": "Sistema",
-      "emptyFilteredTitle": "Nessuna attività corrispondente",
-      "emptyFilteredDescription": "Prova un altro filtro sopra oppure seleziona Tutte per vedere tutte le attività."
+      "emptyFilteredTitle": "Nessuna interazione corrispondente",
+      "emptyFilteredDescription": "Prova un altro filtro sopra oppure seleziona Tutte per vedere ogni interazione."
     },
     "timeline": {
       "you": "Tu",
@@ -67,7 +75,7 @@
       "addedNote": "ha aggiunto una nota",
       "calledContact": "hai chiamato {name}",
       "contactSentMessageAction": "ha inviato un messaggio",
-      "userAppointmentSuffix": "— Appuntamento",
+      "userAppointmentSuffix": "— appuntamento",
       "userDidAction": "{user} {action}",
       "sentEmail": "ha inviato un'email",
       "sentWhatsapp": "ha inviato un messaggio WhatsApp",
@@ -82,14 +90,14 @@
       "leadCreated": "Il lead è stato creato",
       "opportunityCreated": "L'opportunità è stata creata",
       "systemUpdate": "Aggiornamento di sistema",
-      "activity": "Attività",
+      "activity": "Evento",
       "callCompletedFallback": "Chiamata completata.",
       "metaFrom": "da",
       "metaTo": "a",
       "today": "Oggi",
       "yesterday": "Ieri",
-      "recentActivity": "Attività recente",
-      "emptyState": "Nessuna attività",
+      "recentActivity": "Interazioni recenti",
+      "emptyState": "Nessuna interazione ancora",
       "emptyStateDescription": "Note, chiamate, messaggi e altri eventi compariranno qui.",
       "viewThread": "Vedi thread ({count})",
       "viewThreadShort": "Vedi thread",
@@ -98,16 +106,16 @@
       "viewConversationShort": "Vedi conversazione",
       "conversationTitle": "Conversazione",
       "callPills": {
-        "inbound": "Inbound call",
-        "outbound": "Outbound call",
-        "missed": "Missed call",
-        "noAnswer": "No answer",
-        "answered": "Answered",
+        "inbound": "Chiamata in entrata",
+        "outbound": "Chiamata in uscita",
+        "missed": "Chiamata persa",
+        "noAnswer": "Nessuna risposta",
+        "answered": "Risposto",
         "answeredWithDuration": "Risposto · {duration}"
       },
       "messagePills": {
-        "outbound": "Outbound message",
-        "inbound": "Inbound message / email"
+        "outbound": "Messaggio in uscita",
+        "inbound": "Messaggio / email in entrata"
       },
       "channels": {
         "email": "Email",

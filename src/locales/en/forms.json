@@ -392,6 +392,19 @@
       "internalNote": "Internal note for the event",
       "internalNotePlaceholder": "Optional note visible to your team only"
     },
+    "communications": {
+      "title": "Send confirmations and reminders",
+      "immediateConfirmation": "Send immediate confirmation to customer",
+      "reminderBeforeAppointment": "Send reminder the day before appointment",
+      "salespersonNotification": "Notify {name} about appointment",
+      "salespersonFallback": "salesperson",
+      "selectChannels": "Select channels",
+      "channels": {
+        "email": "via Email",
+        "sms": "via SMS",
+        "whatsapp": "via WhatsApp"
+      }
+    },
     "calendar": {
       "days": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
     }

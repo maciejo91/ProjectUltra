@@ -13,7 +13,7 @@
     "assignee": "Assegnato a",
     "createdAt": "Creato il",
     "updatedAt": "Aggiornato il",
-    "lastActivity": "Ultima Attività",
+    "lastActivity": "Ultima interazione",
     "nextActionDue": "Prossima Azione Scaduta",
     "description": "Descrizione",
     "notes": "Note",
@@ -391,6 +391,19 @@
       "dateTime": "Data e ora",
       "internalNote": "Nota interna sull’evento",
       "internalNotePlaceholder": "Nota facoltativa visibile solo al team"
+    },
+    "communications": {
+      "title": "Invia conferme e promemoria",
+      "immediateConfirmation": "Invia conferma immediata al cliente",
+      "reminderBeforeAppointment": "Invia promemoria il giorno prima dell'appuntamento",
+      "salespersonNotification": "Notifica {name} dell'appuntamento",
+      "salespersonFallback": "venditore",
+      "selectChannels": "Seleziona canali",
+      "channels": {
+        "email": "via Email",
+        "sms": "via SMS",
+        "whatsapp": "via WhatsApp"
+      }
     },
     "calendar": {
       "days": ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"]

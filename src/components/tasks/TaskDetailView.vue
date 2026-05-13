@@ -459,7 +459,7 @@ const displayTask = computed(() => {
 
 const useLegacyCommunicationDialogs = computed(() => {
   const customerName = String(displayTask.value?.customer?.name ?? '').trim()
-  return displayTask.value?.type === 'lead' && customerName === 'Josh Adams'
+  return displayTask.value?.type === 'lead' && customerName === 'Luca De Santis'
 })
 
 const qualifyInlineSuccessEffective = computed(() =>

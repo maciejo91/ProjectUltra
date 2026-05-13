@@ -1,76 +1,94 @@
 <template>
   <div
-    class="flex flex-col gap-4 overflow-hidden rounded-lg border border-border bg-background p-4 shadow-mk-dashboard-card"
+    class="flex flex-col gap-4 overflow-hidden rounded-lg bg-background p-4 shadow-mk-dashboard-card"
   >
-    <div class="flex w-full min-w-0 items-center gap-2">
-      <h3 class="min-w-0 flex-1 text-base font-medium leading-6 text-foreground">
-        {{ displayHeading }}
-      </h3>
-      <Button
-        v-if="canEditVehicle && !showEditModal"
-        type="button"
-        variant="secondary"
-        size="icon-sm"
-        class="shrink-0"
-        :aria-label="t('requestDetail.vehicleCard.editAria')"
-        @click="openVehicleEditModal"
-      >
-        <Pencil class="size-3 opacity-70" />
-      </Button>
-    </div>
-
-    <div class="flex w-full min-w-0 items-start gap-3">
+    <div class="flex w-full min-w-0 flex-col-reverse items-start gap-3 sm:flex-row-reverse">
         <div
-          class="w-[90px] shrink-0 overflow-hidden rounded-md bg-muted aspect-4/3"
+          class="relative aspect-4/3 w-full shrink-0 overflow-hidden rounded-md sm:w-2/5 lg:w-1/2"
+          :class="usesLogoImage ? 'flex items-center justify-center border border-black/5 bg-white' : 'bg-muted'"
         >
           <img
-            v-if="imageUrl && !imageError"
-            :src="imageUrl"
+            v-if="resolvedImageUrl && !imageError"
+            :src="resolvedImageUrl"
             :alt="titleLine"
-            class="h-full w-full object-cover"
+            :class="usesLogoImage ? 'size-24 bg-white object-contain' : 'h-full w-full object-cover'"
             @error="handleImageError"
           />
           <div v-else class="flex h-full w-full items-center justify-center">
             <Car class="size-10 text-muted-foreground" />
           </div>
         </div>
-        <div class="flex min-w-0 flex-1 flex-col gap-1">
-          <div class="flex min-w-0 flex-wrap items-center gap-2">
+        <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+          <div class="flex w-full min-w-0 items-center gap-2">
+            <h3 class="min-w-0 flex-1 text-base font-medium leading-6 text-foreground">
+              {{ displayHeading }}
+            </h3>
+            <Button
+              v-if="canEditVehicle && !showEditModal"
+              type="button"
+              variant="secondary"
+              size="icon-sm"
+              class="shrink-0"
+              :aria-label="t('requestDetail.vehicleCard.editAria')"
+              @click="openVehicleEditModal"
+            >
+              <Pencil class="size-3 opacity-70" />
+            </Button>
+          </div>
+          <div class="mt-auto flex min-w-0 flex-col gap-1.5">
             <span
               v-if="conditionBadge"
-              class="inline-flex shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-sm leading-5 text-foreground"
+              class="inline-flex w-fit shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-sm leading-5 text-foreground"
               :class="conditionBadgeClass"
             >
               {{ conditionBadge }}
             </span>
-            <a
-              v-if="listingHref"
-              :href="listingHref"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex min-w-0 max-w-full items-center gap-1 rounded-sm text-sm font-medium leading-5 text-primary outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            >
-              <span class="min-w-0 truncate">{{ titleLine }}</span>
-              <span
-                class="inline-flex size-8 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-primary hover:bg-muted"
-                aria-hidden
+            <div class="flex min-w-0 flex-wrap items-center gap-2">
+              <a
+                v-if="listingHref && !isNewVehicle"
+                :href="listingHref"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex min-w-0 max-w-full items-center gap-1 rounded-sm text-base font-medium leading-5 text-primary outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
-                <ArrowUpRight class="size-4 opacity-80" />
-              </span>
-            </a>
+                <span class="min-w-0 truncate">{{ titleLine }}</span>
+              </a>
+              <p
+                v-else
+                class="min-w-0 max-w-full truncate text-base font-medium leading-5"
+                :class="isNewVehicle ? 'text-foreground' : 'text-primary'"
+              >
+                {{ titleLine }}
+              </p>
+            </div>
             <p
-              v-else
-              class="min-w-0 flex-1 truncate text-sm font-medium leading-5 text-foreground"
+              v-if="trimLine"
+              class="w-full text-sm leading-4 text-muted-foreground"
             >
-              {{ titleLine }}
+              {{ trimLine }}
             </p>
+            <div
+              v-if="vinDisplay && !isNewVehicle"
+              class="mt-1 flex max-w-full flex-wrap items-center gap-2"
+            >
+              <div
+                class="inline-flex w-fit max-w-full self-start items-center gap-1 overflow-hidden rounded-sm border border-black/5 bg-background py-0.5 pl-0.5 pr-2 shadow-sm"
+              >
+                <span
+                  class="h-4 w-1.5 shrink-0 rounded-bl-sm rounded-tl-sm bg-primary"
+                  aria-hidden
+                />
+                <span class="shrink-0 text-xs font-medium leading-4 text-muted-foreground">
+                  {{ t('requestDetail.vehicleCard.vin') }}
+                </span>
+                <span
+                  class="truncate whitespace-nowrap text-sm font-semibold leading-4 text-foreground"
+                >
+                  {{ vinDisplay }}
+                </span>
+              </div>
+            </div>
           </div>
-          <p
-            v-if="trimLine"
-            class="w-full text-sm leading-4 text-muted-foreground"
-          >
-            {{ trimLine }}
-          </p>
         </div>
       </div>
 
@@ -108,19 +126,7 @@
         </div>
       </div>
 
-      <div class="flex w-full flex-col gap-2">
-        <div
-          v-if="stockStatusDisplay"
-          class="flex w-full items-center justify-between gap-3"
-        >
-          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
-            t('requestDetail.vehicleCard.status')
-          }}</span>
-          <span
-            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
-            >{{ stockStatusDisplay }}</span
-          >
-        </div>
+      <div class="flex w-full flex-col gap-2 pt-2">
         <div
           v-if="vehicleLocationDisplay"
           class="flex w-full items-center justify-between gap-3"
@@ -131,6 +137,18 @@
           <span
             class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
             >{{ vehicleLocationDisplay }}</span
+          >
+        </div>
+        <div
+          v-if="stockStatusDisplay"
+          class="flex w-full items-center justify-between gap-3"
+        >
+          <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
+            t('requestDetail.vehicleCard.status')
+          }}</span>
+          <span
+            class="min-w-0 truncate text-right text-sm leading-5 text-foreground"
+            >{{ stockStatusDisplay }}</span
           >
         </div>
         <div class="flex w-full items-center justify-between gap-3">
@@ -185,60 +203,35 @@
           <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
             t('requestDetail.vehicleCard.interactions')
           }}</span>
-          <div
-            class="flex shrink-0 flex-wrap items-center justify-end gap-4 text-sm leading-5 text-foreground"
-          >
-            <span
-              v-if="metricsFunnelCount != null"
-              class="inline-flex items-center gap-1"
-            >
-              <Filter class="size-4 shrink-0 text-muted-foreground" aria-hidden />
-              {{ metricsFunnelCount }}
-            </span>
-            <span
-              v-if="metricsTagCount != null"
-              class="inline-flex items-center gap-1"
-            >
-              <Tag class="size-4 shrink-0 text-muted-foreground" aria-hidden />
-              {{ metricsTagCount }}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div
-        v-if="plateDisplay || vinDisplay"
-        class="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3"
-      >
-        <span class="shrink-0 text-sm leading-5 text-muted-foreground">{{
-          t('requestDetail.vehicleCard.identity')
-        }}</span>
-        <div
-          class="flex min-w-0 w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-1"
-        >
-          <div
-            v-if="plateDisplay"
-            class="inline-flex max-w-full items-center gap-1 overflow-hidden rounded-sm border border-border bg-background py-0.5 pl-0.5 pr-2"
-          >
-            <span
-              class="h-4 w-1.5 shrink-0 rounded-bl-sm rounded-tl-sm bg-primary"
-              aria-hidden
-            />
-            <span
-              class="whitespace-nowrap text-sm font-semibold leading-4 text-foreground"
-            >
-              {{ plateDisplay }}
-            </span>
-          </div>
-          <div
-            v-if="vinDisplay"
-            class="inline-flex min-w-0 max-w-full items-center overflow-hidden rounded-sm border border-border bg-background px-2 py-0.5"
-          >
-            <span
-              class="truncate font-mono text-sm leading-4 text-foreground"
-              >{{ vinDisplay }}</span
-            >
-          </div>
+          <TooltipProvider :delay-duration="200">
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <div
+                  class="group flex shrink-0 cursor-help flex-wrap items-center justify-end gap-4 rounded-sm px-1 py-0.5 text-sm leading-5 text-foreground outline-none transition-colors hover:bg-muted hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  tabindex="0"
+                  :aria-label="interactionMetricsTooltip"
+                >
+                  <span
+                    v-if="metricsFunnelCount != null"
+                    class="inline-flex items-center gap-1"
+                  >
+                    <Filter class="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" aria-hidden />
+                    {{ metricsFunnelCount }}
+                  </span>
+                  <span
+                    v-if="metricsTagCount != null"
+                    class="inline-flex items-center gap-1"
+                  >
+                    <Tag class="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" aria-hidden />
+                    {{ metricsTagCount }}
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" align="end" class="max-w-xs">
+                {{ interactionMetricsTooltip }}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 
@@ -292,8 +285,14 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Button } from '@motork/component-library/future/primitives'
-import { ArrowUpRight, Car, Filter, Pencil, Tag } from 'lucide-vue-next'
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@motork/component-library/future/primitives'
+import { Car, Filter, Pencil, Tag } from 'lucide-vue-next'
 import EditRequestedVehicleModal from '@/components/modals/EditRequestedVehicleModal.vue'
 import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 
@@ -440,14 +439,25 @@ const listingHref = computed(
   () => props.sourceUrl || props.vehicle?.listingUrl || ''
 )
 
+const isNewVehicle = computed(
+  () => String(conditionBadge.value || '').toLowerCase() === 'new'
+)
+
+const isNewBmwVehicle = computed(
+  () => isNewVehicle.value && String(props.vehicle?.brand || '').toLowerCase() === 'bmw'
+)
+
 const stockStatusDisplay = computed(() => {
   const raw = (props.stockStatus || props.vehicle?.carStatus || '').trim()
+  if (!raw && isNewBmwVehicle.value) return t('requestDetail.vehicleCard.stockToBeOrder')
   if (!raw) return ''
   const key = raw.toLowerCase().replace(/\s+/g, '')
   if (key === 'instock')
     return t('requestDetail.vehicleCard.stockInStock')
   if (key === 'notinstock')
     return t('requestDetail.vehicleCard.stockNotInStock')
+  if (key === 'tobeorder' || key === 'tobeordered' || key === 'toorder')
+    return t('requestDetail.vehicleCard.stockToBeOrder')
   return raw
 })
 
@@ -464,11 +474,22 @@ const hasInteractionMetrics = computed(
     props.metricsFunnelCount != null || props.metricsTagCount != null
 )
 
-const plateDisplay = computed(
-  () => props.vehicle.plateNumber || props.vehicle.plate || ''
+const interactionMetricsTooltip = computed(() =>
+  t('requestDetail.vehicleCard.interactionMetricsTooltip', {
+    leads: props.metricsFunnelCount ?? 0,
+    opportunities: props.metricsTagCount ?? 0
+  })
 )
 
-const vinDisplay = computed(() => props.vehicle.vin || '')
+const vinDisplay = computed(
+  () => props.vehicle.vin || props.vehicle.vinNumber || ''
+)
+
+const usesLogoImage = computed(
+  () => isNewBmwVehicle.value || props.vehicle.imageDisplayMode === 'logo' || props.vehicle.imageType === 'logo'
+)
+
+const resolvedImageUrl = computed(() => (isNewBmwVehicle.value ? '/brands/bmw-white.svg' : props.imageUrl))
 
 const registrationDateDisplay = computed(() => {
   const r =

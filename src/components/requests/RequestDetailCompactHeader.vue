@@ -5,9 +5,9 @@
   >
     <template v-if="request">
       <div
-        class="grid w-full min-w-0 grid-cols-1 gap-2 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:items-start lg:gap-x-3"
+        class="grid w-full min-w-0 grid-cols-1 gap-2 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:items-center lg:gap-x-3"
       >
-        <div class="flex min-w-0 items-start gap-2">
+        <div class="flex min-w-0 items-center gap-2">
           <Button
             v-if="isFullPage"
             variant="ghost"
@@ -23,17 +23,47 @@
             class="size-10 shrink-0"
             aria-hidden="true"
           />
-          <div class="flex min-w-0 flex-1 flex-col gap-0">
+          <div class="flex min-w-0 flex-1 flex-col justify-center gap-0">
             <div class="flex w-full min-w-0 items-center justify-between gap-2">
               <div class="min-w-0 flex-1 overflow-hidden">
-                <p class="truncate text-sm leading-tight whitespace-nowrap">
+                <div class="flex min-w-0 items-center gap-1.5 text-sm leading-none whitespace-nowrap">
                   <span class="font-semibold text-foreground">{{ nameParts.primary || '—' }}</span>
                   <span class="text-sm font-normal text-muted-foreground">
                     <template v-if="customerCityLabel">{{ ' · ' }}{{ customerCityLabel }}</template>
                     {{ ' · ' }}{{ t('requestDetail.headerDetailLabelSource') }}
                   </span>
                   <span class="text-sm font-normal text-foreground">{{ ' ' + headerDetailSourceLabel }}</span>
-                </p>
+                  <template v-if="showLeadAiSummary">
+                    <span class="text-muted-foreground" aria-hidden>·</span>
+                    <Popover
+                      :open="aiSummaryOpen"
+                      @update:open="(value) => (aiSummaryOpen = value)"
+                    >
+                      <PopoverTrigger as-child>
+                        <button
+                          type="button"
+                          class="mk-ai-insight-banner inline-flex h-7 min-w-0 flex-1 items-center gap-2 rounded-lg px-3 text-left text-sm font-medium text-foreground hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                          :aria-label="t('entities.activity.aiSummaryHeadline')"
+                        >
+                          <span class="inline-flex shrink-0 origin-center" aria-hidden="true">
+                            <Sparkles
+                              :size="16"
+                              class="mk-sparkles-icon shrink-0"
+                              fill="url(#sparkles-gradient)"
+                            />
+                          </span>
+                          <span class="truncate">{{ aiSummaryText }}</span>
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        align="start"
+                        class="z-50 w-96 max-w-full rounded-lg border border-border bg-background p-3 shadow-mk-dashboard-card"
+                      >
+                        <RequestInsightBanner compact :message="aiSummaryText" />
+                      </PopoverContent>
+                    </Popover>
+                  </template>
+                </div>
               </div>
               <div class="flex shrink-0 flex-wrap items-center justify-end gap-0.5">
                 <template v-for="item in quickActionItems" :key="item.kind || item.key">
@@ -55,16 +85,10 @@
                 </template>
               </div>
             </div>
-            <RequestInsightBanner
-              v-if="showLeadAiSummary"
-              compact
-              class="mt-1.5"
-              :message="aiSummary"
-            />
           </div>
         </div>
 
-        <div class="flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-1 lg:justify-end">
+        <div class="flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-1 self-center lg:justify-end">
           <div class="inline-flex h-10 shrink-0 items-center rounded-md px-3">
             <RequestHeaderLifecycleStepper :steps="lifecycleSteps" />
           </div>
@@ -149,7 +173,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   ChevronLeft,
@@ -158,10 +182,14 @@ import {
   Mail,
   PhoneCall,
   StickyNote,
-  Plus
+  Plus,
+  Sparkles
 } from 'lucide-vue-next'
 import {
   Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger
 } from '@motork/component-library/future/primitives'
 import RequestHeaderLifecycleStepper from './RequestHeaderLifecycleStepper.vue'
 import TagPillWithPopover from '@/components/shared/TagPillWithPopover.vue'
@@ -214,6 +242,7 @@ const emit = defineEmits([
 ])
 
 const { t } = useI18n()
+const aiSummaryOpen = ref(false)
 
 const isFullWidthLayout = computed(() => props.layout === 'fullWidth')
 const isCompactStickyLayout = computed(() => props.layout === 'sticky')
@@ -228,7 +257,7 @@ const headerRootClass = computed(() => {
   }
   return [
     base,
-    'sticky top-0 z-50',
+    'sticky top-0 z-50 shadow-sm',
     props.show
       ? ''
       : 'pointer-events-none h-0 overflow-hidden border-0 py-0 opacity-0'
@@ -285,8 +314,9 @@ const headerDetailSourceLabel = computed(() => {
   return r.sourceCategory ?? (r.source || '—')
 })
 
+const aiSummaryText = computed(() => props.aiSummary?.trim() || '')
 const showLeadAiSummary = computed(
-  () => props.request?.type === 'lead' && Boolean(props.aiSummary?.trim())
+  () => props.request?.type === 'lead' && Boolean(aiSummaryText.value)
 )
 
 const quickActionItems = computed(() => [

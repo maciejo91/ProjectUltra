@@ -2,7 +2,7 @@
   <div class="flex h-auto max-h-none w-full shrink-0 flex-col">
     <!-- Loading state before outcome (closing / postponing) -->
     <template v-if="outcomeSaving">
-      <div class="flex-1 min-h-0 flex items-center justify-center rounded-lg bg-muted/80 py-4" aria-busy="true" aria-label="Saving outcome">
+      <div class="flex-1 min-h-0 flex items-center justify-center rounded-lg bg-muted/80 py-4" aria-busy="true" :aria-label="t('requestDetail.lqfTask.savingOutcome')">
         <Spinner class="size-8 text-foreground shrink-0" />
       </div>
     </template>
@@ -28,15 +28,15 @@
           v-if="hideContactCard"
           class="flex items-center justify-center py-6"
           aria-busy="true"
-          aria-label="Loading"
+          :aria-label="t('common.common.loadingLabel')"
         >
           <Spinner class="size-6 text-foreground shrink-0" />
         </div>
         <div v-else class="pt-1">
           <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden">
-            <div class="p-8 flex items-center justify-center gap-3 min-h-[120px]" aria-busy="true" aria-label="Loading">
+            <div class="p-8 flex items-center justify-center gap-3 min-h-[120px]" aria-busy="true" :aria-label="t('common.common.loadingLabel')">
               <Spinner class="size-6 text-foreground shrink-0" />
-              <span class="text-sm text-muted-foreground">Loading...</span>
+              <span class="text-sm text-muted-foreground">{{ t('common.common.loading') }}</span>
             </div>
           </div>
         </div>
@@ -107,11 +107,11 @@
         <div v-if="!hasPhone && !successState" class="space-y-4">
           <LQTaskSendEmailCard
             :lead="lead"
-            :contact-name="lead.customer?.name ?? 'the customer'"
+            :contact-name="lead.customer?.name ?? t('requestDetail.lqfTask.customerFallback')"
             :recent-attachments="recentAttachmentsForEmail"
           />
           <div id="lqtask-conversations" class="space-y-4">
-            <h4 class="text-sm font-medium text-foreground">Conversations</h4>
+            <h4 class="text-sm font-medium text-foreground">{{ t('requestDetail.tabs.conversations') }}</h4>
             <RequestConversationsTabContent :activities="conversationActivities" />
           </div>
         </div>
@@ -129,7 +129,7 @@
                 <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
                   <Phone :size="14" class="text-muted-foreground" />
                 </span>
-                <span>Answer</span>
+                <span>{{ t('requestDetail.floatingLq.outcomeAnswered') }}</span>
               </Toggle>
               <Toggle
                 variant="outline"
@@ -140,7 +140,7 @@
                 <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
                   <PhoneOff :size="14" class="text-muted-foreground" />
                 </span>
-                <span>No answer</span>
+                <span>{{ t('requestDetail.floatingLq.outcomeNoAnswer') }}</span>
               </Toggle>
               <Toggle
                 variant="outline"
@@ -151,7 +151,7 @@
                 <span class="inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted">
                   <X :size="14" class="text-muted-foreground" />
                 </span>
-                <span>Not valid</span>
+                <span>{{ t('requestDetail.floatingLq.outcomeNotValid') }}</span>
               </Toggle>
             </div>
           </div>
@@ -179,7 +179,7 @@
                 class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <Clock :size="14" class="shrink-0 text-muted-foreground" />
-                <span>Postpone</span>
+                <span>{{ t('common.actions.postpone') }}</span>
               </Toggle>
               <Toggle
                 variant="outline"
@@ -188,7 +188,7 @@
                 class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <X :size="14" class="shrink-0 text-muted-foreground" />
-                <span>Close</span>
+                <span>{{ t('common.buttons.close') }}</span>
               </Toggle>
             </div>
           </div>
@@ -214,7 +214,7 @@
                 class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <ThumbsUp :size="14" class="shrink-0 text-muted-foreground" />
-                <span>Interested</span>
+                <span>{{ t('requestDetail.floatingLq.interestInterested') }}</span>
               </Toggle>
               <Toggle
                 variant="outline"
@@ -223,7 +223,7 @@
                 class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <ThumbsDown :size="14" class="shrink-0 text-muted-foreground" />
-                <span>Not interested</span>
+                <span>{{ t('requestDetail.floatingLq.interestNotInterested') }}</span>
               </Toggle>
               <Toggle
                 variant="outline"
@@ -232,7 +232,7 @@
                 class="outcome-toggle-item w-full h-10 min-w-0 shadow-mk-dashboard-card border-0 text-sm"
               >
                 <Clock :size="14" class="shrink-0 text-muted-foreground" />
-                <span>Postpone</span>
+                <span>{{ t('common.actions.postpone') }}</span>
               </Toggle>
             </div>
           </div>
@@ -254,7 +254,7 @@
                 </button>
               </div>
               <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
-                <h5 class="font-semibold text-foreground text-sm mb-3">Next call attempt</h5>
+                <h5 class="font-semibold text-foreground text-sm mb-3">{{ t('requestDetail.lqfTask.nextCallAttempt') }}</h5>
                 <div class="reschedule-toggle-group flex flex-wrap gap-2">
                   <Toggle
                     variant="outline"
@@ -262,7 +262,7 @@
                     @update:model-value="(p) => p && setRescheduleTime('tomorrow-9am')"
                     class="followup-toggle-item"
                   >
-                    Tomorrow 9:00 AM
+                    {{ t('requestDetail.lqfTask.tomorrow9am') }}
                   </Toggle>
                   <Toggle
                     variant="outline"
@@ -277,7 +277,7 @@
                       :stroke="rescheduleTime === 'monday' ? 'none' : 'currentColor'"
                       :stroke-width="rescheduleTime === 'monday' ? 0 : 1.5"
                     />
-                    Suggest AI time
+                    {{ t('requestDetail.lqfTask.suggestAiTime') }}
                   </Toggle>
                   <Toggle
                     variant="outline"
@@ -285,7 +285,7 @@
                     @update:model-value="(p) => p && setRescheduleTime('custom')"
                     class="followup-toggle-item"
                   >
-                    Select time
+                    {{ t('requestDetail.lqfTask.selectTime') }}
                   </Toggle>
                 </div>
                 <div v-if="rescheduleTime === 'monday' && aiSuggestionData" class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -293,7 +293,7 @@
                     <Lightbulb class="w-4 h-4 shrink-0 text-blue-600 mt-0.5" />
                     <div class="flex-1">
                       <p class="text-sm font-semibold text-foreground mb-1">
-                        {{ aiSuggestionData.formattedDate }} at {{ aiSuggestionData.time }}
+                        {{ t('requestDetail.lqfTask.dateAtTime', { date: aiSuggestionData.formattedDate, time: aiSuggestionData.time }) }}
                       </p>
                       <p class="text-sm text-muted-foreground">
                         {{ aiSuggestionData.reason }}
@@ -303,11 +303,11 @@
                 </div>
                 <div v-if="rescheduleTime === 'custom'" class="mt-3 grid grid-cols-2 gap-3">
                   <div>
-                    <Label class="form-label">Date</Label>
+                    <Label class="form-label">{{ t('requestDetail.lqfTask.date') }}</Label>
                     <Input type="date" v-model="customDate" class="w-full" />
                   </div>
                   <div>
-                    <Label class="form-label">Time</Label>
+                    <Label class="form-label">{{ t('requestDetail.lqfTask.time') }}</Label>
                     <Input type="time" v-model="customTime" class="w-full" />
                   </div>
                 </div>
@@ -318,16 +318,16 @@
                     class="rounded border-border"
                   />
                   <Label :for="`mark-recall-answer-${lead.id}`" class="text-sm font-normal text-foreground cursor-pointer">
-                    Mark as scheduled recall appointment
+                    {{ t('requestDetail.lqfTask.markScheduledRecall') }}
                   </Label>
                 </div>
                 <div class="mt-4">
-                  <Label class="form-label">Assigned to</Label>
+                  <Label class="form-label">{{ t('requestDetail.lqfTask.assignedTo') }}</Label>
                   <SelectMenu
                     v-model="selectedNextAttemptKey"
                     :items="nextAttemptAssigneeOptions"
                     value-key="_key"
-                    placeholder="Assign next attempt to..."
+                    :placeholder="t('requestDetail.lqfTask.assignNextAttemptPlaceholder')"
                     class="w-full"
                   >
                     <template #item="{ item }">
@@ -346,12 +346,12 @@
                   </SelectMenu>
                 </div>
                 <div class="mt-4">
-                  <Label class="form-label">Note to assignee</Label>
+                  <Label class="form-label">{{ t('requestDetail.lqfTask.noteToAssignee') }}</Label>
                   <Textarea
                     v-model="noteForNextAttemptAssignee"
                     rows="3"
                     class="w-full resize-none border-border bg-background text-foreground"
-                    placeholder="Add any notes or instructions for the assignee..."
+                    :placeholder="t('requestDetail.lqfTask.noteToAssigneePlaceholder')"
                   />
                 </div>
               </div>
@@ -372,7 +372,7 @@
               class="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end"
             >
               <Button variant="secondary" class="w-full rounded-sm sm:w-auto" @click="cancelOutcome">
-                Cancel
+                {{ t('common.buttons.cancel') }}
               </Button>
               <Button
                 variant="primary"
@@ -380,7 +380,7 @@
                 class="w-full rounded-sm bg-primary text-white sm:w-auto"
                 @click="onConfirmPostpone"
               >
-                Postpone
+                {{ t('common.actions.postpone') }}
               </Button>
             </div>
           </div>
@@ -433,7 +433,7 @@
             
             <!-- Send follow-up message -->
             <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
-              <h5 class="font-semibold text-foreground text-sm mb-4">Send follow-up message</h5>
+              <h5 class="font-semibold text-foreground text-sm mb-4">{{ t('requestDetail.lqfTask.sendFollowUpMessage') }}</h5>
               
               <!-- Channel Selection -->
               <div class="followup-channel-toggle-group flex flex-wrap gap-2 mb-4">
@@ -475,7 +475,7 @@
                   :data-mk-channel-active="followupChannel === 'dont-send' || undefined"
                 >
                   <X class="w-3 h-3 shrink-0" />
-                  <span>Don't send</span>
+                  <span>{{ t('requestDetail.lqOutcome.channelDontSend') }}</span>
                 </Toggle>
               </div>
               
@@ -483,26 +483,26 @@
               <div v-if="followupChannel && followupChannel !== 'dont-send'" class="space-y-4">
                 <!-- Template (for WhatsApp, template content is not editable) -->
                 <div>
-                  <Label class="form-label">Template</Label>
+                  <Label class="form-label">{{ t('common.actions.template') }}</Label>
                   <Select v-model="selectedTemplate">
                     <SelectTrigger class="w-full h-10 min-h-10">
-                      <SelectValue placeholder="Select template" />
+                      <SelectValue :placeholder="t('common.actions.selectTemplate')" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="followup-1">Follow-up 1</SelectItem>
-                      <SelectItem value="followup-2">Follow-up 2</SelectItem>
+                      <SelectItem value="followup-1">{{ t('requestDetail.lqfTask.followUpTemplateOne') }}</SelectItem>
+                      <SelectItem value="followup-2">{{ t('requestDetail.lqfTask.followUpTemplateTwo') }}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 
                 <!-- Message (read-only for WhatsApp templates) -->
                 <div>
-                  <Label class="form-label">Message</Label>
+                  <Label class="form-label">{{ t('common.actions.message') }}</Label>
                   <Textarea
                     v-model="followupMessageBody"
                     rows="4"
                     class="w-full resize-none border-border bg-background text-foreground"
-                    placeholder="Select a template or type your message..."
+                    :placeholder="t('requestDetail.lqfTask.messageTemplatePlaceholder')"
                     :readonly="followupChannel === 'whatsapp'"
                   />
                 </div>
@@ -511,7 +511,7 @@
             
             <!-- Next call attempt -->
             <div class="bg-white rounded-lg shadow-nsc-card overflow-hidden p-4">
-              <h5 class="font-semibold text-foreground text-sm mb-4">Next call attempt</h5>
+              <h5 class="font-semibold text-foreground text-sm mb-4">{{ t('requestDetail.lqfTask.nextCallAttempt') }}</h5>
               <div class="reschedule-toggle-group flex flex-wrap gap-2">
                 <Toggle
                   variant="outline"
@@ -519,7 +519,7 @@
                   @update:model-value="(p) => p && setRescheduleTime('tomorrow-9am')"
                   class="followup-toggle-item"
                 >
-                  Tomorrow 9:00 AM
+                  {{ t('requestDetail.lqfTask.tomorrow9am') }}
                 </Toggle>
                 <Toggle
                   variant="outline"
@@ -534,7 +534,7 @@
                     :stroke="rescheduleTime === 'monday' ? 'none' : 'currentColor'"
                     :stroke-width="rescheduleTime === 'monday' ? 0 : 1.5"
                   />
-                  Suggest AI time
+                  {{ t('requestDetail.lqfTask.suggestAiTime') }}
                 </Toggle>
                 <Toggle
                   variant="outline"
@@ -542,7 +542,7 @@
                   @update:model-value="(p) => p && setRescheduleTime('custom')"
                   class="followup-toggle-item"
                 >
-                  Select time
+                  {{ t('requestDetail.lqfTask.selectTime') }}
                 </Toggle>
               </div>
               <!-- AI Suggestion Details -->
@@ -551,7 +551,7 @@
                   <Lightbulb class="w-4 h-4 shrink-0 text-blue-600 mt-0.5" />
                   <div class="flex-1">
                     <p class="text-sm font-semibold text-foreground mb-1">
-                      {{ aiSuggestionData.formattedDate }} at {{ aiSuggestionData.time }}
+                      {{ t('requestDetail.lqfTask.dateAtTime', { date: aiSuggestionData.formattedDate, time: aiSuggestionData.time }) }}
                     </p>
                     <p class="text-sm text-muted-foreground">
                       {{ aiSuggestionData.reason }}
@@ -562,22 +562,22 @@
               <!-- Custom Time Selection -->
               <div v-if="rescheduleTime === 'custom'" class="mt-3 grid grid-cols-2 gap-3">
                 <div>
-                  <Label class="form-label">Date</Label>
+                  <Label class="form-label">{{ t('requestDetail.lqfTask.date') }}</Label>
                   <Input type="date" v-model="customDate" class="w-full" />
                 </div>
                 <div>
-                  <Label class="form-label">Time</Label>
+                  <Label class="form-label">{{ t('requestDetail.lqfTask.time') }}</Label>
                   <Input type="time" v-model="customTime" class="w-full" />
                 </div>
               </div>
               <!-- Assigned to (next attempt) -->
               <div class="mt-4">
-                <Label class="form-label">Assigned to</Label>
+                <Label class="form-label">{{ t('requestDetail.lqfTask.assignedTo') }}</Label>
                 <SelectMenu
                   v-model="selectedNextAttemptKey"
                   :items="nextAttemptAssigneeOptions"
                   value-key="_key"
-                  placeholder="Assign next attempt to..."
+                  :placeholder="t('requestDetail.lqfTask.assignNextAttemptPlaceholder')"
                   class="w-full"
                 >
                   <template #item="{ item }">
@@ -597,12 +597,12 @@
               </div>
               <!-- Note to assignee (no-answer + postpone) -->
               <div class="mt-4">
-                <Label class="form-label">Note to assignee</Label>
+                <Label class="form-label">{{ t('requestDetail.lqfTask.noteToAssignee') }}</Label>
                 <Textarea
                   v-model="noteForNextAttemptAssignee"
                   rows="3"
                   class="w-full resize-none border-border bg-background text-foreground"
-                  placeholder="Add any notes or instructions for the assignee..."
+                  :placeholder="t('requestDetail.lqfTask.noteToAssigneePlaceholder')"
                 />
               </div>
             </div>
@@ -655,7 +655,7 @@
             </div>
             <CloseAsLostForm
               :preselected-reason="disqualifyReason"
-              close-button-label="Close"
+              :close-button-label="t('common.buttons.close')"
               @close="handleCloseFromFormNoAnswer"
               @cancel="cancelOutcome"
               @update:reason="setDisqualifyReason"
@@ -727,7 +727,7 @@
               v-if="selectedOutcome === 'not-valid'"
               class="mt-2"
               :preselected-reason="disqualifyReason"
-              close-button-label="Close"
+              :close-button-label="t('common.buttons.close')"
               @close="handleCloseFromForm"
               @cancel="cancelOutcome"
               @update:reason="setDisqualifyReason"
@@ -735,7 +735,7 @@
             <CloseAsLostForm
               v-else
               :preselected-reason="disqualifyReason"
-              close-button-label="Close"
+              :close-button-label="t('common.buttons.close')"
               @close="handleCloseFromForm"
               @cancel="cancelOutcome"
               @update:reason="setDisqualifyReason"
@@ -789,7 +789,7 @@
             </div>
             <!-- Info note -->
             <div class="text-sm text-muted-foreground">
-              <span class="text-red-600">*</span> Required fields
+              <span class="text-red-600">*</span> {{ t('requestDetail.lqfTask.requiredFields') }}
             </div>
             <div
               v-if="!(selectedOutcome === 'answer' && selectedNextStep === 'postpone')"
@@ -808,7 +808,7 @@
             <!-- Enrich Lead Card (collapsible, collapsed by default) -->
             <div ref="enrichLeadSectionRef" class="bg-white rounded-lg shadow-nsc-card overflow-hidden">
               <CollapsibleSection
-                title="Enrich lead"
+                :title="t('requestDetail.floatingLq.enrichLead')"
                 :is-expanded="enrichLeadExpanded"
                 card-style
                 @toggle="enrichLeadExpanded = !enrichLeadExpanded"
@@ -816,7 +816,7 @@
                 <div class="space-y-4 pt-1">
                 <!-- Customer interest level -->
                 <div>
-                  <Label class="form-label">Customer interest level?</Label>
+                  <Label class="form-label">{{ t('requestDetail.lqfTask.customerInterestLevel') }}</Label>
                   <div class="flex gap-4">
                     <Label class="flex items-center gap-2 cursor-pointer">
                       <input
@@ -825,7 +825,7 @@
                         value="High"
                         class="w-4 h-4 text-brand-blue focus:ring-brand-blue border-gray-300"
                       />
-                      <span class="text-sm text-muted-foreground">High</span>
+                      <span class="text-sm text-muted-foreground">{{ t('requestDetail.lqfTask.interestLevels.high') }}</span>
                     </Label>
                     <Label class="flex items-center gap-2 cursor-pointer">
                       <input
@@ -834,7 +834,7 @@
                         value="Medium"
                         class="w-4 h-4 text-brand-blue focus:ring-brand-blue border-gray-300"
                       />
-                      <span class="text-sm text-muted-foreground">Medium</span>
+                      <span class="text-sm text-muted-foreground">{{ t('requestDetail.lqfTask.interestLevels.medium') }}</span>
                     </Label>
                     <Label class="flex items-center gap-2 cursor-pointer">
                       <input
@@ -843,60 +843,60 @@
                         value="Low"
                         class="w-4 h-4 text-brand-blue focus:ring-brand-blue border-gray-300"
                       />
-                      <span class="text-sm text-muted-foreground">Low</span>
+                      <span class="text-sm text-muted-foreground">{{ t('requestDetail.lqfTask.interestLevels.low') }}</span>
                     </Label>
                   </div>
                 </div>
 
                 <!-- Expected purchase timeline -->
                 <div>
-                  <Label class="form-label">Expected purchase timeline?</Label>
+                  <Label class="form-label">{{ t('requestDetail.lqfTask.expectedPurchaseTimeline') }}</Label>
                   <Select v-model="enrichLeadData.purchaseTimeline">
                     <SelectTrigger class="w-full h-10 min-h-10">
-                      <SelectValue placeholder="Select timeline" />
+                      <SelectValue :placeholder="t('requestDetail.lqfTask.selectTimeline')" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Immediate">Immediate</SelectItem>
-                      <SelectItem value="Within 1 month">Within 1 month</SelectItem>
-                      <SelectItem value="Within 3 months">Within 3 months</SelectItem>
-                      <SelectItem value="Within 6 months">Within 6 months</SelectItem>
-                      <SelectItem value="Just browsing">Just browsing</SelectItem>
+                      <SelectItem value="Immediate">{{ t('requestDetail.lqfTask.purchaseTimeline.immediate') }}</SelectItem>
+                      <SelectItem value="Within 1 month">{{ t('requestDetail.lqfTask.purchaseTimeline.withinOneMonth') }}</SelectItem>
+                      <SelectItem value="Within 3 months">{{ t('requestDetail.lqfTask.purchaseTimeline.withinThreeMonths') }}</SelectItem>
+                      <SelectItem value="Within 6 months">{{ t('requestDetail.lqfTask.purchaseTimeline.withinSixMonths') }}</SelectItem>
+                      <SelectItem value="Just browsing">{{ t('requestDetail.lqfTask.purchaseTimeline.justBrowsing') }}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <!-- Budget range -->
                 <div>
-                  <Label class="form-label">Budget range (if discussed)?</Label>
+                  <Label class="form-label">{{ t('requestDetail.lqfTask.budgetRangeQuestion') }}</Label>
                   <Select v-model="enrichLeadData.budgetRange">
                     <SelectTrigger class="w-full h-10 min-h-10">
-                      <SelectValue placeholder="Select budget range" />
+                      <SelectValue :placeholder="t('requestDetail.lqfTask.selectBudgetRange')" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Under €30k">Under €30k</SelectItem>
+                      <SelectItem value="Under €30k">{{ t('requestDetail.lqfTask.budgetRange.under30k') }}</SelectItem>
                       <SelectItem value="€30k-€50k">€30k-€50k</SelectItem>
                       <SelectItem value="€50k-€80k">€50k-€80k</SelectItem>
                       <SelectItem value="€80k+">€80k+</SelectItem>
-                      <SelectItem value="Not discussed">Not discussed</SelectItem>
+                      <SelectItem value="Not discussed">{{ t('requestDetail.lqfTask.budgetRange.notDiscussed') }}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <!-- Additional notes -->
                 <div>
-                  <Label class="form-label">Additional notes</Label>
+                  <Label class="form-label">{{ t('requestDetail.lqfTask.additionalNotes') }}</Label>
                   <Textarea 
                     v-model="enrichLeadData.additionalNotes"
                     rows="4" 
                     class="w-full"
-                    placeholder="Any relevant information about customer interest or preferences..."
+                    :placeholder="t('requestDetail.lqfTask.additionalNotesPlaceholder')"
                   />
                 </div>
                 </div>
 
                 <div class="flex justify-end gap-2 mt-4">
                   <Button
-                    label="Save"
+                    :label="t('common.buttons.save')"
                     variant="primary"
                     size="small"
                     @click="handleEnrichLeadSave"
@@ -1265,7 +1265,7 @@
             variant="secondary"
             @click="cancelOutcome"
           >
-            Cancel
+            {{ t('common.buttons.cancel') }}
           </Button>
           <Button
             variant="primary"
@@ -1297,8 +1297,8 @@
     <!-- Assignment Modal -->
     <ReassignUserModal
       :show="showAssignmentModal"
-      title="Assign to salesman"
-      confirm-label="Assign"
+      :title="t('requestDetail.lqfTask.assignToSalesman')"
+      :confirm-label="t('common.buttons.confirm')"
       @confirm="handleAssignmentConfirm"
       @close="showAssignmentModal = false"
     />
@@ -1354,7 +1354,7 @@ import {
 } from '@motork/component-library/future/primitives'
 import { SelectMenu } from '@motork/component-library/future/components'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 import {
   Dialog,
   DialogContent,
@@ -1594,26 +1594,52 @@ const currentTaskOutcome = computed(() => {
     .filter(a => a.type === 'call' || a.type === 'outcome')
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0]
   if (recentActivity) {
-    return recentActivity.outcome || recentActivity.content || 'Outcome logged'
+    return recentActivity.outcome || recentActivity.content || t('requestDetail.lqfTask.outcomeLogged')
   }
   return null
 })
 
-// Handle enrich lead save
+function getInterestLevelDisplay(value) {
+  const labels = {
+    High: t('requestDetail.lqfTask.interestLevels.high'),
+    Medium: t('requestDetail.lqfTask.interestLevels.medium'),
+    Low: t('requestDetail.lqfTask.interestLevels.low')
+  }
+  return labels[value] ?? value
+}
+
+function getPurchaseTimelineDisplay(value) {
+  const labels = {
+    Immediate: t('requestDetail.lqfTask.purchaseTimeline.immediate'),
+    'Within 1 month': t('requestDetail.lqfTask.purchaseTimeline.withinOneMonth'),
+    'Within 3 months': t('requestDetail.lqfTask.purchaseTimeline.withinThreeMonths'),
+    'Within 6 months': t('requestDetail.lqfTask.purchaseTimeline.withinSixMonths'),
+    'Just browsing': t('requestDetail.lqfTask.purchaseTimeline.justBrowsing')
+  }
+  return labels[value] ?? value
+}
+
+function getBudgetRangeDisplay(value) {
+  const labels = {
+    'Under €30k': t('requestDetail.lqfTask.budgetRange.under30k'),
+    'Not discussed': t('requestDetail.lqfTask.budgetRange.notDiscussed')
+  }
+  return labels[value] ?? value
+}
+
 const handleEnrichLeadSave = async () => {
   try {
     const data = enrichLeadData.value
     const noteParts = []
     
-    // Build note content from form data
     if (data.interestLevel) {
-      noteParts.push(`Interest level: ${data.interestLevel}`)
+      noteParts.push(t('requestDetail.lqfTask.noteInterestLevel', { value: getInterestLevelDisplay(data.interestLevel) }))
     }
     if (data.purchaseTimeline) {
-      noteParts.push(`Purchase timeline: ${data.purchaseTimeline}`)
+      noteParts.push(t('requestDetail.lqfTask.notePurchaseTimeline', { value: getPurchaseTimelineDisplay(data.purchaseTimeline) }))
     }
     if (data.budgetRange) {
-      noteParts.push(`Budget range: ${data.budgetRange}`)
+      noteParts.push(t('requestDetail.lqfTask.noteBudgetRange', { value: getBudgetRangeDisplay(data.budgetRange) }))
     }
     if (data.additionalNotes) {
       noteParts.push(data.additionalNotes)
@@ -1624,8 +1650,8 @@ const handleEnrichLeadSave = async () => {
     if (noteContent.trim()) {
       await leadsStore.addActivity(props.lead.id, {
         type: 'note',
-        user: currentUser.value?.name || 'You',
-        action: 'enriched lead information',
+        user: currentUser.value?.name || t('entities.activity.timeline.you'),
+        action: t('requestDetail.lqfTask.activities.enrichedLeadInformation'),
         content: noteContent,
         timestamp: new Date().toISOString()
       })
@@ -1649,7 +1675,7 @@ const handleEnrichLeadSave = async () => {
       
       await leadsStore.addActivity(props.lead.id, {
         type: 'survey',
-        action: 'Lead Qualification Survey',
+        action: t('requestDetail.lqfTask.activities.leadQualificationSurvey'),
         content: JSON.stringify(surveyResponses),
         timestamp: new Date().toISOString()
       })
@@ -1700,14 +1726,14 @@ function handleExtractInformation() {
 }
 
 async function addCallActivity() {
-  const userName = currentUser.value?.name || 'You'
+  const userName = currentUser.value?.name || t('entities.activity.timeline.you')
   const transcription = callData.value?.transcription
-  const summary = 'Lead confirmed their details and the call covered the main inquiry discussed in the transcript.'
+  const summary = t('requestDetail.lqfTask.activities.callSummary')
   await leadsStore.addActivity(props.lead.id, {
     type: 'call',
     user: userName,
-    action: 'made a call',
-    content: `${userName} made a call`,
+    action: t('requestDetail.lqfTask.activities.madeCall'),
+    content: t('requestDetail.lqfTask.activities.userMadeCall', { user: userName }),
     data: transcription
       ? { transcription, duration: callData.value?.duration, summary }
       : { summary, duration: callData.value?.duration },
@@ -2365,7 +2391,7 @@ const existingNotes = computed(() => {
 // Next attempt reassign: empty option + combined users + teams for SelectMenu (unique _key for value-key)
 const NEXT_ATTEMPT_NONE_KEY = '__none__'
 const nextAttemptAssigneeOptions = computed(() => {
-  const noneOption = { _key: NEXT_ATTEMPT_NONE_KEY, type: 'none', label: 'Unassigned' }
+  const noneOption = { _key: NEXT_ATTEMPT_NONE_KEY, type: 'none', label: t('dataTable.tasks.values.unassigned') }
   const users = (assignableUsers.value || []).map(u => ({
     ...u,
     type: 'user',
@@ -2579,19 +2605,19 @@ watch(callEnded, (ended) => {
   }
 })
 
-const qualificationEventTypeOptions = [
-  { value: 'appointment-on-phone', label: 'Appointment on the phone (15m)' },
-  { value: 'appointment-at-dealership', label: 'Appointment at the dealership (30m)' },
-  { value: 'recall-internal', label: 'Recall - internal (15m)' },
-  { value: 'appointment-at-dealership-test-drive', label: 'Appointment at the dealership + Test drive (1h)' },
-  { value: 'appointment-at-workshop', label: 'Appointment at the workshop (15m)' },
-  { value: 'appointment-at-customer-site', label: 'Appointment at customer\'s site (1h 40m)' },
-  { value: 'appointment-at-customer-site-test-drive', label: 'Appointment at customer\'s site + Test drive (5h)' }
-]
+const qualificationEventTypeOptions = computed(() => [
+  { value: 'appointment-on-phone', label: t('requestDetail.lqfTask.eventTypes.appointmentOnPhone') },
+  { value: 'appointment-at-dealership', label: t('requestDetail.lqfTask.eventTypes.appointmentAtDealership') },
+  { value: 'recall-internal', label: t('requestDetail.lqfTask.eventTypes.recallInternal') },
+  { value: 'appointment-at-dealership-test-drive', label: t('requestDetail.lqfTask.eventTypes.appointmentAtDealershipTestDrive') },
+  { value: 'appointment-at-workshop', label: t('requestDetail.lqfTask.eventTypes.appointmentAtWorkshop') },
+  { value: 'appointment-at-customer-site', label: t('requestDetail.lqfTask.eventTypes.appointmentAtCustomerSite') },
+  { value: 'appointment-at-customer-site-test-drive', label: t('requestDetail.lqfTask.eventTypes.appointmentAtCustomerSiteTestDrive') }
+])
 
 // Event type options for SelectMenu
 const qualificationEventTypeOptionsForSelect = computed(() => 
-  qualificationEventTypeOptions.map(opt => ({
+  qualificationEventTypeOptions.value.map(opt => ({
     value: opt.value,
     label: opt.label
   }))
@@ -2603,9 +2629,11 @@ const selectedQualificationDateLabel = computed(() => {
     return t('forms.schedule.timeSlots.selectDate')
   }
   const date = qualificationSelectedDate.value
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`
+  return new Intl.DateTimeFormat(locale.value || 'en', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric'
+  }).format(date)
 })
 
 const scheduleHeaderAssigneeDisplay = computed(() => {
@@ -2637,7 +2665,7 @@ const qualificationScheduleSummaryVisible = computed(
 const qualificationScheduleEventTypeLabel = computed(() => {
   const v = qualificationEventType.value
   if (!v) return ''
-  const opt = qualificationEventTypeOptions.find((o) => o.value === v)
+  const opt = qualificationEventTypeOptions.value.find((o) => o.value === v)
   return opt?.label ?? v
 })
 
@@ -2790,17 +2818,19 @@ function handleCloseFromFormNoAnswer() {
 
 const actionButtonLabel = computed(() => {
   if (selectedOutcome.value === 'no-answer') {
-    if (selectedNextStep.value === 'close-lead') return 'Close'
-    return followupChannel.value === 'dont-send' ? 'Postpone' : 'Send and postpone'
+    if (selectedNextStep.value === 'close-lead') return t('common.buttons.close')
+    return followupChannel.value === 'dont-send'
+      ? t('common.actions.postpone')
+      : t('requestDetail.lqfTask.sendAndPostpone')
   }
   if (selectedOutcome.value === 'not-valid' || (selectedOutcome.value === 'answer' && selectedNextStep.value === 'not-interested')) {
-    return 'Close'
+    return t('common.buttons.close')
   }
   if (selectedOutcome.value === 'answer' && selectedNextStep.value === 'interested') {
-    return 'Schedule and qualify'
+    return t('requestDetail.lqfTask.scheduleAndQualify')
   }
   if (selectedOutcome.value === 'answer' && selectedNextStep.value === 'postpone') {
-    return 'Postpone'
+    return t('common.actions.postpone')
   }
   return ''
 })

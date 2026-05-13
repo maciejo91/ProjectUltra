@@ -45,41 +45,197 @@
     "financingTradeIns": "Dettagli acquisto",
     "insights": "Insights",
     "attachments": "Allegati",
-    "tasks": "Attività",
-    "activity": "Attività",
+    "tasks": "Tasks",
+    "activity": "Interazioni",
     "timeline": "Timeline"
   },
   "insights": {
-    "empty": "Nessun insight disponibile al momento."
+    "empty": "Nessun insight disponibile al momento.",
+    "title": "Contact Insights",
+    "description": "A summary of enriched customer data at a glance",
+    "leadEmail": "Lead email",
+    "period": "10hrs",
+    "actions": {
+      "sent": "Sent",
+      "call": "Call"
+    },
+    "stats": {
+      "firstEvent": "First event",
+      "firstEventValue": "Mar 24, 2025",
+      "campaignCommunicationSent": "Campaign communication sent",
+      "lastEvent": "Last event",
+      "lastEventValue": "May 13, 2026",
+      "leadQualified": "Lead qualified",
+      "trackedEvents": "Tracked events",
+      "trackedEventsValue": "406"
+    },
+    "filters": {
+      "tags": "Tags",
+      "peakActivity": "Peak activity",
+      "latestMarketingCommunications": "Latest marketing communications",
+      "latestPagesViewed": "Latest pages viewed",
+      "latestLeads": "Latest leads",
+      "latestOpportunities": "Latest opportunities",
+      "latestReviews": "Latest reviews",
+      "sources": "Sources",
+      "associatedContacts": "Associated contacts"
+    },
+    "cards": {
+      "tags": "Tags",
+      "peakActivity": "Peak activity",
+      "latestMarketingCommunications": "Latest marketing communications",
+      "latestPagesViewed": "Latest pages viewed",
+      "latestLeads": "Latest leads",
+      "latestOpportunities": "Latest opportunities",
+      "latestReviews": "Latest reviews",
+      "sources": "Sources",
+      "associatedContacts": "Associated contacts"
+    },
+    "tags": {
+      "apiResponse": "API response",
+      "hasActiveLead": "has active lead",
+      "hasActiveOpportunity": "has active opportunity",
+      "newLeadBuyer": "new lead buyer",
+      "usedCar": "used car",
+      "webVisit": "web visit",
+      "requestScore": "request score",
+      "privateCustomer": "private customer",
+      "afterSales": "after sales",
+      "tradeIn": "trade-in",
+      "remoteLead": "remote lead",
+      "appointmentSet": "appointment set"
+    },
+    "marketing": {
+      "first": {
+        "title": "Employsync.promoworlds",
+        "meta": "Clicked Feb 09, 2026, 10:56"
+      },
+      "second": {
+        "title": "Campaign re-send 2025",
+        "meta": "Clicked Feb 26, 2026, 14:48"
+      }
+    },
+    "pages": {
+      "first": {
+        "title": "Auto Usate Milano Audi A5 Sportback 50 TFSI quattro - Milano",
+        "meta": "Last viewed Apr 4, 2026, 12:54 PM",
+        "badge": "Found"
+      },
+      "second": {
+        "title": "Auto Usate Torino ABARTH 595 Turismo 1.4 T-Jet - Torino",
+        "meta": "Last viewed Feb 1, 2026, 9:20 PM",
+        "badge": "15 mins"
+      },
+      "third": {
+        "title": "Auto Usate Milano Citroen C4 Diesel BlueHDi 100 Feel - Milano",
+        "meta": "Last viewed Apr 8, 2026, 7:23 PM",
+        "badge": "30 mins"
+      },
+      "fourth": {
+        "title": "Auto Usate Milano Jeep Avenger Berlina BEV - Milano",
+        "meta": "Last viewed Apr 6, 2026, 4:20 PM",
+        "badge": "7 mins"
+      }
+    },
+    "leads": {
+      "first": {
+        "title": "Fiat 500",
+        "meta": "Created Feb 13, 2026, 1:04 PM"
+      },
+      "second": {
+        "title": "Active Partecipanti",
+        "meta": "Created Feb 21, 2026, 4:05 PM"
+      },
+      "third": {
+        "title": "Fiat 500",
+        "meta": "Updated Mar 03, 2026, 10:20 AM"
+      },
+      "fourth": {
+        "title": "Fiat 500",
+        "meta": "Created Feb 03, 2026, 9:45 AM"
+      }
+    },
+    "opportunities": {
+      "first": {
+        "title": "Marco peters",
+        "meta": "Updated Apr 11, 2026, 1:13 PM"
+      },
+      "second": {
+        "title": "Fiat 500",
+        "meta": "Updated Feb 14, 2026, 11:31 AM"
+      },
+      "third": {
+        "title": "Fiat 500C",
+        "meta": "Updated Mar 07, 2026, 8:22 AM"
+      },
+      "fourth": {
+        "title": "Fiat 500",
+        "meta": "Updated Apr 15, 2026, 10:08 AM"
+      }
+    },
+    "status": {
+      "qualified": "Qualified",
+      "valid": "Valid",
+      "visit": "Visit",
+      "open": "Open"
+    },
+    "review": {
+      "title": "Doppiamente: sono eccellenti!",
+      "meta": "Created May 10, 2026, 11:30 AM"
+    },
+    "sources": {
+      "callSpark": "CallSparK",
+      "fidSpark": "FidSparK",
+      "leadSpark": "LeadSparK(R)",
+      "predictSpark": "PredictSparK",
+      "webSpark": "WebSparK"
+    },
+    "contacts": {
+      "first": {
+        "name": "Paolo Pezzotti",
+        "email": "mario@dealer.com",
+        "phone": "+39 333 459 4438"
+      },
+      "second": {
+        "name": "Paolo Pezzotti",
+        "email": "paolo@dealer.com",
+        "phone": "+39 333 459 4439"
+      },
+      "third": {
+        "name": "Paolo Pezzotti",
+        "email": "paolo.pezzotti@dealer.com",
+        "phone": "+39 333 459 4440"
+      }
+    }
   },
   "insight": {
     "highPaidStock": "Questo lead proviene da una fonte a pagamento elevata ed è interessato a un'auto in stock da {days} giorni."
   },
   "aiOverviewSummary": "Forte interesse per il VW ID.4; la cliente ha chiesto un richiamo nel pomeriggio dopo un breve scambio su WhatsApp.\nUltimi touchpoint: ricerca a pagamento e WhatsApp—mantieni slancio prima del recall pianificato.\nPasso suggerito: confermare stock, prezzi e opzioni di ricarica in una chiamata breve.",
   "lqfTask": {
-    "title": "Next action",
-    "manageTask": "Gestisci l'attività",
+    "title": "Prossima azione",
+    "manageTask": "Gestisci il task",
     "notNow": "Non ora",
     "postponeReason": {
-      "label": "Reason for postponing",
-      "placeholder": "Select reason…",
+      "label": "Motivo del rinvio",
+      "placeholder": "Seleziona motivo…",
       "options": {
-        "interruptedByOtherCustomers": "Interrupted by other customers",
-        "inATestDrive": "In a test drive",
-        "checkingInventory": "Checking inventory",
-        "reviewingLeadInfo": "Reviewing lead info",
-        "scheduledForLater": "Scheduled for later"
+        "interruptedByOtherCustomers": "Interrotto da altri clienti",
+        "inATestDrive": "In test drive",
+        "checkingInventory": "Verifica stock",
+        "reviewingLeadInfo": "Revisione informazioni lead",
+        "scheduledForLater": "Programmato per dopo"
       }
     },
-    "nextAttemptTitle": "Posticipa attività al",
+    "nextAttemptTitle": "Posticipa task al",
     "nextAttemptAssigneePlaceholder": "Assegna a…",
-    "nextAttemptSaved": "Attività posticipata",
-    "nextAttemptSaveFailed": "Impossibile posticipare l'attività",
-    "openFullTaskView": "Apri vista attività completa",
-    "taskOptionsAria": "Opzioni attività",
+    "nextAttemptSaved": "Task posticipato",
+    "nextAttemptSaveFailed": "Impossibile posticipare il task",
+    "openFullTaskView": "Apri vista task completa",
+    "taskOptionsAria": "Opzioni task",
     "timerAria": "Timer di conto alla rovescia",
     "timerTooltip": "Tempo rimanente per qualificare questo lead",
-    "inProgress": "In progress",
+    "inProgress": "In corso",
     "nextStepQuestion": "Qual è il passo successivo?",
     "backToCallOutcome": "Torna all’esito della chiamata",
     "backToWhatsNext": "Torna a cosa succede dopo",
@@ -97,14 +253,107 @@
       "tenth": "decimo"
     },
     "callAttemptsIndicatorAria": "Tentativi di chiamata: {current} di {max}",
-    "assignTaskTitle": "Assegna attività",
+    "assignTaskTitle": "Assegna task",
     "assigneeSelectPlaceholder": "Seleziona assegnatario",
     "applyAssignment": "Applica assegnazione",
     "assignWholeTeam": "Team intero",
     "outcomeFlowNotes": "Note di chiamata",
     "outcomeFlowNotesPlaceholder": "Aggiungi note per questo tentativo di chiamata…",
     "calledAt": "Chiamato alle:",
-    "editCalledAt": "Modifica l’ora della chiamata"
+    "editCalledAt": "Modifica l’ora della chiamata",
+    "savingOutcome": "Salvataggio esito",
+    "customerFallback": "il cliente",
+    "nextCallAttempt": "Prossimo tentativo di chiamata",
+    "tomorrow9am": "Domani alle 9:00",
+    "suggestAiTime": "Suggerisci orario AI",
+    "selectTime": "Seleziona orario",
+    "dateAtTime": "{date} alle {time}",
+    "date": "Data",
+    "time": "Ora",
+    "timeOptional": "Ora (facoltativa)",
+    "reasonOptional": "Motivo (facoltativo)",
+    "postponeReasonFreeTextPlaceholder": "Perché stai posticipando questo task?",
+    "markScheduledRecall": "Segna come appuntamento di recall programmato",
+    "assignedTo": "Assegnato a",
+    "assignNextAttemptPlaceholder": "Assegna prossimo tentativo a...",
+    "noteToAssignee": "Nota per l'assegnatario",
+    "noteToAssigneePlaceholder": "Aggiungi note o istruzioni per l'assegnatario...",
+    "sendFollowUpMessage": "Invia messaggio di follow-up",
+    "followUpTemplateOne": "Follow-up 1",
+    "followUpTemplateTwo": "Follow-up 2",
+    "messageTemplatePlaceholder": "Seleziona un template o scrivi il messaggio...",
+    "requiredFields": "Campi obbligatori",
+    "customerInterestLevel": "Livello di interesse del cliente?",
+    "expectedPurchaseTimeline": "Timeline di acquisto prevista?",
+    "selectTimeline": "Seleziona timeline",
+    "budgetRangeQuestion": "Range di budget (se discusso)?",
+    "selectBudgetRange": "Seleziona range di budget",
+    "additionalNotes": "Note aggiuntive",
+    "additionalNotesPlaceholder": "Informazioni rilevanti sull'interesse o sulle preferenze del cliente...",
+    "noteInterestLevel": "Livello di interesse: {value}",
+    "notePurchaseTimeline": "Timeline di acquisto: {value}",
+    "noteBudgetRange": "Range di budget: {value}",
+    "outcomeLogged": "Esito registrato",
+    "sendAndPostpone": "Invia e posticipa",
+    "scheduleAndQualify": "Programma e qualifica",
+    "assignToSalesman": "Assegna a venditore",
+    "interestLevels": {
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Basso"
+    },
+    "purchaseTimeline": {
+      "immediate": "Immediato",
+      "withinOneMonth": "Entro 1 mese",
+      "withinThreeMonths": "Entro 3 mesi",
+      "withinSixMonths": "Entro 6 mesi",
+      "justBrowsing": "Solo esplorazione"
+    },
+    "budgetRange": {
+      "under30k": "Sotto €30k",
+      "notDiscussed": "Non discusso"
+    },
+    "eventTypes": {
+      "appointmentOnPhone": "Appuntamento telefonico (15m)",
+      "appointmentAtDealership": "Appuntamento in concessionaria (30m)",
+      "recallInternal": "Recall - interno (15m)",
+      "appointmentAtDealershipTestDrive": "Appuntamento in concessionaria + Test drive (1h)",
+      "appointmentAtWorkshop": "Appuntamento in officina (15m)",
+      "appointmentAtCustomerSite": "Appuntamento presso il cliente (1h 40m)",
+      "appointmentAtCustomerSiteTestDrive": "Appuntamento presso il cliente + Test drive (5h)"
+    },
+    "activities": {
+      "enrichedLeadInformation": "ha arricchito le informazioni del lead",
+      "leadQualificationSurvey": "Survey qualificazione lead",
+      "callSummary": "Il lead ha confermato i propri dettagli e la chiamata ha coperto la richiesta principale discussa nella trascrizione.",
+      "madeCall": "ha effettuato una chiamata",
+      "userMadeCall": "{user} ha effettuato una chiamata"
+    }
+  },
+  "closeAsLost": {
+    "reason": "Motivo",
+    "selectReason": "Seleziona un motivo...",
+    "reasons": {
+      "multipleNoShows": "Più no-show",
+      "dataCleanup": "Pulizia dati",
+      "unreachable": "Non raggiungibile",
+      "purchasePostponed": "Acquisto posticipato",
+      "vehicleSold": "Veicolo venduto",
+      "outOfBudget": "Fuori budget",
+      "financingRejected": "Finanziamento rifiutato",
+      "duplicate": "Duplicato",
+      "boughtElsewhere": "Acquistato altrove",
+      "notInterested": "Non interessato",
+      "budgetConstraints": "Vincoli di budget",
+      "foundBetterPrice": "Prezzo migliore da concorrente",
+      "noResponse": "Cliente non risponde",
+      "wrongTiming": "Tempistica non corretta",
+      "other": "Altro"
+    }
+  },
+  "postponeTaskDialog": {
+    "title": "Posticipa task",
+    "postponeDate": "Data posticipo"
   },
   "quickActions": {
     "phone": "Telefono",
@@ -128,11 +377,11 @@
         },
         "startNew": {
           "title": "Avvia conversazione",
-          "body": "Hello, thank you for choosing our dealership."
+          "body": "Buongiorno, grazie per aver scelto la nostra concessionaria."
         },
         "hello": {
-          "title": "Hello",
-          "body": "Hello from Motork Automotive Group"
+          "title": "Saluto",
+          "body": "Buongiorno da Motork Automotive Group"
         }
       }
     },
@@ -146,7 +395,7 @@
     }
   },
   "contactCard": {
-    "activityMenu": "Attività ({count})",
+    "activityMenu": "Interazioni ({count})",
     "otherInteractions": "Cronologia contatto ({count})",
     "openProfile": "Apri profilo cliente",
     "cardMenu": "Menu scheda cliente",
@@ -212,6 +461,7 @@
     "dealership": "Concessionaria",
     "price": "Prezzo",
     "specification": "Specifiche",
+    "vin": "VIN",
     "registrationDate": "Data di immatricolazione",
     "carLocation": "Posizione veicolo",
     "mileage": "Chilometraggio",
@@ -221,6 +471,7 @@
     "identity": "Identità",
     "stockInStock": "Disponibile",
     "stockNotInStock": "Non disponibile",
+    "stockToBeOrder": "Da ordinare",
     "landingPage": "Landing page",
     "visit": "Visita",
     "editAria": "Modifica veicolo richiesto",
@@ -229,7 +480,8 @@
     "staffNotePlaceholder": "Nota interna sul veicolo (separata dal messaggio di richiesta del cliente).",
     "savingNote": "Salvataggio…",
     "expandNote": "Mostra nota completa",
-    "collapseNote": "Mostra meno"
+    "collapseNote": "Mostra meno",
+    "interactionMetricsTooltip": "{leads} lead e {opportunities} opportunity per questo veicolo"
   },
   "editVehicleModal": {
     "title": "Modifica veicolo richiesto",
@@ -274,18 +526,18 @@
       "commercial": "Commerciale"
     },
     "requestTypes": {
-      "genericSales": "Generic sales",
-      "quotation": "Quotation",
+      "genericSales": "Vendita generica",
+      "quotation": "Preventivo",
       "testDrive": "Test drive",
-      "financing": "Financing",
-      "tradeIn": "Trade-in"
+      "financing": "Finanziamento",
+      "tradeIn": "Permuta"
     },
     "channels": {
-      "manualImport": "Manual import",
+      "manualImport": "Importazione manuale",
       "web": "Web",
-      "paid": "Paid",
+      "paid": "A pagamento",
       "showroom": "Showroom",
-      "organic": "Organic",
+      "organic": "Organico",
       "email": "Email",
       "whatsapp": "WhatsApp"
     },
@@ -299,9 +551,9 @@
     },
     "originDetails": {
       "webspark": "Webspark",
-      "showroomVisit": "Showroom visit",
-      "summerCampaign": "Summer Campaign 2024",
-      "organicSearch": "Organic search"
+      "showroomVisit": "Visita in showroom",
+      "summerCampaign": "Campagna estate 2024",
+      "organicSearch": "Ricerca organica"
     },
     "fiscalEntities": {
       "motorK": "MotorK",
@@ -329,7 +581,13 @@
   "placeholders": {
     "conversations": "Le conversazioni appariranno qui.",
     "attachments": "Gli allegati appariranno qui.",
-    "tasksTab": "Qui appariranno le attività correlate e le altre richieste per questo cliente."
+    "tasksTab": "Qui appariranno i Tasks correlati e le altre richieste per questo cliente."
+  },
+  "purchaseDetails": {
+    "financingOptions": "Opzioni di finanziamento",
+    "tradeIns": "Permute",
+    "add": "Aggiungi",
+    "months": "{count} mesi"
   },
   "emptyStates": {
     "conversations": {
@@ -358,15 +616,15 @@
     }
   },
   "floatingLq": {
-    "taskPostponedHeader": "Attività posticipata",
+    "taskPostponedHeader": "Task posticipato",
     "callNow": "Chiama ora",
     "callingNameFallback": "Cliente",
     "callingWithVehicle": "Chiamata a {name} - {vehicle}",
     "callingWithoutVehicle": "Chiamata a {name}",
     "emailSessionWithVehicle": "Invia email a {name} – {vehicle}",
     "emailSessionWithoutVehicle": "Invia email a {name}",
-    "closeOverlay": "Chiudi area attività",
-    "minimize": "Riduci attività",
+    "closeOverlay": "Chiudi area task",
+    "minimize": "Riduci task",
     "back": "Indietro",
     "continue": "Continua",
     "submit": "Invia",
@@ -400,7 +658,7 @@
     "minutesLeft": "{count} min rimanenti"
   },
   "qualifySuccess": {
-    "title": "Attività completata",
+    "title": "Task completato",
     "subtitle": "Lead qualificato",
     "recapVehicle": "È stata creata un'opportunity per {vehicle}.",
     "recapAppointment": "Primo appuntamento: {date} alle {time}.",
@@ -410,12 +668,12 @@
     "convertingAria": "Conversione in opportunity in corso"
   },
   "lqOutcome": {
-    "titleTaskComplete": "Attività completata",
-    "titleTaskPostponed": "Attività posticipata",
+    "titleTaskComplete": "Task completato",
+    "titleTaskPostponed": "Task posticipato",
     "lineClosedNotInterested": "Questo lead è chiuso — non interessato.",
     "lineClosedNotValid": "Questo lead è chiuso — non valido.",
     "lineClosedNoAnswer": "Questo lead è chiuso dopo mancata risposta.",
-    "linePostponedNextAttempt": "Attività posticipata a {when}.",
+    "linePostponedNextAttempt": "Task posticipato a {when}.",
     "linePostponedFollowUp": "Canale del messaggio di follow-up: {channel}.",
     "lineInterestedPostponed": "La qualifica è stata rinviata. Prossimo passo: ricontattare il cliente il {when}.",
     "nextCallTomorrow9": "Domani alle 9:00",

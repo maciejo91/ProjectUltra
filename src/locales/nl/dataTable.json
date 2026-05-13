@@ -17,7 +17,7 @@
   "closeAiOverlay": "Sluiten",
   "aiExampleTasks1": "Niet-toegewezen BMW-leads van deze week",
   "aiExampleTasks2": "Leads voor auto's boven € 48.000",
-  "aiExampleTasks3": "Leads beheerd door Sarah",
+  "aiExampleTasks3": "Leads beheerd door Sara",
   "aiExampleGeneric1": "Vraag wat je wilt… (bijv. aan mij toegewezen, deze week vervallen)",
   "aiExampleGeneric2": "Vraag wat je wilt… (bijv. warme leads, proefritten)",
   "aiExampleGeneric3": "Vraag wat je wilt… (bijv. per bron, per status)",
@@ -87,6 +87,107 @@
     "vehicleZa": {
       "menu": "Voertuig · Z tot A",
       "summary": "Voertuig Z tot A"
+    }
+  },
+  "filters": {
+    "operators": {
+      "is": "is",
+      "isAnyOf": "is een van",
+      "isNoneOf": "is geen van",
+      "isBetween": "ligt tussen",
+      "isAtLeast": "is minstens",
+      "isAtMost": "is maximaal",
+      "isAfter": "is na",
+      "isBefore": "is voor"
+    }
+  },
+  "tasks": {
+    "emptyState": "Geen tasks gevonden",
+    "itemsSelected": "Items geselecteerd",
+    "columns": {
+      "urgency": "Urgentie",
+      "task": "Task",
+      "dueTime": "Deadline",
+      "customer": "Klant",
+      "type": "Type",
+      "requestStatus": "Aanvraagstatus",
+      "vehicle": "Voertuig",
+      "vin": "VIN",
+      "requestMessage": "Aanvraagbericht",
+      "createdAt": "Aangemaakt op",
+      "attempts": "Pogingen",
+      "source": "Bron",
+      "assignee": "Toegewezen",
+      "status": "Status"
+    },
+    "filters": {
+      "showClosed": "Gesloten tonen",
+      "taskType": "Tasktype",
+      "status": "Status",
+      "priority": "Prioriteit",
+      "source": "Bron",
+      "assigned": "Toegewezen",
+      "vehicleBrand": "Voertuigmerk",
+      "created": "Aangemaakt",
+      "dueDate": "Deadline"
+    },
+    "values": {
+      "notSet": "Niet ingesteld",
+      "recall": "Recall",
+      "unassigned": "Niet toegewezen",
+      "used": "Gebruikt",
+      "overdueJustNow": "Net te laat",
+      "lessThanMinute": "over minder dan een minuut",
+      "justNow": "Zojuist"
+    },
+    "statuses": {
+      "overdue": "Te laat",
+      "inProgress": "In uitvoering",
+      "open": "Open"
+    },
+    "requestTypes": {
+      "testDrive": "Test Drive",
+      "quotation": "Offerte",
+      "genericSales": "Algemene verkoop"
+    },
+    "priority": {
+      "hot": "Hot",
+      "high": "Hoog",
+      "normal": "Normal"
+    }
+  },
+  "requests": {
+    "itemsSelected": "Items geselecteerd",
+    "columns": {
+      "type": "Type",
+      "customer": "Klant",
+      "stage": "Fase",
+      "source": "Bron",
+      "assigned": "Toegewezen"
+    }
+  },
+  "reports": {
+    "bestPerformers": "Beste performers",
+    "aiInsights": {
+      "title": "AI-gestuurde insights",
+      "thinking": "Aan het nadenken...",
+      "askPlaceholder": "Vraag alles...",
+      "sendQuestion": "Vraag versturen",
+      "genericError": "Er is een fout opgetreden. Probeer het opnieuw.",
+      "suggestions": {
+        "bestPerformers": "Wie presteert het best?",
+        "closedDeals": "Hoeveel deals zijn gesloten?",
+        "conversionRate": "Wat is de conversieratio?"
+      }
+    },
+    "columns": {
+      "name": "Naam",
+      "leads": "Leads",
+      "qualifiedLeads": "Gekwalificeerde leads",
+      "qualifiedLeadsPercent": "Gekwalificeerde leads (%)",
+      "opportunities": "Opportunities",
+      "contracts": "Contracten",
+      "conversionRate": "Conversieratio"
     }
   }
 }

@@ -22,12 +22,12 @@ export function useLQWidgetCall() {
 
   const mockTranscription = {
     leadLines: [
-      "Yes, this is Josh Adams speaking.",
-      "Oh, hi Michael! Yes, I was waiting for your call.",
+      "Yes, this is Luca De Santis speaking.",
+      "Oh, hi Matteo! Yes, I was waiting for your call.",
       "That sounds great. I'm definitely interested in seeing it."
     ],
     salesLines: [
-      "Hi Josh, Michael here regarding your Audi A6 inquiry.",
+      "Hi Luca, Matteo here regarding your Audi A6 inquiry.",
       "Great. I see you're interested in the Allroad. Do you have a vehicle you'd like to trade in?"
     ]
   }

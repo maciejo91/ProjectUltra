@@ -4,16 +4,16 @@
     class="relative w-full overflow-hidden rounded-lg border border-yellow-500 bg-linear-to-r from-yellow-500/20 to-background dark:from-yellow-500/15"
   >
     <div
-      class="relative z-10 flex w-full items-center gap-2 py-2 pl-2 pr-4"
+      class="relative z-10 flex w-full items-center gap-1.5 px-1.5 py-0.5"
     >
-      <div class="flex min-w-0 flex-1 items-center gap-2">
+      <div class="flex min-w-0 flex-1 items-center gap-1.5">
         <div
-          class="flex shrink-0 items-center justify-center rounded-md bg-yellow-500 p-1.5 text-white"
+          class="flex shrink-0 items-center justify-center rounded-md bg-yellow-500 p-1 text-white"
           aria-hidden="true"
         >
           <TriangleAlert class="size-3" stroke-width="2" />
         </div>
-        <p class="min-w-0 flex-1 text-sm leading-5 text-foreground">
+        <p class="m-0 min-w-0 flex-1 text-sm leading-5 text-foreground">
           <span class="font-semibold">{{ t('requestDetail.duplicates.conflictsLabel') }}</span>
           <span class="font-normal">{{ ' ' }}{{ bodyMessage }}</span>
         </p>
@@ -22,20 +22,20 @@
         <Button
           variant="ghost"
           size="icon"
-          class="size-7 shrink-0 text-foreground hover:bg-muted hover:text-foreground"
+          class="size-6 shrink-0 text-foreground hover:bg-muted hover:text-foreground"
           :aria-label="t('requestDetail.duplicates.openDuplicateAria')"
           @click="emit('request-navigate', potentialDuplicates[0].compositeId)"
         >
-          <ArrowUpRight class="size-4" />
+          <ArrowUpRight class="size-3.5" />
         </Button>
         <Button
           variant="ghost"
           size="icon"
-          class="size-7 shrink-0 text-foreground hover:bg-muted hover:text-foreground"
+          class="size-6 shrink-0 text-foreground hover:bg-muted hover:text-foreground"
           :aria-label="t('requestDetail.duplicates.dismissAria')"
           @click="emit('dismiss')"
         >
-          <X class="size-4" />
+          <X class="size-3.5" />
         </Button>
       </div>
     </div>

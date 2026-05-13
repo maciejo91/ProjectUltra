@@ -50,7 +50,163 @@
     "timeline": "Timeline"
   },
   "insights": {
-    "empty": "Nog geen insights beschikbaar."
+    "empty": "Nog geen insights beschikbaar.",
+    "title": "Contact Insights",
+    "description": "A summary of enriched customer data at a glance",
+    "leadEmail": "Lead email",
+    "period": "10hrs",
+    "actions": {
+      "sent": "Sent",
+      "call": "Call"
+    },
+    "stats": {
+      "firstEvent": "First event",
+      "firstEventValue": "Mar 24, 2025",
+      "campaignCommunicationSent": "Campaign communication sent",
+      "lastEvent": "Last event",
+      "lastEventValue": "May 13, 2026",
+      "leadQualified": "Lead qualified",
+      "trackedEvents": "Tracked events",
+      "trackedEventsValue": "406"
+    },
+    "filters": {
+      "tags": "Tags",
+      "peakActivity": "Peak activity",
+      "latestMarketingCommunications": "Latest marketing communications",
+      "latestPagesViewed": "Latest pages viewed",
+      "latestLeads": "Latest leads",
+      "latestOpportunities": "Latest opportunities",
+      "latestReviews": "Latest reviews",
+      "sources": "Sources",
+      "associatedContacts": "Associated contacts"
+    },
+    "cards": {
+      "tags": "Tags",
+      "peakActivity": "Peak activity",
+      "latestMarketingCommunications": "Latest marketing communications",
+      "latestPagesViewed": "Latest pages viewed",
+      "latestLeads": "Latest leads",
+      "latestOpportunities": "Latest opportunities",
+      "latestReviews": "Latest reviews",
+      "sources": "Sources",
+      "associatedContacts": "Associated contacts"
+    },
+    "tags": {
+      "apiResponse": "API response",
+      "hasActiveLead": "has active lead",
+      "hasActiveOpportunity": "has active opportunity",
+      "newLeadBuyer": "new lead buyer",
+      "usedCar": "used car",
+      "webVisit": "web visit",
+      "requestScore": "request score",
+      "privateCustomer": "private customer",
+      "afterSales": "after sales",
+      "tradeIn": "trade-in",
+      "remoteLead": "remote lead",
+      "appointmentSet": "appointment set"
+    },
+    "marketing": {
+      "first": {
+        "title": "Employsync.promoworlds",
+        "meta": "Clicked Feb 09, 2026, 10:56"
+      },
+      "second": {
+        "title": "Campaign re-send 2025",
+        "meta": "Clicked Feb 26, 2026, 14:48"
+      }
+    },
+    "pages": {
+      "first": {
+        "title": "Auto Usate Milano Audi A5 Sportback 50 TFSI quattro - Milano",
+        "meta": "Last viewed Apr 4, 2026, 12:54 PM",
+        "badge": "Found"
+      },
+      "second": {
+        "title": "Auto Usate Torino ABARTH 595 Turismo 1.4 T-Jet - Torino",
+        "meta": "Last viewed Feb 1, 2026, 9:20 PM",
+        "badge": "15 mins"
+      },
+      "third": {
+        "title": "Auto Usate Milano Citroen C4 Diesel BlueHDi 100 Feel - Milano",
+        "meta": "Last viewed Apr 8, 2026, 7:23 PM",
+        "badge": "30 mins"
+      },
+      "fourth": {
+        "title": "Auto Usate Milano Jeep Avenger Berlina BEV - Milano",
+        "meta": "Last viewed Apr 6, 2026, 4:20 PM",
+        "badge": "7 mins"
+      }
+    },
+    "leads": {
+      "first": {
+        "title": "Fiat 500",
+        "meta": "Created Feb 13, 2026, 1:04 PM"
+      },
+      "second": {
+        "title": "Active Partecipanti",
+        "meta": "Created Feb 21, 2026, 4:05 PM"
+      },
+      "third": {
+        "title": "Fiat 500",
+        "meta": "Updated Mar 03, 2026, 10:20 AM"
+      },
+      "fourth": {
+        "title": "Fiat 500",
+        "meta": "Created Feb 03, 2026, 9:45 AM"
+      }
+    },
+    "opportunities": {
+      "first": {
+        "title": "Marco peters",
+        "meta": "Updated Apr 11, 2026, 1:13 PM"
+      },
+      "second": {
+        "title": "Fiat 500",
+        "meta": "Updated Feb 14, 2026, 11:31 AM"
+      },
+      "third": {
+        "title": "Fiat 500C",
+        "meta": "Updated Mar 07, 2026, 8:22 AM"
+      },
+      "fourth": {
+        "title": "Fiat 500",
+        "meta": "Updated Apr 15, 2026, 10:08 AM"
+      }
+    },
+    "status": {
+      "qualified": "Qualified",
+      "valid": "Valid",
+      "visit": "Visit",
+      "open": "Open"
+    },
+    "review": {
+      "title": "Doppiamente: sono eccellenti!",
+      "meta": "Created May 10, 2026, 11:30 AM"
+    },
+    "sources": {
+      "callSpark": "CallSparK",
+      "fidSpark": "FidSparK",
+      "leadSpark": "LeadSparK(R)",
+      "predictSpark": "PredictSparK",
+      "webSpark": "WebSparK"
+    },
+    "contacts": {
+      "first": {
+        "name": "Paolo Pezzotti",
+        "email": "mario@dealer.com",
+        "phone": "+39 333 459 4438"
+      },
+      "second": {
+        "name": "Paolo Pezzotti",
+        "email": "paolo@dealer.com",
+        "phone": "+39 333 459 4439"
+      },
+      "third": {
+        "name": "Paolo Pezzotti",
+        "email": "paolo.pezzotti@dealer.com",
+        "phone": "+39 333 459 4440"
+      }
+    }
   },
   "insight": {
     "highPaidStock": "Deze lead komt uit een betalende bron met hoge kosten en gaat over een auto die al {days} dagen op voorraad is."
@@ -104,7 +260,100 @@
     "outcomeFlowNotes": "Belnotities",
     "outcomeFlowNotesPlaceholder": "Voeg notities toe voor deze belpoging…",
     "calledAt": "Gebeld om:",
-    "editCalledAt": "Beltijd bewerken"
+    "editCalledAt": "Beltijd bewerken",
+    "savingOutcome": "Uitkomst opslaan",
+    "customerFallback": "de klant",
+    "nextCallAttempt": "Volgende belpoging",
+    "tomorrow9am": "Morgen om 9:00",
+    "suggestAiTime": "AI-tijd voorstellen",
+    "selectTime": "Tijd selecteren",
+    "dateAtTime": "{date} om {time}",
+    "date": "Datum",
+    "time": "Tijd",
+    "timeOptional": "Tijd (optioneel)",
+    "reasonOptional": "Reden (optioneel)",
+    "postponeReasonFreeTextPlaceholder": "Waarom stel je deze taak uit?",
+    "markScheduledRecall": "Markeren als geplande recall-afspraak",
+    "assignedTo": "Toegewezen aan",
+    "assignNextAttemptPlaceholder": "Volgende poging toewijzen aan...",
+    "noteToAssignee": "Notitie voor assignee",
+    "noteToAssigneePlaceholder": "Voeg notities of instructies toe voor de assignee...",
+    "sendFollowUpMessage": "Follow-upbericht versturen",
+    "followUpTemplateOne": "Follow-up 1",
+    "followUpTemplateTwo": "Follow-up 2",
+    "messageTemplatePlaceholder": "Selecteer een sjabloon of typ je bericht...",
+    "requiredFields": "Verplichte velden",
+    "customerInterestLevel": "Interesseniveau van de klant?",
+    "expectedPurchaseTimeline": "Verwachte aankoopplanning?",
+    "selectTimeline": "Planning selecteren",
+    "budgetRangeQuestion": "Budgetrange (indien besproken)?",
+    "selectBudgetRange": "Budgetrange selecteren",
+    "additionalNotes": "Aanvullende notities",
+    "additionalNotesPlaceholder": "Relevante informatie over interesse of voorkeuren van de klant...",
+    "noteInterestLevel": "Interesseniveau: {value}",
+    "notePurchaseTimeline": "Aankoopplanning: {value}",
+    "noteBudgetRange": "Budgetrange: {value}",
+    "outcomeLogged": "Uitkomst geregistreerd",
+    "sendAndPostpone": "Versturen en uitstellen",
+    "scheduleAndQualify": "Plannen en kwalificeren",
+    "assignToSalesman": "Toewijzen aan verkoper",
+    "interestLevels": {
+      "high": "Hoog",
+      "medium": "Gemiddeld",
+      "low": "Laag"
+    },
+    "purchaseTimeline": {
+      "immediate": "Direct",
+      "withinOneMonth": "Binnen 1 maand",
+      "withinThreeMonths": "Binnen 3 maanden",
+      "withinSixMonths": "Binnen 6 maanden",
+      "justBrowsing": "Alleen aan het rondkijken"
+    },
+    "budgetRange": {
+      "under30k": "Onder €30k",
+      "notDiscussed": "Niet besproken"
+    },
+    "eventTypes": {
+      "appointmentOnPhone": "Telefonische afspraak (15m)",
+      "appointmentAtDealership": "Afspraak bij dealer (30m)",
+      "recallInternal": "Recall - intern (15m)",
+      "appointmentAtDealershipTestDrive": "Afspraak bij dealer + proefrit (1u)",
+      "appointmentAtWorkshop": "Afspraak in werkplaats (15m)",
+      "appointmentAtCustomerSite": "Afspraak bij klant op locatie (1u 40m)",
+      "appointmentAtCustomerSiteTestDrive": "Afspraak bij klant op locatie + proefrit (5u)"
+    },
+    "activities": {
+      "enrichedLeadInformation": "heeft leadinformatie verrijkt",
+      "leadQualificationSurvey": "Leadkwalificatie-enquête",
+      "callSummary": "De lead bevestigde de gegevens en het gesprek behandelde de belangrijkste aanvraag uit de transcriptie.",
+      "madeCall": "heeft gebeld",
+      "userMadeCall": "{user} heeft gebeld"
+    }
+  },
+  "closeAsLost": {
+    "reason": "Reden",
+    "selectReason": "Selecteer een reden...",
+    "reasons": {
+      "multipleNoShows": "Meerdere no-shows",
+      "dataCleanup": "Data opschonen",
+      "unreachable": "Onbereikbaar",
+      "purchasePostponed": "Aankoop uitgesteld",
+      "vehicleSold": "Voertuig verkocht",
+      "outOfBudget": "Buiten budget",
+      "financingRejected": "Financiering afgewezen",
+      "duplicate": "Duplicaat",
+      "boughtElsewhere": "Elders gekocht",
+      "notInterested": "Niet geïnteresseerd",
+      "budgetConstraints": "Budgetbeperkingen",
+      "foundBetterPrice": "Betere prijs bij concurrent",
+      "noResponse": "Klant reageert niet",
+      "wrongTiming": "Timing niet juist",
+      "other": "Overig"
+    }
+  },
+  "postponeTaskDialog": {
+    "title": "Taak uitstellen",
+    "postponeDate": "Uitsteldatum"
   },
   "quickActions": {
     "phone": "Telefoon",
@@ -212,6 +461,7 @@
     "dealership": "Dealer",
     "price": "Prijs",
     "specification": "Specificatie",
+    "vin": "VIN",
     "registrationDate": "Registratiedatum",
     "carLocation": "Locatie voertuig",
     "mileage": "Kilometerstand",
@@ -221,6 +471,7 @@
     "identity": "Identiteit",
     "stockInStock": "Op voorraad",
     "stockNotInStock": "Niet op voorraad",
+    "stockToBeOrder": "Te bestellen",
     "landingPage": "Landingspagina",
     "visit": "Bezoeken",
     "editAria": "Gevraagde voertuig bewerken",
@@ -229,7 +480,8 @@
     "staffNotePlaceholder": "Interne notitie over dit voertuig (los van het klantverzoek).",
     "savingNote": "Opslaan…",
     "expandNote": "Volledige notitie tonen",
-    "collapseNote": "Minder tonen"
+    "collapseNote": "Minder tonen",
+    "interactionMetricsTooltip": "{leads} leads en {opportunities} opportunities voor dit voertuig"
   },
   "editVehicleModal": {
     "title": "Gevraagde voertuig bewerken",
@@ -330,6 +582,12 @@
     "conversations": "Gesprekken verschijnen hier.",
     "attachments": "Bijlagen verschijnen hier.",
     "tasksTab": "Related tasks and requests for this customer will appear here."
+  },
+  "purchaseDetails": {
+    "financingOptions": "Financieringsopties",
+    "tradeIns": "Inruil",
+    "add": "Toevoegen",
+    "months": "{count} maanden"
   },
   "emptyStates": {
     "conversations": {

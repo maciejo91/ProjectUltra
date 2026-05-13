@@ -6,7 +6,10 @@
       <header
         v-if="showMobileHeader"
         class="mobile-header md:hidden shrink-0 z-50 flex items-start justify-between gap-3 px-6 py-6"
-        :class="route.meta?.mutedPageChrome ? 'bg-muted' : 'bg-background'"
+        :class="[
+          route.meta?.mutedPageChrome ? 'bg-muted' : 'bg-background',
+          isHeaderScrolled ? 'shadow-sm' : 'shadow-none'
+        ]"
       >
         <SidebarTrigger
           class="w-11 h-11 shrink-0 rounded-lg text-muted-foreground hover:text-brand-red hover:bg-red-50"
@@ -79,13 +82,15 @@
           <!-- One scroll for list + detail (no nested column scrollbars) -->
           <div
             class="flex min-h-0 flex-1 min-w-0 items-start overflow-x-hidden overflow-y-auto overscroll-contain"
+            @scroll.capture="handleContentScroll"
           >
             <aside
               class="hidden shrink-0 flex-col border-border border-r bg-background md:flex md:w-80"
             >
               <AppHeader
                 v-if="showDesktopHeader"
-                class="sticky top-0 z-10 shrink-0 bg-background"
+                :class="desktopHeaderClass"
+                :is-scrolled="isHeaderScrolled"
               />
               <div class="w-full min-w-0">
                 <div id="tasks-list-teleport" class="flex w-full flex-col" />
@@ -102,11 +107,12 @@
         </template>
         <main
           v-show="!showTaskDetailSplitPane"
-          class="flex min-h-0 flex-1 flex-col overflow-hidden"
-          :class="route.meta?.mutedPageChrome ? 'bg-muted' : 'bg-background'"
+          class="flex min-h-0 flex-1 flex-col"
+          :class="mainContentClass"
+          @scroll.capture="handleContentScroll"
         >
-          <AppHeader v-if="showDesktopHeader" class="sticky top-0 z-10 shrink-0" />
-          <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <AppHeader v-if="showDesktopHeader" :class="desktopHeaderClass" :is-scrolled="isHeaderScrolled" />
+          <div ref="pageContentRef" :class="pageContentClass">
             <router-view />
           </div>
         </main>
@@ -116,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, provide, computed } from 'vue'
+import { ref, provide, computed, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Plus, RefreshCw, Filter } from 'lucide-vue-next'
@@ -130,10 +136,47 @@ const { t } = useI18n()
 const layoutStore = useLayoutStore()
 const headerActionsRef = ref(null)
 const mobileReportsTimeRange = ref('This month')
+const pageContentRef = ref(null)
+const isHeaderScrolled = ref(false)
 provide('headerActionsRef', headerActionsRef)
 
+const getPageScrollContainers = () => {
+  const pageContainer = pageContentRef.value?.querySelector('.page-container')
+  if (!pageContainer) return []
+
+  const candidates = [
+    pageContainer,
+    ...pageContainer.querySelectorAll('.overflow-y-auto')
+  ]
+  const pageRect = pageContainer.getBoundingClientRect()
+
+  return candidates.filter((element) => {
+    const rect = element.getBoundingClientRect()
+    const isPageWidth = rect.width >= pageRect.width * 0.7
+    const isPageAligned = Math.abs(rect.left - pageRect.left) < 2
+    return element.scrollHeight > element.clientHeight && isPageWidth && isPageAligned
+  })
+}
+
+const updateHeaderScrollState = () => {
+  isHeaderScrolled.value = getPageScrollContainers().some((element) => element.scrollTop > 0)
+}
+
+const handleContentScroll = () => {
+  updateHeaderScrollState()
+}
+
+watch(
+  () => route.fullPath,
+  async () => {
+    isHeaderScrolled.value = false
+    await nextTick()
+    updateHeaderScrollState()
+  }
+)
+
 const ROUTE_TITLE_MAP = {
-  'home-dashboard': 'common.navigation.home',
+  'home-dashboard': 'common.navigation.nscDashboard',
   'add-new': 'common.navigation.addNewCustomer',
   'task-detail': 'common.navigation.tasks',
   'customer-view': 'entities.customer.title',
@@ -190,6 +233,20 @@ const showDesktopHeader = computed(() => {
   if (route.name === 'task-detail' && Boolean(route.params.id)) return false
   return true
 })
+
+const desktopHeaderClass = computed(() => {
+  return 'shrink-0'
+})
+
+const mainContentClass = computed(() => [
+  route.meta?.mutedPageChrome ? 'bg-muted' : 'bg-background',
+  'overflow-y-auto overscroll-contain'
+])
+
+const pageContentClass = computed(() => [
+  'flex min-w-0 flex-col',
+  route.name === 'request-detail' ? 'min-h-0 flex-1 overflow-hidden bg-muted' : ''
+])
 
 const showMobileHeader = computed(() => {
   if (route?.meta?.showPageTitle === false) return false

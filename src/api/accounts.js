@@ -9,11 +9,11 @@ const delay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms))
 const MOCK_COMPANY_SEARCH_ONLY = [
   { id: 9901, name: 'Sunrise Automotive SpA', company: 'Sunrise Automotive SpA', email: 'info@sunrise-auto.test' },
   { id: 9902, name: 'Metro Fleet Italia', company: 'Metro Fleet Italia', email: 'sales@metro-fleet.test' },
-  { id: 9903, name: 'Bergmann Premium Cars', company: 'Bergmann Premium Cars', email: 'hello@bergmann-cars.test' },
-  { id: 9904, name: 'Coastal Motors Group', company: 'Coastal Motors Group', email: 'contact@coastal.test' },
+  { id: 9903, name: 'Verona Premium Cars', company: 'Verona Premium Cars', email: 'hello@verona-premium.test' },
+  { id: 9904, name: 'Gruppo Motori Liguria', company: 'Gruppo Motori Liguria', email: 'contact@motori-liguria.test' },
   { id: 9905, name: 'Verona Auto Center', company: 'Verona Auto Center', email: 'info@verona-auto.test' },
   { id: 9906, name: 'Delta Mobility Solutions', company: 'Delta Mobility Solutions', email: 'office@delta-mobility.test' },
-  { id: 9907, name: 'North Star Leasing S.r.l.', company: 'North Star Leasing S.r.l.', email: 'lease@northstar.test' },
+  { id: 9907, name: 'Stella Nord Leasing S.r.l.', company: 'Stella Nord Leasing S.r.l.', email: 'lease@stellanord.test' },
 ]
 
 // Filter accounts (customers with company field) + demo company list for search

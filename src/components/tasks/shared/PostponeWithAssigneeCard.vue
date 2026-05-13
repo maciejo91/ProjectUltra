@@ -10,7 +10,7 @@
             @update:model-value="(p) => p && setRescheduleTime('tomorrow-9am')"
             class="followup-toggle-item"
           >
-            Tomorrow 9:00 AM
+            {{ t('requestDetail.lqfTask.tomorrow9am') }}
           </Toggle>
           <Toggle
             variant="outline"
@@ -25,7 +25,7 @@
               :stroke="rescheduleTime === 'monday' ? 'none' : 'currentColor'"
               :stroke-width="rescheduleTime === 'monday' ? 0 : 1.5"
             />
-            Suggest AI time
+            {{ t('requestDetail.lqfTask.suggestAiTime') }}
           </Toggle>
           <Toggle
             variant="outline"
@@ -33,7 +33,7 @@
             @update:model-value="(p) => p && setRescheduleTime('custom')"
             class="followup-toggle-item"
           >
-            Select time
+            {{ t('requestDetail.lqfTask.selectTime') }}
           </Toggle>
         </div>
         <div
@@ -44,7 +44,7 @@
             <Lightbulb class="w-4 h-4 shrink-0 text-blue-600 mt-0.5" />
             <div class="flex-1">
               <p class="text-sm font-semibold text-foreground mb-1">
-                {{ aiSuggestionData.formattedDate }} at {{ aiSuggestionData.time }}
+                {{ t('requestDetail.lqfTask.dateAtTime', { date: aiSuggestionData.formattedDate, time: aiSuggestionData.time }) }}
               </p>
               <p class="text-sm text-muted-foreground">
                 {{ aiSuggestionData.reason }}
@@ -54,31 +54,31 @@
         </div>
         <div v-if="rescheduleTime === 'custom'" class="mt-3 grid grid-cols-2 gap-3">
           <div>
-            <Label class="form-label">Date <span class="text-destructive">*</span></Label>
+            <Label class="form-label">{{ t('requestDetail.lqfTask.date') }} <span class="text-destructive">*</span></Label>
             <Input type="date" v-model="customDate" :min="minDate" class="w-full" />
           </div>
           <div>
-            <Label class="form-label">Time</Label>
+            <Label class="form-label">{{ t('requestDetail.lqfTask.time') }}</Label>
             <Input type="time" v-model="customTime" class="w-full" />
           </div>
         </div>
       </template>
       <div v-if="!showQuickTimeOptions" class="grid grid-cols-2 gap-3">
         <div>
-          <Label class="form-label">Date <span class="text-destructive">*</span></Label>
+          <Label class="form-label">{{ t('requestDetail.lqfTask.date') }} <span class="text-destructive">*</span></Label>
           <Input type="date" v-model="customDate" :min="minDate" class="w-full" />
         </div>
         <div>
-          <Label class="form-label">Time (optional)</Label>
+          <Label class="form-label">{{ t('requestDetail.lqfTask.timeOptional') }}</Label>
           <Input type="time" v-model="customTime" class="w-full" />
         </div>
       </div>
       <div v-if="showReasonField" class="mt-4">
-        <Label class="form-label">Reason (optional)</Label>
+        <Label class="form-label">{{ t('requestDetail.lqfTask.reasonOptional') }}</Label>
         <Textarea
           v-model="reason"
           rows="2"
-          placeholder="Why are you postponing this task?"
+          :placeholder="t('requestDetail.lqfTask.postponeReasonFreeTextPlaceholder')"
           class="w-full resize-none border-border bg-background text-foreground"
         />
       </div>
@@ -93,7 +93,7 @@
         />
       </div>
       <div class="mt-4">
-        <Label class="form-label">Assigned to</Label>
+        <Label class="form-label">{{ t('requestDetail.lqfTask.assignedTo') }}</Label>
         <SelectMenu
           v-model="selectedAssigneeKey"
           :items="assigneeOptions"
@@ -117,12 +117,12 @@
         </SelectMenu>
       </div>
       <div class="mt-4">
-        <Label class="form-label">Note to assignee</Label>
+        <Label class="form-label">{{ t('requestDetail.lqfTask.noteToAssignee') }}</Label>
         <Textarea
           v-model="noteToAssignee"
           rows="3"
           class="w-full resize-none border-border bg-background text-foreground"
-          placeholder="Add any notes or instructions for the assignee..."
+          :placeholder="t('requestDetail.lqfTask.noteToAssigneePlaceholder')"
         />
       </div>
     </div>
@@ -148,9 +148,12 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Button, Input, Label, Textarea, Toggle, Spinner } from '@motork/component-library/future/primitives'
 import { SelectMenu } from '@motork/component-library/future/components'
 import { Sparkles, Lightbulb, Users } from 'lucide-vue-next'
+
+const { t } = useI18n()
 
 const props = defineProps({
   title: { type: String, default: 'Postpone task to' },

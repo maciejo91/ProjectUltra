@@ -63,6 +63,7 @@ export type ActivityTimelineCardAccent =
   | 'note'
   | 'message'
   | 'messageGreen'
+  | 'sms'
   | 'email'
   | 'call'
   | 'ai'

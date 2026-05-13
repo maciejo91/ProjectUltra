@@ -134,9 +134,9 @@ export const fetchCalendarFilterOptions = async () => {
   
   // Mock users (would typically come from users API)
   const users = [
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Smith' },
-    { id: 3, name: 'Mike Johnson' }
+    { id: 1, name: 'Giovanni Russo' },
+    { id: 2, name: 'Giulia Ferri' },
+    { id: 3, name: 'Michele Romano' }
   ]
   
   return {

@@ -4,6 +4,7 @@
   },
   "navigation": {
     "home": "Home",
+    "nscDashboard": "MotorK Automotive Group",
     "tasks": "Taken",
     "requests": "Verzoeken",
     "sales": "Sales",
@@ -88,7 +89,17 @@
       "admin": "Admin",
       "salesRep": "Sales rep",
       "bdcOperator": "BDC operator",
-      "externalBdc": "External BDC"
+      "externalBdc": "External BDC",
+      "superAdmin": "Super Admin"
+    },
+    "demoAccess": {
+      "lockedTooltip": "Deze pagina is niet beschikbaar voor deze demo",
+      "passwordTitle": "Super Admin-toegang",
+      "passwordDescription": "Voer het demo-wachtwoord in om alle pagina's te ontgrendelen.",
+      "passwordLabel": "Wachtwoord",
+      "passwordPlaceholder": "Voer wachtwoord in",
+      "passwordError": "Onjuist wachtwoord",
+      "unlock": "Alle pagina's ontgrendelen"
     }
   },
   "buttons": {

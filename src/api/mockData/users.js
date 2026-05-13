@@ -1,8 +1,8 @@
 export const mockUsers = [
-  { id: 1, name: 'Maciej Ogonowski', initials: 'MO', role: 'manager', email: 'maciej.ogonowski@example.com', team: 'BDC', teamId: 1, dealership: 'Milano', fiscalEntityId: 'company-a' },
-  { id: 2, name: 'Sarah Jenkins', initials: 'SJ', role: 'salesman', email: 'sarah.jenkins@example.com', team: 'Sales (New)', teamId: 5, dealership: 'Milano', fiscalEntityId: 'company-a' },
-  { id: 3, name: 'David Miller', initials: 'DM', role: 'operator', email: 'david.miller@example.com', team: 'Service', teamId: 4, dealership: 'Firenze', fiscalEntityId: 'company-a' },
-  { id: 4, name: 'Natalia Sung', initials: 'NS', role: 'operator', email: 'natalia.sung@example.com', team: 'Sales (New)', teamId: 10, dealership: 'Bari', fiscalEntityId: 'company-b' },
+  { id: 1, name: 'Matteo Greco', initials: 'MG', role: 'manager', email: 'matteo.greco@example.com', team: 'BDC', teamId: 1, dealership: 'Milano', fiscalEntityId: 'company-a' },
+  { id: 2, name: 'Sara Marino', initials: 'SM', role: 'salesman', email: 'sara.marino@example.com', team: 'Sales (New)', teamId: 5, dealership: 'Milano', fiscalEntityId: 'company-a' },
+  { id: 3, name: 'Davide Rinaldi', initials: 'DR', role: 'operator', email: 'davide.rinaldi@example.com', team: 'Service', teamId: 4, dealership: 'Firenze', fiscalEntityId: 'company-a' },
+  { id: 4, name: 'Natalia Santoro', initials: 'NS', role: 'operator', email: 'natalia.santoro@example.com', team: 'Sales (New)', teamId: 10, dealership: 'Bari', fiscalEntityId: 'company-b' },
   { id: 5, name: 'Marco Rossi', initials: 'MR', role: 'salesman', email: 'marco.rossi@example.com', team: 'Sales (New)', teamId: 8, dealership: 'Firenze', fiscalEntityId: 'company-a' },
   { id: 6, name: 'Giulia Bianchi', initials: 'GB', role: 'salesman', email: 'giulia.bianchi@example.com', team: 'Sales (New)', teamId: 12, dealership: 'Roma', fiscalEntityId: 'company-a' },
   { id: 7, name: 'Luca Ferrari', initials: 'LF', role: 'operator', email: 'luca.ferrari@example.com', team: 'Service', teamId: 13, dealership: 'Roma', fiscalEntityId: 'company-a' },
@@ -14,5 +14,5 @@ export const mockUsers = [
   { id: 13, name: 'Matteo Rizzo', initials: 'MR', role: 'operator', email: 'matteo.rizzo@example.com', team: 'Service', teamId: 9, dealership: 'Bari', fiscalEntityId: 'company-a' },
   { id: 14, name: 'Chiara De Luca', initials: 'CD', role: 'salesman', email: 'chiara.deluca@example.com', team: 'Sales (New)', teamId: 5, dealership: 'Milano', fiscalEntityId: 'company-a' },
   { id: 15, name: 'Riccardo Esposito', initials: 'RE', role: 'operator', email: 'riccardo.esposito@example.com', team: 'Service', teamId: 15, dealership: 'Trento', fiscalEntityId: 'company-a' },
-  { id: 16, name: 'Michael Thomas', initials: 'MT', role: 'salesman', email: 'michael.thomas@example.com', team: 'Sales (New)', teamId: 5, dealership: 'Milano', fiscalEntityId: 'company-a' },
+  { id: 16, name: 'Michele Tomasi', initials: 'MT', role: 'salesman', email: 'michele.tomasi@example.com', team: 'Sales (New)', teamId: 5, dealership: 'Milano', fiscalEntityId: 'company-a' },
 ]

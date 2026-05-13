@@ -23,6 +23,7 @@ import {
   mockManagerFunnelMetrics
 } from './dashboard.js'
 import { mockNotifications } from './notifications.js'
+import { translateObject } from './locales/translations.js'
 
 // Import locale-specific data (English as default)
 import { mockLeads as enLeads } from './locales/en/leads.js'
@@ -106,6 +107,8 @@ const localeData = {
 export function getMockData() {
   const locale = getCurrentLocale()
   const data = localeData[locale] || localeData.en
+  const translatedTextFields = ['requestMessage', 'notes', 'content', 'summary', 'action', 'message', 'aiSummary']
+  const translateLocaleData = (value) => locale === 'en' ? value : translateObject(value, locale, translatedTextFields)
   // English is the default source; other locales get interestScore from EN by id so we don't duplicate
   const localeCustomers = data.customers || []
   const mockCustomers =
@@ -115,18 +118,21 @@ export function getMockData() {
           const enCustomer = localeData.en.customers.find((e) => e.id === c.id)
           return { ...c, interestScore: enCustomer?.interestScore ?? c.interestScore }
         })
+  const mockLeads = translateLocaleData(data.leads)
+  const mockOpportunities = translateLocaleData(data.opportunities)
+  const mockActivities = translateLocaleData(data.activities)
 
   return {
     mockUsers, // Users don't need localization
     mockNotifications,
-    mockCustomers,
-    mockLeads: data.leads,
-    mockOpportunities: data.opportunities,
+    mockCustomers: translateLocaleData(mockCustomers),
+    mockLeads,
+    mockOpportunities,
     mockTasks: enTasks, // English default; task labels translated in components
     mockContacts, // Contacts are derived from customers
     mockVehicles, // Vehicles use technical names
     mockCalendarEvents, // Calendar events use technical data
-    mockActivities: data.activities,
+    mockActivities,
     calendarEventTypes,
     calendarDealerships,
     calendarTeams,

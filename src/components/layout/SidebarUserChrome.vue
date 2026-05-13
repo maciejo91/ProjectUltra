@@ -141,12 +141,59 @@
       @close="handleCloseSearchModal"
       @search="handleSearch"
     />
+
+    <Dialog :open="showSuperAdminDialog" @update:open="handleSuperAdminDialogOpenChange">
+      <DialogPortal>
+        <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
+        <DialogContent
+          class="w-full sm:max-w-md max-h-[calc(100vh-4rem)] flex flex-col"
+          :show-close-button="true"
+        >
+          <DialogHeader class="shrink-0">
+            <DialogTitle>{{ t('common.layout.demoAccess.passwordTitle') }}</DialogTitle>
+            <DialogDescription>
+              {{ t('common.layout.demoAccess.passwordDescription') }}
+            </DialogDescription>
+          </DialogHeader>
+          <form class="flex-1 py-4 w-full space-y-4" @submit.prevent="unlockSuperAdmin">
+            <div class="space-y-2">
+              <Label for="super-admin-password" class="text-foreground">
+                {{ t('common.layout.demoAccess.passwordLabel') }}
+              </Label>
+              <Input
+                id="super-admin-password"
+                v-model="superAdminPassword"
+                type="password"
+                autocomplete="off"
+                :placeholder="t('common.layout.demoAccess.passwordPlaceholder')"
+              />
+              <p v-if="superAdminPasswordError" class="text-sm text-destructive">
+                {{ t('common.layout.demoAccess.passwordError') }}
+              </p>
+            </div>
+            <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                class="rounded-sm w-full sm:w-auto"
+                @click="handleSuperAdminDialogOpenChange(false)"
+              >
+                {{ t('common.buttons.cancel') }}
+              </Button>
+              <Button type="submit" variant="default" class="rounded-sm w-full sm:w-auto">
+                {{ t('common.layout.demoAccess.unlock') }}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
   UserRound,
@@ -160,9 +207,29 @@ import { useLayoutStore } from '@/stores/layout'
 import { useUserStore } from '@/stores/user'
 import { useSettingsStore } from '@/stores/settings'
 import FloatingSearchModal from '@/components/shared/FloatingSearchModal.vue'
-import { SidebarMenuButton, useSidebar } from '@motork/component-library/future/primitives'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  Input,
+  Label,
+  SidebarMenuButton,
+  useSidebar
+} from '@motork/component-library/future/primitives'
+import {
+  SUPER_ADMIN_PROFILE,
+  isDemoAccessPasswordValid,
+  isRouteAvailableForDemo
+} from '@/utils/demoAccess'
 
 const router = useRouter()
+const route = useRoute()
 const { locale, t } = useI18n()
 const layoutStore = useLayoutStore()
 const userStore = useUserStore()
@@ -186,13 +253,17 @@ const sidebarProfiles = computed(() => [
   { id: 'salesRep', label: t('common.layout.profiles.salesRep') },
   { id: 'bdc', label: t('common.layout.profiles.bdcOperator') },
   { id: 'admin', label: t('common.layout.profiles.admin') },
-  { id: 'externalBdc', label: t('common.layout.profiles.externalBdc') }
+  { id: 'externalBdc', label: t('common.layout.profiles.externalBdc') },
+  { id: SUPER_ADMIN_PROFILE, label: t('common.layout.profiles.superAdmin') }
 ])
 
 const showUserMenu = ref(false)
 const profileExpanded = ref(false)
 const languageExpanded = ref(false)
 const showSearchModal = ref(false)
+const showSuperAdminDialog = ref(false)
+const superAdminPassword = ref('')
+const superAdminPasswordError = ref(false)
 const triggerWrapRef = ref(null)
 const popoverPanelRef = ref(null)
 const popoverStyle = ref({})
@@ -364,12 +435,44 @@ function handleLogout() {
 }
 
 function setSidebarProfile(profileId) {
+  if (profileId === SUPER_ADMIN_PROFILE) {
+    superAdminPassword.value = ''
+    superAdminPasswordError.value = false
+    profileExpanded.value = false
+    showUserMenu.value = false
+    showSuperAdminDialog.value = true
+    return
+  }
+
   settingsStore.setSetting('sidebarProfile', profileId)
   profileExpanded.value = false
+  showUserMenu.value = false
+
+  if (!isRouteAvailableForDemo(route, profileId)) {
+    router.push('/home')
+  }
 }
 
 function handleSearch() {
   handleCloseSearchModal()
+}
+
+function handleSuperAdminDialogOpenChange(open) {
+  showSuperAdminDialog.value = open
+  if (!open) {
+    superAdminPassword.value = ''
+    superAdminPasswordError.value = false
+  }
+}
+
+function unlockSuperAdmin() {
+  if (!isDemoAccessPasswordValid(superAdminPassword.value)) {
+    superAdminPasswordError.value = true
+    return
+  }
+
+  settingsStore.setSetting('sidebarProfile', SUPER_ADMIN_PROFILE)
+  handleSuperAdminDialogOpenChange(false)
 }
 </script>
 

@@ -2,12 +2,15 @@
   <div class="rounded-lg border border-border bg-card overflow-hidden shadow-mk-dashboard-card h-full flex flex-col">
     <div class="flex flex-col md:flex-row flex-1 min-h-0">
       <!-- Vehicle Image -->
-      <div class="md:w-1/4 aspect-video bg-muted relative shrink-0 overflow-hidden">
+      <div
+        class="md:w-1/4 aspect-4/3 relative shrink-0 overflow-hidden"
+        :class="usesLogoImage ? 'flex items-center justify-center border border-black/5 bg-white' : 'bg-muted'"
+      >
         <img
           v-if="effectiveImageUrl"
           :src="effectiveImageUrl"
           :alt="vehicleDisplayName"
-          class="w-full h-full object-cover"
+          :class="usesLogoImage ? 'size-24 bg-white object-contain' : 'w-full h-full object-cover'"
           @error="handleImageError"
         />
         <div
@@ -141,8 +144,19 @@ const hasVehicle = computed(() => {
   return !!(v?.brand || v?.model)
 })
 
+const usesLogoImage = computed(() => {
+  const v = vehicle.value
+  return isNewBmwVehicle.value || v?.imageDisplayMode === 'logo' || v?.imageType === 'logo'
+})
+
+const isNewBmwVehicle = computed(() => {
+  const v = vehicle.value
+  return String(vehicleConditionLabel.value || '').toLowerCase() === 'new' && String(v?.brand || '').toLowerCase() === 'bmw'
+})
+
 const imageUrl = computed(() => {
   const v = vehicle.value
+  if (isNewBmwVehicle.value) return '/brands/bmw-white.svg'
   const url = v?.image || v?.imageUrl || ''
   return url || (hasVehicle.value ? DEFAULT_CAR_IMAGE : '')
 })

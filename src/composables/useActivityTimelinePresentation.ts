@@ -42,10 +42,10 @@ function getActivityTimestampMs(activity: ActivityRecord): number {
 }
 
 export function isCommunicationReply(
-  activity: ActivityRecord,
+  activity: ActivityRecord | null | undefined,
   allActivities: ActivityRecord[] | undefined
 ): boolean {
-  if (!allActivities?.length) return false
+  if (!activity || !allActivities?.length) return false
   const channel = getCommunicationChannel(activity)
   if (!channel) return false
   const key = getConversationKey(activity)
@@ -111,12 +111,19 @@ export function getCallSummaryText(activity: ActivityRecord | undefined, t: TFn)
   return activity.data?.summary || activity.content || t('entities.activity.timeline.callCompletedFallback')
 }
 
-export function getActivityIconKind(activity: ActivityRecord): ActivityTimelineIconKind {
+export function getActivityIconKind(activity: ActivityRecord | null | undefined): ActivityTimelineIconKind {
+  if (!activity) return 'file'
   const type = activity.type
   if (type === 'note') return 'note'
   if (type === 'call') {
-    const text = `${activity.action ?? ''} ${activity.message ?? ''} ${activity.content ?? ''}`.toLowerCase()
-    const isMissed = text.includes('no answer') || text.includes('voicemail')
+    const text = `${activity.action ?? ''} ${activity.message ?? ''} ${activity.content ?? ''} ${activity.data?.summary ?? ''}`.toLowerCase()
+    const isMissed =
+      text.includes('no answer') ||
+      text.includes('voicemail') ||
+      /\bmissed\b/.test(text) ||
+      text.includes('unanswered') ||
+      text.includes('not answered') ||
+      /\bbusy\b/.test(text)
     return isMissed ? 'callMissed' : 'call'
   }
   if (type === 'email' || type === 'customer-email') return 'email'
@@ -139,7 +146,8 @@ export function getActivityIconKind(activity: ActivityRecord): ActivityTimelineI
   return 'file'
 }
 
-export function isActivityTimelineSystemHeadline(activity: ActivityRecord): boolean {
+export function isActivityTimelineSystemHeadline(activity: ActivityRecord | null | undefined): boolean {
+  if (!activity) return false
   if (activity.type === 'ai-summary') return true
   return getActivityIconKind(activity) === 'system'
 }
@@ -165,10 +173,13 @@ function getCommunicationActionLabel(
 }
 
 export function buildActivityHeadlineParts(
-  activity: ActivityRecord,
+  activity: ActivityRecord | null | undefined,
   t: TFn,
   allActivities?: ActivityRecord[]
 ): ActivityTimelineHeadlineParts {
+  if (!activity) {
+    return { primary: '', secondary: null }
+  }
   const type = activity.type
   const user = activity.user ?? ''
   const contactName = activity.data?.contactName || activity.customerName || ''
@@ -266,7 +277,7 @@ export function buildActivityHeadlineParts(
 }
 
 export function buildActivityHeadline(
-  activity: ActivityRecord,
+  activity: ActivityRecord | null | undefined,
   t: TFn,
   allActivities?: ActivityRecord[]
 ): string {
@@ -275,12 +286,13 @@ export function buildActivityHeadline(
   return `${primary} ${secondary}`.trim()
 }
 
-export function getActivityCardAccent(activity: ActivityRecord): ActivityTimelineCardAccent {
+export function getActivityCardAccent(activity: ActivityRecord | null | undefined): ActivityTimelineCardAccent {
+  if (!activity) return 'default'
   const type = activity.type
   if (type === 'note') return 'note'
   if (type === 'email' || type === 'customer-email') return 'email'
-  if (type === 'whatsapp' || type === 'customer-whatsapp' || type === 'sms' || type === 'customer-sms')
-    return 'messageGreen'
+  if (type === 'whatsapp' || type === 'customer-whatsapp') return 'messageGreen'
+  if (type === 'sms' || type === 'customer-sms') return 'sms'
   if (type === 'call') return 'call'
   if (type === 'ai-summary') return 'ai'
   if (type === 'appointment') return 'appointment'
@@ -288,9 +300,10 @@ export function getActivityCardAccent(activity: ActivityRecord): ActivityTimelin
 }
 
 export function shouldShowActivityCard(
-  activity: ActivityRecord,
+  activity: ActivityRecord | null | undefined,
   linesForTranscript: Array<{ speaker: string; text: string }>
 ): boolean {
+  if (!activity) return false
   const type = activity.type
   if (type === 'note') return !!(activity.message || activity.content)
   if (type === 'email' || type === 'customer-email') return !!activity.content
@@ -311,7 +324,8 @@ export function shouldShowActivityCard(
   return false
 }
 
-export function getActivityMetadataLine(activity: ActivityRecord, t: TFn): string | null {
+export function getActivityMetadataLine(activity: ActivityRecord | null | undefined, t: TFn): string | null {
+  if (!activity) return null
   const type = activity.type
   const labelFrom = t('entities.activity.timeline.metaFrom')
   const labelTo = t('entities.activity.timeline.metaTo')
@@ -344,6 +358,7 @@ export function getActivityMetadataLine(activity: ActivityRecord, t: TFn): strin
   return null
 }
 
-export function isActivityClickable(activity: ActivityRecord): boolean {
-  return ['note', 'email', 'whatsapp', 'customer-email', 'customer-whatsapp'].includes(activity.type)
+export function isActivityClickable(activity: ActivityRecord | null | undefined): boolean {
+  if (!activity) return false
+  return false
 }

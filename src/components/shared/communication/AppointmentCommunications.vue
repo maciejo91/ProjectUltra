@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white rounded-lg p-4 shadow-nsc-card">
-    <h5 class="font-semibold text-foreground text-sm mb-4">Send confirmations and reminders</h5>
+    <h5 class="font-semibold text-foreground text-sm mb-4">{{ t('forms.schedule.communications.title') }}</h5>
     
     <div class="space-y-4">
       <!-- Immediate Confirmation -->
@@ -10,14 +10,14 @@
             id="immediate-confirmation"
             v-model="communications.immediateConfirmationEnabled"
           />
-          <span class="text-sm font-medium text-foreground">Send immediate confirmation to customer</span>
+          <span class="text-sm font-medium text-foreground">{{ t('forms.schedule.communications.immediateConfirmation') }}</span>
         </Label>
         <SelectMenu
           v-if="communications.immediateConfirmationEnabled"
           v-model="communications.immediateConfirmationChannels"
           :items="channelOptions"
           :multiple="true"
-          placeholder="Select channels"
+          :placeholder="t('forms.schedule.communications.selectChannels')"
           class="w-48"
         />
       </div>
@@ -29,14 +29,14 @@
             id="reminder"
             v-model="communications.reminderEnabled"
           />
-          <span class="text-sm font-medium text-foreground">Send reminder the day before appointment</span>
+          <span class="text-sm font-medium text-foreground">{{ t('forms.schedule.communications.reminderBeforeAppointment') }}</span>
         </Label>
         <SelectMenu
           v-if="communications.reminderEnabled"
           v-model="communications.reminderChannels"
           :items="channelOptions"
           :multiple="true"
-          placeholder="Select channels"
+          :placeholder="t('forms.schedule.communications.selectChannels')"
           class="w-48"
         />
       </div>
@@ -48,7 +48,7 @@
           v-model="communications.salespersonNotification"
         />
         <span class="text-sm font-medium text-foreground">
-          Notify {{ salesperson ? salesperson.name : (team ? team.name : 'salesperson') }} about appointment
+          {{ salespersonNotificationLabel }}
         </span>
       </Label>
     </div>
@@ -60,8 +60,11 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Checkbox, Label } from '@motork/component-library/future/primitives'
 import { SelectMenu } from '@motork/component-library/future/components'
+
+const { t } = useI18n()
 
 const props = defineProps({
   appointment: {
@@ -88,11 +91,16 @@ const props = defineProps({
 
 const emit = defineEmits(['update'])
 
-const channelOptions = [
-  { value: 'email', label: 'via Email' },
-  { value: 'sms', label: 'via SMS' },
-  { value: 'whatsapp', label: 'via WhatsApp' }
-]
+const channelOptions = computed(() => [
+  { value: 'email', label: t('forms.schedule.communications.channels.email') },
+  { value: 'sms', label: t('forms.schedule.communications.channels.sms') },
+  { value: 'whatsapp', label: t('forms.schedule.communications.channels.whatsapp') }
+])
+
+const salespersonNotificationLabel = computed(() => {
+  const name = props.salesperson?.name || props.team?.name || t('forms.schedule.communications.salespersonFallback')
+  return t('forms.schedule.communications.salespersonNotification', { name })
+})
 
 const communications = ref({
   immediateConfirmationEnabled: true,

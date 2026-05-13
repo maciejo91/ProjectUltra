@@ -62,7 +62,7 @@ export class ActivityRepository extends BaseRepository {
       customerId,
       customerName: customer?.name || lead?.contactName || '',
       assigneeName: lead?.assignee || '',
-      templateCustomerName: 'Sophie Mueller'
+      templateCustomerName: 'Giulia Conti'
     }
     this._leadContextCache.set(leadId, ctx)
     return ctx
@@ -72,7 +72,7 @@ export class ActivityRepository extends BaseRepository {
     if (typeof text !== 'string' || !text.trim()) return text
     const customerName = ctx?.customerName || ''
     const assigneeName = ctx?.assigneeName || ''
-    const templateName = ctx?.templateCustomerName || 'Sophie Mueller'
+    const templateName = ctx?.templateCustomerName || 'Giulia Conti'
 
     let out = text
 
@@ -82,7 +82,7 @@ export class ActivityRepository extends BaseRepository {
     }
 
     // If this is an outbound rep-authored message and it contains the customer's name
-    // (e.g. "Hi Sophie"), swap it to the target customer's first name.
+    // (e.g. "Hi Giulia"), swap it to the target customer's first name.
     if (mode === 'outbound' && customerName) {
       const firstName = customerName.split(' ').filter(Boolean)[0] || customerName
       const templateFirst = templateName.split(' ')[0]
@@ -96,9 +96,9 @@ export class ActivityRepository extends BaseRepository {
       out = out.replaceAll(templateName, 'the customer')
     }
 
-    // Ensure the rep signature isn't "David Miller" for everyone.
+    // Ensure the rep signature isn't "Davide Rinaldi" for everyone.
     if (mode === 'outbound' && assigneeName) {
-      out = out.replaceAll('David Miller', assigneeName)
+      out = out.replaceAll('Davide Rinaldi', assigneeName)
     }
 
     return out

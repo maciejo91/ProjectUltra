@@ -150,6 +150,7 @@ import {
 import { useI18n } from 'vue-i18n'
 import {
   getActivityTimelineDateLabel,
+  getActivityIconKind,
   getCallTranscriptLines
 } from '@/composables/useActivityTimelinePresentation'
 import ActivityTimeline from '@/components/tasks/activity-timeline/ActivityTimeline.vue'
@@ -229,6 +230,7 @@ const activityList = computed(() => (Array.isArray(props.activities) ? props.act
 const hasAnyActivities = computed(() => activityList.value.length > 0)
 
 function getActivityFilterCategory(activity) {
+  if (getActivityIconKind(activity) === 'system') return 'system-updates'
   if (
     ['email', 'sms', 'whatsapp', 'call', 'customer-email', 'customer-whatsapp', 'customer-sms'].includes(
       activity.type
@@ -238,18 +240,6 @@ function getActivityFilterCategory(activity) {
   }
   if (activity.type === 'note') return 'notes'
   if (activity.type === 'appointment') return 'appointments'
-  if (activity.type === 'transcription') return 'system-updates'
-  if (
-    activity.type === 'system' ||
-    activity.type === 'created' ||
-    activity.type === 'status' ||
-    activity.type === 'lead-created' ||
-    activity.type === 'lead-assigned' ||
-    activity.type === 'lead-updated'
-  ) {
-    return 'system-updates'
-  }
-  if (activity.type === 'opportunity-created') return 'system-updates'
   if (activity.type === 'ai-summary') return 'notes'
   return null
 }

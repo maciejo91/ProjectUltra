@@ -53,9 +53,9 @@
       <!-- Vehicle Info (if available) -->
       <div v-if="hasCar" class="space-y-3">
         <div class="flex items-center gap-3">
-          <div class="w-16 h-12 bg-surfaceTertiary rounded-lg overflow-hidden shrink-0">
+          <div class="w-32 aspect-4/3 bg-surfaceTertiary rounded-lg overflow-hidden shrink-0">
             <img v-if="carImage" :src="carImage" alt="Car" class="w-full h-full object-cover">
-            <Car v-else class="w-6 h-6 shrink-0 text-muted-foreground" />
+            <Car v-else class="size-9 shrink-0 text-muted-foreground" />
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex flex-wrap items-center gap-2 mb-1">

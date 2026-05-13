@@ -31,5 +31,86 @@
     "weeklyTarget": "Weekly target",
     "monthlyTarget": "Monthly target",
     "quarterlyTarget": "Quarterly target"
+  },
+  "nscDashboard": {
+    "leadsByArea": "Leads by area",
+    "contractsByArea": "Contracts by area",
+    "modelsSold": "Models sold",
+    "totalLeads": "{count} total leads",
+    "totalContracts": "{count} total contracts",
+    "unitsSold": "{count} units sold",
+    "totalLeadsLabel": "Total leads",
+    "totalContractsLabel": "Total contracts",
+    "unitsSoldLabel": "Units sold",
+    "thisMonth": "This month",
+    "vsLastMonth": "vs last month",
+    "salesPipeline": "Funnel lead vendita",
+    "leadSources": "Lead sources",
+    "bestPerformers": "Best performers",
+    "tasksDue": "Tasks due",
+    "expired": "Expired",
+    "noTasksDue": "No tasks with a due date",
+    "taskFallback": "Task",
+    "unknownCustomer": "Unknown customer",
+    "noVehicle": "No vehicle specified",
+    "lead": "Lead",
+    "opportunity": "Opportunity",
+    "percentage": "Percentage",
+    "columns": {
+      "name": "Name",
+      "leads": "Leads",
+      "qualifiedLeadsPercent": "Qualified leads (%)",
+      "opportunities": "Opportunities",
+      "contracts": "Contracts",
+      "conversionRate": "Conversion rate"
+    },
+    "timeRanges": {
+      "last30Days": "Last 30 days",
+      "last90Days": "Last 90 days",
+      "last180Days": "Last 180 days",
+      "lastYear": "Last year"
+    },
+    "kpis": {
+      "dealsClosedThisMonth": "Deals closed this month",
+      "offersGeneratedThisMonth": "Offers generated this month",
+      "newLeadsToday": "New leads today",
+      "walkInOffersProducedToday": "Walk-in offers produced today",
+      "breakdown": {
+        "leads": "Leads",
+        "walkIns": "Walk-ins"
+      }
+    },
+    "stages": {
+      "lead": "Lead",
+      "takeInCharge": "Take in charge",
+      "qualified": "Qualified",
+      "offerCreated": "Offer created",
+      "deal": "Deal"
+    },
+    "averageTime": {
+      "hours": "{hours}h on avg.",
+      "daysHours": "{days}d {hours}h on avg.",
+      "worseThanLastMonth": "Worse than last month."
+    },
+    "ai": {
+      "title": "Insights powered by AI",
+      "thinking": "Thinking...",
+      "you": "You",
+      "placeholder": "Ask anything...",
+      "error": "An error occurred. Please try again.",
+      "suggestions": {
+        "newCarSellers": "Who is my top 5 new car sellers this quarter?",
+        "webSources": "Which are my top 5 performing web sources?",
+        "bdcAppointments": "Summarize BDC appointment volume and show rates from yesterday."
+      }
+    },
+    "months": {
+      "januaryShort": "JAN",
+      "februaryShort": "FEB",
+      "marchShort": "MAR",
+      "aprilShort": "APR",
+      "mayShort": "MAY",
+      "juneShort": "JUN"
+    }
   }
 }

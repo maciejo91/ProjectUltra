@@ -31,5 +31,86 @@
     "weeklyTarget": "Objectif hebdomadaire",
     "monthlyTarget": "Objectif mensuel",
     "quarterlyTarget": "Objectif trimestriel"
+  },
+  "nscDashboard": {
+    "leadsByArea": "Leads par zone",
+    "contractsByArea": "Contrats par zone",
+    "modelsSold": "Modèles vendus",
+    "totalLeads": "{count} leads au total",
+    "totalContracts": "{count} contrats au total",
+    "unitsSold": "{count} unités vendues",
+    "totalLeadsLabel": "Leads au total",
+    "totalContractsLabel": "Contrats au total",
+    "unitsSoldLabel": "Unités vendues",
+    "thisMonth": "Ce mois-ci",
+    "vsLastMonth": "vs mois dernier",
+    "salesPipeline": "Funnel lead vendita",
+    "leadSources": "Sources de leads",
+    "bestPerformers": "Meilleures performances",
+    "tasksDue": "Tâches à traiter",
+    "expired": "Expiré",
+    "noTasksDue": "Aucune tâche avec une échéance",
+    "taskFallback": "Tâche",
+    "unknownCustomer": "Client inconnu",
+    "noVehicle": "Aucun véhicule spécifié",
+    "lead": "Lead",
+    "opportunity": "Opportunity",
+    "percentage": "Pourcentage",
+    "columns": {
+      "name": "Nom",
+      "leads": "Leads",
+      "qualifiedLeadsPercent": "Leads qualifiés (%)",
+      "opportunities": "Opportunities",
+      "contracts": "Contrats",
+      "conversionRate": "Taux de conversion"
+    },
+    "timeRanges": {
+      "last30Days": "30 derniers jours",
+      "last90Days": "90 derniers jours",
+      "last180Days": "180 derniers jours",
+      "lastYear": "Année dernière"
+    },
+    "kpis": {
+      "dealsClosedThisMonth": "Deals conclus ce mois-ci",
+      "offersGeneratedThisMonth": "Offres générées ce mois-ci",
+      "newLeadsToday": "Nouveaux leads aujourd'hui",
+      "walkInOffersProducedToday": "Offres walk-in produites aujourd'hui",
+      "breakdown": {
+        "leads": "Leads",
+        "walkIns": "Walk-ins"
+      }
+    },
+    "stages": {
+      "lead": "Lead",
+      "takeInCharge": "Pris en charge",
+      "qualified": "Qualifiés",
+      "offerCreated": "Offre créée",
+      "deal": "Deal"
+    },
+    "averageTime": {
+      "hours": "{hours}h en moyenne",
+      "daysHours": "{days}j {hours}h en moyenne",
+      "worseThanLastMonth": "Moins bon que le mois dernier."
+    },
+    "ai": {
+      "title": "Insights générés par AI",
+      "thinking": "Réflexion...",
+      "you": "Vous",
+      "placeholder": "Posez une question...",
+      "error": "Une erreur s'est produite. Réessayez.",
+      "suggestions": {
+        "newCarSellers": "Qui sont mes 5 meilleurs vendeurs de voitures neuves ce trimestre ?",
+        "webSources": "Quelles sont mes 5 sources web les plus performantes ?",
+        "bdcAppointments": "Résume le volume de rendez-vous BDC et les show rates d'hier."
+      }
+    },
+    "months": {
+      "januaryShort": "JAN",
+      "februaryShort": "FÉV",
+      "marchShort": "MAR",
+      "aprilShort": "AVR",
+      "mayShort": "MAI",
+      "juneShort": "JUN"
+    }
   }
 }

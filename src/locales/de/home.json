@@ -31,5 +31,86 @@
     "weeklyTarget": "Wochenziel",
     "monthlyTarget": "Monatsziel",
     "quarterlyTarget": "Quartalsziel"
+  },
+  "nscDashboard": {
+    "leadsByArea": "Leads nach Gebiet",
+    "contractsByArea": "Verträge nach Gebiet",
+    "modelsSold": "Verkaufte Modelle",
+    "totalLeads": "{count} Leads insgesamt",
+    "totalContracts": "{count} Verträge insgesamt",
+    "unitsSold": "{count} verkaufte Einheiten",
+    "totalLeadsLabel": "Leads insgesamt",
+    "totalContractsLabel": "Verträge insgesamt",
+    "unitsSoldLabel": "Verkaufte Einheiten",
+    "thisMonth": "Diesen Monat",
+    "vsLastMonth": "vs. letzter Monat",
+    "salesPipeline": "Funnel lead vendita",
+    "leadSources": "Lead-Quellen",
+    "bestPerformers": "Beste Performer",
+    "tasksDue": "Fällige Aufgaben",
+    "expired": "Überfällig",
+    "noTasksDue": "Keine Aufgaben mit Fälligkeitsdatum",
+    "taskFallback": "Aufgabe",
+    "unknownCustomer": "Unbekannter Kunde",
+    "noVehicle": "Kein Fahrzeug angegeben",
+    "lead": "Lead",
+    "opportunity": "Opportunity",
+    "percentage": "Prozent",
+    "columns": {
+      "name": "Name",
+      "leads": "Leads",
+      "qualifiedLeadsPercent": "Qualifizierte Leads (%)",
+      "opportunities": "Opportunities",
+      "contracts": "Verträge",
+      "conversionRate": "Conversion Rate"
+    },
+    "timeRanges": {
+      "last30Days": "Letzte 30 Tage",
+      "last90Days": "Letzte 90 Tage",
+      "last180Days": "Letzte 180 Tage",
+      "lastYear": "Letztes Jahr"
+    },
+    "kpis": {
+      "dealsClosedThisMonth": "Geschlossene Deals diesen Monat",
+      "offersGeneratedThisMonth": "Diesen Monat generierte Offers",
+      "newLeadsToday": "Neue Leads heute",
+      "walkInOffersProducedToday": "Heute produzierte Walk-in Offers",
+      "breakdown": {
+        "leads": "Leads",
+        "walkIns": "Walk-ins"
+      }
+    },
+    "stages": {
+      "lead": "Lead",
+      "takeInCharge": "In Bearbeitung",
+      "qualified": "Qualifiziert",
+      "offerCreated": "Offer erstellt",
+      "deal": "Deal"
+    },
+    "averageTime": {
+      "hours": "{hours} Std. im Schnitt",
+      "daysHours": "{days} T. {hours} Std. im Schnitt",
+      "worseThanLastMonth": "Schlechter als im letzten Monat."
+    },
+    "ai": {
+      "title": "Insights powered by AI",
+      "thinking": "Denkt nach...",
+      "you": "Sie",
+      "placeholder": "Fragen Sie etwas...",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "suggestions": {
+        "newCarSellers": "Wer sind meine Top 5 Verkäufer für Neuwagen in diesem Quartal?",
+        "webSources": "Welche sind meine Top 5 performenden Webquellen?",
+        "bdcAppointments": "Fassen Sie das BDC-Terminvolumen und die Show Rates von gestern zusammen."
+      }
+    },
+    "months": {
+      "januaryShort": "JAN",
+      "februaryShort": "FEB",
+      "marchShort": "MÄR",
+      "aprilShort": "APR",
+      "mayShort": "MAI",
+      "juneShort": "JUN"
+    }
   }
 }

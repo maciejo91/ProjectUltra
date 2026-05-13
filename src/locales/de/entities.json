@@ -7,7 +7,15 @@
     "sendEmailToVerifyContact": "E-Mail an {name} senden",
     "sendEmailToVerifyContactNoName": "E-Mail senden, um Kontaktdaten zu prüfen",
     "beginQualificationSendEmailNamed": "Beginnen Sie die Lead-Qualifizierung, indem Sie eine E-Mail an {name} senden.",
-    "beginQualificationSendEmailAnonymous": "Beginnen Sie die Lead-Qualifizierung, indem Sie eine E-Mail an den Kunden senden."
+    "beginQualificationSendEmailAnonymous": "Beginnen Sie die Lead-Qualifizierung, indem Sie eine E-Mail an den Kunden senden.",
+    "taskActions": {
+      "callToVerify": "Zur Überprüfung anrufen",
+      "callProspect": "Interessenten anrufen",
+      "callBack": "Zurückrufen",
+      "disqualifyLead": "Lead disqualifizieren",
+      "postponeTask": "Aufgabe verschieben",
+      "reopenLead": "Lead erneut öffnen"
+    }
   },
   "opportunity": {
     "title": "Chance",

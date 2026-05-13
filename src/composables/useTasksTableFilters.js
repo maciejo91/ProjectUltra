@@ -1,4 +1,5 @@
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getDisplayStage } from '@/utils/stageMapper'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 
@@ -12,6 +13,8 @@ import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
  * @returns {Object} Object containing filterDefinitions
  */
 export function useTasksTableFilters({ showTypeFilter, tasks }) {
+  const { t } = useI18n()
+
   const filterDefinitions = computed(() => {
     const taskList = tasks.value ?? []
     const defs = []
@@ -19,12 +22,12 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
     // Show Closed - external filter (controls data source, not column); excluded from row-level filtering
     defs.push({
       key: 'showClosed',
-      label: 'Show Closed',
+      label: t('dataTable.tasks.filters.showClosed'),
       type: 'select',
-      operators: [{ value: 'eq', label: 'is' }],
+      operators: [{ value: 'eq', label: t('dataTable.filters.operators.is') }],
       options: [
-        { value: '', label: 'No' },
-        { value: 'yes', label: 'Yes' }
+        { value: '', label: t('common.common.no') },
+        { value: 'yes', label: t('common.common.yes') }
       ],
       externalFilter: true,
       pinned: true
@@ -34,11 +37,11 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
     if (showTypeFilter.value) {
       defs.push({
         key: 'type',
-        label: 'Task type',
+        label: t('dataTable.tasks.filters.taskType'),
         type: 'select',
-        operators: [{ value: 'eq', label: 'is' }],
+        operators: [{ value: 'eq', label: t('dataTable.filters.operators.is') }],
         options: [
-          { value: '', label: 'All' },
+          { value: '', label: t('common.common.all') },
           { value: 'lead', label: 'Lead' },
           { value: 'opportunity', label: 'Opportunity' }
         ],
@@ -62,11 +65,11 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
         ].filter((v, i, a) => a.indexOf(v) === i).map(s => ({ value: s, label: s }))
     defs.push({
       key: 'status',
-      label: 'Status',
+      label: t('dataTable.tasks.filters.status'),
       type: 'multiselect',
       operators: [
-        { value: 'in', label: 'is any of' },
-        { value: 'notIn', label: 'is none of' }
+        { value: 'in', label: t('dataTable.filters.operators.isAnyOf') },
+        { value: 'notIn', label: t('dataTable.filters.operators.isNoneOf') }
       ],
       options: statusOptions,
       aiHint: 'Lead status or opportunity stage (e.g. New, To be called back, Qualified, In Negotiation)',
@@ -76,12 +79,12 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
     // Priority filter - matches task priority (leads)
     defs.push({
       key: 'priority',
-      label: 'Priority',
+      label: t('dataTable.tasks.filters.priority'),
       type: 'select',
-      operators: [{ value: 'eq', label: 'is' }],
+      operators: [{ value: 'eq', label: t('dataTable.filters.operators.is') }],
       options: [
-        { value: 'Hot', label: 'High' },
-        { value: 'Normal', label: 'Normal' }
+        { value: 'Hot', label: t('dataTable.tasks.priority.high') },
+        { value: 'Normal', label: t('dataTable.tasks.priority.normal') }
       ],
       aiHint: 'Task priority level'
     })
@@ -98,11 +101,11 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
         ]
     defs.push({
       key: 'source',
-      label: 'Source',
+      label: t('dataTable.tasks.filters.source'),
       type: 'multiselect',
       operators: [
-        { value: 'in', label: 'is any of' },
-        { value: 'notIn', label: 'is none of' }
+        { value: 'in', label: t('dataTable.filters.operators.isAnyOf') },
+        { value: 'notIn', label: t('dataTable.filters.operators.isNoneOf') }
       ],
       options: sourceOptions,
       aiHint: 'Lead or opportunity source',
@@ -113,14 +116,14 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
     const uniqueAssignees = [...new Set(taskList.map(t => t.assignee).filter(Boolean))].sort()
     const assigneeOptions = [
       ...uniqueAssignees.map(name => ({ value: name, label: name })),
-      ...(taskList.some(t => !t.assignee) ? [{ value: '__unassigned__', label: 'Unassigned' }] : [])
+      ...(taskList.some(t => !t.assignee) ? [{ value: '__unassigned__', label: t('dataTable.tasks.values.unassigned') }] : [])
     ]
     defs.push({
       key: 'assignee',
-      label: 'Assigned',
+      label: t('dataTable.tasks.filters.assigned'),
       type: 'select',
-      operators: [{ value: 'eq', label: 'is' }],
-      options: assigneeOptions.length > 0 ? assigneeOptions : [{ value: '__unassigned__', label: 'Unassigned' }],
+      operators: [{ value: 'eq', label: t('dataTable.filters.operators.is') }],
+      options: assigneeOptions.length > 0 ? assigneeOptions : [{ value: '__unassigned__', label: t('dataTable.tasks.values.unassigned') }],
       aiHint: 'Person assigned to the task',
       pinned: true
     })
@@ -135,11 +138,11 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
     if (uniqueBrands.length > 0) {
       defs.push({
         key: 'requestedCarBrand',
-        label: 'Vehicle brand',
+        label: t('dataTable.tasks.filters.vehicleBrand'),
         type: 'multiselect',
         operators: [
-          { value: 'in', label: 'is any of' },
-          { value: 'notIn', label: 'is none of' }
+          { value: 'in', label: t('dataTable.filters.operators.isAnyOf') },
+          { value: 'notIn', label: t('dataTable.filters.operators.isNoneOf') }
         ],
         options: uniqueBrands.map(brand => ({ value: brand, label: brand })),
         aiHint: 'Car brand requested or associated with the task'
@@ -149,13 +152,13 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
     // Creation date - matches Created column
     defs.push({
       key: 'createdAt',
-      label: 'Created',
+      label: t('dataTable.tasks.filters.created'),
       type: 'inputrange',
       inputType: 'date',
       operators: [
-        { value: 'between', label: 'is between' },
-        { value: 'gte', label: 'is after' },
-        { value: 'lte', label: 'is before' }
+        { value: 'between', label: t('dataTable.filters.operators.isBetween') },
+        { value: 'gte', label: t('dataTable.filters.operators.isAfter') },
+        { value: 'lte', label: t('dataTable.filters.operators.isBefore') }
       ],
       aiHint: 'Date when the task was created'
     })
@@ -163,13 +166,13 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
     // Due date - matches Due date column
     defs.push({
       key: 'nextActionDue',
-      label: 'Due date',
+      label: t('dataTable.tasks.filters.dueDate'),
       type: 'inputrange',
       inputType: 'date',
       operators: [
-        { value: 'between', label: 'is between' },
-        { value: 'gte', label: 'is after' },
-        { value: 'lte', label: 'is before' }
+        { value: 'between', label: t('dataTable.filters.operators.isBetween') },
+        { value: 'gte', label: t('dataTable.filters.operators.isAfter') },
+        { value: 'lte', label: t('dataTable.filters.operators.isBefore') }
       ],
       aiHint: 'Next action due date or task deadline'
     })

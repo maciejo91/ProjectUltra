@@ -42,7 +42,7 @@
             <template #empty-state>
               <div class="empty-state">
                 <ListTodo class="empty-state-icon w-8 h-8 shrink-0" />
-                <p class="empty-state-text">No tasks found</p>
+                <p class="empty-state-text">{{ t('dataTable.tasks.emptyState') }}</p>
               </div>
             </template>
             <template #batch-action-bar>
@@ -51,7 +51,7 @@
                   <div class="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-blue-600 text-white text-sm font-medium">
                     {{ selectedCount }}
                   </div>
-                  <span class="text-white text-fluid-sm font-medium whitespace-nowrap">Items selected</span>
+                  <span class="text-white text-fluid-sm font-medium whitespace-nowrap">{{ t('dataTable.tasks.itemsSelected') }}</span>
                 </div>
                 <div class="h-4 w-px bg-greys-700"></div>
                 <Button
@@ -60,7 +60,7 @@
                   @click="handleBulkDelete"
                 >
                   <Trash2 class="w-4 h-4 shrink-0 mr-2" />
-                  Delete
+                  {{ t('common.buttons.delete') }}
                 </Button>
                 <Button
                   variant="ghost"
@@ -68,7 +68,7 @@
                   @click="clearSelection"
                 >
                   <X class="w-4 h-4 shrink-0 mr-2" />
-                  Close
+                  {{ t('common.buttons.close') }}
                 </Button>
               </div>
             </template>
@@ -85,7 +85,7 @@ import { ListTodo, Trash2, X, Triangle, Circle } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Button } from '@motork/component-library/future/primitives'
 import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
-import { formatCurrency, formatDueDateRelative, formatRelativeTime, getDeadlineStatus } from '@/utils/formatters'
+import { formatCurrency, getDeadlineStatus } from '@/utils/formatters'
 import { calculateLeadUrgency, getUrgencyDotClass } from '@/composables/useLeadUrgency'
 import { useSettingsStore } from '@/stores/settings'
 import { useUsersStore } from '@/stores/users'
@@ -100,7 +100,9 @@ import { getTaskActionTitle, getTaskDisplayTitle } from '@/utils/taskActionTitle
 import { getDisplayStage } from '@/utils/stageMapper'
 import { getTaskStatus } from '@/utils/taskStatus'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+const taskColumnLabel = (key) => t(`dataTable.tasks.columns.${key}`)
 
 const props = defineProps({
   tasks: { type: Array, required: true },
@@ -137,11 +139,11 @@ function getVehicleConditionDisplay(task) {
   if (km === 0 || (typeof km === 'number' && km < 1) || status === 'New') {
     return (status && status.toLowerCase() === 'new') || km === 0 ? 'Km0' : 'New'
   }
-  return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Used'
+  return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : t('dataTable.tasks.values.used')
 }
 
 function getAssigneeDepartmentLocation(task) {
-  if (!task?.assignee) return { name: 'Unassigned', line2: '' }
+  if (!task?.assignee) return { name: t('dataTable.tasks.values.unassigned'), line2: '' }
   const user = usersStore.users.find(u => u.name === task.assignee)
   if (!user) return { name: task.assignee, line2: '' }
   const line2 = [user.team, user.dealership].filter(Boolean).join(' - ') || ''
@@ -152,6 +154,52 @@ function getRequestMessageSnippet(task) {
   const msg = task.requestedCar?.requestMessage ?? task.requestMessage
   if (!msg || typeof msg !== 'string') return '—'
   return msg.length > 32 ? `${msg.slice(0, 29)}...` : msg
+}
+
+function getRelativeTimeFormatter() {
+  return new Intl.RelativeTimeFormat(locale.value || 'en', { numeric: 'auto' })
+}
+
+function formatTaskDate(date) {
+  return date.toLocaleDateString(locale.value || 'en', { month: 'short', day: 'numeric' })
+}
+
+function formatTaskDueDateRelative(isoTimestamp) {
+  if (!isoTimestamp) return ''
+  const relativeTimeFormatter = getRelativeTimeFormatter()
+  const dueDate = new Date(isoTimestamp)
+  const now = new Date()
+  const diffMs = dueDate - now
+  const diffMin = Math.floor(Math.abs(diffMs) / (1000 * 60))
+  const diffHour = Math.floor(diffMin / 60)
+  const diffDay = Math.floor(diffHour / 24)
+  const sign = diffMs < 0 ? -1 : 1
+
+  if (diffMin < 1) {
+    return diffMs < 0 ? t('dataTable.tasks.values.overdueJustNow') : t('dataTable.tasks.values.lessThanMinute')
+  }
+  if (diffMin < 60) return relativeTimeFormatter.format(sign * diffMin, 'minute')
+  if (diffHour < 24) return relativeTimeFormatter.format(sign * diffHour, 'hour')
+  if (diffDay < 7) return relativeTimeFormatter.format(sign * diffDay, 'day')
+  return formatTaskDate(dueDate)
+}
+
+function formatTaskRelativeTime(dateInput) {
+  if (!dateInput) return ''
+  const relativeTimeFormatter = getRelativeTimeFormatter()
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput
+  const now = new Date()
+  const diffMs = now - date
+  const diffSec = Math.floor(diffMs / 1000)
+  const diffMin = Math.floor(diffSec / 60)
+  const diffHour = Math.floor(diffMin / 60)
+  const diffDay = Math.floor(diffHour / 24)
+
+  if (diffSec < 60) return t('dataTable.tasks.values.justNow')
+  if (diffMin < 60) return relativeTimeFormatter.format(-diffMin, 'minute')
+  if (diffHour < 24) return relativeTimeFormatter.format(-diffHour, 'hour')
+  if (diffDay < 7) return relativeTimeFormatter.format(-diffDay, 'day')
+  return formatTaskDate(date)
 }
 
 // Row selection
@@ -251,11 +299,11 @@ const assigneeOptions = computed(() => {
   const names = [...new Set(props.tasks.map(t => t.assignee).filter(Boolean))]
   return names.map(name => ({ value: name, label: name }))
 })
-const requestTypeOptions = [
-  { value: 'Test Drive', label: 'Test Drive' },
-  { value: 'Quotation', label: 'Quotation' },
-  { value: 'Generic sales', label: 'Generic sales' }
-]
+const requestTypeOptions = computed(() => [
+  { value: 'Test Drive', label: t('dataTable.tasks.requestTypes.testDrive') },
+  { value: 'Quotation', label: t('dataTable.tasks.requestTypes.quotation') },
+  { value: 'Generic sales', label: t('dataTable.tasks.requestTypes.genericSales') }
+])
 const tasksStatusOptions = computed(() => {
   const def = filterDefinitions.value?.find(d => d.key === 'status')
   return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
@@ -264,10 +312,10 @@ const tasksSourceOptions = computed(() => {
   const def = filterDefinitions.value?.find(d => d.key === 'source')
   return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
 })
-const tasksPriorityOptions = [
-  { value: 'Hot', label: 'Hot' },
-  { value: 'Normal', label: 'Normal' }
-]
+const tasksPriorityOptions = computed(() => [
+  { value: 'Hot', label: t('dataTable.tasks.priority.hot') },
+  { value: 'Normal', label: t('dataTable.tasks.priority.normal') }
+])
 const tasksRequestedCarBrandOptions = computed(() => {
   const def = filterDefinitions.value?.find(d => d.key === 'requestedCarBrand')
   return def?.options?.map(o => ({ value: o.value, label: o.label })) ?? []
@@ -300,8 +348,8 @@ const columns = computed(() => {
   const urgencyColumn = {
     id: 'urgencyLevel',
     accessorKey: 'urgencyLevel',
-    header: 'Urgency',
-    meta: { title: 'Urgency' },
+    header: taskColumnLabel('urgency'),
+    meta: { title: taskColumnLabel('urgency') },
     cell: ({ row }) => {
       const task = row.original
       if (!task.urgencyLevel) {
@@ -320,9 +368,9 @@ const columns = computed(() => {
   {
     id: 'taskTitle',
     accessorKey: 'taskTitle',
-    header: 'Task',
+    header: taskColumnLabel('task'),
     meta: {
-      title: 'Task',
+      title: taskColumnLabel('task'),
       onOpen: (row) => handleRowClick(row.original)
     },
     cell: ({ row }) => {
@@ -338,8 +386,8 @@ const columns = computed(() => {
   {
     id: 'dueDate',
     accessorKey: 'nextActionDue',
-    header: 'Due time',
-    meta: { title: 'Due time' },
+    header: taskColumnLabel('dueTime'),
+    meta: { title: taskColumnLabel('dueTime') },
     cell: ({ row }) => {
       const task = row.original
       const date = task.type === 'opportunity' && task.expectedCloseDate
@@ -347,13 +395,13 @@ const columns = computed(() => {
         : (task.nextActionDue ?? task.dueDate)
       const hasRecall = task.type === 'lead' && task.scheduledRecallAppointment?.date
       if (!date && !hasRecall) {
-        return h('span', { class: 'text-meta' }, 'Not set')
+        return h('span', { class: 'text-meta' }, t('dataTable.tasks.values.notSet'))
       }
       const parts = []
       if (date) {
         const status = getDeadlineStatus(date)
         const pillClass = status.type === 'overdue' ? 'mk-due-pill-overdue' : (status.type === 'urgent' || status.type === 'today' ? 'mk-due-pill-urgent' : 'mk-due-pill-normal')
-        const text = formatDueDateRelative(date)
+        const text = formatTaskDueDateRelative(date)
         parts.push(h('span', {
           class: `inline-flex items-center gap-1 px-2 py-0.5 rounded text-sm font-medium uppercase leading-none ${pillClass}`
         }, text))
@@ -361,7 +409,7 @@ const columns = computed(() => {
       if (hasRecall) {
         parts.push(h('span', {
           class: 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-sm font-medium uppercase leading-none bg-blue-50 text-blue-700 ml-1'
-        }, [h('span', { class: 'shrink-0 rounded-full size-1.5 bg-blue-500', 'aria-hidden': 'true' }), 'Recall']))
+        }, [h('span', { class: 'shrink-0 rounded-full size-1.5 bg-blue-500', 'aria-hidden': 'true' }), t('dataTable.tasks.values.recall')]))
       }
       return h('div', { class: 'flex flex-wrap items-center gap-1' }, parts)
     }
@@ -369,8 +417,8 @@ const columns = computed(() => {
   {
     id: 'customer',
     accessorKey: 'customer',
-    header: 'Customer',
-    meta: { title: 'Customer' },
+    header: taskColumnLabel('customer'),
+    meta: { title: taskColumnLabel('customer') },
     cell: ({ row }) => {
       const task = row.original
       const city = getCustomerCity(task)
@@ -384,8 +432,8 @@ const columns = computed(() => {
   {
     id: 'type',
     accessorKey: 'type',
-    header: 'Type',
-    meta: { title: 'Type' },
+    header: taskColumnLabel('type'),
+    meta: { title: taskColumnLabel('type') },
     cell: ({ row }) => {
       const task = row.original
       const typeClass = task.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'
@@ -397,8 +445,8 @@ const columns = computed(() => {
   {
     id: 'requestStatus',
     accessorKey: 'status',
-    header: 'Request status',
-    meta: { title: 'Request status' },
+    header: taskColumnLabel('requestStatus'),
+    meta: { title: taskColumnLabel('requestStatus') },
     cell: ({ row }) => {
       const task = row.original
       const displayStage = getDisplayStage(task, task.type === 'lead' ? 'lead' : 'opportunity')
@@ -413,8 +461,8 @@ const columns = computed(() => {
   {
     id: 'vehicle',
     accessorKey: 'carInfo',
-    header: 'Vehicle',
-    meta: { title: 'Vehicle' },
+    header: taskColumnLabel('vehicle'),
+    meta: { title: taskColumnLabel('vehicle') },
     cell: ({ row }) => {
       const task = row.original
       const vehicleInfo = getVehicleInfo(task)
@@ -435,8 +483,8 @@ const columns = computed(() => {
   {
     id: 'vin',
     accessorKey: 'vin',
-    header: 'VIN',
-    meta: { title: 'VIN' },
+    header: taskColumnLabel('vin'),
+    meta: { title: taskColumnLabel('vin') },
     cell: ({ row }) => {
       const task = row.original
       const vehicle = task.type === 'lead' ? task.requestedCar : (task.vehicle || task.requestedCar)
@@ -448,8 +496,8 @@ const columns = computed(() => {
   {
     id: 'requestMessage',
     accessorKey: 'requestMessage',
-    header: 'Request message',
-    meta: { title: 'Request message' },
+    header: taskColumnLabel('requestMessage'),
+    meta: { title: taskColumnLabel('requestMessage') },
     cell: ({ row }) => {
       const snippet = getRequestMessageSnippet(row.original)
       return h('span', { class: 'text-meta truncate max-w-32 inline-block' }, snippet)
@@ -458,19 +506,19 @@ const columns = computed(() => {
   {
     id: 'createdAt',
     accessorKey: 'createdAt',
-    header: 'Created at',
-    meta: { title: 'Created at' },
+    header: taskColumnLabel('createdAt'),
+    meta: { title: taskColumnLabel('createdAt') },
     cell: ({ row }) => {
       const task = row.original
       if (!task.createdAt) return h('span', { class: 'text-meta' }, '—')
-      return h('span', { class: 'text-meta' }, formatRelativeTime(task.createdAt))
+      return h('span', { class: 'text-meta' }, formatTaskRelativeTime(task.createdAt))
     }
   },
   {
     id: 'contactAttempts',
     accessorKey: 'contactAttempts',
-    header: 'Attempts',
-    meta: { title: 'Attempts' },
+    header: taskColumnLabel('attempts'),
+    meta: { title: taskColumnLabel('attempts') },
     cell: ({ row }) => {
       const task = row.original
       const attempts = task.contactAttempts?.length || 0
@@ -509,8 +557,8 @@ const columns = computed(() => {
   {
     id: 'source',
     accessorKey: 'source',
-    header: 'Source',
-    meta: { title: 'Source' },
+    header: taskColumnLabel('source'),
+    meta: { title: taskColumnLabel('source') },
     cell: ({ row }) => {
       const task = row.original
       const main = task.source || '—'
@@ -527,8 +575,8 @@ const columns = computed(() => {
   {
     id: 'assignee',
     accessorKey: 'assignee',
-    header: 'Assignee',
-    meta: { title: 'Assignee' },
+    header: taskColumnLabel('assignee'),
+    meta: { title: taskColumnLabel('assignee') },
     cell: ({ row }) => {
       const task = row.original
       const { name, line2 } = getAssigneeDepartmentLocation(task)
@@ -541,12 +589,16 @@ const columns = computed(() => {
   {
     id: 'taskStatus',
     accessorKey: 'taskStatus',
-    header: 'Status',
-    meta: { title: 'Status' },
+    header: taskColumnLabel('status'),
+    meta: { title: taskColumnLabel('status') },
     cell: ({ row }) => {
       const task = row.original
       const status = getTaskStatus(task, maxContactAttempts.value)
-      const labels = { overdue: 'Overdue', in_progress: 'In progress', open: 'Open' }
+      const labels = {
+        overdue: t('dataTable.tasks.statuses.overdue'),
+        in_progress: t('dataTable.tasks.statuses.inProgress'),
+        open: t('dataTable.tasks.statuses.open')
+      }
       const statusClass = status === 'overdue' ? 'mk-task-status-overdue' : (status === 'in_progress' ? 'mk-task-status-in-progress' : 'mk-task-status-open')
       const icon = status === 'overdue' ? h(Triangle, { class: 'shrink-0 size-3.5', 'aria-hidden': 'true' }) : h(Circle, { class: 'shrink-0 size-3.5', 'aria-hidden': 'true' })
       return h('span', {
@@ -579,14 +631,12 @@ const getTaskFilterValue = (row, key) => {
   return getNestedProperty(row, key)
 }
 
-/** Due-date display label for table and search (formatDueDateRelative style; "Not set" excluded from search). */
 function getDueDateSearchLabel(row) {
   const raw = row.type === 'opportunity' && row.expectedCloseDate
     ? row.expectedCloseDate
     : (row.nextActionDue ?? row.dueDate)
   if (!raw) return null
-  const label = formatDueDateRelative(raw)
-  return label === 'Not set' ? null : label
+  return formatTaskDueDateRelative(raw)
 }
 
 const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({

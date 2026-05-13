@@ -1,7 +1,10 @@
 <template>
   <header
-    class="hidden md:flex shrink-0 items-start justify-between gap-4 px-6 py-6 app-header"
-    :class="route.meta?.mutedPageChrome ? 'bg-muted' : 'bg-background'"
+    class="hidden md:flex shrink-0 items-start justify-between gap-4 px-6 py-6 app-header transition-shadow duration-200"
+    :class="[
+      route.meta?.mutedPageChrome ? 'bg-muted' : 'bg-background',
+      isScrolled ? 'shadow-sm' : 'shadow-none'
+    ]"
   >
     <div class="flex min-w-0 flex-1 items-start">
       <h1 class="truncate text-xl leading-6 font-semibold text-foreground min-w-0">
@@ -87,6 +90,13 @@ import { useI18n } from 'vue-i18n'
 import { Plus, RefreshCw, Filter, Link } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
 
+defineProps({
+  isScrolled: {
+    type: Boolean,
+    default: false
+  }
+})
+
 const route = useRoute()
 const { t } = useI18n()
 const reportsTimeRange = ref('This month')
@@ -122,7 +132,7 @@ const calendarHeaderActions = computed(() => {
 })
 
 const ROUTE_TITLE_MAP = {
-  'home-dashboard': 'common.navigation.home',
+  'home-dashboard': 'common.navigation.nscDashboard',
   'add-new': 'common.navigation.addNewCustomer',
   'task-detail': 'common.navigation.tasks',
   'customer-view': 'entities.customer.title',

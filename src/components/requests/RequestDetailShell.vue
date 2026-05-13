@@ -1,8 +1,8 @@
 <template>
-  <div class="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted">
+  <div class="flex min-h-full flex-col bg-muted">
     <div
       v-if="request"
-      class="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted"
+      class="flex min-h-full flex-col bg-muted"
     >
       <slot />
     </div>

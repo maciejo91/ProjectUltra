@@ -36,7 +36,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { fetchDashboardKPIs, fetchSalesPipeline, fetchTeamPerformance, fetchTodaysEvents, fetchTasksDue } from '@/api/dashboard'
 import { useDashboardData } from '@/composables/useDashboardData'
 import { useAIAssistant } from '@/composables/useAIAssistant'
@@ -58,6 +59,7 @@ const loadingSalesPipeline = ref(true)
 const loadingTeamPerformance = ref(true)
 const loadingTodaysEvents = ref(true)
 const loadingTasksDue = ref(true)
+const { t } = useI18n()
 
 const { getDataForAI } = useDashboardData(dashboardKPIs, teamPerformance, salesPipeline)
 const {
@@ -69,17 +71,33 @@ const {
   addMessage,
 } = useAIAssistant(() => getDataForAI.value)
 
-const suggestions = ["Who's performing best?", "How many deals were closed?", "What's the conversion rate?"]
+const suggestions = computed(() => [
+  {
+    label: t('dataTable.reports.aiInsights.suggestions.bestPerformers'),
+    value: "Who's performing best?"
+  },
+  {
+    label: t('dataTable.reports.aiInsights.suggestions.closedDeals'),
+    value: 'How many deals were closed?'
+  },
+  {
+    label: t('dataTable.reports.aiInsights.suggestions.conversionRate'),
+    value: "What's the conversion rate?"
+  }
+])
 
 const handleAISend = async (userMessage) => {
-  if (!userMessage?.trim() || isTyping.value || isThinking.value) return
-  const text = userMessage.trim()
-  addMessage('user', text)
+  const message = typeof userMessage === 'string'
+    ? { label: userMessage, value: userMessage }
+    : userMessage
+  if (!message?.value?.trim() || isTyping.value || isThinking.value) return
+  const text = message.value.trim()
+  addMessage('user', message.label?.trim() || text)
   try {
     const response = await sendAIMessage(text)
     addMessage('assistant', response)
   } catch (err) {
-    const errMsg = err instanceof Error ? err.message : 'An error occurred. Please try again.'
+    const errMsg = err instanceof Error ? err.message : t('dataTable.reports.aiInsights.genericError')
     addMessage('assistant', errMsg)
   }
 }

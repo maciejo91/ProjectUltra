@@ -4,11 +4,12 @@
   },
   "navigation": {
     "home": "Home",
-    "tasks": "Attività",
+    "nscDashboard": "MotorK Automotive Group",
+    "tasks": "Tasks",
     "requests": "Richieste",
-    "sales": "Sales",
-    "afterSales": "Service",
-    "conversations": "Conversations",
+    "sales": "Vendite",
+    "afterSales": "Assistenza",
+    "conversations": "Conversazioni",
     "customers": "Contatti",
     "calendar": "Calendario",
     "reports": "Report",
@@ -16,13 +17,13 @@
     "vehicles": "Veicoli",
     "salesSub": {
       "newLeads": "Nuovi lead",
-      "openOpportunities": "Opportunities qualificate",
-      "inNegotiation": "Opportunities in negoziazione",
-      "won": "Opportunities vinte",
-      "allOpportunities": "Tutte le opportunities"
+      "openOpportunities": "Opportunità qualificate",
+      "inNegotiation": "Opportunità in negoziazione",
+      "won": "Opportunità vinte",
+      "allOpportunities": "Tutte le opportunità"
     },
     "addNew": "Aggiungi nuovo",
-    "addNewCustomer": "Aggiungi nuovo Lead o Opportunity",
+    "addNewCustomer": "Aggiungi nuovo lead o opportunità",
     "marketing": "Marketing",
     "support": "Supporto",
     "notifications": "Notifiche",
@@ -51,8 +52,8 @@
     "settingsAdminWhatsappBusiness": "WhatsApp Business",
     "settingsOpsDataNormalization": "Normalizzazione dati",
     "settingsOpsSalesAlerts": "Avvisi vendite",
-    "settingsOpsSalesTasks": "Attività vendite",
-    "settingsOpsAfterSalesTasks": "Attività post-vendita",
+    "settingsOpsSalesTasks": "Sales tasks",
+    "settingsOpsAfterSalesTasks": "After-sales tasks",
     "settingsOpsTimetablesAndHolidays": "Orari e festività",
     "settingsOpsQuotesAndContracts": "Preventivi e contratti",
     "settingsOpsFailureReasons": "Motivi di fallimento",
@@ -88,7 +89,17 @@
       "admin": "Admin",
       "salesRep": "Sales rep",
       "bdcOperator": "BDC operator",
-      "externalBdc": "External BDC"
+      "externalBdc": "External BDC",
+      "superAdmin": "Super Admin"
+    },
+    "demoAccess": {
+      "lockedTooltip": "Questa pagina non è disponibile per questa demo",
+      "passwordTitle": "Accesso Super Admin",
+      "passwordDescription": "Inserisci la password demo per sbloccare tutte le pagine.",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Inserisci password",
+      "passwordError": "Password errata",
+      "unlock": "Sblocca tutte le pagine"
     }
   },
   "buttons": {
@@ -305,8 +316,8 @@
     "placeholder": "Scrivi una nota qui e usa {'@'} per menzionare qualcuno"
   },
   "tasks": {
-    "filterAria": "Filtra attività",
-    "sortAria": "Ordina attività",
+    "filterAria": "Filtra Tasks",
+    "sortAria": "Ordina Tasks",
     "showClosed": "Mostra chiusi",
     "filters": {
       "lead": "Lead",
@@ -389,7 +400,7 @@
   },
   "assignee": {
     "assignedTo": "Assegnato a",
-    "taskUnassigned": "Questa attività non è assegnata",
+    "taskUnassigned": "Questo task non è assegnato",
     "assignToMe": "Assegna a me",
     "assignToSomeone": "Assegna a qualcuno",
     "removeAssignee": "Rimuovi assegnatario",

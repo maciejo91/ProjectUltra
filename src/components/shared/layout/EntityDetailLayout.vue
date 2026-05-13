@@ -775,7 +775,7 @@ const taskId = computed(() => props.task.id)
 
 const useLegacyCommunicationDialogs = computed(() => {
   const customerName = String(props.task?.customer?.name ?? '').trim()
-  return props.type === 'lead' && customerName === 'Josh Adams'
+  return props.type === 'lead' && customerName === 'Luca De Santis'
 })
 
 // Check if we're on the tasks view (not the customer view)

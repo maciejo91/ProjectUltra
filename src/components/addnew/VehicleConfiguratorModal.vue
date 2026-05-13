@@ -81,13 +81,13 @@
             ]"
             @click="selectBrand(b.id)"
           >
-            <div class="flex h-[60px] w-32 items-center justify-center">
+            <div class="flex h-12 w-24 items-center justify-center">
               <img
                 v-if="getBrandLogoUrl(b) && !brandLogoFailed[b.id]"
                 :key="`${b.id}-${logoRenderKey}`"
                 :src="getBrandLogoUrl(b)"
                 :alt="`${b.label} logo`"
-                class="h-full w-auto max-w-full object-contain"
+                class="h-10 w-auto max-w-full object-contain"
                 loading="lazy"
                 @error="onBrandLogoError(b.id)"
               />
@@ -151,7 +151,7 @@
                   </p>
                 </div>
 
-                <div class="w-full aspect-[16/9] overflow-hidden rounded-md bg-muted">
+                <div class="w-full aspect-video overflow-hidden rounded-md bg-muted">
                   <img v-if="m.imageUrl" :src="m.imageUrl" alt="" class="h-full w-full object-cover" loading="lazy" />
                 </div>
 
@@ -311,7 +311,7 @@
                   </div>
                 </div>
                 <div class="px-4 pb-4">
-                  <div class="aspect-[16/9] w-full overflow-hidden rounded-md bg-muted">
+                  <div class="aspect-video w-full overflow-hidden rounded-md bg-muted">
                     <img v-if="configuredImageUrl" :src="configuredImageUrl" alt="" class="h-full w-full object-cover" loading="lazy" />
                   </div>
                 </div>
@@ -409,7 +409,7 @@ const brands = [
   {
     id: 'bmw',
     label: 'BMW',
-    logoUrl: 'https://cdn.dealerk.it/cars/make/brand/160/bmw.png',
+    logoUrl: '/brands/bmw.png',
   },
   {
     id: 'volkswagen',

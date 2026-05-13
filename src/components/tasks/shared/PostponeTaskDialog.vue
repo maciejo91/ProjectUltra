@@ -3,13 +3,13 @@
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
       <DialogContent class="w-full sm:max-w-lg max-h-[calc(100vh-4rem)] flex flex-col">
-        <DialogHeader class="flex-shrink-0">
-          <DialogTitle>Postpone Task</DialogTitle>
+        <DialogHeader class="shrink-0">
+          <DialogTitle>{{ t('requestDetail.postponeTaskDialog.title') }}</DialogTitle>
         </DialogHeader>
 
         <div class="flex-1 overflow-y-auto px-6 py-4 w-full space-y-4">
           <div>
-            <Label class="block text-sm font-medium text-foreground mb-2">Postpone Date <span class="text-red-600">*</span></Label>
+            <Label class="block text-sm font-medium text-foreground mb-2">{{ t('requestDetail.postponeTaskDialog.postponeDate') }} <span class="text-red-600">*</span></Label>
             <Input
               type="date"
               v-model="postponeForm.date"
@@ -19,7 +19,7 @@
           </div>
 
           <div>
-            <Label class="block text-sm font-medium text-foreground mb-2">Time (Optional)</Label>
+            <Label class="block text-sm font-medium text-foreground mb-2">{{ t('requestDetail.lqfTask.timeOptional') }}</Label>
             <Input
               type="time"
               v-model="postponeForm.time"
@@ -28,17 +28,17 @@
           </div>
 
           <div>
-            <Label class="block text-sm font-medium text-foreground mb-2">Reason (Optional)</Label>
+            <Label class="block text-sm font-medium text-foreground mb-2">{{ t('requestDetail.lqfTask.reasonOptional') }}</Label>
             <Textarea
               v-model="postponeForm.reason"
               rows="3"
-              placeholder="Why are you postponing this task?"
+              :placeholder="t('requestDetail.lqfTask.postponeReasonFreeTextPlaceholder')"
               class="w-full"
             />
           </div>
         </div>
 
-        <DialogFooter class="flex-shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
+        <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
           <Button
             variant="outline"
             size="small"
@@ -46,7 +46,7 @@
             :disabled="saving"
             @click="handleCancel"
           >
-            Cancel
+            {{ t('common.buttons.cancel') }}
           </Button>
           <Button
             variant="default"
@@ -56,7 +56,7 @@
             @click="handleConfirm"
           >
             <Spinner v-if="saving" class="size-4 shrink-0" />
-            <span>{{ saving ? 'Saving…' : 'Postpone Task' }}</span>
+            <span>{{ saving ? t('requestDetail.editVehicleModal.saving') : t('requestDetail.postponeTaskDialog.title') }}</span>
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -66,6 +66,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Button, Input, Label, Textarea, Spinner } from '@motork/component-library/future/primitives'
 import {
   Dialog,
@@ -76,6 +77,8 @@ import {
   DialogPortal,
   DialogTitle
 } from '@motork/component-library/future/primitives'
+
+const { t } = useI18n()
 
 const props = defineProps({
   show: {

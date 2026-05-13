@@ -1,7 +1,9 @@
 <template>
   <div class="overflow-hidden rounded-lg bg-white shadow-nsc-card p-4 flex flex-col gap-4 w-full">
     <div class="flex items-center justify-between gap-2">
-      <h3 class="text-base font-medium text-foreground leading-6">Trade-ins</h3>
+      <h3 class="text-base font-medium text-foreground leading-6">
+        {{ t('requestDetail.purchaseDetails.tradeIns') }}
+      </h3>
       <Button
         variant="secondary"
         size="sm"
@@ -11,7 +13,7 @@
       >
         <Spinner v-if="addLoading" class="size-3.5 shrink-0" aria-hidden />
         <Plus v-else class="size-3.5" />
-        Add
+        {{ t('requestDetail.purchaseDetails.add') }}
       </Button>
     </div>
     <ul v-if="items.length" class="space-y-1.5">
@@ -30,6 +32,7 @@
 
 <script setup>
 import { Plus } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 import { Button, Spinner } from '@motork/component-library/future/primitives'
 
 defineProps({
@@ -45,6 +48,8 @@ defineProps({
 })
 
 defineEmits(['open-add', 'open-edit'])
+
+const { t } = useI18n()
 
 function formatCurrency(val) {
   if (val == null) return '0'

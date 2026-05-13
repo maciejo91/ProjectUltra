@@ -31,5 +31,86 @@
     "weeklyTarget": "Weekdoel",
     "monthlyTarget": "Maanddoel",
     "quarterlyTarget": "Kwartaaldoel"
+  },
+  "nscDashboard": {
+    "leadsByArea": "Leads per gebied",
+    "contractsByArea": "Contracten per gebied",
+    "modelsSold": "Verkochte modellen",
+    "totalLeads": "{count} leads totaal",
+    "totalContracts": "{count} contracten totaal",
+    "unitsSold": "{count} verkochte eenheden",
+    "totalLeadsLabel": "Leads totaal",
+    "totalContractsLabel": "Contracten totaal",
+    "unitsSoldLabel": "Verkochte eenheden",
+    "thisMonth": "Deze maand",
+    "vsLastMonth": "vs vorige maand",
+    "salesPipeline": "Funnel lead vendita",
+    "leadSources": "Leadbronnen",
+    "bestPerformers": "Best presterend",
+    "tasksDue": "Taken gepland",
+    "expired": "Verlopen",
+    "noTasksDue": "Geen taken met een deadline",
+    "taskFallback": "Taak",
+    "unknownCustomer": "Onbekende klant",
+    "noVehicle": "Geen voertuig opgegeven",
+    "lead": "Lead",
+    "opportunity": "Opportunity",
+    "percentage": "Percentage",
+    "columns": {
+      "name": "Naam",
+      "leads": "Leads",
+      "qualifiedLeadsPercent": "Gekwalificeerde leads (%)",
+      "opportunities": "Opportunities",
+      "contracts": "Contracten",
+      "conversionRate": "Conversieratio"
+    },
+    "timeRanges": {
+      "last30Days": "Laatste 30 dagen",
+      "last90Days": "Laatste 90 dagen",
+      "last180Days": "Laatste 180 dagen",
+      "lastYear": "Vorig jaar"
+    },
+    "kpis": {
+      "dealsClosedThisMonth": "Gesloten deals deze maand",
+      "offersGeneratedThisMonth": "Deze maand gegenereerde offers",
+      "newLeadsToday": "Nieuwe leads vandaag",
+      "walkInOffersProducedToday": "Vandaag geproduceerde walk-in offers",
+      "breakdown": {
+        "leads": "Leads",
+        "walkIns": "Walk-ins"
+      }
+    },
+    "stages": {
+      "lead": "Lead",
+      "takeInCharge": "In behandeling",
+      "qualified": "Gekwalificeerd",
+      "offerCreated": "Offer aangemaakt",
+      "deal": "Deal"
+    },
+    "averageTime": {
+      "hours": "{hours}u gemiddeld",
+      "daysHours": "{days}d {hours}u gemiddeld",
+      "worseThanLastMonth": "Slechter dan vorige maand."
+    },
+    "ai": {
+      "title": "Insights powered by AI",
+      "thinking": "Aan het nadenken...",
+      "you": "Jij",
+      "placeholder": "Stel een vraag...",
+      "error": "Er is een fout opgetreden. Probeer het opnieuw.",
+      "suggestions": {
+        "newCarSellers": "Wie zijn mijn top 5 verkopers van nieuwe auto's dit kwartaal?",
+        "webSources": "Welke zijn mijn top 5 best presterende webbronnen?",
+        "bdcAppointments": "Vat het BDC-afspraakvolume en de show rates van gisteren samen."
+      }
+    },
+    "months": {
+      "januaryShort": "JAN",
+      "februaryShort": "FEB",
+      "marchShort": "MRT",
+      "aprilShort": "APR",
+      "mayShort": "MEI",
+      "juneShort": "JUN"
+    }
   }
 }

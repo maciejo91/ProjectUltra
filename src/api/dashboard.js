@@ -61,8 +61,8 @@ export const fetchTasksDue = async () => {
   return [
     {
       id: '1',
-      dealershipName: 'David Martin',
-      customerName: 'Jean-Pierre Dubois',
+      dealershipName: 'Davide Martino',
+      customerName: 'Gianni De Luca',
       car: 'Volvo XC90',
       dueTime: '10:00',
       dueDate: '2024-02-14',
@@ -70,8 +70,8 @@ export const fetchTasksDue = async () => {
     },
     {
       id: '2',
-      dealershipName: 'Sophie Dubois',
-      customerName: 'Marie Lefebvre',
+      dealershipName: 'Sofia De Luca',
+      customerName: 'Maria Ferrari',
       car: 'Volvo V60',
       dueTime: '14:30',
       dueDate: '2024-02-14',
@@ -79,8 +79,8 @@ export const fetchTasksDue = async () => {
     },
     {
       id: '3',
-      dealershipName: 'Thomas Anderson',
-      customerName: 'Pierre Moreau',
+      dealershipName: 'Tommaso Romano',
+      customerName: 'Pietro Morelli',
       car: 'Volvo S90',
       dueTime: '16:00',
       dueDate: '2024-02-14',
@@ -88,8 +88,8 @@ export const fetchTasksDue = async () => {
     },
     {
       id: '4',
-      dealershipName: 'Marie Leclerc',
-      customerName: 'Sarah Johnson',
+      dealershipName: 'Maria Marchetti',
+      customerName: 'Sara Mancini',
       car: 'Volvo XC60',
       dueTime: '09:00',
       dueDate: '2024-02-15',
@@ -97,8 +97,8 @@ export const fetchTasksDue = async () => {
     },
     {
       id: '5',
-      dealershipName: 'James Wilson',
-      customerName: 'Michael Brown',
+      dealershipName: 'Giacomo Colombo',
+      customerName: 'Michele Bruno',
       car: 'Volvo C40',
       dueTime: '15:00',
       dueDate: '2024-02-15',

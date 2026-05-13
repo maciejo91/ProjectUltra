@@ -15,7 +15,7 @@ export const mockVehicles = [
     dealership: 'Firenze',
     stockDays: 15,
     color: 'Blue',
-    requestedBy: ['Josh Adams'],
+    requestedBy: ['Luca De Santis'],
     listingMetrics: { funnelViews: 6, tagCount: 21 }
   },
   {
@@ -33,7 +33,7 @@ export const mockVehicles = [
     dealership: 'Berlin Mitte',
     stockDays: 42,
     color: 'Black',
-    requestedBy: ['Emma Watson'],
+    requestedBy: ['Chiara Moretti'],
     listingMetrics: { funnelViews: 12, tagCount: 8 }
   },
   {
@@ -106,7 +106,7 @@ export const mockVehicles = [
     dealership: 'Firenze',
     inventoryType: 'customer-vehicles',
     soldAt: '2024-11-15',
-    soldTo: 'Josh Adams',
+    soldTo: 'Luca De Santis',
     ownerContactId: 1,
   },
   {
@@ -142,7 +142,7 @@ export const mockVehicles = [
     dealership: 'Berlin Mitte',
     inventoryType: 'sold',
     soldAt: '2024-12-02',
-    soldTo: 'Thomas Mueller'
+    soldTo: 'Tommaso Moretti'
   }
 ]
 

@@ -50,7 +50,163 @@
     "timeline": "Timeline"
   },
   "insights": {
-    "empty": "Noch keine Insights verfügbar."
+    "empty": "Noch keine Insights verfügbar.",
+    "title": "Contact Insights",
+    "description": "A summary of enriched customer data at a glance",
+    "leadEmail": "Lead email",
+    "period": "10hrs",
+    "actions": {
+      "sent": "Sent",
+      "call": "Call"
+    },
+    "stats": {
+      "firstEvent": "First event",
+      "firstEventValue": "Mar 24, 2025",
+      "campaignCommunicationSent": "Campaign communication sent",
+      "lastEvent": "Last event",
+      "lastEventValue": "May 13, 2026",
+      "leadQualified": "Lead qualified",
+      "trackedEvents": "Tracked events",
+      "trackedEventsValue": "406"
+    },
+    "filters": {
+      "tags": "Tags",
+      "peakActivity": "Peak activity",
+      "latestMarketingCommunications": "Latest marketing communications",
+      "latestPagesViewed": "Latest pages viewed",
+      "latestLeads": "Latest leads",
+      "latestOpportunities": "Latest opportunities",
+      "latestReviews": "Latest reviews",
+      "sources": "Sources",
+      "associatedContacts": "Associated contacts"
+    },
+    "cards": {
+      "tags": "Tags",
+      "peakActivity": "Peak activity",
+      "latestMarketingCommunications": "Latest marketing communications",
+      "latestPagesViewed": "Latest pages viewed",
+      "latestLeads": "Latest leads",
+      "latestOpportunities": "Latest opportunities",
+      "latestReviews": "Latest reviews",
+      "sources": "Sources",
+      "associatedContacts": "Associated contacts"
+    },
+    "tags": {
+      "apiResponse": "API response",
+      "hasActiveLead": "has active lead",
+      "hasActiveOpportunity": "has active opportunity",
+      "newLeadBuyer": "new lead buyer",
+      "usedCar": "used car",
+      "webVisit": "web visit",
+      "requestScore": "request score",
+      "privateCustomer": "private customer",
+      "afterSales": "after sales",
+      "tradeIn": "trade-in",
+      "remoteLead": "remote lead",
+      "appointmentSet": "appointment set"
+    },
+    "marketing": {
+      "first": {
+        "title": "Employsync.promoworlds",
+        "meta": "Clicked Feb 09, 2026, 10:56"
+      },
+      "second": {
+        "title": "Campaign re-send 2025",
+        "meta": "Clicked Feb 26, 2026, 14:48"
+      }
+    },
+    "pages": {
+      "first": {
+        "title": "Auto Usate Milano Audi A5 Sportback 50 TFSI quattro - Milano",
+        "meta": "Last viewed Apr 4, 2026, 12:54 PM",
+        "badge": "Found"
+      },
+      "second": {
+        "title": "Auto Usate Torino ABARTH 595 Turismo 1.4 T-Jet - Torino",
+        "meta": "Last viewed Feb 1, 2026, 9:20 PM",
+        "badge": "15 mins"
+      },
+      "third": {
+        "title": "Auto Usate Milano Citroen C4 Diesel BlueHDi 100 Feel - Milano",
+        "meta": "Last viewed Apr 8, 2026, 7:23 PM",
+        "badge": "30 mins"
+      },
+      "fourth": {
+        "title": "Auto Usate Milano Jeep Avenger Berlina BEV - Milano",
+        "meta": "Last viewed Apr 6, 2026, 4:20 PM",
+        "badge": "7 mins"
+      }
+    },
+    "leads": {
+      "first": {
+        "title": "Fiat 500",
+        "meta": "Created Feb 13, 2026, 1:04 PM"
+      },
+      "second": {
+        "title": "Active Partecipanti",
+        "meta": "Created Feb 21, 2026, 4:05 PM"
+      },
+      "third": {
+        "title": "Fiat 500",
+        "meta": "Updated Mar 03, 2026, 10:20 AM"
+      },
+      "fourth": {
+        "title": "Fiat 500",
+        "meta": "Created Feb 03, 2026, 9:45 AM"
+      }
+    },
+    "opportunities": {
+      "first": {
+        "title": "Marco peters",
+        "meta": "Updated Apr 11, 2026, 1:13 PM"
+      },
+      "second": {
+        "title": "Fiat 500",
+        "meta": "Updated Feb 14, 2026, 11:31 AM"
+      },
+      "third": {
+        "title": "Fiat 500C",
+        "meta": "Updated Mar 07, 2026, 8:22 AM"
+      },
+      "fourth": {
+        "title": "Fiat 500",
+        "meta": "Updated Apr 15, 2026, 10:08 AM"
+      }
+    },
+    "status": {
+      "qualified": "Qualified",
+      "valid": "Valid",
+      "visit": "Visit",
+      "open": "Open"
+    },
+    "review": {
+      "title": "Doppiamente: sono eccellenti!",
+      "meta": "Created May 10, 2026, 11:30 AM"
+    },
+    "sources": {
+      "callSpark": "CallSparK",
+      "fidSpark": "FidSparK",
+      "leadSpark": "LeadSparK(R)",
+      "predictSpark": "PredictSparK",
+      "webSpark": "WebSparK"
+    },
+    "contacts": {
+      "first": {
+        "name": "Paolo Pezzotti",
+        "email": "mario@dealer.com",
+        "phone": "+39 333 459 4438"
+      },
+      "second": {
+        "name": "Paolo Pezzotti",
+        "email": "paolo@dealer.com",
+        "phone": "+39 333 459 4439"
+      },
+      "third": {
+        "name": "Paolo Pezzotti",
+        "email": "paolo.pezzotti@dealer.com",
+        "phone": "+39 333 459 4440"
+      }
+    }
   },
   "insight": {
     "highPaidStock": "Dieser Lead stammt aus einer stark bezahlten Quelle und interessiert sich für ein Fahrzeug, das seit {days} Tagen auf Lager ist."
@@ -104,7 +260,100 @@
     "outcomeFlowNotes": "Anrufnotizen",
     "outcomeFlowNotesPlaceholder": "Notizen zu diesem Anrufversuch hinzufügen…",
     "calledAt": "Anrufzeit:",
-    "editCalledAt": "Anrufzeit bearbeiten"
+    "editCalledAt": "Anrufzeit bearbeiten",
+    "savingOutcome": "Ergebnis wird gespeichert",
+    "customerFallback": "der Kunde",
+    "nextCallAttempt": "Nächster Anrufversuch",
+    "tomorrow9am": "Morgen um 9:00 Uhr",
+    "suggestAiTime": "KI-Zeit vorschlagen",
+    "selectTime": "Zeit auswählen",
+    "dateAtTime": "{date} um {time}",
+    "date": "Datum",
+    "time": "Uhrzeit",
+    "timeOptional": "Uhrzeit (optional)",
+    "reasonOptional": "Grund (optional)",
+    "postponeReasonFreeTextPlaceholder": "Warum verschieben Sie diese Aufgabe?",
+    "markScheduledRecall": "Als geplanten Recall-Termin markieren",
+    "assignedTo": "Zugewiesen an",
+    "assignNextAttemptPlaceholder": "Nächsten Versuch zuweisen an...",
+    "noteToAssignee": "Notiz an Bearbeiter",
+    "noteToAssigneePlaceholder": "Notizen oder Anweisungen für den Bearbeiter hinzufügen...",
+    "sendFollowUpMessage": "Follow-up-Nachricht senden",
+    "followUpTemplateOne": "Follow-up 1",
+    "followUpTemplateTwo": "Follow-up 2",
+    "messageTemplatePlaceholder": "Vorlage auswählen oder Nachricht eingeben...",
+    "requiredFields": "Pflichtfelder",
+    "customerInterestLevel": "Interesse des Kunden?",
+    "expectedPurchaseTimeline": "Erwarteter Kaufzeitraum?",
+    "selectTimeline": "Zeitraum auswählen",
+    "budgetRangeQuestion": "Budgetspanne (falls besprochen)?",
+    "selectBudgetRange": "Budgetspanne auswählen",
+    "additionalNotes": "Zusätzliche Notizen",
+    "additionalNotesPlaceholder": "Relevante Informationen zum Interesse oder zu den Präferenzen des Kunden...",
+    "noteInterestLevel": "Interesse: {value}",
+    "notePurchaseTimeline": "Kaufzeitraum: {value}",
+    "noteBudgetRange": "Budgetspanne: {value}",
+    "outcomeLogged": "Ergebnis protokolliert",
+    "sendAndPostpone": "Senden und verschieben",
+    "scheduleAndQualify": "Termin planen und qualifizieren",
+    "assignToSalesman": "Verkäufer zuweisen",
+    "interestLevels": {
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig"
+    },
+    "purchaseTimeline": {
+      "immediate": "Sofort",
+      "withinOneMonth": "Innerhalb von 1 Monat",
+      "withinThreeMonths": "Innerhalb von 3 Monaten",
+      "withinSixMonths": "Innerhalb von 6 Monaten",
+      "justBrowsing": "Nur am Stöbern"
+    },
+    "budgetRange": {
+      "under30k": "Unter 30.000 €",
+      "notDiscussed": "Nicht besprochen"
+    },
+    "eventTypes": {
+      "appointmentOnPhone": "Telefontermin (15 Min.)",
+      "appointmentAtDealership": "Termin im Autohaus (30 Min.)",
+      "recallInternal": "Recall - intern (15 Min.)",
+      "appointmentAtDealershipTestDrive": "Termin im Autohaus + Probefahrt (1 Std.)",
+      "appointmentAtWorkshop": "Werkstatttermin (15 Min.)",
+      "appointmentAtCustomerSite": "Termin beim Kunden (1 Std. 40 Min.)",
+      "appointmentAtCustomerSiteTestDrive": "Termin beim Kunden + Probefahrt (5 Std.)"
+    },
+    "activities": {
+      "enrichedLeadInformation": "hat Lead-Informationen ergänzt",
+      "leadQualificationSurvey": "Lead-Qualifizierungsumfrage",
+      "callSummary": "Der Lead bestätigte seine Daten und der Anruf deckte die Hauptanfrage aus der Transkription ab.",
+      "madeCall": "hat einen Anruf getätigt",
+      "userMadeCall": "{user} hat einen Anruf getätigt"
+    }
+  },
+  "closeAsLost": {
+    "reason": "Grund",
+    "selectReason": "Grund auswählen...",
+    "reasons": {
+      "multipleNoShows": "Mehrere No-Shows",
+      "dataCleanup": "Datenbereinigung",
+      "unreachable": "Nicht erreichbar",
+      "purchasePostponed": "Kauf verschoben",
+      "vehicleSold": "Fahrzeug verkauft",
+      "outOfBudget": "Außerhalb des Budgets",
+      "financingRejected": "Finanzierung abgelehnt",
+      "duplicate": "Duplikat",
+      "boughtElsewhere": "Anderswo gekauft",
+      "notInterested": "Nicht interessiert",
+      "budgetConstraints": "Budgetbeschränkungen",
+      "foundBetterPrice": "Besserer Preis beim Wettbewerber",
+      "noResponse": "Kunde antwortet nicht",
+      "wrongTiming": "Falscher Zeitpunkt",
+      "other": "Sonstiges"
+    }
+  },
+  "postponeTaskDialog": {
+    "title": "Aufgabe verschieben",
+    "postponeDate": "Verschiebedatum"
   },
   "quickActions": {
     "phone": "Telefon",
@@ -212,6 +461,7 @@
     "dealership": "Händler",
     "price": "Preis",
     "specification": "Ausstattung",
+    "vin": "VIN",
     "registrationDate": "Erstzulassung",
     "carLocation": "Standort Fahrzeug",
     "mileage": "Kilometerstand",
@@ -221,6 +471,7 @@
     "identity": "Identität",
     "stockInStock": "Auf Lager",
     "stockNotInStock": "Nicht auf Lager",
+    "stockToBeOrder": "Zu bestellen",
     "landingPage": "Landing Page",
     "visit": "Besuchen",
     "editAria": "Angefragtes Fahrzeug bearbeiten",
@@ -229,7 +480,8 @@
     "staffNotePlaceholder": "Interne Notiz zu diesem Fahrzeug (getrennt von der Kundenanfrage).",
     "savingNote": "Wird gespeichert…",
     "expandNote": "Gesamte Notiz anzeigen",
-    "collapseNote": "Weniger anzeigen"
+    "collapseNote": "Weniger anzeigen",
+    "interactionMetricsTooltip": "{leads} Leads und {opportunities} Opportunities für dieses Fahrzeug"
   },
   "editVehicleModal": {
     "title": "Angefragtes Fahrzeug bearbeiten",
@@ -330,6 +582,12 @@
     "conversations": "Gespräche erscheinen hier.",
     "attachments": "Anhänge erscheinen hier.",
     "tasksTab": "Related tasks and requests for this customer will appear here."
+  },
+  "purchaseDetails": {
+    "financingOptions": "Finanzierungsoptionen",
+    "tradeIns": "Inzahlungnahmen",
+    "add": "Hinzufügen",
+    "months": "{count} Monate"
   },
   "emptyStates": {
     "conversations": {
