@@ -194,9 +194,12 @@
             </div>
             <div>
               <Label class="text-sm font-medium text-muted-foreground mb-1">Evaluation Date</Label>
-              <Input 
+              <MiniCalendarDateField
                 v-model="valuationData.evaluationDate"
-                type="date" 
+                aria-label="Evaluation date"
+                group-class="rounded-md"
+                input-class="min-w-0"
+                :max-date="todayIsoMax"
               />
             </div>
           </div>
@@ -237,6 +240,9 @@ import {
   SelectItem,
   SelectValue
 } from '@motork/component-library/future/primitives'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { getTodayDateString } from '@/utils/formHelpers.js'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 
 const props = defineProps({
   item: {
@@ -263,7 +269,7 @@ const props = defineProps({
 
 const emit = defineEmits(['save', 'cancel'])
 
-const showValuation = ref(false)
+const todayIsoMax = computed(() => getTodayDateString())
 
 const vehicleData = ref({
   brand: '',
@@ -323,6 +329,12 @@ onMounted(() => {
 const handleSave = () => {
   if (!isValid.value) return
 
+  const evalRaw = valuationData.value.evaluationDate
+  const evaluationDateNorm =
+    evalRaw != null && String(evalRaw).trim()
+      ? normalizeMotorkDateFieldToIso(String(evalRaw).trim()) || String(evalRaw).trim()
+      : null
+
   const data = {
     id: props.item?.id || Date.now(),
     type: 'tradein',
@@ -348,7 +360,7 @@ const handleSave = () => {
       evaluationRangeLow: valuationData.value.evaluationRangeLow,
       evaluationRangeHigh: valuationData.value.evaluationRangeHigh,
       provider: valuationData.value.provider || null,
-      evaluationDate: valuationData.value.evaluationDate || null
+      evaluationDate: evaluationDateNorm
     }
   }
 

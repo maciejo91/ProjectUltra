@@ -263,11 +263,11 @@ export function useAddFormValidation({
         const hasStock = vehicleFormData && vehicleFormData.stockVehicleId != null
         const hasManual = vehicleFormData && vehicleFormData.manualOpen === true
         if (!hasStock && !(hasManual && isManualVehicleValid())) {
-          setE('vehicle', 'vehicle')
+          setE('vehicle', 'vehicleRequest')
         }
       }
       if (salesOpp && vehicleFormData && !hasRequiredVehicleInfo(vehicleFormData)) {
-        setE('vehicle', 'vehicle')
+        setE('vehicle', 'vehicleOffer')
       }
     }
 

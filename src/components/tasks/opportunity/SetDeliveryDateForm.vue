@@ -7,12 +7,13 @@
     <div class="space-y-4">
       <div>
         <Label class="form-label">Delivery Date <span class="text-red-600">*</span></Label>
-        <Input
-          type="date"
+        <MiniCalendarDateField
+          aria-label="Delivery date"
+          group-class="rounded-md"
+          input-class="min-w-0"
           :model-value="form.deliveryDate"
+          :min-date="minDeliveryDate"
           @update:model-value="$emit('update:form', { ...form, deliveryDate: $event })"
-          :min="minDeliveryDate"
-          class="w-full"
         />
       </div>
       <div>
@@ -113,6 +114,7 @@
 <script setup>
 import { computed } from 'vue'
 import { Button, Label, Input, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@motork/component-library/future/primitives'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
 
 const props = defineProps({
   form: { type: Object, required: true },

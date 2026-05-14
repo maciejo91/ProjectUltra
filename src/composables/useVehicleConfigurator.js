@@ -6,7 +6,6 @@ import {
   createTaxExtraCostLinesFromSeeds,
   EQUIPMENT,
   PROMOS,
-  PURCHASE_METHODS,
   TAXES,
   taxExtraCostLineIsRemovable,
   TRADE_IN_MOCK_VALUE,
@@ -18,6 +17,7 @@ import {
   findVersion,
   promoIdsForTrimLabel,
 } from '@/constants/vehicleConfiguratorCatalog'
+import { normalizeConfiguratorPurchaseMethod, dedupePurchaseMethodName } from '@/utils/purchaseMethodConfiguratorForm.js'
 
 /**
  * Single source of truth for Step 3 of the VehicleConfiguratorModal.
@@ -26,13 +26,20 @@ import {
  * @param {import('vue').Ref<string>|()=>string} ctx.brandLabel - Selected brand label (Step 1).
  * @param {import('vue').Ref<string>|()=>string} ctx.modelTitle - Selected model title (Step 2).
  * @param {import('vue').Ref<string>|()=>string} ctx.modelImageUrl - Selected model image URL.
- * @param {import('vue').Ref<number>|()=>number} ctx.modelBasePrice - Base price coming from Step 2 selection.
+ * @param {import('vue').Ref<number>|()=>number} ctx.modelBasePrice - Catalog/stock list price (always gross €). Read-only from Step 2; this composable never assigns to it. Net list is derived (vehicleBasePriceNet) for display only.
+ * @param {import('vue').Ref<boolean>|()=>boolean} [ctx.showNetPrices] - View toggle only: switches derived net/gross amounts; does not rewrite catalog prices or re-align rows on toggle by itself.
  * @param {import('vue').Ref<number>|()=>number} [ctx.vatRatePercent] - Modal-wide VAT rate (overrides catalog default).
+ * @param {import('vue').Ref<boolean>|()=>boolean} [ctx.quotationOnly] - Stock quotation step: skip version/colour gate; payload uses stock summary lines.
+ * @param {import('vue').Ref<string>|()=>string} [ctx.stockSummaryLine] - Offer summary text when quotationOnly (e.g. trim line).
+ * @param {import('vue').Ref<string>|()=>string} [ctx.stockSpecificationLine] - Specification line when quotationOnly (e.g. fuel – gearbox).
  */
 export function useVehicleConfigurator(ctx = {}) {
   const readBrand = () => String(unref(ctx.brandLabel) || '')
   const readModel = () => String(unref(ctx.modelTitle) || '')
   const readModelImage = () => String(unref(ctx.modelImageUrl) || '')
+  const readQuotationOnly = () => Boolean(unref(ctx.quotationOnly))
+  const readStockSummaryLine = () => String(unref(ctx.stockSummaryLine) ?? '').trim()
+  const readStockSpecificationLine = () => String(unref(ctx.stockSpecificationLine) ?? '').trim()
   const readShowNetPrices = () => Boolean(unref(ctx.showNetPrices))
   const readModelBase = () => {
     const n = Number(unref(ctx.modelBasePrice))
@@ -88,7 +95,24 @@ export function useVehicleConfigurator(ctx = {}) {
   const userCampaigns = ref([])
   /** User trade-in rows (valuation € deducted from grand total). */
   const userTradeInLines = ref([])
-  const selectedPurchaseMethodId = ref('')
+  /** User-defined purchase methods (quotation UI only; no price effect). */
+  const userPurchaseMethods = ref([])
+  /** Multi-select checkbox state on quotation cards (UI only). */
+  const selectedPurchaseMethodIds = ref([])
+  /** Quotation tab — additional notes and offer validity (UI + snapshot + payload). */
+  const quotationNotes = ref('')
+  const quotationOfferValidUntil = ref('')
+
+  const purchaseMethodSummaryLine = computed(() => {
+    const ids = new Set(selectedPurchaseMethodIds.value)
+    const list = userPurchaseMethods.value
+    const picked = list.filter((row) => ids.has(row.id))
+    const source = picked.length ? picked : list
+    return source
+      .map((r) => String(r.name || '').trim())
+      .filter(Boolean)
+      .join(', ')
+  })
   const roundPriceApplied = ref(false)
   const roundPriceAdjustment = ref(0)
 
@@ -97,10 +121,6 @@ export function useVehicleConfigurator(ctx = {}) {
   const selectedVersion = computed(() => findVersion(selectedVersionId.value))
   const selectedColour = computed(() => findColour(selectedColourId.value))
   const selectedInteriorColour = computed(() => findColour(selectedInteriorColourId.value))
-  const selectedPurchaseMethod = computed(
-    () => PURCHASE_METHODS.find((m) => m.id === selectedPurchaseMethodId.value) || null
-  )
-
   const selectedEquipment = computed(() =>
     EQUIPMENT.filter((item) => equipmentSelection[item.id])
   )
@@ -138,15 +158,17 @@ export function useVehicleConfigurator(ctx = {}) {
       interiorColourPriceDelta.value
   )
 
-  const vehicleBasePrice = computed(() => {
-    if (!readShowNetPrices()) return vehicleBasePriceGross.value
-    return (
+  const vehicleBasePriceNet = computed(
+    () =>
       toNet(readModelBase()) +
       toNet(versionPriceDelta.value) +
       toNet(colourPriceDelta.value) +
-      toNet(interiorColourPriceDelta.value)
-    )
-  })
+      toNet(interiorColourPriceDelta.value),
+  )
+
+  const vehicleBasePrice = computed(() =>
+    readShowNetPrices() ? vehicleBasePriceNet.value : vehicleBasePriceGross.value,
+  )
 
   const equipmentTotalGross = computed(() =>
     selectedEquipment.value.reduce((sum, item) => sum + Number(item.price || 0), 0)
@@ -252,7 +274,9 @@ export function useVehicleConfigurator(ctx = {}) {
    */
   const subtotal = computed(() => offerSummarySubtotalBeforeAccessories.value + accessoriesTotal.value)
 
+  /** In gross view the bundle subtotal is already VAT-inclusive; only extra-cost lines add gross tax. */
   const vatAmount = computed(() => {
+    if (!readShowNetPrices()) return 0
     const rate = readVatRate() / 100
     return Math.max(0, subtotal.value) * rate
   })
@@ -262,6 +286,31 @@ export function useVehicleConfigurator(ctx = {}) {
   )
 
   const taxesTotal = computed(() => vatAmount.value + extraCostsLinesTotalGross.value)
+
+  /** Before trade-in: gross (VAT incl.). Net view: net subtotal + VAT on bundle + extras gross. Gross view: gross subtotal + extras gross only (vatAmount is 0). */
+  const offerSummaryTaxBreakdownGross = computed(() => {
+    if (!readShowNetPrices()) {
+      return subtotal.value + extraCostsLinesTotalGross.value
+    }
+    return subtotal.value + taxesTotal.value
+  })
+
+  /** Net portion: taxable subtotal (net in net view) + net amounts on extra-cost lines; gross view uses toNet(subtotal) for hidden breakdown consistency. */
+  const offerSummaryTaxBreakdownNet = computed(() => {
+    const extrasNet = extraCostLines.value.reduce(
+      (sum, row) => sum + Math.max(0, Number(row.netAmount || 0)),
+      0,
+    )
+    if (!readShowNetPrices()) {
+      return toNet(subtotal.value) + extrasNet
+    }
+    return subtotal.value + extrasNet
+  })
+
+  const offerSummaryTaxBreakdownVat = computed(() => {
+    const diff = offerSummaryTaxBreakdownGross.value - offerSummaryTaxBreakdownNet.value
+    return Number.isFinite(diff) && diff > 0 ? diff : 0
+  })
 
   function rowVatRate(row) {
     const r = Number(row?.vatRatePercent)
@@ -347,12 +396,14 @@ export function useVehicleConfigurator(ctx = {}) {
     return grandTotalRaw.value + roundPriceAdjustment.value
   })
 
-  const isReadyToSave = computed(
-    () =>
+  const isReadyToSave = computed(() => {
+    if (readQuotationOnly()) return true
+    return (
       Boolean(selectedVersionId.value) &&
       Boolean(selectedColourId.value) &&
       Boolean(selectedInteriorColourId.value)
-  )
+    )
+  })
 
   const summaryLine = computed(() => {
     const parts = []
@@ -376,18 +427,25 @@ export function useVehicleConfigurator(ctx = {}) {
     const brand = readBrand()
     const model = readModel()
     const label = [brand, model].filter(Boolean).join(' ').trim()
+    const stockOnly = readQuotationOnly()
+    const summaryText = stockOnly
+      ? readStockSummaryLine() || label
+      : summaryLine.value
+    const specText = stockOnly ? readStockSpecificationLine() : specificationLine.value
     return {
-      mode: 'configurator',
+      mode: stockOnly ? 'stock' : 'configurator',
       brand,
       model,
       label,
-      summary: summaryLine.value,
+      summary: summaryText,
       imageUrl: configuredImageUrl.value,
       quantity: 1,
       price: grandTotal.value,
-      specification: specificationLine.value,
-      purchaseMethod: selectedPurchaseMethod.value?.label || '',
+      specification: specText,
+      purchaseMethod: purchaseMethodSummaryLine.value,
       interiorColour: selectedInteriorColour.value?.name || '',
+      quotationNotes: String(quotationNotes.value || '').trim(),
+      quotationOfferValidUntil: String(quotationOfferValidUntil.value || '').trim(),
     }
   })
 
@@ -498,6 +556,7 @@ export function useVehicleConfigurator(ctx = {}) {
   }
 
   function alignDiscountFromPercent(discount) {
+    // Base = vehicle list price minus active *flat* OEM promos (excl. taxes, accessories).
     const base = readShowNetPrices() ? discountBaseNet.value : discountBaseGross.value
     const percent = Number(discount?.percent || 0)
     const p = Number.isFinite(percent) ? percent : 0
@@ -517,6 +576,7 @@ export function useVehicleConfigurator(ctx = {}) {
   }
 
   function alignDiscountFromAmount(discount) {
+    // Same base as alignDiscountFromPercent (vehicle − fixed OEM promos).
     const base = readShowNetPrices() ? discountBaseNet.value : discountBaseGross.value
     const amount = Number(discount?.amount || 0)
     const a = Number.isFinite(amount) ? amount : 0
@@ -614,7 +674,7 @@ export function useVehicleConfigurator(ctx = {}) {
   }
 
   function alignCampaignFromPercent(row) {
-    const base = readShowNetPrices() ? discountBaseNet.value : discountBaseGross.value
+    const base = readShowNetPrices() ? vehicleBasePrice.value : vehicleBasePriceGross.value
     const percent = Number(row?.percent || 0)
     const p = Number.isFinite(percent) ? percent : 0
     const percentNegative = -Math.abs(p)
@@ -633,7 +693,7 @@ export function useVehicleConfigurator(ctx = {}) {
   }
 
   function alignCampaignFromAmount(row) {
-    const base = readShowNetPrices() ? discountBaseNet.value : discountBaseGross.value
+    const base = readShowNetPrices() ? vehicleBasePrice.value : vehicleBasePriceGross.value
     const amount = Number(row?.amount || 0)
     const a = Number.isFinite(amount) ? amount : 0
     const amountNegative = -Math.abs(a)
@@ -837,8 +897,51 @@ export function useVehicleConfigurator(ctx = {}) {
     userTradeInLines.value = userTradeInLines.value.filter((row) => row.id !== id)
   }
 
-  function selectPurchaseMethod(id) {
-    selectedPurchaseMethodId.value = id || ''
+  function addPurchaseMethod(row) {
+    const r = normalizeConfiguratorPurchaseMethod(row)
+    r.name = dedupePurchaseMethodName(r.name, userPurchaseMethods.value, null)
+    userPurchaseMethods.value = [...userPurchaseMethods.value, r]
+  }
+
+  function updatePurchaseMethod(id, patch) {
+    const list = userPurchaseMethods.value
+    const idx = list.findIndex((row) => row.id === id)
+    if (idx < 0) return
+    const merged = { ...list[idx], ...patch }
+    if (patch.name !== undefined) {
+      merged.name = dedupePurchaseMethodName(merged.name, list, id)
+    }
+    const next = [...list]
+    next[idx] = normalizeConfiguratorPurchaseMethod(merged)
+    userPurchaseMethods.value = next
+  }
+
+  function removePurchaseMethod(id) {
+    userPurchaseMethods.value = userPurchaseMethods.value.filter((row) => row.id !== id)
+    selectedPurchaseMethodIds.value = selectedPurchaseMethodIds.value.filter((x) => x !== id)
+  }
+
+  function togglePurchaseMethodSelected(id, selected) {
+    const sid = String(id || '')
+    if (!sid) return
+    const set = new Set(selectedPurchaseMethodIds.value)
+    if (selected) set.add(sid)
+    else set.delete(sid)
+    selectedPurchaseMethodIds.value = Array.from(set)
+  }
+
+  function replacePurchaseMethod(row) {
+    const r = normalizeConfiguratorPurchaseMethod(row)
+    const list = userPurchaseMethods.value
+    const idx = list.findIndex((item) => item.id === r.id)
+    if (idx < 0) {
+      addPurchaseMethod(r)
+      return
+    }
+    r.name = dedupePurchaseMethodName(r.name, list, r.id)
+    const next = [...list]
+    next[idx] = r
+    userPurchaseMethods.value = next
   }
 
   function applyRoundPrice() {
@@ -889,14 +992,129 @@ export function useVehicleConfigurator(ctx = {}) {
     userDiscounts.value = []
     userCampaigns.value = []
     userTradeInLines.value = []
-    selectedPurchaseMethodId.value = ''
+    userPurchaseMethods.value = []
+    selectedPurchaseMethodIds.value = []
+    quotationNotes.value = ''
+    quotationOfferValidUntil.value = ''
     roundPriceApplied.value = false
     roundPriceAdjustment.value = 0
     extraCostLines.value = createTaxExtraCostLinesFromSeeds()
   }
 
+  function captureSnapshot() {
+    const equipmentSnap = {}
+    EQUIPMENT.forEach((item) => {
+      equipmentSnap[item.id] = !!equipmentSelection[item.id]
+    })
+    const promoSnap = {}
+    PROMOS.forEach((p) => {
+      promoSnap[p.id] = !!promoSelection[p.id]
+    })
+    const cloneRows = (arr) =>
+      JSON.parse(JSON.stringify(Array.isArray(arr) ? arr : []))
+    return {
+      v: 1,
+      selectedVersionId: String(selectedVersionId.value || ''),
+      selectedColourId: String(selectedColourId.value || ''),
+      selectedInteriorColourId: String(selectedInteriorColourId.value || ''),
+      equipmentSelection: equipmentSnap,
+      promoSelection: promoSnap,
+      lockedEquipmentIds: [...lockedEquipmentIds.value],
+      userAccessoryLines: cloneRows(userAccessoryLines.value),
+      userDiscounts: cloneRows(userDiscounts.value),
+      userCampaigns: cloneRows(userCampaigns.value),
+      userTradeInLines: cloneRows(userTradeInLines.value),
+      userPurchaseMethods: cloneRows(userPurchaseMethods.value),
+      selectedPurchaseMethodIds: [...selectedPurchaseMethodIds.value].map(String),
+      roundPriceApplied: !!roundPriceApplied.value,
+      roundPriceAdjustment: Number(roundPriceAdjustment.value) || 0,
+      extraCostLines: cloneRows(extraCostLines.value),
+      quotationNotes: String(quotationNotes.value || ''),
+      quotationOfferValidUntil: String(quotationOfferValidUntil.value || ''),
+    }
+  }
+
+  /**
+   * Restores quoting/config state after modal `reset()`; does not invoke default-promo heuristics.
+   */
+  function applySnapshot(snapshot) {
+    if (!snapshot || typeof snapshot !== 'object') return
+
+    reset()
+
+    selectedVersionId.value = String(snapshot.selectedVersionId ?? '')
+    selectedColourId.value = String(snapshot.selectedColourId ?? '')
+    selectedInteriorColourId.value = String(snapshot.selectedInteriorColourId ?? '')
+
+    EQUIPMENT.forEach((item) => {
+      const k = item.id
+      equipmentSelection[k] =
+        !!(snapshot.equipmentSelection && typeof snapshot.equipmentSelection === 'object'
+          ? snapshot.equipmentSelection[k]
+          : false)
+    })
+
+    PROMOS.forEach((p) => {
+      const k = p.id
+      promoSelection[k] =
+        !!(snapshot.promoSelection && typeof snapshot.promoSelection === 'object'
+          ? snapshot.promoSelection[k]
+          : false)
+    })
+
+    lockedEquipmentIds.value =
+      Array.isArray(snapshot.lockedEquipmentIds)
+        ? snapshot.lockedEquipmentIds.filter(Boolean).map(String)
+        : []
+
+    for (const id of lockedEquipmentIds.value) {
+      if (id in equipmentSelection) equipmentSelection[id] = true
+    }
+
+    userAccessoryLines.value = Array.isArray(snapshot.userAccessoryLines)
+      ? snapshot.userAccessoryLines.map((row) => ({ ...row }))
+      : []
+
+    userDiscounts.value = Array.isArray(snapshot.userDiscounts)
+      ? snapshot.userDiscounts.map((row) => ({ ...row }))
+      : []
+
+    userCampaigns.value = Array.isArray(snapshot.userCampaigns)
+      ? snapshot.userCampaigns.map((row) => ({ ...row }))
+      : []
+
+    userTradeInLines.value = Array.isArray(snapshot.userTradeInLines)
+      ? snapshot.userTradeInLines.map((row) => ({ ...row }))
+      : []
+
+    userPurchaseMethods.value = Array.isArray(snapshot.userPurchaseMethods)
+      ? snapshot.userPurchaseMethods.map((row) => normalizeConfiguratorPurchaseMethod({ ...row }))
+      : []
+
+    selectedPurchaseMethodIds.value = Array.isArray(snapshot.selectedPurchaseMethodIds)
+      ? [...snapshot.selectedPurchaseMethodIds].map(String)
+      : []
+
+    quotationNotes.value = String(snapshot.quotationNotes ?? '')
+    quotationOfferValidUntil.value = String(snapshot.quotationOfferValidUntil ?? '')
+
+    roundPriceApplied.value = snapshot.roundPriceApplied === true
+    const adj = Number(snapshot.roundPriceAdjustment)
+    roundPriceAdjustment.value = Number.isFinite(adj) ? adj : 0
+
+    if (Array.isArray(snapshot.extraCostLines) && snapshot.extraCostLines.length) {
+      extraCostLines.value = snapshot.extraCostLines.map((row) => {
+        const copy = { ...row }
+        copy.removable = taxExtraCostLineIsRemovable(copy)
+        return copy
+      })
+    } else {
+      extraCostLines.value = createTaxExtraCostLinesFromSeeds()
+    }
+  }
+
   return {
-    catalog: { VERSIONS, COLOURS, EQUIPMENT, PROMOS, ACCESSORIES, ACCESSORY_LINE_ITEMS, PURCHASE_METHODS, TAXES },
+    catalog: { VERSIONS, COLOURS, EQUIPMENT, PROMOS, ACCESSORIES, ACCESSORY_LINE_ITEMS, TAXES },
     selectedVersionId,
     selectedColourId,
     selectedInteriorColourId,
@@ -911,16 +1129,21 @@ export function useVehicleConfigurator(ctx = {}) {
     discountBaseGross,
     discountBaseNet,
     tradeInApplied,
-    selectedPurchaseMethodId,
+    userPurchaseMethods,
+    selectedPurchaseMethodIds,
+    quotationNotes,
+    quotationOfferValidUntil,
+    purchaseMethodSummaryLine,
     roundPriceApplied,
     roundPriceAdjustment,
     selectedVersion,
     selectedColour,
     selectedInteriorColour,
-    selectedPurchaseMethod,
     selectedEquipment,
     activePromos,
     vehicleBasePrice,
+    vehicleBasePriceNet,
+    vehicleBasePriceGross,
     versionPriceDelta,
     colourPriceDelta,
     interiorColourPriceDelta,
@@ -936,7 +1159,11 @@ export function useVehicleConfigurator(ctx = {}) {
     subtotal,
     vatAmount,
     extraCostLines,
+    extraCostsLinesTotalGross,
     taxesTotal,
+    offerSummaryTaxBreakdownNet,
+    offerSummaryTaxBreakdownVat,
+    offerSummaryTaxBreakdownGross,
     addTaxExtraCostLine,
     removeTaxExtraCostLine,
     updateTaxExtraCostLine,
@@ -969,11 +1196,17 @@ export function useVehicleConfigurator(ctx = {}) {
     addTradeInLine,
     updateTradeInLine,
     removeTradeInLine,
-    selectPurchaseMethod,
+    addPurchaseMethod,
+    updatePurchaseMethod,
+    removePurchaseMethod,
+    replacePurchaseMethod,
+    togglePurchaseMethodSelected,
     applyRoundPrice,
     updateRoundPriceAdjustment,
     resetRoundPrice,
     toggleRoundPrice,
     reset,
+    captureSnapshot,
+    applySnapshot,
   }
 }

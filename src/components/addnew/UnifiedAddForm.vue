@@ -261,6 +261,12 @@ function createDefaultVehicleFormState() {
     configPrice: null,
     configSpecification: '',
     configPurchaseMethod: '',
+    configQuotationNotes: '',
+    configOfferValidUntil: '',
+    /** Client-only: reopen configurator with same draft (not sent in API payload). */
+    configuratorResumeDraft: null,
+    /** Client-only: reopen stock modal quotation step with snapshot (not sent in API payload). */
+    stockQuotationResumeDraft: null,
 
     // Manual insert — Sales (Figma 1710:68242)
     manualVehicleClass: '',

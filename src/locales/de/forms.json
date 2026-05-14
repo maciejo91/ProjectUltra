@@ -273,11 +273,25 @@
         "filterOwner": "Besitzer",
         "inventoryCustomerVehicles": "Kundenfahrzeug",
         "noVehicles": "Keine passenden Fahrzeuge.",
-        "sectionVehicleRequested": "Gewünschtes Fahrzeug",
-        "sectionVehicleInfo": "Fahrzeuginformationen",
+        "sectionVehicleRequested": "Fahrzeug der Anfrage",
+        "sectionVehicleInfo": "Fahrzeug des Angebots",
         "sectionOwnedVehicle": "Bestandenes Fahrzeug",
         "configure": "Konfigurieren",
         "insertManually": "Manuell eingeben",
+        "stockOfferModalTitle": "Angebotserstellung",
+        "stockOfferDraftBadge": "Entwurf",
+        "stockSearchSubtitle": "Wählen Sie ein Fahrzeug aus dem Bestand.",
+        "stockStep1Subtitle": "Wählen Sie ein Fahrzeug aus dem Bestand.",
+        "stockStep2Subtitle": "Definieren Sie die Angebotsdetails.",
+        "stockStepVehicle": "Fahrzeug",
+        "stockStepQuotation": "Angebot",
+        "stockBackToVehicles": "Zurück zu Fahrzeugen",
+        "stockSaveAndClose": "Speichern und schließen",
+        "showNetPrices": "Nettopreise anzeigen",
+        "quotationSearchItemsPlaceholder": "Einträge suchen…",
+        "quotationSearchDialogTitle": "Angebotspositionen suchen",
+        "quotationSearchDialogInputPlaceholder": "Name der Position eingeben…",
+        "quotationSearchNoItems": "Keine Einträge gefunden",
         "configurePlaceholder": "Konfigurationsoptionen folgen in einer späteren Version.",
         "manualPlaceholder": "Manuelle Fahrzeugdaten können in einer späteren Version ergänzt werden.",
         "manual": {
@@ -297,6 +311,18 @@
             "selectModel": "Modell wählen",
             "selectBrandFirst": "Zuerst eine Marke wählen"
           }
+        },
+        "quotation": {
+          "additionalNotes": "Zusätzliche Hinweise",
+          "additionalNotesPlaceholder": "Geben Sie hier Ihre Notizen ein",
+          "offerValidUntil": "Das Angebot ist gültig bis:",
+          "offerValidityDisclaimer": "Aktionen in diesem Angebot können vor dem angezeigten Angebotsdatum enden. Der Preis unterliegt der Aktionsgültigkeit.",
+          "summaryAdditionalNotes": "Zusätzliche Hinweise",
+          "summaryOfferValidUntil": "Angebot gültig bis",
+          "offerSummaryTaxBreakdownTotalNet": "Gesamt netto",
+          "offerSummaryTaxBreakdownTotalVat": "Gesamt MwSt. ({percent}%)",
+          "offerSummaryTaxBreakdownTotalGross": "Gesamt brutto (inkl. MwSt.)",
+          "offerSummaryGrandTotalVatIncl": "inkl. MwSt."
         }
       },
       "errors": {
@@ -309,7 +335,8 @@
         "serviceName": "Service ist erforderlich",
         "serviceDescription": "Beschreibung ist erforderlich",
         "servicePrice": "Preis ist erforderlich",
-        "vehicle": "Fahrzeuginformationen sind erforderlich"
+        "vehicleRequest": "Fahrzeug der Anfrage ist erforderlich",
+        "vehicleOffer": "Fahrzeug des Angebots ist erforderlich"
       }
     }
   },

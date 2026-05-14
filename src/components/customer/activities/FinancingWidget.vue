@@ -4,11 +4,11 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label class="text-sm font-medium text-muted-foreground mb-1">Start date</Label>
-          <Input type="date" v-model="financingData.startDate" />
+          <MiniCalendarDateField v-model="financingData.startDate" aria-label="Start date" group-class="rounded-md" input-class="min-w-0" />
         </div>
         <div>
           <Label class="text-sm font-medium text-muted-foreground mb-1">Expiration date</Label>
-          <Input type="date" v-model="financingData.expDate" />
+          <MiniCalendarDateField v-model="financingData.expDate" aria-label="Expiration date" group-class="rounded-md" input-class="min-w-0" />
         </div>
       </div>
       <div>
@@ -49,6 +49,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { Button, Input, Label } from '@motork/component-library/future/primitives'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
 
 const props = defineProps({
   item: {

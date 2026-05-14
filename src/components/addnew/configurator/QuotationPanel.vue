@@ -17,6 +17,7 @@
         :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.vehicleDetails"
         card-style
+        uniform-header-height
         @toggle="toggleSection('vehicleDetails')"
       >
         <div class="space-y-2.5">
@@ -149,11 +150,12 @@
         :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.promoCampaigns"
         card-style
+        uniform-header-height
         @toggle="toggleSection('promoCampaigns')"
       >
         <div class="space-y-4">
           <section v-if="promos.length" class="space-y-2.5">
-            <p class="text-sm font-normal text-muted-foreground">OEM promo</p>
+            <p class="pt-1 text-xs font-normal text-muted-foreground">OEM promo</p>
             <div class="space-y-3">
               <PromoCard
                 v-for="promo in promos"
@@ -192,6 +194,7 @@
                 :show-net-prices="showNetPrices"
                 :vat-options="vatOptions"
                 :modal-vat-rate-percent="Number(vatRatePercent)"
+                :paired-discount-vehicle-base="campaignPairedVehicleListBase"
                 editable
                 removable
                 @toggle="(v) => emit('toggle-campaign-active', c.id, v)"
@@ -228,6 +231,7 @@
         static-header
         :show-chevron="false"
         card-style
+        uniform-header-height
       >
         <template #afterTitle>
           <Button
@@ -249,6 +253,7 @@
         :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.discounts"
         card-style
+        uniform-header-height
         @toggle="toggleSection('discounts')"
       >
         <div class="flex flex-col gap-4">
@@ -429,6 +434,7 @@
         static-header
         :show-chevron="false"
         card-style
+        uniform-header-height
       >
         <template #afterTitle>
           <Button
@@ -450,6 +456,7 @@
         :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.accessories"
         card-style
+        uniform-header-height
         @toggle="toggleSection('accessories')"
       >
         <div class="flex flex-col gap-4">
@@ -576,6 +583,7 @@
         :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.taxes"
         card-style
+        uniform-header-height
         @toggle="toggleSection('taxes')"
       >
       <div class="space-y-2.5">
@@ -601,6 +609,7 @@
         static-header
         :show-chevron="false"
         card-style
+        uniform-header-height
       >
         <template #afterTitle>
           <Button
@@ -622,6 +631,7 @@
         :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.tradeIn"
         card-style
+        uniform-header-height
         @toggle="toggleSection('tradeIn')"
       >
         <div class="flex flex-col gap-4">
@@ -720,7 +730,7 @@
             </div>
           </div>
 
-          <div class="flex flex-wrap gap-2 pt-2">
+          <div class="flex flex-wrap gap-2 pt-4">
             <Button
               type="button"
               variant="outline"
@@ -737,25 +747,103 @@
 
     <div ref="sectionEls.purchaseMethod">
       <CollapsibleSection
+        v-if="userPurchaseMethods.length === 0"
+        title="Purchase methods"
+        :title-class="collapsibleSectionTitleClass"
+        static-header
+        :show-chevron="false"
+        card-style
+        uniform-header-height
+      >
+        <template #afterTitle>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            class="ml-auto shrink-0 rounded-md font-medium"
+            @click.stop="openPurchaseMethodAdd"
+          >
+            <Plus class="size-4 mr-1.5" />
+            Add
+          </Button>
+        </template>
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        v-else
         title="Purchase methods"
         :title-class="collapsibleSectionTitleClass"
         :is-expanded="open.purchaseMethod"
         card-style
+        uniform-header-height
         @toggle="toggleSection('purchaseMethod')"
       >
-        <div class="outcome-toggle-group flex flex-wrap gap-3">
-          <Toggle
-            v-for="method in purchaseMethods"
-            :key="method.id"
+        <div class="flex flex-col gap-3">
+          <PurchaseMethodQuotationCard
+            v-for="row in userPurchaseMethods"
+            :key="row.id"
+            :method="row"
+            :selected="selectedPurchaseMethodIdSet.has(row.id)"
+            @update:selected="(v) => emit('toggle-purchase-method-selected', row.id, v)"
+            @edit="openPurchaseMethodEdit(row)"
+            @delete="requestDeletePurchaseMethod(row.id)"
+          />
+        </div>
+        <div class="flex flex-wrap gap-2 pt-4">
+          <Button
+            type="button"
             variant="outline"
-            class="outcome-toggle-item"
-            :model-value="selectedPurchaseMethodId === method.id"
-            @update:model-value="(p) => emit('select-purchase-method', p ? method.id : '')"
+            class="h-9 shrink-0 rounded-md px-4 font-medium"
+            @click="openPurchaseMethodAdd"
           >
-            {{ method.label }}
-          </Toggle>
+            <Plus class="size-4 mr-2" />
+            Add
+          </Button>
         </div>
       </CollapsibleSection>
+    </div>
+
+    <div class="mb-0 overflow-visible rounded-lg border-0 bg-transparent p-0">
+      <Field class="pt-4">
+        <FieldLabel class="text-sm font-medium text-foreground" for="quotation-additional-notes">
+          {{ t('forms.addNew.leadDetails.vehicle.quotation.additionalNotes') }}
+        </FieldLabel>
+        <Textarea
+          id="quotation-additional-notes"
+          v-model="quotationNotesModel"
+          rows="4"
+          class="w-full resize-none rounded-lg border border-border bg-background text-sm text-foreground"
+          :placeholder="t('forms.addNew.leadDetails.vehicle.quotation.additionalNotesPlaceholder')"
+        />
+      </Field>
+    </div>
+
+    <div class="mb-0 overflow-hidden rounded-lg bg-transparent p-0">
+      <div class="mt-6 space-y-2">
+        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <Label
+            class="shrink-0 text-sm font-medium text-foreground sm:max-w-md"
+            for="quotation-offer-valid-until"
+          >
+            {{ t('forms.addNew.leadDetails.vehicle.quotation.offerValidUntil') }}
+          </Label>
+          <div class="relative flex min-w-0 w-fit">
+            <MiniCalendarDateField
+              id="quotation-offer-valid-until"
+              inline-width
+              :model-value="quotationOfferValidUntil"
+              :aria-label="t('forms.addNew.leadDetails.vehicle.quotation.offerValidUntil')"
+              group-class="rounded-md"
+              input-class="min-w-0"
+              popover-content-class="z-[110]"
+              @update:model-value="(v) => emit('update:quotationOfferValidUntil', String(v ?? ''))"
+            />
+          </div>
+        </div>
+        <p class="text-xs leading-snug text-muted-foreground">
+          {{ t('forms.addNew.leadDetails.vehicle.quotation.offerValidityDisclaimer') }}
+        </p>
+      </div>
     </div>
     </div>
 
@@ -766,15 +854,67 @@
       @update:open="(v) => (tradeInModalOpen = v)"
       @save="onTradeInModalSave"
     />
+
+    <PurchaseMethodConfiguratorModal
+      :open="purchaseMethodModalOpen"
+      :mode="purchaseMethodModalMode"
+      :editing-id="purchaseMethodEditId"
+      :initial="purchaseMethodModalInitial"
+      :default-vehicle-price="vehicleBaseTotal"
+      @update:open="(v) => (purchaseMethodModalOpen = v)"
+      @save="onPurchaseMethodModalSave"
+    />
+
+    <Dialog :open="purchaseMethodDeleteId !== ''" @update:open="onPurchaseMethodDeleteOpenChange">
+      <DialogPortal>
+        <DialogOverlay class="fixed inset-0 z-50 bg-black/50" />
+        <DialogContent class="w-full sm:max-w-md max-h-[calc(100vh-4rem)] flex flex-col" :show-close-button="true">
+          <DialogHeader class="shrink-0">
+            <DialogTitle>Remove purchase method?</DialogTitle>
+          </DialogHeader>
+          <div class="flex-1 overflow-y-auto py-4 w-full">
+            <p class="text-sm text-muted-foreground">
+              This removes the purchase method from the quotation. You cannot undo this action.
+            </p>
+          </div>
+          <DialogFooter class="shrink-0 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3">
+            <Button variant="outline" class="rounded-sm w-full sm:w-auto" type="button" @click="purchaseMethodDeleteId = ''">
+              Cancel
+            </Button>
+            <Button variant="destructive" class="rounded-sm w-full sm:w-auto" type="button" @click="confirmDeletePurchaseMethod">
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   </div>
 </template>
 
 <script setup>
 import { reactive, ref, computed, nextTick, watch } from 'vue'
 import { Info, Plus, Trash2, Car, Calendar, Gauge, PenLine } from 'lucide-vue-next'
-import { Button, Input, Toggle } from '@motork/component-library/future/primitives'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  Field,
+  FieldLabel,
+  Input,
+  Label,
+  Textarea,
+} from '@motork/component-library/future/primitives'
+import { useI18n } from 'vue-i18n'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
 import TradeInQuotationModal from '@/components/addnew/configurator/TradeInQuotationModal.vue'
+import PurchaseMethodConfiguratorModal from '@/components/addnew/configurator/PurchaseMethodConfiguratorModal.vue'
+import PurchaseMethodQuotationCard from '@/components/addnew/configurator/PurchaseMethodQuotationCard.vue'
 import VehicleDetailAmountPill from '@/components/addnew/configurator/VehicleDetailAmountPill.vue'
 import VehicleDetailVatStub from '@/components/addnew/configurator/VehicleDetailVatStub.vue'
 import PromoCard from '@/components/addnew/configurator/PromoCard.vue'
@@ -787,6 +927,7 @@ import TruncatingTooltip from '@/components/shared/TruncatingTooltip.vue'
 
 const props = defineProps({
   vehicleLine: { type: String, default: '' },
+  /** Configured vehicle list price, always gross (catalog); net column uses toNet(). */
   vehicleBaseTotal: { type: Number, default: 0 },
   colourLabel: { type: String, default: '' },
   colourPriceDelta: { type: Number, default: 0 },
@@ -795,19 +936,22 @@ const props = defineProps({
   selectedEquipment: { type: Array, default: () => [] },
   showNetPrices: { type: Boolean, default: false },
   vatRatePercent: { type: Number, default: 0 },
+  /** Net or gross discount base: vehicle price minus active flat OEM promos (same as alignDiscount*). */
+  discountPairingBase: { type: Number, default: 0 },
   promos: { type: Array, required: true },
   promoSelection: { type: Object, required: true },
   disabledPromoIds: { type: Array, default: () => [] },
-  discountBaseGross: { type: Number, default: 0 },
   userCampaigns: { type: Array, default: () => [] },
   vatOptions: { type: Array, default: () => [] },
   userDiscounts: { type: Array, default: () => [] },
   userAccessoryLines: { type: Array, default: () => [] },
   userTradeInLines: { type: Array, default: () => [] },
+  userPurchaseMethods: { type: Array, default: () => [] },
+  selectedPurchaseMethodIds: { type: Array, default: () => [] },
   taxExtraCostLines: { type: Array, required: true },
   vatAmount: { type: Number, default: 0 },
-  purchaseMethods: { type: Array, required: true },
-  selectedPurchaseMethodId: { type: String, default: '' },
+  quotationNotes: { type: String, default: '' },
+  quotationOfferValidUntil: { type: String, default: '' },
 })
 
 const emit = defineEmits([
@@ -827,11 +971,23 @@ const emit = defineEmits([
   'update-campaign-vat',
   'remove-campaign',
   'toggle-campaign-active',
-  'select-purchase-method',
+  'add-purchase-method',
+  'replace-purchase-method',
+  'remove-purchase-method',
+  'toggle-purchase-method-selected',
   'add-tax-line',
   'remove-tax-line',
   'update-tax-line',
+  'update:quotationNotes',
+  'update:quotationOfferValidUntil',
 ])
+
+const { t } = useI18n()
+
+const quotationNotesModel = computed({
+  get: () => props.quotationNotes,
+  set: (v) => emit('update:quotationNotes', String(v ?? '')),
+})
 
 const collapsibleSectionTitleClass = 'text-base font-semibold'
 
@@ -840,6 +996,14 @@ const vatSelectLabel = computed(() => {
   if (!Number.isFinite(p) || p <= 0) return '0% VAT'
   const label = Number.isInteger(p) ? String(p) : p.toLocaleString(undefined, { maximumFractionDigits: 2 })
   return `${label}% VAT`
+})
+
+/** Full vehicle list base for dealer campaign %/amount pairing (matches composable alignCampaignFrom*). */
+const campaignPairedVehicleListBase = computed(() => {
+  const g = Number(props.vehicleBaseTotal)
+  if (!Number.isFinite(g) || g <= 0) return 0
+  if (props.showNetPrices) return toNet(g)
+  return g
 })
 
 const discountVatSelectOptions = computed(() =>
@@ -887,6 +1051,64 @@ watch(hasUserTradeInLines, (next, prev) => {
   if (!next) open.tradeIn = false
   else if (next && !prev) open.tradeIn = true
 })
+
+const hasUserPurchaseMethods = computed(() => props.userPurchaseMethods.length > 0)
+
+watch(hasUserPurchaseMethods, (next, prev) => {
+  if (!next) open.purchaseMethod = false
+  else if (next && !prev) open.purchaseMethod = true
+})
+
+const selectedPurchaseMethodIdSet = computed(
+  () => new Set((props.selectedPurchaseMethodIds || []).map(String)),
+)
+
+const purchaseMethodModalOpen = ref(false)
+const purchaseMethodModalMode = ref('add')
+const purchaseMethodEditId = ref('')
+const purchaseMethodModalInitial = ref({})
+const purchaseMethodDeleteId = ref('')
+
+function openPurchaseMethodAdd() {
+  purchaseMethodModalMode.value = 'add'
+  purchaseMethodEditId.value = ''
+  purchaseMethodModalInitial.value = {}
+  purchaseMethodModalOpen.value = true
+}
+
+function openPurchaseMethodEdit(row) {
+  purchaseMethodModalMode.value = 'edit'
+  purchaseMethodEditId.value = String(row?.id || '')
+  purchaseMethodModalInitial.value = { ...row }
+  purchaseMethodModalOpen.value = true
+}
+
+function onPurchaseMethodModalSave(row) {
+  if (purchaseMethodModalMode.value === 'edit') {
+    emit('replace-purchase-method', row)
+  } else {
+    emit('add-purchase-method', row)
+  }
+}
+
+function requestDeletePurchaseMethod(id) {
+  purchaseMethodDeleteId.value = String(id || '')
+}
+
+function onPurchaseMethodDeleteOpenChange(isOpen) {
+  if (!isOpen) purchaseMethodDeleteId.value = ''
+}
+
+function confirmDeletePurchaseMethod() {
+  const id = purchaseMethodDeleteId.value
+  if (id) emit('remove-purchase-method', id)
+  purchaseMethodDeleteId.value = ''
+}
+
+function addPurchaseMethodFromSearch() {
+  openPurchaseMethodAdd()
+  openSection('purchaseMethod')
+}
 
 const sectionKeys = [
   'vehicleDetails',
@@ -1098,36 +1320,51 @@ function parseDecimalInput(raw) {
 }
 
 function discountPercentInputValue(d) {
-  const p = Math.abs(Number(d?.percent || 0))
-  if (!Number.isFinite(p) || p === 0) return '0'
-  return String(p)
+  const p = Number(d?.percent ?? 0)
+  if (Number.isFinite(p) && p !== 0) {
+    const rounded = Math.round(p * 100) / 100
+    return String(rounded)
+  }
+  const base = Number(props.discountPairingBase)
+  if (!Number.isFinite(base) || base <= 0) return '0'
+  let absAmt = 0
+  if (props.showNetPrices) {
+    absAmt = Math.abs(Number(d?.netAmount ?? d?.amount ?? 0))
+  } else {
+    absAmt = Math.abs(Number(d?.grossAmount ?? d?.amount ?? 0))
+  }
+  if (!Number.isFinite(absAmt) || absAmt === 0) return '0'
+  const derived = (absAmt / base) * 100
+  if (!Number.isFinite(derived) || derived === 0) return '0'
+  const rounded = Math.round(derived * 100) / 100
+  return String(-Math.abs(rounded))
 }
 
 function discountAmountInputValue(d) {
   const raw = props.showNetPrices
     ? Number(d?.netAmount ?? d?.amount ?? 0)
     : Number(d?.grossAmount ?? d?.amount ?? 0)
-  const abs = Math.abs(Number.isFinite(raw) ? raw : 0)
-  if (abs === 0) return '0'
-  return String(abs)
+  if (!Number.isFinite(raw) || raw === 0) return '0'
+  const rounded = Math.round(raw * 100) / 100
+  return rounded === 0 ? '0' : String(rounded)
 }
 
 function onDiscountPercentChange(id, raw) {
   const n = parseDecimalInput(raw)
-  if (!Number.isFinite(n) || n < 0) {
+  if (!Number.isFinite(n) || n === 0) {
     emit('update-discount', id, { percent: 0 })
     return
   }
-  emit('update-discount', id, { percent: n })
+  emit('update-discount', id, { percent: Math.abs(n) })
 }
 
 function onDiscountAmountChange(id, raw) {
   const n = parseDecimalInput(raw)
-  if (!Number.isFinite(n) || n < 0) {
+  if (!Number.isFinite(n) || n === 0) {
     emit('update-discount', id, { amount: 0 })
     return
   }
-  emit('update-discount', id, { amount: n })
+  emit('update-discount', id, { amount: Math.abs(n) })
 }
 
 function handleAddDiscount() {
@@ -1147,13 +1384,22 @@ function handleAddCampaign() {
   })
 }
 
+/** Gross list price of the configured vehicle (vehicleBaseTotal is always gross). */
+function vehicleListPriceGrossForPromo() {
+  const g = Number(props.vehicleBaseTotal)
+  return Number.isFinite(g) ? g : 0
+}
+
 function oemPercentForPromo(promo) {
   const p = promo
   if (!p) return 0
   if (p.discountType === 'percent') return -Math.abs(Number(p.discountPercent))
-  const base = Number(props.discountBaseGross)
-  const amt = Math.abs(Number(p.amount || 0))
-  if (!Number.isFinite(amt) || amt === 0 || !Number.isFinite(base) || base <= 0) return 0
+  const baseGross = Number(props.vehicleBaseTotal)
+  const base = props.showNetPrices ? toNet(baseGross) : baseGross
+  const grossAmt = Math.abs(Number(p.amount || 0))
+  const amt = props.showNetPrices ? toNet(grossAmt) : grossAmt
+  if (!Number.isFinite(amt) || amt === 0) return 0
+  if (!Number.isFinite(base) || base <= 0) return Number.NaN
   return -(amt / base) * 100
 }
 
@@ -1161,7 +1407,7 @@ function oemAmountGrossForPromo(promo) {
   const p = promo
   if (!p) return 0
   if (p.discountType === 'percent') {
-    const base = Number(props.discountBaseGross)
+    const base = vehicleListPriceGrossForPromo()
     const pct = Math.abs(Number(p.discountPercent))
     if (!Number.isFinite(base) || base <= 0 || !Number.isFinite(pct)) return 0
     return -Math.abs((base * pct) / 100)
@@ -1194,5 +1440,12 @@ function formatCurrency(value) {
   return `${n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}€`
 }
 
-defineExpose({ openSection, addDiscountFromSearch, addCampaignFromSearch, addAccessoryFromSearch, addTradeInFromSearch })
+defineExpose({
+  openSection,
+  addDiscountFromSearch,
+  addCampaignFromSearch,
+  addAccessoryFromSearch,
+  addTradeInFromSearch,
+  addPurchaseMethodFromSearch,
+})
 </script>

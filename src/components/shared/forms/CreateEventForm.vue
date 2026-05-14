@@ -31,11 +31,12 @@
     <div class="grid grid-cols-2 gap-4">
       <div>
         <label class="block label-upper mb-2">Date</label>
-        <input
+        <MiniCalendarDateField
           v-model="localEvent.date"
-          type="date"
-          class="input"
-        >
+          aria-label="Event date"
+          group-class="rounded-md"
+          input-class="min-w-0"
+        />
       </div>
       <div>
         <label class="block label-upper mb-2">Time</label>
@@ -125,6 +126,7 @@ import {
 } from '@motork/component-library/future/primitives'
 import { useUserStore } from '@/stores/user'
 import { useUsersStore } from '@/stores/users'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
 
 const props = defineProps({
   customer: {

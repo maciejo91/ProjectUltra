@@ -209,7 +209,7 @@
                 <Input
                   v-model="itemSearchQuery"
                   type="text"
-                  placeholder="Search items..."
+                  placeholder="Search..."
                   class="w-full pl-9 bg-background border-border"
                 />
               </template>
@@ -276,7 +276,7 @@
                   :model-value="configurator.selectedVersionId.value"
                   :versions="filteredVersions"
                   :base-price="configuredModelBasePrice"
-                  :show-net-prices="showNetPrices"
+                  :show-net-prices="showNetPrices === true"
                   :vat-rate-percent="currentVatRate"
                   @update:model-value="onVersionPicked"
                 />
@@ -285,7 +285,7 @@
                   :exterior-id="configurator.selectedColourId.value"
                   :interior-id="configurator.selectedInteriorColourId.value"
                   :colours="filteredColours"
-                  :show-net-prices="showNetPrices"
+                  :show-net-prices="showNetPrices === true"
                   :vat-rate-percent="currentVatRate"
                   @update:exterior-id="onExteriorColourPicked"
                   @update:interior-id="onInteriorColourPicked"
@@ -296,7 +296,7 @@
                   :selection="configurator.equipmentSelection"
                   :locked-ids="configurator.lockedEquipmentIds.value"
                   :groups="EQUIPMENT_GROUPS"
-                  :show-net-prices="showNetPrices"
+                  :show-net-prices="showNetPrices === true"
                   :vat-rate-percent="currentVatRate"
                   :show-standard-equipment="showStandardEquipment"
                   @update:show-standard-equipment="(v) => (showStandardEquipment = v === true)"
@@ -306,27 +306,29 @@
                   v-else
                   ref="quotationPanelRef"
                   :vehicle-line="quotationVehicleLine"
-                  :vehicle-base-total="configurator.vehicleBasePrice.value"
+                  :vehicle-base-total="configurator.vehicleBasePriceGross.value"
                   :colour-label="configurator.selectedColour.value?.name || ''"
                   :colour-price-delta="configurator.colourPriceDelta.value"
                   :interior-colour-label="configurator.selectedInteriorColour.value?.name || ''"
                   :interior-colour-price-delta="configurator.interiorColourPriceDelta.value"
                   :selected-equipment="configurator.selectedEquipment.value"
-                  :show-net-prices="showNetPrices"
+                  :show-net-prices="showNetPrices === true"
                   :vat-rate-percent="currentVatRate"
+                  :discount-pairing-base="showNetPrices ? configurator.discountBaseNet.value : configurator.discountBaseGross.value"
                   :promos="configurator.catalog.PROMOS"
                   :promo-selection="configurator.promoSelection"
                   :disabled-promo-ids="configurator.disabledPromoIds.value"
-                  :discount-base-gross="configurator.discountBaseGross.value"
                   :user-campaigns="configurator.userCampaigns.value"
                   :vat-options="VAT_OPTIONS"
                   :user-discounts="configurator.userDiscounts.value"
                   :user-accessory-lines="configurator.userAccessoryLines.value"
+                  :user-trade-in-lines="configurator.userTradeInLines.value"
                   :tax-extra-cost-lines="configurator.extraCostLines.value"
                   :vat-amount="configurator.vatAmount.value"
-                  :user-trade-in-lines="configurator.userTradeInLines.value"
-                  :purchase-methods="configurator.catalog.PURCHASE_METHODS"
-                  :selected-purchase-method-id="configurator.selectedPurchaseMethodId.value"
+                  :user-purchase-methods="configurator.userPurchaseMethods.value"
+                  :selected-purchase-method-ids="configurator.selectedPurchaseMethodIds.value"
+                  :quotation-notes="configurator.quotationNotes.value"
+                  :quotation-offer-valid-until="configurator.quotationOfferValidUntil.value"
                   @toggle-promo="(id, v) => configurator.togglePromo(id, v)"
                   @add-campaign="(c) => configurator.addCampaign(c)"
                   @update-campaign="(id, patch) => configurator.updateCampaign(id, patch)"
@@ -343,10 +345,15 @@
                   @add-trade-in-line="(p) => configurator.addTradeInLine(p)"
                   @update-trade-in-line="(id, patch) => configurator.updateTradeInLine(id, patch)"
                   @remove-trade-in-line="(id) => configurator.removeTradeInLine(id)"
-                  @select-purchase-method="(id) => configurator.selectPurchaseMethod(id)"
+                  @add-purchase-method="(row) => configurator.addPurchaseMethod(row)"
+                  @replace-purchase-method="(row) => configurator.replacePurchaseMethod(row)"
+                  @remove-purchase-method="(id) => configurator.removePurchaseMethod(id)"
+                  @toggle-purchase-method-selected="(id, v) => configurator.togglePurchaseMethodSelected(id, v)"
                   @add-tax-line="configurator.addTaxExtraCostLine"
                   @remove-tax-line="(id) => configurator.removeTaxExtraCostLine(id)"
                   @update-tax-line="(id, patch) => configurator.updateTaxExtraCostLine(id, patch)"
+                  @update:quotation-notes="(v) => (configurator.quotationNotes.value = String(v ?? ''))"
+                  @update:quotation-offer-valid-until="(v) => (configurator.quotationOfferValidUntil.value = String(v ?? ''))"
                 />
               </div>
 
@@ -359,17 +366,22 @@
                   :interior-colour-name="configurator.selectedInteriorColour.value?.name || ''"
                   :colour-hex="configurator.selectedColour.value?.hex || ''"
                   :configured-image-url="configurator.configuredImageUrl.value"
-                  :vehicle-base-price="configurator.vehicleBasePrice.value"
+                  :vehicle-display-price="offerSummaryVehicleDisplayPrice"
                   :equipment-total="configurator.equipmentTotal.value"
                   :accessories-total="configurator.accessoriesTotal.value"
                   :promo-total="configurator.offerSummaryPromoTotal.value"
                   :discounts-total="configurator.discountsTotal.value"
                   :subtotal="configurator.offerSummarySubtotalBeforeAccessories.value"
-                  :taxes-total="configurator.taxesTotal.value"
+                  :taxes-total="configurator.extraCostsLinesTotalGross.value"
+                  :taxes-total-net="offerSummaryTaxesAndExtraCostsNet"
                   :trade-in-value="configurator.tradeInValue.value"
                   :grand-total-raw="configurator.grandTotalRaw.value"
                   :grand-total="configurator.grandTotal.value"
-                  :show-net-prices="showNetPrices"
+                  :offer-summary-tax-breakdown-net="configurator.offerSummaryTaxBreakdownNet.value"
+                  :offer-summary-tax-breakdown-vat="configurator.offerSummaryTaxBreakdownVat.value"
+                  :offer-summary-tax-breakdown-gross="configurator.offerSummaryTaxBreakdownGross.value"
+                  :vat-rate-percent="currentVatRate"
+                  :show-net-prices="showNetPrices === true"
                   :round-price-applied="configurator.roundPriceApplied.value"
                   :round-price-adjustment="configurator.roundPriceAdjustment.value"
                   @toggle-round-price="configurator.toggleRoundPrice()"
@@ -457,7 +469,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ArrowLeft, Check, ChevronDown, Search, X } from 'lucide-vue-next'
 import { Badge, Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Input, Switch, TooltipProvider } from '@motork/component-library/future/primitives'
 import AppTabs from '@/components/shared/AppTabs.vue'
@@ -469,33 +481,29 @@ import ConfigurationSummary from '@/components/addnew/configurator/Configuration
 import TruncatingTooltip from '@/components/shared/TruncatingTooltip.vue'
 import PromoBadge from '@/components/shared/PromoBadge.vue'
 import { useVehicleConfigurator } from '@/composables/useVehicleConfigurator'
+import { useQuotationItemSearch } from '@/composables/useQuotationItemSearch'
 import {
-  ACCESSORY_LINE_ITEMS,
-  CAMPAIGN_ITEMS,
   DEFAULT_VAT_OPTION_ID,
-  DISCOUNT_ITEMS,
   EQUIPMENT_GROUPS,
   VAT_OPTIONS,
-  findAccessory,
-  findAccessoryLineItem,
-  findCampaignItem,
-  findDiscountItem,
   findPromo,
 } from '@/constants/vehicleConfiguratorCatalog'
 
 const props = defineProps({
-  open: { type: Boolean, default: false }
+  open: { type: Boolean, default: false },
+  /** When set while opening, restores step 3 + quotation snapshot (edit-from-card flow). */
+  resumeDraft: { type: Object, default: null },
 })
 
-const emit = defineEmits(['update:open', 'save'])
+const emit = defineEmits(['update:open', 'save', 'resume-draft-consumed'])
+
+const STEP_THREE_TAB_KEYS = new Set(['version', 'colour', 'equipment', 'quotation'])
 
 const step = ref(1)
 const selectedBrand = ref('')
 const selectedModel = ref('')
 
 const quotationPanelRef = ref(null)
-const quotationSearchOpen = ref(false)
-const quotationSearchQuery = ref('')
 
 const isMac = computed(() => {
   if (typeof navigator === 'undefined') return true
@@ -504,10 +512,6 @@ const isMac = computed(() => {
 })
 
 const keyboardShortcutLabel = computed(() => (isMac.value ? '⌘K' : 'Ctrl+K'))
-
-function openQuotationSearch() {
-  quotationSearchOpen.value = true
-}
 
 function onGlobalKeydown(e) {
   if (!props.open) return
@@ -530,210 +534,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onGlobalKeydown)
 })
-
-const quotationSearchItems = computed(() => {
-  const out = []
-
-  const promos = Array.isArray(configurator?.catalog?.PROMOS) ? configurator.catalog.PROMOS : []
-  for (const p of promos) {
-    if (!p) continue
-    out.push({
-      key: `promo:${p.id ?? p.label}`,
-      label: String(p.label ?? '').trim(),
-      groupKey: 'promoCampaigns',
-      groupLabel: 'Promo and campaigns',
-    })
-  }
-
-  const discounts = Array.isArray(configurator?.userDiscounts?.value) ? configurator.userDiscounts.value : []
-  for (const d of discounts) {
-    if (!d) continue
-    out.push({
-      key: `discount:${d.id ?? d.label}`,
-      label: String(d.label ?? 'Discount').trim(),
-      groupKey: 'discounts',
-      groupLabel: 'Discount',
-    })
-  }
-
-  for (const item of DISCOUNT_ITEMS) {
-    if (!item) continue
-    out.push({
-      key: `discountItem:${item.id ?? item.label}`,
-      label: String(item.label ?? '').trim(),
-      groupKey: 'discounts',
-      groupLabel: 'Discount',
-    })
-  }
-
-  for (const item of CAMPAIGN_ITEMS) {
-    if (!item) continue
-    out.push({
-      key: `campaignItem:${item.id ?? item.label}`,
-      label: String(item.label ?? '').trim(),
-      groupKey: 'promoCampaigns',
-      groupLabel: 'Promo and campaigns',
-    })
-  }
-
-  for (const item of ACCESSORY_LINE_ITEMS) {
-    if (!item) continue
-    out.push({
-      key: `accessoryItem:${item.id}`,
-      label: String(item.name ?? '').trim(),
-      groupKey: 'accessories',
-      groupLabel: 'Accessories and services',
-    })
-  }
-
-  const userAccessoryLines = Array.isArray(configurator?.userAccessoryLines?.value)
-    ? configurator.userAccessoryLines.value
-    : []
-  for (const row of userAccessoryLines) {
-    if (!row) continue
-    const label = String(row.description || '').trim()
-    if (!label) continue
-    out.push({
-      key: `accessoryLine:${row.id}`,
-      label,
-      groupKey: 'accessories',
-      groupLabel: 'Accessories and services',
-    })
-  }
-
-  const accessories = Array.isArray(configurator?.catalog?.ACCESSORIES) ? configurator.catalog.ACCESSORIES : []
-  for (const a of accessories) {
-    if (!a) continue
-    out.push({
-      key: `accessory:${a.id ?? a.name}`,
-      label: String(a.name ?? '').trim(),
-      groupKey: 'accessories',
-      groupLabel: 'Accessories and services',
-    })
-  }
-
-  const purchaseMethods = Array.isArray(configurator?.catalog?.PURCHASE_METHODS)
-    ? configurator.catalog.PURCHASE_METHODS
-    : []
-  for (const m of purchaseMethods) {
-    if (!m) continue
-    out.push({
-      key: `purchaseMethod:${m.id ?? m.label}`,
-      label: String(m.label ?? '').trim(),
-      groupKey: 'purchaseMethod',
-      groupLabel: 'Purchase method',
-    })
-  }
-
-  const vatRate = Number(configurator?.catalog?.TAXES?.vatRatePercent)
-  if (Number.isFinite(vatRate)) {
-    out.push({
-      key: 'tax:vat',
-      label: `VAT (${vatRate}%)`,
-      groupKey: 'taxes',
-      groupLabel: 'Taxes and extra costs',
-    })
-  }
-
-  const taxLines = configurator?.extraCostLines?.value
-  if (Array.isArray(taxLines)) {
-    for (const line of taxLines) {
-      if (!line) continue
-      const label = String(line.description || '').trim()
-      if (!label) continue
-      out.push({
-        key: `taxLine:${line.id}`,
-        label,
-        groupKey: 'taxes',
-        groupLabel: 'Taxes and extra costs',
-      })
-    }
-  }
-
-  out.push({
-    key: 'tradeIn:add',
-    label: 'Trade-in vehicle',
-    groupKey: 'tradeIn',
-    groupLabel: 'Trade-in',
-  })
-
-  const userTradeInLines = Array.isArray(configurator?.userTradeInLines?.value)
-    ? configurator.userTradeInLines.value
-    : []
-  for (const row of userTradeInLines) {
-    if (!row) continue
-    const label = String(row.title || '').trim() || 'Trade-in'
-    out.push({
-      key: `tradeInLine:${row.id}`,
-      label,
-      groupKey: 'tradeIn',
-      groupLabel: 'Trade-in',
-    })
-  }
-
-  return out.filter((i) => i.label)
-})
-
-const filteredQuotationSearchItems = computed(() => {
-  const q = quotationSearchQuery.value.trim().toLowerCase()
-  const list = quotationSearchItems.value
-  if (!q) return list
-  return list.filter((i) => i.label.toLowerCase().includes(q))
-})
-
-function selectQuotationSearchItem(item) {
-  if (!item) return
-  quotationSearchOpen.value = false
-  quotationSearchQuery.value = ''
-  const key = String(item.key || '')
-  if (item.groupKey === 'discounts' && key.startsWith('discountItem:')) {
-    const id = key.slice('discountItem:'.length)
-    const discount = findDiscountItem(id)
-    const percent = Number(discount?.percent)
-    quotationPanelRef.value?.addDiscountFromSearch?.({
-      description: String(item.label || '').trim(),
-      percent: Number.isFinite(percent) ? percent : -2,
-    })
-    return
-  }
-  if (item.groupKey === 'promoCampaigns' && key.startsWith('campaignItem:')) {
-    const id = key.slice('campaignItem:'.length)
-    const tpl = findCampaignItem(id)
-    quotationPanelRef.value?.addCampaignFromSearch?.({
-      description: String(item.label || '').trim(),
-      percent: Number(tpl?.percent) || 0,
-      amount: Number(tpl?.amount) || 0,
-    })
-    return
-  }
-  if (item.groupKey === 'accessories' && key.startsWith('accessoryItem:')) {
-    const id = key.slice('accessoryItem:'.length)
-    const tpl = findAccessoryLineItem(id)
-    quotationPanelRef.value?.addAccessoryFromSearch?.({
-      description: String(tpl?.name || item.label || '').trim(),
-      price: Number(tpl?.price) || 0,
-    })
-    return
-  }
-  if (item.groupKey === 'accessories' && key.startsWith('accessory:')) {
-    const id = key.slice('accessory:'.length)
-    const acc = findAccessory(id)
-    quotationPanelRef.value?.addAccessoryFromSearch?.({
-      description: String(acc?.name || item.label || '').trim(),
-      price: Math.max(0, Number(acc?.price) || 0),
-    })
-    return
-  }
-  if (item.groupKey === 'tradeIn' && key === 'tradeIn:add') {
-    quotationPanelRef.value?.addTradeInFromSearch?.({})
-    return
-  }
-  if (item.groupKey === 'tradeIn' && key.startsWith('tradeInLine:')) {
-    quotationPanelRef.value?.openSection?.('tradeIn')
-    return
-  }
-  quotationPanelRef.value?.openSection?.(item.groupKey)
-}
 
 const brands = [
   {
@@ -889,6 +689,26 @@ const configurator = useVehicleConfigurator({
   showNetPrices,
 })
 
+const offerSummaryTaxesAndExtraCostsNet = computed(() =>
+  configurator.extraCostLines.value.reduce(
+    (sum, row) => sum + Math.max(0, Number(row.netAmount || 0)),
+    0,
+  ),
+)
+
+const offerSummaryVehicleDisplayPrice = computed(() =>
+  showNetPrices.value ? configurator.vehicleBasePriceNet.value : configurator.vehicleBasePriceGross.value,
+)
+
+const {
+  quotationSearchOpen,
+  quotationSearchQuery,
+  quotationSearchItems,
+  filteredQuotationSearchItems,
+  selectQuotationSearchItem,
+  openQuotationSearch,
+} = useQuotationItemSearch(configurator, quotationPanelRef)
+
 const quotationVehicleLine = computed(() => {
   const base = [configuredBrandLabel.value, configuredModelTitle.value].filter(Boolean).join(' ')
   const versionName = configurator.selectedVersion.value?.name || ''
@@ -1032,9 +852,49 @@ function backToBrandSelection() {
   brandLogoFailed.value = {}
 }
 
+function buildResumeDraft() {
+  return {
+    brandId: selectedBrand.value,
+    modelId: selectedModel.value,
+    showNetPrices: showNetPrices.value === true,
+    selectedVatId: selectedVatId.value,
+    showStandardEquipment: showStandardEquipment.value === true,
+    activeTab: activeTab.value,
+    itemSearchQuery: itemSearchQuery.value,
+    configuratorSnapshot: configurator.captureSnapshot(),
+  }
+}
+
+function applyResumeDraft(draft) {
+  const snapshot = draft?.configuratorSnapshot
+  if (!snapshot || typeof snapshot !== 'object') return
+
+  selectedBrand.value = String(draft.brandId || '')
+  selectedModel.value = String(draft.modelId || '')
+  step.value = 3
+
+  showNetPrices.value = draft.showNetPrices === true
+
+  const vatId = String(draft.selectedVatId || '')
+  selectedVatId.value = VAT_OPTIONS.some((o) => o.id === vatId) ? vatId : DEFAULT_VAT_OPTION_ID
+
+  showStandardEquipment.value = draft.showStandardEquipment !== false
+
+  itemSearchQuery.value = String(draft.itemSearchQuery || '')
+  modelSearchQuery.value = ''
+
+  brandLogoFailed.value = {}
+  logoRenderKey.value += 1
+
+  configurator.applySnapshot(snapshot)
+
+  const tab = String(draft.activeTab || 'version')
+  activeTab.value = STEP_THREE_TAB_KEYS.has(tab) ? tab : 'version'
+}
+
 function handleSaveAndClose() {
   if (!configurator.isReadyToSave.value) return
-  emit('save', { ...configurator.payload.value })
+  emit('save', { ...configurator.payload.value, resumeDraft: buildResumeDraft() })
   handleOpenChange(false)
 }
 
@@ -1048,6 +908,17 @@ watch(
     }
     resetState()
   }
+)
+
+watch(
+  () => [props.open, props.resumeDraft],
+  async ([opened, draft]) => {
+    if (!opened || !draft?.configuratorSnapshot) return
+    await nextTick()
+    applyResumeDraft(draft)
+    emit('resume-draft-consumed')
+  },
+  { flush: 'post' }
 )
 
 watch(

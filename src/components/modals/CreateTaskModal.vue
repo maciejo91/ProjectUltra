@@ -57,10 +57,12 @@
 
           <div class="space-y-2">
             <Label class="text-sm font-semibold uppercase text-muted-foreground">Due date</Label>
-            <Input
+            <MiniCalendarDateField
               v-model="dueDate"
-              type="date"
-              class="w-full h-10 min-h-10 bg-background"
+              aria-label="Task due date"
+              group-class="rounded-md"
+              input-class="min-w-0"
+              popover-content-class="z-[110]"
             />
           </div>
         </div>
@@ -98,7 +100,6 @@ import {
 } from '@motork/component-library/future/primitives'
 import {
   Button,
-  Input,
   Label,
   Popover,
   PopoverContent,
@@ -109,6 +110,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '@motork/component-library/future/primitives'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 import AssigneeDropdownContent from '@/components/tasks/AssigneeDropdownContent.vue'
 import { getAllTaskTypes } from '@/utils/taskTypes'
 
@@ -166,12 +169,14 @@ function handleSave() {
   if (!isValid.value) return
   const assignee = selectedAssignee.value
   const initials = assignee?.initials ?? (assignee?.name || '').slice(0, 2).toUpperCase()
+  const dueRaw = String(dueDate.value || '').trim()
+  const dueIso = dueRaw ? normalizeMotorkDateFieldToIso(dueRaw) || dueRaw : ''
   emit('save', {
     taskCode: taskCode.value,
     taskName: selectedTaskName.value,
     assignee: assignee.name,
     assigneeInitials: initials,
-    dueDate: dueDate.value
+    dueDate: dueIso
   })
 }
 

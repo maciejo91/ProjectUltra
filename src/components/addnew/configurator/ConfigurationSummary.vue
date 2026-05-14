@@ -5,22 +5,41 @@
         class="inline-flex w-fit shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-sm font-normal leading-5 text-foreground"
         :class="conditionBadgeClass"
       >
-        {{ CONDITION_LABEL }}
+        {{ conditionBadgeLabel }}
       </span>
       <div>
         <p class="text-base leading-none font-semibold text-foreground">{{ brandLabel }}</p>
         <p class="text-base font-semibold text-foreground">{{ modelTitle }}</p>
-        <p v-if="versionName" class="text-sm text-muted-foreground">{{ versionName }}</p>
-        <p v-else class="text-sm text-muted-foreground italic">Select a version</p>
-        <div class="flex items-center gap-2 pt-2 text-sm text-muted-foreground">
-          <span
-            class="size-3 rounded-full border border-border"
-            :style="colourSwatchStyle"
-            aria-hidden="true"
-          />
-          <span v-if="colourName">{{ colourName }}</span>
-          <span v-else class="italic">Select a colour</span>
-        </div>
+        <template v-if="hideVersionColourSection">
+          <p v-if="versionName" class="text-sm text-muted-foreground pt-0.5">{{ versionName }}</p>
+          <div v-if="plateLabel || vinLabel" class="flex min-w-0 flex-wrap items-center gap-2 pt-2">
+            <span
+              v-if="plateLabel"
+              class="inline-flex max-w-full items-center gap-1 overflow-hidden rounded-sm border border-border bg-background px-2 py-0.5 text-sm text-muted-foreground"
+            >
+              {{ plateLabel }}
+            </span>
+            <span
+              v-if="vinLabel"
+              class="inline-flex min-w-0 max-w-full items-center overflow-hidden rounded-sm border border-border bg-background px-2 py-0.5 font-mono text-sm text-muted-foreground"
+            >
+              <span class="truncate">{{ vinLabel }}</span>
+            </span>
+          </div>
+        </template>
+        <template v-else>
+          <p v-if="versionName" class="text-sm text-muted-foreground">{{ versionName }}</p>
+          <p v-else class="text-sm text-muted-foreground italic">Select a version</p>
+          <div class="flex items-center gap-2 pt-2 text-sm text-muted-foreground">
+            <span
+              class="size-3 rounded-full border border-border"
+              :style="colourSwatchStyle"
+              aria-hidden="true"
+            />
+            <span v-if="colourName">{{ colourName }}</span>
+            <span v-else class="italic">Select a colour</span>
+          </div>
+        </template>
       </div>
     </div>
 
@@ -42,7 +61,7 @@
       <div class="space-y-2 text-sm">
         <div class="flex items-center justify-between">
           <span class="text-muted-foreground">Vehicle</span>
-          <span class="text-foreground">{{ formatCurrency(vehicleBasePrice) }}</span>
+          <span class="text-foreground">{{ formatCurrency(vehicleDisplayPrice) }}</span>
         </div>
         <div v-if="equipmentTotal > 0" class="flex items-center justify-between">
           <span class="text-muted-foreground">Equipment</span>
@@ -74,8 +93,30 @@
           :class="accessoriesTotal <= 0 ? 'border-t border-border pt-2 mt-2' : ''"
         >
           <span class="text-muted-foreground">Taxes and extra costs</span>
-          <span class="text-foreground">{{ formatCurrency(taxesTotal) }}</span>
+          <span class="text-foreground">{{ formatCurrency(taxesRowDisplay) }}</span>
         </div>
+        <template v-if="isNetPricesView">
+          <div class="flex items-center justify-between">
+            <span class="text-muted-foreground">{{
+              t('forms.addNew.leadDetails.vehicle.quotation.offerSummaryTaxBreakdownTotalNet')
+            }}</span>
+            <span class="text-foreground">{{ formatCurrency(offerSummaryTaxBreakdownNet) }}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-muted-foreground">{{
+              t('forms.addNew.leadDetails.vehicle.quotation.offerSummaryTaxBreakdownTotalVat', {
+                percent: vatPercentLabel,
+              })
+            }}</span>
+            <span class="text-foreground">{{ formatCurrency(offerSummaryTaxBreakdownVat) }}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-muted-foreground">{{
+              t('forms.addNew.leadDetails.vehicle.quotation.offerSummaryTaxBreakdownTotalGross')
+            }}</span>
+            <span class="text-foreground">{{ formatCurrency(offerSummaryTaxBreakdownGross) }}</span>
+          </div>
+        </template>
         <div v-if="tradeInValue > 0" class="flex items-center justify-between">
           <span class="text-muted-foreground">Trade-in</span>
           <span class="text-foreground">- {{ formatCurrency(tradeInValue) }}</span>
@@ -88,7 +129,9 @@
           <span class="text-foreground">Grand total</span>
           <span class="flex flex-col items-end text-foreground">
             <span>{{ formatCurrency(grandTotal) }}</span>
-            <span class="text-sm font-normal text-muted-foreground">{{ vatSummaryLabel }}</span>
+            <span class="text-sm font-normal text-muted-foreground">{{
+              t('forms.addNew.leadDetails.vehicle.quotation.offerSummaryGrandTotalVatIncl')
+            }}</span>
           </span>
         </div>
 
@@ -142,7 +185,9 @@
 
           <span class="flex flex-col items-end text-base font-semibold text-foreground">
             <span>{{ formatCurrency(grandTotal) }}</span>
-            <span class="text-sm font-normal text-muted-foreground">{{ vatSummaryLabel }}</span>
+            <span class="text-sm font-normal text-muted-foreground">{{
+              t('forms.addNew.leadDetails.vehicle.quotation.offerSummaryGrandTotalVatIncl')
+            }}</span>
           </span>
         </div>
       </div>
@@ -152,9 +197,12 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ArrowDown, RotateCcw } from 'lucide-vue-next'
 import { Button, Input } from '@motork/component-library/future/primitives'
 import { getVehicleConditionBadgeClass } from '@/utils/vehicleHelpers'
+
+const { t } = useI18n()
 
 const props = defineProps({
   brandLabel: { type: String, default: '' },
@@ -164,26 +212,61 @@ const props = defineProps({
   interiorColourName: { type: String, default: '' },
   colourHex: { type: String, default: '' },
   configuredImageUrl: { type: String, default: '' },
-  vehicleBasePrice: { type: Number, default: 0 },
+  /** Vehicle row amount: net when showNetPrices, gross otherwise (single source for offer summary row 1). */
+  vehicleDisplayPrice: { type: Number, default: 0 },
   equipmentTotal: { type: Number, default: 0 },
   accessoriesTotal: { type: Number, default: 0 },
   promoTotal: { type: Number, default: 0 },
   discountsTotal: { type: Number, default: 0 },
   subtotal: { type: Number, default: 0 },
+  /** Gross sum for “Taxes and extra costs” when Show net prices is off. */
   taxesTotal: { type: Number, default: 0 },
+  /** Net sum of extra-cost lines when Show net prices is on. */
+  taxesTotalNet: { type: Number, default: 0 },
   tradeInValue: { type: Number, default: 0 },
   grandTotalRaw: { type: Number, default: 0 },
   grandTotal: { type: Number, default: 0 },
+  offerSummaryTaxBreakdownNet: { type: Number, default: 0 },
+  offerSummaryTaxBreakdownVat: { type: Number, default: 0 },
+  offerSummaryTaxBreakdownGross: { type: Number, default: 0 },
+  /** VAT % for “Total VAT (x%)” label (modal catalog rate). */
+  vatRatePercent: { type: Number, default: 0 },
   showNetPrices: { type: Boolean, default: false },
   roundPriceApplied: { type: Boolean, default: false },
   roundPriceAdjustment: { type: Number, default: 0 },
+  /** When set, overrides default factory-order “New” badge (e.g. inventory Used/New). */
+  conditionLabel: { type: String, default: '' },
+  /** Stock / simplified header: hide version + colour row; optional subtitle uses `versionName`; show plate/VIN chips. */
+  hideVersionColourSection: { type: Boolean, default: false },
+  plateLabel: { type: String, default: '' },
+  vinLabel: { type: String, default: '' },
 })
 
 const emit = defineEmits(['toggle-round-price', 'update-round-price-adjustment', 'reset-round-price'])
 
-const CONDITION_LABEL = 'New'
-const conditionBadgeClass = computed(() => getVehicleConditionBadgeClass(CONDITION_LABEL))
-const vatSummaryLabel = computed(() => (props.showNetPrices ? 'VAT excl.' : 'VAT incl.'))
+const conditionBadgeLabel = computed(() => {
+  const s = String(props.conditionLabel || '').trim()
+  return s || 'New'
+})
+const conditionBadgeClass = computed(() => getVehicleConditionBadgeClass(conditionBadgeLabel.value))
+
+/** Strict net view (boolean or rare string/number coercion from bindings). */
+const isNetPricesView = computed(() => {
+  const v = props.showNetPrices
+  return v === true || v === 1 || v === 'true' || v === '1'
+})
+
+const taxesRowDisplay = computed(() =>
+  isNetPricesView.value ? props.taxesTotalNet : props.taxesTotal,
+)
+
+const vatPercentLabel = computed(() => {
+  const n = Number(props.vatRatePercent)
+  if (!Number.isFinite(n) || n <= 0) return '0'
+  const rounded = Math.round(n * 100) / 100
+  if (Math.abs(rounded - Math.round(rounded)) < 1e-9) return String(Math.round(rounded))
+  return String(rounded)
+})
 const roundPriceAdjustmentInput = ref(formatAdjustmentInput(props.roundPriceAdjustment))
 
 const colourSwatchStyle = computed(() => {

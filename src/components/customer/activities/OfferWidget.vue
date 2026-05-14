@@ -647,9 +647,11 @@
           <!-- Expiration Date -->
           <div>
             <Label class="text-sm font-medium text-muted-foreground mb-1">Offer Expiration Date</Label>
-            <Input 
-              type="date"
-              v-model="offerData.expirationDate" 
+            <MiniCalendarDateField
+              v-model="offerData.expirationDate"
+              aria-label="Offer expiration date"
+              group-class="rounded-md"
+              input-class="min-w-0"
             />
           </div>
           
@@ -714,6 +716,8 @@ import {
   Select, SelectTrigger, SelectContent, SelectItem, SelectValue 
 } from '@motork/component-library/future/primitives'
 import VehicleSelectionInline from '@/components/shared/VehicleSelectionInline.vue'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 
 const opportunitiesStore = useOpportunitiesStore()
 
@@ -929,7 +933,7 @@ const offerData = ref({
     notes: ''
   },
   paymentMethods: [],
-  expirationDate: null,
+  expirationDate: '',
   
   // Pool references
   selectedTradeInId: null,
@@ -1095,7 +1099,7 @@ onMounted(() => {
         notes: ''
       },
       paymentMethods: props.item.data.paymentMethods || [],
-      expirationDate: props.item.data.expirationDate || null,
+      expirationDate: props.item.data.expirationDate || '',
       selectedTradeInId: props.item.data.selectedTradeInId || null,
       selectedTradeInLabel: props.item.data.selectedTradeInLabel || '',
       selectedFinancingId: props.item.data.selectedFinancingId || null,
@@ -1213,7 +1217,12 @@ const handleSave = () => {
       discounts: offerData.value.discounts,
       tradeIn: offerData.value.tradeIn,
       paymentMethods: offerData.value.paymentMethods,
-      expirationDate: offerData.value.expirationDate,
+      expirationDate: (() => {
+        const ex = offerData.value.expirationDate
+        if (ex == null || !String(ex).trim()) return null
+        const s = String(ex).trim()
+        return normalizeMotorkDateFieldToIso(s) || s
+      })(),
       grandTotal: grandTotal.value,
       
       // Pool references

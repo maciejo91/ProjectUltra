@@ -273,11 +273,27 @@
         "filterOwner": "Proprietario",
         "inventoryCustomerVehicles": "Veicolo cliente",
         "noVehicles": "Nessun veicolo corrisponde alla ricerca.",
-        "sectionVehicleRequested": "Veicolo richiesto",
-        "sectionVehicleInfo": "Informazioni veicolo",
+        "sectionVehicleRequested": "Veicolo della richiesta",
+        "sectionVehicleInfo": "Veicolo dell'offerta",
         "sectionOwnedVehicle": "Veicolo di proprietà",
         "configure": "Configura",
         "insertManually": "Inserisci manualmente",
+        "editConfiguredOffer": "Modifica offerta veicolo",
+        "editStockVehicle": "Cambia veicolo da stock",
+        "stockOfferModalTitle": "Creazione offerta",
+        "stockOfferDraftBadge": "Bozza",
+        "stockSearchSubtitle": "Scegli un veicolo dal magazzino.",
+        "stockStep1Subtitle": "Seleziona un veicolo dal magazzino.",
+        "stockStep2Subtitle": "Definisci i dettagli del preventivo.",
+        "stockStepVehicle": "Veicolo",
+        "stockStepQuotation": "Preventivo",
+        "stockBackToVehicles": "Torna ai veicoli",
+        "stockSaveAndClose": "Salva e chiudi",
+        "showNetPrices": "Mostra prezzi netti",
+        "quotationSearchItemsPlaceholder": "Cerca voci…",
+        "quotationSearchDialogTitle": "Cerca voci preventivo",
+        "quotationSearchDialogInputPlaceholder": "Digita il nome della voce…",
+        "quotationSearchNoItems": "Nessun risultato",
         "configurePlaceholder": "Le opzioni di configurazione saranno disponibili in un secondo momento.",
         "manualPlaceholder": "I dettagli veicolo manuali potranno essere aggiunti in un secondo momento.",
         "manual": {
@@ -297,6 +313,18 @@
             "selectModel": "Seleziona modello",
             "selectBrandFirst": "Seleziona prima una marca"
           }
+        },
+        "quotation": {
+          "additionalNotes": "Note aggiuntive",
+          "additionalNotesPlaceholder": "Scrivi qui le tue note",
+          "offerValidUntil": "L’offerta sarà valida fino al:",
+          "offerValidityDisclaimer": "Le promozioni incluse in questo preventivo possono scadere prima della data di validità dell’offerta indicata. Il prezzo è soggetto alla validità delle promozioni.",
+          "summaryAdditionalNotes": "Note aggiuntive",
+          "summaryOfferValidUntil": "Validità offerta",
+          "offerSummaryTaxBreakdownTotalNet": "Totale netto",
+          "offerSummaryTaxBreakdownTotalVat": "Totale IVA ({percent}%)",
+          "offerSummaryTaxBreakdownTotalGross": "Totale lordo (IVA incl.)",
+          "offerSummaryGrandTotalVatIncl": "IVA incl."
         }
       },
       "errors": {
@@ -309,7 +337,8 @@
         "serviceName": "Il servizio è obbligatorio",
         "serviceDescription": "La descrizione è obbligatoria",
         "servicePrice": "Il prezzo è obbligatorio",
-        "vehicle": "Le informazioni sul veicolo sono obbligatorie"
+        "vehicleRequest": "Il veicolo della richiesta è obbligatorio",
+        "vehicleOffer": "Il veicolo dell'offerta è obbligatorio"
       }
     }
   },

@@ -16,11 +16,13 @@
             <!-- Contract Date -->
             <div>
               <Label class="block text-sm font-medium text-muted-foreground mb-2">Contract Date <span class="text-red-600">*</span></Label>
-              <Input 
-                type="date"
+              <MiniCalendarDateField
                 v-model="contractDate"
-                :max="maxContractDateComputed"
-                class="w-full"
+                aria-label="Contract date"
+                group-class="rounded-md"
+                input-class="min-w-0"
+                popover-content-class="z-[110]"
+                :max-date="maxContractDateComputed"
               />
             </div>
             
@@ -77,6 +79,8 @@ import {
   Label,
   Textarea
 } from '@motork/component-library/future/primitives'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { formatMotorkDateFieldEu, normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 import {
   Dialog,
   DialogContent,
@@ -122,16 +126,17 @@ const canSubmit = computed(() => {
 // Reset form when modal opens
 watch(() => props.show, (newVal) => {
   if (newVal) {
-    // Default to today
+    // Default to today (Motork EU wire)
     const today = new Date()
-    contractDate.value = today.toISOString().split('T')[0]
+    today.setHours(0, 0, 0, 0)
+    contractDate.value = formatMotorkDateFieldEu(today)
     contractTime.value = today.toTimeString().slice(0, 5)
     notes.value = ''
     
     // If contract has existing date, use it
     if (props.contract?.contractDate) {
       const date = new Date(props.contract.contractDate)
-      contractDate.value = date.toISOString().split('T')[0]
+      contractDate.value = formatMotorkDateFieldEu(date)
       if (date.getHours() || date.getMinutes()) {
         const hours = String(date.getHours()).padStart(2, '0')
         const minutes = String(date.getMinutes()).padStart(2, '0')
@@ -146,11 +151,15 @@ watch(() => props.show, (newVal) => {
 
 const handleConfirm = () => {
   if (!contractDate.value) return
-  
+
+  const dateIso =
+    normalizeMotorkDateFieldToIso(String(contractDate.value).trim()) ||
+    String(contractDate.value).trim()
+
   // Combine date and time
-  const datetime = contractTime.value 
-    ? `${contractDate.value}T${contractTime.value}:00`
-    : `${contractDate.value}T12:00:00`
+  const datetime = contractTime.value
+    ? `${dateIso}T${contractTime.value}:00`
+    : `${dateIso}T12:00:00`
   
   emit('confirm', {
     contractDate: datetime,

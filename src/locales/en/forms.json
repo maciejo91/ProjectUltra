@@ -273,11 +273,27 @@
         "filterOwner": "Owner",
         "inventoryCustomerVehicles": "Customer vehicle",
         "noVehicles": "No vehicles match your search.",
-        "sectionVehicleRequested": "Requested vehicle",
-        "sectionVehicleInfo": "Vehicle information",
+        "sectionVehicleRequested": "Vehicle of the request",
+        "sectionVehicleInfo": "Vehicle of the offer",
         "sectionOwnedVehicle": "Owned vehicle",
         "configure": "Configure",
         "insertManually": "Insert manually",
+        "editConfiguredOffer": "Edit vehicle offer",
+        "editStockVehicle": "Change stock vehicle",
+        "stockOfferModalTitle": "Offer creation",
+        "stockOfferDraftBadge": "Draft",
+        "stockSearchSubtitle": "Pick a vehicle from inventory.",
+        "stockStep1Subtitle": "Select a vehicle from inventory.",
+        "stockStep2Subtitle": "Define the quotation details.",
+        "stockStepVehicle": "Vehicle",
+        "stockStepQuotation": "Quotation",
+        "stockBackToVehicles": "Back to vehicles",
+        "stockSaveAndClose": "Save and close",
+        "showNetPrices": "Show net prices",
+        "quotationSearchItemsPlaceholder": "Search items…",
+        "quotationSearchDialogTitle": "Search quotation items",
+        "quotationSearchDialogInputPlaceholder": "Type the item name…",
+        "quotationSearchNoItems": "No items found",
         "configurePlaceholder": "Configuration options will be available in a next iteration.",
         "manualPlaceholder": "You can add manual vehicle details here in a next iteration.",
         "manual": {
@@ -297,6 +313,18 @@
             "selectModel": "Select model",
             "selectBrandFirst": "Select a brand first"
           }
+        },
+        "quotation": {
+          "additionalNotes": "Additional notes",
+          "additionalNotesPlaceholder": "Type your notes here",
+          "offerValidUntil": "The offer will be valid until:",
+          "offerValidityDisclaimer": "Promotions included in this quote may expire earlier than the offer date shown. Price is subject to promotion validity.",
+          "summaryAdditionalNotes": "Additional notes",
+          "summaryOfferValidUntil": "Offer valid until",
+          "offerSummaryTaxBreakdownTotalNet": "Total net",
+          "offerSummaryTaxBreakdownTotalVat": "Total VAT ({percent}%)",
+          "offerSummaryTaxBreakdownTotalGross": "Total gross (VAT incl.)",
+          "offerSummaryGrandTotalVatIncl": "VAT incl."
         }
       },
       "errors": {
@@ -309,7 +337,8 @@
         "serviceName": "Service is required",
         "serviceDescription": "Description is required",
         "servicePrice": "Price is required",
-        "vehicle": "Vehicle information is required"
+        "vehicleRequest": "Vehicle of the request is required",
+        "vehicleOffer": "Vehicle of the offer is required"
       }
     }
   },

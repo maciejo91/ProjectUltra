@@ -18,12 +18,13 @@
           <Label class="block text-sm font-semibold text-foreground">
             Callback Date <span class="text-brand-red">*</span>
           </Label>
-          <Input 
+          <MiniCalendarDateField
             v-model="formData.date"
-            type="date"
-            :min="minDate"
-            required
-            class="w-full h-10"
+            aria-label="Callback date"
+            group-class="rounded-md"
+            input-class="min-w-0"
+            popover-content-class="z-[110]"
+            :min-date="minDate"
           />
         </div>
         <div class="space-y-2">
@@ -151,6 +152,8 @@ import {
   DialogPortal,
   DialogTitle
 } from '@motork/component-library/future/primitives'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { formatMotorkDateFieldEu, normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 import { useUsersStore } from '@/stores/users'
 
 const props = defineProps({
@@ -207,10 +210,11 @@ const handleOpenChange = (isOpen) => {
 }
 
 onMounted(() => {
-  // Set default date to tomorrow
+  // Set default date to tomorrow (Motork EU wire format)
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
-  formData.value.date = tomorrow.toISOString().split('T')[0]
+  tomorrow.setHours(0, 0, 0, 0)
+  formData.value.date = formatMotorkDateFieldEu(tomorrow)
   
   // Set default time to 10:00 AM
   formData.value.time = '10:00'
@@ -221,11 +225,15 @@ onMounted(() => {
 
 function handleConfirm() {
   if (!isValid.value) return
-  
+
+  const dateIso =
+    normalizeMotorkDateFieldToIso(String(formData.value.date || '').trim()) ||
+    String(formData.value.date || '').trim()
+
   const callbackData = {
-    date: formData.value.date,
+    date: dateIso,
     time: formData.value.time,
-    dateTime: `${formData.value.date}T${formData.value.time}:00`,
+    dateTime: `${dateIso}T${formData.value.time}:00`,
     reason: formData.value.reason,
     notes: formData.value.notes,
     assigneeId: formData.value.assigneeId || props.currentAssigneeId,

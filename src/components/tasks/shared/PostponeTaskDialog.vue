@@ -10,11 +10,13 @@
         <div class="flex-1 overflow-y-auto px-6 py-4 w-full space-y-4">
           <div>
             <Label class="block text-sm font-medium text-foreground mb-2">Postpone Date <span class="text-red-600">*</span></Label>
-            <Input
-              type="date"
+            <MiniCalendarDateField
               v-model="postponeForm.date"
-              :min="minDate"
-              class="w-full"
+              aria-label="Postpone date"
+              group-class="rounded-md"
+              input-class="min-w-0"
+              :min-date="minDate"
+              popover-content-class="z-[110]"
             />
           </div>
 
@@ -76,6 +78,9 @@ import {
   DialogPortal,
   DialogTitle
 } from '@motork/component-library/future/primitives'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { getTodayMotorkDateStringEu } from '@/utils/formHelpers'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 
 const props = defineProps({
   show: {
@@ -113,7 +118,7 @@ watch(() => props.show, (isOpen) => {
   if (isOpen) {
     // Initialize form with today's date and current time
     const today = new Date()
-    postponeForm.value.date = today.toISOString().split('T')[0]
+    postponeForm.value.date = getTodayMotorkDateStringEu()
     postponeForm.value.time = today.toTimeString().slice(0, 5)
     postponeForm.value.reason = ''
   }
@@ -132,13 +137,15 @@ const handleCancel = () => {
 const handleConfirm = () => {
   if (!canSubmit.value || props.saving) return
 
+  const raw = String(postponeForm.value.date || '').trim()
+  const datePart = normalizeMotorkDateFieldToIso(raw) || raw
   const dateTime = postponeForm.value.time
-    ? `${postponeForm.value.date}T${postponeForm.value.time}:00`
-    : `${postponeForm.value.date}T12:00:00`
+    ? `${datePart}T${postponeForm.value.time}:00`
+    : `${datePart}T12:00:00`
 
   emit('confirm', {
     taskType: props.taskType,
-    date: postponeForm.value.date,
+    date: datePart,
     time: postponeForm.value.time || '12:00',
     dateTime: dateTime,
     reason: postponeForm.value.reason

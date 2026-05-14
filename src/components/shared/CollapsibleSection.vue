@@ -14,16 +14,21 @@
         cardStyle && staticHeader ? 'bg-white' : '',
         !cardStyle && !staticHeader ? 'bg-muted/30 hover:bg-muted/50' : '',
         !cardStyle && staticHeader ? 'bg-muted/30' : '',
+        uniformHeaderHeight ? 'min-h-14' : '',
         headerClass,
       ]"
       @click="onHeaderClick"
     >
-      <div class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+      <div
+        class="flex min-w-0 flex-1 items-center gap-2"
+        :class="uniformHeaderHeight ? 'flex-nowrap' : 'flex-wrap'"
+      >
         <h5
-          class="mb-0 shrink-0 text-foreground"
+          class="mb-0 text-foreground"
           :class="[
             titleClass || 'text-sm font-semibold',
             noSidePadding ? 'px-4' : '',
+            uniformHeaderHeight ? 'min-w-0 shrink truncate' : 'shrink-0',
           ]"
         >
           {{ title }}
@@ -89,6 +94,11 @@ const props = defineProps({
   headerClass: {
     type: String,
     default: '',
+  },
+  /** When true, header uses min-h-14 and single-line title + afterTitle (quotation cards). */
+  uniformHeaderHeight: {
+    type: Boolean,
+    default: false,
   },
 })
 

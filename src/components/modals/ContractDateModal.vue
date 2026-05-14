@@ -11,11 +11,13 @@
       <!-- Contract Date -->
       <div class="space-y-2">
         <Label class="block text-sm font-semibold text-foreground">Contract Date</Label>
-        <Input 
-          type="date"
+        <MiniCalendarDateField
           v-model="contractDate"
-          :max="maxDate"
-          class="w-full h-10"
+          aria-label="Contract date"
+          group-class="rounded-md"
+          input-class="min-w-0"
+          :max-date="maxDate"
+          popover-content-class="z-[110]"
         />
       </div>
       
@@ -71,6 +73,9 @@ import {
   Label,
   Textarea
 } from '@motork/component-library/future/primitives'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { getTodayMotorkDateStringEu } from '@/utils/formHelpers'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 import {
   Dialog,
   DialogContent,
@@ -105,7 +110,7 @@ watch(() => props.show, (newVal) => {
   if (newVal) {
     // Default to today
     const today = new Date()
-    contractDate.value = today.toISOString().split('T')[0]
+    contractDate.value = getTodayMotorkDateStringEu()
     contractTime.value = today.toTimeString().slice(0, 5)
     notes.value = ''
   }
@@ -113,12 +118,13 @@ watch(() => props.show, (newVal) => {
 
 const handleConfirm = () => {
   if (!contractDate.value) return
-  
-  // Combine date and time
-  const datetime = contractTime.value 
-    ? `${contractDate.value}T${contractTime.value}:00`
-    : `${contractDate.value}T12:00:00`
-  
+
+  const raw = String(contractDate.value || '').trim()
+  const datePart = normalizeMotorkDateFieldToIso(raw) || raw
+  const datetime = contractTime.value
+    ? `${datePart}T${contractTime.value}:00`
+    : `${datePart}T12:00:00`
+
   emit('confirm', {
     contractDate: datetime,
     notes: notes.value

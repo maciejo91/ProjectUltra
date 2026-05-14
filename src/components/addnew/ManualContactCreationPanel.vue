@@ -463,7 +463,13 @@
                   <Label class="text-sm font-semibold text-foreground">
                     {{ t('forms.addNew.manualContact.moreDetailsFields.dateOfBirth') }}
                   </Label>
-                  <Input v-model="data.detailsDateOfBirth" type="date" class="h-10 w-full" />
+                  <MiniCalendarDateField
+                    v-model="data.detailsDateOfBirth"
+                    :aria-label="t('forms.addNew.manualContact.moreDetailsFields.dateOfBirth')"
+                    group-class="rounded-md"
+                    input-class="min-w-0"
+                    :max-date="dateOfBirthMaxIso"
+                  />
                 </div>
 
                 <div class="space-y-2">
@@ -745,6 +751,8 @@ import {
 import { FISCAL_ENTITY_COMPANY_A, FISCAL_ENTITY_COMPANY_B } from '@/constants/fiscalEntities'
 import InternationalPhoneInput from '@/components/shared/InternationalPhoneInput.vue'
 import SelectAccountBox from '@/components/addnew/SelectAccountBox.vue'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { getTodayDateString } from '@/utils/formHelpers.js'
 
 const props = defineProps({
   contactFormData: { type: Object, required: true },
@@ -757,6 +765,8 @@ const emit = defineEmits(['request-close'])
 const { t } = useI18n()
 
 const data = props.contactFormData
+
+const dateOfBirthMaxIso = computed(() => getTodayDateString())
 
 const dealerChoice = computed({
   get: () => (data.companyIsDealer ? 'yes' : 'no'),

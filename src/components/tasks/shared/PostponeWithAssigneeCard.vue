@@ -55,7 +55,13 @@
         <div v-if="rescheduleTime === 'custom'" class="mt-3 grid grid-cols-2 gap-3">
           <div>
             <Label class="form-label">Date <span class="text-destructive">*</span></Label>
-            <Input type="date" v-model="customDate" :min="minDate" class="w-full" />
+            <MiniCalendarDateField
+              v-model="customDate"
+              aria-label="Postpone date"
+              group-class="rounded-md"
+              input-class="min-w-0"
+              :min-date="minDate"
+            />
           </div>
           <div>
             <Label class="form-label">Time</Label>
@@ -66,7 +72,13 @@
       <div v-if="!showQuickTimeOptions" class="grid grid-cols-2 gap-3">
         <div>
           <Label class="form-label">Date <span class="text-destructive">*</span></Label>
-          <Input type="date" v-model="customDate" :min="minDate" class="w-full" />
+          <MiniCalendarDateField
+            v-model="customDate"
+            aria-label="Postpone date"
+            group-class="rounded-md"
+            input-class="min-w-0"
+            :min-date="minDate"
+          />
         </div>
         <div>
           <Label class="form-label">Time (optional)</Label>
@@ -151,6 +163,9 @@ import { ref, computed, watch } from 'vue'
 import { Button, Input, Label, Textarea, Toggle, Spinner } from '@motork/component-library/future/primitives'
 import { SelectMenu } from '@motork/component-library/future/components'
 import { Sparkles, Lightbulb, Users } from 'lucide-vue-next'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { getTodayMotorkDateStringEu } from '@/utils/formHelpers'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 
 const props = defineProps({
   title: { type: String, default: 'Postpone task to' },
@@ -224,10 +239,12 @@ function computeDateTime() {
     return monday.toISOString()
   }
   if (customDate.value && customTime.value) {
-    return new Date(`${customDate.value}T${customTime.value}:00`).toISOString()
+    const datePart = normalizeMotorkDateFieldToIso(String(customDate.value).trim()) || String(customDate.value).trim()
+    return new Date(`${datePart}T${customTime.value}:00`).toISOString()
   }
   if (customDate.value) {
-    return new Date(`${customDate.value}T12:00:00`).toISOString()
+    const datePart = normalizeMotorkDateFieldToIso(String(customDate.value).trim()) || String(customDate.value).trim()
+    return new Date(`${datePart}T12:00:00`).toISOString()
   }
   return null
 }
@@ -263,7 +280,7 @@ watch(() => props.showQuickTimeOptions, (show) => {
   if (!show) {
     rescheduleTime.value = 'custom'
     const today = new Date()
-    customDate.value = today.toISOString().split('T')[0]
+    customDate.value = getTodayMotorkDateStringEu()
     customTime.value = today.toTimeString().slice(0, 5)
   }
 }, { immediate: true })

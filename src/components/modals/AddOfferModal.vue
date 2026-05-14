@@ -544,7 +544,13 @@
                   </div>
                   <div class="space-y-1.5">
                     <Label class="text-[10px] font-bold uppercase text-muted-foreground px-1">Offer Expiration Date</Label>
-                    <Input type="date" v-model="offerData.expirationDate" class="bg-background h-10" />
+                    <MiniCalendarDateField
+                      v-model="offerData.expirationDate"
+                      aria-label="Offer expiration date"
+                      group-class="rounded-md"
+                      input-class="min-w-0"
+                      popover-content-class="z-[110]"
+                    />
                   </div>
                 </div>
 
@@ -650,6 +656,8 @@ import VehicleSelectionInline from '@/components/shared/VehicleSelectionInline.v
 import TradeInsCard from '@/components/shared/TradeInsCard.vue'
 import FinancingOptionsCard from '@/components/shared/FinancingOptionsCard.vue'
 import CustomerSearchSelect from '@/components/shared/CustomerSearchSelect.vue'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 
 const BASE_STEP_KEYS = ['vehicle', 'personal', 'tradein_financing', 'pricing', 'payment', 'terms']
 const BASE_STEP_LABELS = [
@@ -768,7 +776,7 @@ const offerData = ref({
   promotions: [],
   tradeIn: { showOnPdf: true, valuation: 0, notes: '' },
   paymentMethods: [],
-  expirationDate: null,
+  expirationDate: '',
   selectedTradeInIds: [],
   selectedFinancingId: null,
   selectedFinancingLabel: ''
@@ -1062,6 +1070,11 @@ function handleOpenChange(isOpen) {
 
 function submitForm() {
   if (!canSubmit.value) return
+  const exRaw = offerData.value.expirationDate
+  const expirationDate =
+    exRaw != null && String(exRaw).trim()
+      ? normalizeMotorkDateFieldToIso(String(exRaw).trim()) || String(exRaw).trim()
+      : null
   const payload = {
     id: Date.now(),
     type: 'offer',
@@ -1101,7 +1114,7 @@ function submitForm() {
       finalTotal: finalTotal.value,
       tradeIn: offerData.value.tradeIn,
       paymentMethods: offerData.value.paymentMethods,
-      expirationDate: offerData.value.expirationDate,
+      expirationDate,
       grandTotal: finalTotal.value,
       selectedTradeInIds: offerData.value.selectedTradeInIds,
       selectedFinancingId: offerData.value.selectedFinancingId,
@@ -1154,7 +1167,7 @@ function reset() {
     promotions: [],
     tradeIn: { showOnPdf: true, valuation: 0, notes: '' },
     paymentMethods: [],
-    expirationDate: null,
+    expirationDate: '',
     selectedTradeInIds: [],
     selectedFinancingId: null,
     selectedFinancingLabel: ''

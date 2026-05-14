@@ -100,11 +100,12 @@
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-foreground mb-2">New Delivery Date</label>
-          <input
+          <MiniCalendarDateField
             v-model="rescheduleForm.newDeliveryDate"
-            type="date"
-            :min="minRescheduleDate"
-            class="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+            aria-label="New delivery date"
+            group-class="rounded-md"
+            input-class="min-w-0"
+            :min-date="minRescheduleDate"
           />
         </div>
         <div>
@@ -142,6 +143,8 @@ import { ClipboardList, CalendarDays } from 'lucide-vue-next'
 import { Button, Toggle } from '@motork/component-library/future/primitives'
 import PostDeliverySurvey from '@/components/tasks/opportunity/PostDeliverySurvey.vue'
 import ThresholdBanner from '@/components/tasks/shared/ThresholdBanner.vue'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useUserStore } from '@/stores/user'
 import { useSettingsStore } from '@/stores/settings'
@@ -349,9 +352,11 @@ const handleCancelReschedule = () => {
 
 const handleConfirmReschedule = async () => {
   try {
+    const raw = String(rescheduleForm.value.newDeliveryDate || '').trim()
+    const dateIso = normalizeMotorkDateFieldToIso(raw) || raw
     emit('reschedule-delivery', {
       opportunity: props.opportunity,
-      newDeliveryDate: rescheduleForm.value.newDeliveryDate,
+      newDeliveryDate: dateIso,
       reason: rescheduleForm.value.reason
     })
     showReschedule.value = false

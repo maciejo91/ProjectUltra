@@ -1,4 +1,8 @@
 import { ref, computed } from 'vue'
+import {
+  normalizeMotorkDateFieldToIso,
+  formatMotorkDateFieldForLocale,
+} from '@/utils/motorkDateField.js'
 
 /**
  * Composable for UnifiedAddForm submission logic
@@ -90,14 +94,58 @@ export function useAddFormSubmission({
         label: vehicleData.label,
         summary: vehicleData.summary,
       }
+
+      const qNotes = String(vehicleData.configQuotationNotes || '').trim()
+      const qUntilRaw = String(vehicleData.configOfferValidUntil || '').trim()
+      const qUntilIso = normalizeMotorkDateFieldToIso(qUntilRaw)
+      const purchase = String(vehicleData.configPurchaseMethod || '').trim()
+      const spec = String(vehicleData.configSpecification || '').trim()
+      const summary = String(vehicleData.summary || '').trim()
+      const priceRaw = vehicleData.configPrice
+      const hasOfferFields =
+        (priceRaw != null && priceRaw !== '' && Number.isFinite(Number(priceRaw))) ||
+        qNotes ||
+        qUntilRaw ||
+        purchase ||
+        spec
+
+      if (hasOfferFields) {
+        const msgParts = [
+          summary,
+          spec,
+          purchase ? `Purchase: ${purchase}` : '',
+          qNotes ? `Additional notes: ${qNotes}` : '',
+          qUntilRaw ? `Offer valid until: ${formatMotorkDateFieldForLocale(qUntilRaw, 'en')}` : '',
+        ].filter(Boolean)
+        const requestMessage = msgParts.join('\n\n').trim() || undefined
+        const price =
+          priceRaw != null && priceRaw !== '' && Number.isFinite(Number(priceRaw)) ? Number(priceRaw) : undefined
+        const image = String(vehicleData.configImageUrl || '').trim() || undefined
+        if (price != null) out.price = price
+        if (image) out.image = image
+        if (requestMessage) out.requestMessage = requestMessage
+        if (qNotes) out.quotationNotes = qNotes
+        if (qUntilRaw) out.quotationOfferValidUntil = qUntilIso || qUntilRaw
+      }
+
       return pickNonEmpty(out)
     }
 
+    // Configure flow (VehicleConfiguratorModal). vehicleData.configuratorResumeDraft is UI-only for reopen.
     if (isConfigure) {
       const summary = String(vehicleData.summary || '').trim()
       const spec = String(vehicleData.configSpecification || '').trim()
       const purchase = String(vehicleData.configPurchaseMethod || '').trim()
-      const msgParts = [summary, spec, purchase ? `Purchase: ${purchase}` : ''].filter(Boolean)
+      const qNotes = String(vehicleData.configQuotationNotes || '').trim()
+      const qUntilRaw = String(vehicleData.configOfferValidUntil || '').trim()
+      const qUntilIso = normalizeMotorkDateFieldToIso(qUntilRaw)
+      const msgParts = [
+        summary,
+        spec,
+        purchase ? `Purchase: ${purchase}` : '',
+        qNotes ? `Additional notes: ${qNotes}` : '',
+        qUntilRaw ? `Offer valid until: ${formatMotorkDateFieldForLocale(qUntilRaw, 'en')}` : '',
+      ].filter(Boolean)
       const requestMessage = msgParts.join('\n\n').trim() || undefined
       const priceRaw = vehicleData.configPrice
       const price =
@@ -112,6 +160,8 @@ export function useAddFormSubmission({
         price,
         requestMessage,
       }
+      if (qNotes) out.quotationNotes = qNotes
+      if (qUntilRaw) out.quotationOfferValidUntil = qUntilIso || qUntilRaw
       return pickNonEmpty(out)
     }
 

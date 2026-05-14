@@ -11,7 +11,27 @@ const props = defineProps({
    * Use in popover date fields so browsing months does not overwrite the bound value.
    */
   decoupleNavigation: { type: Boolean, default: false },
+  /** Inclusive minimum selectable day (local midnight). */
+  minDate: { type: Date, default: null },
+  /** Inclusive maximum selectable day (local midnight). */
+  maxDate: { type: Date, default: null },
 })
+
+function startOfLocalDay(d) {
+  const x = new Date(d)
+  x.setHours(0, 0, 0, 0)
+  return x
+}
+
+function isDayBeforeMin(date) {
+  if (!props.minDate) return false
+  return startOfLocalDay(date) < startOfLocalDay(props.minDate)
+}
+
+function isDayAfterMax(date) {
+  if (!props.maxDate) return false
+  return startOfLocalDay(date) > startOfLocalDay(props.maxDate)
+}
 
 function addMonthsClampingDay(date, deltaMonths) {
   const d = new Date(date)
@@ -63,6 +83,8 @@ const gridDays = computed(() => {
   for (let i = 0; i < 42; i++) {
     const date = new Date(start)
     date.setDate(start.getDate() + i)
+    const beforeMin = isDayBeforeMin(date)
+    const afterMax = isDayAfterMax(date)
     result.push({
       date,
       inCurrentMonth: date.getMonth() === monthStart.value.getMonth(),
@@ -74,6 +96,7 @@ const gridDays = computed(() => {
         date.getFullYear() === props.modelValue.getFullYear() &&
         date.getMonth() === props.modelValue.getMonth() &&
         date.getDate() === props.modelValue.getDate(),
+      isDisabled: beforeMin || afterMax,
     })
   }
   return result
@@ -112,6 +135,7 @@ const goToNextMonth = () => {
 }
 
 const selectDate = (date) => {
+  if (isDayBeforeMin(date) || isDayAfterMax(date)) return
   const d = new Date(date)
   d.setHours(0, 0, 0, 0)
   if (props.decoupleNavigation) {
@@ -152,10 +176,11 @@ const selectDate = (date) => {
         v-for="day in gridDays"
         :key="day.date.toISOString()"
         type="button"
-        class="relative flex items-center justify-center py-1.5 rounded-md text-sm cursor-pointer transition-colors min-h-9"
+        :disabled="day.isDisabled"
+        class="relative flex items-center justify-center py-1.5 rounded-md text-sm transition-colors min-h-9 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
         :class="[
           day.inCurrentMonth ? 'text-foreground' : 'text-muted-foreground',
-          day.isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-muted',
+          day.isSelected ? 'bg-primary text-primary-foreground' : !day.isDisabled && 'cursor-pointer hover:bg-muted',
         ]"
         @click="selectDate(day.date)"
       >

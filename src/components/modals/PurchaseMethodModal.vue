@@ -143,11 +143,23 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
               <div class="space-y-2">
                 <Label class="block text-sm font-medium text-foreground">Offer Valid From</Label>
-                <Input v-model="formData.offerValidFrom" type="date" class="w-full" />
+                <MiniCalendarDateField
+                  v-model="formData.offerValidFrom"
+                  aria-label="Offer valid from"
+                  group-class="rounded-md"
+                  input-class="min-w-0"
+                  popover-content-class="z-[110]"
+                />
               </div>
               <div class="space-y-2">
                 <Label class="block text-sm font-medium text-foreground">Offer Valid To</Label>
-                <Input v-model="formData.offerValidTo" type="date" class="w-full" />
+                <MiniCalendarDateField
+                  v-model="formData.offerValidTo"
+                  aria-label="Offer valid to"
+                  group-class="rounded-md"
+                  input-class="min-w-0"
+                  popover-content-class="z-[110]"
+                />
               </div>
             </div>
 
@@ -244,6 +256,7 @@ import {
 import { usePurchaseMethodsStore } from '@/stores/purchaseMethods'
 import { purchaseMethodService } from '@/services/purchaseMethodService'
 import { formatCurrency } from '@/utils/formatters'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
 import { useUserStore } from '@/stores/user'
 
 const props = defineProps({

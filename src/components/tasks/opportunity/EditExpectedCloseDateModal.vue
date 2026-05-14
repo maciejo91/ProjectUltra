@@ -11,11 +11,14 @@
           <FieldGroup class="gap-4">
             <Field>
               <FieldLabel for="extend-expected-close-date">Expected Close Date</FieldLabel>
-              <Input
+              <MiniCalendarDateField
                 id="extend-expected-close-date"
-                type="date"
                 v-model="newDate"
-                :min="minDate"
+                aria-label="Expected close date"
+                group-class="rounded-md"
+                input-class="min-w-0"
+                popover-content-class="z-[110]"
+                :min-date="minDate"
               />
             </Field>
             <Field>
@@ -59,7 +62,6 @@
 import { ref, computed, watch } from 'vue'
 import {
   Button,
-  Input,
   Textarea,
   Field,
   FieldGroup,
@@ -73,6 +75,8 @@ import {
   DialogTitle,
   Spinner
 } from '@motork/component-library/future/primitives'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { formatMotorkDateFieldEu, normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 
 const props = defineProps({
   show: {
@@ -109,9 +113,10 @@ watch(() => props.show, (isOpen) => {
     if (currentDate < new Date()) {
       const tomorrow = new Date()
       tomorrow.setDate(tomorrow.getDate() + 1)
-      newDate.value = tomorrow.toISOString().split('T')[0]
+      tomorrow.setHours(0, 0, 0, 0)
+      newDate.value = formatMotorkDateFieldEu(tomorrow)
     } else {
-      newDate.value = currentDate.toISOString().split('T')[0]
+      newDate.value = formatMotorkDateFieldEu(currentDate)
     }
     reason.value = ''
   }
@@ -127,8 +132,11 @@ function handleCancel() {
 
 function handleConfirm() {
   if (!canSubmit.value || props.saving) return
+  const dateIso =
+    normalizeMotorkDateFieldToIso(String(newDate.value || '').trim()) ||
+    String(newDate.value || '').trim()
   emit('confirm', {
-    expectedCloseDate: newDate.value,
+    expectedCloseDate: dateIso,
     reason: reason.value
   })
   // Parent closes modal after async save completes

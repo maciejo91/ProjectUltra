@@ -54,11 +54,13 @@
                 </div>
                 <div class="space-y-1.5">
                   <Label class="text-sm font-semibold uppercase text-muted-foreground">Contract Date <span class="text-destructive">*</span></Label>
-                  <Input
+                  <MiniCalendarDateField
                     v-model="formData.core.contractDate"
-                    type="date"
-                    :max="maxContractDateComputed"
-                    class="bg-background"
+                    aria-label="Contract date"
+                    group-class="rounded-md"
+                    input-class="min-w-0"
+                    :max-date="maxContractDateComputed"
+                    popover-content-class="z-[110]"
                   />
                 </div>
                 <div class="space-y-1.5">
@@ -71,11 +73,23 @@
                 </div>
                 <div class="space-y-1.5">
                   <Label class="text-sm font-semibold uppercase text-muted-foreground">Expected Delivery</Label>
-                  <Input v-model="formData.core.expectedDeliveryDate" type="date" class="bg-background" />
+                  <MiniCalendarDateField
+                    v-model="formData.core.expectedDeliveryDate"
+                    aria-label="Expected delivery"
+                    group-class="rounded-md"
+                    input-class="min-w-0"
+                    popover-content-class="z-[110]"
+                  />
                 </div>
                 <div class="space-y-1.5">
                   <Label class="text-sm font-semibold uppercase text-muted-foreground">Delivery Date</Label>
-                  <Input v-model="formData.core.deliveryDate" type="date" class="bg-background" />
+                  <MiniCalendarDateField
+                    v-model="formData.core.deliveryDate"
+                    aria-label="Delivery date"
+                    group-class="rounded-md"
+                    input-class="min-w-0"
+                    popover-content-class="z-[110]"
+                  />
                 </div>
               </div>
             </div>
@@ -186,7 +200,13 @@
               </div>
               <div class="space-y-1.5">
                 <Label class="text-sm font-semibold uppercase text-muted-foreground">Registration Date</Label>
-                <Input v-model="formData.vehicle.registrationDate" type="date" class="bg-background" />
+                <MiniCalendarDateField
+                  v-model="formData.vehicle.registrationDate"
+                  aria-label="Vehicle registration date"
+                  group-class="rounded-md"
+                  input-class="min-w-0"
+                  popover-content-class="z-[110]"
+                />
               </div>
               <div class="space-y-1.5">
                 <Label class="text-sm font-semibold uppercase text-muted-foreground">Gear Type</Label>
@@ -288,7 +308,13 @@
               </div>
               <div class="space-y-1.5">
                 <Label class="text-sm font-semibold uppercase text-muted-foreground">Registration Date</Label>
-                <Input v-model="formData.tradein.registrationDate" type="date" class="bg-background" />
+                <MiniCalendarDateField
+                  v-model="formData.tradein.registrationDate"
+                  aria-label="Trade-in registration date"
+                  group-class="rounded-md"
+                  input-class="min-w-0"
+                  popover-content-class="z-[110]"
+                />
               </div>
               <div class="space-y-1.5 sm:col-span-2">
                 <Label class="text-sm font-semibold uppercase text-muted-foreground">Current Owner</Label>
@@ -555,6 +581,9 @@ import {
   DialogTitle
 } from '@motork/component-library/future/primitives'
 import { useUsersStore } from '@/stores/users'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { getTodayMotorkDateStringEu } from '@/utils/formHelpers'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 
 const STEP_LABELS = [
   { key: 'contract_customer', label: 'Contract & Customer' },
@@ -592,12 +621,12 @@ const formData = ref(createInitialFormData())
 
 function createInitialFormData() {
   const today = new Date()
-  const todayStr = today.toISOString().split('T')[0]
+  const todayEu = getTodayMotorkDateStringEu()
   const timeStr = today.toTimeString().slice(0, 5)
   return {
     core: {
       contractStatus: 'active',
-      contractDate: todayStr,
+      contractDate: todayEu,
       contractTime: timeStr,
       deliveryDate: '',
       expectedDeliveryDate: '',
@@ -768,14 +797,32 @@ function handleBackClick() {
 function handleConfirm() {
   if (!canSubmit.value) return
   const fd = formData.value
+  const normDate = (s) => {
+    const t = String(s || '').trim()
+    return t ? normalizeMotorkDateFieldToIso(t) || t : ''
+  }
+  const core = {
+    ...fd.core,
+    contractDate: normDate(fd.core.contractDate),
+    expectedDeliveryDate: normDate(fd.core.expectedDeliveryDate),
+    deliveryDate: normDate(fd.core.deliveryDate),
+  }
+  const vehicle = {
+    ...fd.vehicle,
+    registrationDate: normDate(fd.vehicle.registrationDate),
+  }
+  const tradein = {
+    ...fd.tradein,
+    registrationDate: normDate(fd.tradein.registrationDate),
+  }
   emit('confirm', {
-    contractDate: fd.core.contractDate,
+    contractDate: core.contractDate,
     contractTime: fd.core.contractTime,
     notes: fd.additional.notes,
-    ...fd.core,
+    ...core,
     contact: fd.contact,
-    vehicle: fd.vehicle,
-    tradeIn: fd.tradein,
+    vehicle,
+    tradeIn: tradein,
     financial: fd.financial,
     paymentMethods: fd.paymentMethods,
     legal: fd.legal,

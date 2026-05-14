@@ -273,11 +273,25 @@
         "filterOwner": "Eigenaar",
         "inventoryCustomerVehicles": "Klantvoertuig",
         "noVehicles": "Geen voertuigen komen overeen met je zoekopdracht.",
-        "sectionVehicleRequested": "Gevraagd voertuig",
-        "sectionVehicleInfo": "Voertuiginformatie",
+        "sectionVehicleRequested": "Voertuig van de aanvraag",
+        "sectionVehicleInfo": "Voertuig van het aanbod",
         "sectionOwnedVehicle": "Eigen voertuig",
         "configure": "Configureren",
         "insertManually": "Handmatig invoeren",
+        "stockOfferModalTitle": "Offerte aanmaken",
+        "stockOfferDraftBadge": "Concept",
+        "stockSearchSubtitle": "Kies een voertuig uit de voorraad.",
+        "stockStep1Subtitle": "Selecteer een voertuig uit de voorraad.",
+        "stockStep2Subtitle": "Definieer de offertegegevens.",
+        "stockStepVehicle": "Voertuig",
+        "stockStepQuotation": "Offerte",
+        "stockBackToVehicles": "Terug naar voertuigen",
+        "stockSaveAndClose": "Opslaan en sluiten",
+        "showNetPrices": "Nettoprijzen tonen",
+        "quotationSearchItemsPlaceholder": "Zoek regels…",
+        "quotationSearchDialogTitle": "Zoek offertregels",
+        "quotationSearchDialogInputPlaceholder": "Typ de naam van de regel…",
+        "quotationSearchNoItems": "Geen resultaten",
         "configurePlaceholder": "Configuratieopties volgen in een volgende versie.",
         "manualPlaceholder": "Handmatige voertuiggegevens kunnen in een volgende versie worden toegevoegd.",
         "manual": {
@@ -297,6 +311,18 @@
             "selectModel": "Selecteer model",
             "selectBrandFirst": "Selecteer eerst een merk"
           }
+        },
+        "quotation": {
+          "additionalNotes": "Aanvullende opmerkingen",
+          "additionalNotesPlaceholder": "Typ hier uw opmerkingen",
+          "offerValidUntil": "Het aanbod is geldig tot:",
+          "offerValidityDisclaimer": "Promoties in deze offerte kunnen eerder verlopen dan de getoonde datum. De prijs is afhankelijk van de geldigheid van promoties.",
+          "summaryAdditionalNotes": "Aanvullende opmerkingen",
+          "summaryOfferValidUntil": "Aanbod geldig tot",
+          "offerSummaryTaxBreakdownTotalNet": "Totaal netto",
+          "offerSummaryTaxBreakdownTotalVat": "Totaal BTW ({percent}%)",
+          "offerSummaryTaxBreakdownTotalGross": "Totaal bruto (incl. BTW)",
+          "offerSummaryGrandTotalVatIncl": "incl. BTW"
         }
       },
       "errors": {
@@ -309,7 +335,8 @@
         "serviceName": "Service is verplicht",
         "serviceDescription": "Beschrijving is verplicht",
         "servicePrice": "Prijs is verplicht",
-        "vehicle": "Voertuiginformatie is verplicht"
+        "vehicleRequest": "Voertuig van de aanvraag is verplicht",
+        "vehicleOffer": "Voertuig van het aanbod is verplicht"
       }
     }
   },

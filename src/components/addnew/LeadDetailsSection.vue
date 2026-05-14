@@ -456,26 +456,43 @@
           class="rounded-lg border border-border bg-card overflow-hidden shadow-mk-dashboard-card"
         >
           <div class="relative flex flex-col gap-4 p-4">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              class="absolute right-2 top-2 z-10 h-8 w-8 text-muted-foreground hover:text-foreground"
-              :aria-label="t('common.buttons.remove')"
-              @click="onRequestClearVehicle"
-            >
-              <X class="h-4 w-4" aria-hidden="true" />
-            </Button>
+            <div class="absolute right-2 top-2 z-10 flex items-center gap-1">
+              <Button
+                v-if="vehicle.configureOpen || hasSelectedStockVehicle"
+                type="button"
+                variant="ghost"
+                size="icon"
+                class="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+                :aria-label="
+                  vehicle.configureOpen
+                    ? t('forms.addNew.leadDetails.vehicle.editConfiguredOffer')
+                    : t('forms.addNew.leadDetails.vehicle.editStockVehicle')
+                "
+                @click="vehicle.configureOpen ? onEditConfiguredOffer() : onEditStockVehicle()"
+              >
+                <Pencil class="h-4 w-4" aria-hidden="true" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                class="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+                :aria-label="t('common.buttons.remove')"
+                @click="onRequestClearVehicle"
+              >
+                <X class="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </div>
 
             <!-- Figma 1710:100591 — section title only when not repeating outer label pattern -->
             <template v-if="hasSelectedStockVehicle">
-              <p class="pr-10 text-sm font-medium leading-5 text-foreground">
+              <p class="pr-24 text-sm font-medium leading-5 text-foreground">
                 {{ vehicleSectionTitle }}
               </p>
 
               <!-- Hero: thumbnail | title+badge+trim (8px gap, items-start) -->
               <div class="flex w-full items-start gap-2">
-                <div class="h-[72px] w-[90px] shrink-0 overflow-hidden rounded-md bg-muted">
+                <div :class="vehicleHeroThumbWrapClass">
                   <img
                     v-if="selectedStockVehicle?.image"
                     :src="selectedStockVehicle.image"
@@ -578,9 +595,7 @@
                   </div>
                   <div class="flex flex-col gap-0 text-sm leading-5">
                     <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.price') }}</p>
-                    <p class="text-foreground">
-                      {{ selectedStockVehicle?.price != null ? `${selectedStockVehicle.price.toLocaleString()}€` : '—' }}
-                    </p>
+                    <p class="text-foreground">{{ stockCardPriceDisplay }}</p>
                   </div>
                   <div class="flex flex-col gap-0 text-sm leading-5">
                     <p class="text-muted-foreground">{{ t('requestDetail.vehicleCard.specification') }}</p>
@@ -648,23 +663,23 @@
               </p>
             </template>
             <template v-else-if="vehicle.configureOpen">
-              <p class="pr-10 text-sm font-medium leading-5 text-foreground">
-                Vehicle information
+              <p class="pr-24 text-sm font-medium leading-5 text-foreground">
+                {{ vehicleSectionTitle }}
               </p>
 
-              <div class="flex w-full items-start gap-3">
-                <div class="h-14 w-20 shrink-0 overflow-hidden rounded-md bg-muted">
+              <div class="flex w-full items-start gap-2">
+                <div :class="vehicleHeroThumbWrapClass">
                   <img
                     v-if="vehicle.configImageUrl"
                     :src="vehicle.configImageUrl"
                     alt=""
-                    class="h-full w-full object-cover"
+                    class="block h-auto max-h-full w-full object-contain object-center"
                     loading="lazy"
                     @error="onConfiguredVehicleImageError"
                   />
                 </div>
 
-                <div class="flex min-h-14 min-w-0 flex-1 flex-col gap-0.5">
+                <div class="flex min-h-[72px] min-w-0 flex-1 flex-col gap-0.5">
                   <div class="flex w-full min-w-0 items-center gap-2">
                     <span
                       class="inline-flex shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-sm font-normal leading-5 text-foreground"
@@ -700,6 +715,23 @@
                 <div class="flex flex-col gap-0 text-sm leading-5">
                   <p class="text-muted-foreground">Purchase method</p>
                   <p class="text-foreground">{{ vehicle.configPurchaseMethod || '—' }}</p>
+                </div>
+              </div>
+
+              <div
+                class="mt-1 grid w-full grid-cols-1 gap-3 border-t border-border pt-3 sm:grid-cols-2"
+              >
+                <div class="flex flex-col gap-0 text-sm leading-5">
+                  <p class="text-muted-foreground">
+                    {{ t('forms.addNew.leadDetails.vehicle.quotation.summaryAdditionalNotes') }}
+                  </p>
+                  <p class="whitespace-pre-wrap text-foreground">{{ vehicle.configQuotationNotes || '—' }}</p>
+                </div>
+                <div class="flex flex-col gap-0 text-sm leading-5">
+                  <p class="text-muted-foreground">
+                    {{ t('forms.addNew.leadDetails.vehicle.quotation.summaryOfferValidUntil') }}
+                  </p>
+                  <p class="text-foreground">{{ configuredOfferValidityDisplay || '—' }}</p>
                 </div>
               </div>
             </template>
@@ -1131,11 +1163,20 @@
     v-model:open="vehicleModalOpen"
     :inventory-mode="vehiclePickerInventoryMode"
     :prefill-search="vehicleModalPrefillSearch"
+    :quotation-step-required="enableStockQuotationStep"
+    :resume-draft="pendingStockQuotationResumeDraft"
     @select="onVehiclePicked"
+    @save="onStockVehicleOfferSaved"
+    @resume-draft-consumed="onStockQuotationResumeDraftConsumed"
     @insert-manually="onInsertManuallyFromVehicleModal"
   />
 
-  <VehicleConfiguratorModal v-model:open="vehicleConfiguratorOpen" @save="onVehicleConfigured" />
+  <VehicleConfiguratorModal
+    v-model:open="vehicleConfiguratorOpen"
+    :resume-draft="pendingConfiguratorResumeDraft"
+    @save="onVehicleConfigured"
+    @resume-draft-consumed="onConfiguratorResumeDraftConsumed"
+  />
 
   <Dialog :open="showDiscardManualVehicleConfirm" @update:open="(o) => (showDiscardManualVehicleConfirm = o)">
     <DialogPortal>
@@ -1161,7 +1202,17 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, useId, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ArrowUpRight, CircleHelp, Filter, Search, Tag as LucideTag, Tag, Wrench, X } from 'lucide-vue-next'
+import {
+  ArrowUpRight,
+  CircleHelp,
+  Filter,
+  Pencil,
+  Search,
+  Tag as LucideTag,
+  Tag,
+  Wrench,
+  X,
+} from 'lucide-vue-next'
 import {
   Button,
   Card,
@@ -1201,6 +1252,7 @@ import VehicleFromStockModal from '@/components/addnew/VehicleFromStockModal.vue
 import VehicleConfiguratorModal from '@/components/addnew/VehicleConfiguratorModal.vue'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
 import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { formatMotorkDateFieldForLocale } from '@/utils/motorkDateField.js'
 
 function onConfiguredVehicleImageError(e) {
   const img = e?.target
@@ -1219,9 +1271,20 @@ const props = defineProps({
   errors: { type: Object, default: () => ({}) },
 })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const form = props.leadForm
 const vehicle = props.vehicleFormData
+
+const configuredOfferValidityDisplay = computed(() =>
+  formatMotorkDateFieldForLocale(
+    vehicle.configOfferValidUntil,
+    typeof locale.value === 'string' ? locale.value : 'en',
+  ),
+)
+
+/** Hero thumbnail (stock card + configured-offer card): same 90×72 box. */
+const vehicleHeroThumbWrapClass =
+  'flex h-[72px] w-[90px] shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted'
 
 /** Creation-flow (Figma): white inner card, layered shadow */
 const innerPanelClass =
@@ -1233,6 +1296,11 @@ const oppTipId = `ld-tip-opp-${tipUid}`
 const isService = computed(() => form.department === 'service')
 const isOpp = computed(() => form.recordType === 'opportunity')
 const isLead = computed(() => form.recordType === 'lead')
+
+/** Sales opportunity: stock picker requires quotation step in modal. */
+const enableStockQuotationStep = computed(
+  () => form.department === 'sales' && form.recordType === 'opportunity',
+)
 
 const leadDetailsSectionTitle = computed(() =>
   isOpp.value
@@ -1383,7 +1451,7 @@ const vehicleSectionTitle = computed(() => {
 /** Sales + Opportunity: extra “Configure” path before “Insert manually”. */
 const showConfigureVehicle = computed(() => !isService.value && isOpp.value)
 
-/** Required: Sales + Lead ("Requested vehicle") and Sales + Opportunity ("Vehicle information") */
+/** Required: Sales + Lead ("Vehicle of the request"); Sales + Opportunity ("Vehicle of the offer") */
 const vehicleTitleShowAsterisk = computed(() => !isService.value && (isLead.value || isOpp.value))
 
 const vehiclePickerInventoryMode = computed(() =>
@@ -1391,8 +1459,10 @@ const vehiclePickerInventoryMode = computed(() =>
 )
 
 const vehicleModalPrefillSearch = computed(() => {
-  if (vehiclePickerInventoryMode.value !== 'customer-vehicles') return ''
-  return String(props.existingContactName || '').trim()
+  if (vehiclePickerInventoryMode.value === 'customer-vehicles') {
+    return String(props.existingContactName || '').trim()
+  }
+  return String(stockVehicleModalSearchPrefill.value || '').trim()
 })
 
 const vehicleDisplayText = computed(() => {
@@ -1472,6 +1542,18 @@ const stockVinDisplay = computed(() => {
   return (v.vin || '').toString().trim()
 })
 
+/** List price vs saved stock-offer grand total (sales opp quotation). */
+const stockCardPriceDisplay = computed(() => {
+  if (!selectedStockVehicle.value) return '—'
+  const offer = vehicle.configPrice
+  if (offer != null && Number.isFinite(Number(offer))) {
+    return `${Number(offer).toLocaleString()}€`
+  }
+  const p = selectedStockVehicle.value?.price
+  if (p != null) return `${p.toLocaleString()}€`
+  return '—'
+})
+
 const ownedVehicleOwnershipLabel = computed(() => {
   const v = selectedStockVehicle.value
   if (!v) return '—'
@@ -1501,9 +1583,19 @@ const isMac = ref(typeof navigator !== 'undefined' && /Mac|iPhone|iPod|iPad/i.te
 const keyboardShortcutLabel = computed(() => (isMac.value ? '⌘K' : 'Ctrl+K'))
 
 const vehicleModalOpen = ref(false)
+/** Passed into stock modal when reopening saved quotation from card (cleared after apply). */
+const pendingStockQuotationResumeDraft = ref(null)
+/** Seeds in-stock unified search when reopening picker from vehicle card Edit. Cleared when modal closes. */
+const stockVehicleModalSearchPrefill = ref('')
 const vehicleConfiguratorOpen = ref(false)
+/** Passed into modal once when reopening saved offer from card (cleared after apply). */
+const pendingConfiguratorResumeDraft = ref(null)
 const showDiscardManualVehicleConfirm = ref(false)
 const serviceOwnedMoreDetailsExpanded = ref(false)
+
+watch(vehicleModalOpen, (open) => {
+  if (!open) stockVehicleModalSearchPrefill.value = ''
+})
 
 const manualBrandOptions = VEHICLE_BRANDS
 
@@ -1584,6 +1676,26 @@ function confirmDiscardManualVehicle() {
 }
 
 function openVehicleModal() {
+  stockVehicleModalSearchPrefill.value = ''
+  pendingStockQuotationResumeDraft.value = null
+  vehicleModalOpen.value = true
+}
+
+function onEditStockVehicle() {
+  const v = selectedStockVehicle.value
+  if (!v?.id) {
+    pendingStockQuotationResumeDraft.value = null
+    vehicleModalOpen.value = true
+    return
+  }
+  if (enableStockQuotationStep.value && vehicle.stockQuotationResumeDraft?.configuratorSnapshot) {
+    pendingStockQuotationResumeDraft.value = vehicle.stockQuotationResumeDraft
+  } else {
+    pendingStockQuotationResumeDraft.value = null
+  }
+  const vin = (v.vin || '').toString().trim()
+  const brandModel = [v.brand, v.model].filter(Boolean).join(' ').trim()
+  stockVehicleModalSearchPrefill.value = vin || brandModel || ''
   vehicleModalOpen.value = true
 }
 
@@ -1597,9 +1709,50 @@ function onVehiclePicked(v) {
   vehicle.label = [v?.brand, v?.model, v?.year].filter(Boolean).join(' ')
   vehicle.summary = v?.summary || ''
   vehicle.vin = v?.vin || ''
-  vehicle.plateNumber = v?.plateNumber || ''
+  vehicle.plateNumber = (v?.plateNumber || v?.plate || v?.plates || '').toString().trim()
   vehicle.brand = v?.brand || ''
   vehicle.model = v?.model || ''
+
+  vehicle.stockQuotationResumeDraft = null
+  vehicle.configImageUrl = ''
+  vehicle.configQuantity = null
+  vehicle.configPrice = null
+  vehicle.configSpecification = ''
+  vehicle.configPurchaseMethod = ''
+  vehicle.configQuotationNotes = ''
+  vehicle.configOfferValidUntil = ''
+}
+
+function onStockVehicleOfferSaved(payload) {
+  const sv = payload?.stockVehicle
+  if (!sv) return
+  vehicle.manualOpen = false
+  vehicle.configureOpen = false
+
+  vehicle.stockVehicle = sv
+  vehicle.stockVehicleId = sv?.id ?? null
+  vehicle.label = [sv?.brand, sv?.model, sv?.year].filter(Boolean).join(' ')
+  vehicle.summary = String(payload?.summary || sv?.summary || '').trim()
+  vehicle.vin = sv?.vin || ''
+  vehicle.plateNumber = (sv?.plateNumber || sv?.plate || sv?.plates || '').toString().trim()
+  vehicle.brand = sv?.brand || ''
+  vehicle.model = sv?.model || ''
+
+  vehicle.configImageUrl = String(payload?.imageUrl || '').trim()
+  vehicle.configQuantity = payload?.quantity != null ? Number(payload.quantity) : 1
+  vehicle.configPrice = payload?.price != null ? Number(payload.price) : null
+  vehicle.configSpecification = String(payload?.specification || '').trim()
+  vehicle.configPurchaseMethod = String(payload?.purchaseMethod || '').trim()
+  vehicle.configQuotationNotes = String(payload?.quotationNotes ?? '').trim()
+  vehicle.configOfferValidUntil = String(payload?.quotationOfferValidUntil ?? '').trim()
+  vehicle.stockQuotationResumeDraft = payload?.resumeDraft ?? null
+
+  pendingStockQuotationResumeDraft.value = null
+  vehicleModalOpen.value = false
+}
+
+function onStockQuotationResumeDraftConsumed() {
+  pendingStockQuotationResumeDraft.value = null
 }
 
 function onInsertManually() {
@@ -1615,9 +1768,20 @@ function onInsertManuallyFromVehicleModal() {
 }
 
 function onConfigure() {
+  pendingConfiguratorResumeDraft.value = null
   clearVehicleSelection()
   vehicle.configureOpen = false
   vehicleConfiguratorOpen.value = true
+}
+
+function onEditConfiguredOffer() {
+  pendingConfiguratorResumeDraft.value =
+    vehicle.configuratorResumeDraft?.configuratorSnapshot ? vehicle.configuratorResumeDraft : null
+  vehicleConfiguratorOpen.value = true
+}
+
+function onConfiguratorResumeDraftConsumed() {
+  pendingConfiguratorResumeDraft.value = null
 }
 
 function onVehicleConfigured(payload) {
@@ -1634,6 +1798,10 @@ function onVehicleConfigured(payload) {
   vehicle.configPrice = payload?.price != null ? Number(payload.price) : null
   vehicle.configSpecification = String(payload?.specification || '').trim()
   vehicle.configPurchaseMethod = String(payload?.purchaseMethod || '').trim()
+  vehicle.configQuotationNotes = String(payload?.quotationNotes ?? '').trim()
+  vehicle.configOfferValidUntil = String(payload?.quotationOfferValidUntil ?? '').trim()
+
+  vehicle.configuratorResumeDraft = payload?.resumeDraft ?? null
 }
 
 function clearVehicleSelection() {
@@ -1680,6 +1848,10 @@ function clearVehicleSelection() {
   vehicle.configPrice = null
   vehicle.configSpecification = ''
   vehicle.configPurchaseMethod = ''
+  vehicle.configQuotationNotes = ''
+  vehicle.configOfferValidUntil = ''
+  vehicle.configuratorResumeDraft = null
+  vehicle.stockQuotationResumeDraft = null
 }
 
 function onGlobalKey(e) {

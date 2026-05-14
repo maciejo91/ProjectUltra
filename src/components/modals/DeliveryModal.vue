@@ -11,11 +11,13 @@
       <!-- Delivery Date -->
       <div class="space-y-2">
         <Label class="block text-sm font-semibold text-foreground">Delivery Date</Label>
-        <Input 
-          type="date"
+        <MiniCalendarDateField
           v-model="deliveryDate"
-          :max="maxDate"
-          class="w-full h-10"
+          aria-label="Delivery date"
+          group-class="rounded-md"
+          input-class="min-w-0"
+          :max-date="maxDate"
+          popover-content-class="z-[110]"
         />
       </div>
       
@@ -91,6 +93,9 @@ import {
   SelectContent,
   SelectItem
 } from '@motork/component-library/future/primitives'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { getTodayMotorkDateStringEu } from '@/utils/formHelpers'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 import {
   Dialog,
   DialogContent,
@@ -125,8 +130,7 @@ const maxDate = computed(() => {
 watch(() => props.show, (newVal) => {
   if (newVal) {
     // Default to today
-    const today = new Date()
-    deliveryDate.value = today.toISOString().split('T')[0]
+    deliveryDate.value = getTodayMotorkDateStringEu()
     deliveryTime.value = today.toTimeString().slice(0, 5)
     deliveryLocation.value = ''
     notes.value = ''
@@ -137,9 +141,11 @@ const handleConfirm = () => {
   if (!deliveryDate.value || !deliveryLocation.value) return
   
   // Combine date and time
-  const datetime = deliveryTime.value 
-    ? `${deliveryDate.value}T${deliveryTime.value}:00`
-    : `${deliveryDate.value}T12:00:00`
+  const raw = String(deliveryDate.value || '').trim()
+  const datePart = normalizeMotorkDateFieldToIso(raw) || raw
+  const datetime = deliveryTime.value
+    ? `${datePart}T${deliveryTime.value}:00`
+    : `${datePart}T12:00:00`
   
   emit('confirm', {
     deliveryDate: datetime,

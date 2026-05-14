@@ -52,19 +52,19 @@
             <TooltipContent
               side="top"
               align="start"
-              class="max-w-sm rounded-md border border-border bg-background p-4 text-foreground shadow-md"
+              class="max-w-sm rounded-md border border-border bg-background px-4 py-3 text-foreground shadow-md"
             >
-              <div class="flex w-full flex-col gap-2 text-balance">
-                <p class="text-base font-semibold leading-normal text-foreground">{{ label }}</p>
+              <div class="flex w-full flex-col gap-0.5 text-balance">
+                <p class="text-base font-semibold leading-snug text-foreground">{{ label }}</p>
                 <p
                   v-if="formattedExpiresAt"
-                  class="text-sm font-normal leading-normal text-muted-foreground"
+                  class="text-sm font-normal leading-snug text-muted-foreground"
                 >
                   Expires {{ formattedExpiresAt }}
                 </p>
                 <p
                   v-if="showDetailsSection"
-                  class="text-sm font-normal leading-normal text-foreground"
+                  class="text-sm font-normal leading-snug text-foreground"
                 >
                   {{ infoDetailsText }}
                 </p>
@@ -225,19 +225,19 @@
             <TooltipContent
               side="top"
               align="start"
-              class="max-w-sm rounded-md border border-border bg-background p-4 text-foreground shadow-md"
+              class="max-w-sm rounded-md border border-border bg-background px-4 py-3 text-foreground shadow-md"
             >
-              <div class="flex w-full flex-col gap-2 text-balance">
-                <p class="text-base font-semibold leading-normal text-foreground">{{ label }}</p>
+              <div class="flex w-full flex-col gap-0.5 text-balance">
+                <p class="text-base font-semibold leading-snug text-foreground">{{ label }}</p>
                 <p
                   v-if="formattedExpiresAt"
-                  class="text-sm font-normal leading-normal text-muted-foreground"
+                  class="text-sm font-normal leading-snug text-muted-foreground"
                 >
                   Expires {{ formattedExpiresAt }}
                 </p>
                 <p
                   v-if="showDetailsSection"
-                  class="text-sm font-normal leading-normal text-foreground"
+                  class="text-sm font-normal leading-snug text-foreground"
                 >
                   {{ infoDetailsText }}
                 </p>
@@ -398,6 +398,8 @@ const props = defineProps({
   oemAmountGross: { type: Number, default: 0 },
   oemAmountNet: { type: Number, default: 0 },
   modalVatRatePercent: { type: Number, default: 0 },
+  /** Vehicle list price (net or gross per showNetPrices); pairs %/€ for dealer campaigns */
+  pairedDiscountVehicleBase: { type: Number, default: 0 },
   campaign: { type: Object, default: null },
   /** ISO date string (e.g. 2026-06-30); shown in info tooltip when valid */
   expiresAt: { type: String, default: '' },
@@ -524,8 +526,23 @@ const promoVatSelectDisplayLabel = computed(() => {
 const dealerPercentInput = computed(() => {
   if (!props.campaign) return ''
   const n = Number(props.campaign.percent)
-  if (!Number.isFinite(n) || n === 0) return ''
-  return String(Math.abs(n))
+  if (Number.isFinite(n) && n !== 0) {
+    return String(Math.abs(n))
+  }
+  const base = Number(props.pairedDiscountVehicleBase)
+  if (!Number.isFinite(base) || base <= 0) return ''
+  let absAmt = 0
+  if (props.showNetPrices) {
+    const net = Number(props.campaign.netAmount ?? props.campaign.amount ?? 0)
+    absAmt = Math.abs(net)
+  } else {
+    const gross = Number(props.campaign.grossAmount ?? props.campaign.amount ?? 0)
+    absAmt = Math.abs(gross)
+  }
+  if (!Number.isFinite(absAmt) || absAmt === 0) return ''
+  const derivedPct = (absAmt / base) * 100
+  if (!Number.isFinite(derivedPct) || derivedPct === 0) return ''
+  return String(derivedPct)
 })
 
 const dealerAmountInput = computed(() => {

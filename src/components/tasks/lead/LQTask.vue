@@ -418,7 +418,12 @@
               <div v-if="rescheduleTime === 'custom'" class="mt-3 grid grid-cols-2 gap-3">
                 <div>
                   <Label class="form-label">Date</Label>
-                  <Input type="date" v-model="customDate" class="w-full" />
+                  <MiniCalendarDateField
+                    v-model="customDate"
+                    aria-label="Follow-up date"
+                    group-class="rounded-md"
+                    input-class="min-w-0"
+                  />
                 </div>
                 <div>
                   <Label class="form-label">Time</Label>
@@ -1073,7 +1078,12 @@
             <div v-if="rescheduleTime === 'custom'" class="mt-3 grid grid-cols-2 gap-3">
               <div>
                 <Label class="form-label">Date</Label>
-                <Input type="date" v-model="customDate" class="w-full" />
+                <MiniCalendarDateField
+                  v-model="customDate"
+                  aria-label="Follow-up date"
+                  group-class="rounded-md"
+                  input-class="min-w-0"
+                />
               </div>
               <div>
                 <Label class="form-label">Time</Label>
@@ -1264,6 +1274,8 @@ const LQTaskSendEmailCard = defineAsyncComponent(() =>
 import DeadlineBanner from '@/components/tasks/shared/DeadlineBanner.vue'
 import AppointmentCommunications from '@/components/shared/communication/AppointmentCommunications.vue'
 import MiniCalendar from '@/components/calendar/MiniCalendar.vue'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { getTodayMotorkDateStringEu } from '@/utils/formHelpers.js'
 import CloseAsLostForm from '@/components/shared/CloseAsLostForm.vue'
 import CollapsibleSection from '@/components/shared/CollapsibleSection.vue'
 import RequestConversationsTabContent from '@/components/requests/RequestConversationsTabContent.vue'
@@ -1726,8 +1738,7 @@ function setRescheduleTime(v) {
   } else {
     rescheduleTime.value = v
     if (v === 'custom') {
-      const today = new Date()
-      customDate.value = today.toISOString().split('T')[0]
+      customDate.value = getTodayMotorkDateStringEu()
     }
   }
 }

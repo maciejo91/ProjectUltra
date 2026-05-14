@@ -1,4 +1,5 @@
 import { ref, computed, watch } from 'vue'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 
 /**
  * Composable for LQWidget outcome selection logic
@@ -322,7 +323,20 @@ export function useLQWidgetOutcomes(lead, callDataRef, extractedDataRef, contact
       monday.setHours(9, 0, 0, 0)
       return monday.toISOString()
     } else if (rescheduleTime.value === 'custom' && customDate.value && customTime.value) {
-      const dateTime = new Date(`${customDate.value}T${customTime.value}:00`)
+      const isoDate = normalizeMotorkDateFieldToIso(String(customDate.value).trim())
+      if (!isoDate) {
+        const tomorrow = new Date()
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        tomorrow.setHours(9, 0, 0, 0)
+        return tomorrow.toISOString()
+      }
+      const dateTime = new Date(`${isoDate}T${customTime.value}:00`)
+      if (Number.isNaN(dateTime.getTime())) {
+        const tomorrow = new Date()
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        tomorrow.setHours(9, 0, 0, 0)
+        return tomorrow.toISOString()
+      }
       return dateTime.toISOString()
     }
     const tomorrow = new Date()

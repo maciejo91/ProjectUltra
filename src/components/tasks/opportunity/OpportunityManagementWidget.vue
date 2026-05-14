@@ -444,11 +444,12 @@
               <!-- Delivery Date -->
               <div>
                 <Label class="block text-sm font-medium text-muted-foreground mb-2">Delivery Date <span class="text-red-600">*</span></Label>
-                <Input 
-                  type="date"
+                <MiniCalendarDateField
                   v-model="deliveryScheduleForm.deliveryDate"
-                  :min="minDeliveryDate"
-                  class="w-full"
+                  aria-label="Delivery date"
+                  group-class="rounded-md"
+                  input-class="min-w-0"
+                  :min-date="minDeliveryDate"
                 />
               </div>
               
@@ -573,11 +574,12 @@
               <!-- Actual Delivery Date -->
               <div>
                 <Label class="block text-sm font-medium text-muted-foreground mb-2">Actual Delivery Date <span class="text-red-600">*</span></Label>
-                <Input 
-                  type="date"
+                <MiniCalendarDateField
                   v-model="deliveryConfirmForm.actualDeliveryDate"
-                  :max="maxDeliveryDate"
-                  class="w-full"
+                  aria-label="Actual delivery date"
+                  group-class="rounded-md"
+                  input-class="min-w-0"
+                  :max-date="maxDeliveryDate"
                 />
               </div>
               
@@ -648,11 +650,12 @@
               <!-- Delivery Date -->
               <div>
                 <Label class="block text-sm font-medium text-muted-foreground mb-2">New Delivery Date <span class="text-red-600">*</span></Label>
-                <Input 
-                  type="date"
+                <MiniCalendarDateField
                   v-model="deliveryRescheduleForm.deliveryDate"
-                  :min="minDeliveryDate"
-                  class="w-full"
+                  aria-label="New delivery date"
+                  group-class="rounded-md"
+                  input-class="min-w-0"
+                  :min-date="minDeliveryDate"
                 />
               </div>
               
@@ -1123,6 +1126,7 @@ import { fetchVehicles } from '@/api/vehicles'
 import { getDisplayStage, OPPORTUNITY_STAGES } from '@/utils/stageMapper'
 import { formatDateTime, formatDate, formatTime } from '@/utils/formatters'
 import { initDateField, getTodayDateString } from '@/utils/formHelpers'
+import { normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 import { useOpportunityActions } from '@/composables/useOpportunityActions'
 import { useLQWidgetCall } from '@/composables/useLQWidgetCall'
 import { useContractPDF } from '@/composables/useContractPDF'
@@ -1142,6 +1146,7 @@ import CreateEventModal from '@/components/modals/CreateEventModal.vue'
 import VehicleSelectionModal from '@/components/modals/VehicleSelectionModal.vue'
 import ContractDateModal from '@/components/modals/ContractDateModal.vue'
 import DeliveryModal from '@/components/modals/DeliveryModal.vue'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
 import CloseAsLostCard from '@/components/shared/CloseAsLostCard.vue'
 import RequalifyAsLeadModal from '@/components/modals/RequalifyAsLeadModal.vue'
 import ComingSoonModal from '@/components/modals/ComingSoonModal.vue'
@@ -2574,9 +2579,11 @@ async function handleConfirmRescheduleDelivery() {
   
   try {
     const opp = getCurrentOpportunity()
-    const datetime = deliveryRescheduleForm.value.deliveryTime 
-      ? `${deliveryRescheduleForm.value.deliveryDate}T${deliveryRescheduleForm.value.deliveryTime}:00`
-      : `${deliveryRescheduleForm.value.deliveryDate}T12:00:00`
+    const rawDate = String(deliveryRescheduleForm.value.deliveryDate || '').trim()
+    const datePart = normalizeMotorkDateFieldToIso(rawDate) || rawDate
+    const datetime = deliveryRescheduleForm.value.deliveryTime
+      ? `${datePart}T${deliveryRescheduleForm.value.deliveryTime}:00`
+      : `${datePart}T12:00:00`
     
     // Update opportunity with rescheduled delivery date
     await opportunitiesStore.updateOpportunity(opp.id, {
@@ -2673,9 +2680,11 @@ async function handleConfirmDelivery() {
   
   try {
     const opp = getCurrentOpportunity()
-    const datetime = deliveryConfirmForm.value.deliveryTime 
-      ? `${deliveryConfirmForm.value.actualDeliveryDate}T${deliveryConfirmForm.value.deliveryTime}:00`
-      : `${deliveryConfirmForm.value.actualDeliveryDate}T12:00:00`
+    const rawDate = String(deliveryConfirmForm.value.actualDeliveryDate || '').trim()
+    const datePart = normalizeMotorkDateFieldToIso(rawDate) || rawDate
+    const datetime = deliveryConfirmForm.value.deliveryTime
+      ? `${datePart}T${deliveryConfirmForm.value.deliveryTime}:00`
+      : `${datePart}T12:00:00`
     
     // Update opportunity with actual delivery date and set substatus to 'Delivered'
     await opportunitiesStore.updateOpportunity(opp.id, {
@@ -3309,9 +3318,11 @@ async function handleVehicleConflictCreateNew() {
 }
 
 async function performDeliverySave(form, context, opp, linkedVehicleId) {
+  const rawDate = String(form.deliveryDate || '').trim()
+  const datePart = normalizeMotorkDateFieldToIso(rawDate) || rawDate
   const datetime = form.deliveryTime
-    ? `${form.deliveryDate}T${form.deliveryTime}:00`
-    : `${form.deliveryDate}T12:00:00`
+    ? `${datePart}T${form.deliveryTime}:00`
+    : `${datePart}T12:00:00`
   const isContractPending = context === 'contract-pending'
 
   const updates = {

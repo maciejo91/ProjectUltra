@@ -121,8 +121,8 @@
               <MiniCalendarDateField
                 v-model="form.registrationYear"
                 aria-label="Registration date"
-                :input-class="registrationYearInputClass"
-                calendar-button-class="rounded-md"
+                :group-class="registrationYearGroupClass"
+                input-class="min-w-0"
                 popover-content-class="z-[110]"
               />
               <p v-if="errors.registrationYear" class="text-sm text-destructive">{{ errors.registrationYear }}</p>
@@ -377,10 +377,9 @@ const modelOptions = computed(() => {
   return modelsByBrand[b] || []
 })
 
-const registrationYearInputClass = computed(() => {
-  const base = 'h-10 w-full min-w-0 border-border bg-background'
-  return errors.registrationYear ? `${base} border-destructive` : base
-})
+const registrationYearGroupClass = computed(() =>
+  errors.registrationYear ? 'rounded-md border-destructive' : 'rounded-md',
+)
 
 function emptyForm() {
   form.vehicleClass = 'car'

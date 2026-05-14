@@ -46,10 +46,12 @@
       <div class="grid grid-cols-2 gap-4">
         <div class="space-y-2">
           <Label class="block text-sm font-semibold text-foreground">Date</Label>
-          <Input 
+          <MiniCalendarDateField
             v-model="localEvent.date"
-            type="date" 
-            class="w-full h-10"
+            aria-label="Event date"
+            group-class="rounded-md"
+            input-class="min-w-0"
+            popover-content-class="z-[110]"
           />
         </div>
         <div class="space-y-2">
@@ -177,6 +179,8 @@ import {
   DialogPortal,
   DialogTitle
 } from '@motork/component-library/future/primitives'
+import MiniCalendarDateField from '@/components/shared/forms/MiniCalendarDateField.vue'
+import { formatMotorkDateFieldEu, normalizeMotorkDateFieldToIso } from '@/utils/motorkDateField.js'
 import { useUserStore } from '@/stores/user'
 import { useUsersStore } from '@/stores/users'
 
@@ -248,7 +252,7 @@ watch(() => [props.show, props.event], ([newShow, newEvent]) => {
         id: newEvent.id,
         type: newEvent.type || 'test-drive',
         title: newEvent.title || '',
-        date: startDate.toISOString().split('T')[0],
+        date: formatMotorkDateFieldEu(startDate),
         time: startDate.toTimeString().slice(0, 5),
         customer: props.customer?.name || newEvent.customer || '',
         assignee: eventAssignee,
@@ -268,7 +272,7 @@ watch(() => [props.show, props.event], ([newShow, newEvent]) => {
         id: newEvent.id,
         type: newEvent.type || 'test-drive',
         title: newEvent.title || '',
-        date: now.toISOString().split('T')[0],
+        date: formatMotorkDateFieldEu(now),
         time: now.toTimeString().slice(0, 5),
         customer: props.customer?.name || newEvent.customer || '',
         assignee: eventAssignee,
@@ -282,7 +286,10 @@ watch(() => [props.show, props.event], ([newShow, newEvent]) => {
 
 const handleSave = () => {
   if (localEvent.value.title && localEvent.value.date) {
-    emit('save', { ...localEvent.value })
+    const dateIso =
+      normalizeMotorkDateFieldToIso(String(localEvent.value.date || '').trim()) ||
+      String(localEvent.value.date || '').trim()
+    emit('save', { ...localEvent.value, date: dateIso })
   }
 }
 
