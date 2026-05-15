@@ -70,11 +70,11 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Security headers (frame-ancestors: only add.leadspark.app may embed; use ?hide-navigation=1 in the iframe URL)
+# Security headers (frame-ancestors allows embedding in iframes on other sites; use ?hide-navigation=1 in the URL)
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "frame-ancestors 'self' https://add.leadspark.app"
+    Content-Security-Policy = "frame-ancestors *"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
