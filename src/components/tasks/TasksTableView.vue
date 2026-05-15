@@ -119,6 +119,7 @@ import {
   formatTaskCreatedAtDisplay,
   getTaskDueTimestamp
 } from '@/utils/taskTableDates'
+import { getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 
 const { t, locale } = useI18n()
 
@@ -154,13 +155,7 @@ const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAt
 
 function getVehicleConditionDisplay(task) {
   const vehicle = task.type === 'lead' ? task.requestedCar : (task.vehicle || task.requestedCar)
-  if (!vehicle) return null
-  const status = vehicle.status || ''
-  const km = vehicle.kilometers
-  if (km === 0 || (typeof km === 'number' && km < 1) || status === 'New') {
-    return (status && status.toLowerCase() === 'new') || km === 0 ? 'Km0' : 'New'
-  }
-  return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : t('dataTable.tasks.values.used')
+  return getVehicleConditionLabel(vehicle)
 }
 
 function getAssigneeDepartmentLocation(task) {
