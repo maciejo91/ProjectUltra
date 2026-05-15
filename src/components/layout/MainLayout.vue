@@ -1,6 +1,6 @@
 <template>
   <SidebarProvider class="max-h-svh min-h-svh w-full overflow-hidden bg-muted">
-    <AppSidebar />
+    <AppSidebar v-if="!hideNavigation" />
 
     <SidebarInset class="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted">
       <header
@@ -12,6 +12,7 @@
         ]"
       >
         <SidebarTrigger
+          v-if="!hideNavigation"
           class="w-11 h-11 shrink-0 rounded-lg text-muted-foreground hover:text-brand-red hover:bg-red-50"
           :aria-label="t('common.layout.openSidebar')"
         />
@@ -130,8 +131,10 @@ import { Button, SidebarProvider, SidebarInset, SidebarTrigger } from '@motork/c
 import { useLayoutStore } from '@/stores/layout'
 import AppHeader from './AppHeader.vue'
 import AppSidebar from './AppSidebar.vue'
+import { useHideNavigation } from '@/composables/useHideNavigation'
 
 const route = useRoute()
+const { hideNavigation } = useHideNavigation()
 const { t } = useI18n()
 const layoutStore = useLayoutStore()
 const headerActionsRef = ref(null)
