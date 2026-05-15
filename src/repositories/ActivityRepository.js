@@ -1,20 +1,32 @@
 import { BaseRepository } from './BaseRepository.js'
 import { getMockData } from '@/api/mockData/localeLoader.js'
+import { CRM_VEHICLE_MENTION_NAMES } from '@/api/mockData/crmVehicles.js'
 import { LeadRepository } from '@/repositories/LeadRepository'
 import { CustomerRepository } from '@/repositories/CustomerRepository'
 
-const DEMO_VEHICLE_MENTIONS = [
+const LEGACY_VEHICLE_MENTIONS = [
   'BMW iX xDrive50',
   'BMW iX',
   'Audi A6 Allroad',
   'Audi A6',
   'Volkswagen ID.4',
   'VW ID.4',
-  'ID.4',
   'Mercedes-Benz C-Class',
   'Mercedes C-Class',
-  'C-Class'
+  'C-Class',
+  'Toyota RAV4',
+  'Fiat Panda Hybrid',
+  'Fiat 500 Hybrid',
+  'Toyota Yaris',
+  'Volkswagen Golf',
+  'Volkswagen Tiguan',
+  'Jeep Avenger',
+  'Jeep Compass',
+  'Audi Q3',
+  'BMW X1'
 ]
+
+const DEMO_VEHICLE_MENTIONS = [...new Set([...CRM_VEHICLE_MENTION_NAMES, ...LEGACY_VEHICLE_MENTIONS])]
 
 const DEMO_STAFF_MENTIONS = ['Sara Marino', 'Davide Rinaldi', 'Matteo Greco', 'Matteo Alpino']
 const DEMO_VEHICLE_MENTION_PATTERN = new RegExp(

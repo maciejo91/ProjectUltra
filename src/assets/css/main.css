@@ -1487,8 +1487,9 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
    DataTable Styling - Minimal Overrides
    ======================================== */
 
-/* White table card (Tasks + Customers): same radius when inside page-container scroll area */
-/* Scroll area: rounded top so container top edge is rounded (Tasks + Customers) */
+/* Full-height list pages: rounded inset frame comes from [data-slot="frame"] (Motork DataTable) */
+
+/* Legacy page-scroll tables (embedded dashboards) */
 .page-container .overflow-y-auto:has(.bg-white .data-table-inner) {
   border-top-left-radius: var(--table-outer-radius);
   border-top-right-radius: var(--table-outer-radius);
@@ -1500,15 +1501,66 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 }
 
 /*
- * Motork Table wraps <table> in [data-slot="table-container"] with overflow-x-auto only.
- * CSS overflow pairing turns overflow-y visible into auto next to overflow-x auto, which
- * creates an inner vertical scrollport — thead position:sticky then binds to that shell
- * instead of .page-container/.overflow-y-auto, so headers scroll away with the rows.
- * overflow-y:clip preserves horizontal scroll without establishing a vertical scroll container.
+ * Default: clip vertical overflow on table-container so sticky thead binds to page scrollport.
  */
 .data-table-inner [data-slot="table-container"] {
   overflow-x: auto !important;
   overflow-y: clip !important;
+}
+
+/*
+ * Full-height list pages (Motork DataTable DOM):
+ *   frame > frame-panel (scrollport) + footer (pagination)
+ * Keep native table layout so columns size by content; sticky thead in frame-panel.
+ */
+.datatable-fill-height .data-table-inner {
+  overflow: visible !important;
+}
+
+.datatable-fill-height .data-table-inner > * {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+.datatable-fill-height .data-table-inner > * > :not([data-slot="frame"]) {
+  flex-shrink: 0;
+}
+
+.datatable-fill-height .data-table-inner [data-slot="frame"] {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  border-radius: var(--table-outer-radius) !important;
+  overflow: hidden !important;
+}
+
+.datatable-fill-height .data-table-inner [data-slot="frame-panel"] {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+  padding: var(--table-outer-padding) !important;
+}
+
+.datatable-fill-height .data-table-inner [data-slot="table-container"] {
+  overflow: visible !important;
+}
+
+.datatable-fill-height .data-table-inner [data-slot="table"] {
+  width: max-content;
+  min-width: 100%;
+}
+
+.data-table-inner [data-slot="frame"] > footer {
+  background-color: var(--muted);
+}
+
+.datatable-fill-height .data-table-inner [data-slot="frame"] > footer {
+  flex-shrink: 0 !important;
+  margin-top: auto !important;
 }
 
 /* Table typography (Tasks + Customers): match reference font sizes using theme tokens */
@@ -1521,7 +1573,7 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
 }
 
 /*
- * Sticky column titles: scrollport is .page-container > … > .overflow-y-auto (not .data-table-inner).
+ * Sticky column titles: scrollport is frame-panel on fill-height pages, or page overflow-y-auto otherwise.
  */
 .data-table-inner thead th,
 .data-table-inner [data-slot="table-container"] thead th,
@@ -1531,6 +1583,48 @@ button.mk-ai-mode-active-toggle[aria-pressed="true"]:hover:not(:disabled) {
   z-index: 2;
   background-color: var(--muted);
   box-shadow: 0 1px 0 0 var(--border);
+}
+
+.datatable-fill-height .data-table-inner thead th,
+.datatable-fill-height .data-table-inner [data-slot="table-container"] thead th,
+.datatable-fill-height .data-table-inner thead [role="columnheader"] {
+  box-shadow: none;
+}
+
+/*
+ * Motork frame tables: grey header row (muted), white body rows (bg-card on tbody cells).
+ */
+.datatable-fill-height .data-table-inner [data-slot="frame"] [data-slot="table-header"] {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.datatable-fill-height .data-table-inner [data-slot="frame"] [data-slot="table-header"] [data-slot="table-row"] {
+  background-color: var(--muted);
+}
+
+.datatable-fill-height .data-table-inner [data-slot="frame"] [data-slot="table-header"] [data-slot="table-row"]:hover {
+  background-color: var(--muted);
+}
+
+.datatable-fill-height .data-table-inner [data-slot="frame"] [data-slot="table-head"],
+.datatable-fill-height .data-table-inner [data-slot="frame"] thead th,
+.datatable-fill-height .data-table-inner [data-slot="frame"] thead [role="columnheader"] {
+  z-index: 11;
+  background-color: var(--muted) !important;
+  background-clip: padding-box;
+  border-color: var(--muted) !important;
+  border-bottom-color: var(--border) !important;
+  box-shadow: 0 calc(-1 * var(--table-outer-padding)) 0 var(--table-outer-padding) var(--muted);
+}
+
+.datatable-fill-height .data-table-inner [data-slot="frame"] [data-slot="table-head"]:first-child {
+  border-top-left-radius: var(--radius-xl, var(--radius));
+}
+
+.datatable-fill-height .data-table-inner [data-slot="frame"] [data-slot="table-head"]:last-child {
+  border-top-right-radius: var(--radius-xl, var(--radius));
 }
 
 /* Primary table cell text (customer names, main data): 14px, foreground */

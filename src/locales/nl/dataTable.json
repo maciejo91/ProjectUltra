@@ -49,12 +49,12 @@
       "summary": "Deadline laatste eerst"
     },
     "taskAz": {
-      "menu": "Taak · A tot Z",
-      "summary": "Taak A tot Z"
+      "menu": "Volgende actie · A tot Z",
+      "summary": "Volgende actie A tot Z"
     },
     "taskZa": {
-      "menu": "Taak · Z tot A",
-      "summary": "Taak Z tot A"
+      "menu": "Volgende actie · Z tot A",
+      "summary": "Volgende actie Z tot A"
     },
     "customerAz": {
       "menu": "Klant · A tot Z",
@@ -107,6 +107,8 @@
     "columns": {
       "urgency": "Urgentie",
       "task": "Task",
+      "taskType": "Type",
+      "nextAction": "Volgende actie",
       "dueTime": "Deadline",
       "customer": "Klant",
       "type": "Type",
@@ -122,7 +124,7 @@
     },
     "filters": {
       "showClosed": "Gesloten tonen",
-      "taskType": "Tasktype",
+      "taskType": "Type",
       "status": "Status",
       "priority": "Prioriteit",
       "source": "Bron",
@@ -138,12 +140,21 @@
       "used": "Gebruikt",
       "overdueJustNow": "Net te laat",
       "lessThanMinute": "over minder dan een minuut",
-      "justNow": "Zojuist"
+      "justNow": "Zojuist",
+      "today": "Vandaag",
+      "yesterday": "Gisteren",
+      "expiredWithTime": "Verlopen - {time}"
     },
     "statuses": {
       "overdue": "Te laat",
-      "inProgress": "In uitvoering",
-      "open": "Open"
+      "inProgress": "In behandeling",
+      "open": "Open",
+      "closed": "Gesloten"
+    },
+    "requestStatuses": {
+      "valid": "Geldig",
+      "inProgress": "In behandeling",
+      "expired": "Verlopen"
     },
     "requestTypes": {
       "testDrive": "Test Drive",

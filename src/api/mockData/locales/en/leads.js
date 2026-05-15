@@ -2,16 +2,14 @@ import {
   addMinutesToIso,
   createHourOffset,
   createDateString,
-  DEFAULT_CAR_IMAGE,
-  DEMO_CUSTOMER_REQUEST_MESSAGE,
-  demoPlateNumber
+  DEMO_CUSTOMER_REQUEST_MESSAGE
 } from '@/utils/mockDataHelpers'
-import audiA6Allroad40TdiImage from '@/assets/images/mock-vehicles/audi-a6-allroad-40-tdi.png'
-
-const lqfDemoCreatedAt = createHourOffset(-2)
-const lead2CreatedAt = createHourOffset(-3)
-
-const demoListingUrl = (slug) => `https://www.example.com/inventory/${slug}`
+import {
+  carStatusFromVehicle,
+  crmVehicleForLeadSlot,
+  getCrmVehicleDisplayName,
+  toRequestedCar
+} from '@/api/mockData/crmVehicles'
 
 /** Full UTM + WebSpark + original email for Request details → More details */
 const demoRequestAttribution = {
@@ -22,54 +20,34 @@ const demoRequestAttribution = {
   originalMessageUrl: 'https://example.com/inbox/original-email'
 }
 
-const baseRequestedCar = (brand, model, year, price) => ({
-  brand,
-  model,
-  year,
-  price,
-  plateNumber: demoPlateNumber(brand, model, year),
-  image: DEFAULT_CAR_IMAGE,
-  vin: 'WBA3B1C50EK123456',
-  kilometers: 0,
-  status: 'New',
-  fuelType: 'Petrol',
-  gearType: 'Automatic',
-  dealership: 'Milano',
-  stockDays: 5,
-  registration: '01/2024',
-  requestType: 'Quotation',
-  adCampaign: 'Summer 2024',
-  adMedium: 'Display',
-  adSource: 'Google',
-  expectedPurchaseDate: '2025-04',
-  requestMessage: DEMO_CUSTOMER_REQUEST_MESSAGE,
-  staffNote: ''
-})
+function leadRequestedCar(leadId, extra = {}) {
+  return toRequestedCar(crmVehicleForLeadSlot(Number(leadId) - 1), extra)
+}
 
-export const mockLeads = [
+function vehicleLabel(leadId) {
+  return getCrmVehicleDisplayName(crmVehicleForLeadSlot(Number(leadId) - 1))
+}
+
+export function buildMockLeads() {
+  const lqfDemoCreatedAt = createHourOffset(-2)
+  const lead2CreatedAt = createHourOffset(-3)
+
+  return [
   // 1. LQF: New lead – stage: Open, no callback (Lead Qualification task)
   {
     id: 1,
     customerId: 1,
     status: 'Open',
     priority: 'Hot',
-    requestedCar: {
-      ...baseRequestedCar('Audi', 'A6 Allroad', 2023, 19000),
-      image: audiA6Allroad40TdiImage,
-      plateNumber: 'FZ131FG',
-      variant: '40 TDI 2.0 quattro S tronic Business Advanced',
-      kilometers: 10237,
-      status: 'Used',
-      fuelType: 'Petrol',
-      vin: '1FADP34A59K123456',
+    requestedCar: leadRequestedCar(1, {
+      requestMessage: DEMO_CUSTOMER_REQUEST_MESSAGE,
       dealership: 'Roma',
-      registration: '22/12/2015',
       listingUrl: 'https://www.autoscout24.es',
       stockDistanceKm: 10,
-      stockDays: 200
-    },
+      stockDays: 45
+    }),
     requestMessage: DEMO_CUSTOMER_REQUEST_MESSAGE,
-    carStatus: 'In Stock',
+    carStatus: carStatusFromVehicle(crmVehicleForLeadSlot(0)),
     listingMetrics: { funnelViews: 6, tagCount: 21 },
     utmSource: 'google',
     utmTerm: 'cpc',
@@ -87,7 +65,7 @@ export const mockLeads = [
     createdAt: lqfDemoCreatedAt,
     importedAt: addMinutesToIso(lqfDemoCreatedAt, 3),
     lastActivity: createHourOffset(-1),
-    nextActionDue: createHourOffset(4),
+    nextActionDue: createHourOffset(-2),
     tags: ['Premium'],
     stage: 'Open',
     isDisqualified: false,
@@ -96,7 +74,7 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 5,
     aiSummary:
-      'Strong interest in the used Audi A6 Allroad; asked about stock and delivery via the Autoscout listing. Suggested next step: confirm availability and send a tailored quote.'
+      `Strong interest in the ${vehicleLabel(1)}; asked about stock and delivery via the Autoscout listing. Suggested next step: confirm availability and send a tailored quote.`
   },
   // 2. To be called back – callbackDate, scheduled recall
   {
@@ -104,15 +82,11 @@ export const mockLeads = [
     customerId: 2,
     status: 'Open',
     priority: 'Hot',
-    requestedCar: {
-      ...baseRequestedCar('Volkswagen', 'ID.4', 2024, 45000),
-      dealership: 'Milano',
-      listingUrl: demoListingUrl('vw-id4-2024')
-    },
+    requestedCar: leadRequestedCar(2, { dealership: 'Milano' }),
     ...demoRequestAttribution,
     utmCampaign: 'spring_ev_promo',
     webSparkCampaign: 'vw_id4_landing',
-    carStatus: 'In Stock',
+    carStatus: carStatusFromVehicle(crmVehicleForLeadSlot(1)),
     requestType: 'Quotation',
     source: 'Google Ads',
     channel: 'Paid',
@@ -123,9 +97,10 @@ export const mockLeads = [
     createdAt: lead2CreatedAt,
     importedAt: addMinutesToIso(lead2CreatedAt, 2),
     lastActivity: createHourOffset(-2),
-    nextActionDue: createHourOffset(8),
+    nextActionDue: addMinutesToIso(createHourOffset(0), 18),
     callbackDate: createHourOffset(8),
     scheduledRecallAppointment: { date: createDateString(1), time: '10:00' },
+    nextStepChannel: 'whatsapp',
     tags: ['Premium'],
     stage: 'Open',
     isDisqualified: false,
@@ -136,7 +111,7 @@ export const mockLeads = [
     ],
     distanceKm: 3,
     aiSummary:
-      'Clear intent on the VW ID.4; customer asked for an afternoon callback after WhatsApp. Keep momentum before the scheduled recall—confirm stock, pricing, and charging options in one short call.'
+      `Clear intent on the ${vehicleLabel(2)}; customer asked for an afternoon callback after WhatsApp. Keep momentum before the scheduled recall—confirm stock, pricing, and options in one short call.`
   },
   // 3. Valid - to be called back
   {
@@ -144,24 +119,15 @@ export const mockLeads = [
     customerId: 3,
     status: 'Open',
     priority: 'Warm',
-    requestedCar: {
-      ...baseRequestedCar('BMW', 'iX xDrive50', 2024, 105000),
-      image: '/brands/bmw-white.svg',
-      imageDisplayMode: 'logo',
-      status: 'New',
-      vin: 'WBY11CF050CM214XX',
-      plateNumber: '',
-      kilometers: null,
-      mileage: null,
+    requestedCar: leadRequestedCar(3, {
       dealership: 'Milano',
-      registration: '',
-      requestMessage: 'Vorrei sapere se la BMW iX xDrive50 è ancora disponibile per un test drive. Potete confermare autonomia, tempi di consegna e opzioni di leasing?',
-      listingUrl: demoListingUrl('bmw-ix-2024')
-    },
+      requestMessage:
+        'I would like to know if the Toyota Yaris is still available for a test drive. Can you confirm price, delivery time, and financing options?'
+    }),
     ...demoRequestAttribution,
-    utmCampaign: 'bmw_ix_electric',
-    webSparkCampaign: 'bmw_ix_detail',
-    carStatus: 'toBeOrder',
+    utmCampaign: 'toyota_yaris',
+    webSparkCampaign: 'toyota_yaris_detail',
+    carStatus: carStatusFromVehicle(crmVehicleForLeadSlot(2)),
     requestType: 'Test Drive',
     source: 'Google Ads',
     fiscalEntity: 'MotorK',
@@ -182,7 +148,7 @@ export const mockLeads = [
     ],
     distanceKm: 15,
     aiSummary:
-      'Validated interest in the BMW iX; customer wants a follow-up call on range and lease options. Next: schedule a test drive and share current stock and incentives.'
+      `Validated interest in the ${vehicleLabel(3)}; customer wants a follow-up call on price and finance options. Next: schedule a test drive and share current stock and incentives.`
   },
   // 4. New – NO PHONE – shows contact-by-email form
   {
@@ -190,15 +156,11 @@ export const mockLeads = [
     customerId: 4,
     status: 'Open',
     priority: 'Warm',
-    requestedCar: {
-      ...baseRequestedCar('Mercedes-Benz', 'C-Class', 2024, 48000),
-      dealership: 'Bologna',
-      listingUrl: demoListingUrl('mb-c-class-2024')
-    },
+    requestedCar: leadRequestedCar(4, { dealership: 'Bologna' }),
     ...demoRequestAttribution,
-    utmCampaign: 'mercedes_c_class',
-    webSparkCampaign: 'mb_c_class_stock',
-    carStatus: 'In Stock',
+    utmCampaign: 'toyota_yaris',
+    webSparkCampaign: 'toyota_yaris_stock',
+    carStatus: carStatusFromVehicle(crmVehicleForLeadSlot(3)),
     requestType: 'Quotation',
     source: 'Website',
     channel: 'Manual import',
@@ -217,7 +179,7 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 20,
     aiSummary:
-      'Mercedes C-Class quotation request with no phone on file; prefers email. Next: send specs and pricing, then propose a call once they reply.'
+      `${vehicleLabel(4)} quotation request with no phone on file; prefers email. Next: send specs and pricing, then propose a call once they reply.`
   },
   // 5. Closed - Invalid
   {
@@ -225,10 +187,7 @@ export const mockLeads = [
     customerId: 5,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Tesla', 'Model 3', 2023, 42000),
-      listingUrl: demoListingUrl('tesla-m3-used')
-    },
+    requestedCar: leadRequestedCar(5),
     utmSource: 'bing',
     utmTerm: 'ev',
     utmCampaign: 'tesla_used',
@@ -241,7 +200,7 @@ export const mockLeads = [
     assigneeInitials: '',
     createdAt: createHourOffset(-48),
     lastActivity: createHourOffset(-48),
-    nextActionDue: createHourOffset(-24),
+    nextActionDue: null,
     tags: [],
     stage: 'Not Valid',
     isDisqualified: true,
@@ -250,7 +209,7 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 120,
     aiSummary:
-      'Lead marked invalid after failed contact attempts; inquiry was for a used Tesla Model 3. No further outreach recommended unless details are corrected.'
+      `Lead marked invalid after failed contact attempts; inquiry was for the ${vehicleLabel(5)}. No further outreach recommended unless details are corrected.`
   },
   // 6. Closed - Not Interested
   {
@@ -258,10 +217,7 @@ export const mockLeads = [
     customerId: 6,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Porsche', 'Cayenne', 2024, 95000),
-      listingUrl: demoListingUrl('porsche-cayenne-2024')
-    },
+    requestedCar: leadRequestedCar(6),
     ...demoRequestAttribution,
     utmCampaign: 'porsche_suv',
     webSparkCampaign: 'cayenne_gallery',
@@ -274,7 +230,7 @@ export const mockLeads = [
     assigneeInitials: 'DR',
     createdAt: createHourOffset(-24),
     lastActivity: createHourOffset(-2),
-    nextActionDue: createHourOffset(-12),
+    nextActionDue: null,
     tags: [],
     stage: 'Not Interested',
     isDisqualified: true,
@@ -285,7 +241,7 @@ export const mockLeads = [
     ],
     distanceKm: 50,
     aiSummary:
-      'Customer confirmed they bought elsewhere; Porsche Cayenne inquiry is closed as not interested. Archive for reporting; no follow-up unless they re-engage.'
+      `Customer confirmed they bought elsewhere; ${vehicleLabel(6)} inquiry is closed as not interested. Archive for reporting; no follow-up unless they re-engage.`
   },
   // 7. Duplicate candidate – same customer + same vehicle as Lead 1 (for Duplicate Detected card)
   {
@@ -293,11 +249,7 @@ export const mockLeads = [
     customerId: 1,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Audi', 'A6 Allroad', 2023, 19000),
-      image: audiA6Allroad40TdiImage,
-      listingUrl: demoListingUrl('audi-a6-allroad-dup')
-    },
+    requestedCar: leadRequestedCar(1),
     ...demoRequestAttribution,
     carStatus: 'In Stock',
     requestType: 'Quotation',
@@ -317,7 +269,7 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 5,
     aiSummary:
-      'Second inquiry on the Audi A6 Allroad for the same customer—likely duplicate of an open lead. Merge records before sending duplicate quotes.'
+      `Second inquiry on the ${vehicleLabel(1)} for the same customer—likely duplicate of an open lead. Merge records before sending duplicate quotes.`
   },
   // 8. Duplicate candidate – same customer + same vehicle as Lead 2 (VW ID.4)
   {
@@ -325,10 +277,7 @@ export const mockLeads = [
     customerId: 2,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Volkswagen', 'ID.4', 2024, 45000),
-      listingUrl: demoListingUrl('vw-id4-dup')
-    },
+    requestedCar: leadRequestedCar(2),
     ...demoRequestAttribution,
     utmCampaign: 'spring_ev_promo',
     webSparkCampaign: 'vw_id4_landing',
@@ -350,7 +299,7 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 3,
     aiSummary:
-      'Another VW ID.4 request from the same contact—align with the primary lead before scheduling callbacks to avoid mixed messaging.'
+      `Another ${vehicleLabel(2)} request from the same contact—align with the primary lead before scheduling callbacks to avoid mixed messaging.`
   },
   // 9. Duplicate candidate – same customer + same vehicle as Lead 3 (BMW iX)
   {
@@ -358,14 +307,7 @@ export const mockLeads = [
     customerId: 3,
     status: 'Open',
     priority: 'Warm',
-    requestedCar: {
-      ...baseRequestedCar('BMW', 'iX xDrive50', 2024, 105000),
-      image: '/brands/bmw-white.svg',
-      imageDisplayMode: 'logo',
-      dealership: 'Milano',
-      requestMessage: 'Vorrei sapere se la BMW iX xDrive50 è ancora disponibile per un test drive. Potete confermare autonomia, tempi di consegna e opzioni di leasing?',
-      listingUrl: demoListingUrl('bmw-ix-dup')
-    },
+    requestedCar: leadRequestedCar(3),
     ...demoRequestAttribution,
     utmCampaign: 'bmw_ix_electric',
     webSparkCampaign: 'bmw_ix_detail',
@@ -378,26 +320,26 @@ export const mockLeads = [
     assigneeInitials: 'SM',
     createdAt: createHourOffset(-2),
     lastActivity: createHourOffset(-2),
-    nextActionDue: createHourOffset(10),
+    nextActionDue: createHourOffset(-1),
     tags: [],
     stage: 'Open',
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: [],
+    contactAttempts: [
+      { timestamp: createHourOffset(-2), outcome: 'no-answer', channel: 'phone', notes: 'No answer.', transcription: null },
+      { timestamp: createHourOffset(-1), outcome: 'no-answer', channel: 'phone', notes: 'Voicemail.', transcription: null }
+    ],
     distanceKm: 15,
     aiSummary:
-      'Duplicate BMW iX lead for the same customer; consolidate under one owner and one next step to prevent parallel outreach.'
+      `Duplicate ${vehicleLabel(3)} lead for the same customer; consolidate under one owner and one next step to prevent parallel outreach.`
   },
   {
     id: 11,
     customerId: 5,
     status: 'Open',
     priority: 'Hot',
-    requestedCar: {
-      ...baseRequestedCar('Porsche', 'Macan', 2024, 72000),
-      listingUrl: demoListingUrl('porsche-macan-2024')
-    },
+    requestedCar: leadRequestedCar(11),
     ...demoRequestAttribution,
     utmCampaign: 'porsche_macan_stock',
     webSparkCampaign: 'macan_listing',
@@ -410,26 +352,25 @@ export const mockLeads = [
     assigneeInitials: 'MG',
     createdAt: createHourOffset(-1),
     lastActivity: createHourOffset(-1),
-    nextActionDue: createHourOffset(5),
+    nextActionDue: createHourOffset(-2),
     tags: ['EV curious'],
     stage: 'Open',
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: [],
+    contactAttempts: [
+      { timestamp: createHourOffset(-1), outcome: 'no-answer', channel: 'phone', notes: 'No answer on first attempt.', transcription: null }
+    ],
     distanceKm: 12,
     aiSummary:
-      'Marco asked about Macan availability and weekend test drive slots; confirm stock and send a short options recap before the callback.'
+      `Marco asked about ${vehicleLabel(11)} availability and weekend test drive slots; confirm stock and send a short options recap before the callback.`
   },
   {
     id: 12,
     customerId: 6,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Audi', 'A5 Sportback', 2023, 52000),
-      listingUrl: demoListingUrl('audi-a5-2023')
-    },
+    requestedCar: leadRequestedCar(12),
     ...demoRequestAttribution,
     utmCampaign: 'audi_a5_used',
     webSparkCampaign: 'a5_detail',
@@ -449,7 +390,15 @@ export const mockLeads = [
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
+    nextStepChannel: 'email',
     contactAttempts: [
+      {
+        timestamp: createHourOffset(-5),
+        outcome: 'no-answer',
+        channel: 'phone',
+        notes: 'No answer.',
+        transcription: null
+      },
       {
         timestamp: createHourOffset(-4),
         outcome: 'spoke-to-customer',
@@ -460,17 +409,14 @@ export const mockLeads = [
     ],
     distanceKm: 8,
     aiSummary:
-      'Paolo validated interest in a used A5 Sportback; next call should cover trim, warranty, and trade-in ballpark before sending the formal quote.'
+      `Paolo validated interest in the ${vehicleLabel(12)}; next call should cover trim, warranty, and trade-in ballpark before sending the formal quote.`
   },
   {
     id: 13,
     customerId: 8,
     status: 'Open',
     priority: 'Warm',
-    requestedCar: {
-      ...baseRequestedCar('Volvo', 'XC60', 2024, 58000),
-      listingUrl: demoListingUrl('volvo-xc60-2024')
-    },
+    requestedCar: leadRequestedCar(13),
     ...demoRequestAttribution,
     utmCampaign: 'volvo_xc60_safety',
     webSparkCampaign: 'xc60_landing',
@@ -483,26 +429,27 @@ export const mockLeads = [
     assigneeInitials: 'SM',
     createdAt: createHourOffset(-2),
     lastActivity: createHourOffset(-2),
-    nextActionDue: createHourOffset(7),
+    nextActionDue: addMinutesToIso(createHourOffset(0), -20),
     tags: ['Fleet'],
     stage: 'Open',
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: [],
+    nextStepChannel: 'whatsapp',
+    contactAttempts: [
+      { timestamp: createHourOffset(-3), outcome: 'no-answer', channel: 'phone', notes: 'Voicemail.', transcription: null },
+      { timestamp: createHourOffset(-2), outcome: 'no-answer', channel: 'phone', notes: 'Busy signal.', transcription: null }
+    ],
     distanceKm: 4,
     aiSummary:
-      'Tommaso inquired about XC60 safety pack and delivery timing; follow up with a configured offer and invite for a weekday test drive.'
+      `Tommaso inquired about ${vehicleLabel(13)} and delivery timing; follow up with a configured offer and invite for a weekday test drive.`
   },
   {
     id: 14,
     customerId: 9,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Toyota', 'bZ4X', 2024, 48000),
-      listingUrl: demoListingUrl('toyota-bz4x-2024')
-    },
+    requestedCar: leadRequestedCar(14),
     ...demoRequestAttribution,
     utmCampaign: 'toyota_ev_q2',
     webSparkCampaign: 'bz4x_stock',
@@ -515,16 +462,20 @@ export const mockLeads = [
     assigneeInitials: 'MA',
     createdAt: createHourOffset(-6),
     lastActivity: createHourOffset(-4),
-    nextActionDue: createHourOffset(9),
+    nextActionDue: createHourOffset(-4),
     tags: [],
     stage: 'Open',
     isDisqualified: false,
     disqualifyReason: null,
     scheduledAppointment: null,
-    contactAttempts: [],
+    contactAttempts: [
+      { timestamp: createHourOffset(-5), outcome: 'no-answer', channel: 'phone', notes: 'No answer.', transcription: null },
+      { timestamp: createHourOffset(-4), outcome: 'no-answer', channel: 'phone', notes: 'Voicemail.', transcription: null },
+      { timestamp: createHourOffset(-3), outcome: 'no-answer', channel: 'phone', notes: 'No answer.', transcription: null }
+    ],
     distanceKm: 20,
     aiSummary:
-      'Julia is comparing EV SUVs; share charging and range figures for the bZ4X and offer a weekday slot for a short demo drive.'
+      `Julia is comparing options; share specs for the ${vehicleLabel(14)} and offer a weekday slot for a short demo drive.`
   },
   // 10. Closed - Duplicate
   {
@@ -532,10 +483,7 @@ export const mockLeads = [
     customerId: 7,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Audi', 'A4', 2024, 42000),
-      listingUrl: demoListingUrl('audi-a4-dup-close')
-    },
+    requestedCar: leadRequestedCar(7),
     ...demoRequestAttribution,
     utmCampaign: 'audi_a4_stock',
     webSparkCampaign: 'a4_listing',
@@ -548,7 +496,7 @@ export const mockLeads = [
     assigneeInitials: 'MG',
     createdAt: createHourOffset(-1),
     lastActivity: createHourOffset(-1),
-    nextActionDue: createHourOffset(-2),
+    nextActionDue: null,
     tags: [],
     stage: 'Closed Failed',
     isDisqualified: true,
@@ -558,17 +506,14 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 5,
     aiSummary:
-      'Closed as duplicate of an existing Audi A4 pipeline record; retain for audit only and route future contact to the primary request.'
+      `Closed as duplicate of an existing ${vehicleLabel(7)} pipeline record; retain for audit only and route future contact to the primary request.`
   },
   {
     id: 15,
     customerId: 46,
     status: 'Open',
     priority: 'Hot',
-    requestedCar: {
-      ...baseRequestedCar('Skoda', 'Enyaq iV', 2024, 42000),
-      listingUrl: demoListingUrl('skoda-enyaq-2024')
-    },
+    requestedCar: leadRequestedCar(15),
     ...demoRequestAttribution,
     utmCampaign: 'skoda_ev_spring',
     webSparkCampaign: 'enyaq_listing',
@@ -591,17 +536,14 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 18,
     aiSummary:
-      'New inquiry on Skoda Enyaq iV stock and delivery; first call should confirm budget, charging setup, and trim preference.'
+      `New inquiry on ${vehicleLabel(15)} stock and delivery; first call should confirm budget, charging setup, and trim preference.`
   },
   {
     id: 16,
     customerId: 47,
     status: 'Open',
     priority: 'Warm',
-    requestedCar: {
-      ...baseRequestedCar('Ford', 'Mustang Mach-E', 2023, 48000),
-      listingUrl: demoListingUrl('ford-mach-e-2023')
-    },
+    requestedCar: leadRequestedCar(16),
     ...demoRequestAttribution,
     utmCampaign: 'ford_ev_used',
     webSparkCampaign: 'mach_e_stock',
@@ -624,17 +566,14 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 25,
     aiSummary:
-      'Customer asked about a used Mach-E and weekend test drive slots; verify range expectations before scheduling.'
+      `Customer asked about the ${vehicleLabel(16)} and weekend test drive slots; verify expectations before scheduling.`
   },
   {
     id: 17,
     customerId: 48,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Hyundai', 'IONIQ 5', 2024, 52000),
-      listingUrl: demoListingUrl('hyundai-ioniq5-2024')
-    },
+    requestedCar: leadRequestedCar(17),
     ...demoRequestAttribution,
     utmCampaign: 'hyundai_ioniq5_nl',
     webSparkCampaign: 'ioniq5_detail',
@@ -657,17 +596,14 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 90,
     aiSummary:
-      'IONIQ 5 pricing and lease options requested; qualify timeline and home charging before sending an offer.'
+      `${vehicleLabel(17)} pricing and lease options requested; qualify timeline and home charging before sending an offer.`
   },
   {
     id: 18,
     customerId: 49,
     status: 'Open',
     priority: 'Hot',
-    requestedCar: {
-      ...baseRequestedCar('Alfa Romeo', 'Tonale', 2024, 39000),
-      listingUrl: demoListingUrl('alfa-tonale-2024')
-    },
+    requestedCar: leadRequestedCar(18),
     ...demoRequestAttribution,
     utmCampaign: 'alfa_tonale_social',
     webSparkCampaign: 'tonale_fb',
@@ -690,17 +626,14 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 14,
     aiSummary:
-      'Strong interest in Tonale plug-in hybrid; confirm stock colour and invite for a short weekday test drive.'
+      `Strong interest in the ${vehicleLabel(18)}; confirm stock colour and invite for a short weekday test drive.`
   },
   {
     id: 19,
     customerId: 50,
     status: 'Open',
     priority: 'Warm',
-    requestedCar: {
-      ...baseRequestedCar('Peugeot', 'e-3008', 2024, 46000),
-      listingUrl: demoListingUrl('peugeot-e3008-2024')
-    },
+    requestedCar: leadRequestedCar(19),
     ...demoRequestAttribution,
     utmCampaign: 'peugeot_ev_fr',
     webSparkCampaign: 'e3008_landing',
@@ -723,17 +656,14 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 110,
     aiSummary:
-      'e-3008 family SUV inquiry from paid traffic; validate purchase window and trade-in before quoting.'
+      `${vehicleLabel(19)} inquiry from paid traffic; validate purchase window and trade-in before quoting.`
   },
   {
     id: 20,
     customerId: 51,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Mini', 'Cooper SE', 2023, 32000),
-      listingUrl: demoListingUrl('mini-cooper-se-2023')
-    },
+    requestedCar: leadRequestedCar(20),
     ...demoRequestAttribution,
     utmCampaign: 'mini_city_ev',
     webSparkCampaign: 'cooper_se_showroom',
@@ -756,17 +686,14 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 6,
     aiSummary:
-      'Walk-in on used Cooper SE; follow up to confirm city parking constraints and charging access.'
+      `Walk-in on ${vehicleLabel(20)}; follow up to confirm city parking constraints and charging access.`
   },
   {
     id: 21,
     customerId: 52,
     status: 'Open',
     priority: 'Warm',
-    requestedCar: {
-      ...baseRequestedCar('Cupra', 'Born', 2024, 38000),
-      listingUrl: demoListingUrl('cupra-born-2024')
-    },
+    requestedCar: leadRequestedCar(21),
     ...demoRequestAttribution,
     utmCampaign: 'cupra_born_ig',
     webSparkCampaign: 'born_reel',
@@ -789,17 +716,14 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 22,
     aiSummary:
-      'Cupra Born stock check requested; qualify if customer prefers purchase or subscription-style offer.'
+      `${vehicleLabel(21)} stock check requested; qualify if customer prefers purchase or subscription-style offer.`
   },
   {
     id: 22,
     customerId: 53,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Kia', 'EV6', 2024, 54000),
-      listingUrl: demoListingUrl('kia-ev6-2024')
-    },
+    requestedCar: leadRequestedCar(22),
     ...demoRequestAttribution,
     utmCampaign: 'kia_ev6_search',
     webSparkCampaign: 'ev6_stock',
@@ -822,17 +746,14 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 200,
     aiSummary:
-      'EV6 GT-Line inquiry from Denmark; confirm import or local stock path and expected delivery.'
+      `${vehicleLabel(22)} inquiry from Denmark; confirm import or local stock path and expected delivery.`
   },
   {
     id: 23,
     customerId: 54,
     status: 'Open',
     priority: 'Hot',
-    requestedCar: {
-      ...baseRequestedCar('Seat', 'Leon', 2023, 24000),
-      listingUrl: demoListingUrl('seat-leon-2023')
-    },
+    requestedCar: leadRequestedCar(23),
     ...demoRequestAttribution,
     utmCampaign: 'seat_leon_used',
     webSparkCampaign: 'leon_es',
@@ -855,17 +776,14 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 35,
     aiSummary:
-      'Used Leon family car request from Spain; verify financing preference and annual mileage.'
+      `${vehicleLabel(23)} family car request from Spain; verify financing preference and annual mileage.`
   },
   {
     id: 24,
     customerId: 55,
     status: 'Open',
     priority: 'Warm',
-    requestedCar: {
-      ...baseRequestedCar('Renault', 'Scenic E-Tech', 2024, 44000),
-      listingUrl: demoListingUrl('renault-scenic-etech-2024')
-    },
+    requestedCar: leadRequestedCar(24),
     ...demoRequestAttribution,
     utmCampaign: 'renault_scenic_q2',
     webSparkCampaign: 'scenic_family',
@@ -888,17 +806,14 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 40,
     aiSummary:
-      'Scenic E-Tech family EV; confirm seating needs and charging at home before workshop booking.'
+      `${vehicleLabel(24)} family car inquiry; confirm seating needs and charging at home before workshop booking.`
   },
   {
     id: 25,
     customerId: 56,
     status: 'Open',
     priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Opel', 'Astra Electric', 2024, 37000),
-      listingUrl: demoListingUrl('opel-astra-ev-2024')
-    },
+    requestedCar: leadRequestedCar(25),
     ...demoRequestAttribution,
     utmCampaign: 'opel_astra_ev',
     webSparkCampaign: 'astra_e_detail',
@@ -921,138 +836,7 @@ export const mockLeads = [
     contactAttempts: [],
     distanceKm: 12,
     aiSummary:
-      'Astra Electric company car inquiry; check employer policy and tax bracket for quote accuracy.'
-  },
-  {
-    id: 26,
-    customerId: 57,
-    status: 'Open',
-    priority: 'Warm',
-    requestedCar: {
-      ...baseRequestedCar('Dacia', 'Spring', 2024, 18000),
-      listingUrl: demoListingUrl('dacia-spring-2024')
-    },
-    ...demoRequestAttribution,
-    utmCampaign: 'dacia_spring_fb',
-    webSparkCampaign: 'spring_city',
-    carStatus: 'In Stock',
-    requestType: 'Quotation',
-    source: 'Facebook',
-    channel: 'Paid',
-    fiscalEntity: 'MotorK',
-    sourceDetails: 'Messenger',
-    assignee: 'Davide Rinaldi',
-    assigneeInitials: 'DR',
-    createdAt: createHourOffset(-1),
-    lastActivity: createHourOffset(-1),
-    nextActionDue: createHourOffset(6),
-    tags: [],
-    stage: 'Open',
-    isDisqualified: false,
-    disqualifyReason: null,
-    scheduledAppointment: null,
-    contactAttempts: [],
-    distanceKm: 130,
-    aiSummary:
-      'Budget-focused Spring request; qualify city use case and expected handover date.'
-  },
-  {
-    id: 27,
-    customerId: 58,
-    status: 'Open',
-    priority: 'Hot',
-    requestedCar: {
-      ...baseRequestedCar('Citroën', 'ë-C4', 2024, 35000),
-      listingUrl: demoListingUrl('citroen-ec4-2024')
-    },
-    ...demoRequestAttribution,
-    utmCampaign: 'citroen_ec4_fr',
-    webSparkCampaign: 'ec4_walkin',
-    carStatus: 'In Stock',
-    requestType: 'Test Drive',
-    source: 'Walk-in',
-    channel: 'Organic',
-    fiscalEntity: 'MotorK',
-    sourceDetails: 'Showroom',
-    assignee: 'Matteo Alpino',
-    assigneeInitials: 'MA',
-    createdAt: createHourOffset(-1),
-    lastActivity: createHourOffset(-1),
-    nextActionDue: createHourOffset(3),
-    tags: [],
-    stage: 'Open',
-    isDisqualified: false,
-    disqualifyReason: null,
-    scheduledAppointment: null,
-    contactAttempts: [],
-    distanceKm: 85,
-    aiSummary:
-      'ë-C4 comfort-focused buyer; confirm preferred spec pack and same-day callback expectation.'
-  },
-  {
-    id: 28,
-    customerId: 59,
-    status: 'Open',
-    priority: 'Normal',
-    requestedCar: {
-      ...baseRequestedCar('Volkswagen', 'Golf GTE', 2023, 36000),
-      listingUrl: demoListingUrl('vw-golf-gte-2023')
-    },
-    ...demoRequestAttribution,
-    utmCampaign: 'vw_golf_gte_used',
-    webSparkCampaign: 'gte_search',
-    carStatus: 'Used',
-    requestType: 'Quotation',
-    source: 'Google Ads',
-    channel: 'Paid',
-    fiscalEntity: 'MotorK',
-    sourceDetails: 'Search',
-    assignee: 'Sara Marino',
-    assigneeInitials: 'SM',
-    createdAt: createHourOffset(-1),
-    lastActivity: createHourOffset(0),
-    nextActionDue: createHourOffset(10),
-    tags: ['Fleet'],
-    stage: 'Open',
-    isDisqualified: false,
-    disqualifyReason: null,
-    scheduledAppointment: null,
-    contactAttempts: [],
-    distanceKm: 9,
-    aiSummary:
-      'Used Golf GTE for fleet evaluation; verify pool size and charging at depot before proposal.'
-  },
-  {
-    id: 29,
-    customerId: 60,
-    status: 'Open',
-    priority: 'Warm',
-    requestedCar: {
-      ...baseRequestedCar('Nissan', 'Ariya', 2024, 50000),
-      listingUrl: demoListingUrl('nissan-ariya-2024')
-    },
-    ...demoRequestAttribution,
-    utmCampaign: 'nissan_ariya_web',
-    webSparkCampaign: 'ariya_contact',
-    carStatus: 'In Stock',
-    requestType: 'Generic sales',
-    source: 'Website',
-    channel: 'Organic',
-    fiscalEntity: 'MotorK',
-    sourceDetails: 'Lead form',
-    assignee: 'Davide Rinaldi',
-    assigneeInitials: 'DR',
-    createdAt: createHourOffset(0),
-    lastActivity: createHourOffset(0),
-    nextActionDue: createHourOffset(5),
-    tags: [],
-    stage: 'Open',
-    isDisqualified: false,
-    disqualifyReason: null,
-    scheduledAppointment: null,
-    contactAttempts: [],
-    distanceKm: 55,
-    aiSummary:
-      'Ariya inquiry comparing trim levels; first call should lock must-have options and handover timing.'
+      `${vehicleLabel(25)} company car inquiry; check employer policy and tax bracket for quote accuracy.`
   }
-]
+  ]
+}

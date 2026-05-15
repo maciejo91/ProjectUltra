@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col lg:flex-row overflow-hidden bg-surface">
+  <div class="flex h-full min-h-0 flex-col overflow-hidden bg-surface lg:flex-row">
     <!-- Card View: when header-over-list layout (desktop), teleport list and right panel to layout slots.
          Only mount Teleports after targets exist (avoids "Failed to locate Teleport target" on Tasks mount).
          Use disabled when route changes so content renders in place before unmount (avoids insertBefore null). -->
@@ -215,7 +215,7 @@
     </div>
     
     <!-- Table View - Same structure as Customers: page-container, scroll area with padding, white card. -->
-    <div v-if="viewMode === 'table'" class="page-container relative flex flex-col flex-1 overflow-hidden min-w-0 h-full bg-surface border-r border-border">
+    <div v-if="viewMode === 'table'" class="page-container relative flex min-h-0 flex-1 flex-col overflow-hidden min-w-0 bg-surface border-r border-border">
       <TasksTableView
         :tasks="allTasks"
         :current-task-id="drawerTask?.compositeId"

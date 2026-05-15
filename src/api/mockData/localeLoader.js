@@ -24,92 +24,30 @@ import {
 } from './dashboard.js'
 import { mockNotifications } from './notifications.js'
 import { translateObject } from './locales/translations.js'
-import audiA6Allroad40TdiImage from '@/assets/images/mock-vehicles/audi-a6-allroad-40-tdi.png'
+import { CRM_VEHICLE_MENTION_NAMES, getCrmVehicleDisplayName } from './crmVehicles.js'
 
 // Import locale-specific data (English as default)
-import { mockLeads as enLeads } from './locales/en/leads.js'
+import { buildMockLeads as enBuildMockLeads } from './locales/en/leads.js'
 import { mockCustomers as enCustomers } from './locales/en/customers.js'
-import { mockOpportunities as enOpportunities } from './locales/en/opportunities.js'
+import { buildMockOpportunities as enBuildMockOpportunities } from './locales/en/opportunities.js'
 import { mockActivities as enActivities } from './locales/en/activities.js'
 import { mockTasks as enTasks } from './locales/en/tasks.js'
 
-const DEMO_USED_VEHICLE = {
-  brand: 'Audi',
-  model: 'A6 Allroad',
-  year: 2023,
-  price: 19000,
-  plateNumber: 'FZ131FG',
-  image: audiA6Allroad40TdiImage,
-  vin: '',
-  kilometers: 10237,
-  mileage: undefined,
-  status: 'Used',
-  fuelType: 'Petrol',
-  gearType: 'Automatic',
-  dealership: 'Roma',
-  stockDays: 200,
-  registration: '22/12/2015',
-  variant: '40 TDI 2.0 quattro S tronic Business Advanced',
-  listingUrl: 'https://www.autoscout24.es'
-}
-
-const DEMO_NEW_VEHICLE = {
-  brand: 'BMW',
-  model: 'iX xDrive50',
-  year: 2024,
-  price: 105000,
-  plateNumber: '',
-  image: '/brands/bmw-white.svg',
-  imageDisplayMode: 'logo',
-  vin: '',
-  kilometers: null,
-  mileage: null,
-  status: 'New',
-  fuelType: 'Electric',
-  gearType: 'Automatic',
-  dealership: 'Milano',
-  stockDays: null,
-  registration: '',
-  variant: '',
-  listingUrl: 'https://www.example.com/inventory/bmw-ix-2024'
-}
-
-const VEHICLE_MENTIONS = [
+const LEGACY_VEHICLE_MENTIONS = [
   'Audi A6 Allroad',
   'Audi A6',
   'Volkswagen ID.4',
   'VW ID.4',
-  'ID.4',
   'Mercedes-Benz C-Class',
   'Mercedes C-Class',
-  'C-Class',
   'Tesla Model 3',
   'Porsche Cayenne',
   'Porsche Macan',
-  'Audi A5 Sportback',
-  'Audi A5',
-  'Volvo XC60',
-  'Toyota bZ4X',
-  'Skoda Enyaq iV',
-  'Ford Mustang Mach-E',
-  'Hyundai IONIQ 5',
-  'Alfa Romeo Tonale',
-  'Peugeot e-3008',
-  'Mini Cooper SE',
-  'Cupra Born',
-  'Kia EV6',
-  'Seat Leon',
-  'Renault Scenic E-Tech',
-  'Opel Astra Electric',
-  'Dacia Spring',
-  'Citroën ë-C4',
-  'VW Golf GTE',
-  'Volkswagen Golf GTE',
-  'Nissan Ariya',
   'BMW iX xDrive50',
-  'BMW iX',
-  'iX xDrive50'
+  'BMW iX'
 ]
+
+const VEHICLE_MENTIONS = [...new Set([...CRM_VEHICLE_MENTION_NAMES, ...LEGACY_VEHICLE_MENTIONS])]
 
 const STAFF_MENTIONS = ['Sara Marino', 'Davide Rinaldi', 'Matteo Greco', 'Matteo Alpino']
 
@@ -129,8 +67,10 @@ const DEMO_CITY_BY_PROFILE = {
 
 const LOCALIZED_COPY = {
   en: {
-    newRequestMessage: 'I would like to know if the BMW iX xDrive50 is available to order. Can you confirm configuration, price, and delivery timing?',
-    usedRequestMessage: 'Hi, I am interested in the Audi A6 Allroad. Can we schedule a test drive?',
+    newRequestMessage: ({ vehicleName }) =>
+      `I would like to know if the ${vehicleName} is available to order. Can you confirm configuration, price, and delivery timing?`,
+    usedRequestMessage: ({ vehicleName }) =>
+      `Hi, I am interested in the ${vehicleName}. Can we schedule a test drive?`,
     newLeadSummary: ({ customerName, vehicleName }) =>
       `${customerName || 'The customer'} is interested in ordering the ${vehicleName}; confirm configuration, price, delivery timing, and test-drive options.`,
     usedLeadSummary: ({ customerName, vehicleName }) =>
@@ -143,8 +83,10 @@ const LOCALIZED_COPY = {
       `${customerName} is interested in the used ${vehicleName} in Roma and responds best when availability, price, and test-drive options are handled quickly.`
   },
   it: {
-    newRequestMessage: 'Vorrei sapere se la BMW iX xDrive50 è disponibile da ordinare. Potete confermare configurazione, prezzo e tempi di consegna?',
-    usedRequestMessage: "Buongiorno, sono interessato all'Audi A6 Allroad. Possiamo fissare un test drive?",
+    newRequestMessage: ({ vehicleName }) =>
+      `Vorrei sapere se la ${vehicleName} è disponibile da ordinare. Potete confermare configurazione, prezzo e tempi di consegna?`,
+    usedRequestMessage: ({ vehicleName }) =>
+      `Buongiorno, sono interessato alla ${vehicleName}. Possiamo fissare un test drive?`,
     newLeadSummary: ({ customerName, vehicleName }) =>
       `${customerName || 'Il cliente'} è interessato a ordinare la ${vehicleName}; confermare configurazione, prezzo, tempi di consegna e disponibilità per un test drive.`,
     usedLeadSummary: ({ customerName, vehicleName }) =>
@@ -157,8 +99,10 @@ const LOCALIZED_COPY = {
       `${customerName} è interessato alla ${vehicleName} usata a Roma e risponde meglio quando disponibilità, prezzo e test drive vengono gestiti rapidamente.`
   },
   de: {
-    newRequestMessage: 'Ich möchte wissen, ob der BMW iX xDrive50 bestellbar ist. Können Sie Konfiguration, Preis und Lieferzeit bestätigen?',
-    usedRequestMessage: 'Hallo, ich interessiere mich für den Audi A6 Allroad. Können wir eine Probefahrt vereinbaren?',
+    newRequestMessage: ({ vehicleName }) =>
+      `Ich möchte wissen, ob der ${vehicleName} bestellbar ist. Können Sie Konfiguration, Preis und Lieferzeit bestätigen?`,
+    usedRequestMessage: ({ vehicleName }) =>
+      `Hallo, ich interessiere mich für den ${vehicleName}. Können wir eine Probefahrt vereinbaren?`,
     newLeadSummary: ({ customerName, vehicleName }) =>
       `${customerName || 'Der Kunde'} interessiert sich für eine Bestellung des ${vehicleName}; Konfiguration, Preis, Lieferzeit und Probefahrt bestätigen.`,
     usedLeadSummary: ({ customerName, vehicleName }) =>
@@ -171,8 +115,10 @@ const LOCALIZED_COPY = {
       `${customerName} interessiert sich für den gebrauchten ${vehicleName} in Roma und reagiert am besten auf schnelle Informationen zu Verfügbarkeit, Preis und Probefahrt.`
   },
   fr: {
-    newRequestMessage: 'Je voudrais savoir si la BMW iX xDrive50 est disponible à la commande. Pouvez-vous confirmer la configuration, le prix et le délai de livraison ?',
-    usedRequestMessage: "Bonjour, je suis intéressé par l'Audi A6 Allroad. Pouvons-nous programmer un essai ?",
+    newRequestMessage: ({ vehicleName }) =>
+      `Je voudrais savoir si la ${vehicleName} est disponible à la commande. Pouvez-vous confirmer la configuration, le prix et le délai de livraison ?`,
+    usedRequestMessage: ({ vehicleName }) =>
+      `Bonjour, je suis intéressé par la ${vehicleName}. Pouvons-nous programmer un essai ?`,
     newLeadSummary: ({ customerName, vehicleName }) =>
       `${customerName || 'Le client'} souhaite commander la ${vehicleName}; confirmer la configuration, le prix, le délai de livraison et les options d'essai.`,
     usedLeadSummary: ({ customerName, vehicleName }) =>
@@ -185,8 +131,10 @@ const LOCALIZED_COPY = {
       `${customerName} est intéressé par la ${vehicleName} d'occasion à Roma et répond mieux lorsque disponibilité, prix et essai sont traités rapidement.`
   },
   nl: {
-    newRequestMessage: 'Ik wil graag weten of de BMW iX xDrive50 te bestellen is. Kunt u configuratie, prijs en levertijd bevestigen?',
-    usedRequestMessage: 'Hallo, ik ben geïnteresseerd in de Audi A6 Allroad. Kunnen we een proefrit plannen?',
+    newRequestMessage: ({ vehicleName }) =>
+      `Ik wil graag weten of de ${vehicleName} te bestellen is. Kunt u configuratie, prijs en levertijd bevestigen?`,
+    usedRequestMessage: ({ vehicleName }) =>
+      `Hallo, ik ben geïnteresseerd in de ${vehicleName}. Kunnen we een proefrit plannen?`,
     newLeadSummary: ({ customerName, vehicleName }) =>
       `${customerName || 'De klant'} is geïnteresseerd in het bestellen van de ${vehicleName}; bevestig configuratie, prijs, levertijd en proefritopties.`,
     usedLeadSummary: ({ customerName, vehicleName }) =>
@@ -211,35 +159,30 @@ function isNewRequestedVehicle(entity) {
   return status === 'new' || NEW_CAR_STATUS_KEYS.has(carStatus)
 }
 
-function getDemoVehicleProfile(entity) {
-  return isNewRequestedVehicle(entity) ? DEMO_NEW_VEHICLE : DEMO_USED_VEHICLE
-}
-
 function getVehicleDisplayName(entity) {
-  const profile = getDemoVehicleProfile(entity)
-  return `${profile.brand} ${profile.model}`
+  const car = entity?.requestedCar || entity?.vehicle || entity
+  if (!car?.brand && !car?.model) return ''
+  return getCrmVehicleDisplayName(car)
 }
 
 function normalizeRequestedVehicle(car, entity = {}, locale = 'en') {
   if (!car) return car
-  const profile = getDemoVehicleProfile({ ...entity, requestedCar: car })
+  const vehicleName = getCrmVehicleDisplayName(car)
   const copy = getCopy(locale)
+  const isNew = String(car.status || '').toLowerCase() === 'new'
+  const defaultMessage = isNew
+    ? copy.newRequestMessage({ vehicleName })
+    : copy.usedRequestMessage({ vehicleName })
   return {
     ...car,
-    ...profile,
-    requestMessage: profile.status === 'New'
-      ? copy.newRequestMessage
-      : copy.usedRequestMessage,
+    requestMessage: car.requestMessage || defaultMessage,
     staffNote: car.staffNote || ''
   }
 }
 
 function replaceVehicleMentions(text, vehicleName) {
-  if (typeof text !== 'string' || !text.trim()) return text
-  return text
-    .replace(/BMW\s+BMW\s+iX\s+xDrive50(?:\s+xDrive50)*/g, 'BMW iX xDrive50')
-    .replace(/BMW\s+iX\s+xDrive50(?:\s+xDrive50)+/g, 'BMW iX xDrive50')
-    .replace(VEHICLE_MENTION_PATTERN, vehicleName)
+  if (typeof text !== 'string' || !text.trim() || !vehicleName) return text
+  return text.replace(VEHICLE_MENTION_PATTERN, vehicleName)
 }
 
 function replaceStaffMentions(text, assigneeName) {
@@ -254,45 +197,30 @@ function normalizeLeadCopy(lead, customerName, locale = 'en') {
   const vehicleName = getVehicleDisplayName(lead)
   const isNew = isNewRequestedVehicle(lead)
   const copy = getCopy(locale)
+  const carStatus = lead.carStatus || (isNew ? 'toBeOrder' : 'In Stock')
+  const aiSummary =
+    lead.aiSummary ||
+    (isNew
+      ? copy.newLeadSummary({ customerName, vehicleName })
+      : copy.usedLeadSummary({ customerName, vehicleName }))
   return {
     ...lead,
-    carStatus: isNew ? 'toBeOrder' : 'In Stock',
+    carStatus,
     requestMessage: lead.requestedCar?.requestMessage || lead.requestMessage,
-    aiSummary: isNew
-      ? copy.newLeadSummary({ customerName, vehicleName })
-      : copy.usedLeadSummary({ customerName, vehicleName })
+    aiSummary
   }
 }
 
 function normalizeOpportunityCopy(opportunity, customerName, locale = 'en') {
   const vehicleName = getVehicleDisplayName(opportunity)
-  const profile = getDemoVehicleProfile(opportunity)
+  const car = opportunity.requestedCar || opportunity.vehicle
+  const isNew = String(car?.status || '').toLowerCase() === 'new'
   const copy = getCopy(locale)
-  const offers = Array.isArray(opportunity.offers)
-    ? opportunity.offers.map((offer) => ({
-        ...offer,
-        vehicleBrand: profile.brand,
-        vehicleModel: profile.model,
-        vehicleYear: profile.year,
-        price: profile.price,
-        data: offer.data
-          ? {
-              ...offer.data,
-              brand: profile.brand,
-              model: profile.model,
-              year: profile.year,
-              price: profile.price,
-              image: profile.image
-            }
-          : offer.data
-      }))
-    : opportunity.offers
   return {
     ...opportunity,
-    carStatus: profile.status === 'New' ? 'toBeOrder' : 'In Stock',
-    value: profile.price,
-    offers,
-    aiSummary: copy.opportunitySummary({ customerName, vehicleName })
+    carStatus: opportunity.carStatus || (isNew ? 'toBeOrder' : 'In Stock'),
+    aiSummary:
+      opportunity.aiSummary || copy.opportunitySummary({ customerName, vehicleName })
   }
 }
 
@@ -373,8 +301,8 @@ function applyDemoVehicleConsistency({ leads, customers, opportunities, tasks, a
       summary: isNew
         ? copy.newCustomerSummary({ customerName: customer.name, vehicleName })
         : copy.usedCustomerSummary({ customerName: customer.name, vehicleName }),
-      preferredVehicleType: isNew ? 'Electric SUV' : 'Premium wagon',
-      budgetRange: isNew ? '€90K-€110K' : '€18K-€22K'
+      preferredVehicleType: isNew ? 'New car' : 'Used / Km0',
+      budgetRange: isNew ? '€40K-€45K' : '€15K-€45K'
     }
   })
   const normalizedCustomerById = new Map(normalizedCustomers.map((customer) => [customer.id, customer]))
@@ -408,24 +336,24 @@ function applyDemoVehicleConsistency({ leads, customers, opportunities, tasks, a
   }
 }
 
-import { mockLeads as itLeads } from './locales/it/leads.js'
+import { buildMockLeads as itBuildMockLeads } from './locales/it/leads.js'
 import { mockCustomers as itCustomers } from './locales/it/customers.js'
-import { mockOpportunities as itOpportunities } from './locales/it/opportunities.js'
+import { buildMockOpportunities as itBuildMockOpportunities } from './locales/it/opportunities.js'
 import { mockActivities as itActivities } from './locales/it/activities.js'
 
-import { mockLeads as deLeads } from './locales/de/leads.js'
+import { buildMockLeads as deBuildMockLeads } from './locales/de/leads.js'
 import { mockCustomers as deCustomers } from './locales/de/customers.js'
-import { mockOpportunities as deOpportunities } from './locales/de/opportunities.js'
+import { buildMockOpportunities as deBuildMockOpportunities } from './locales/de/opportunities.js'
 import { mockActivities as deActivities } from './locales/de/activities.js'
 
-import { mockLeads as frLeads } from './locales/fr/leads.js'
+import { buildMockLeads as frBuildMockLeads } from './locales/fr/leads.js'
 import { mockCustomers as frCustomers } from './locales/fr/customers.js'
-import { mockOpportunities as frOpportunities } from './locales/fr/opportunities.js'
+import { buildMockOpportunities as frBuildMockOpportunities } from './locales/fr/opportunities.js'
 import { mockActivities as frActivities } from './locales/fr/activities.js'
 
-import { mockLeads as nlLeads } from './locales/nl/leads.js'
+import { buildMockLeads as nlBuildMockLeads } from './locales/nl/leads.js'
 import { mockCustomers as nlCustomers } from './locales/nl/customers.js'
-import { mockOpportunities as nlOpportunities } from './locales/nl/opportunities.js'
+import { buildMockOpportunities as nlBuildMockOpportunities } from './locales/nl/opportunities.js'
 import { mockActivities as nlActivities } from './locales/nl/activities.js'
 
 /**
@@ -444,35 +372,39 @@ function getCurrentLocale() {
 /**
  * Locale-specific data maps
  */
+function resolveLocaleCollection(collection) {
+  return typeof collection === 'function' ? collection() : collection
+}
+
 const localeData = {
   en: {
-    leads: enLeads,
+    leads: enBuildMockLeads,
     customers: enCustomers,
-    opportunities: enOpportunities,
+    opportunities: enBuildMockOpportunities,
     activities: enActivities
   },
   it: {
-    leads: itLeads,
+    leads: itBuildMockLeads,
     customers: itCustomers,
-    opportunities: itOpportunities,
+    opportunities: itBuildMockOpportunities,
     activities: itActivities
   },
   de: {
-    leads: deLeads,
+    leads: deBuildMockLeads,
     customers: deCustomers,
-    opportunities: deOpportunities,
+    opportunities: deBuildMockOpportunities,
     activities: deActivities
   },
   fr: {
-    leads: frLeads,
+    leads: frBuildMockLeads,
     customers: frCustomers,
-    opportunities: frOpportunities,
+    opportunities: frBuildMockOpportunities,
     activities: frActivities
   },
   nl: {
-    leads: nlLeads,
+    leads: nlBuildMockLeads,
     customers: nlCustomers,
-    opportunities: nlOpportunities,
+    opportunities: nlBuildMockOpportunities,
     activities: nlActivities
   }
 }
@@ -494,8 +426,8 @@ export function getMockData() {
           const enCustomer = localeData.en.customers.find((e) => e.id === c.id)
           return { ...c, interestScore: enCustomer?.interestScore ?? c.interestScore }
         })
-  const mockLeads = translateLocaleData(data.leads)
-  const mockOpportunities = translateLocaleData(data.opportunities)
+  const mockLeads = translateLocaleData(resolveLocaleCollection(data.leads))
+  const mockOpportunities = translateLocaleData(resolveLocaleCollection(data.opportunities))
   const mockActivities = translateLocaleData(data.activities)
   const translatedCustomers = translateLocaleData(mockCustomers)
   const consistentDemoData = applyDemoVehicleConsistency({

@@ -14,7 +14,12 @@
       "callBack": "Zurückrufen",
       "disqualifyLead": "Lead disqualifizieren",
       "postponeTask": "Aufgabe verschieben",
-      "reopenLead": "Lead erneut öffnen"
+      "reopenLead": "Lead erneut öffnen",
+      "firstCallAttempt": "Ersten Anrufversuch durchführen",
+      "firstEmail": "Erste E-Mail senden",
+      "nextCallAttempt": "Nächsten Anrufversuch durchführen",
+      "nextStepEmail": "Nächster Schritt: E-Mail senden",
+      "nextStepWhatsapp": "Nächster Schritt: WhatsApp nutzen"
     }
   },
   "opportunity": {

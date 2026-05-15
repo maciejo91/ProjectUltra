@@ -53,8 +53,16 @@
       <!-- Vehicle Info (if available) -->
       <div v-if="hasCar" class="space-y-3">
         <div class="flex items-center gap-3">
-          <div class="w-32 aspect-4/3 bg-surfaceTertiary rounded-lg overflow-hidden shrink-0">
-            <img v-if="carImage" :src="carImage" alt="Car" class="w-full h-full object-cover">
+          <div
+            class="w-32 aspect-4/3 rounded-lg overflow-hidden shrink-0"
+            :class="usesLogoImage ? 'flex items-center justify-center border border-black/5 bg-white' : 'bg-surfaceTertiary'"
+          >
+            <img
+              v-if="carImage"
+              :src="carImage"
+              alt="Car"
+              :class="usesLogoImage ? 'size-16 object-contain' : 'w-full h-full object-cover'"
+            >
             <Car v-else class="size-9 shrink-0 text-muted-foreground" />
           </div>
           <div class="flex-1 min-w-0">
@@ -149,7 +157,7 @@ import { Badge, Button } from '@motork/component-library/future/primitives'
 import LeadOpportunityDetailsCard from '@/components/shared/LeadOpportunityDetailsCard.vue'
 import RequestMessageCard from '@/components/requests/RequestMessageCard.vue'
 import { getRequestAttributionProps } from '@/utils/requestAttribution'
-import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
+import { getCarImageUrl, getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 import { getStageColor } from '@/utils/stageMapper'
 import { calculateDaysSince } from '@/utils/formatters'
 import { getLatestOffer } from '@/utils/activityHelpers'
@@ -181,7 +189,22 @@ const hasCar = computed(() => {
 const carBrand = computed(() => props.task.requestedCar?.brand || '')
 const carModel = computed(() => props.task.requestedCar?.model || '')
 const carYear = computed(() => props.task.requestedCar?.year || '')
-const carImage = computed(() => props.task.requestedCar?.image || '')
+const carCondition = computed(() => getVehicleConditionLabel(props.task.requestedCar))
+
+const isBmwNewVehicle = computed(
+  () =>
+    String(carCondition.value || '').toLowerCase() === 'new' &&
+    String(props.task.requestedCar?.brand || '').toLowerCase() === 'bmw'
+)
+
+const usesLogoImage = computed(
+  () =>
+    isBmwNewVehicle.value ||
+    props.task.requestedCar?.imageDisplayMode === 'logo' ||
+    props.task.requestedCar?.imageType === 'logo'
+)
+
+const carImage = computed(() => getCarImageUrl(props.task.requestedCar) || '')
 const carPrice = computed(() => props.task.requestedCar?.price || null)
 const stockDays = computed(() => props.task.requestedCar?.stockDays !== undefined ? props.task.requestedCar.stockDays : null)
 
@@ -206,8 +229,6 @@ const carMileage = computed(() => {
   const val = v?.kilometers ?? v?.mileage
   return val !== undefined && val !== null ? val : null
 })
-
-const carCondition = computed(() => getVehicleConditionLabel(props.task.requestedCar))
 
 const carConditionBadgeClass = computed(() => getVehicleConditionBadgeClass(carCondition.value))
 

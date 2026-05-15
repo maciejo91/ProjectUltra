@@ -105,6 +105,7 @@ import { useI18n } from 'vue-i18n'
 import { Sparkles, X, ArrowRight, Search } from 'lucide-vue-next'
 import { Button, Switch, InputGroup, InputGroupAddon, InputGroupInput } from '@motork/component-library/future/primitives'
 import { useNaturalLanguageQuery } from '@/composables/useNaturalLanguageQuery'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 
 const { t } = useI18n()
 
@@ -121,7 +122,7 @@ const props = defineProps({
   typeOptions: { type: Array, default: () => [] },
   requestedCarBrandOptions: { type: Array, default: () => [] },
   accountTypeOptions: { type: Array, default: () => [] },
-  pagination: { type: Object, default: () => ({ pageIndex: 0, pageSize: 10 }) },
+  pagination: { type: Object, default: () => ({ pageIndex: 0, pageSize: DEFAULT_TABLE_PAGE_SIZE }) },
   /** When set, keeps the input in sync with parent `globalFilter` (e.g. programmatic clear). */
   globalFilter: { type: String, default: undefined },
 })
@@ -230,6 +231,22 @@ const aiPlaceholder = computed(() => {
   return currentRotationExample.value || t('dataTable.aiExampleGeneric1')
 })
 
+function focusInputRef (inputRef) {
+  nextTick(() => {
+    const el = inputRef.value
+    const dom =
+      el instanceof HTMLElement
+        ? el
+        : el?.$el instanceof HTMLElement
+          ? el.$el
+          : null
+    const input = dom?.querySelector?.('input,textarea,[contenteditable="true"]') || dom
+    if (input && typeof input.focus === 'function') {
+      input.focus()
+    }
+  })
+}
+
 function clearExampleRotation () {
   if (exampleIntervalId != null) {
     clearInterval(exampleIntervalId)
@@ -250,9 +267,7 @@ watch(showAiOverlay, (open) => {
   if (open) {
     exampleIndex.value = 0
     startExampleRotation()
-    nextTick(() => {
-      aiInputRef.value?.focus()
-    })
+    focusInputRef(aiInputRef)
   } else {
     clearExampleRotation()
   }
@@ -265,9 +280,7 @@ function setAiMode (enabled) {
   showAiOverlay.value = next
   if (!next) {
     aiQuery.value = ''
-    nextTick(() => {
-      searchInputRef.value?.focus()
-    })
+    focusInputRef(searchInputRef)
   }
 }
 
@@ -309,9 +322,7 @@ function closeAiOverlay () {
   aiModeEnabled.value = false
   aiQuery.value = ''
   queryError.value = null
-  nextTick(() => {
-    searchInputRef.value?.focus()
-  })
+  focusInputRef(searchInputRef)
 }
 
 async function submitAiQuery () {

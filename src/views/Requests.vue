@@ -1,12 +1,12 @@
 <template>
   <div class="page-container relative flex flex-col overflow-hidden h-full bg-surface">
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide min-h-0">
-        <div class="mb-8 bg-background">
+    <div class="flex flex-1 flex-col min-h-0 overflow-hidden px-6 pb-4 md:pb-8">
+      <div class="flex flex-1 flex-col min-h-0 bg-background">
           <div class="shrink-0 overflow-visible pb-2 pt-1 mb-2">
             <RequestMainTabs v-model="selectedSegment" :tabs="filterChips" />
           </div>
           <DataTableWithUnifiedSearch
+            class="flex flex-1 flex-col min-h-0"
             ref="datatableShellRef"
             active-tab="requests"
             :placeholder="t('dataTable.searchRequests')"
@@ -34,9 +34,10 @@
               v-model:columnVisibility="columnVisibility"
               v-model:rowSelection="rowSelection"
               :paginationOptions="{
-                rowCount: totalFilteredCount
+                rowCount: totalFilteredCount,
+                pageSizeOptions: [15, 20, 50]
               }"
-              class="h-full"
+              class="flex min-h-0 flex-1 flex-col"
             >
               <template #empty-state>
                 <div class="empty-state">
@@ -73,10 +74,8 @@
               </template>
             </DataTable>
           </DataTableWithUnifiedSearch>
-        </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -100,6 +99,7 @@ import { getDisplayStage } from '@/utils/stageMapper'
 import { useUsersStore } from '@/stores/users'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 
 const {
   filteredList,
@@ -126,7 +126,7 @@ const requestNavigationStore = useRequestNavigationStore()
 
 const { rowSelection, selectedCount, hasSelection, getSelectedRows, clearSelection } = useTableRowSelection((row) => row.compositeId)
 
-const pagination = ref({ pageIndex: 0, pageSize: 50 })
+const pagination = ref({ pageIndex: 0, pageSize: DEFAULT_TABLE_PAGE_SIZE })
 const sorting = ref([])
 const globalFilter = ref('')
 const columnFilters = ref([
@@ -364,7 +364,7 @@ watch(
     if (!id || !tableScrollContainer) return
     const idx = sortedData.value.findIndex(r => r.compositeId === id)
     if (idx === -1) return
-    const pageSize = pagination.value.pageSize || 50
+    const pageSize = pagination.value.pageSize || DEFAULT_TABLE_PAGE_SIZE
     const pageIndex = Math.floor(idx / pageSize)
     if (pagination.value.pageIndex !== pageIndex) {
       pagination.value = { ...pagination.value, pageIndex }

@@ -14,7 +14,12 @@
       "callBack": "Call back",
       "disqualifyLead": "Disqualify Lead",
       "postponeTask": "Postpone Task",
-      "reopenLead": "Reopen Lead"
+      "reopenLead": "Reopen Lead",
+      "firstCallAttempt": "Make the first call attempt",
+      "firstEmail": "Send the first email",
+      "nextCallAttempt": "Make the next call attempt",
+      "nextStepEmail": "Next step: Send an email",
+      "nextStepWhatsapp": "Next step: use WhatsApp"
     }
   },
   "opportunity": {

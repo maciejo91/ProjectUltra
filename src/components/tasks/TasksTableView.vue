@@ -1,8 +1,9 @@
 <template>
-  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
-    <!-- Same as Customers: one scroll area with padding, one white card (search + table) -->
-    <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide min-h-0">
+  <div class="flex flex-1 flex-col min-h-0 min-w-0 overflow-hidden">
+    <div class="flex flex-1 flex-col min-h-0 px-6 pb-4 md:pb-8">
+      <div class="flex flex-1 flex-col min-h-0 bg-background">
       <DataTableWithUnifiedSearch
+        class="flex flex-1 flex-col min-h-0"
         ref="datatableShellRef"
         v-model:sorting="sorting"
         active-tab="tasks"
@@ -35,9 +36,10 @@
             v-model:columnVisibility="columnVisibility"
             v-model:rowSelection="rowSelection"
             :paginationOptions="{
-              rowCount: totalFilteredCount
+              rowCount: totalFilteredCount,
+              pageSizeOptions: [15, 20, 50]
             }"
-            class="h-full"
+              class="flex min-h-0 flex-1 flex-col"
           >
             <template #empty-state>
               <div class="empty-state">
@@ -74,16 +76,23 @@
             </template>
           </DataTable>
       </DataTableWithUnifiedSearch>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, h, watch, nextTick, onUnmounted } from 'vue'
+import { ref, computed, h, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ListTodo, Trash2, X, Triangle, Circle } from 'lucide-vue-next'
+import { ListTodo, Trash2, X } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
-import { Button } from '@motork/component-library/future/primitives'
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@motork/component-library/future/primitives'
 import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import { formatCurrency, getDeadlineStatus } from '@/utils/formatters'
 import { calculateLeadUrgency, getUrgencyDotClass } from '@/composables/useLeadUrgency'
@@ -93,12 +102,23 @@ import { useTasksTableFilters } from '@/composables/useTasksTableFilters'
 import { useTableRowSelection } from '@/composables/useTableRowSelection'
 import { useTableRowClick } from '@/composables/useTableRowClick'
 import { useDataTableData, getNestedProperty } from '@/composables/useDataTableData'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useTaskHelpers } from '@/composables/useTaskHelpers'
-import { getTaskActionTitle, getTaskDisplayTitle } from '@/utils/taskActionTitle'
+import { getTaskNextActionDisplay, getTaskTypeCode } from '@/utils/taskActionTitle'
 import { getDisplayStage } from '@/utils/stageMapper'
-import { getTaskStatus } from '@/utils/taskStatus'
+import {
+  getTaskTableStatus,
+  getTaskTableStatusBadgeClass,
+  TASK_TABLE_STATUS,
+  translateTaskTableStatus
+} from '@/utils/taskStatus'
+import {
+  formatTaskDueTimeDisplay,
+  formatTaskCreatedAtDisplay,
+  getTaskDueTimestamp
+} from '@/utils/taskTableDates'
 
 const { t, locale } = useI18n()
 
@@ -128,6 +148,7 @@ const opportunitiesStore = useOpportunitiesStore()
 const { getCustomerCity } = useTaskHelpers()
 const searchQuery = ref('')
 const datatableShellRef = ref(null)
+let isTableMounted = false
 
 const maxContactAttempts = computed(() => settingsStore.getSetting('maxContactAttempts') ?? 5)
 
@@ -156,50 +177,32 @@ function getRequestMessageSnippet(task) {
   return msg.length > 32 ? `${msg.slice(0, 29)}...` : msg
 }
 
-function getRelativeTimeFormatter() {
-  return new Intl.RelativeTimeFormat(locale.value || 'en', { numeric: 'auto' })
+function renderTaskDateLabel({ label, tooltip, className }) {
+  const text = h('span', { class: className }, label)
+  if (!tooltip || tooltip === label) return text
+  return h(TooltipProvider, { delayDuration: 200 }, {
+    default: () => h(Tooltip, {}, {
+      default: () => [
+        h(TooltipTrigger, { asChild: true }, { default: () => text }),
+        h(TooltipContent, { side: 'top' }, { default: () => tooltip })
+      ]
+    })
+  })
 }
 
-function formatTaskDate(date) {
-  return date.toLocaleDateString(locale.value || 'en', { month: 'short', day: 'numeric' })
-}
-
-function formatTaskDueDateRelative(isoTimestamp) {
-  if (!isoTimestamp) return ''
-  const relativeTimeFormatter = getRelativeTimeFormatter()
-  const dueDate = new Date(isoTimestamp)
-  const now = new Date()
-  const diffMs = dueDate - now
-  const diffMin = Math.floor(Math.abs(diffMs) / (1000 * 60))
-  const diffHour = Math.floor(diffMin / 60)
-  const diffDay = Math.floor(diffHour / 24)
-  const sign = diffMs < 0 ? -1 : 1
-
-  if (diffMin < 1) {
-    return diffMs < 0 ? t('dataTable.tasks.values.overdueJustNow') : t('dataTable.tasks.values.lessThanMinute')
-  }
-  if (diffMin < 60) return relativeTimeFormatter.format(sign * diffMin, 'minute')
-  if (diffHour < 24) return relativeTimeFormatter.format(sign * diffHour, 'hour')
-  if (diffDay < 7) return relativeTimeFormatter.format(sign * diffDay, 'day')
-  return formatTaskDate(dueDate)
-}
-
-function formatTaskRelativeTime(dateInput) {
-  if (!dateInput) return ''
-  const relativeTimeFormatter = getRelativeTimeFormatter()
-  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput
-  const now = new Date()
-  const diffMs = now - date
-  const diffSec = Math.floor(diffMs / 1000)
-  const diffMin = Math.floor(diffSec / 60)
-  const diffHour = Math.floor(diffMin / 60)
-  const diffDay = Math.floor(diffHour / 24)
-
-  if (diffSec < 60) return t('dataTable.tasks.values.justNow')
-  if (diffMin < 60) return relativeTimeFormatter.format(-diffMin, 'minute')
-  if (diffHour < 24) return relativeTimeFormatter.format(-diffHour, 'hour')
-  if (diffDay < 7) return relativeTimeFormatter.format(-diffDay, 'day')
-  return formatTaskDate(date)
+function renderDueTimePill({ label, tooltip, pillClass }) {
+  const pill = h('span', {
+    class: `inline-flex items-center gap-1 px-2 py-0.5 rounded text-sm font-medium uppercase leading-none ${pillClass}`
+  }, label)
+  if (!tooltip || tooltip === label) return pill
+  return h(TooltipProvider, { delayDuration: 200 }, {
+    default: () => h(Tooltip, {}, {
+      default: () => [
+        h(TooltipTrigger, { asChild: true }, { default: () => pill }),
+        h(TooltipContent, { side: 'top' }, { default: () => tooltip })
+      ]
+    })
+  })
 }
 
 // Row selection
@@ -208,7 +211,7 @@ const { rowSelection, selectedCount, hasSelection, getSelectedRows, clearSelecti
 // DataTable state management
 const pagination = ref({
   pageIndex: 0,
-  pageSize: 10
+  pageSize: DEFAULT_TABLE_PAGE_SIZE
 })
 
 const globalFilter = ref(props.initialGlobalFilter || '')
@@ -220,8 +223,8 @@ const taskSortMenuItems = computed(() => [
   { value: 'createdAt-asc', sorting: [{ id: 'createdAt', desc: false }], optionId: 'createdOldest' },
   { value: 'dueDate-asc', sorting: [{ id: 'dueDate', desc: false }], optionId: 'dueSoonest' },
   { value: 'dueDate-desc', sorting: [{ id: 'dueDate', desc: true }], optionId: 'dueLatest' },
-  { value: 'taskTitle-asc', sorting: [{ id: 'taskTitle', desc: false }], optionId: 'taskAz' },
-  { value: 'taskTitle-desc', sorting: [{ id: 'taskTitle', desc: true }], optionId: 'taskZa' },
+  { value: 'nextAction-asc', sorting: [{ id: 'nextAction', desc: false }], optionId: 'taskAz' },
+  { value: 'nextAction-desc', sorting: [{ id: 'nextAction', desc: true }], optionId: 'taskZa' },
   { value: 'customer-asc', sorting: [{ id: 'customer', desc: false }], optionId: 'customerAz' },
   { value: 'customer-desc', sorting: [{ id: 'customer', desc: true }], optionId: 'customerZa' },
   { value: 'assignee-asc', sorting: [{ id: 'assignee', desc: false }], optionId: 'assigneeAz' },
@@ -234,12 +237,13 @@ const taskSortMenuItems = computed(() => [
 
 const columnFilters = ref([
   { id: 'showClosed-1', field: 'showClosed', value: props.showClosed ? 'yes' : '', operator: 'eq', pinned: true },
-  { id: 'type-1', field: 'type', value: '', operator: 'eq', pinned: true },
+  { id: 'taskType-1', field: 'taskType', value: '', operator: 'eq', pinned: true },
   { id: 'status-1', field: 'status', value: [], operator: 'in', pinned: true }
 ])
-// Default visible: Task, Due time, Customer, Vehicle, Attempts, Assignee, Created at, Status (task-level). Hidden: Request status, Type, Urgency, VIN, Request message, Source
+// Default visible: Task type, Next action, Due time, Customer, Vehicle, Attempts, Assignee, Created at, Status. Hidden: Request status, Type, Urgency, VIN, Request message, Source
 const columnVisibility = ref({
-  taskTitle: true,
+  taskType: true,
+  nextAction: true,
   dueDate: true,
   customer: true,
   vehicle: true,
@@ -366,52 +370,63 @@ const columns = computed(() => {
   }
   return [
   {
-    id: 'taskTitle',
-    accessorKey: 'taskTitle',
-    header: taskColumnLabel('task'),
+    id: 'taskType',
+    accessorKey: 'taskType',
+    accessorFn: (row) => getTaskTypeCode(row) ?? '',
+    header: taskColumnLabel('taskType'),
+    meta: { title: taskColumnLabel('taskType') },
+    size: 56,
+    minSize: 48,
+    maxSize: 72,
+    cell: ({ row }) => {
+      const task = row.original
+      const code = getTaskTypeCode(task)
+      if (!code) {
+        return h('span', { class: 'text-meta text-xs' }, '\u2014')
+      }
+      return h('span', {
+        class: 'inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground w-fit uppercase tracking-wide'
+      }, code)
+    }
+  },
+  {
+    id: 'nextAction',
+    accessorKey: 'nextAction',
+    accessorFn: (row) => {
+      if (getTaskTableStatus(row) === TASK_TABLE_STATUS.CLOSED) return ''
+      return getTaskNextActionDisplay(row) ?? ''
+    },
+    header: taskColumnLabel('nextAction'),
     meta: {
-      title: taskColumnLabel('task'),
+      title: taskColumnLabel('nextAction'),
       onOpen: (row) => handleRowClick(row.original)
     },
     cell: ({ row }) => {
       const task = row.original
-      const displayTitle = getTaskDisplayTitle(task)
-      const subtitle = task.type === 'lead' ? 'Lead' : 'Opportunity'
-      return h('div', { class: 'flex flex-col min-w-0' }, [
-        h('div', { class: 'text-content font-semibold text-foreground truncate' }, displayTitle || '—'),
-        h('div', { class: 'text-meta truncate' }, subtitle)
-      ])
+      if (getTaskTableStatus(task) === TASK_TABLE_STATUS.CLOSED) {
+        return h('span', { class: 'text-meta' }, '\u2014')
+      }
+      const label = getTaskNextActionDisplay(task)
+      return h('div', { class: 'text-content font-medium text-foreground truncate min-w-0' }, label || '\u2014')
     }
   },
   {
     id: 'dueDate',
     accessorKey: 'nextActionDue',
+    accessorFn: (row) => {
+      const raw = getTaskDueTimestamp(row)
+      return raw ? new Date(raw).getTime() : null
+    },
     header: taskColumnLabel('dueTime'),
     meta: { title: taskColumnLabel('dueTime') },
     cell: ({ row }) => {
       const task = row.original
-      const date = task.type === 'opportunity' && task.expectedCloseDate
-        ? task.expectedCloseDate
-        : (task.nextActionDue ?? task.dueDate)
-      const hasRecall = task.type === 'lead' && task.scheduledRecallAppointment?.date
-      if (!date && !hasRecall) {
+      const date = getTaskDueTimestamp(task)
+      if (!date) {
         return h('span', { class: 'text-meta' }, t('dataTable.tasks.values.notSet'))
       }
-      const parts = []
-      if (date) {
-        const status = getDeadlineStatus(date)
-        const pillClass = status.type === 'overdue' ? 'mk-due-pill-overdue' : (status.type === 'urgent' || status.type === 'today' ? 'mk-due-pill-urgent' : 'mk-due-pill-normal')
-        const text = formatTaskDueDateRelative(date)
-        parts.push(h('span', {
-          class: `inline-flex items-center gap-1 px-2 py-0.5 rounded text-sm font-medium uppercase leading-none ${pillClass}`
-        }, text))
-      }
-      if (hasRecall) {
-        parts.push(h('span', {
-          class: 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-sm font-medium uppercase leading-none bg-blue-50 text-blue-700 ml-1'
-        }, [h('span', { class: 'shrink-0 rounded-full size-1.5 bg-blue-500', 'aria-hidden': 'true' }), t('dataTable.tasks.values.recall')]))
-      }
-      return h('div', { class: 'flex flex-wrap items-center gap-1' }, parts)
+      const { label, tooltip, pillClass } = formatTaskDueTimeDisplay(task, date, locale.value, t)
+      return renderDueTimePill({ label, tooltip, pillClass })
     }
   },
   {
@@ -419,11 +434,14 @@ const columns = computed(() => {
     accessorKey: 'customer',
     header: taskColumnLabel('customer'),
     meta: { title: taskColumnLabel('customer') },
+    size: 200,
+    minSize: 160,
+    maxSize: 280,
     cell: ({ row }) => {
       const task = row.original
       const city = getCustomerCity(task)
       return h('div', { class: 'flex flex-col min-w-0' }, [
-        h('div', { class: 'text-content font-semibold text-foreground truncate' }, task.customer?.name || '—'),
+        h('div', { class: 'text-content font-medium text-foreground truncate' }, task.customer?.name || '—'),
         h('div', { class: 'text-meta truncate' }, city || '—')
       ])
     }
@@ -438,7 +456,7 @@ const columns = computed(() => {
       const task = row.original
       const typeClass = task.type === 'lead' ? 'bg-badge-green text-emerald-700' : 'bg-purple-50 text-purple-700'
       return h('span', {
-        class: `inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold ${typeClass} w-fit`
+        class: `inline-flex items-center px-2 py-0.5 rounded text-sm font-medium ${typeClass} w-fit`
       }, task.type === 'lead' ? 'Lead' : 'Opportunity')
     }
   },
@@ -449,13 +467,12 @@ const columns = computed(() => {
     meta: { title: taskColumnLabel('requestStatus') },
     cell: ({ row }) => {
       const task = row.original
-      const displayStage = getDisplayStage(task, task.type === 'lead' ? 'lead' : 'opportunity')
-      const stageClass = props.getStageBadgeClass(displayStage)
-      return displayStage
-        ? h('span', {
-            class: `inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold ${stageClass} w-fit`
-          }, displayStage)
-        : h('span', { class: 'text-meta' }, '—')
+      const tableStatus = getTaskTableStatus(task)
+      const stageClass = getTaskTableStatusBadgeClass(tableStatus)
+      const label = translateTaskTableStatus(tableStatus, t)
+      return h('span', {
+        class: `inline-flex items-center px-2 py-0.5 rounded text-sm font-medium ${stageClass} w-fit`
+      }, label)
     }
   },
   {
@@ -511,12 +528,18 @@ const columns = computed(() => {
     cell: ({ row }) => {
       const task = row.original
       if (!task.createdAt) return h('span', { class: 'text-meta' }, '—')
-      return h('span', { class: 'text-meta' }, formatTaskRelativeTime(task.createdAt))
+      const { label, tooltip } = formatTaskCreatedAtDisplay(task.createdAt, locale.value, t)
+      return renderTaskDateLabel({
+        label,
+        tooltip,
+        className: 'text-meta text-foreground'
+      })
     }
   },
   {
     id: 'contactAttempts',
     accessorKey: 'contactAttempts',
+    accessorFn: (row) => row.contactAttempts?.length ?? 0,
     header: taskColumnLabel('attempts'),
     meta: { title: taskColumnLabel('attempts') },
     cell: ({ row }) => {
@@ -567,7 +590,7 @@ const columns = computed(() => {
       return h('div', { class: 'flex flex-col gap-1 min-w-0' }, [
         h('span', { class: 'text-meta' }, `${main}${details}`.trim()),
         ...(badge ? [h('span', {
-          class: 'inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold bg-emerald-100 text-emerald-700 w-fit'
+          class: 'inline-flex items-center px-2 py-0.5 rounded text-sm font-medium bg-emerald-100 text-emerald-700 w-fit'
         }, badge)] : [])
       ])
     }
@@ -593,17 +616,12 @@ const columns = computed(() => {
     meta: { title: taskColumnLabel('status') },
     cell: ({ row }) => {
       const task = row.original
-      const status = getTaskStatus(task, maxContactAttempts.value)
-      const labels = {
-        overdue: t('dataTable.tasks.statuses.overdue'),
-        in_progress: t('dataTable.tasks.statuses.inProgress'),
-        open: t('dataTable.tasks.statuses.open')
-      }
-      const statusClass = status === 'overdue' ? 'mk-task-status-overdue' : (status === 'in_progress' ? 'mk-task-status-in-progress' : 'mk-task-status-open')
-      const icon = status === 'overdue' ? h(Triangle, { class: 'shrink-0 size-3.5', 'aria-hidden': 'true' }) : h(Circle, { class: 'shrink-0 size-3.5', 'aria-hidden': 'true' })
+      const tableStatus = getTaskTableStatus(task)
+      const stageClass = getTaskTableStatusBadgeClass(tableStatus)
+      const label = translateTaskTableStatus(tableStatus, t)
       return h('span', {
-        class: `inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-sm font-semibold ${statusClass} w-fit`
-      }, [icon, labels[status]])
+        class: `inline-flex items-center px-2 py-0.5 rounded text-sm font-medium ${stageClass} w-fit`
+      }, label)
     }
   }
   ]
@@ -611,32 +629,39 @@ const columns = computed(() => {
 
 // Filter → sort → paginate for DataTable - maps filter keys to row values (aligned with columns)
 const getTaskFilterValue = (row, key) => {
-  if (key === 'taskTitle') {
-    return getTaskActionTitle(row) ?? ''
+  if (key === 'nextAction') {
+    if (getTaskTableStatus(row) === TASK_TABLE_STATUS.CLOSED) return ''
+    return getTaskNextActionDisplay(row) ?? ''
+  }
+  if (key === 'taskType') {
+    return getTaskTypeCode(row) ?? ''
   }
   if (key === 'requestedCarBrand') {
     const car = row.type === 'lead' ? row.requestedCar : (row.vehicle || row.requestedCar)
     return car?.brand
   }
   if (key === 'status') {
-    return getDisplayStage(row, row.type === 'lead' ? 'lead' : 'opportunity') ?? row.displayStage ?? row.status ?? row.stage
+    return getTaskTableStatus(row)
   }
   if (key === 'assignee') {
     const val = row.assignee
     return val || '__unassigned__'
   }
-  if (key === 'nextActionDue') {
-    return row.nextActionDue ?? row.dueDate
+  if (key === 'dueDate' || key === 'nextActionDue') {
+    const raw = getTaskDueTimestamp(row)
+    return raw ? new Date(raw).getTime() : null
+  }
+  if (key === 'contactAttempts') {
+    return row.contactAttempts?.length ?? 0
   }
   return getNestedProperty(row, key)
 }
 
 function getDueDateSearchLabel(row) {
-  const raw = row.type === 'opportunity' && row.expectedCloseDate
-    ? row.expectedCloseDate
-    : (row.nextActionDue ?? row.dueDate)
+  const raw = getTaskDueTimestamp(row)
   if (!raw) return null
-  return formatTaskDueDateRelative(raw)
+  const { label } = formatTaskDueTimeDisplay(row, raw, locale.value, t)
+  return label
 }
 
 const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
@@ -672,7 +697,8 @@ const { paginatedData, sortedData, totalFilteredCount } = useDataTableData({
       ...(urgencyEnabled ? [urgencyField] : []),
       row.compositeId,
       row.id,
-      getTaskActionTitle(row),
+      getTaskNextActionDisplay(row),
+      getTaskTypeCode(row),
       row.requestedCar?.requestMessage,
       row.requestMessage,
       row.taskStatusBadge
@@ -714,7 +740,12 @@ watch(
   { deep: true }
 )
 
+onMounted(() => {
+  isTableMounted = true
+})
+
 onUnmounted(() => {
+  isTableMounted = false
   if (fetchTimeout) clearTimeout(fetchTimeout)
 })
 
@@ -749,25 +780,29 @@ const handleBulkDelete = () => {
 watch(
   () => [props.currentTaskId, props.highlightId],
   async ([currentTaskId, highlightId]) => {
+    if (!isTableMounted) return
     const targetId = currentTaskId || highlightId
     const tableScrollContainer = datatableShellRef.value?.tableScrollContainer
     if (!targetId || !tableScrollContainer) return
     const idx = sortedData.value.findIndex((t) => t.compositeId === targetId)
     if (idx === -1) return
-    const pageSize = pagination.value.pageSize || 10
+    const pageSize = pagination.value.pageSize || DEFAULT_TABLE_PAGE_SIZE
     const pageIndex = Math.floor(idx / pageSize)
     if (pagination.value.pageIndex !== pageIndex) {
       pagination.value = { ...pagination.value, pageIndex }
     }
     await nextTick()
+    if (!isTableMounted) return
+    const scrollRoot =
+      tableScrollContainer.querySelector('[data-slot="frame-panel"]') ?? tableScrollContainer
     const rows = tableScrollContainer.querySelectorAll('tbody tr')
     const rowIndexOnPage = idx % pageSize
     const row = rows[rowIndexOnPage]
-    if (row) {
+    if (row && scrollRoot.contains(row)) {
       row.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
   },
-  { immediate: true }
+  { immediate: true, flush: 'post' }
 )
 
 // Table meta with row click handler and highlighting

@@ -1,4 +1,4 @@
 /**
- * Dutch locale: use same simplified opportunities as EN (one per stage, no duplicates).
+ * Dutch locale: same opportunities as EN (single source, relative dates via buildMockOpportunities).
  */
-export { mockOpportunities } from '../en/opportunities.js'
+export { buildMockOpportunities } from '../en/opportunities.js'

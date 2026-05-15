@@ -1,13 +1,13 @@
 <template>
   <div class="page-container relative flex flex-col overflow-hidden h-full bg-surface">
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide min-h-0">
-        <div class="mb-8 flex flex-col gap-2 md:gap-3">
+    <div class="flex flex-1 flex-col min-h-0 overflow-hidden px-6 pb-4 md:pb-8">
+      <div class="flex flex-1 flex-col min-h-0 gap-2 md:gap-3">
           <div class="shrink-0 overflow-visible pb-2 pt-1">
             <RequestMainTabs v-model="selectedInventoryChip" :tabs="filterChips" />
           </div>
-          <div class="min-w-0 w-full bg-background">
+          <div class="flex min-h-0 min-w-0 w-full flex-1 flex-col bg-background">
             <DataTableWithUnifiedSearch
+              class="flex flex-1 flex-col min-h-0"
               active-tab="vehicles"
               placeholder="Search vehicles..."
               :pagination="pagination"
@@ -35,7 +35,6 @@
               />
             </DataTableWithUnifiedSearch>
           </div>
-        </div>
       </div>
     </div>
 
@@ -61,6 +60,7 @@ import VehicleGrid from '@/components/vehicles/VehicleGrid.vue'
 import AddOfferModal from '@/components/modals/AddOfferModal.vue'
 import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import { getNestedProperty, useDataTableData } from '@/composables/useDataTableData'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 import {
   normalizeVehicleInventoryType,
   getInventoryTypeColumnFilters,
@@ -129,7 +129,7 @@ async function handleAddOfferConfirm(payload) {
 // DataTable state management
 const pagination = ref({
   pageIndex: 0,
-  pageSize: 10
+  pageSize: DEFAULT_TABLE_PAGE_SIZE
 })
 
 const globalFilter = ref('')

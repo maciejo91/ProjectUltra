@@ -62,6 +62,7 @@ import LinkOpportunityModal from '@/components/modals/LinkOpportunityModal.vue'
 import ConversationViewModal from '@/components/modals/ConversationViewModal.vue'
 import { useCampaignsStore } from '@/stores/campaigns'
 import { useDataTableData, getNestedProperty } from '@/composables/useDataTableData'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 
 const campaignsStore = useCampaignsStore()
 
@@ -71,7 +72,7 @@ const showConversationModal = ref(false)
 const linkingInteraction = ref(null)
 const viewingConversation = ref(null)
 
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
+const pagination = ref({ pageIndex: 0, pageSize: DEFAULT_TABLE_PAGE_SIZE })
 const globalFilter = ref('')
 const columnFilters = ref([])
 const sorting = ref([])

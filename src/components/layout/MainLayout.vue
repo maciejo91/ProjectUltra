@@ -140,13 +140,16 @@ const pageContentRef = ref(null)
 const isHeaderScrolled = ref(false)
 provide('headerActionsRef', headerActionsRef)
 
+const isTablePageLayout = computed(() => Boolean(route.meta?.tablePageLayout))
+
 const getPageScrollContainers = () => {
   const pageContainer = pageContentRef.value?.querySelector('.page-container')
   if (!pageContainer) return []
 
   const candidates = [
     pageContainer,
-    ...pageContainer.querySelectorAll('.overflow-y-auto')
+    ...pageContainer.querySelectorAll('.overflow-y-auto'),
+    ...pageContainer.querySelectorAll('.data-table-inner [data-slot="frame-panel"]')
   ]
   const pageRect = pageContainer.getBoundingClientRect()
 
@@ -240,12 +243,15 @@ const desktopHeaderClass = computed(() => {
 
 const mainContentClass = computed(() => [
   route.meta?.mutedPageChrome ? 'bg-muted' : 'bg-background',
-  'overflow-y-auto overscroll-contain'
+  isTablePageLayout.value ? 'overflow-hidden' : 'overflow-y-auto overscroll-contain'
 ])
 
 const pageContentClass = computed(() => [
   'flex min-w-0 flex-col',
-  route.name === 'request-detail' ? 'min-h-0 flex-1 overflow-hidden bg-muted' : ''
+  route.name === 'request-detail' || isTablePageLayout.value
+    ? 'min-h-0 flex-1 overflow-hidden'
+    : '',
+  route.name === 'request-detail' ? 'bg-muted' : ''
 ])
 
 const showMobileHeader = computed(() => {

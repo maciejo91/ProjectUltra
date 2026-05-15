@@ -36,11 +36,15 @@
         :assignment-lead-id="assignmentLeadId"
         :countdown-label="headerCountdownLabel"
         :timer-aria="timerAria"
-        :timer-title="timerTitle"
+        :timer-title="effectiveTimerTitle"
+        :timer-expired="timerExpired"
         :show-chevron="true"
         chevron-direction="down"
         :chevron-aria-label="t('requestDetail.floatingLq.minimize')"
         :on-dark-surface="floatingInverse"
+        show-call-attempts-ring
+        :contact-attempts="bodyContactAttempts"
+        :max-contact-attempts="bodyMaxContactAttempts"
         @chevron-click="emit('cancel-action')"
         @reassigned="emit('reassigned')"
       />
@@ -65,7 +69,8 @@
       :assignment-lead-id="assignmentLeadId"
       :countdown-label="headerCountdownLabel"
       :timer-aria="timerAria"
-      :timer-title="timerTitle"
+      :timer-title="effectiveTimerTitle"
+      :timer-expired="timerExpired"
       :show-chevron="expandableCollapsedCard"
       chevron-direction="up"
       :chevron-aria-label="t('requestDetail.floatingLq.continue')"
@@ -245,6 +250,14 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  timerExpired: {
+    type: Boolean,
+    default: false
+  },
+  timerTitle: {
+    type: String,
+    default: ''
+  },
   floatingElevated: {
     type: Boolean,
     default: false
@@ -365,7 +378,9 @@ const headerCountdownLabel = computed(() =>
   props.internalTimer ? countdownLabelInternal.value : props.parentCountdownLabel
 )
 
-const timerTitle = computed(() => t('requestDetail.lqfTask.timerTooltip'))
+const effectiveTimerTitle = computed(() =>
+  (props.timerTitle || '').trim() || t('requestDetail.lqfTask.timerTooltip')
+)
 
 const isManagingTask = ref(false)
 const isTaskActionInProgress = computed(

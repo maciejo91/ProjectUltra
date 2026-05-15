@@ -94,8 +94,7 @@ import { ref, computed, watch } from 'vue'
 import { Car, Plus } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
 import { DEFAULT_CAR_IMAGE } from '@/utils/mockDataHelpers'
-import audiA6Allroad40TdiImage from '@/assets/images/mock-vehicles/audi-a6-allroad-40-tdi.png'
-import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
+import { getCarImageUrl, getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 
 const props = defineProps({
   request: {
@@ -129,12 +128,12 @@ const vehicleConditionBadgeClass = computed(() =>
 
 const isNewVehicle = computed(() => String(vehicleConditionLabel.value || '').toLowerCase() === 'new')
 
-const usesAudiDisplayVehicle = computed(() => !isNewVehicle.value)
+const isBmwNewVehicle = computed(
+  () => isNewVehicle.value && String(vehicle.value.brand || '').toLowerCase() === 'bmw'
+)
 
 const vehicleDisplayName = computed(() => {
   const v = vehicle.value
-  if (isNewVehicle.value && String(v.brand || '').toLowerCase() !== 'bmw') return 'BMW iX xDrive50'
-  if (usesAudiDisplayVehicle.value) return 'Audi A6 Allroad'
   if (!v.brand && !v.model) return 'General Request'
   const parts = [v.brand, v.model, v.variant].filter(Boolean)
   return parts.join(' ') || 'Vehicle Details'
@@ -153,18 +152,19 @@ const hasVehicle = computed(() => {
 
 const usesLogoImage = computed(() => {
   const v = vehicle.value
-  return isNewVehicle.value || (!usesAudiDisplayVehicle.value && (v?.imageDisplayMode === 'logo' || v?.imageType === 'logo'))
+  return (
+    isBmwNewVehicle.value ||
+    v?.imageDisplayMode === 'logo' ||
+    v?.imageType === 'logo'
+  )
 })
 
 const imageUrl = computed(() => {
-  const v = vehicle.value
-  if (isNewVehicle.value) return '/brands/bmw-white.svg'
-  if (usesAudiDisplayVehicle.value) return audiA6Allroad40TdiImage
-  const url = v?.image || v?.imageUrl || ''
+  const url = getCarImageUrl(vehicle.value)
   return url || (hasVehicle.value ? DEFAULT_CAR_IMAGE : '')
 })
 
-const displayPrice = computed(() => usesAudiDisplayVehicle.value ? 19000 : vehicle.value.price)
+const displayPrice = computed(() => vehicle.value.price)
 
 const effectiveImageUrl = computed(() => {
   if (fallbackFailed.value || (!hasVehicle.value && imageError.value)) return ''
@@ -173,9 +173,6 @@ const effectiveImageUrl = computed(() => {
 })
 
 const vehicleSpecs = computed(() => {
-  if (usesAudiDisplayVehicle.value) {
-    return ['2023', 'Petrol', 'Automatic', '10,237 km']
-  }
   const v = vehicle.value
   const specs = []
   if (v.year) specs.push(v.year)

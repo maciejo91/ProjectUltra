@@ -1,10 +1,13 @@
 <template>
   <div
     class="datatable-unified-shell bg-background"
-    :class="includeMarginBottom ? 'mb-8' : ''"
+    :class="[
+      fillHeight ? 'datatable-fill-height flex flex-col flex-1 min-h-0 h-full' : '',
+      !fillHeight && includeMarginBottom ? 'mb-8' : ''
+    ]"
   >
     <slot name="before-search" />
-    <div class="mb-1">
+    <div class="mb-1 shrink-0">
       <UnifiedSearchBar
         :active-tab="activeTab"
         :placeholder="placeholder"
@@ -47,6 +50,7 @@
     <div
       ref="tableScrollContainer"
       class="data-table-inner table-search-wrapper"
+      :class="fillHeight ? 'flex flex-1 flex-col min-h-0' : ''"
       @click="emit('wrapperClick', $event)"
     >
       <slot />
@@ -65,13 +69,14 @@ import {
   SelectValue,
 } from '@motork/component-library/future/primitives'
 import UnifiedSearchBar from '@/components/shared/UnifiedSearchBar.vue'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 
 const { t } = useI18n()
 
 const props = defineProps({
   activeTab: { type: String, default: 'opportunities' },
   placeholder: { type: String, default: '' },
-  pagination: { type: Object, default: () => ({ pageIndex: 0, pageSize: 10 }) },
+  pagination: { type: Object, default: () => ({ pageIndex: 0, pageSize: DEFAULT_TABLE_PAGE_SIZE }) },
   assigneeOptions: { type: Array, default: () => [] },
   volvoModelOptions: { type: Array, default: () => [] },
   brandOptions: { type: Array, default: () => [] },
@@ -83,6 +88,7 @@ const props = defineProps({
   requestedCarBrandOptions: { type: Array, default: () => [] },
   accountTypeOptions: { type: Array, default: () => [] },
   includeMarginBottom: { type: Boolean, default: true },
+  fillHeight: { type: Boolean, default: true },
   sortMenuItems: { type: Array, default: () => [] },
   globalFilter: { type: String, default: undefined },
 })
@@ -121,7 +127,6 @@ const sortSelectModel = computed({
 })
 
 const tableScrollContainer = ref(null)
+
 defineExpose({ tableScrollContainer })
 </script>
-
-

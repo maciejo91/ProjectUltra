@@ -16,13 +16,14 @@
       v-model:columnVisibility="columnVisibilityModel"
       v-model:rowSelection="rowSelection"
       :paginationOptions="{
-        rowCount: rowCount ?? filteredVehicles.length
+        rowCount: rowCount ?? filteredVehicles.length,
+        pageSizeOptions: [15, 20, 50]
       }"
       :globalFilterOptions="{
         debounce: 300,
         show: true
       }"
-      class="h-full"
+      class="flex min-h-0 flex-1 flex-col"
     >
       <template #toolbar>
         <slot name="toolbar" />
@@ -75,13 +76,14 @@
       v-model:columnFilters="columnFiltersModel"
       v-model:columnVisibility="columnVisibilityModel"
       :paginationOptions="{
-        rowCount: rowCount ?? filteredVehicles.length
+        rowCount: rowCount ?? filteredVehicles.length,
+        pageSizeOptions: [15, 20, 50]
       }"
       :globalFilterOptions="{
         debounce: 300,
         show: true
       }"
-      class="h-full"
+      class="flex min-h-0 flex-1 flex-col"
     >
       <template #toolbar>
         <slot name="toolbar" />

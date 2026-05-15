@@ -1,7 +1,6 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getDisplayStage } from '@/utils/stageMapper'
-import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
+import { TASK_TABLE_STATUS, translateTaskTableStatus } from '@/utils/taskStatus'
 
 /**
  * Composable for TasksTableView filter definitions
@@ -33,36 +32,27 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
       pinned: true
     })
 
-    // Type filter - matches Task details column (lead/opportunity badge)
+    // Type filter - matches Type column (LQF task type)
     if (showTypeFilter.value) {
       defs.push({
-        key: 'type',
-        label: t('dataTable.tasks.filters.taskType'),
+        key: 'taskType',
+        label: t('dataTable.tasks.columns.taskType'),
         type: 'select',
         operators: [{ value: 'eq', label: t('dataTable.filters.operators.is') }],
         options: [
           { value: '', label: t('common.common.all') },
-          { value: 'lead', label: 'Lead' },
-          { value: 'opportunity', label: 'Opportunity' }
+          { value: 'LQF', label: 'LQF' }
         ],
-        aiHint: 'Lead or Opportunity type',
+        aiHint: 'LQF lead qualification task type',
         pinned: true
       })
     }
 
-    // Status/Stage filter - matches Task details column (status badge), dynamic options from tasks
-    const uniqueStatuses = [...new Set(
-      taskList.map(t => getDisplayStage(t, t.type === 'lead' ? 'lead' : 'opportunity') ?? t.displayStage ?? t.status ?? t.stage).filter(Boolean)
-    )].sort()
-    const leadStageValues = Object.values(LEAD_STAGES).filter(s => s !== LEAD_STAGES.VALID)
-    const statusOptions = uniqueStatuses.length > 0
-      ? uniqueStatuses.map(s => ({ value: s, label: s }))
-      : [
-          ...leadStageValues,
-          ...Object.values(OPPORTUNITY_STAGES),
-          'In Negotiation - Offer Sent',
-          'In Negotiation - Contract Pending'
-        ].filter((v, i, a) => a.indexOf(v) === i).map(s => ({ value: s, label: s }))
+    const statusOptions = [
+      TASK_TABLE_STATUS.OPEN,
+      TASK_TABLE_STATUS.IN_PROGRESS,
+      TASK_TABLE_STATUS.CLOSED
+    ].map((value) => ({ value, label: translateTaskTableStatus(value, t) }))
     defs.push({
       key: 'status',
       label: t('dataTable.tasks.filters.status'),
@@ -72,7 +62,7 @@ export function useTasksTableFilters({ showTypeFilter, tasks }) {
         { value: 'notIn', label: t('dataTable.filters.operators.isNoneOf') }
       ],
       options: statusOptions,
-      aiHint: 'Lead status or opportunity stage (e.g. New, To be called back, Qualified, In Negotiation)',
+      aiHint: 'Task status: Open, In progress, or Closed',
       pinned: true
     })
 

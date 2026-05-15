@@ -14,7 +14,12 @@
       "callBack": "Terugbellen",
       "disqualifyLead": "Lead diskwalificeren",
       "postponeTask": "Taak uitstellen",
-      "reopenLead": "Lead heropenen"
+      "reopenLead": "Lead heropenen",
+      "firstCallAttempt": "Voer de eerste belpoging uit",
+      "firstEmail": "Stuur de eerste e-mail",
+      "nextCallAttempt": "Voer de volgende belpoging uit",
+      "nextStepEmail": "Volgende stap: stuur een e-mail",
+      "nextStepWhatsapp": "Volgende stap: gebruik WhatsApp"
     }
   },
   "opportunity": {

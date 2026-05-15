@@ -270,8 +270,8 @@
               @add-requested-car="handleAddRequestedCar"
             />
 
-            <!-- Other Tasks for This Customer -->
             <CustomerRelatedTasksWidget
+              v-if="type === 'opportunity'"
               :task="task"
               :entity-type="type"
             />
@@ -321,9 +321,8 @@
             />
           </div>
 
-          <!-- Customer Related Tasks Widget -->
           <CustomerRelatedTasksWidget
-            v-if="type !== 'contact'"
+            v-if="type === 'opportunity'"
             :task="task"
             :entity-type="type"
           />

@@ -29,6 +29,8 @@
             :manage-open="false"
             :internal-timer="false"
             :parent-countdown-label="lqTimer.countdownLabel"
+            :timer-expired="lqTimer.isExpired"
+            :timer-title="lqTimer.dueAtFullLabel || t('requestDetail.lqfTask.timerTooltip')"
             hide-body-subheader
             :contact-attempts="contactAttempts"
             :max-contact-attempts="maxContactAttempts"
@@ -56,6 +58,8 @@
           :resume-from-collapsed="true"
           :internal-timer="false"
             :parent-countdown-label="lqTimer.countdownLabel"
+            :timer-expired="lqTimer.isExpired"
+            :timer-title="lqTimer.dueAtFullLabel || t('requestDetail.lqfTask.timerTooltip')"
           hide-body-subheader
             :contact-attempts="contactAttempts"
             :max-contact-attempts="maxContactAttempts"
@@ -80,11 +84,15 @@
             :assignment-lead-id="request.id"
             :countdown-label="lqTimer.countdownLabel"
             :timer-aria="t('requestDetail.lqfTask.timerAria')"
-            :timer-title="t('requestDetail.lqfTask.timerTooltip')"
+            :timer-title="lqTimer.dueAtFullLabel || t('requestDetail.lqfTask.timerTooltip')"
+            :timer-expired="lqTimer.isExpired"
             :show-chevron="true"
             chevron-direction="down"
             :chevron-aria-label="t('requestDetail.floatingLq.minimize')"
             on-dark-surface
+            show-call-attempts-ring
+            :contact-attempts="contactAttempts"
+            :max-contact-attempts="maxContactAttempts"
             @chevron-click="collapseToMinimized"
             @reassigned="$emit('reassigned')"
           />
@@ -190,7 +198,7 @@ const emit = defineEmits([
 
 const { t } = useI18n()
 const leadsStore = useLeadsStore()
-const lqTimer = useLqTaskCountdown()
+const lqTimer = useLqTaskCountdown(() => props.request?.nextActionDue ?? null)
 
 const view = ref('peek')
 
@@ -337,7 +345,7 @@ onBeforeUnmount(() => {
 })
 
 watch(
-  () => props.request?.compositeId,
+  () => [props.request?.compositeId, props.request?.nextActionDue],
   () => {
     detachTrap()
     view.value = 'peek'

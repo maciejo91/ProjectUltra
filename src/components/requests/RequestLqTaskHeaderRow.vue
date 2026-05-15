@@ -1,61 +1,75 @@
 <template>
   <div class="flex w-full shrink-0 items-start justify-between gap-2 px-4 py-1.5">
     <div
-      v-if="subtitle || (titleCtaHref && titleCtaLabel)"
-      ref="titleBlockRef"
-      class="min-w-0 flex-1"
+      class="flex min-w-0 flex-1 items-start gap-2"
+      :class="showCallAttemptsRing && onDarkSurface && '[&_.mk-attempts-progress-text]:text-background'"
     >
-      <div class="flex min-w-0 flex-wrap items-start gap-x-2 gap-y-0.5">
+      <CallAttemptsProgressRing
+        v-if="showCallAttemptsRing"
+        :attempts="contactAttempts"
+        :max="maxContactAttemptsDisplay"
+        :aria-label="callAttemptsAriaLabel"
+      />
+      <div
+        v-if="subtitle || (titleCtaHref && titleCtaLabel)"
+        ref="titleBlockRef"
+        class="min-w-0 flex-1"
+      >
+        <div class="flex min-w-0 flex-wrap items-start gap-x-2 gap-y-0.5">
+          <p
+            :id="titleId"
+            :class="[
+              'min-w-0 max-w-full text-sm font-medium leading-snug',
+              onDarkSurface ? 'text-background' : 'text-foreground'
+            ]"
+          >
+            {{ title }}
+          </p>
+          <a
+            v-if="titleCtaHref && titleCtaLabel"
+            :href="titleCtaHref"
+            class="shrink-0 text-sm font-medium leading-snug underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
+            :class="
+              onDarkSurface
+                ? 'text-background hover:text-background/90'
+                : 'text-primary hover:text-primary/90'
+            "
+            @click.stop
+          >
+            {{ titleCtaLabel }}
+          </a>
+        </div>
         <p
-          :id="titleId"
+          v-if="subtitle"
           :class="[
-            'min-w-0 max-w-full text-sm font-medium leading-snug',
-            onDarkSurface ? 'text-background' : 'text-foreground'
+            'mt-0.5 text-sm leading-snug',
+            onDarkSurface ? 'text-background/80' : 'text-muted-foreground'
           ]"
         >
-          {{ title }}
+          {{ subtitle }}
         </p>
-        <a
-          v-if="titleCtaHref && titleCtaLabel"
-          :href="titleCtaHref"
-          class="shrink-0 text-sm font-medium leading-snug underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
-          :class="
-            onDarkSurface
-              ? 'text-background hover:text-background/90'
-              : 'text-primary hover:text-primary/90'
-          "
-          @click.stop
-        >
-          {{ titleCtaLabel }}
-        </a>
       </div>
       <p
-        v-if="subtitle"
+        v-else
+        ref="titleBlockRef"
+        :id="titleId"
         :class="[
-          'mt-0.5 text-sm leading-snug',
-          onDarkSurface ? 'text-background/80' : 'text-muted-foreground'
+          'min-w-0 flex-1 self-center text-sm font-medium leading-none',
+          onDarkSurface ? 'text-background' : 'text-foreground'
         ]"
       >
-        {{ subtitle }}
+        {{ title }}
       </p>
     </div>
-    <p
-      v-else
-      ref="titleBlockRef"
-      :id="titleId"
-      :class="[
-        'min-w-0 flex-1 self-center text-sm font-medium leading-none',
-        onDarkSurface ? 'text-background' : 'text-foreground'
-      ]"
-    >
-      {{ title }}
-    </p>
     <div class="flex shrink-0 items-center gap-2 self-center">
       <span
         role="timer"
         aria-live="polite"
         :class="[
-          'inline-flex h-7 min-h-7 shrink-0 select-none items-center gap-1.5 rounded-full px-2.5 text-sm font-medium tabular-nums bg-background text-foreground'
+          'inline-flex h-7 min-h-7 shrink-0 select-none items-center gap-1.5 rounded-full px-2.5 text-sm font-medium tabular-nums',
+          timerExpired
+            ? 'mk-due-pill-overdue'
+            : 'bg-background text-foreground'
         ]"
         :aria-label="timerAria"
         :title="timerTitle"
@@ -148,7 +162,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ChevronUp, Clock, X } from 'lucide-vue-next'
 import {
@@ -157,13 +171,10 @@ import {
   PopoverContent,
   PopoverTrigger
 } from '@motork/component-library/future/primitives'
+import CallAttemptsProgressRing from '@/components/tasks/shared/CallAttemptsProgressRing.vue'
 import LqTeaserAssignTaskPopoverContent from './LqTeaserAssignTaskPopoverContent.vue'
 
-const { t } = useI18n()
-
-const assignPopoverOpen = ref(false)
-
-defineProps({
+const props = defineProps({
   title: {
     type: String,
     required: true
@@ -187,6 +198,10 @@ defineProps({
   timerTitle: {
     type: String,
     required: true
+  },
+  timerExpired: {
+    type: Boolean,
+    default: false
   },
   showChevron: {
     type: Boolean,
@@ -219,12 +234,38 @@ defineProps({
   assignmentLeadId: {
     type: [String, Number],
     default: null
+  },
+  showCallAttemptsRing: {
+    type: Boolean,
+    default: false
+  },
+  contactAttempts: {
+    type: Number,
+    default: 0
+  },
+  maxContactAttempts: {
+    type: Number,
+    default: 5
   }
 })
 
 const emit = defineEmits(['chevron-click', 'reassigned'])
 
+const { t } = useI18n()
+
+const assignPopoverOpen = ref(false)
 const titleBlockRef = ref(null)
+
+const maxContactAttemptsDisplay = computed(() =>
+  props.maxContactAttempts > 0 ? props.maxContactAttempts : 5
+)
+
+const callAttemptsAriaLabel = computed(() =>
+  t('requestDetail.lqfTask.callAttemptsIndicatorAria', {
+    current: props.contactAttempts,
+    max: maxContactAttemptsDisplay.value
+  })
+)
 
 function focusForPanelTrap() {
   const el = titleBlockRef.value

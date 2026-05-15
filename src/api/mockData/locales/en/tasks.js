@@ -4,7 +4,7 @@ export const mockTasks = [
   {
     id: 1,
     title: 'Follow up on test drive request',
-    description: 'Customer requested test drive for Audi A6 Allroad. Schedule appointment.',
+    description: 'Customer requested test drive for Fiat Panda Hybrid. Schedule appointment.',
     status: 'active',
     priority: 'high',
     dueDate: createHourOffset(24),
@@ -17,7 +17,7 @@ export const mockTasks = [
   {
     id: 2,
     title: 'Manage Appointment',
-    description: 'Prepare and send detailed quotation for EQS model.',
+    description: 'Prepare and send detailed quotation for Fiat 500 Hybrid.',
     status: 'active',
     priority: 'normal',
     dueDate: createHourOffset(48),
@@ -30,7 +30,7 @@ export const mockTasks = [
   {
     id: 3,
     title: 'Review financing options',
-    description: 'Customer needs financing information for Audi e-tron GT purchase.',
+    description: 'Customer needs financing information for Fiat Panda Hybrid purchase.',
     status: 'active',
     priority: 'high',
     dueDate: createHourOffset(72),
@@ -43,7 +43,7 @@ export const mockTasks = [
   {
     id: 4,
     title: 'Schedule delivery date',
-    description: 'Coordinate delivery date for Porsche Taycan purchase.',
+    description: 'Coordinate delivery date for Toyota RAV4 purchase.',
     status: 'active',
     priority: 'normal',
     dueDate: createDateOffset(5),
@@ -82,7 +82,7 @@ export const mockTasks = [
   {
     id: 7,
     title: 'Follow up on offer response',
-    description: 'Customer received offer for BMW iX. Follow up on their response.',
+    description: 'Customer received offer for Fiat 500 Hybrid. Follow up on their response.',
     status: 'active',
     priority: 'high',
     dueDate: createHourOffset(24),
@@ -95,7 +95,7 @@ export const mockTasks = [
   {
     id: 8,
     title: 'Complete paperwork',
-    description: 'Complete all necessary paperwork for Tesla Model S purchase.',
+    description: 'Complete all necessary paperwork for Toyota RAV4 purchase.',
     status: 'active',
     priority: 'normal',
     dueDate: createDateOffset(4),
@@ -107,8 +107,8 @@ export const mockTasks = [
   },
   {
     id: 9,
-    title: 'Lead qualification – Porsche Macan',
-    description: 'Marco Rossi asked about Macan test drive and stock.',
+    title: 'Lead qualification – Jeep Avenger',
+    description: 'Marco Rossi asked about Jeep Avenger test drive and stock.',
     status: 'active',
     priority: 'high',
     dueDate: createHourOffset(5),
@@ -120,7 +120,7 @@ export const mockTasks = [
   },
   {
     id: 10,
-    title: 'Lead qualification – Audi A5 used',
+    title: 'Lead qualification – Jeep Compass',
     description: 'Paolo Ricci wants pricing on used A5 Sportback.',
     status: 'active',
     priority: 'normal',
@@ -146,7 +146,7 @@ export const mockTasks = [
   },
   {
     id: 12,
-    title: 'Lead qualification – Toyota bZ4X',
+    title: 'Lead qualification – Audi Q3',
     description: 'Giulia Serra comparing EV SUVs; follow up with range and charging.',
     status: 'active',
     priority: 'normal',
@@ -276,7 +276,7 @@ export const mockTasks = [
   },
   {
     id: 22,
-    title: 'Lead qualification – Renault Scenic E-Tech',
+    title: 'Lead qualification – Volkswagen Golf',
     description: 'Begin lead qualification by verifying customer contact information.',
     status: 'active',
     priority: 'normal',
@@ -289,7 +289,7 @@ export const mockTasks = [
   },
   {
     id: 23,
-    title: 'Lead qualification – Opel Astra Electric',
+    title: 'Lead qualification – Jeep Avenger',
     description: 'Begin lead qualification by verifying customer contact information.',
     status: 'active',
     priority: 'normal',
@@ -299,57 +299,5 @@ export const mockTasks = [
     opportunityId: null,
     assignee: 'Sara Marino',
     createdAt: createHourOffset(-2)
-  },
-  {
-    id: 24,
-    title: 'Lead qualification – Dacia Spring',
-    description: 'Begin lead qualification by verifying customer contact information.',
-    status: 'active',
-    priority: 'normal',
-    dueDate: createHourOffset(6),
-    customerId: 57,
-    leadId: 26,
-    opportunityId: null,
-    assignee: 'Davide Rinaldi',
-    createdAt: createHourOffset(-1)
-  },
-  {
-    id: 25,
-    title: 'Lead qualification – Citroën ë-C4',
-    description: 'Begin lead qualification by verifying customer contact information.',
-    status: 'active',
-    priority: 'high',
-    dueDate: createHourOffset(3),
-    customerId: 58,
-    leadId: 27,
-    opportunityId: null,
-    assignee: 'Matteo Greco',
-    createdAt: createHourOffset(-1)
-  },
-  {
-    id: 26,
-    title: 'Send fleet stock sheet – VW Golf GTE',
-    description: 'Prepare one-pager with VIN, warranty, and charging cable included for fleet buyer.',
-    status: 'active',
-    priority: 'normal',
-    dueDate: createHourOffset(10),
-    customerId: 59,
-    leadId: 28,
-    opportunityId: null,
-    assignee: 'Sara Marino',
-    createdAt: createHourOffset(-1)
-  },
-  {
-    id: 27,
-    title: 'Callback – Nissan Ariya trim compare',
-    description: 'Customer asked to compare Venture+ vs Evolve+; call with equipment matrix after internal check.',
-    status: 'active',
-    priority: 'normal',
-    dueDate: createHourOffset(5),
-    customerId: 60,
-    leadId: 29,
-    opportunityId: null,
-    assignee: 'Davide Rinaldi',
-    createdAt: createHourOffset(0)
   }
 ]

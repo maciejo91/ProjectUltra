@@ -1,13 +1,12 @@
 <template>
   <div class="page-container relative flex flex-col overflow-hidden h-full bg-surface">
     <!-- Filters + Table -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <div class="flex-1 overflow-y-auto px-6 pb-4 md:pb-8 scrollbar-hide">
-        <!-- Customers table (tabs hidden for now) -->
+    <div class="flex flex-1 flex-col min-h-0 overflow-hidden px-6 pb-4 md:pb-8">
+      <div class="flex flex-1 flex-col min-h-0 bg-background">
         <Suspense>
           <CustomersTab ref="customersTabRef" :highlight-id="highlightId" @row-click="handleRowClick" />
           <template #fallback>
-            <div class="flex items-center justify-center py-12">
+            <div class="flex flex-1 items-center justify-center py-12">
               <div class="text-center">
                 <Loader2 class="w-8 h-8 shrink-0 text-muted-foreground mb-2 animate-spin" />
                 <p class="text-meta">Loading...</p>

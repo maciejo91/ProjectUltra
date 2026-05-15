@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { ChevronDown } from 'lucide-vue-next'
 import { DataTable } from '@motork/component-library/future/components'
 import { Avatar, AvatarFallback, Button } from '@motork/component-library/future/primitives'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 
 const { t } = useI18n()
 
@@ -14,7 +15,7 @@ const props = defineProps({
 
 const pagination = ref({
   pageIndex: 0,
-  pageSize: 10
+  pageSize: DEFAULT_TABLE_PAGE_SIZE
 })
 
 const sorting = ref([{ id: 'leads', desc: true }])
@@ -120,7 +121,7 @@ const sortedData = computed(() =>
 )
 
 const paginatedData = computed(() => {
-  const pageSize = pagination.value.pageSize || 10
+  const pageSize = pagination.value.pageSize || DEFAULT_TABLE_PAGE_SIZE
   const pageIndex = Math.max(0, pagination.value.pageIndex || 0)
   const start = pageIndex * pageSize
   return sortedData.value.slice(start, start + pageSize)
@@ -152,7 +153,7 @@ const paginatedData = computed(() => {
           :columns="columns"
           :pagination-options="{
             rowCount: sortedData.length,
-            pageSizeOptions: [10, 20, 50]
+            pageSizeOptions: [15, 20, 50]
           }"
         />
       </div>

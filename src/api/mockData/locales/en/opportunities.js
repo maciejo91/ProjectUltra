@@ -3,40 +3,55 @@ import {
   createDateString,
   createDateTimeOffset,
   createHourOffset,
-  DEFAULT_CAR_IMAGE,
-  DEMO_CUSTOMER_REQUEST_MESSAGE,
-  demoPlateNumber
+  DEMO_CUSTOMER_REQUEST_MESSAGE
 } from '@/utils/mockDataHelpers'
+import { crmVehicleForLeadSlot, toRequestedCar } from '@/api/mockData/crmVehicles'
 
 /**
  * English mock opportunities – one per display stage/status for the state machine.
  * No duplicates; simplified set for default (EN) mock.
  */
 
-const baseRequestedCar = (brand, model, year, price, opts = {}) => {
-  const defaults = {
-    plateNumber: demoPlateNumber(brand, model, year),
-    vin: 'WBA3B1C50EK123456',
-    image: DEFAULT_CAR_IMAGE,
-    dealership: 'Munich Downtown',
-    fuelType: 'Petrol',
-    gearType: 'Automatic',
-    kilometers: 0,
-    status: 'New',
-    stockDays: 5,
-    registration: '01/2024',
+function oppRequestedCar(oppId, extra = {}) {
+  return toRequestedCar(crmVehicleForLeadSlot(Number(oppId) - 1), {
     requestMessage: DEMO_CUSTOMER_REQUEST_MESSAGE,
-    requestType: 'Quotation',
-    adCampaign: 'Summer 2024',
-    adMedium: 'Display',
-    adSource: 'Google',
     expectedPurchaseDate: createDateString(30),
-    staffNote: ''
-  }
-  return { brand, model, year, price, ...defaults, ...opts }
+    dealership: 'Munich Downtown',
+    ...extra
+  })
 }
 
-export const mockOpportunities = [
+function offerVehicleFields(oppId) {
+  const v = crmVehicleForLeadSlot(Number(oppId) - 1)
+  const car = toRequestedCar(v)
+  return {
+    vehicleBrand: v.brand,
+    vehicleModel: v.model,
+    vehicleYear: v.year,
+    price: v.price,
+    data: {
+      brand: v.brand,
+      model: v.model,
+      year: v.year,
+      price: v.price,
+      image: car.image
+    }
+  }
+}
+
+function buildOffer(oppId, offerId, status, financingType, createdAt) {
+  const fields = offerVehicleFields(oppId)
+  return {
+    id: offerId,
+    createdAt,
+    ...fields,
+    status,
+    data: { ...fields.data, financingType }
+  }
+}
+
+export function buildMockOpportunities() {
+  return [
   // 1. Awaiting Appointment – Qualified, no appointment
   {
     id: 1,
@@ -46,14 +61,14 @@ export const mockOpportunities = [
     sourceDetails: 'Showroom visit',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('BMW', '3 Series', 2024, 45000),
+    requestedCar: oppRequestedCar(1),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Qualified',
     negotiationSubstatus: null,
     offers: [],
     tags: ['Hot'],
-    value: 45000,
+    value: 18900,
     expectedCloseDate: createHourOffset(22),
     assignee: 'Matteo Greco',
     createdAt: createHourOffset(-2),
@@ -71,14 +86,14 @@ export const mockOpportunities = [
     sourceDetails: 'Summer Campaign 2024',
     fiscalEntity: 'MotorK',
     requestType: 'Test Drive',
-    requestedCar: baseRequestedCar('Audi', 'A4', 2024, 42000, { vin: 'WAUZZZ8V9KA123456' }),
+    requestedCar: oppRequestedCar(2),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Qualified',
     negotiationSubstatus: null,
     offers: [],
     tags: [],
-    value: 42000,
+    value: 14800,
     expectedCloseDate: createHourOffset(18),
     assignee: 'Sara Marino',
     createdAt: createHourOffset(-4),
@@ -107,14 +122,14 @@ export const mockOpportunities = [
     sourceDetails: 'Lead form',
     fiscalEntity: 'MotorK',
     requestType: 'Test Drive',
-    requestedCar: baseRequestedCar('Volkswagen', 'Passat', 2024, 38000, { vin: 'WVWZZZ3CZWE123456' }),
+    requestedCar: oppRequestedCar(12),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Qualified',
     negotiationSubstatus: null,
     offers: [],
     tags: [],
-    value: 38000,
+    value: 14800,
     expectedCloseDate: createDateOffset(7),
     assignee: 'Sara Marino',
     createdAt: createDateOffset(-2),
@@ -143,25 +158,18 @@ export const mockOpportunities = [
     sourceDetails: 'Contact form',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Mercedes-Benz', 'C-Class', 2024, 48000, { vin: 'WDDWF4KB0KR123456' }),
+    requestedCar: oppRequestedCar(3),
     vehicle: null,
     selectedVehicle: null,
     stage: 'In Negotiation',
     negotiationSubstatus: 'Offer Sent',
     offers: [
       {
-        id: 'offer-3',
-        createdAt: createDateOffset(-8),
-        vehicleBrand: 'Mercedes-Benz',
-        vehicleModel: 'C-Class',
-        vehicleYear: 2024,
-        price: 48000,
-        status: 'active',
-        data: { brand: 'Mercedes-Benz', model: 'C-Class', year: 2024, price: 48000, financingType: 'cash', image: 'https://images.unsplash.com/photo-1546518071-fddcdda7580a?w=900&auto=format&fit=crop&q=60' }
+        ...buildOffer(3, 'offer-3', 'active', 'cash', createDateOffset(-8))
       }
     ],
     tags: [],
-    value: 48000,
+    value: 14800,
     expectedCloseDate: createDateOffset(7),
     assignee: 'Davide Rinaldi',
     createdAt: createDateOffset(-10),
@@ -178,21 +186,14 @@ export const mockOpportunities = [
     sourceDetails: 'Premium showroom',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Porsche', '911', 2024, 125000, { vin: 'WP0ZZZ99ZPS234567' }),
+    requestedCar: oppRequestedCar(4),
     vehicle: null,
     selectedVehicle: null,
     stage: 'In Negotiation',
     negotiationSubstatus: 'Offer Sent',
     offers: [
       {
-        id: 'offer-4',
-        createdAt: createDateOffset(-12),
-        vehicleBrand: 'Porsche',
-        vehicleModel: '911',
-        vehicleYear: 2024,
-        price: 125000,
-        status: 'accepted',
-        data: { brand: 'Porsche', model: '911', year: 2024, price: 125000, financingType: 'cash', image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=900&auto=format&fit=crop&q=60' }
+        ...buildOffer(4, 'offer-4', 'accepted', 'cash', createDateOffset(-12))
       }
     ],
     contracts: [
@@ -207,7 +208,7 @@ export const mockOpportunities = [
       }
     ],
     tags: ['Premium'],
-    value: 125000,
+    value: 46000,
     expectedCloseDate: createDateOffset(7),
     assignee: 'Davide Rinaldi',
     createdAt: createDateOffset(-15),
@@ -226,7 +227,7 @@ export const mockOpportunities = [
     sourceDetails: '',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Volkswagen', 'Golf', 2024, 32000, { vin: 'WVWZZZ3CZWE123456' }),
+    requestedCar: oppRequestedCar(5),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Closed Won',
@@ -234,14 +235,7 @@ export const mockOpportunities = [
     deliverySubstatus: null,
     offers: [
       {
-        id: 'offer-5',
-        createdAt: createDateOffset(-20),
-        vehicleBrand: 'Volkswagen',
-        vehicleModel: 'Golf',
-        vehicleYear: 2024,
-        price: 32000,
-        status: 'accepted',
-        data: { brand: 'Volkswagen', model: 'Golf', year: 2024, price: 32000, financingType: 'cash', image: 'https://images.unsplash.com/photo-1607853203100-69829c08b88e?w=900&auto=format&fit=crop&q=60' }
+        ...buildOffer(5, 'offer-5', 'accepted', 'cash', createDateOffset(-20))
       }
     ],
     contracts: [
@@ -256,7 +250,7 @@ export const mockOpportunities = [
       }
     ],
     tags: [],
-    value: 32000,
+    value: 24100,
     expectedCloseDate: null,
     assignee: 'Sara Marino',
     createdAt: createDateOffset(-25),
@@ -276,25 +270,18 @@ export const mockOpportunities = [
     sourceDetails: 'Auto campaign',
     fiscalEntity: '',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Porsche', 'Cayenne', 2024, 95000, { vin: 'WP0ZZZ9XZPS123456' }),
+    requestedCar: oppRequestedCar(6),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Closed Lost',
     negotiationSubstatus: 'Offer Sent',
     offers: [
       {
-        id: 'offer-6',
-        createdAt: createDateOffset(-12),
-        vehicleBrand: 'Porsche',
-        vehicleModel: 'Cayenne',
-        vehicleYear: 2024,
-        price: 95000,
-        status: 'archived',
-        data: { brand: 'Porsche', model: 'Cayenne', year: 2024, price: 95000, financingType: 'financing', image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=900&auto=format&fit=crop&q=60' }
+        ...buildOffer(6, 'offer-6', 'archived', 'financing', createDateOffset(-12))
       }
     ],
     tags: ['Premium'],
-    value: 95000,
+    value: 28400,
     lostReason: 'Went with competitor',
     expectedCloseDate: null,
     assignee: 'Davide Rinaldi',
@@ -313,14 +300,14 @@ export const mockOpportunities = [
     sourceDetails: 'Lead aggregator',
     fiscalEntity: '',
     requestType: 'Generic sales',
-    requestedCar: baseRequestedCar('Jaguar', 'F-Pace', 2024, 72000, { vin: 'SALWA2FK4LA123456' }),
+    requestedCar: oppRequestedCar(7),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Abandoned',
     negotiationSubstatus: null,
     offers: [],
     tags: [],
-    value: 72000,
+    value: 46000,
     expectedCloseDate: createHourOffset(24),
     assignee: 'Sara Marino',
     createdAt: createHourOffset(-4),
@@ -337,25 +324,18 @@ export const mockOpportunities = [
     sourceDetails: 'Contact form',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('BMW', 'iX xDrive50', 2024, 105000, { vin: 'WBA3B1C50EK789012' }),
+    requestedCar: oppRequestedCar(8),
     vehicle: null,
     selectedVehicle: null,
     stage: 'In Negotiation',
     negotiationSubstatus: 'Offer Feedback',
     offers: [
       {
-        id: 'offer-8',
-        createdAt: createDateOffset(-10),
-        vehicleBrand: 'BMW',
-        vehicleModel: 'iX xDrive50',
-        vehicleYear: 2024,
-        price: 105000,
-        status: 'active',
-        data: { brand: 'BMW', model: 'iX xDrive50', year: 2024, price: 105000, financingType: 'cash', image: 'https://images.unsplash.com/photo-1605822102629-918beea85679?w=900&auto=format&fit=crop&q=60' }
+        ...buildOffer(8, 'offer-8', 'active', 'cash', createDateOffset(-10))
       }
     ],
     tags: [],
-    value: 105000,
+    value: 32500,
     expectedCloseDate: createDateOffset(7),
     assignee: 'Sara Marino',
     createdAt: createDateOffset(-10),
@@ -372,14 +352,14 @@ export const mockOpportunities = [
     sourceDetails: 'Contact form',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Volvo', 'XC60', 2024, 55000, { vin: 'YV1LFA2E2N1123456' }),
+    requestedCar: oppRequestedCar(14),
     vehicle: null,
     selectedVehicle: null,
     stage: 'In Negotiation',
     negotiationSubstatus: 'Awaiting Offer',
     offers: [],
     tags: [],
-    value: 55000,
+    value: 46000,
     expectedCloseDate: createDateOffset(10),
     assignee: 'Sara Marino',
     createdAt: createDateOffset(-2),
@@ -396,14 +376,14 @@ export const mockOpportunities = [
     sourceDetails: 'Showroom visit',
     fiscalEntity: 'MotorK',
     requestType: 'Test Drive',
-    requestedCar: baseRequestedCar('Mazda', 'CX-5', 2024, 42000, { vin: 'JM3KFBDM5N0123456' }),
+    requestedCar: oppRequestedCar(13),
     vehicle: null,
     selectedVehicle: null,
     stage: 'In Negotiation',
     negotiationSubstatus: 'Awaiting Offer',
     offers: [],
     tags: ['Hot'],
-    value: 42000,
+    value: 39500,
     expectedCloseDate: createDateOffset(7),
     assignee: 'Davide Rinaldi',
     createdAt: createDateOffset(-1),
@@ -420,26 +400,19 @@ export const mockOpportunities = [
     sourceDetails: 'Showroom visit',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Lexus', 'ES 300h', 2024, 52000, { vin: 'JTHBK1EG3A2123456' }),
+    requestedCar: oppRequestedCar(9),
     vehicle: null,
     selectedVehicle: null,
     stage: 'In Negotiation',
     negotiationSubstatus: 'Offer Feedback',
     offers: [
       {
-        id: 'offer-9',
-        createdAt: createDateOffset(-4),
-        vehicleBrand: 'Lexus',
-        vehicleModel: 'ES 300h',
-        vehicleYear: 2024,
-        price: 52000,
-        status: 'active',
-        acceptance_status: 'pending',
-        data: { brand: 'Lexus', model: 'ES 300h', year: 2024, price: 52000, financingType: 'cash', image: DEFAULT_CAR_IMAGE }
+        ...buildOffer(9, 'offer-9', 'active', 'cash', createDateOffset(-4)),
+        acceptance_status: 'pending'
       }
     ],
     tags: [],
-    value: 52000,
+    value: 42100,
     expectedCloseDate: createDateOffset(14),
     assignee: 'Davide Rinaldi',
     createdAt: createDateOffset(-6),
@@ -456,7 +429,7 @@ export const mockOpportunities = [
     sourceDetails: '',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Toyota', 'Camry', 2024, 38000, { vin: '4T1BF1FK0NU123456' }),
+    requestedCar: oppRequestedCar(10),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Closed Won',
@@ -464,14 +437,7 @@ export const mockOpportunities = [
     deliverySubstatus: 'Awaiting Delivery',
     offers: [
       {
-        id: 'offer-10',
-        createdAt: createDateOffset(-15),
-        vehicleBrand: 'Toyota',
-        vehicleModel: 'Camry',
-        vehicleYear: 2024,
-        price: 38000,
-        status: 'accepted',
-        data: { brand: 'Toyota', model: 'Camry', year: 2024, price: 38000, financingType: 'cash', image: DEFAULT_CAR_IMAGE }
+        ...buildOffer(10, 'offer-10', 'accepted', 'cash', createDateOffset(-15))
       }
     ],
     contracts: [
@@ -486,7 +452,7 @@ export const mockOpportunities = [
       }
     ],
     tags: [],
-    value: 38000,
+    value: 28400,
     expectedCloseDate: null,
     assignee: 'Sara Marino',
     createdAt: createDateOffset(-20),
@@ -507,7 +473,7 @@ export const mockOpportunities = [
     sourceDetails: 'Contact form',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Honda', 'Accord', 2024, 36000, { vin: '1HGCV1F12NA123456' }),
+    requestedCar: oppRequestedCar(11),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Closed Won',
@@ -515,14 +481,7 @@ export const mockOpportunities = [
     deliverySubstatus: 'Delivered',
     offers: [
       {
-        id: 'offer-11',
-        createdAt: createDateOffset(-25),
-        vehicleBrand: 'Honda',
-        vehicleModel: 'Accord',
-        vehicleYear: 2024,
-        price: 36000,
-        status: 'accepted',
-        data: { brand: 'Honda', model: 'Accord', year: 2024, price: 36000, financingType: 'cash', image: DEFAULT_CAR_IMAGE }
+        ...buildOffer(11, 'offer-11', 'accepted', 'cash', createDateOffset(-25))
       }
     ],
     contracts: [
@@ -537,7 +496,7 @@ export const mockOpportunities = [
       }
     ],
     tags: [],
-    value: 36000,
+    value: 24900,
     expectedCloseDate: null,
     assignee: 'Davide Rinaldi',
     createdAt: createDateOffset(-30),
@@ -558,14 +517,14 @@ export const mockOpportunities = [
     sourceDetails: 'Showroom visit',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Genesis', 'GV60', 2024, 65000, { vin: 'WBADT43452G123456' }),
+    requestedCar: oppRequestedCar(15),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Qualified',
     negotiationSubstatus: null,
     offers: [],
     tags: ['EV'],
-    value: 65000,
+    value: 42100,
     expectedCloseDate: createDateOffset(14),
     assignee: 'Sara Marino',
     createdAt: createHourOffset(-6),
@@ -582,14 +541,14 @@ export const mockOpportunities = [
     sourceDetails: 'Contact form',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('BMW', '4 Series', 2024, 52000, { vin: 'WBA4B1C50FK123456' }),
+    requestedCar: oppRequestedCar(23),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Qualified',
     negotiationSubstatus: null,
     offers: [],
     tags: [],
-    value: 52000,
+    value: 24100,
     expectedCloseDate: createDateOffset(14),
     assignee: 'Davide Rinaldi',
     createdAt: createDateOffset(-10),
@@ -606,14 +565,14 @@ export const mockOpportunities = [
     sourceDetails: 'Summer Campaign',
     fiscalEntity: 'MotorK',
     requestType: 'Test Drive',
-    requestedCar: baseRequestedCar('Mercedes-Benz', 'E-Class', 2024, 62000, { vin: 'WDD2130411A123456' }),
+    requestedCar: oppRequestedCar(24),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Qualified',
     negotiationSubstatus: null,
     offers: [],
     tags: [],
-    value: 62000,
+    value: 46000,
     expectedCloseDate: createDateOffset(7),
     assignee: 'Sara Marino',
     createdAt: createDateOffset(-16),
@@ -630,25 +589,18 @@ export const mockOpportunities = [
     sourceDetails: 'Summer Campaign',
     fiscalEntity: 'MotorK',
     requestType: 'Test Drive',
-    requestedCar: baseRequestedCar('Polestar', '2', 2024, 55000, { vin: 'YV1EZFA2XN5123456' }),
+    requestedCar: oppRequestedCar(16),
     vehicle: null,
     selectedVehicle: null,
     stage: 'In Negotiation',
     negotiationSubstatus: 'Offer Sent',
     offers: [
       {
-        id: 'offer-16',
-        createdAt: createHourOffset(-4),
-        vehicleBrand: 'Polestar',
-        vehicleModel: '2',
-        vehicleYear: 2024,
-        price: 55000,
-        status: 'active',
-        data: { brand: 'Polestar', model: '2', year: 2024, price: 55000, financingType: 'cash', image: DEFAULT_CAR_IMAGE }
+        ...buildOffer(16, 'offer-16', 'active', 'cash', createHourOffset(-4))
       }
     ],
     tags: [],
-    value: 55000,
+    value: 28400,
     expectedCloseDate: createDateOffset(7),
     assignee: 'Davide Rinaldi',
     createdAt: createHourOffset(-8),
@@ -665,21 +617,14 @@ export const mockOpportunities = [
     sourceDetails: 'Contact form',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Audi', 'e-tron', 2024, 78000, { vin: 'WAUZZZ8V9LA123456' }),
+    requestedCar: oppRequestedCar(17),
     vehicle: null,
     selectedVehicle: null,
     stage: 'In Negotiation',
     negotiationSubstatus: 'Offer Sent',
     offers: [
       {
-        id: 'offer-17',
-        createdAt: createDateOffset(-6),
-        vehicleBrand: 'Audi',
-        vehicleModel: 'e-tron',
-        vehicleYear: 2024,
-        price: 78000,
-        status: 'accepted',
-        data: { brand: 'Audi', model: 'e-tron', year: 2024, price: 78000, financingType: 'financing', image: DEFAULT_CAR_IMAGE }
+        ...buildOffer(17, 'offer-17', 'accepted', 'financing', createDateOffset(-6))
       }
     ],
     contracts: [
@@ -693,7 +638,7 @@ export const mockOpportunities = [
       }
     ],
     tags: ['Premium'],
-    value: 78000,
+    value: 24900,
     expectedCloseDate: createDateOffset(5),
     assignee: 'Sara Marino',
     createdAt: createDateOffset(-12),
@@ -711,7 +656,7 @@ export const mockOpportunities = [
     sourceDetails: 'Auto campaign',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Cupra', 'Formentor', 2024, 42000, { vin: 'WVWZZZ3CZWE123457' }),
+    requestedCar: oppRequestedCar(18),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Closed Won',
@@ -719,14 +664,7 @@ export const mockOpportunities = [
     deliverySubstatus: null,
     offers: [
       {
-        id: 'offer-18',
-        createdAt: createDateOffset(-20),
-        vehicleBrand: 'Cupra',
-        vehicleModel: 'Formentor',
-        vehicleYear: 2024,
-        price: 42000,
-        status: 'accepted',
-        data: { brand: 'Cupra', model: 'Formentor', year: 2024, price: 42000, financingType: 'cash', image: DEFAULT_CAR_IMAGE }
+        ...buildOffer(18, 'offer-18', 'accepted', 'cash', createDateOffset(-20))
       }
     ],
     contracts: [
@@ -741,7 +679,7 @@ export const mockOpportunities = [
       }
     ],
     tags: [],
-    value: 42000,
+    value: 39500,
     expectedCloseDate: null,
     assignee: 'Davide Rinaldi',
     createdAt: createDateOffset(-25),
@@ -761,31 +699,24 @@ export const mockOpportunities = [
     sourceDetails: 'Aggregator',
     fiscalEntity: '',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Alfa Romeo', 'Giulia', 2024, 52000, { vin: 'ZARFAEEB0N7123456' }),
+    requestedCar: oppRequestedCar(19),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Closed Lost',
     negotiationSubstatus: 'Offer Sent',
     offers: [
       {
-        id: 'offer-19',
-        createdAt: createDateOffset(-10),
-        vehicleBrand: 'Alfa Romeo',
-        vehicleModel: 'Giulia',
-        vehicleYear: 2024,
-        price: 52000,
-        status: 'archived',
-        data: { brand: 'Alfa Romeo', model: 'Giulia', year: 2024, price: 52000, financingType: 'financing', image: DEFAULT_CAR_IMAGE }
+        ...buildOffer(19, 'offer-19', 'archived', 'financing', createDateOffset(-10))
       }
     ],
     tags: [],
-    value: 52000,
+    value: 43800,
     lostReason: 'Financing fell through',
     expectedCloseDate: null,
     assignee: 'Sara Marino',
     createdAt: createDateOffset(-15),
     lastActivity: createDateOffset(-8),
-    nextActionDue: createDateOffset(-5),
+    nextActionDue: null,
     closedDate: createDateOffset(-8),
     scheduledAppointment: null
   },
@@ -798,14 +729,14 @@ export const mockOpportunities = [
     sourceDetails: 'Contact form',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('BMW', '3 Series', 2024, 45000),
+    requestedCar: oppRequestedCar(1),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Qualified',
     negotiationSubstatus: null,
     offers: [],
     tags: [],
-    value: 45000,
+    value: 18900,
     expectedCloseDate: createDateOffset(14),
     assignee: 'Matteo Alpino',
     createdAt: createHourOffset(-1),
@@ -822,14 +753,14 @@ export const mockOpportunities = [
     sourceDetails: 'Lead form',
     fiscalEntity: 'MotorK',
     requestType: 'Test Drive',
-    requestedCar: baseRequestedCar('Audi', 'A4', 2024, 42000, { vin: 'WAUZZZ8V9KA123457' }),
+    requestedCar: oppRequestedCar(2),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Qualified',
     negotiationSubstatus: null,
     offers: [],
     tags: [],
-    value: 42000,
+    value: 14800,
     expectedCloseDate: createDateOffset(10),
     assignee: 'Sara Marino',
     createdAt: createHourOffset(-2),
@@ -846,14 +777,14 @@ export const mockOpportunities = [
     sourceDetails: 'Contact form',
     fiscalEntity: 'MotorK',
     requestType: 'Test Drive',
-    requestedCar: baseRequestedCar('Hyundai', 'Ioniq 6', 2024, 48000, { vin: 'KM8J3CA46NU123456' }),
+    requestedCar: oppRequestedCar(25),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Qualified',
     negotiationSubstatus: null,
     offers: [],
     tags: ['EV'],
-    value: 48000,
+    value: 32500,
     expectedCloseDate: createDateOffset(7),
     assignee: 'Sara Marino',
     createdAt: createDateOffset(-5),
@@ -882,21 +813,14 @@ export const mockOpportunities = [
     sourceDetails: '',
     fiscalEntity: 'MotorK',
     requestType: 'Quotation',
-    requestedCar: baseRequestedCar('Skoda', 'Octavia', 2024, 35000, { vin: 'TMBJJ9NE3N0123456' }),
+    requestedCar: oppRequestedCar(26),
     vehicle: null,
     selectedVehicle: null,
     stage: 'In Negotiation',
     negotiationSubstatus: 'Offer Sent',
     offers: [
       {
-        id: 'offer-26',
-        createdAt: createDateOffset(-12),
-        vehicleBrand: 'Skoda',
-        vehicleModel: 'Octavia',
-        vehicleYear: 2024,
-        price: 35000,
-        status: 'accepted',
-        data: { brand: 'Skoda', model: 'Octavia', year: 2024, price: 35000, financingType: 'cash', image: DEFAULT_CAR_IMAGE }
+        ...buildOffer(26, 'offer-26', 'accepted', 'cash', createDateOffset(-12))
       }
     ],
     contracts: [
@@ -911,7 +835,7 @@ export const mockOpportunities = [
       }
     ],
     tags: [],
-    value: 35000,
+    value: 28400,
     expectedCloseDate: createDateOffset(3),
     assignee: 'Davide Rinaldi',
     createdAt: createDateOffset(-20),
@@ -933,14 +857,14 @@ export const mockOpportunities = [
     sourceDetails: 'Contact form',
     fiscalEntity: '',
     requestType: 'Generic sales',
-    requestedCar: baseRequestedCar('DS', '4', 2024, 45000, { vin: 'VR3UHZKX1NM123456' }),
+    requestedCar: oppRequestedCar(20),
     vehicle: null,
     selectedVehicle: null,
     stage: 'Abandoned',
     negotiationSubstatus: null,
     offers: [],
     tags: [],
-    value: 45000,
+    value: 43800,
     expectedCloseDate: createHourOffset(48),
     assignee: 'Davide Rinaldi',
     createdAt: createHourOffset(-12),
@@ -948,4 +872,5 @@ export const mockOpportunities = [
     nextActionDue: createHourOffset(24),
     scheduledAppointment: null
   }
-]
+  ]
+}

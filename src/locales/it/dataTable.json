@@ -49,12 +49,12 @@
       "summary": "Scadenza più lontana"
     },
     "taskAz": {
-      "menu": "Task · A-Z",
-      "summary": "Task A-Z"
+      "menu": "Prossima azione · A-Z",
+      "summary": "Prossima azione A-Z"
     },
     "taskZa": {
-      "menu": "Task · Z-A",
-      "summary": "Task Z-A"
+      "menu": "Prossima azione · Z-A",
+      "summary": "Prossima azione Z-A"
     },
     "customerAz": {
       "menu": "Cliente · A-Z",
@@ -107,6 +107,8 @@
     "columns": {
       "urgency": "Urgenza",
       "task": "Task",
+      "taskType": "Tipo",
+      "nextAction": "Prossima azione",
       "dueTime": "Scadenza",
       "customer": "Cliente",
       "type": "Tipo",
@@ -122,7 +124,7 @@
     },
     "filters": {
       "showClosed": "Mostra chiusi",
-      "taskType": "Tipo task",
+      "taskType": "Tipo",
       "status": "Stato",
       "priority": "Priorità",
       "source": "Fonte",
@@ -138,12 +140,21 @@
       "used": "Usato",
       "overdueJustNow": "In ritardo adesso",
       "lessThanMinute": "tra meno di un minuto",
-      "justNow": "Adesso"
+      "justNow": "Adesso",
+      "today": "Oggi",
+      "yesterday": "Ieri",
+      "expiredWithTime": "Scaduto - {time}"
     },
     "statuses": {
       "overdue": "In ritardo",
-      "inProgress": "In corso",
-      "open": "Aperto"
+      "inProgress": "In gestione",
+      "open": "Aperto",
+      "closed": "Chiuso"
+    },
+    "requestStatuses": {
+      "valid": "Valido",
+      "inProgress": "In gestione",
+      "expired": "Scaduto"
     },
     "requestTypes": {
       "testDrive": "Test Drive",

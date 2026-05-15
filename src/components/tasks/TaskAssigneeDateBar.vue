@@ -128,13 +128,18 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Popover, PopoverTrigger, PopoverContent } from '@motork/component-library/future/primitives'
 import { ChevronDown, Clock, History } from 'lucide-vue-next'
 import AssigneeDropdownContent from '@/components/tasks/AssigneeDropdownContent.vue'
 import { formatDueDateRelative } from '@/utils/formatters'
+import { formatTaskDueTimeDisplay } from '@/utils/taskTableDates'
+import { getTaskTableStatus, TASK_TABLE_STATUS } from '@/utils/taskStatus'
 import { useUsersStore } from '@/stores/users'
 import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
+
+const { t, locale } = useI18n()
 
 const props = defineProps({
   task: {
@@ -268,7 +273,13 @@ const dueDateLabel = computed(() => 'Due Date')
 
 const formattedDueDate = computed(() => {
   if (!props.task?.nextActionDue) return ''
-  return formatDueDateRelative(props.task.nextActionDue)
+  const { label } = formatTaskDueTimeDisplay(
+    props.task,
+    props.task.nextActionDue,
+    locale.value,
+    t
+  )
+  return label
 })
 
 const showExpectedCloseDate = computed(() => {
@@ -281,7 +292,8 @@ const formattedExpectedCloseDate = computed(() => {
 })
 
 const isTaskClosed = computed(() => {
-  return props.task?.stage === 'Closed Won' || props.task?.stage === 'Closed Lost' || props.task?.isClosed
+  if (!props.task) return false
+  return getTaskTableStatus(props.task) === TASK_TABLE_STATUS.CLOSED
 })
 
 const dueDateMenuItems = computed(() => {

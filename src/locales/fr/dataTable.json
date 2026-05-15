@@ -49,12 +49,12 @@
       "summary": "Échéance la plus tardive"
     },
     "taskAz": {
-      "menu": "Tâche · A à Z",
-      "summary": "Tâche A à Z"
+      "menu": "Prochaine action · A à Z",
+      "summary": "Prochaine action A à Z"
     },
     "taskZa": {
-      "menu": "Tâche · Z à A",
-      "summary": "Tâche Z à A"
+      "menu": "Prochaine action · Z à A",
+      "summary": "Prochaine action Z à A"
     },
     "customerAz": {
       "menu": "Client · A à Z",
@@ -107,6 +107,8 @@
     "columns": {
       "urgency": "Urgence",
       "task": "Task",
+      "taskType": "Type",
+      "nextAction": "Prochaine action",
       "dueTime": "Échéance",
       "customer": "Client",
       "type": "Type",
@@ -122,7 +124,7 @@
     },
     "filters": {
       "showClosed": "Afficher les fermés",
-      "taskType": "Type de task",
+      "taskType": "Type",
       "status": "Statut",
       "priority": "Priorité",
       "source": "Source",
@@ -138,12 +140,21 @@
       "used": "Occasion",
       "overdueJustNow": "En retard à l'instant",
       "lessThanMinute": "dans moins d'une minute",
-      "justNow": "À l'instant"
+      "justNow": "À l'instant",
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "expiredWithTime": "Expiré - {time}"
     },
     "statuses": {
       "overdue": "En retard",
       "inProgress": "En cours",
-      "open": "Ouvert"
+      "open": "Ouvert",
+      "closed": "Fermé"
+    },
+    "requestStatuses": {
+      "valid": "Valide",
+      "inProgress": "En cours de traitement",
+      "expired": "Expiré"
     },
     "requestTypes": {
       "testDrive": "Test Drive",

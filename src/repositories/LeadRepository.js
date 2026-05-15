@@ -1,13 +1,14 @@
 import { BaseRepository } from './BaseRepository.js'
 import { getMockData } from '@/api/mockData/localeLoader.js'
 import {
+  createHourOffset,
   DEFAULT_CAR_IMAGE,
   demoPlateNumber,
   ensureRequestedCarImage
 } from '@/utils/mockDataHelpers'
 
 const STORAGE_KEY = 'project-ultra-leads'
-const DATA_VERSION = 7
+const DATA_VERSION = 9
 
 /**
  * Lead Repository
@@ -40,14 +41,40 @@ export class LeadRepository extends BaseRepository {
 
   /**
    * Ensure every lead has nextActionDue so the UI does not show "Not set".
-   * Patches leads loaded from localStorage that may have been saved before the mock fix.
+   * Uses fresh mock values when available; otherwise a near-future fallback (not stale createdAt).
    */
   _ensureNextActionDue(leads) {
     if (!Array.isArray(leads)) return
+    const mockById = new Map((getMockData().mockLeads || []).map((l) => [l.id, l]))
     let changed = false
     for (const lead of leads) {
-      if (lead.nextActionDue == null) {
-        lead.nextActionDue = lead.lastActivity || lead.createdAt || new Date().toISOString()
+      if (lead.nextActionDue != null) continue
+      const mock = mockById.get(lead.id)
+      lead.nextActionDue = mock?.nextActionDue ?? createHourOffset(4)
+      changed = true
+    }
+    if (changed) this._persist()
+  }
+
+  /**
+   * Refresh time-sensitive fields from mock so relative due dates stay accurate across sessions.
+   */
+  _syncRelativeDatesFromMock(leads) {
+    if (!Array.isArray(leads)) return
+    const mockById = new Map((getMockData().mockLeads || []).map((l) => [l.id, l]))
+    let changed = false
+    for (const lead of leads) {
+      const mock = mockById.get(lead.id)
+      if (!mock) continue
+      const fields = ['nextActionDue', 'createdAt', 'importedAt', 'lastActivity', 'callbackDate']
+      for (const field of fields) {
+        if (mock[field] !== lead[field]) {
+          lead[field] = mock[field]
+          changed = true
+        }
+      }
+      if (Array.isArray(mock.contactAttempts) && JSON.stringify(mock.contactAttempts) !== JSON.stringify(lead.contactAttempts)) {
+        lead.contactAttempts = JSON.parse(JSON.stringify(mock.contactAttempts))
         changed = true
       }
     }
@@ -213,6 +240,47 @@ export class LeadRepository extends BaseRepository {
   }
 
   /**
+   * Replace requestedCar from current mock (fixes stale localStorage e.g. old BMW iX demo).
+   */
+  _syncRequestedCarFromMock(leads) {
+    if (!Array.isArray(leads)) return
+    const mockById = new Map((getMockData().mockLeads || []).map((l) => [l.id, l]))
+    let changed = false
+    for (const lead of leads) {
+      const mock = mockById.get(lead.id)
+      if (!mock?.requestedCar) continue
+      const stored = lead.requestedCar
+      const next = JSON.parse(JSON.stringify(mock.requestedCar))
+      const same =
+        stored &&
+        stored.brand === next.brand &&
+        stored.model === next.model &&
+        stored.price === next.price &&
+        stored.status === next.status &&
+        stored.image === next.image
+      if (!same) {
+        lead.requestedCar = next
+        changed = true
+      }
+    }
+    if (changed) this._persist()
+  }
+
+  /**
+   * Drop leads removed from mock catalog (e.g. trimmed from 29 to 25).
+   */
+  _trimToMockLeadCatalog(leads) {
+    if (!Array.isArray(leads)) return leads
+    const mockIds = new Set((getMockData().mockLeads || []).map((l) => l.id))
+    const trimmed = leads.filter((l) => mockIds.has(l.id))
+    if (trimmed.length !== leads.length) {
+      this._leadsCache = trimmed
+      this._persist()
+    }
+    return trimmed
+  }
+
+  /**
    * Merge mock leads that don't exist in stored data (e.g. new demo leads).
    * Ensures new mock leads appear even when user has existing localStorage.
    */
@@ -238,12 +306,15 @@ export class LeadRepository extends BaseRepository {
           const parsed = JSON.parse(stored)
           this._leadsCache = Array.isArray(parsed) ? parsed : []
           this._ensureNextActionDue(this._leadsCache)
+          this._syncRelativeDatesFromMock(this._leadsCache)
           this._ensureCarImages(this._leadsCache)
           this._syncDemoRequestedCarImagesFromMock(this._leadsCache)
           this._ensureRequestedCarPlates(this._leadsCache)
           this._ensureLeadAttributionFromMock(this._leadsCache)
           this._ensureTradeInsFinancingFromMock(this._leadsCache)
           this._syncAssigneeFromMock(this._leadsCache)
+          this._leadsCache = this._trimToMockLeadCatalog(this._leadsCache)
+          this._syncRequestedCarFromMock(this._leadsCache)
           const merged = this._mergeNewMockLeads(this._leadsCache)
           if (merged.length > this._leadsCache.length) {
             this._leadsCache = merged
@@ -251,6 +322,7 @@ export class LeadRepository extends BaseRepository {
             this._ensureLeadAttributionFromMock(this._leadsCache)
             this._ensureTradeInsFinancingFromMock(this._leadsCache)
             this._syncAssigneeFromMock(this._leadsCache)
+            this._syncRequestedCarFromMock(this._leadsCache)
             this._persist()
           }
         }
@@ -258,6 +330,7 @@ export class LeadRepository extends BaseRepository {
       if (this._leadsCache === null) {
         const mock = getMockData().mockLeads
         this._leadsCache = JSON.parse(JSON.stringify(mock || []))
+        this._syncRelativeDatesFromMock(this._leadsCache)
         this._ensureRequestedCarPlates(this._leadsCache)
         this._ensureLeadAttributionFromMock(this._leadsCache)
         this._ensureTradeInsFinancingFromMock(this._leadsCache)

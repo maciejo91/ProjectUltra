@@ -162,7 +162,7 @@ export const mockActivities = [
     type: 'customer-whatsapp',
     user: 'Chiara Moretti',
     action: 'sent a WhatsApp message',
-    content: 'I am still interested in the ID.4. Can we schedule a callback after 2 PM?',
+    content: 'I am still interested in the Fiat 500 Hybrid. Can we schedule a callback after 2 PM?',
     data: {
       fromPhone: '+49 170 555 0142',
       toPhone: '+49 89 555 0199'
@@ -175,7 +175,7 @@ export const mockActivities = [
     type: 'customer-email',
     user: 'Matteo Bianchi',
     action: 'sent an email',
-    content: 'When can I visit the Milano dealership to see the BMW iX?',
+    content: 'When can I visit the Milano dealership to see the Toyota Yaris?',
     data: {
       from: 'matteo.bianchi@example.com',
       to: 'munich@motork.io'
@@ -188,7 +188,7 @@ export const mockActivities = [
     type: 'customer-email',
     user: 'Giulia Conti',
     action: 'sent an email',
-    content: 'Thanks for the C-Class info. I would like to see it this week.',
+    content: 'Thanks for the Toyota RAV4 info. I would like to see it this week.',
     data: {
       from: 'giulia.conti@example.com',
       to: 'sales@motork.io'
@@ -202,7 +202,7 @@ export const mockActivities = [
     user: 'Davide Rinaldi',
     action: 'sent an email',
     content:
-      'Hi Giulia — happy to help. We have a C-Class available. Would you prefer Wed 12:30 or Thu 13:00 for a quick viewing in Bologna?',
+      'Hi Giulia — happy to help. We have a Toyota RAV4 available. Would you prefer Wed 12:30 or Thu 13:00 for a quick viewing in Bologna?',
     data: {
       threadId: 'lead-4-email',
       from: 'davide.rinaldi@motork.io',
@@ -270,7 +270,7 @@ export const mockActivities = [
     user: 'Davide Rinaldi',
     action: 'sent an email',
     content:
-      'Quote attached for the C-Class including warranty options. Delivery time is 7–10 days after confirmation. See you Thu 13:00 in Milano.',
+      'Quote attached for the Toyota RAV4 including warranty options. Delivery time is 7–10 days after confirmation. See you Thu 13:00 in Bologna.',
     data: {
       threadId: 'lead-4-email',
       from: 'davide.rinaldi@motork.io',
@@ -417,7 +417,7 @@ export const mockActivities = [
     type: 'email',
     user: 'Sara Marino',
     action: 'sent an email',
-    content: 'Here is the quote for the Audi A6 you requested. Let me know if you have questions.',
+    content: 'Here is the quote for the Fiat Panda Hybrid you requested. Let me know if you have questions.',
     data: {
       from: 'sara.marino@motork.io',
       to: 'giovanni.sarti@example.com'
@@ -457,9 +457,9 @@ export const mockActivities = [
     user: 'MotorKAI',
     action: 'summarized recent interactions',
     message:
-      'Strong intent on the VW ID.4; the customer asked for an afternoon callback after a short WhatsApp thread.\nPaid search and WhatsApp are the latest touchpoints—keep momentum before the scheduled recall.\nSuggested next step: confirm stock, pricing, and home-charging options in one concise call.',
+      'Clear intent on the Fiat 500 Hybrid; customer asked for an afternoon callback after WhatsApp. Keep momentum before the scheduled recall—confirm stock, pricing, and options in one short call.',
     content:
-      'Strong intent on the VW ID.4; the customer asked for an afternoon callback after a short WhatsApp thread.\nPaid search and WhatsApp are the latest touchpoints—keep momentum before the scheduled recall.\nSuggested next step: confirm stock, pricing, and home-charging options in one concise call.',
+      'Clear intent on the Fiat 500 Hybrid; customer asked for an afternoon callback after WhatsApp. Keep momentum before the scheduled recall—confirm stock, pricing, and options in one short call.',
     timestamp: createHourOffset(-0.2),
     leadId: 2
   },
@@ -468,7 +468,7 @@ export const mockActivities = [
     type: 'customer-sms',
     user: 'Matteo Bianchi',
     action: 'sent an SMS',
-    content: 'Can you confirm the BMW iX is still available for a test drive this Saturday?',
+    content: 'Can you confirm the Toyota Yaris is still available for a test drive this Saturday?',
     data: {
       fromPhone: '+49 170 555 0311',
       toPhone: '+49 89 555 0200'
@@ -481,7 +481,7 @@ export const mockActivities = [
     type: 'sms',
     user: 'Sara Marino',
     action: 'sent an SMS',
-    content: 'Yes, Saturday works. I will reserve the iX for 11:00. See you at the Milano showroom.',
+    content: 'Yes, Saturday works. I will reserve the Yaris for 11:00. See you at the Milano showroom.',
     data: {
       fromPhone: '+49 89 555 0200',
       toPhone: '+49 170 555 0311'
@@ -557,7 +557,7 @@ export const mockActivities = [
     type: 'customer-email',
     user: 'Luca De Santis',
     action: 'sent an email',
-    content: 'Hi, I am interested in the Audi A6. Can we schedule a test drive?',
+    content: 'Hi, I am interested in the Fiat Panda Hybrid. Can we schedule a test drive?',
     data: {
       threadId: 'lead-1-email',
       from: 'luca.desantis@example.com',
@@ -604,7 +604,7 @@ export const mockActivities = [
     type: 'whatsapp',
     user: 'Sara Marino',
     action: 'sent a WhatsApp message',
-    content: 'Thu 11:00 is available. Shall I book the Audi A6 for you at 11:00 at Roma showroom?',
+    content: 'Thu 11:00 is available. Shall I book the Fiat Panda Hybrid for you at 11:00 at Roma showroom?',
     data: {
       threadId: 'lead-1-whatsapp',
       fromPhone: '+34 910 555 0199',

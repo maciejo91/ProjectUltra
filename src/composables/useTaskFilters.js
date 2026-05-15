@@ -5,10 +5,14 @@ import { useUserStore } from '@/stores/user'
 import { useUsersStore } from '@/stores/users'
 import { useSettingsStore } from '@/stores/settings'
 import { getDisplayStage } from '@/utils/stageMapper'
+import { getTaskTableStatus } from '@/utils/taskStatus'
 import { OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 import { calculateLeadUrgency } from '@/composables/useLeadUrgency'
 
 const CLOSED_OPPORTUNITY_STAGES = [OPPORTUNITY_STAGES.CLOSED_WON, OPPORTUNITY_STAGES.CLOSED_LOST, OPPORTUNITY_STAGES.ABANDONED]
+
+const DEMO_TABLE_CLOSED_LEAD_IDS = new Set([5, 6])
+const DEMO_TABLE_CLOSED_OPPORTUNITY_IDS = new Set([5, 6])
 
 /** Map opportunity/lead priority label to urgency level (HOT/WARM/STANDARD/COLD) for display. */
 function priorityToUrgencyLevel(priority) {
@@ -38,20 +42,20 @@ export function useTaskFilters(showClosed) {
     const _urgencyThresholds = settingsStore.getSetting('urgencyThresholds')
     const _leadScoring = settingsStore.getSetting('leadScoring')
 
-    // Filter out disqualified leads (unless showClosed is enabled)
     const visibleLeads = showClosed.value
       ? leadsStore.leads
-      : leadsStore.leads.filter(lead => !lead.isDisqualified)
+      : leadsStore.leads.filter(
+        (lead) => !lead.isDisqualified || DEMO_TABLE_CLOSED_LEAD_IDS.has(lead.id)
+      )
 
     const leads = visibleLeads.map(lead => {
-      const displayStage = getDisplayStage(lead, 'lead')
-
       const task = {
         ...lead,
         type: 'lead',
-        compositeId: `lead-${lead.id}`,
-        displayStage
+        compositeId: `lead-${lead.id}`
       }
+      task.displayStage = getTaskTableStatus(task)
+
       if (!task.customer && lead.customer) {
         task.customer = lead.customer
       }
@@ -67,22 +71,20 @@ export function useTaskFilters(showClosed) {
     
     const visibleOpportunities = showClosed.value
       ? opportunitiesStore.opportunities
-      : opportunitiesStore.opportunities.filter(opp => {
-          const displayStage = getDisplayStage(opp, 'opportunity')
-          // Include when stage is unknown (null/undefined) so we never hide opportunities by mistake
-          if (displayStage == null) return true
-          return !CLOSED_OPPORTUNITY_STAGES.includes(displayStage)
-        })
+      : opportunitiesStore.opportunities.filter((opp) => {
+        if (DEMO_TABLE_CLOSED_OPPORTUNITY_IDS.has(opp.id)) return true
+        const displayStage = getDisplayStage(opp, 'opportunity')
+        if (displayStage == null) return true
+        return !CLOSED_OPPORTUNITY_STAGES.includes(displayStage)
+      })
 
     const opportunities = visibleOpportunities.map(opp => {
-      const displayStage = getDisplayStage(opp, 'opportunity')
-
       const task = {
         ...opp,
         type: 'opportunity',
-        compositeId: `opportunity-${opp.id}`,
-        displayStage
+        compositeId: `opportunity-${opp.id}`
       }
+      task.displayStage = getTaskTableStatus(task)
       if (!task.customer && opp.customer) {
         task.customer = opp.customer
       }
@@ -113,13 +115,12 @@ export function useTaskFilters(showClosed) {
     const urgencyEnabled = settingsStore.getSetting('urgencyEnabled') === true
 
     const leads = leadsStore.leads.map(lead => {
-      const displayStage = getDisplayStage(lead, 'lead')
       const task = {
         ...lead,
         type: 'lead',
-        compositeId: `lead-${lead.id}`,
-        displayStage
+        compositeId: `lead-${lead.id}`
       }
+      task.displayStage = getTaskTableStatus(task)
       if (!task.customer && lead.customer) task.customer = lead.customer
       if (urgencyEnabled) {
         const urgencyResult = calculateLeadUrgency(lead)
@@ -130,13 +131,12 @@ export function useTaskFilters(showClosed) {
     })
 
     const opportunities = opportunitiesStore.opportunities.map(opp => {
-      const displayStage = getDisplayStage(opp, 'opportunity')
       const task = {
         ...opp,
         type: 'opportunity',
-        compositeId: `opportunity-${opp.id}`,
-        displayStage
+        compositeId: `opportunity-${opp.id}`
       }
+      task.displayStage = getTaskTableStatus(task)
       if (!task.customer && opp.customer) task.customer = opp.customer
       if (urgencyEnabled) task.urgencyLevel = priorityToUrgencyLevel(opp.priority)
       return task

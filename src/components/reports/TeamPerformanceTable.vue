@@ -19,6 +19,7 @@
       :placeholder="t('dataTable.searchReports')"
       :pagination="pagination"
       :include-margin-bottom="false"
+      :fill-height="false"
       @update:global-filter="globalFilter = $event"
       @update:column-filters="columnFilters = $event"
       @update:pagination="pagination = $event"
@@ -34,7 +35,7 @@
         }"
         :pagination-options="{
           rowCount: totalFilteredCount,
-          pageSizeOptions: [10, 20, 50]
+          pageSizeOptions: [15, 20, 50]
         }"
         class="h-full"
       >
@@ -57,6 +58,7 @@ import { DataTable } from '@motork/component-library/future/components'
 import { Avatar, AvatarFallback } from '@motork/component-library/future/primitives'
 import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import { useDataTableData } from '@/composables/useDataTableData'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 
 const props = defineProps({
   teamMembers: {
@@ -75,7 +77,7 @@ const reportColumnLabel = (key) => t(`dataTable.reports.columns.${key}`)
 // DataTable state management
 const pagination = ref({
   pageIndex: 0,
-  pageSize: 10
+  pageSize: DEFAULT_TABLE_PAGE_SIZE
 })
 
 const sorting = ref([{ id: 'leads', desc: true }])

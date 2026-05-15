@@ -49,12 +49,12 @@
       "summary": "Fälligkeit späteste zuerst"
     },
     "taskAz": {
-      "menu": "Aufgabe · A bis Z",
-      "summary": "Aufgabe A bis Z"
+      "menu": "Nächste Aktion · A bis Z",
+      "summary": "Nächste Aktion A bis Z"
     },
     "taskZa": {
-      "menu": "Aufgabe · Z bis A",
-      "summary": "Aufgabe Z bis A"
+      "menu": "Nächste Aktion · Z bis A",
+      "summary": "Nächste Aktion Z bis A"
     },
     "customerAz": {
       "menu": "Kunde · A bis Z",
@@ -107,6 +107,8 @@
     "columns": {
       "urgency": "Dringlichkeit",
       "task": "Task",
+      "taskType": "Typ",
+      "nextAction": "Nächste Aktion",
       "dueTime": "Fälligkeit",
       "customer": "Kunde",
       "type": "Typ",
@@ -122,7 +124,7 @@
     },
     "filters": {
       "showClosed": "Geschlossene anzeigen",
-      "taskType": "Task-Typ",
+      "taskType": "Typ",
       "status": "Status",
       "priority": "Priorität",
       "source": "Quelle",
@@ -138,12 +140,21 @@
       "used": "Gebraucht",
       "overdueJustNow": "Gerade überfällig",
       "lessThanMinute": "in weniger als einer Minute",
-      "justNow": "Gerade eben"
+      "justNow": "Gerade eben",
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "expiredWithTime": "Überfällig - {time}"
     },
     "statuses": {
       "overdue": "Überfällig",
       "inProgress": "In Bearbeitung",
-      "open": "Offen"
+      "open": "Offen",
+      "closed": "Geschlossen"
+    },
+    "requestStatuses": {
+      "valid": "Gültig",
+      "inProgress": "In Bearbeitung",
+      "expired": "Überfällig"
     },
     "requestTypes": {
       "testDrive": "Test Drive",

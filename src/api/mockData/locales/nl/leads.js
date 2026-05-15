@@ -1,4 +1,4 @@
 /**
- * Dutch locale: use same leads as EN (single source, 24-hour window via createHourOffset).
+ * Dutch locale: same leads as EN (single source, relative dates via buildMockLeads).
  */
-export { mockLeads } from '../en/leads.js'
+export { buildMockLeads } from '../en/leads.js'

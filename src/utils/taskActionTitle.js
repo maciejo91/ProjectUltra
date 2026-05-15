@@ -6,6 +6,34 @@ import i18n from '@/locales'
 const customerName = (item) => item?.customer?.name ?? ''
 const customerPhone = (item) => item?.customer?.phone ?? ''
 
+function hasCustomerPhone(item) {
+  return !!customerPhone(item)?.trim()
+}
+
+/**
+ * LQ task title from contact attempts and next-step channel (active leads only).
+ * @param {Object} lead
+ * @returns {string|null}
+ */
+export function resolveLeadLqTaskDisplayTitle(lead) {
+  if (!lead || lead.isDisqualified === true) return null
+
+  const t = i18n.global.t
+  const attempts = lead.contactAttempts?.length ?? 0
+
+  if (attempts === 0) {
+    return hasCustomerPhone(lead)
+      ? t('entities.lead.taskActions.firstCallAttempt')
+      : t('entities.lead.taskActions.firstEmail')
+  }
+
+  const channel = lead.nextStepChannel
+  if (channel === 'email') return t('entities.lead.taskActions.nextStepEmail')
+  if (channel === 'whatsapp') return t('entities.lead.taskActions.nextStepWhatsapp')
+
+  return t('entities.lead.taskActions.nextCallAttempt')
+}
+
 const LEAD_ACTION_TITLE_KEYS = {
   'Call to Verify': 'entities.lead.taskActions.callToVerify',
   'Call to Verify Contact Details': 'entities.lead.taskActions.callToVerify',
@@ -120,6 +148,9 @@ export function getTaskActionTitle(item) {
     }
 
     if (type === 'lead') {
+      const lqTitle = resolveLeadLqTaskDisplayTitle(item)
+      if (lqTitle) return lqTitle
+
       const config = displayStage && LEAD_STATE_CONFIG[displayStage]
       if (config && config.primaryAction) {
         const primaryAction = config.primaryAction
@@ -203,4 +234,24 @@ export function getTaskDisplayTitle(item) {
   const title = getTaskActionTitle(item)
   if (!title) return null
   return normalizeTitleDashes(title)
+}
+
+/** Task type code for the tasks table (LQF for lead qualification leads only). */
+export function getTaskTypeCode(item) {
+  if (item?.type === 'lead') return 'LQF'
+  return null
+}
+
+/**
+ * Next-action label for the tasks table (LQ flow title for leads, stage action for opportunities).
+ * @param {Object} item
+ * @returns {string|null}
+ */
+export function getTaskNextActionDisplay(item) {
+  if (!item) return null
+  if (item.type === 'lead') {
+    const lqTitle = resolveLeadLqTaskDisplayTitle(item)
+    if (lqTitle) return lqTitle
+  }
+  return getTaskDisplayTitle(item)
 }

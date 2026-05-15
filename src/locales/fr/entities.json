@@ -14,7 +14,12 @@
       "callBack": "Rappeler",
       "disqualifyLead": "Disqualifier le lead",
       "postponeTask": "Reporter la tâche",
-      "reopenLead": "Rouvrir le lead"
+      "reopenLead": "Rouvrir le lead",
+      "firstCallAttempt": "Effectuer la première tentative d'appel",
+      "firstEmail": "Envoyer le premier e-mail",
+      "nextCallAttempt": "Effectuer la prochaine tentative d'appel",
+      "nextStepEmail": "Prochaine étape : envoyer un e-mail",
+      "nextStepWhatsapp": "Prochaine étape : utiliser WhatsApp"
     }
   },
   "opportunity": {

@@ -78,6 +78,7 @@ import { useCustomersTable } from '@/composables/useCustomersTable'
 import { useTableRowSelection } from '@/composables/useTableRowSelection'
 import { useTableRowClick } from '@/composables/useTableRowClick'
 import { useDataTableData } from '@/composables/useDataTableData'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 
 const emit = defineEmits(['row-click'])
 
@@ -89,7 +90,7 @@ const showDisqualified = ref(false)
 const { rowSelection, selectedCount, hasSelection, getSelectedRows, clearSelection } = useTableRowSelection((row) => row.id)
 
 // DataTable state (local to this tab)
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
+const pagination = ref({ pageIndex: 0, pageSize: DEFAULT_TABLE_PAGE_SIZE })
 const globalFilter = ref('')
 const columnFilters = ref([])
 const sorting = ref([])

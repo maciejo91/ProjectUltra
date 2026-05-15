@@ -20,6 +20,7 @@
             :volvo-model-options="volvoModelOptions"
             :brand-options="vehicleBrandOptions"
             :include-margin-bottom="false"
+            :fill-height="false"
             @update:global-filter="globalFilter = $event"
             @update:column-filters="columnFilters = $event"
             @update:pagination="pagination = $event"
@@ -67,6 +68,7 @@ import { computed, h, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useVehiclesStore } from '@/stores/vehicles'
 import { getNestedProperty, useDataTableData } from '@/composables/useDataTableData'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 import { useTableRowClick } from '@/composables/useTableRowClick'
 import DataTableWithUnifiedSearch from '@/components/shared/layout/DataTableWithUnifiedSearch.vue'
 import VehicleGrid from '@/components/vehicles/VehicleGrid.vue'
@@ -95,7 +97,7 @@ const { t } = useI18n()
 const vehiclesStore = useVehiclesStore()
 
 // DataTable state: inventory scope matches Vehicles.vue via pinned `inventoryType` column filter
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
+const pagination = ref({ pageIndex: 0, pageSize: DEFAULT_TABLE_PAGE_SIZE })
 const globalFilter = ref('')
 const sorting = ref([])
 

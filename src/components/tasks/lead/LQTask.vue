@@ -1380,7 +1380,6 @@ import { useSettingsStore } from '@/stores/settings'
 import { useLeadsStore } from '@/stores/leads'
 import { useToastStore } from '@/stores/toast'
 import { formatDate, formatTime } from '@/utils/formatters'
-import { defineAsyncComponent } from 'vue'
 import { mergeContactIntoDescription, getNoPhoneContactDescription } from '@/utils/taskActionTitle'
 import { useLeadActions } from '@/composables/useLeadActions'
 import { LEAD_STAGES } from '@/utils/stageMapper'
@@ -1389,10 +1388,7 @@ import { useLQWidgetOutcomes } from '@/composables/useLQWidgetOutcomes'
 import { useLQWidgetHandlers } from '@/composables/useLQWidgetHandlers'
 import CallInterface from '@/components/tasks/lead/CallInterface.vue'
 import CallAttemptsProgressRing from '@/components/tasks/shared/CallAttemptsProgressRing.vue'
-
-const LQTaskSendEmailCard = defineAsyncComponent(() =>
-  import('@/components/tasks/lead/LQTaskSendEmailCard.vue')
-)
+import LQTaskSendEmailCard from '@/components/tasks/lead/LQTaskSendEmailCard.vue'
 import DeadlineBanner from '@/components/tasks/shared/DeadlineBanner.vue'
 import AppointmentCommunications from '@/components/shared/communication/AppointmentCommunications.vue'
 import MiniCalendar from '@/components/calendar/MiniCalendar.vue'

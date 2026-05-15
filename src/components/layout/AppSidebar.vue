@@ -86,15 +86,11 @@
                       <span class="flex min-w-0 w-full items-center gap-2">
                         <Plus class="size-4 shrink-0" />
                         <span class="truncate group-data-[collapsible=icon]:hidden">{{ addNewLabel }}</span>
-                        <Lock class="ml-auto size-3.5 shrink-0 text-muted-foreground/50 group-data-[collapsible=icon]:hidden" />
                       </span>
                     </SidebarMenuButton>
                   </TooltipTrigger>
                   <TooltipContent side="right" align="center" class="max-w-xs">
-                    <span class="flex items-center gap-2">
-                      <Lock class="size-3.5 shrink-0 text-muted-foreground/50" />
-                      <span>{{ lockedTooltipText }}</span>
-                    </span>
+                    {{ lockedTooltipText }}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -139,15 +135,11 @@
                         <span class="truncate group-data-[collapsible=icon]:hidden">
                           {{ t('common.navigation.notifications') }}
                         </span>
-                        <Lock class="ml-auto size-3.5 shrink-0 text-muted-foreground/50 group-data-[collapsible=icon]:hidden" />
                       </span>
                     </SidebarMenuButton>
                   </TooltipTrigger>
                   <TooltipContent side="right" align="center" class="max-w-xs">
-                    <span class="flex items-center gap-2">
-                      <Lock class="size-3.5 shrink-0 text-muted-foreground/50" />
-                      <span>{{ lockedTooltipText }}</span>
-                    </span>
+                    {{ lockedTooltipText }}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -175,15 +167,11 @@
                       <span class="flex min-w-0 w-full items-center gap-2">
                         <component :is="item.icon" class="size-4 shrink-0" />
                         <span class="truncate group-data-[collapsible=icon]:hidden">{{ item.name }}</span>
-                        <Lock class="ml-auto size-3.5 shrink-0 text-muted-foreground/50 group-data-[collapsible=icon]:hidden" />
                       </span>
                     </SidebarMenuButton>
                   </TooltipTrigger>
                   <TooltipContent side="right" align="center" class="max-w-xs">
-                    <span class="flex items-center gap-2">
-                      <Lock class="size-3.5 shrink-0 text-muted-foreground/50" />
-                      <span>{{ lockedTooltipText }}</span>
-                    </span>
+                    {{ lockedTooltipText }}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -228,15 +216,11 @@
                       <span class="flex min-w-0 w-full items-center gap-2">
                         <component :is="item.icon" class="size-4 shrink-0" />
                         <span class="truncate group-data-[collapsible=icon]:hidden">{{ item.name }}</span>
-                        <Lock class="ml-auto size-3.5 shrink-0 text-muted-foreground/50 group-data-[collapsible=icon]:hidden" />
                       </span>
                     </SidebarMenuButton>
                   </TooltipTrigger>
                   <TooltipContent side="right" align="center" class="max-w-xs">
-                    <span class="flex items-center gap-2">
-                      <Lock class="size-3.5 shrink-0 text-muted-foreground/50" />
-                      <span>{{ lockedTooltipText }}</span>
-                    </span>
+                    {{ lockedTooltipText }}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -382,15 +366,11 @@
                     <span class="truncate group-data-[collapsible=icon]:hidden">{{
                       t('common.navigation.settings')
                     }}</span>
-                    <Lock class="ml-auto size-3.5 shrink-0 text-muted-foreground/50 group-data-[collapsible=icon]:hidden" />
                   </span>
                 </SidebarMenuButton>
               </TooltipTrigger>
               <TooltipContent side="right" align="center" class="max-w-xs">
-                <span class="flex items-center gap-2">
-                  <Lock class="size-3.5 shrink-0 text-muted-foreground/50" />
-                  <span>{{ lockedTooltipText }}</span>
-                </span>
+                {{ lockedTooltipText }}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -449,7 +429,6 @@ import {
   Search,
   LifeBuoy,
   Settings,
-  Lock,
   Bell,
   ChevronLeft,
   ChevronRight,

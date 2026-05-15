@@ -1,5 +1,6 @@
 <template>
   <DataTableWithUnifiedSearch
+    class="flex flex-1 flex-col min-h-0"
     ref="datatableShellRef"
     active-tab="customers"
     placeholder="Search customers..."
@@ -24,9 +25,10 @@
         v-model:columnFilters="columnFilters"
         v-model:rowSelection="rowSelection"
         :paginationOptions="{
-          rowCount: totalFilteredCount
+          rowCount: totalFilteredCount,
+          pageSizeOptions: [15, 20, 50]
         }"
-        class="h-full"
+        class="flex min-h-0 flex-1 flex-col"
       >
         <template #empty-state>
           <div class="empty-state">
@@ -78,6 +80,7 @@ import { useCustomersTable } from '@/composables/useCustomersTable'
 import { useTableRowSelection } from '@/composables/useTableRowSelection'
 import { useTableRowClick } from '@/composables/useTableRowClick'
 import { useDataTableData, getNestedProperty } from '@/composables/useDataTableData'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 
 const customersStore = useCustomersStore()
 const leadsStore = useLeadsStore()
@@ -91,7 +94,7 @@ const { rowSelection, selectedCount, hasSelection, getSelectedRows, clearSelecti
 const emit = defineEmits(['row-click'])
 
 // DataTable state (local to this tab) - default filters: Source, Account type
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
+const pagination = ref({ pageIndex: 0, pageSize: DEFAULT_TABLE_PAGE_SIZE })
 const globalFilter = ref('')
 const columnFilters = ref([
   { id: 'source-1', field: 'source', value: '', operator: 'eq', pinned: true },
@@ -219,7 +222,7 @@ watch(
     if (!id || !tableScrollContainer) return
     const idx = sortedData.value.findIndex(r => r.id === id)
     if (idx === -1) return
-    const pageSize = pagination.value.pageSize || 10
+    const pageSize = pagination.value.pageSize || DEFAULT_TABLE_PAGE_SIZE
     const pageIndex = Math.floor(idx / pageSize)
     if (pagination.value.pageIndex !== pageIndex) {
       pagination.value = { ...pagination.value, pageIndex }

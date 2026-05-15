@@ -858,6 +858,7 @@ const requestActivities = computed(() => {
 
 const showAssociatedTasks = computed(() => {
   const r = props.request
+  if (r?.type === 'lead') return false
   return !!(r?.customer || r?.customerId)
 })
 

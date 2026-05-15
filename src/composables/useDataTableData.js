@@ -1,4 +1,5 @@
 import { computed, watch } from 'vue'
+import { DEFAULT_TABLE_PAGE_SIZE } from '@/constants/dataTable'
 
 /**
  * Get a nested property from an object by dot path (e.g. 'customer.name').
@@ -334,7 +335,7 @@ export function useDataTableData({
   const totalFilteredCount = computed(() => sortedData.value.length)
 
   const paginatedData = computed(() => {
-    const pageSize = Math.max(1, pagination.value?.pageSize ?? 10)
+    const pageSize = Math.max(1, pagination.value?.pageSize ?? DEFAULT_TABLE_PAGE_SIZE)
     const pageIndex = Math.max(0, pagination.value?.pageIndex ?? 0)
     const start = pageIndex * pageSize
     return sortedData.value.slice(start, start + pageSize)

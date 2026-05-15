@@ -9,7 +9,7 @@ export const DEFAULT_CAR_IMAGE = 'https://images.unsplash.com/photo-1555215695-3
 
 /** Shared demo customer request text for mock leads/opportunities (request detail message card). */
 export const DEMO_CUSTOMER_REQUEST_MESSAGE =
-  'Looking for a late-model Audi A6 Allroad 40 TDI. Specifically interested in the high-output 3.0L diesel. Please let me know if you have any available or if you can source one. Thanks!'
+  'Hi, I am interested in the Fiat Panda Hybrid. Can we schedule a test drive or receive a quotation? Thanks!'
 
 /**
  * Ensure requestedCar (or vehicle) object has an image URL.

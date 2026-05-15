@@ -291,8 +291,7 @@ import {
 } from '@motork/component-library/future/primitives'
 import { Car, Filter, Pencil, Tag } from 'lucide-vue-next'
 import EditRequestedVehicleModal from '@/components/modals/EditRequestedVehicleModal.vue'
-import audiA6Allroad40TdiImage from '@/assets/images/mock-vehicles/audi-a6-allroad-40-tdi.png'
-import { getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
+import { getCarImageUrl, getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
 
 const props = defineProps({
   vehicle: {
@@ -430,13 +429,12 @@ const isNewVehicle = computed(
   () => String(conditionBadge.value || '').toLowerCase() === 'new'
 )
 
-const usesAudiDisplayVehicle = computed(() => !isNewVehicle.value)
+const isBmwNewVehicle = computed(
+  () =>
+    isNewVehicle.value && String(props.vehicle.brand || '').toLowerCase() === 'bmw'
+)
 
 const titleLine = computed(() => {
-  if (isNewVehicle.value && String(props.vehicle.brand || '').toLowerCase() !== 'bmw') {
-    return 'BMW iX xDrive50'
-  }
-  if (usesAudiDisplayVehicle.value) return 'Audi A6 Allroad'
   const parts = []
   if (props.vehicle.brand) parts.push(props.vehicle.brand)
   if (props.vehicle.model) parts.push(props.vehicle.model)
@@ -444,14 +442,12 @@ const titleLine = computed(() => {
 })
 
 const trimLine = computed(() => {
-  if (usesAudiDisplayVehicle.value) return '40 TDI 2.0 quattro S tronic Business Advanced'
   const v = props.vehicle
   const line = v?.trim || v?.variant || v?.engineLine || ''
   return typeof line === 'string' ? line.trim() : ''
 })
 
 const priceLine = computed(() => {
-  if (usesAudiDisplayVehicle.value) return '19.000€'
   const p = props.vehicle.price
   if (p == null || p === '') return '—'
   const n = typeof p === 'string' ? parseFloat(p) : p
@@ -465,7 +461,6 @@ const listingHref = computed(
 
 const stockStatusDisplay = computed(() => {
   if (isNewVehicle.value) return t('requestDetail.vehicleCard.stockToBeOrder')
-  if (usesAudiDisplayVehicle.value) return t('requestDetail.vehicleCard.stockInStock')
   const raw = (props.stockStatus || props.vehicle?.carStatus || '').trim()
   if (!raw) return ''
   const key = raw.toLowerCase().replace(/\s+/g, '')
@@ -479,7 +474,6 @@ const stockStatusDisplay = computed(() => {
 })
 
 const specificationLine = computed(() => {
-  if (usesAudiDisplayVehicle.value) return 'Petrol - Automatic'
   const v = props.vehicle
   const fuel = (v?.fuelType || '').trim()
   const gear = (v?.gearType || v?.transmission || '').trim()
@@ -500,21 +494,24 @@ const interactionMetricsTooltip = computed(() =>
 )
 
 const plateDisplay = computed(
-  () => usesAudiDisplayVehicle.value ? 'FZ131FG' : props.vehicle.plateNumber || props.vehicle.plate || props.vehicle.plates || ''
+  () => props.vehicle.plateNumber || props.vehicle.plate || props.vehicle.plates || ''
 )
 
 const usesLogoImage = computed(
-  () => isNewVehicle.value || (!usesAudiDisplayVehicle.value && (props.vehicle.imageDisplayMode === 'logo' || props.vehicle.imageType === 'logo'))
+  () =>
+    isBmwNewVehicle.value ||
+    props.vehicle.imageDisplayMode === 'logo' ||
+    props.vehicle.imageType === 'logo'
 )
 
 const resolvedImageUrl = computed(() => {
-  if (isNewVehicle.value) return '/brands/bmw-white.svg'
-  if (usesAudiDisplayVehicle.value) return audiA6Allroad40TdiImage
-  return props.imageUrl
+  if (usesLogoImage.value) {
+    return props.imageUrl || getCarImageUrl(props.vehicle) || '/brands/bmw-white.svg'
+  }
+  return props.imageUrl || getCarImageUrl(props.vehicle)
 })
 
 const registrationDateDisplay = computed(() => {
-  if (usesAudiDisplayVehicle.value) return '22/12/2015'
   const r =
     props.vehicle.registrationDate ||
     props.vehicle.registration ||
@@ -523,12 +520,10 @@ const registrationDateDisplay = computed(() => {
 })
 
 const vehicleLocationDisplay = computed(() => {
-  if (usesAudiDisplayVehicle.value) return 'Roma'
   return props.vehicle.dealership || props.vehicle.location || props.vehicle.city || ''
 })
 
 const mileageDetailLine = computed(() => {
-  if (usesAudiDisplayVehicle.value) return '10.237 km'
   const km = props.vehicle.kilometers ?? props.vehicle.mileage
   if (km == null || km === '') return ''
   return `${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(Number(km))} km`
