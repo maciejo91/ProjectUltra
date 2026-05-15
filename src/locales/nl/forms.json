@@ -322,8 +322,10 @@
           "offerSummaryTaxBreakdownTotalNet": "Totaal netto",
           "offerSummaryTaxBreakdownTotalVat": "Totaal BTW ({percent}%)",
           "offerSummaryTaxBreakdownTotalGross": "Totaal bruto (incl. BTW)",
-          "offerSummaryGrandTotalVatIncl": "incl. BTW"
-        }
+          "offerSummaryGrandTotalVatIncl": "incl. BTW",
+          "openStockVehicleDetail": "Open voertuigpagina in voorraad"
+        },
+        "vehicleDetailNotFound": "Dit voertuig is niet gevonden."
       },
       "errors": {
         "requestType": "Aanvraagtype is verplicht",

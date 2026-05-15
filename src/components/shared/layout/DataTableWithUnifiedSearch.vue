@@ -1,7 +1,7 @@
 <template>
   <div
-    class="datatable-unified-shell bg-background"
-    :class="includeMarginBottom ? 'mb-8' : ''"
+    class="datatable-unified-shell"
+    :class="[includeMarginBottom ? 'mb-8' : '', transparentShell ? '' : 'bg-background']"
   >
     <slot name="before-search" />
     <div class="mb-1">
@@ -54,6 +54,8 @@ defineProps({
   requestedCarBrandOptions: { type: Array, default: () => [] },
   accountTypeOptions: { type: Array, default: () => [] },
   includeMarginBottom: { type: Boolean, default: true },
+  /** When true, no surface on the shell (e.g. dialog on `bg-muted`). */
+  transparentShell: { type: Boolean, default: false },
   /** Pass through to UnifiedSearchBar so the query input matches parent state. */
   globalFilter: { type: String, default: undefined },
 })

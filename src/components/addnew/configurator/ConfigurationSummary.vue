@@ -1,5 +1,16 @@
 <template>
-  <div class="rounded-lg border border-border bg-background shadow-mk-dashboard-card overflow-hidden">
+  <div class="relative rounded-lg border border-border bg-background shadow-mk-dashboard-card overflow-hidden">
+    <Button
+      v-if="showStockVehicleDetailLink"
+      type="button"
+      variant="ghost"
+      size="sm"
+      class="absolute top-3 right-3 z-10 h-8 w-8 shrink-0 rounded-md p-0 text-muted-foreground hover:text-foreground"
+      :aria-label="t('forms.addNew.leadDetails.vehicle.quotation.openStockVehicleDetail')"
+      @click="goToStockVehicleDetail"
+    >
+      <ExternalLink class="size-4 shrink-0" aria-hidden="true" />
+    </Button>
     <div class="p-4 space-y-3">
       <span
         class="inline-flex w-fit shrink-0 items-center justify-center rounded-md px-2 py-0.5 text-sm font-normal leading-5 text-foreground"
@@ -198,8 +209,9 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ArrowDown, RotateCcw } from 'lucide-vue-next'
+import { ArrowDown, ExternalLink, RotateCcw } from 'lucide-vue-next'
 import { Button, Input } from '@motork/component-library/future/primitives'
+import { useRouter } from 'vue-router'
 import { getVehicleConditionBadgeClass } from '@/utils/vehicleHelpers'
 
 const { t } = useI18n()
@@ -240,9 +252,28 @@ const props = defineProps({
   hideVersionColourSection: { type: Boolean, default: false },
   plateLabel: { type: String, default: '' },
   vinLabel: { type: String, default: '' },
+  /** Inventory vehicle id — opens `/vehicles/:id` when from stock quotation. */
+  stockVehicleId: { type: [String, Number], default: null },
 })
 
 const emit = defineEmits(['toggle-round-price', 'update-round-price-adjustment', 'reset-round-price'])
+
+const router = useRouter()
+
+const showStockVehicleDetailLink = computed(() => {
+  if (!props.hideVersionColourSection) return false
+  const id = props.stockVehicleId
+  if (id === null || id === undefined) return false
+  const s = String(id).trim()
+  return s.length > 0
+})
+
+function goToStockVehicleDetail() {
+  router.push({
+    name: 'vehicle-detail',
+    params: { id: String(props.stockVehicleId) },
+  })
+}
 
 const conditionBadgeLabel = computed(() => {
   const s = String(props.conditionLabel || '').trim()

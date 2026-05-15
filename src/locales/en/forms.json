@@ -324,8 +324,10 @@
           "offerSummaryTaxBreakdownTotalNet": "Total net",
           "offerSummaryTaxBreakdownTotalVat": "Total VAT ({percent}%)",
           "offerSummaryTaxBreakdownTotalGross": "Total gross (VAT incl.)",
-          "offerSummaryGrandTotalVatIncl": "VAT incl."
-        }
+          "offerSummaryGrandTotalVatIncl": "VAT incl.",
+          "openStockVehicleDetail": "Open vehicle inventory page"
+        },
+        "vehicleDetailNotFound": "This vehicle could not be found."
       },
       "errors": {
         "requestType": "Request type is required",

@@ -322,8 +322,10 @@
           "offerSummaryTaxBreakdownTotalNet": "Gesamt netto",
           "offerSummaryTaxBreakdownTotalVat": "Gesamt MwSt. ({percent}%)",
           "offerSummaryTaxBreakdownTotalGross": "Gesamt brutto (inkl. MwSt.)",
-          "offerSummaryGrandTotalVatIncl": "inkl. MwSt."
-        }
+          "offerSummaryGrandTotalVatIncl": "inkl. MwSt.",
+          "openStockVehicleDetail": "Fahrzeugbestandsseite öffnen"
+        },
+        "vehicleDetailNotFound": "Dieses Fahrzeug konnte nicht gefunden werden."
       },
       "errors": {
         "requestType": "Anfragetyp ist erforderlich",

@@ -322,8 +322,10 @@
           "offerSummaryTaxBreakdownTotalNet": "Total HT",
           "offerSummaryTaxBreakdownTotalVat": "Total TVA ({percent}%)",
           "offerSummaryTaxBreakdownTotalGross": "Total TTC",
-          "offerSummaryGrandTotalVatIncl": "TTC"
-        }
+          "offerSummaryGrandTotalVatIncl": "TTC",
+          "openStockVehicleDetail": "Ouvrir la fiche véhicule dans le stock"
+        },
+        "vehicleDetailNotFound": "Ce véhicule est introuvable."
       },
       "errors": {
         "requestType": "Le type de demande est requis",

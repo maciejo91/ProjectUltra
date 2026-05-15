@@ -324,8 +324,10 @@
           "offerSummaryTaxBreakdownTotalNet": "Totale netto",
           "offerSummaryTaxBreakdownTotalVat": "Totale IVA ({percent}%)",
           "offerSummaryTaxBreakdownTotalGross": "Totale lordo (IVA incl.)",
-          "offerSummaryGrandTotalVatIncl": "IVA incl."
-        }
+          "offerSummaryGrandTotalVatIncl": "IVA incl.",
+          "openStockVehicleDetail": "Apri la scheda veicolo in inventario"
+        },
+        "vehicleDetailNotFound": "Impossibile trovare questo veicolo."
       },
       "errors": {
         "requestType": "Il tipo di richiesta è obbligatorio",

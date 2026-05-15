@@ -2,6 +2,7 @@
   <Dialog :open="open" @update:open="handleOpenChange">
     <DialogContent
       class="w-[90vw] max-w-screen-2xl h-[80vh] max-h-[calc(100vh-4rem)] flex flex-col gap-0 overflow-hidden p-0"
+      :class="step === 1 ? 'bg-background' : ''"
       :show-close-button="false"
     >
       <TooltipProvider :delay-duration="200">
@@ -68,9 +69,12 @@
           </div>
         </DialogHeader>
 
-        <div class="flex-1 min-h-0 overflow-y-auto bg-muted px-6 pb-6 pt-0 border-0">
+        <div
+          class="flex-1 min-h-0 overflow-y-auto px-6 pb-6 pt-0 border-0"
+          :class="step === 1 ? 'bg-background' : 'bg-muted'"
+        >
           <div v-if="step === 1" class="min-h-0 pt-4">
-            <div class="min-h-0 overflow-hidden rounded-lg bg-background">
+            <div class="min-h-0 overflow-hidden rounded-lg">
               <DataTableWithUnifiedSearch
                 active-tab="vehicles"
                 :placeholder="searchBarPlaceholder"
@@ -80,6 +84,7 @@
                 :volvo-model-options="volvoModelOptions"
                 :brand-options="vehicleBrandOptions"
                 :include-margin-bottom="false"
+                :transparent-shell="true"
                 @update:global-filter="globalFilter = $event"
                 @update:column-filters="columnFilters = $event"
                 @update:pagination="pagination = $event"
@@ -250,6 +255,7 @@
                     :round-price-adjustment="configurator.roundPriceAdjustment.value"
                     :condition-label="stockConditionSummaryLabel"
                     :hide-version-colour-section="true"
+                    :stock-vehicle-id="pendingStockVehicle?.id ?? null"
                     :plate-label="stockPlateSummary"
                     :vin-label="stockVinSummary"
                     @toggle-round-price="configurator.toggleRoundPrice()"
