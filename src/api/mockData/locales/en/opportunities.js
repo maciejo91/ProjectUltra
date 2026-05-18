@@ -849,6 +849,30 @@ export function buildMockOpportunities() {
     scheduledAppointment: null
   },
 
+  {
+    id: 27,
+    customerId: 1001,
+    source: 'WebSparK',
+    sourceDetails: 'Webspark',
+    fiscalEntity: 'MotorK',
+    requestType: 'Quotation',
+    requestedCar: oppRequestedCar(27, { dealership: 'Milano' }),
+    vehicle: null,
+    selectedVehicle: null,
+    stage: 'Closed Won',
+    negotiationSubstatus: null,
+    offers: [],
+    tags: ['Premium'],
+    value: 38500,
+    expectedCloseDate: createDateOffset(-45),
+    assignee: 'Matteo Alpino',
+    assigneeInitials: 'MA',
+    createdAt: createDateOffset(-60),
+    lastActivity: createDateOffset(-48),
+    nextActionDue: null,
+    scheduledAppointment: null
+  },
+
   // 20. Abandoned (additional)
   {
     id: 20,

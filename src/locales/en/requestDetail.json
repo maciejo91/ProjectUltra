@@ -542,6 +542,7 @@
     },
     "origins": {
       "web": "Web",
+      "webSpark": "WebSparK",
       "walkIn": "Walk-in",
       "googleAds": "Google Ads",
       "autoscout": "Autoscout24.es",

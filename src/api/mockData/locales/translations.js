@@ -190,6 +190,14 @@ export const translations = {
     'Quote request via Webspark for the used Volkswagen Tiguan; confirm stock, pricing, and R-Line equipment before sending the formal offer.': 'Richiesta di preventivo via Webspark per la Volkswagen Tiguan usata; confermare disponibilità, prezzo e dotazione R-Line prima di inviare il preventivo formale.',
     'Quote request via Webspark for a used Volkswagen Tiguan. Prefers WhatsApp for quick updates.': 'Richiesta di preventivo via Webspark per una Volkswagen Tiguan usata. Preferisce WhatsApp per aggiornamenti rapidi.',
     'Hello, I am interested in the Volkswagen Tiguan. Could I receive a detailed quotation? Thanks.': 'Buongiorno, sono interessato al Volkswagen Tiguan. Potrei ricevere un preventivo dettagliato? Grazie.',
+    'Thanks for the Volkswagen Tiguan info. I would like to see it this week.': 'Grazie per le informazioni sul Volkswagen Tiguan. Vorrei vederla questa settimana.',
+    'Hi Leadspark — happy to help. We have a Volkswagen Tiguan available. Would you prefer Wed 12:30 or Thu 13:00 for a quick viewing in Bologna?': 'Ciao Leadspark, volentieri. Abbiamo una Volkswagen Tiguan disponibile. Preferisci mercoledì alle 12:30 o giovedì alle 13:00 per una visita rapida a Bologna?',
+    'Hi Leadspark Ultra — happy to help. We have a Volkswagen Tiguan available. Would you prefer Wed 12:30 or Thu 13:00 for a quick viewing in Bologna?': 'Ciao Leadspark Ultra, volentieri. Abbiamo una Volkswagen Tiguan disponibile. Preferisci mercoledì alle 12:30 o giovedì alle 13:00 per una visita rapida a Bologna?',
+    'Quote attached for the Volkswagen Tiguan including warranty options. Delivery time is 7–10 days after confirmation. See you Thu 13:00 in Bologna.': 'Preventivo allegato per la Volkswagen Tiguan con opzioni di garanzia. Tempi di consegna 7-10 giorni dalla conferma. A giovedì alle 13:00 a Bologna.',
+    'Yes — customer parking is available on site. Ask at reception.': 'Sì, il parcheggio clienti è disponibile in sede. Chiedi in reception.',
+    'Yes — customer parking is available on site. Ask for “Leadspark Ultra” at reception.': 'Sì, il parcheggio clienti è disponibile in sede. Chiedi di "Leadspark Ultra" alla reception.',
+    'Hello, I would like more information about the Volkswagen Golf. Is it still available?': 'Buongiorno, vorrei maggiori informazioni sul Volkswagen Golf. È ancora disponibile?',
+    'Hi, I am interested in the Jeep Avenger. Can you send availability and price?': 'Ciao, sono interessato alla Jeep Avenger. Puoi inviare disponibilità e prezzo?',
   },
   
   de: {

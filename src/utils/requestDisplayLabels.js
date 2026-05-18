@@ -17,6 +17,9 @@ const REQUEST_TYPE_KEYS = {
 const SOURCE_KEYS = {
   website: 'web',
   web: 'web',
+  webspark: 'webSpark',
+  websparks: 'webSpark',
+  'web spark': 'webSpark',
   'walk-in': 'walkIn',
   walkin: 'walkIn',
   showroom: 'walkIn',

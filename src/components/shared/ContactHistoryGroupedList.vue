@@ -6,12 +6,14 @@
           {{ groupHeading(group.key, group.items.length) }}
         </p>
         <div class="flex flex-col gap-1.5">
-          <button
+          <component
+            :is="interactive ? 'button' : 'div'"
             v-for="item in group.items"
             :key="item.compositeId"
-            type="button"
-            class="w-full min-w-0 rounded-md border border-border bg-muted/20 p-2 text-left transition-colors hover:bg-muted/40"
-            @click="emit('select', item)"
+            :type="interactive ? 'button' : undefined"
+            class="w-full min-w-0 rounded-md border border-border bg-muted/20 p-2 text-left"
+            :class="interactive ? 'transition-colors hover:bg-muted/40' : ''"
+            @click="interactive && emit('select', item)"
           >
             <div class="flex w-full min-w-0 items-center gap-2">
               <div class="flex shrink-0 flex-wrap items-center gap-1.5">
@@ -89,7 +91,7 @@
                 </div>
               </div>
             </div>
-          </button>
+          </component>
         </div>
       </div>
     </template>
@@ -107,6 +109,10 @@ const props = defineProps({
   rows: {
     type: Array,
     default: () => []
+  },
+  interactive: {
+    type: Boolean,
+    default: true
   }
 })
 

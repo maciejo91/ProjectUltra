@@ -1284,7 +1284,7 @@ export const mockCustomers = [
     address: 'Via Monte Napoleone 12, 20121 Milano',
     company: 'Motork',
     source: 'Web',
-    tags: [],
+    tags: ['Green Vehicles', 'VIP'],
     createdAt: '2026-05-18T12:27:00.000Z',
     lastContact: '2026-05-18T12:27:00.000Z',
     interestScore: 75,

@@ -1,6 +1,7 @@
 import {
   addMinutesToIso,
   createHourOffset,
+  createDateOffset,
   createDateString,
   createDateTimeOffset,
   DEMO_CUSTOMER_REQUEST_MESSAGE
@@ -844,7 +845,7 @@ export function buildMockLeads() {
     id: 26,
     customerId: 1001,
     status: 'Open',
-    priority: 'B',
+    priority: 'Hot',
     requestedCar: toRequestedCar(CRM_VEHICLE_BY_ID['10'], {
       variant: '2.0 TSI 195KW R-Line DSG 4MOTION',
       registration: '02/2025',
@@ -858,10 +859,10 @@ export function buildMockLeads() {
     carStatus: carStatusFromVehicle(CRM_VEHICLE_BY_ID['10']),
     listingMetrics: { funnelViews: 1, tagCount: 1 },
     requestType: 'Quotation',
-    source: 'Web',
+    source: 'WebSparK',
     sourceCategory: 'Web',
     sourceDetails: 'Webspark',
-    channel: 'WhatsApp',
+    channel: 'Paid',
     fiscalEntity: 'MotorK',
     dealership: 'Milano',
     utmSource: 'web',
@@ -875,7 +876,7 @@ export function buildMockLeads() {
     importedAt: createDateTimeOffset(0, 14, 27),
     lastActivity: createDateTimeOffset(0, 14, 27),
     nextActionDue: createHourOffset(-1),
-    tags: [],
+    tags: ['Premium'],
     stage: 'Open',
     isDisqualified: false,
     disqualifyReason: null,
@@ -884,6 +885,82 @@ export function buildMockLeads() {
     distanceKm: 8,
     aiSummary:
       'Quote request via Webspark for the used Volkswagen Tiguan; confirm stock, pricing, and R-Line equipment before sending the formal offer.'
+  },
+  {
+    id: 27,
+    customerId: 1001,
+    status: 'Closed',
+    priority: 'Normal',
+    requestedCar: leadRequestedCar(27, {
+      dealership: 'Milano',
+      requestMessage:
+        'Hello, I would like more information about the Volkswagen Golf. Is it still available?'
+    }),
+    requestMessage:
+      'Hello, I would like more information about the Volkswagen Golf. Is it still available?',
+    carStatus: carStatusFromVehicle(crmVehicleForLeadSlot(26)),
+    requestType: 'Generic sales',
+    source: 'WebSparK',
+    sourceCategory: 'Web',
+    sourceDetails: 'Webspark',
+    channel: 'Paid',
+    fiscalEntity: 'MotorK',
+    utmSource: 'web',
+    utmCampaign: 'webspark_golf',
+    webSparkCampaign: 'webspark',
+    assignee: 'Matteo Alpino',
+    assigneeInitials: 'MA',
+    createdAt: createDateOffset(-95),
+    importedAt: createDateOffset(-95),
+    lastActivity: createDateOffset(-88),
+    nextActionDue: createDateOffset(-87),
+    tags: [],
+    stage: 'Closed',
+    isDisqualified: false,
+    disqualifyReason: null,
+    scheduledAppointment: null,
+    contactAttempts: [],
+    distanceKm: 12,
+    aiSummary:
+      `Earlier ${vehicleLabel(27)} inquiry via WebSparK; customer chose another dealer. Closed after follow-up.`
+  },
+  {
+    id: 28,
+    customerId: 1001,
+    status: 'Open',
+    priority: 'Normal',
+    requestedCar: leadRequestedCar(28, {
+      dealership: 'Torino',
+      requestMessage:
+        'Hi, I am interested in the Jeep Avenger. Can you send availability and price?'
+    }),
+    requestMessage:
+      'Hi, I am interested in the Jeep Avenger. Can you send availability and price?',
+    carStatus: carStatusFromVehicle(crmVehicleForLeadSlot(27)),
+    requestType: 'Quotation',
+    source: 'WebSparK',
+    sourceCategory: 'Web',
+    sourceDetails: 'Webspark',
+    channel: 'Paid',
+    fiscalEntity: 'MotorK',
+    utmSource: 'web',
+    utmCampaign: 'webspark_avenger',
+    webSparkCampaign: 'webspark',
+    assignee: 'Matteo Alpino',
+    assigneeInitials: 'MA',
+    createdAt: createDateOffset(-42),
+    importedAt: createDateOffset(-42),
+    lastActivity: createDateOffset(-35),
+    nextActionDue: createDateOffset(-30),
+    tags: [],
+    stage: 'In progress',
+    isDisqualified: false,
+    disqualifyReason: null,
+    scheduledAppointment: null,
+    contactAttempts: [],
+    distanceKm: 10,
+    aiSummary:
+      `Prior ${vehicleLabel(28)} quote via WebSparK; waiting on customer reply after first email.`
   }
   ]
 }

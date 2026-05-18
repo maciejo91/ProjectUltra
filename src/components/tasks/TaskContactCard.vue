@@ -265,6 +265,7 @@
             >
               <ContactHistoryGroupedList
                 :rows="pastRequestRows"
+                :interactive="!hideNavigation"
                 @select="handleContactHistorySelect"
               />
             </div>
@@ -317,6 +318,7 @@ import { useLeadsStore } from '@/stores/leads'
 import { useOpportunitiesStore } from '@/stores/opportunities'
 import { useRequestNavigationStore } from '@/stores/requestNavigation'
 import { useCustomerDuplicateDetection } from '@/composables/useCustomerDuplicateDetection'
+import { useHideNavigation } from '@/composables/useHideNavigation'
 import { getCustomerCityLabel, getCustomerNameParts } from '@/utils/customerDisplay'
 import {
   Badge,
@@ -421,6 +423,7 @@ const emit = defineEmits([
 ])
 
 const { t } = useI18n()
+const { hideNavigation } = useHideNavigation()
 const toastStore = useToastStore()
 const userStore = useUserStore()
 const route = useRoute()

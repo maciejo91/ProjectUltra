@@ -42,7 +42,7 @@
                 systemHeadline ? 'font-normal text-muted-foreground' : 'font-medium text-foreground'
               "
             >
-              {{ headlineParts.primary }}
+              {{ localizedHeadlinePrimary }}
             </span>
             <template v-if="type === 'call'">
               <span class="inline-flex flex-wrap items-center gap-1.5">
@@ -60,7 +60,7 @@
               class="min-w-0 font-normal leading-snug wrap-break-word"
               :class="secondaryToneClass"
             >
-              {{ headlineParts.secondary }}
+              {{ localizedHeadlineSecondary }}
             </span>
             <span
               v-if="timeLabel"
@@ -89,7 +89,7 @@
           class="max-w-fit"
         >
           <p class="text-sm leading-relaxed text-foreground wrap-break-word">
-            {{ noteOrAiBody }}
+            {{ localizedNoteOrAiBody }}
           </p>
         </ActivityTimelineCard>
       </template>
@@ -101,7 +101,7 @@
           class="border-foreground/12"
         >
           <p class="text-sm leading-relaxed text-foreground wrap-break-word">
-            {{ noteOrAiBody }}
+            {{ localizedNoteOrAiBody }}
           </p>
         </ActivityTimelineCard>
       </template>
@@ -127,7 +127,7 @@
             class="text-sm leading-relaxed wrap-break-word text-left"
             :class="isSophieAnchoredVariant && !isInboundCommunication ? 'text-muted-foreground' : 'text-foreground'"
           >
-            {{ activity.content }}
+            {{ localizedActivityContent }}
           </p>
           <div
             v-if="type === 'customer-email' || (showThreadAction && threadId)"
@@ -178,7 +178,7 @@
             class="text-sm leading-relaxed wrap-break-word text-left"
             :class="isSophieAnchoredVariant && !isInboundCommunication ? 'text-muted-foreground' : 'text-foreground'"
           >
-            {{ activity.content }}
+            {{ localizedActivityContent }}
           </p>
           <div
             v-if="type === 'customer-whatsapp' || (showThreadAction && threadId)"
@@ -207,7 +207,7 @@
       <template v-else-if="type === 'call'">
         <ActivityTimelineCard accent="call" :show-accent="false">
           <p class="text-sm leading-relaxed text-foreground wrap-break-word">
-            {{ callSummary }}
+            {{ localizedCallSummary }}
           </p>
           <Button
             v-if="transcriptLines.length > 0"
@@ -255,6 +255,7 @@ import {
   isActivityClickable,
   shouldShowActivityCard
 } from '@/composables/useActivityTimelinePresentation'
+import { translateText } from '@/api/mockData/locales/translations.js'
 import ActivityTimelineIcon from './ActivityTimelineIcon.vue'
 import ActivityTimelineCard from './ActivityTimelineCard.vue'
 
@@ -287,7 +288,12 @@ const props = defineProps({
 
 const emit = defineEmits(['activity-click', 'open-transcript', 'add-activity', 'open-thread'])
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+function localizeMockText(text) {
+  if (!text || typeof text !== 'string') return text ?? ''
+  return translateText(text, locale.value)
+}
 
 const type = computed(() => props.activity?.type ?? '')
 
@@ -300,6 +306,11 @@ const timeLabel = computed(() => {
 })
 
 const headlineParts = computed(() => buildActivityHeadlineParts(props.activity, t, props.allActivities))
+const localizedHeadlinePrimary = computed(() => localizeMockText(headlineParts.value.primary))
+const localizedHeadlineSecondary = computed(() =>
+  headlineParts.value.secondary ? localizeMockText(headlineParts.value.secondary) : ''
+)
+const localizedActivityContent = computed(() => localizeMockText(props.activity?.content))
 const secondaryToneClass = computed(() => {
   const secondary = headlineParts.value.secondary || ''
   if (type.value !== 'call') return 'text-muted-foreground'
@@ -339,8 +350,10 @@ const showCard = computed(() => shouldShowActivityCard(props.activity, transcrip
 const cardAccent = computed(() => getActivityCardAccent(props.activity))
 
 const callSummary = computed(() => getCallSummaryText(props.activity, t))
+const localizedCallSummary = computed(() => localizeMockText(callSummary.value))
 
 const noteOrAiBody = computed(() => props.activity?.message || props.activity?.content || '')
+const localizedNoteOrAiBody = computed(() => localizeMockText(noteOrAiBody.value))
 
 const isCommunicationActivity = computed(() =>
   ['email', 'customer-email', 'whatsapp', 'customer-whatsapp', 'sms', 'customer-sms'].includes(type.value)
