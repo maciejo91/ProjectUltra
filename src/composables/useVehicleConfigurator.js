@@ -61,6 +61,11 @@ export function useVehicleConfigurator(ctx = {}) {
     return gross / (1 + rate)
   }
 
+  function roundCurrencyAmount(value) {
+    const n = Number(value)
+    return Number.isFinite(n) ? Math.round(n * 100) / 100 : 0
+  }
+
   const selectedVersionId = ref('')
   const selectedColourId = ref('')
   const selectedInteriorColourId = ref('')
@@ -204,18 +209,32 @@ export function useVehicleConfigurator(ctx = {}) {
     }, 0)
   )
 
-  const discountBaseGross = computed(() => {
-    // Matches QuotationPanel: % OEM and manual discounts apply to vehicle minus fixed OEM promos.
+  /** Vehicle list price minus active flat OEM promos; used for OEM % promo amounts only. */
+  const oemPromoPercentBaseGross = computed(() => {
     const base = Number(vehicleBasePriceGross.value || 0) - oemAmountPromoTotalGross.value
     return Number.isFinite(base) ? Math.max(0, base) : 0
   })
 
-  const discountBaseNet = computed(() => toNet(discountBaseGross.value))
+  /** User % discount base: vehicle + factory equipment (excl. promos, accessories, taxes). */
+  const discountBaseGross = computed(() => {
+    const sum =
+      Number(vehicleBasePriceGross.value || 0) + Number(equipmentTotalGross.value || 0)
+    return Number.isFinite(sum) ? Math.max(0, sum) : 0
+  })
 
-  /** Total OEM promo reduction (gross €): fixed amounts + % of discountBaseGross per active percent promo. */
+  const discountBaseNet = computed(() => {
+    const equipNet = selectedEquipment.value.reduce(
+      (sum, item) => sum + toNet(Number(item.price || 0)),
+      0,
+    )
+    const sum = Number(vehicleBasePriceNet.value || 0) + equipNet
+    return Number.isFinite(sum) ? Math.max(0, sum) : 0
+  })
+
+  /** Total OEM promo reduction (gross €): fixed amounts + % of oemPromoPercentBaseGross per active percent promo. */
   const promoTotal = computed(() => {
     const fixed = oemAmountPromoTotalGross.value
-    const base = discountBaseGross.value
+    const base = oemPromoPercentBaseGross.value
     const fromPercent = activePromos.value
       .filter((p) => p.discountType === 'percent')
       .reduce((sum, p) => {
@@ -556,14 +575,14 @@ export function useVehicleConfigurator(ctx = {}) {
   }
 
   function alignDiscountFromPercent(discount) {
-    // Base = vehicle list price minus active *flat* OEM promos (excl. taxes, accessories).
+    // Base = vehicle details total (vehicle + factory equipment; excl. promos, accessories, taxes).
     const base = readShowNetPrices() ? discountBaseNet.value : discountBaseGross.value
     const percent = Number(discount?.percent || 0)
     const p = Number.isFinite(percent) ? percent : 0
     const percentNegative = -Math.abs(p)
     const amount = base > 0 ? (base * percentNegative) / 100 : 0
     discount.percent = percentNegative
-    const aligned = -Math.abs(amount)
+    const aligned = -Math.abs(roundCurrencyAmount(amount))
     if (readShowNetPrices()) {
       discount.netAmount = aligned
       discount.grossAmount = aligned * (1 + discountVatRate(discount) / 100)
@@ -576,7 +595,7 @@ export function useVehicleConfigurator(ctx = {}) {
   }
 
   function alignDiscountFromAmount(discount) {
-    // Same base as alignDiscountFromPercent (vehicle − fixed OEM promos).
+    // Same base as alignDiscountFromPercent (vehicle details total).
     const base = readShowNetPrices() ? discountBaseNet.value : discountBaseGross.value
     const amount = Number(discount?.amount || 0)
     const a = Number.isFinite(amount) ? amount : 0

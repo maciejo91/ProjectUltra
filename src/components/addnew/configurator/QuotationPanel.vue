@@ -406,7 +406,7 @@
           >
             <Info class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
             <p class="min-w-0 flex-1 text-xs leading-normal text-muted-foreground">
-              The percentage discount is applied to the vehicle's price, net of applied promotions (excluding taxes and accessories).
+              The percentage discount is applied to the vehicle's total list price (excluding accessories, extra services, taxes, and promotions).
             </p>
           </div>
 
@@ -936,7 +936,7 @@ const props = defineProps({
   selectedEquipment: { type: Array, default: () => [] },
   showNetPrices: { type: Boolean, default: false },
   vatRatePercent: { type: Number, default: 0 },
-  /** Net or gross discount base: vehicle price minus active flat OEM promos (same as alignDiscount*). */
+  /** Net or gross discount base: vehicle + factory equipment (same as alignDiscount*; excl. promos, accessories, taxes). */
   discountPairingBase: { type: Number, default: 0 },
   promos: { type: Array, required: true },
   promoSelection: { type: Object, required: true },
