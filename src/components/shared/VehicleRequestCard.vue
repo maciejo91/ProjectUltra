@@ -291,7 +291,12 @@ import {
 } from '@motork/component-library/future/primitives'
 import { Car, Filter, Pencil, Tag } from 'lucide-vue-next'
 import EditRequestedVehicleModal from '@/components/modals/EditRequestedVehicleModal.vue'
-import { getCarImageUrl, getVehicleConditionBadgeClass, getVehicleConditionLabel } from '@/utils/vehicleHelpers'
+import {
+  getCarImageUrl,
+  getVehicleConditionBadgeClass,
+  getVehicleConditionLabel,
+  translateVehicleConditionLabel
+} from '@/utils/vehicleHelpers'
 
 const props = defineProps({
   vehicle: {
@@ -419,14 +424,18 @@ async function handleEditModalSave(payload) {
   }
 }
 
-const conditionBadge = computed(() => getVehicleConditionLabel(props.vehicle))
+const conditionBadgeRaw = computed(() => getVehicleConditionLabel(props.vehicle))
+
+const conditionBadge = computed(() =>
+  translateVehicleConditionLabel(conditionBadgeRaw.value, t)
+)
 
 const conditionBadgeClass = computed(() =>
-  getVehicleConditionBadgeClass(conditionBadge.value)
+  getVehicleConditionBadgeClass(conditionBadgeRaw.value)
 )
 
 const isNewVehicle = computed(
-  () => String(conditionBadge.value || '').toLowerCase() === 'new'
+  () => String(conditionBadgeRaw.value || '').toLowerCase() === 'new'
 )
 
 const isBmwNewVehicle = computed(

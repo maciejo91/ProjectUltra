@@ -473,6 +473,7 @@
               </div>
               <span class="text-[10px] sm:text-sm font-semibold text-muted-foreground w-11 sm:w-12 text-right flex-shrink-0 whitespace-nowrap tabular-nums">{{ formatNumber(stage.count) }} ({{ stage.percentage }}%)</span>
               <Button
+                v-if="!hideNavigation"
                 variant="ghost"
                 size="sm"
                 class="shrink-0 h-7 w-7 p-0 rounded-sm text-muted-foreground hover:text-foreground"
@@ -544,6 +545,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useHideNavigation } from '@/composables/useHideNavigation'
 import { LineChart, Lightbulb, Eye } from 'lucide-vue-next'
 import { useUserStore } from '@/stores/user'
 import { fetchBDCOperatorMetrics, fetchSalespersonMetrics, fetchManagerFunnelMetrics } from '@/api/dashboard'
@@ -570,6 +572,7 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const { hideNavigation } = useHideNavigation()
 const { t } = useI18n()
 const userStore = useUserStore()
 const userRole = computed(() => userStore.userRole())
@@ -754,6 +757,7 @@ const funnelStageToSegment = {
 }
 
 function goToRequestsForStage(stageName) {
+  if (hideNavigation.value) return
   const segment = funnelStageToSegment[stageName] ?? SEGMENT_KEYS.ALL
   router.push({ path: '/requests', query: { segment } })
 }

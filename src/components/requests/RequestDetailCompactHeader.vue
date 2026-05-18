@@ -9,7 +9,7 @@
       >
         <div class="flex min-w-0 items-center gap-2">
           <Button
-            v-if="isFullPage"
+            v-if="showFullPageBack"
             variant="ghost"
             size="icon-sm"
             class="size-10 shrink-0 rounded-md"
@@ -93,7 +93,7 @@
             <RequestHeaderLifecycleStepper :steps="lifecycleSteps" />
           </div>
 
-          <div class="ml-1 flex shrink-0 items-center gap-2">
+          <div v-if="showPageNavigation" class="ml-1 flex shrink-0 items-center gap-2">
             <Button
               variant="outline"
               size="icon-sm"
@@ -112,17 +112,17 @@
             >
               <ChevronRight class="size-4 text-muted-foreground" />
             </Button>
-            <Button
-              v-if="!isFullPage"
-              variant="outline"
-              size="icon-sm"
-              class="rounded-md"
-              :aria-label="t('common.buttons.close')"
-              @click="$emit('close')"
-            >
-              <X class="size-4 text-muted-foreground" />
-            </Button>
           </div>
+          <Button
+            v-if="!isFullPage"
+            variant="outline"
+            size="icon-sm"
+            class="rounded-md"
+            :aria-label="t('common.buttons.close')"
+            @click="$emit('close')"
+          >
+            <X class="size-4 text-muted-foreground" />
+          </Button>
         </div>
       </div>
 
@@ -199,6 +199,7 @@ import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 import { getCustomerCityLabel, getCustomerNameParts } from '@/utils/customerDisplay'
 import { getRequestSourceLabel } from '@/utils/requestDisplayLabels'
+import { useHideNavigation } from '@/composables/useHideNavigation'
 
 const props = defineProps({
   request: {
@@ -243,7 +244,11 @@ const emit = defineEmits([
 ])
 
 const { t } = useI18n()
+const { hideNavigation } = useHideNavigation()
 const aiSummaryOpen = ref(false)
+
+const showFullPageBack = computed(() => props.isFullPage && !hideNavigation.value)
+const showPageNavigation = computed(() => !hideNavigation.value)
 
 const isFullWidthLayout = computed(() => props.layout === 'fullWidth')
 const isCompactStickyLayout = computed(() => props.layout === 'sticky')

@@ -1274,6 +1274,25 @@ export const mockCustomers = [
     preferredChannel: 'Email',
     preferredContactTime: 'Business hours (10 AM-4 PM)',
     budgetRange: '€30K-€50K per vehicle'
+  },
+  {
+    id: 1001,
+    name: 'Leadspark Ultra',
+    initials: 'LU',
+    email: 'matteo.alpino@motork.io',
+    phone: '+39 342 859 9463',
+    address: 'Via Monte Napoleone 12, 20121 Milano',
+    company: 'Motork',
+    source: 'Web',
+    tags: [],
+    createdAt: '2026-05-18T12:27:00.000Z',
+    lastContact: '2026-05-18T12:27:00.000Z',
+    interestScore: 75,
+    summary: 'Quote request via Webspark for a used Volkswagen Tiguan. Prefers WhatsApp for quick updates.',
+    preferredVehicleType: 'SUV',
+    preferredChannel: 'WhatsApp',
+    preferredContactTime: 'Afternoons',
+    budgetRange: '€40K-€50K'
   }
 ]
 

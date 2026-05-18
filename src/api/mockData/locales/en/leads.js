@@ -2,10 +2,12 @@ import {
   addMinutesToIso,
   createHourOffset,
   createDateString,
+  createDateTimeOffset,
   DEMO_CUSTOMER_REQUEST_MESSAGE
 } from '@/utils/mockDataHelpers'
 import {
   carStatusFromVehicle,
+  CRM_VEHICLE_BY_ID,
   crmVehicleForLeadSlot,
   getCrmVehicleDisplayName,
   toRequestedCar
@@ -837,6 +839,51 @@ export function buildMockLeads() {
     distanceKm: 12,
     aiSummary:
       `${vehicleLabel(25)} company car inquiry; check employer policy and tax bracket for quote accuracy.`
+  },
+  {
+    id: 26,
+    customerId: 1001,
+    status: 'Open',
+    priority: 'B',
+    requestedCar: toRequestedCar(CRM_VEHICLE_BY_ID['10'], {
+      variant: '2.0 TSI 195KW R-Line DSG 4MOTION',
+      registration: '02/2025',
+      registrationDate: '02/2025',
+      dealership: 'Torino',
+      requestMessage:
+        'Hello, I am interested in the Volkswagen Tiguan. Could I receive a detailed quotation? Thanks.'
+    }),
+    requestMessage:
+      'Hello, I am interested in the Volkswagen Tiguan. Could I receive a detailed quotation? Thanks.',
+    carStatus: carStatusFromVehicle(CRM_VEHICLE_BY_ID['10']),
+    listingMetrics: { funnelViews: 1, tagCount: 1 },
+    requestType: 'Quotation',
+    source: 'Web',
+    sourceCategory: 'Web',
+    sourceDetails: 'Webspark',
+    channel: 'WhatsApp',
+    fiscalEntity: 'MotorK',
+    dealership: 'Milano',
+    utmSource: 'web',
+    utmTerm: 'organic',
+    utmCampaign: 'webspark_tiguan',
+    webSparkCampaign: 'webspark',
+    originalMessageUrl: 'https://example.com/inbox/original-email',
+    assignee: 'Matteo Alpino',
+    assigneeInitials: 'MA',
+    createdAt: createDateTimeOffset(0, 14, 27),
+    importedAt: createDateTimeOffset(0, 14, 27),
+    lastActivity: createDateTimeOffset(0, 14, 27),
+    nextActionDue: createHourOffset(-1),
+    tags: [],
+    stage: 'Open',
+    isDisqualified: false,
+    disqualifyReason: null,
+    scheduledAppointment: null,
+    contactAttempts: [],
+    distanceKm: 8,
+    aiSummary:
+      'Quote request via Webspark for the used Volkswagen Tiguan; confirm stock, pricing, and R-Line equipment before sending the formal offer.'
   }
   ]
 }

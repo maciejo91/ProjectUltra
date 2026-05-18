@@ -187,6 +187,9 @@ export const translations = {
     'Toyota Yaris quotation request with no phone on file; prefers email. Next: send specs and pricing, then propose a call once they reply.': 'Richiesta preventivo Toyota Yaris senza telefono registrato; preferisce l\'email. Prossimo passo: inviare specifiche e prezzo, poi proporre una chiamata quando risponde.',
     'I would like to know if the Toyota Yaris is still available for a test drive. Can you confirm price, delivery time, and financing options?': 'Vorrei sapere se la Toyota Yaris è ancora disponibile per un test drive. Potete confermare prezzo, tempi di consegna e opzioni di finanziamento?',
     'Hi, I am interested in the Fiat Panda Hybrid. Can we schedule a test drive or receive a quotation? Thanks!': 'Ciao, sono interessato alla Fiat Panda Hybrid. Possiamo programmare un test drive o ricevere un preventivo? Grazie!',
+    'Quote request via Webspark for the used Volkswagen Tiguan; confirm stock, pricing, and R-Line equipment before sending the formal offer.': 'Richiesta di preventivo via Webspark per la Volkswagen Tiguan usata; confermare disponibilità, prezzo e dotazione R-Line prima di inviare il preventivo formale.',
+    'Quote request via Webspark for a used Volkswagen Tiguan. Prefers WhatsApp for quick updates.': 'Richiesta di preventivo via Webspark per una Volkswagen Tiguan usata. Preferisce WhatsApp per aggiornamenti rapidi.',
+    'Hello, I am interested in the Volkswagen Tiguan. Could I receive a detailed quotation? Thanks.': 'Buongiorno, sono interessato al Volkswagen Tiguan. Potrei ricevere un preventivo dettagliato? Grazie.',
   },
   
   de: {
@@ -232,6 +235,9 @@ export const translations = {
     'Left voicemail with callback request': 'Sprachnachricht mit Rückrufwunsch hinterlassen',
     'Customer interested, requested callback tomorrow afternoon at 2 PM': 'Kunde interessiert, Rückruf morgen Nachmittag um 14 Uhr angefordert',
     'Walk-in customer left details. Called but no answer.': 'Walk-in-Kunde hinterließ Details. Angerufen, aber keine Antwort.',
+    'Quote request via Webspark for the used Volkswagen Tiguan; confirm stock, pricing, and R-Line equipment before sending the formal offer.': 'Angebotsanfrage über Webspark für den gebrauchten Volkswagen Tiguan; Bestand, Preis und R-Line-Ausstattung vor dem formellen Angebot bestätigen.',
+    'Quote request via Webspark for a used Volkswagen Tiguan. Prefers WhatsApp for quick updates.': 'Angebotsanfrage über Webspark für einen gebrauchten Volkswagen Tiguan. Bevorzugt WhatsApp für schnelle Updates.',
+    'Hello, I am interested in the Volkswagen Tiguan. Could I receive a detailed quotation? Thanks.': 'Hallo, ich interessiere mich für den Volkswagen Tiguan. Könnte ich ein detailliertes Angebot erhalten? Danke.',
   },
   
   fr: {
@@ -277,6 +283,9 @@ export const translations = {
     'Left voicemail with callback request': 'Message vocal laissé avec demande de rappel',
     'Customer interested, requested callback tomorrow afternoon at 2 PM': 'Client intéressé, rappel demandé demain après-midi à 14h',
     'Walk-in customer left details. Called but no answer.': 'Client en magasin a laissé ses coordonnées. Appelé mais pas de réponse.',
+    'Quote request via Webspark for the used Volkswagen Tiguan; confirm stock, pricing, and R-Line equipment before sending the formal offer.': 'Demande de devis via Webspark pour le Volkswagen Tiguan d\'occasion ; confirmer stock, tarif et équipement R-Line avant d\'envoyer l\'offre formelle.',
+    'Quote request via Webspark for a used Volkswagen Tiguan. Prefers WhatsApp for quick updates.': 'Demande de devis via Webspark pour un Volkswagen Tiguan d\'occasion. Préfère WhatsApp pour des mises à jour rapides.',
+    'Hello, I am interested in the Volkswagen Tiguan. Could I receive a detailed quotation? Thanks.': 'Bonjour, je suis intéressé par le Volkswagen Tiguan. Pourrais-je recevoir un devis détaillé ? Merci.',
   },
   
   nl: {
@@ -322,6 +331,9 @@ export const translations = {
     'Left voicemail with callback request': 'Voicemail achtergelaten met terugbelverzoek',
     'Customer interested, requested callback tomorrow afternoon at 2 PM': 'Klant geïnteresseerd, terugbelverzoek morgenmiddag om 14:00',
     'Walk-in customer left details. Called but no answer.': 'Walk-in klant liet gegevens achter. Gebeld maar geen antwoord.',
+    'Quote request via Webspark for the used Volkswagen Tiguan; confirm stock, pricing, and R-Line equipment before sending the formal offer.': 'Offerteaanvraag via Webspark voor de gebruikte Volkswagen Tiguan; bevestig voorraad, prijs en R-Line-uitrusting voordat u het formele aanbod verstuurt.',
+    'Quote request via Webspark for a used Volkswagen Tiguan. Prefers WhatsApp for quick updates.': 'Offerteaanvraag via Webspark voor een gebruikte Volkswagen Tiguan. Voorkeur voor WhatsApp voor snelle updates.',
+    'Hello, I am interested in the Volkswagen Tiguan. Could I receive a detailed quotation? Thanks.': 'Hallo, ik ben geïnteresseerd in de Volkswagen Tiguan. Kan ik een gedetailleerde offerte ontvangen? Bedankt.',
   }
 }
 

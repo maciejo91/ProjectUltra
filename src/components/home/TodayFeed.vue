@@ -30,13 +30,17 @@
           aria-hidden="true"
         />
         <div class="space-y-0">
-          <button
+          <component
+            :is="hideNavigation ? 'div' : 'button'"
             v-for="(item, idx) in items"
             :key="item.id"
-            type="button"
-            class="group flex w-full items-start gap-3 rounded-lg py-3 text-left transition-colors hover:bg-muted/30 -mx-2 px-2"
-            :class="{ 'rounded-t-none': idx === 0 && items.length > 1 }"
-            @click="handleClick(item)"
+            :type="hideNavigation ? undefined : 'button'"
+            class="group flex w-full items-start gap-3 rounded-lg py-3 text-left transition-colors -mx-2 px-2"
+            :class="[
+              hideNavigation ? '' : 'hover:bg-muted/30',
+              { 'rounded-t-none': idx === 0 && items.length > 1 }
+            ]"
+            @click="!hideNavigation && handleClick(item)"
           >
             <div class="timeline-slot relative z-10 flex shrink-0 flex-col items-center gap-0.5 w-14">
               <span
@@ -77,8 +81,11 @@
                 />
               </div>
             </div>
-            <ChevronRight class="size-4 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
+            <ChevronRight
+              v-if="!hideNavigation"
+              class="size-4 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+            />
+          </component>
         </div>
       </div>
     </template>
@@ -89,6 +96,7 @@
 import { CalendarClock, CalendarCheck, ListTodo, ChevronRight, Inbox } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { Badge } from '@motork/component-library/future/primitives'
+import { useHideNavigation } from '@/composables/useHideNavigation'
 
 defineProps({
   items: {
@@ -106,6 +114,7 @@ defineProps({
 })
 
 const router = useRouter()
+const { hideNavigation } = useHideNavigation()
 
 function feedIcon(item) {
   if (item.kind === 'appointment') return CalendarCheck
@@ -123,6 +132,7 @@ function getNodeRingClass(item) {
 }
 
 function handleClick(item) {
+  if (hideNavigation.value) return
   if (item.kind === 'appointment') {
     if (item.opportunityId) {
       router.push({ path: `/requests/${item.opportunityId}`, query: { type: 'opportunity', from: 'home' } })

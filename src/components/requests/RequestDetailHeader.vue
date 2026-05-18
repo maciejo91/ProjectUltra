@@ -7,7 +7,7 @@
         <div class="flex min-w-0 flex-col gap-1">
           <div class="flex flex-wrap items-center gap-x-2 gap-y-1.5 min-w-0">
             <Button
-              v-if="isFullPage"
+              v-if="showFullPageBack"
               variant="ghost"
               size="icon-sm"
               class="shrink-0 rounded-md"
@@ -87,7 +87,7 @@
             v-if="request && headerDetailsExpanded"
             :id="headerDetailsPanelId"
             class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2 w-full min-w-0 text-sm"
-            :class="isFullPage ? 'pl-8' : ''"
+            :class="headerContentIndent ? 'pl-8' : ''"
           >
             <span
               v-if="importedLabel"
@@ -139,7 +139,7 @@
         <div
           v-if="request"
           class="flex flex-wrap items-center gap-x-3 gap-y-1"
-          :class="isFullPage ? 'pl-8' : ''"
+          :class="headerContentIndent ? 'pl-8' : ''"
         >
           <div class="flex flex-wrap items-center gap-2">
             <div class="flex flex-wrap items-center gap-1">
@@ -207,24 +207,26 @@
             <RequestHeaderLifecycleStepper :steps="lifecycleSteps" />
           </div>
 
-          <Button
-            variant="outline"
-            size="icon-sm"
-            class="ml-1 rounded-md"
-            :disabled="!hasPrevious"
-            @click="$emit('previous')"
-          >
-            <ChevronLeft class="size-4 text-muted-foreground" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon-sm"
-            class="rounded-md"
-            :disabled="!hasNext"
-            @click="$emit('next')"
-          >
-            <ChevronRight class="size-4 text-muted-foreground" />
-          </Button>
+          <template v-if="showPageNavigation">
+            <Button
+              variant="outline"
+              size="icon-sm"
+              class="ml-1 rounded-md"
+              :disabled="!hasPrevious"
+              @click="$emit('previous')"
+            >
+              <ChevronLeft class="size-4 text-muted-foreground" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              class="rounded-md"
+              :disabled="!hasNext"
+              @click="$emit('next')"
+            >
+              <ChevronRight class="size-4 text-muted-foreground" />
+            </Button>
+          </template>
 
           <Button
             v-if="!isFullPage"
@@ -284,6 +286,7 @@ import TagPillWithPopover from '@/components/shared/TagPillWithPopover.vue'
 import { getDisplayStage, getStageColor } from '@/utils/stageMapper'
 import { LEAD_STAGES, OPPORTUNITY_STAGES } from '@/utils/stageMapper/constants'
 import { getRequestSourceLabel, getRequestTypeLabel } from '@/utils/requestDisplayLabels'
+import { useHideNavigation } from '@/composables/useHideNavigation'
 
 const props = defineProps({
   request: {
@@ -313,7 +316,12 @@ const emit = defineEmits([
 ])
 
 const { t, locale } = useI18n()
+const { hideNavigation } = useHideNavigation()
 const toastStore = useToastStore()
+
+const showFullPageBack = computed(() => props.isFullPage && !hideNavigation.value)
+const showPageNavigation = computed(() => !hideNavigation.value)
+const headerContentIndent = computed(() => props.isFullPage && !hideNavigation.value)
 
 const headerDetailsExpanded = ref(false)
 const headerDetailsPanelId = `request-header-details-${useId().replace(/:/g, '')}`

@@ -29,11 +29,12 @@
                 />
               </div>
               <Button
+                v-if="!hideNavigation"
                 :label="t('home.importantToday.openTasks')"
                 variant="ghost"
                 size="small"
                 class="text-sm shrink-0"
-                @click="router.push('/tasks')"
+                @click="openTasks"
               />
             </CardHeader>
             <CardContent class="flex flex-col pt-0 px-4 md:px-6 pb-4 md:pb-6">
@@ -50,12 +51,14 @@
                 {{ t('home.importantToday.empty') }}
               </div>
               <div v-else class="divide-y divide-border">
-                <button
+                <component
+                  :is="hideNavigation ? 'div' : 'button'"
                   v-for="row in importantTodayTasks"
                   :key="row.id"
-                  type="button"
-                  class="group flex w-full items-start gap-3 py-3 text-left transition-colors hover:bg-muted/30 -mx-2 px-2 rounded-lg"
-                  @click="goTask(row)"
+                  :type="hideNavigation ? undefined : 'button'"
+                  class="group flex w-full items-start gap-3 py-3 text-left transition-colors -mx-2 px-2 rounded-lg"
+                  :class="hideNavigation ? '' : 'hover:bg-muted/30'"
+                  @click="!hideNavigation && goTask(row)"
                 >
                   <span class="text-sm font-medium tabular-nums text-muted-foreground w-14 shrink-0 pt-0.5">
                     {{ row.time }}
@@ -82,8 +85,11 @@
                       />
                     </div>
                   </div>
-                  <ChevronRight class="size-4 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity mt-1" />
-                </button>
+                  <ChevronRight
+                    v-if="!hideNavigation"
+                    class="size-4 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity mt-1"
+                  />
+                </component>
               </div>
             </CardContent>
           </Card>
@@ -102,11 +108,12 @@
                 />
               </div>
               <Button
+                v-if="!hideNavigation"
                 :label="t('home.importantToday.openTasks')"
                 variant="ghost"
                 size="small"
                 class="text-sm shrink-0"
-                @click="router.push('/tasks')"
+                @click="openTasks"
               />
             </CardHeader>
             <CardContent class="flex flex-col pt-0 px-4 md:px-6 pb-4 md:pb-6">
@@ -123,12 +130,14 @@
                 {{ t('home.newInbound.empty') }}
               </div>
               <div v-else class="divide-y divide-border">
-                <button
+                <component
+                  :is="hideNavigation ? 'div' : 'button'"
                   v-for="row in recentInboundItems"
                   :key="row.id"
-                  type="button"
-                  class="group flex w-full items-start gap-3 py-3 text-left transition-colors hover:bg-muted/30 -mx-2 px-2 rounded-lg"
-                  @click="goTask(row)"
+                  :type="hideNavigation ? undefined : 'button'"
+                  class="group flex w-full items-start gap-3 py-3 text-left transition-colors -mx-2 px-2 rounded-lg"
+                  :class="hideNavigation ? '' : 'hover:bg-muted/30'"
+                  @click="!hideNavigation && goTask(row)"
                 >
                   <span class="text-xs font-medium tabular-nums text-muted-foreground w-24 shrink-0 pt-0.5">
                     {{ row.time }}
@@ -147,8 +156,11 @@
                       :theme="row.typeTheme"
                     />
                   </div>
-                  <ChevronRight class="size-4 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity mt-1" />
-                </button>
+                  <ChevronRight
+                    v-if="!hideNavigation"
+                    class="size-4 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity mt-1"
+                  />
+                </component>
               </div>
             </CardContent>
           </Card>
@@ -167,12 +179,12 @@
                 />
               </div>
               <Button
-                v-if="totalNotificationsCount > 5"
+                v-if="!hideNavigation && totalNotificationsCount > 5"
                 :label="t('home.needsAttention.viewAll')"
                 variant="ghost"
                 size="small"
                 class="text-sm shrink-0"
-                @click="router.push('/tasks')"
+                @click="openTasks"
               />
             </CardHeader>
             <CardContent class="flex flex-col pt-0 px-4 md:px-6 pb-4 md:pb-6">
@@ -232,20 +244,20 @@
                   theme="blue"
                 />
               </div>
-              <div class="flex items-center gap-1 shrink-0">
+              <div v-if="!hideNavigation" class="flex items-center gap-1 shrink-0">
                 <Button
                   :label="t('home.schedule.openTasks')"
                   variant="ghost"
                   size="small"
                   class="text-sm"
-                  @click="router.push('/tasks')"
+                  @click="openTasks"
                 />
                 <Button
                   :label="t('home.schedule.openCalendar')"
                   variant="ghost"
                   size="small"
                   class="text-sm"
-                  @click="router.push('/calendar')"
+                  @click="openCalendar"
                 />
               </div>
             </CardHeader>
@@ -285,8 +297,10 @@ import ActionableQuestionCard from '@/components/home/ActionableQuestionCard.vue
 import ReassignUserModal from '@/components/modals/ReassignUserModal.vue'
 import TodayFeed from '@/components/home/TodayFeed.vue'
 import PerformanceWidget from '@/components/home/PerformanceWidget.vue'
+import { useHideNavigation } from '@/composables/useHideNavigation'
 
 const router = useRouter()
+const { hideNavigation } = useHideNavigation()
 const { t, locale } = useI18n()
 const userStore = useUserStore()
 const headerActionsRef = inject('headerActionsRef', null)
@@ -324,7 +338,18 @@ const summaryLine = computed(() =>
   })
 )
 
+function openTasks() {
+  if (hideNavigation.value) return
+  router.push('/tasks')
+}
+
+function openCalendar() {
+  if (hideNavigation.value) return
+  router.push('/calendar')
+}
+
 function goTask(row) {
+  if (hideNavigation.value) return
   router.push({
     path: `/requests/${row.entityId}`,
     query: { type: row.entityType, from: 'home' }
@@ -381,11 +406,13 @@ const handleAnswerNo = async (question) => {
   } else if (question.type === 'ns-followup') {
     dismissQuestion(question.id)
   } else if (question.type === 'stuck-opportunity') {
+    if (hideNavigation.value) return
     router.push({
       path: `/requests/${question.opportunityId}`,
       query: { type: 'opportunity', from: 'home' }
     })
   } else if (question.type === 'lead-qualification-urgency') {
+    if (hideNavigation.value) return
     router.push({
       path: `/requests/${question.leadId}`,
       query: { type: 'lead', from: 'home' }
@@ -413,6 +440,7 @@ const handleReassignConfirm = async (newAssigneeId) => {
 }
 
 const handleViewTask = (question) => {
+  if (hideNavigation.value) return
   if (question.opportunityId) {
     router.push({
       path: `/requests/${question.opportunityId}`,

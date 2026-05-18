@@ -8,7 +8,7 @@ import {
 } from '@/utils/mockDataHelpers'
 
 const STORAGE_KEY = 'project-ultra-leads'
-const DATA_VERSION = 9
+const DATA_VERSION = 10
 
 /**
  * Lead Repository
@@ -240,6 +240,35 @@ export class LeadRepository extends BaseRepository {
   }
 
   /**
+   * Keep locale-translated demo copy (aiSummary, requestMessage) in sync with current mock catalog.
+   * Fixes stale English text in localStorage when app locale is not English.
+   */
+  _syncLocalizedDemoCopyFromMock(leads) {
+    if (!Array.isArray(leads)) return
+    const mockById = new Map((getMockData().mockLeads || []).map((l) => [l.id, l]))
+    let changed = false
+    for (const lead of leads) {
+      const mock = mockById.get(lead.id)
+      if (!mock) continue
+      if (mock.aiSummary && lead.aiSummary !== mock.aiSummary) {
+        lead.aiSummary = mock.aiSummary
+        changed = true
+      }
+      if (mock.requestMessage && lead.requestMessage !== mock.requestMessage) {
+        lead.requestMessage = mock.requestMessage
+        changed = true
+      }
+      if (lead.requestedCar && mock.requestedCar?.requestMessage) {
+        if (lead.requestedCar.requestMessage !== mock.requestedCar.requestMessage) {
+          lead.requestedCar.requestMessage = mock.requestedCar.requestMessage
+          changed = true
+        }
+      }
+    }
+    if (changed) this._persist()
+  }
+
+  /**
    * Replace requestedCar from current mock (fixes stale localStorage e.g. old BMW iX demo).
    */
   _syncRequestedCarFromMock(leads) {
@@ -315,6 +344,7 @@ export class LeadRepository extends BaseRepository {
           this._syncAssigneeFromMock(this._leadsCache)
           this._leadsCache = this._trimToMockLeadCatalog(this._leadsCache)
           this._syncRequestedCarFromMock(this._leadsCache)
+          this._syncLocalizedDemoCopyFromMock(this._leadsCache)
           const merged = this._mergeNewMockLeads(this._leadsCache)
           if (merged.length > this._leadsCache.length) {
             this._leadsCache = merged
@@ -323,6 +353,7 @@ export class LeadRepository extends BaseRepository {
             this._ensureTradeInsFinancingFromMock(this._leadsCache)
             this._syncAssigneeFromMock(this._leadsCache)
             this._syncRequestedCarFromMock(this._leadsCache)
+            this._syncLocalizedDemoCopyFromMock(this._leadsCache)
             this._persist()
           }
         }
@@ -335,6 +366,7 @@ export class LeadRepository extends BaseRepository {
         this._ensureLeadAttributionFromMock(this._leadsCache)
         this._ensureTradeInsFinancingFromMock(this._leadsCache)
         this._syncAssigneeFromMock(this._leadsCache)
+        this._syncLocalizedDemoCopyFromMock(this._leadsCache)
         this._persist()
         try {
           localStorage.setItem(`${STORAGE_KEY}-version`, String(DATA_VERSION))

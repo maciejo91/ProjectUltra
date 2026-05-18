@@ -46,6 +46,22 @@ export function getVehicleConditionLabel(vehicle) {
   return 'Used'
 }
 
+const VEHICLE_CONDITION_I18N_KEYS = {
+  used: 'requestDetail.editVehicleModal.vehicleTypes.used',
+  new: 'requestDetail.editVehicleModal.vehicleTypes.new'
+}
+
+/**
+ * @param {string|null|undefined} label - from getVehicleConditionLabel
+ * @param {(key: string) => string} t - vue-i18n translate function
+ * @returns {string}
+ */
+export function translateVehicleConditionLabel(label, t) {
+  if (!label) return ''
+  const key = VEHICLE_CONDITION_I18N_KEYS[String(label).toLowerCase()]
+  return key ? t(key) : label
+}
+
 /**
  * @param {string|null|undefined} label
  * @returns {string} Tailwind classes for condition pill

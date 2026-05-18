@@ -3,7 +3,7 @@ import fiat500HybridImage from '@/assets/images/mock-vehicles/fiat_500hybrid_use
 import toyotaYarisImage from '@/assets/images/mock-vehicles/toyota_yaris_new.jpeg'
 import toyotaRav4Image from '@/assets/images/mock-vehicles/toyota_rav4_km0.jpeg'
 import vwGolfImage from '@/assets/images/mock-vehicles/vw_golf_new.jpeg'
-import vwTiguanImage from '@/assets/images/mock-vehicles/vw_tiguan_used.jpeg'
+import vwTiguanImage from '@/assets/images/mock-vehicles/volkswagen-tiguan.png'
 import jeepAvengerImage from '@/assets/images/mock-vehicles/jeep_avenger_new.jpeg'
 import jeepCompassImage from '@/assets/images/mock-vehicles/jeep_compass_km0.jpeg'
 import audiQ3Image from '@/assets/images/mock-vehicles/audi_q3_km0.jpeg'
@@ -122,11 +122,11 @@ const RAW_ROWS = [
     brand: 'Volkswagen',
     model: 'Tiguan',
     condition: 'Used',
-    year: 2021,
-    kilometers: 78000,
-    specification: 'Diesel, DSG',
-    plate: 'FR 551 ST',
-    price: 28400,
+    year: 2025,
+    kilometers: 27024,
+    specification: 'Benzina, Automatico',
+    plate: '-',
+    price: 44650,
     image: vwTiguanImage
   },
   {
