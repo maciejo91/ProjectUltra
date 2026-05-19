@@ -94,6 +94,56 @@ export function formatDueDate(isoTimestamp) {
  * @param {{ pastSuffix?: 'overdue'|'ago' }} [options] - For "last updated" use pastSuffix: 'ago' to show "X ago" instead of "X overdue"
  * @returns {string} Relative time string
  */
+function relativePastKey(pastSuffix, unit, count) {
+  const base = pastSuffix === 'ago' ? 'ago' : 'overdue'
+  const plural = count === 1 ? '' : 's'
+  const unitCap = unit.charAt(0).toUpperCase() + unit.slice(1)
+  return `common.time.${base}${unitCap}${plural}`
+}
+
+function relativeFutureKey(unit, count) {
+  const plural = count === 1 ? '' : 's'
+  const unitCap = unit.charAt(0).toUpperCase() + unit.slice(1)
+  return `common.time.in${unitCap}${plural}`
+}
+
+/**
+ * Localized relative due date (for tasks). Uses vue-i18n `t` for all strings.
+ * @param {string} isoTimestamp
+ * @param {(key: string, params?: object) => string} t
+ * @param {{ pastSuffix?: 'overdue'|'ago', locale?: string }} [options]
+ */
+export function formatDueDateRelativeI18n(isoTimestamp, t, options = {}) {
+  if (!isoTimestamp) return ''
+  const pastSuffix = options.pastSuffix === 'ago' ? 'ago' : 'overdue'
+  const locale = options.locale || 'en'
+  const dueDate = new Date(isoTimestamp)
+  const now = new Date()
+  const diffMs = dueDate - now
+  const diffMin = Math.floor(Math.abs(diffMs) / (1000 * 60))
+  const diffHour = Math.floor(diffMin / 60)
+  const diffDay = Math.floor(diffHour / 24)
+
+  if (diffMs < 0) {
+    if (diffMin < 1) {
+      return pastSuffix === 'ago' ? t('common.time.justNow') : t('common.time.overdueJustNow')
+    }
+    if (diffMin < 60) {
+      return t(relativePastKey(pastSuffix, 'minute', diffMin), { count: diffMin })
+    }
+    if (diffHour < 24) {
+      return t(relativePastKey(pastSuffix, 'hour', diffHour), { count: diffHour })
+    }
+    return t(relativePastKey(pastSuffix, 'day', diffDay), { count: diffDay })
+  }
+
+  if (diffMin < 1) return t('common.time.inLessThanMinute')
+  if (diffMin < 60) return t(relativeFutureKey('minute', diffMin), { count: diffMin })
+  if (diffHour < 24) return t(relativeFutureKey('hour', diffHour), { count: diffHour })
+  if (diffDay < 7) return t(relativeFutureKey('day', diffDay), { count: diffDay })
+  return dueDate.toLocaleDateString(locale, { month: 'short', day: 'numeric' })
+}
+
 export function formatDueDateRelative(isoTimestamp, options = {}) {
   if (!isoTimestamp) return ''
   const pastSuffix = options.pastSuffix === 'ago' ? 'ago' : 'overdue'

@@ -2,11 +2,11 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Avatar, AvatarFallback, Badge } from '@motork/component-library/future/primitives'
-import { formatDueDateRelative, getDeadlineStatus } from '@/utils/formatters'
+import { formatDueDateRelativeI18n, getDeadlineStatus } from '@/utils/formatters'
 import { getTaskDisplayTitle } from '@/utils/taskActionTitle'
 import { useHideNavigation } from '@/composables/useHideNavigation'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { hideNavigation } = useHideNavigation()
 
 const props = defineProps({
@@ -54,7 +54,9 @@ const isOverdue = (task) => {
 
 const getDueDateLabel = (task) => {
   const dueDate = getTaskDueDate(task)
-  return dueDate ? formatDueDateRelative(dueDate) : t('dataTable.tasks.values.notSet')
+  return dueDate
+    ? formatDueDateRelativeI18n(dueDate, t, { locale: locale.value })
+    : t('dataTable.tasks.values.notSet')
 }
 
 const rowClass = (index) =>
