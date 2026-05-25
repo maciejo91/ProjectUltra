@@ -4,9 +4,7 @@
     :class="{
       'cursor-pointer transition-opacity hover:opacity-90': clickable,
       'border-b border-border': showRowSeparator,
-      'mb-5': !isLast && isSophieAnchoredVariant,
-      'py-2': !isLast && !isSophieAnchoredVariant && compactBottomSpacing,
-      'py-4': !isLast && !isSophieAnchoredVariant && !compactBottomSpacing,
+      '-mb-4': compactBottomSpacing,
       'gap-3': isSophieAnchoredVariant,
       'gap-2': !isSophieAnchoredVariant && isSophieCondensedCommunication,
       'gap-2': !isSophieAnchoredVariant && !isSophieCondensedCommunication
@@ -38,6 +36,33 @@
             :class="isRightAlignedEffective ? 'justify-end' : 'justify-start'"
           >
             <span
+              v-if="type === 'ai-agent-action'"
+              class="inline-flex items-center gap-1 font-medium text-foreground"
+            >
+              <span class="sparkles-gradient inline-flex shrink-0" aria-hidden="true">
+                <Sparkles
+                  :size="14"
+                  class="mk-sparkles-icon size-3.5 shrink-0"
+                  fill="url(#sparkles-gradient)"
+                  stroke="none"
+                />
+              </span>
+              {{ localizedHeadlinePrimary }}
+            </span>
+            <span
+              v-else-if="isRichSystemEventActivity"
+              class="inline-flex flex-wrap items-center gap-x-1"
+            >
+              <span class="font-medium text-foreground">{{ localizedHeadlinePrimary }}</span>
+              <span
+                v-if="headlineParts.secondary"
+                class="font-normal text-foreground wrap-break-word"
+              >
+                {{ localizedHeadlineSecondary }}
+              </span>
+            </span>
+            <span
+              v-else
               :class="
                 systemHeadline ? 'font-normal text-muted-foreground' : 'font-medium text-foreground'
               "
@@ -56,7 +81,7 @@
               </span>
             </template>
             <span
-              v-else-if="headlineParts.secondary"
+              v-else-if="headlineParts.secondary && !isRichSystemEventActivity"
               class="min-w-0 font-normal leading-snug wrap-break-word"
               :class="secondaryToneClass"
             >
@@ -77,6 +102,7 @@
       v-if="showCard"
       class="ml-9 min-w-0"
       :class="[
+        type === 'calendar-event' ? 'w-full max-w-2xl' : '',
         isRightAlignedEffective ? 'flex justify-end' : '',
         outboundCardShiftClass,
         ''
@@ -103,6 +129,32 @@
           <p class="text-sm leading-relaxed text-foreground wrap-break-word">
             {{ localizedNoteOrAiBody }}
           </p>
+        </ActivityTimelineCard>
+      </template>
+
+      <template v-else-if="type === 'ai-agent-action'">
+        <ActivityTimelineCard
+          :accent="cardAccent"
+          surface="muted"
+          :show-accent="false"
+          class="w-full max-w-2xl border-transparent shadow-none"
+        >
+          <div class="relative min-w-0">
+            <span
+              class="sparkles-gradient absolute top-0 right-0 inline-flex shrink-0"
+              aria-hidden="true"
+            >
+              <Sparkles
+                :size="16"
+                class="mk-sparkles-icon"
+                fill="url(#sparkles-gradient)"
+                stroke="none"
+              />
+            </span>
+            <p class="pr-7 text-sm leading-relaxed text-muted-foreground wrap-break-word">
+              {{ localizedActivityContent }}
+            </p>
+          </div>
         </ActivityTimelineCard>
       </template>
 
@@ -236,6 +288,31 @@
           </div>
         </ActivityTimelineCard>
       </template>
+
+      <template v-else-if="isRichSystemEventActivity">
+        <ActivityTimelineCard
+          :show-accent="false"
+          surface="background"
+          inner-padding-class="px-3 py-2.5"
+          class="w-full max-w-2xl shadow-none"
+        >
+          <ActivityTimelineRichSystemEventCard :activity="activity" />
+        </ActivityTimelineCard>
+      </template>
+
+      <template v-else-if="type === 'calendar-event'">
+        <ActivityTimelineCard
+          :accent="cardAccent"
+          :show-accent="true"
+          accent-bar-class="calendar-timeline-event-accent"
+          :no-border="true"
+          surface="background"
+          inner-padding-class="p-3"
+          class="w-full max-w-2xl shadow-mk-dashboard-card"
+        >
+          <ActivityTimelineCalendarEventCard :activity="activity" />
+        </ActivityTimelineCard>
+      </template>
     </div>
   </div>
 </template>
@@ -243,12 +320,14 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ArrowDownLeft, ArrowUpRight } from 'lucide-vue-next'
+import { ArrowDownLeft, ArrowUpRight, Sparkles } from 'lucide-vue-next'
 import { Button } from '@motork/component-library/future/primitives'
 import { formatTime } from '@/utils/formatters'
 import {
   buildActivityHeadlineParts,
   isActivityTimelineSystemHeadline,
+  isRichSystemEvent,
+  getTimelinePresentationType,
   getActivityCardAccent,
   getCallSummaryText,
   getCallTranscriptLines,
@@ -258,6 +337,8 @@ import {
 import { translateText } from '@/api/mockData/locales/translations.js'
 import ActivityTimelineIcon from './ActivityTimelineIcon.vue'
 import ActivityTimelineCard from './ActivityTimelineCard.vue'
+import ActivityTimelineCalendarEventCard from './ActivityTimelineCalendarEventCard.vue'
+import ActivityTimelineRichSystemEventCard from './ActivityTimelineRichSystemEventCard.vue'
 
 const props = defineProps({
   activity: {
@@ -276,11 +357,19 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
-  isLast: {
+  isLastInDayGroup: {
+    type: Boolean,
+    default: false
+  },
+  isLastInTimeline: {
     type: Boolean,
     default: false
   },
   compactBottomSpacing: {
+    type: Boolean,
+    default: false
+  },
+  isFirstInDayGroup: {
     type: Boolean,
     default: false
   }
@@ -295,7 +384,7 @@ function localizeMockText(text) {
   return translateText(text, locale.value)
 }
 
-const type = computed(() => props.activity?.type ?? '')
+const type = computed(() => getTimelinePresentationType(props.activity))
 
 const timeLabel = computed(() => {
   const a = props.activity
@@ -319,6 +408,8 @@ const secondaryToneClass = computed(() => {
   if (v.includes('answered')) return 'text-emerald-700'
   return 'text-muted-foreground'
 })
+
+const isRichSystemEventActivity = computed(() => isRichSystemEvent(props.activity))
 
 const systemHeadline = computed(() => isActivityTimelineSystemHeadline(props.activity))
 
@@ -390,7 +481,10 @@ const isRightAlignedEffective = computed(() => {
 
 const showRowSeparator = computed(() => {
   if (isSophieAnchoredVariant.value) return false
-  return !props.isLast && !(systemHeadline.value && props.compactBottomSpacing)
+  return (
+    !props.isLastInTimeline &&
+    !(systemHeadline.value && props.compactBottomSpacing)
+  )
 })
 
 const isOutboundCommunication = computed(() => {

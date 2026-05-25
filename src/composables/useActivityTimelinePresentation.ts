@@ -4,10 +4,37 @@ import type {
   ActivityTimelineHeadlineParts,
   ActivityTimelineIconKind
 } from '@/types/activityTimeline'
+import { getEventTypeLabel } from '@/utils/calendarHelpers'
 
 type TFn = (key: string, ...args: unknown[]) => string
 
+const APPOINTMENT_SCHEDULED_PATTERN = /appointment\s+scheduled/i
+
 type CommunicationChannel = 'email' | 'whatsapp' | 'sms'
+
+export function isRichSystemEvent(activity: ActivityRecord | null | undefined): boolean {
+  if (!activity) return false
+  const data = activity.data
+  if (data?.richSystemEvent) return true
+  return Array.isArray(data?.sections) && data.sections.length > 0
+}
+
+export function isAppointmentScheduledActivity(
+  activity: ActivityRecord | null | undefined
+): boolean {
+  if (!activity || activity.type === 'calendar-event') return false
+  const text = `${activity.action ?? ''} ${activity.message ?? ''}`.trim()
+  return APPOINTMENT_SCHEDULED_PATTERN.test(text)
+}
+
+/** Timeline UI type; appointment-scheduled logs render as calendar events. */
+export function getTimelinePresentationType(activity: ActivityRecord | null | undefined): string {
+  if (!activity?.type) return ''
+  if (activity.type === 'calendar-event' || isAppointmentScheduledActivity(activity)) {
+    return 'calendar-event'
+  }
+  return activity.type
+}
 
 const WHATSAPP_CONVERSATION_WINDOW_MS = 24 * 60 * 60 * 1000
 
@@ -69,26 +96,71 @@ export function isCommunicationReply(
   return false
 }
 
-export function getActivityTimelineDateLabel(activities: ActivityRecord[] | undefined, t: TFn): string {
-  if (!activities || activities.length === 0) return ''
-  const mostRecent = activities[0]
-  const timestamp = mostRecent.timestamp || mostRecent.createdAt
-  if (!timestamp) return t('entities.activity.timeline.recentActivity')
+export type ActivityTimelineDayGroup = {
+  dayKey: string
+  label: string
+  activities: ActivityRecord[]
+}
+
+function getTimelineDayKey(timestamp: string | undefined): string {
+  if (!timestamp) return 'unknown'
   const date = new Date(timestamp)
+  if (Number.isNaN(date.getTime())) return 'unknown'
+  return date.toDateString()
+}
+
+function formatTimelineDayDate(date: Date): string {
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = String(date.getFullYear()).slice(-2)
+  return `${day}/${month}/${year}`
+}
+
+export function formatActivityTimelineDayLabel(
+  timestamp: string | undefined,
+  t: TFn
+): string {
+  const dayKey = getTimelineDayKey(timestamp)
+  if (dayKey === 'unknown') return t('entities.activity.timeline.recentActivity')
+  const date = new Date(timestamp as string)
   const today = new Date()
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
-  if (date.toDateString() === today.toDateString()) {
+  if (dayKey === today.toDateString()) {
     return t('entities.activity.timeline.today')
   }
-  if (date.toDateString() === yesterday.toDateString()) {
+  if (dayKey === yesterday.toDateString()) {
     return t('entities.activity.timeline.yesterday')
   }
-  return date.toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
-  })
+  return formatTimelineDayDate(date)
+}
+
+export function groupActivitiesByTimelineDay(
+  activities: ActivityRecord[] | undefined,
+  t: TFn
+): ActivityTimelineDayGroup[] {
+  if (!activities?.length) return []
+  const groups: ActivityTimelineDayGroup[] = []
+  let currentKey = ''
+  for (const activity of activities) {
+    const timestamp = activity.timestamp || activity.createdAt
+    const dayKey = getTimelineDayKey(timestamp)
+    const label = formatActivityTimelineDayLabel(timestamp, t)
+    if (dayKey !== currentKey) {
+      groups.push({ dayKey, label, activities: [activity] })
+      currentKey = dayKey
+    } else {
+      groups[groups.length - 1].activities.push(activity)
+    }
+  }
+  return groups
+}
+
+/** @deprecated Use groupActivitiesByTimelineDay for per-day section headers. */
+export function getActivityTimelineDateLabel(activities: ActivityRecord[] | undefined, t: TFn): string {
+  if (!activities || activities.length === 0) return ''
+  const mostRecent = activities[0]
+  return formatActivityTimelineDayLabel(mostRecent.timestamp || mostRecent.createdAt, t)
 }
 
 export function getCallTranscriptLines(activity: ActivityRecord | undefined): Array<{ speaker: string; text: string }> {
@@ -111,26 +183,42 @@ export function getCallSummaryText(activity: ActivityRecord | undefined, t: TFn)
   return activity.data?.summary || activity.content || t('entities.activity.timeline.callCompletedFallback')
 }
 
+function getCallIconKindFromText(activity: ActivityRecord): 'call' | 'callMissed' {
+  const text = `${activity.action ?? ''} ${activity.message ?? ''} ${activity.content ?? ''} ${activity.data?.summary ?? ''}`.toLowerCase()
+  const isMissed =
+    text.includes('no answer') ||
+    text.includes('voicemail') ||
+    /\bmissed\b/.test(text) ||
+    text.includes('unanswered') ||
+    text.includes('not answered') ||
+    /\bbusy\b/.test(text)
+  return isMissed ? 'callMissed' : 'call'
+}
+
+function getAgentActionIconKind(activity: ActivityRecord): ActivityTimelineIconKind {
+  const action = activity.data?.agentAction
+  if (action === 'call') return getCallIconKindFromText(activity)
+  if (action === 'email') return 'email'
+  if (action === 'whatsapp') return 'messageGreen'
+  if (action === 'sms') return 'messageGreen'
+  return 'file'
+}
+
 export function getActivityIconKind(activity: ActivityRecord | null | undefined): ActivityTimelineIconKind {
   if (!activity) return 'file'
+  if (isAppointmentScheduledActivity(activity)) return 'calendarEvent'
   const type = activity.type
   if (type === 'note') return 'note'
   if (type === 'call') {
-    const text = `${activity.action ?? ''} ${activity.message ?? ''} ${activity.content ?? ''} ${activity.data?.summary ?? ''}`.toLowerCase()
-    const isMissed =
-      text.includes('no answer') ||
-      text.includes('voicemail') ||
-      /\bmissed\b/.test(text) ||
-      text.includes('unanswered') ||
-      text.includes('not answered') ||
-      /\bbusy\b/.test(text)
-    return isMissed ? 'callMissed' : 'call'
+    return getCallIconKindFromText(activity)
   }
   if (type === 'email' || type === 'customer-email') return 'email'
   if (type === 'whatsapp' || type === 'customer-whatsapp' || type === 'sms' || type === 'customer-sms')
     return 'messageGreen'
+  if (type === 'ai-agent-action') return getAgentActionIconKind(activity)
   if (type === 'ai-summary') return 'ai'
   if (type === 'appointment') return 'appointment'
+  if (type === 'calendar-event') return 'calendarEvent'
   if (
     type === 'created' ||
     type === 'system' ||
@@ -149,6 +237,8 @@ export function getActivityIconKind(activity: ActivityRecord | null | undefined)
 export function isActivityTimelineSystemHeadline(activity: ActivityRecord | null | undefined): boolean {
   if (!activity) return false
   if (activity.type === 'ai-summary') return true
+  if (isAppointmentScheduledActivity(activity)) return false
+  if (isRichSystemEvent(activity)) return false
   return getActivityIconKind(activity) === 'system'
 }
 
@@ -226,6 +316,31 @@ export function buildActivityHeadlineParts(
     return { primary: t('entities.activity.timeline.aiSummaryHeadline'), secondary: null }
   }
 
+  if (type === 'ai-agent-action') {
+    const contactName = activity.data?.contactName || activity.customerName || ''
+    const agentAction = activity.data?.agentAction
+    let secondary =
+      (activity.action || activity.message || '').trim() || null
+    if (!secondary && agentAction === 'call') {
+      secondary = contactName
+        ? t('entities.activity.timeline.agentSparkCalledContact', { name: contactName })
+        : t('entities.activity.timeline.agentSparkCalledCustomer')
+    }
+    if (!secondary && agentAction === 'email') {
+      secondary = t('entities.activity.timeline.agentSparkSentEmail')
+    }
+    if (!secondary && agentAction === 'whatsapp') {
+      secondary = t('entities.activity.timeline.agentSparkSentWhatsapp')
+    }
+    if (!secondary && agentAction === 'sms') {
+      secondary = t('entities.activity.timeline.agentSparkSentSms')
+    }
+    return {
+      primary: t('entities.activity.timeline.agentSparkName'),
+      secondary
+    }
+  }
+
   if (type === 'appointment') {
     const detail = (activity.message || activity.title || '').trim()
     if (user && detail) {
@@ -238,6 +353,18 @@ export function buildActivityHeadlineParts(
       }
     }
     return { primary: t('entities.activity.timeline.appointmentFallback'), secondary: null }
+  }
+
+  if (type === 'calendar-event' || isAppointmentScheduledActivity(activity)) {
+    const eventType = activity.data?.eventType || 'appointment'
+    const typeLabel = getEventTypeLabel(eventType)
+    const secondary = t('entities.activity.timeline.bookedCalendarEvent', { type: typeLabel })
+    const assignee =
+      user && user !== 'System' ? user : activity.data?.assignee || t('entities.activity.timeline.you')
+    return {
+      primary: assignee,
+      secondary
+    }
   }
 
   if (type === 'created') {
@@ -259,6 +386,12 @@ export function buildActivityHeadlineParts(
       primary: activity.message || activity.action || t('entities.activity.timeline.opportunityCreated'),
       secondary: null
     }
+  }
+
+  if (isRichSystemEvent(activity)) {
+    const action = (activity.action || activity.message || '').trim()
+    const secondary = action.replace(/^SYSTEM\s*/i, '').trim() || action
+    return { primary: 'SYSTEM', secondary: secondary || null }
   }
 
   if (type === 'system' || type === 'status') {
@@ -288,14 +421,23 @@ export function buildActivityHeadline(
 
 export function getActivityCardAccent(activity: ActivityRecord | null | undefined): ActivityTimelineCardAccent {
   if (!activity) return 'default'
+  if (isAppointmentScheduledActivity(activity)) return 'calendarEvent'
   const type = activity.type
   if (type === 'note') return 'note'
   if (type === 'email' || type === 'customer-email') return 'email'
   if (type === 'whatsapp' || type === 'customer-whatsapp') return 'messageGreen'
   if (type === 'sms' || type === 'customer-sms') return 'sms'
   if (type === 'call') return 'call'
+  if (type === 'ai-agent-action') {
+    const action = activity.data?.agentAction
+    if (action === 'call') return 'call'
+    if (action === 'email') return 'email'
+    if (action === 'whatsapp') return 'messageGreen'
+    if (action === 'sms') return 'sms'
+  }
   if (type === 'ai-summary') return 'ai'
   if (type === 'appointment') return 'appointment'
+  if (type === 'calendar-event') return 'calendarEvent'
   return 'default'
 }
 
@@ -310,8 +452,15 @@ export function shouldShowActivityCard(
   if (type === 'whatsapp' || type === 'customer-whatsapp' || type === 'sms' || type === 'customer-sms')
     return !!activity.content
   if (type === 'ai-summary') return !!(activity.message || activity.content)
+  if (type === 'ai-agent-action') return !!(activity.message || activity.content)
   if (type === 'appointment') {
     return !!(activity.title || activity.message || activity.location || activity.customerName || activity.vehicle)
+  }
+  if (type === 'calendar-event' || isAppointmentScheduledActivity(activity)) {
+    return !!(activity.title || activity.data?.start || activity.timestamp)
+  }
+  if (isRichSystemEvent(activity)) {
+    return true
   }
   if (type === 'call') {
     const hasTranscript = linesForTranscript.length > 0

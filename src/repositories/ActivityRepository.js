@@ -289,6 +289,7 @@ export class ActivityRepository extends BaseRepository {
       if (type === 'note') return 0.45
       if (type === 'call') return 0.35
       if (['email', 'customer-email', 'whatsapp', 'customer-whatsapp', 'sms', 'customer-sms'].includes(type)) return 0.55
+      if (type === 'ai-agent-action') return 0.85
       return 0.4
     }
 
@@ -310,6 +311,7 @@ export class ActivityRepository extends BaseRepository {
       ['customer-sms', 1],
       ['note', 1],
       ['ai-summary', 1],
+      ['ai-agent-action', 2],
       ['lead-created', 1],
       ['lead-assigned', 1],
       ['lead-updated', 1]
@@ -368,15 +370,26 @@ export class ActivityRepository extends BaseRepository {
       return tb - ta
     })
     if (sorted.length <= maxItems) return sorted
+
+    const preservedTypes = new Set(['ai-agent-action'])
+    const preserved = sorted.filter((activity) => preservedTypes.has(activity?.type))
     const systemItems = sorted.filter((activity) =>
       ['lead-created', 'lead-assigned', 'lead-updated'].includes(activity?.type)
     )
-    const interactionItems = sorted.filter((activity) =>
-      !['lead-created', 'lead-assigned', 'lead-updated'].includes(activity?.type)
+    const interactionItems = sorted.filter(
+      (activity) =>
+        !preservedTypes.has(activity?.type) &&
+        !['lead-created', 'lead-assigned', 'lead-updated'].includes(activity?.type)
+    )
+
+    const slotsForInteractions = Math.max(
+      0,
+      maxItems - preserved.length - Math.min(systemItems.length, 2)
     )
     const keepSystem = systemItems.slice(0, 2)
-    const keepInteractions = interactionItems.slice(0, Math.max(0, maxItems - keepSystem.length))
-    return [...keepInteractions, ...keepSystem].sort((a, b) => {
+    const keepInteractions = interactionItems.slice(0, slotsForInteractions)
+
+    return [...preserved, ...keepInteractions, ...keepSystem].sort((a, b) => {
       const ta = a?.timestamp ? new Date(a.timestamp).getTime() : 0
       const tb = b?.timestamp ? new Date(b.timestamp).getTime() : 0
       return tb - ta
@@ -407,7 +420,7 @@ export class ActivityRepository extends BaseRepository {
         const randomizedTimeline = this._getRandomizedLeadTimelineActivities(requestedLeadId)
         const leadSpecific = results.filter((a) => a.leadId === requestedLeadId)
         results = this._limitTimelineActivities(
-          this._dedupeActivities([...randomizedTimeline, ...leadSpecific]),
+          this._dedupeActivities([...leadSpecific, ...randomizedTimeline]),
           this._makeRng(requestedLeadId * 2017 + 31)
         )
       } else {

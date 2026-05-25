@@ -184,6 +184,46 @@ export const mockActivities = [
     leadId: 3
   },
   {
+    id: 20.9,
+    type: 'system',
+    user: 'SYSTEM',
+    action: 'merged an opportunity at 09:30',
+    timestamp: createHourOffset(-52),
+    leadId: 4,
+    data: {
+      richSystemEvent: true,
+      systemIcon: 'merge',
+      sectionsTitle: 'Merged opportunity information',
+      summary:
+        'The opportunity with ID 019dbe65-b980-70c1-a512-7a0a2411ebca has been reconciled.',
+      sections: [
+        {
+          title: 'Merged opportunity information',
+          fields: [
+            { label: 'Contact ID', value: '019dbe65-b980-70c1-a512-7a0a2411ebca' },
+            { label: 'Assignee', value: 'davide.rinaldi@motork.io' },
+            { label: 'Team', value: 'Sales (New) — Bologna' },
+            { label: 'Dealership', value: 'Bologna' },
+            { label: 'Fiscal entity', value: 'MotorK Italia' },
+            { label: 'Status', value: 'In negotiation' },
+            { label: 'Imported at', value: '2026-04-28T07:30:00Z' },
+            { label: 'Created at', value: '2026-04-20T14:12:00Z' },
+            { label: 'Integration details', value: 'vgi-swp — 88421' }
+          ]
+        },
+        {
+          title: 'Offer that triggered the reconciliation',
+          fields: [
+            { label: 'Offer ID', value: 'a4f2c891-22be-4d01-9c12-8f004e2a91bc' },
+            { label: 'Created at', value: '2026-04-27T16:45:00Z' },
+            { label: 'Imported at', value: '2026-04-28T07:28:00Z' },
+            { label: 'Integration details', value: 'vgi-swp — 991204' }
+          ]
+        }
+      ]
+    }
+  },
+  {
     id: 21,
     type: 'customer-email',
     user: 'Giulia Conti',
@@ -193,7 +233,7 @@ export const mockActivities = [
       from: 'giulia.conti@example.com',
       to: 'sales@motork.io'
     },
-    timestamp: createHourOffset(-4),
+    timestamp: createHourOffset(-55),
     leadId: 4
   },
   {
@@ -208,7 +248,7 @@ export const mockActivities = [
       from: 'davide.rinaldi@motork.io',
       to: 'giulia.conti@example.com'
     },
-    timestamp: createHourOffset(-3.7),
+    timestamp: createHourOffset(-54),
     leadId: 4
   },
   {
@@ -222,7 +262,7 @@ export const mockActivities = [
       fromPhone: '+49 151 555 0404',
       toPhone: '+49 89 555 0101'
     },
-    timestamp: createHourOffset(-3.2),
+    timestamp: createHourOffset(-30),
     leadId: 4
   },
   {
@@ -237,7 +277,7 @@ export const mockActivities = [
       fromPhone: '+49 89 555 0101',
       toPhone: '+49 151 555 0404'
     },
-    timestamp: createHourOffset(-3),
+    timestamp: createHourOffset(-29),
     leadId: 4
   },
   {
@@ -252,7 +292,7 @@ export const mockActivities = [
       from: 'giulia.conti@example.com',
       to: 'sales@motork.io'
     },
-    timestamp: createHourOffset(-2.7),
+    timestamp: createHourOffset(-28),
     leadId: 4
   },
   {
@@ -261,7 +301,7 @@ export const mockActivities = [
     user: 'Davide Rinaldi',
     action: 'added a note',
     content: 'Customer prefers email, no phone on file. Prepare quote + warranty options before appointment.',
-    timestamp: createHourOffset(-2.3),
+    timestamp: createHourOffset(-27),
     leadId: 4
   },
   {
@@ -303,15 +343,6 @@ export const mockActivities = [
       toPhone: '+49 151 555 0404'
     },
     timestamp: createHourOffset(-1.5),
-    leadId: 4
-  },
-  {
-    id: 21.9,
-    type: 'lead-updated',
-    user: 'System',
-    action: 'Appointment scheduled: Thu 13:00 (Milano)',
-    message: 'Appointment scheduled: Thu 13:00 (Milano)',
-    timestamp: createHourOffset(-1.4),
     leadId: 4
   },
   {
@@ -611,6 +642,33 @@ export const mockActivities = [
       toPhone: '+34 600 555 0101'
     },
     timestamp: createHourOffset(-1.6),
+    leadId: 1
+  },
+  {
+    id: 40,
+    type: 'ai-agent-action',
+    user: 'AgentSparK',
+    action: 'sent a WhatsApp message',
+    content:
+      'Hi Luca, following up on your test drive — Thu 11:00 at Roma still works. Reply YES to confirm.',
+    data: {
+      agentAction: 'whatsapp',
+      contactName: 'Luca De Santis'
+    },
+    timestamp: createHourOffset(-1.55),
+    leadId: 1
+  },
+  {
+    id: 41,
+    type: 'ai-agent-action',
+    user: 'AgentSparK',
+    action: 'called the customer',
+    content: 'No answer. Queued automatic WhatsApp follow-up.',
+    data: {
+      agentAction: 'call',
+      contactName: 'Luca De Santis'
+    },
+    timestamp: createHourOffset(-2.05),
     leadId: 1
   }
 ]

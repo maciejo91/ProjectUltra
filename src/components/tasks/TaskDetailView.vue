@@ -48,9 +48,9 @@
 
         <!-- Right Sidebar with Tabs -->
         <div
-          class="right-sidebar flex w-full shrink-0 flex-col overflow-x-hidden border-border border-t bg-background lg:w-[320px] lg:min-h-0 lg:min-w-[320px] lg:border-l lg:border-t-0"
+          class="right-sidebar flex w-full shrink-0 flex-col overflow-x-hidden overflow-y-visible border-border border-t bg-background lg:w-[320px] lg:min-h-0 lg:min-w-[320px] lg:border-l lg:border-t-0"
         >
-          <Tabs v-model="sidebarTab" class="flex w-full flex-col gap-0 overflow-x-hidden">
+          <Tabs v-model="sidebarTab" class="flex w-full flex-col gap-0 overflow-x-hidden overflow-y-visible">
             <!-- Sidebar Tabs -->
             <TabsList class="relative flex w-full shrink-0 rounded-none border-0 bg-background">
               <TabsTrigger 
@@ -191,6 +191,7 @@
               <TabsContent value="activity" class="mt-0 flex flex-col overflow-visible p-2">
                 <TaskActivityCard
                   :activities="allActivities"
+                  :entity-context="timelineEntityContext"
                   :expanded-summaries="expandedSummaries"
                   @activity-click="handleActivityClick"
                   @toggle-summary-expanded="toggleSummaryExpanded"
@@ -361,6 +362,7 @@ import TaskContactCard from './TaskContactCard.vue'
 import OtherCustomerRequestsCard from './OtherCustomerRequestsCard.vue'
 import VehicleRequestCard from '@/components/shared/VehicleRequestCard.vue'
 import TaskActivityCard from './TaskActivityCard.vue'
+import { buildTimelineEntityContext } from '@/utils/calendarTimelineMapper'
 import TaskBadgesAndTags from './TaskBadgesAndTags.vue'
 import TradeInsCard from '@/components/shared/TradeInsCard.vue'
 import FinancingOptionsCard from '@/components/shared/FinancingOptionsCard.vue'
@@ -569,6 +571,8 @@ function handlePostponeExpectedClose() {
     emit('postpone-expected-close', task)
   }
 }
+
+const timelineEntityContext = computed(() => buildTimelineEntityContext(displayTask.value))
 
 // Activities
 const allActivities = computed(() => {

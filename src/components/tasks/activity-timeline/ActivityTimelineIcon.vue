@@ -19,8 +19,10 @@ import {
   Sparkles,
   Calendar,
   Info,
+  RefreshCw,
   FileText
 } from 'lucide-vue-next'
+import { isRichSystemEvent } from '@/composables/useActivityTimelinePresentation'
 import { getActivityIconKind } from '@/composables/useActivityTimelinePresentation'
 import WhatsAppIcon from '@/components/icons/WhatsAppIcon.vue'
 
@@ -33,7 +35,11 @@ const props = defineProps({
 
 const kind = computed(() => getActivityIconKind(props.activity))
 
-const isWhatsapp = computed(() => ['whatsapp', 'customer-whatsapp'].includes(props.activity?.type))
+const isWhatsapp = computed(
+  () =>
+    ['whatsapp', 'customer-whatsapp'].includes(props.activity?.type) ||
+    (props.activity?.type === 'ai-agent-action' && props.activity?.data?.agentAction === 'whatsapp')
+)
 
 const iconSize = computed(() => {
   if (kind.value === 'messageGreen' && isWhatsapp.value) return 17
@@ -58,9 +64,12 @@ const icon = computed(() => {
     case 'ai':
       return Sparkles
     case 'appointment':
+    case 'calendarEvent':
       return Calendar
     case 'system':
-      return Info
+      return props.activity?.data?.systemIcon === 'merge' || isRichSystemEvent(props.activity)
+        ? RefreshCw
+        : Info
     default:
       return FileText
   }
@@ -83,6 +92,8 @@ const badgeClass = computed(() => {
       return 'bg-violet-600'
     case 'appointment':
       return 'bg-indigo-600'
+    case 'calendarEvent':
+      return 'bg-muted border border-border'
     case 'system':
       return 'bg-muted border border-border'
     default:
@@ -91,7 +102,7 @@ const badgeClass = computed(() => {
 })
 
 const iconClass = computed(() => {
-  if (kind.value === 'system') return 'text-muted-foreground'
+  if (kind.value === 'system' || kind.value === 'calendarEvent') return 'text-muted-foreground'
   if (kind.value === 'file') return 'text-foreground'
   return 'text-white'
 })

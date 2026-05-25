@@ -217,6 +217,7 @@
       <div class="hidden h-full min-h-0 w-80 shrink-0 flex-col overflow-y-auto border-l border-border lg:flex">
         <TaskActivityCard
           :activities="allActivities"
+          :entity-context="timelineEntityContext"
           :timeline-variant="type === 'lead' ? 'sophieAnchored' : ''"
           :expanded-summaries="expandedSummaries"
           @activity-click="handleActivityClick"
@@ -741,6 +742,7 @@ import { useUsersStore } from '@/stores/users'
 import { useUserStore } from '@/stores/user'
 import CreateEventForm from '@/components/shared/forms/CreateEventForm.vue'
 import { createCalendarEvent, fetchCalendarFilterOptions } from '@/api/calendar'
+import { buildTimelineEntityContext } from '@/utils/calendarTimelineMapper'
 
 const props = defineProps({
   task: { type: Object, required: true },
@@ -1743,6 +1745,10 @@ const allActivities = computed(() => {
   // Filter out null/undefined activities to prevent unmount errors
   return activities.filter(activity => activity != null && activity.id != null)
 })
+
+const timelineEntityContext = computed(() =>
+  buildTimelineEntityContext(props.task, props.type)
+)
 
 // Computed title for overview modals
 const overviewModalTitle = computed(() => {

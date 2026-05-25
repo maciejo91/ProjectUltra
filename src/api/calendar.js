@@ -95,6 +95,53 @@ const APPOINTMENT_TYPES = ['appointment', 'test-drive', 'meeting', 'call', 'deli
  * @param {number} customerId
  * @returns {Promise<Array>} Sorted by start date descending (newest first).
  */
+/**
+ * Calendar events linked to a CRM entity (opportunity, lead customer, or contact).
+ * @param {{ customerId?: number|string, opportunityId?: number|string, leadId?: number|string }} params
+ * @param {number} [limit=1] Max events to return for the timeline (one per lead/entity).
+ * @returns {Promise<Array>} Sorted by start descending, capped at `limit`.
+ */
+export const fetchCalendarEventsForEntity = async ({
+  customerId,
+  opportunityId,
+  leadId,
+  limit = 5
+} = {}) => {
+  await delay()
+  let list = [...mockCalendarEvents]
+
+  if (opportunityId != null && opportunityId !== '') {
+    const oppId = Number(opportunityId)
+    list = list.filter((e) => e.opportunityId === oppId)
+  } else if (leadId != null && leadId !== '') {
+    const lid = Number(leadId)
+    list = list.filter((e) => e.leadId === lid)
+  } else if (customerId != null && customerId !== '') {
+    const cid = Number(customerId)
+    list = list.filter((e) => e.customerId === cid)
+  } else {
+    return []
+  }
+
+  const cap = Math.max(1, Number(limit) || 5)
+  if (cap === 1) {
+    return pickPrimaryCalendarEventForTimeline(list)
+  }
+  return list.sort((a, b) => new Date(b.start) - new Date(a.start)).slice(0, cap)
+}
+
+/** One timeline row: next upcoming event, or else the most recent. */
+function pickPrimaryCalendarEventForTimeline(events) {
+  if (!events.length) return []
+  const now = Date.now()
+  const upcoming = events
+    .filter((e) => new Date(e.start).getTime() >= now)
+    .sort((a, b) => new Date(a.start) - new Date(b.start))
+  if (upcoming.length) return [upcoming[0]]
+  const past = [...events].sort((a, b) => new Date(b.start) - new Date(a.start))
+  return [past[0]]
+}
+
 export const fetchAppointmentsByCustomerId = async (customerId) => {
   await delay()
   return mockCalendarEvents

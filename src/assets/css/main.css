@@ -49,6 +49,23 @@
   --calendar-event-absence: #FFF1F2;
   --calendar-event-internal: #F3E8FF;
   --calendar-event-other: #F3F4F6;
+  /* Calendar event left-edge accent (matches event type badge colors) */
+  --calendar-event-accent-test-drive: #1d4ed8;
+  --calendar-event-accent-appointment: #15803d;
+  --calendar-event-accent-offsite: #047857;
+  --calendar-event-accent-workshop: #4338ca;
+  --calendar-event-accent-call: #c2410c;
+  --calendar-event-accent-delivery: #0f766e;
+  --calendar-event-accent-meeting: #7e22ce;
+  --calendar-event-accent-training: #be185d;
+  --calendar-event-accent-marketing: #a16207;
+  --calendar-event-accent-leave: #b91c1c;
+  --calendar-event-accent-memo: #374151;
+  --calendar-event-accent-recall: #0e7490;
+  --calendar-event-accent-absence: #be123c;
+  --calendar-event-accent-internal: #6d28d9;
+  --calendar-event-accent-other: #334155;
+  --calendar-timeline-event-accent: #9088e5;
   --calendar-current-time: #ef4444;
 
   --mk-dashboard-card-shadow:
@@ -244,22 +261,71 @@ body,
   background-color: var(--calendar-current-time);
 }
 
-/* Calendar event chip backgrounds */
-.calendar-event-test-drive { background-color: var(--calendar-event-test-drive); }
-.calendar-event-appointment { background-color: var(--calendar-event-appointment); }
-.calendar-event-offsite { background-color: var(--calendar-event-offsite); }
-.calendar-event-workshop { background-color: var(--calendar-event-workshop); }
-.calendar-event-call { background-color: var(--calendar-event-call); }
-.calendar-event-delivery { background-color: var(--calendar-event-delivery); }
-.calendar-event-meeting { background-color: var(--calendar-event-meeting); }
-.calendar-event-training { background-color: var(--calendar-event-training); }
-.calendar-event-marketing { background-color: var(--calendar-event-marketing); }
-.calendar-event-leave { background-color: var(--calendar-event-leave); }
-.calendar-event-memo { background-color: var(--calendar-event-memo); }
-.calendar-event-recall { background-color: var(--calendar-event-recall); }
-.calendar-event-absence { background-color: var(--calendar-event-absence); }
-.calendar-event-internal { background-color: var(--calendar-event-internal); }
-.calendar-event-other { background-color: var(--calendar-event-other); }
+/* Calendar event chip backgrounds + left accent bar */
+.calendar-event-test-drive {
+  background-color: var(--calendar-event-test-drive);
+  border-left: 4px solid var(--calendar-event-accent-test-drive);
+}
+.calendar-event-appointment {
+  background-color: var(--calendar-event-appointment);
+  border-left: 4px solid var(--calendar-event-accent-appointment);
+}
+.calendar-event-offsite {
+  background-color: var(--calendar-event-offsite);
+  border-left: 4px solid var(--calendar-event-accent-offsite);
+}
+.calendar-event-workshop {
+  background-color: var(--calendar-event-workshop);
+  border-left: 4px solid var(--calendar-event-accent-workshop);
+}
+.calendar-event-call {
+  background-color: var(--calendar-event-call);
+  border-left: 4px solid var(--calendar-event-accent-call);
+}
+.calendar-event-delivery {
+  background-color: var(--calendar-event-delivery);
+  border-left: 4px solid var(--calendar-event-accent-delivery);
+}
+.calendar-event-meeting {
+  background-color: var(--calendar-event-meeting);
+  border-left: 4px solid var(--calendar-event-accent-meeting);
+}
+.calendar-event-training {
+  background-color: var(--calendar-event-training);
+  border-left: 4px solid var(--calendar-event-accent-training);
+}
+.calendar-event-marketing {
+  background-color: var(--calendar-event-marketing);
+  border-left: 4px solid var(--calendar-event-accent-marketing);
+}
+.calendar-event-leave {
+  background-color: var(--calendar-event-leave);
+  border-left: 4px solid var(--calendar-event-accent-leave);
+}
+.calendar-event-memo {
+  background-color: var(--calendar-event-memo);
+  border-left: 4px solid var(--calendar-event-accent-memo);
+}
+.calendar-event-recall {
+  background-color: var(--calendar-event-recall);
+  border-left: 4px solid var(--calendar-event-accent-recall);
+}
+.calendar-event-absence {
+  background-color: var(--calendar-event-absence);
+  border-left: 4px solid var(--calendar-event-accent-absence);
+}
+.calendar-event-internal {
+  background-color: var(--calendar-event-internal);
+  border-left: 4px solid var(--calendar-event-accent-internal);
+}
+.calendar-event-other {
+  background-color: var(--calendar-event-other);
+  border-left: 4px solid var(--calendar-event-accent-other);
+}
+
+.calendar-timeline-event-accent {
+  background-color: var(--calendar-timeline-event-accent);
+}
 
 .bg-ai-gradient {
   background: var(--ai-gradient);

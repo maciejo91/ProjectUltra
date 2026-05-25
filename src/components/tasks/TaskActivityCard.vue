@@ -26,11 +26,10 @@
       </SegmentedControl>
     </div>
 
-    <div class="flex min-w-0 flex-col">
+    <div class="flex min-w-0 flex-col pb-2">
       <ActivityTimeline
         v-if="sortedActivities.length > 0"
         :activities="sortedActivities"
-        :date-label="getActivityTimelineDateLabel(sortedActivities, t)"
         :timeline-variant="timelineVariant"
         :show-thread-action="true"
         @activity-click="handleActivityClick"
@@ -107,7 +106,6 @@
           <ActivityTimeline
             v-if="threadDialogActivities.length > 0"
             :activities="threadDialogActivities"
-            :date-label="''"
             :timeline-variant="timelineVariant"
             :show-thread-action="false"
             @activity-click="handleActivityClick"
@@ -132,7 +130,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, toRef } from 'vue'
 import {
   MessagesSquare,
   Clock,
@@ -149,14 +147,15 @@ import {
 } from '@motork/component-library/future/primitives'
 import { useI18n } from 'vue-i18n'
 import {
-  getActivityTimelineDateLabel,
   getActivityIconKind,
-  getCallTranscriptLines
+  getCallTranscriptLines,
+  isAppointmentScheduledActivity
 } from '@/composables/useActivityTimelinePresentation'
 import ActivityTimeline from '@/components/tasks/activity-timeline/ActivityTimeline.vue'
 import RequestTabEmptyState from '@/components/requests/RequestTabEmptyState.vue'
 import SegmentedControl from '@/components/shared/SegmentedControl.vue'
 import WhatsAppBusinessMockModal from '@/components/modals/WhatsAppBusinessMockModal.vue'
+import { useMergedActivityTimeline } from '@/composables/useMergedActivityTimeline'
 
 const { t } = useI18n()
 
@@ -164,6 +163,10 @@ const props = defineProps({
   activities: {
     type: Array,
     default: () => []
+  },
+  entityContext: {
+    type: Object,
+    default: null
   },
   timelineVariant: {
     type: String,
@@ -225,21 +228,30 @@ const threadDialogActivities = computed(() => {
     })
 })
 
-const activityList = computed(() => (Array.isArray(props.activities) ? props.activities : []))
+const { mergedActivities: activityList } = useMergedActivityTimeline(
+  () => props.activities,
+  toRef(props, 'entityContext')
+)
 
 const hasAnyActivities = computed(() => activityList.value.length > 0)
 
 function getActivityFilterCategory(activity) {
   if (getActivityIconKind(activity) === 'system') return 'system-updates'
   if (
-    ['email', 'sms', 'whatsapp', 'call', 'customer-email', 'customer-whatsapp', 'customer-sms'].includes(
+    ['email', 'sms', 'whatsapp', 'call', 'customer-email', 'customer-whatsapp', 'customer-sms', 'ai-agent-action'].includes(
       activity.type
     )
   ) {
     return 'communication'
   }
   if (activity.type === 'note') return 'notes'
-  if (activity.type === 'appointment') return 'appointments'
+  if (
+    activity.type === 'appointment' ||
+    activity.type === 'calendar-event' ||
+    isAppointmentScheduledActivity(activity)
+  ) {
+    return 'appointments'
+  }
   if (activity.type === 'ai-summary') return 'notes'
   return null
 }

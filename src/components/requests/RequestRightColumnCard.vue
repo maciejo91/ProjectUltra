@@ -31,6 +31,7 @@
         <TabsContent value="activity" class="mt-0 data-[state=inactive]:hidden py-2 px-1">
           <TaskActivityCard
             :activities="activities"
+            :entity-context="timelineEntityContext"
             :expanded-summaries="expandedSummaries"
             :show-add-appointment="false"
             @activity-click="$emit('activity-click', $event)"
@@ -52,9 +53,10 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@motork/component-library/future/primitives'
 import TaskActivityCard from '@/components/tasks/TaskActivityCard.vue'
+import { buildTimelineEntityContext } from '@/utils/calendarTimelineMapper'
 import OtherCustomerRequestsCard from '@/components/tasks/OtherCustomerRequestsCard.vue'
 
 const props = defineProps({
@@ -77,6 +79,8 @@ const props = defineProps({
 })
 
 defineEmits(['request-navigate', 'activity-click', 'toggle-summary-expanded', 'add-activity'])
+
+const timelineEntityContext = computed(() => buildTimelineEntityContext(props.request))
 
 const activeTab = ref('activity')
 

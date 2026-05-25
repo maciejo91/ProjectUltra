@@ -11,7 +11,9 @@ export type ActivityType =
   | 'whatsapp'
   | 'customer-whatsapp'
   | 'ai-summary'
+  | 'ai-agent-action'
   | 'appointment'
+  | 'calendar-event'
   | 'created'
   | 'system'
   | 'status'
@@ -36,6 +38,26 @@ export interface ActivityData {
   contactName?: string
   /** Optional thread identifier for grouping messages */
   threadId?: string
+  /** Calendar-event timeline rows */
+  calendarEventId?: number
+  start?: string
+  end?: string
+  bookedAt?: string
+  eventType?: string
+  status?: string
+  team?: string
+  assignee?: string
+  /** AgentSparK action channel */
+  agentAction?: 'call' | 'email' | 'whatsapp' | 'sms'
+  /** Expandable system event (merge, reconciliation, etc.) */
+  richSystemEvent?: boolean
+  systemIcon?: 'info' | 'merge'
+  sectionsTitle?: string
+  summary?: string
+  sections?: Array<{
+    title?: string
+    fields?: Array<{ label: string; value: string }>
+  }>
 }
 
 export interface ActivityRecord {
@@ -68,6 +90,7 @@ export type ActivityTimelineCardAccent =
   | 'call'
   | 'ai'
   | 'appointment'
+  | 'calendarEvent'
   | 'default'
 
 export interface ActivityTimelineHeadlineParts {
@@ -84,5 +107,6 @@ export type ActivityTimelineIconKind =
   | 'messageGreen'
   | 'ai'
   | 'appointment'
+  | 'calendarEvent'
   | 'system'
   | 'file'

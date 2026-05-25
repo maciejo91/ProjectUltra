@@ -248,8 +248,10 @@
                 </div>
 
                 <div
-                  class="flex min-w-0 flex-col gap-4 overflow-hidden rounded-b-lg bg-background max-lg:shrink-0"
-                  :class="mainTab === 'activity' ? '' : 'p-4'"
+                  class="flex min-w-0 flex-col gap-4 rounded-b-lg bg-background max-lg:shrink-0"
+                  :class="[
+                    mainTab === 'activity' ? 'overflow-visible' : 'overflow-hidden p-4'
+                  ]"
                 >
               <template v-if="mainTab === 'overview'">
                 <div class="flex flex-col gap-4">
@@ -316,6 +318,7 @@
                   <TaskActivityCard
                     v-if="showTimeline && request"
                     :activities="requestActivities"
+                    :entity-context="timelineEntityContext"
                     :timeline-variant="request?.type === 'lead' ? 'sophieAnchored' : ''"
                     :expanded-summaries="activityExpandedSummaries"
                     @toggle-summary-expanded="handleActivitySummaryToggle"
@@ -522,6 +525,7 @@ import RequestLeadQualificationTeaser from './RequestLeadQualificationTeaser.vue
 import RequestMessageCard from './RequestMessageCard.vue'
 import SuggestedNextActionCard from './SuggestedNextActionCard.vue'
 import TaskActivityCard from '@/components/tasks/TaskActivityCard.vue'
+import { buildTimelineEntityContext } from '@/utils/calendarTimelineMapper'
 import NoteWidget from '@/components/shared/feed/NoteWidget.vue'
 import AttachmentWidget from '@/components/shared/feed/AttachmentWidget.vue'
 import AddWhatsAppModal from '@/components/modals/AddWhatsAppModal.vue'
@@ -816,6 +820,8 @@ const lqfAssigneeInitials = computed(() => {
 })
 
 const { potentialDuplicates } = useDuplicateDetection(computed(() => props.request))
+
+const timelineEntityContext = computed(() => buildTimelineEntityContext(props.request))
 
 const requestActivities = computed(() => {
   const r = props.request
